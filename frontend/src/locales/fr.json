@@ -1,0 +1,114 @@
+{
+  "common": {
+    "agree": "D'accord",
+    "disagree": "Pas d'accord",
+    "neutral": "Neutre",
+    "undo": "Annuler",
+    "next": "Étape suivante",
+    "submit": "Soumettre l'étude",
+    "loading": "Chargement...",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "cancel": "Annuler",
+    "attention": "Attention",
+    "error": "Erreur",
+    "submitting": "Envoi en cours..."
+  },
+  "layout": {
+    "title": "Q-Method App",
+    "steps": {
+      "welcome": "Bienvenue",
+      "presort": "Questions",
+      "rough": "Tri préliminaire",
+      "fine": "Tri détaillé",
+      "review": "Finalisation"
+    },
+    "mobile_step": "Étape",
+    "language": "Français"
+  },
+  "welcome": {
+    "start": "Commencer l'étude",
+    "consent": {
+      "label": "Je consens à participer à cette étude",
+      "description": "Je comprends que mes données seront traitées de manière anonyme et que je peux me retirer à tout moment.",
+      "error": "Vous devez consentir pour participer."
+    }
+  },
+  "presort": {
+    "title": "À propos de vous",
+    "description": "Veuillez répondre à quelques questions avant de commencer le tri.",
+    "submit": "Continuer vers le tri",
+    "select_placeholder": "Sélectionner...",
+    "error_required": "Ce champ est requis"
+  },
+  "rough": {
+    "header": {
+      "title": "Cette affirmation représente-t-elle votre point de vue ?",
+      "subtitle": "Faites glisser vers la gauche pour « Pas d'accord », vers la droite pour « D'accord », ou vers le bas pour « Neutre ».",
+      "hint": "Vos choix ici ne sont pas définitifs. Cette étape aide simplement à organiser vos pensées avant le tri précis."
+    },
+    "complete": {
+      "title": "Premier tri terminé",
+      "subtitle": "Vous avez catégorisé toutes les affirmations. Nous allons maintenant affiner vos choix."
+    },
+    "instructions": {
+        "swipe": "Glissez ou appuyez pour catégoriser"
+    }
+  },
+  "fine": {
+    "deck": {
+        "title": "Affirmations à trier",
+        "all_placed": "Tout est placé !",
+        "reset": "Réinitialiser",
+        "confirm_reset": "Êtes-vous sûr de vouloir réinitialiser la grille ? Toutes les cartes placées retourneront dans leurs piles."
+    },
+    "toolbar": {
+        "mobile": "Classez de <0>pas d'accord</0> (gauche) à <1>d'accord</1> (droite). Sélectionnez l'affirmation et cliquez à nouveau où vous voulez la placer dans la grille.",
+        "desktop": "Classez de <0>pas d'accord</0> (gauche) à <1>d'accord</1> (droite). Faites glisser les cartes vers la grille."
+    },
+    "tips": {
+        "extremes": "Il est souvent plus facile de commencer par placer les cartes sur lesquelles vous avez l'opinion la plus forte dans les colonnes extrêmes (-4 et +4).",
+        "vertical": "Note : La position verticale n'a pas d'importance. Seul l'ordre de gauche à droite compte."
+    },
+    "legend": {
+        "disagree": "Pas d'accord",
+        "neutral": "Neutre",
+        "agree": "D'accord"
+    },
+    "actions": {
+        "validate": "Valider",
+        "finish": "Terminer le tri",
+        "ready": "Prêt à réviser",
+        "not_ready": "Placez toutes les cartes pour continuer"
+    }
+  },
+  "post": {
+    "title": "Dernières questions",
+    "description": "Vous avez presque fini ! Veuillez prendre un moment pour expliquer vos choix pour les affirmations les plus significatives.",
+    "extreme": {
+        "why": "Pourquoi avez-vous placé ceci ici ?",
+        "placeholder": "Veuillez expliquer votre pensée...",
+        "min_chars": "Veuillez entrer au moins 10 caractères.",
+        "label_agree": "Plutôt d'accord",
+        "label_disagree": "Plutôt pas d'accord"
+    },
+    "missing": {
+        "label": "Y a-t-il une affirmation clé manquante pour refléter votre point de vue ?",
+        "description": "Si oui, veuillez la décrire brièvement ci-dessous.",
+        "placeholder": "Optionnel..."
+    },
+    "general": {
+        "label": "Commentaires généraux",
+        "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
+        "placeholder": "Optionnel..."
+    },
+    "submit": "Soumettre l'étude",
+    "validation_error": "Veuillez compléter tous les commentaires requis (min 10 caractères).",
+    "success": {
+        "title": "Merci !",
+        "message": "Vos réponses ont été soumises avec succès.",
+        "id_label": "Code de Confirmation"
+    }
+  }
+}

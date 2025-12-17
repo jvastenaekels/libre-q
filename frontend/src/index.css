@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile-First Base Styles */
+@layer base {
+  html {
+    font-size: 16px; /* Explicit base size for iOS */
+  }
+}

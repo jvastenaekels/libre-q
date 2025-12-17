@@ -1,0 +1,105 @@
+{
+  "common": {
+    "agree": "Samaa mieltä",
+    "disagree": "Eri mieltä",
+    "neutral": "Neutraali",
+    "undo": "Kumoa",
+    "next": "Seuraava vaihe",
+    "submit": "Lähetä vastaus",
+    "loading": "Ladataan...",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "ok": "OK",
+    "cancel": "Peruuta"
+  },
+  "layout": {
+    "title": "Q-metodi",
+    "steps": {
+      "welcome": "Tervetuloa",
+      "presort": "Taustakysymykset",
+      "rough": "Alustava lajittelu",
+      "fine": "Tarkka lajittelu",
+      "review": "Tarkistus"
+    },
+    "mobile_step": "Vaihe",
+    "language": "Suomi"
+  },
+  "welcome": {
+    "start": "Aloita tutkimus",
+    "consent": {
+      "label": "Suostun osallistumaan tähän tutkimukseen",
+      "description": "Ymmärrän, että tietojani käsitellään nimettömästi ja voin keskeyttää milloin tahansa.",
+      "error": "Sinun on annettava suostumuksesi osallistuaksesi."
+    }
+  },
+  "presort": {
+    "title": "Tietoja sinusta",
+    "description": "Vastaathan muutamaan kysymykseen ennen lajittelun aloittamista.",
+    "submit": "Jatka lajitteluun",
+    "select_placeholder": "Valitse...",
+    "error_required": "Tämä kenttä on pakollinen"
+  },
+  "rough": {
+    "header": {
+      "title": "Edustaako tämä väittämä näkemystäsi?",
+      "subtitle": "Pyyhkäise vasemmalle (eri mieltä), oikealle (samaa mieltä) tai alas (neutraali).",
+      "hint": "Valintasi tässä vaiheessa eivät ole lopullisia. Tämä vaihe auttaa jäsentämään ajatuksiasi ennen tarkkaa lajittelua."
+    },
+    "complete": {
+      "title": "Alustava lajittelu valmis",
+      "subtitle": "Olet luokitellut kaikki väittämät. Nyt tarkennamme valintojasi."
+    },
+    "instructions": {
+        "swipe": "Pyyhkäise tai napauta luokitellaksesi"
+    }
+  },
+  "fine": {
+    "deck": {
+        "title": "Lajiteltavat väittämät",
+        "all_placed": "Kaikki sijoitettu!",
+        "reset": "Tyhjennä ruudukko",
+        "confirm_reset": "Oletko varma, että haluat tyhjentää ruudukon? Kaikki sijoitetut kortit palautuvat pinoihin."
+    },
+    "toolbar": {
+        "mobile": "Järjestä: <0>eri mieltä</0> (vasen) – <1>samaa mieltä</1> (oikea). Napauta asettaaksesi.",
+        "desktop": "Järjestä: <0>eri mieltä</0> (vasen) – <1>samaa mieltä</1> (oikea). Raahaa kortit ruudukkoon."
+    },
+    "tips": {
+        "extremes": "Usein on helpointa aloittaa sijoittamalla ääripäihin (-4 ja +4) ne kortit, joista olet vahvimmin jotain mieltä.",
+        "vertical": "Huomio: Pystysuuntaisella sijainnilla ei ole merkitystä. Vain järjestys vasemmalta oikealle merkitsee."
+    },
+    "legend": {
+        "disagree": "Eri mieltä",
+        "neutral": "Neutraali",
+        "agree": "Samaa mieltä"
+    },
+    "actions": {
+        "validate": "Vahvista",
+        "finish": "Valmis",
+        "ready": "Valmis tarkistettavaksi",
+        "not_ready": "Sijoita kaikki kortit jatkaaksesi"
+    }
+  },
+  "post": {
+    "title": "Viimeiset kysymykset",
+    "description": "Olet melkein valmis! Kerrothan lyhyesti valinnoistasi merkittävimpien väittämien kohdalla.",
+    "extreme": {
+        "why": "Miksi sijoitit tämän tähän?",
+        "placeholder": "Perustele ajatuksesi...",
+        "min_chars": "Kirjoita vähintään 10 merkkiä.",
+        "label_agree": "Samaa mieltä",
+        "label_disagree": "Eri mieltä"
+    },
+    "missing": {
+        "label": "Puuttuuko jokin keskeinen väittämä, joka kuvaisi näkemystäsi?",
+        "description": "Jos kyllä, kuvaile se lyhyesti alla.",
+        "placeholder": "Vapaaehtoinen..."
+    },
+    "general": {
+        "label": "Yleiset kommentit",
+        "description": "Palautetta tutkimuksesta tai muita ajatuksia?",
+        "placeholder": "Vapaaehtoinen..."
+    },
+    "submit": "Lähetä vastaus"
+  }
+}
