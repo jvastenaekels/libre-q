@@ -81,10 +81,10 @@ async def seed_db():
         t_en = StudyTranslation(
             study_id=study.id, 
             language_code="en", 
-            title="Example study", 
+            title="Study Example", 
             description="General description for the welcome page.", 
-            instructions="**Welcome to this research study using Q-methodology.**\n\nThe goal is to understand your unique perspective.\n\nThe process consists of three simple steps:\n1. **Rough Sort**: Quickly categorize statements into 'Agree', 'Disagree', or 'Neutral'.\n2. **Fine Sort**: Arrange the statements on a grid to reflect the nuance of your opinion.\n3. **Questions**: Answer a few background questions.\n\nThere are no right or wrong answers—only your perspective matters. Enjoy!",
-            consent_title="I verify that I am at least 18 years old. I understand that my participation is voluntary and that I can withdraw at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
+            instructions="**Welcome!** This study uses Q-methodology to map different viewpoints on a subject.\n\nYour participation involves 4 smooth steps:\n1. **Context**: A few anonymous questions to get to know you better.\n2. **First Impression**: Instinctively sort statements based on your agreement.\n3. **Distinctions**: Refine your position by arranging cards on a grid.\n4. **Reflections**: Explain your key choices to conclude the study.\n\nThere are no right or wrong answers, only your unique perspective matters.",
+            consent_title="I confirm that I am at least 18 years old. I understand that my participation is voluntary and that I can stop at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
             consent_description="Data will be used solely for scientific research and stored securely.",
             consent_accept="I agree",
             consent_decline="I do not agree",
@@ -93,24 +93,24 @@ async def seed_db():
         t_fr = StudyTranslation(
             study_id=study.id, 
             language_code="fr", 
-            title="Étude exemple", 
+            title="Exemple d'étude", 
             description="Description générale pour la page d'accueil.", 
-            instructions="**Bienvenue dans cette étude de recherche utilisant la méthodologie Q.**\n\nL'objectif est de comprendre votre perspective unique.\n\nLe processus se déroule en trois étapes simples :\n1. **Tri préliminaire** : Catégorisez rapidement les affirmations en 'D\\'accord', 'Pas d\\'accord' ou 'Neutre'.\n2. **Tri détaillé** : Organisez les affirmations sur une grille pour nuancer votre opinion.\n3. **Questions** : Répondez à quelques questions contextuelles.\n\nIl n'y a pas de bonnes ou de mauvaises réponses, seule votre perspective compte. Bonne participation !",
+            instructions="**Bienvenue !** Cette étude utilise la méthode Q pour cartographier les différents points de vue sur un sujet.\n\nVotre participation se déroule en 4 étapes fluides :\n1. **Contexte** : Quelques questions anonymes pour mieux vous connaître.\n2. **Première impression** : Triez instinctivement les affirmations selon votre accord.\n3. **Nuances** : Affinez votre position en organisant les cartes sur une grille.\n4. **Réflexions** : Expliquez vos choix les plus marquants pour clore l'étude.\n\nIl n'y a pas de bonne ou de mauvaise réponse, c'est votre propre vision qui nous intéresse.",
+            consent_title="Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
+            consent_description="Les données seront utilisées uniquement pour la recherche scientifique et stockées de manière sécurisée.",
             ui_labels={
-                "consent_label": "Je certifie avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux me retirer à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
-                "consent_description": "Les données seront utilisées uniquement pour la recherche scientifique et stockées de manière sécurisée.",
                 "start_button": "Commencer l'étude"
             }
         )
         t_fi = StudyTranslation(
             study_id=study.id,
             language_code="fi",
-            title="Esimerkkitutkimus",
+            title="Tutkimusesimerkki",
             description="Yleinen kuvaus aloitussivulle.",
-            instructions="**Tervetuloa tähän Q-metodologiaa käyttävään tutkimukseen.**\n\nTavoitteena on ymmärtää ainutlaatuinen näkökulmasi.\n\nProsessi koostuu kolmesta yksinkertaisesta vaiheesta:\n1. **Alustava lajittelu**: Luokittele väittämät nopeasti ryhmiin 'Samaa mieltä', 'Eri mieltä' tai 'Neutraali'.\n2. **Tarkka lajittelu**: Järjestä väittämät ruudukolle mielipiteesi mukaan.\n3. **Kysymykset**: Vastaa muutamaan taustakysymykseen.\n\nOikeita tai vääriä vastauksia ei ole – vain sinun näkökulmasi merkitsee. Antoisia hetkiä!",
+            instructions="**Tervetuloa!** Tässä tutkimuksessa käytetään Q-metodologiaa erilaisten näkökulmien kartoittamiseen.\n\nOsallistumisesi etenee sujuvasti 4 vaiheessa:\n1. **Taustoitus**: Muutama nimetön kysymys taustasi ymmärtämiseksi.\n2. **Ensivaikutelma**: Lajittele väittämät vaistomaisesti sen mukaan, oletko samaa mieltä.\n3. **Vivahteet**: Tarkenna kantaasi järjestämällä kortit ruudukolle.\n4. **Pohdinta**: Perustele keskeisimmät valintasi tutkimuksen päätteeksi.\n\nOikeita tai vääriä vastauksia ei ole – vain sinun ainutlaatuinen näkökulmasi merkitsee.",
+            consent_title="Vahvistan olevani vähintään 18-vuotias. Ymmärrän, että osallistumiseni on vapaaehtoista ja voin keskeyttää sen milloin tahansa. Suostun tietojeni nimettömään käsittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
+            consent_description="Tietoja käytetään ainoastaan tieteelliseen tutkimukseen ja niitä säilytetään turvallisesti.",
             ui_labels={
-                "consent_label": "Vahvistan olevani vähintään 18-vuotias. Ymmärrän, että osallistumiseni on vapaaehtoista ja voin keskeyttää sen milloin tahansa. Suostun tietojeni nimettömään käsittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
-                "consent_description": "Tietoja käytetään ainoastaan tieteelliseen tutkimukseen ja niitä säilytetään turvallisesti.",
                 "start_button": "Aloita tutkimus"
             }
         )

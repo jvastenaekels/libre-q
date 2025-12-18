@@ -31,7 +31,7 @@
       "presort": "Contexte",
       "rough": "Première impression",
       "fine": "Nuances",
-      "review": "Vue d'ensemble"
+      "review": "Réflexions"
     },
     "mobile_step": "Étape",
     "language": "Français"
@@ -107,8 +107,8 @@
     }
   },
   "post": {
-    "title": "Dernières questions",
-    "description": "Dernière étape ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
+    "title": "Pour conclure",
+    "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
     "extreme": {
         "why": "Qu'est-ce qui, dans votre expérience personnelle, vous a fait placer cette carte ici ?",
         "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
