@@ -16,7 +16,7 @@ vi.mock('../i18n', () => ({
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn()
+    useStudyConfig: vi.fn(() => ({ retry: vi.fn() }))
 }));
 
 // We need to Mock LayoutContext properly or wrap it. StudyLayout uses it.

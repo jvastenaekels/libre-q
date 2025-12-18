@@ -241,5 +241,6 @@ async def get_study(
             "description": getattr(translation, "consent_description", None),
             "accept": getattr(translation, "consent_accept", None),
             "decline": getattr(translation, "consent_decline", None)
-        }
+        },
+        "available_languages": [t.language_code for t in study.translations]
     }

@@ -203,7 +203,9 @@ const StudyLayoutContent: React.FC = () => {
                 {/* Dropdown (Simplified) */}
                 {isLangMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in zoom-in-95">
-                        {['en', 'fr', 'fi'].map((lang) => (
+                        {['en', 'fr', 'fi']
+                            .filter(lang => !config?.available_languages || config.available_languages.includes(lang))
+                            .map((lang) => (
                             <button 
                                 key={lang}
                                 onClick={() => changeLanguage(lang)}
