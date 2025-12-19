@@ -27,17 +27,17 @@ backend/
    ```
 
 2. **Database Initialization**:
-   By default, the app uses **SQLite** (`q_method.db`).
+   By default, the app uses **SQLite** (`q_method.db`). This script creates the database schema and an initial admin user.
 
    ```bash
    python init_db.py
    ```
 
 3. **Seeding**:
-   Populate the database with a default study (includes English, French, and Finnish translations).
+   Populate the database with studies defined in JSON files located in `data/`.
 
    ```bash
-   python seed.py
+   python seed.py data/example-study.json
    ```
 
 4. **Running Locally**:

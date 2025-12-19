@@ -1,0 +1,459 @@
+{
+    "slug": "example-study",
+    "default_language": "en",
+    "grid_config": [
+        {
+            "score": -4,
+            "capacity": 2
+        },
+        {
+            "score": -3,
+            "capacity": 3
+        },
+        {
+            "score": -2,
+            "capacity": 4
+        },
+        {
+            "score": -1,
+            "capacity": 5
+        },
+        {
+            "score": 0,
+            "capacity": 6
+        },
+        {
+            "score": 1,
+            "capacity": 5
+        },
+        {
+            "score": 2,
+            "capacity": 4
+        },
+        {
+            "score": 3,
+            "capacity": 3
+        },
+        {
+            "score": 4,
+            "capacity": 2
+        }
+    ],
+    "presort_config": {
+        "age": {
+            "type": "number",
+            "label": {
+                "en": "Age",
+                "fr": "\u00c2ge",
+                "fi": "Ik\u00e4"
+            },
+            "required": true,
+            "min": 18,
+            "max": 99
+        },
+        "gender": {
+            "type": "select",
+            "options": [
+                {
+                    "value": "Male",
+                    "label": {
+                        "en": "Male",
+                        "fr": "Homme",
+                        "fi": "Mies"
+                    }
+                },
+                {
+                    "value": "Female",
+                    "label": {
+                        "en": "Female",
+                        "fr": "Femme",
+                        "fi": "Nainen"
+                    }
+                },
+                {
+                    "value": "Non-binary",
+                    "label": {
+                        "en": "Non-binary",
+                        "fr": "Non-binaire",
+                        "fi": "Ei-bin\u00e4\u00e4rinen"
+                    }
+                },
+                {
+                    "value": "Prefer not to say",
+                    "label": {
+                        "en": "Prefer not to say",
+                        "fr": "Pr\u00e9f\u00e8re ne pas dire",
+                        "fi": "En halua sanoa"
+                    }
+                }
+            ],
+            "label": {
+                "en": "Gender",
+                "fr": "Genre",
+                "fi": "Sukupuoli"
+            },
+            "required": true
+        },
+        "education": {
+            "type": "select",
+            "options": [
+                {
+                    "value": "High School",
+                    "label": {
+                        "en": "High School",
+                        "fr": "Lyc\u00e9e",
+                        "fi": "Lukio"
+                    }
+                },
+                {
+                    "value": "Bachelor",
+                    "label": {
+                        "en": "Bachelor",
+                        "fr": "Licence",
+                        "fi": "Kandidaatti"
+                    }
+                },
+                {
+                    "value": "Master",
+                    "label": {
+                        "en": "Master",
+                        "fr": "Master",
+                        "fi": "Maisteri"
+                    }
+                },
+                {
+                    "value": "PhD",
+                    "label": {
+                        "en": "PhD",
+                        "fr": "Doctorat",
+                        "fi": "Tohtori"
+                    }
+                },
+                {
+                    "value": "Other",
+                    "label": {
+                        "en": "Other",
+                        "fr": "Autre",
+                        "fi": "Muu"
+                    }
+                }
+            ],
+            "label": {
+                "en": "Education Level",
+                "fr": "Niveau d education",
+                "fi": "Koulutustaso"
+            },
+            "required": true
+        }
+    },
+    "postsort_config": {
+        "extreme_columns": [
+            -4,
+            4
+        ],
+        "ask_missing": true,
+        "ask_general_comment": true
+    },
+    "translations": {
+        "en": {
+            "title": "Study Example",
+            "instructions": "**Welcome!** This study uses Q-methodology to map different viewpoints on a subject.\n\nYour participation involves 4 smooth steps:\n1. **Context**: A few anonymous questions to get to know you better.\n2. **First Impression**: Instinctively sort statements based on your agreement.\n3. **Distinctions**: Refine your position by arranging cards on a grid.\n4. **Reflections**: Explain your key choices to conclude the study.\n\nThere are no right or wrong answers, only your unique perspective matters.",
+            "consent_title": "I confirm that I am at least 18 years old. I understand that my participation is voluntary and that I can stop at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
+            "consent_description": "Data will be used solely for scientific research and stored securely.",
+            "consent_accept": "I agree",
+            "consent_decline": "I do not agree"
+        },
+        "fr": {
+            "title": "Exemple d \u00e9tude",
+            "instructions": "**Bienvenue !** Cette \u00e9tude utilise la m\u00e9thode Q pour cartographier les diff\u00e9rents points de vue sur un sujet.\n\nVotre participation se d\u00e9roule en 4 \u00e9tapes fluides :\n1. **Contexte** : Quelques questions anonymes pour mieux vous conna\u00eetre.\n2. **Premi\u00e8re impression** : Triez instinctivement les affirmations selon votre accord.\n3. **Nuances** : Affinez votre position en organisant les cartes sur une grille.\n4. **R\u00e9flexions** : Expliquez vos choix les plus marquants pour clore l \u00e9tude.\n\nIl n y a pas de bonne ou de mauvaise r\u00e9ponse, c est votre propre vision qui nous int\u00e9resse.",
+            "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l arr\u00eater \u00e0 tout moment. Je consens au traitement anonyme de mes donn\u00e9es \u00e0 des fins de recherche, conform\u00e9ment au RGPD.",
+            "consent_description": "Les donn\u00e9es seront utilis\u00e9es uniquement pour la recherche scientifique et stock\u00e9es de mani\u00e8re s\u00e9curis\u00e9e.",
+            "ui_labels": {
+                "start_button": "Commencer l \u00e9tude"
+            }
+        },
+        "fi": {
+            "title": "Tutkimusesimerkki",
+            "instructions": "**Tervetuloa!** T\u00e4ss\u00e4 tutkimuksessa k\u00e4ytet\u00e4\u00e4n Q-metodologiaa erilaisten n\u00e4k\u00f6kulmien kartoittamiseen.\n\nOsallistumisesi etenee sujuvasti 4 vaiheessa:\n1. **Taustoitus**: Muutama nimet\u00f6n kysymys taustasi ymm\u00e4rt\u00e4miseksi.\n2. **Ensivaikutelma**: Lajittele v\u00e4itt\u00e4m\u00e4t vaistomaisesti sen mukaan, oletko samaa mielt\u00e4.\n3. **Vivahteet**: Tarkenna kantaasi j\u00e4rjest\u00e4m\u00e4ll\u00e4 kortit ruudukolle.\n4. **Pohdinta**: Perustele keskeisimm\u00e4t valintasi tutkimuksen p\u00e4\u00e4tteeksi.\n\nOikeita tai v\u00e4\u00e4ri\u00e4 vastauksia ei ole \u2013 vain sinun ainutlaatuinen n\u00e4k\u00f6kulmasi merkitsee.",
+            "consent_title": "Vahvistan olevani v\u00e4hint\u00e4\u00e4n 18-vuotias. Ymm\u00e4rr\u00e4n, ett\u00e4 osallistumiseni on vapaaehtoista ja voin keskeytt\u00e4\u00e4 sen milloin tahansa. Suostun tietojeni nimett\u00f6m\u00e4\u00e4n k\u00e4sittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
+            "consent_description": "Tietoja k\u00e4ytet\u00e4\u00e4n ainoastaan tieteelliseen tutkimukseen ja niit\u00e4 s\u00e4ilytet\u00e4\u00e4n turvallisesti.",
+            "ui_labels": {
+                "start_button": "Aloita tutkimus"
+            }
+        }
+    },
+    "statements": [
+        {
+            "code": "S1",
+            "translations": {
+                "en": "Statement S1:",
+                "fr": "\u00c9nonc\u00e9 S1:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S1:"
+            }
+        },
+        {
+            "code": "S2",
+            "translations": {
+                "en": "Statement S2: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S2: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S2: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S3",
+            "translations": {
+                "en": "Statement S3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S3: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S4",
+            "translations": {
+                "en": "Statement S4: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S4: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S4: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S5",
+            "translations": {
+                "en": "Statement S5:",
+                "fr": "\u00c9nonc\u00e9 S5:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S5:"
+            }
+        },
+        {
+            "code": "S6",
+            "translations": {
+                "en": "Statement S6: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S6: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S6: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S7",
+            "translations": {
+                "en": "Statement S7: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S7: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S7: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S8",
+            "translations": {
+                "en": "Statement S8: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S8: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S8: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S9",
+            "translations": {
+                "en": "Statement S9:",
+                "fr": "\u00c9nonc\u00e9 S9:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S9:"
+            }
+        },
+        {
+            "code": "S10",
+            "translations": {
+                "en": "Statement S10: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S10: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S10: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S11",
+            "translations": {
+                "en": "Statement S11: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S11: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S11: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S12",
+            "translations": {
+                "en": "Statement S12: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S12: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S12: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S13",
+            "translations": {
+                "en": "Statement S13:",
+                "fr": "\u00c9nonc\u00e9 S13:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S13:"
+            }
+        },
+        {
+            "code": "S14",
+            "translations": {
+                "en": "Statement S14: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S14: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S14: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S15",
+            "translations": {
+                "en": "Statement S15: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S15: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S15: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S16",
+            "translations": {
+                "en": "Statement S16: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S16: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S16: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S17",
+            "translations": {
+                "en": "Statement S17:",
+                "fr": "\u00c9nonc\u00e9 S17:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S17:"
+            }
+        },
+        {
+            "code": "S18",
+            "translations": {
+                "en": "Statement S18: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S18: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S18: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S19",
+            "translations": {
+                "en": "Statement S19: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S19: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S19: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S20",
+            "translations": {
+                "en": "Statement S20: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S20: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S20: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S21",
+            "translations": {
+                "en": "Statement S21:",
+                "fr": "\u00c9nonc\u00e9 S21:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S21:"
+            }
+        },
+        {
+            "code": "S22",
+            "translations": {
+                "en": "Statement S22: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S22: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S22: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S23",
+            "translations": {
+                "en": "Statement S23: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S23: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S23: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S24",
+            "translations": {
+                "en": "Statement S24: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S24: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S24: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S25",
+            "translations": {
+                "en": "Statement S25:",
+                "fr": "\u00c9nonc\u00e9 S25:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S25:"
+            }
+        },
+        {
+            "code": "S26",
+            "translations": {
+                "en": "Statement S26: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S26: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S26: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S27",
+            "translations": {
+                "en": "Statement S27: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S27: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S27: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S28",
+            "translations": {
+                "en": "Statement S28: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S28: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S28: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S29",
+            "translations": {
+                "en": "Statement S29:",
+                "fr": "\u00c9nonc\u00e9 S29:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S29:"
+            }
+        },
+        {
+            "code": "S30",
+            "translations": {
+                "en": "Statement S30: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S30: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S30: Lorem ipsum dolor sit amet."
+            }
+        },
+        {
+            "code": "S31",
+            "translations": {
+                "en": "Statement S31: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fr": "\u00c9nonc\u00e9 S31: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S31: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            }
+        },
+        {
+            "code": "S32",
+            "translations": {
+                "en": "Statement S32: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fr": "\u00c9nonc\u00e9 S32: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S32: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            }
+        },
+        {
+            "code": "S33",
+            "translations": {
+                "en": "Statement S33:",
+                "fr": "\u00c9nonc\u00e9 S33:",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S33:"
+            }
+        },
+        {
+            "code": "S34",
+            "translations": {
+                "en": "Statement S34: Lorem ipsum dolor sit amet.",
+                "fr": "\u00c9nonc\u00e9 S34: Lorem ipsum dolor sit amet.",
+                "fi": "V\u00e4itt\u00e4m\u00e4 S34: Lorem ipsum dolor sit amet."
+            }
+        }
+    ]
+}
