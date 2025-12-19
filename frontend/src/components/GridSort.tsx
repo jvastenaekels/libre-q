@@ -149,17 +149,18 @@ const GridSort: React.FC<GridSortProps> = ({
       const isMobile = window.innerWidth < 1024;
 
       if (isMobile) {
-          // Mobile: Fit to Width primarily, but ensuring it fits Height (Contain)
-          const widthScale = (wrapperW * 0.95) / contentW; // Slightly smaller to be safe
-          const heightScale = (wrapperH * 0.82) / contentH; 
+          // Mobile: Prioritize Width Filling (Readability)
+          const widthScale = (wrapperW * 0.98) / contentW; 
+          const heightScale = (wrapperH * 0.92) / contentH; 
           
-          const scale = Math.min(widthScale, heightScale);
+          // Strategy: Favor width but allow up to 25% vertical overflow before shrinking further
+          const scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.75));
           
           const x = (wrapperW - (contentW * scale)) / 2;
           
-          // Align to Bottom (as requested to show spectrum bar)
-          // We sit exactly on the bottom, with a small padding
-          const y = wrapperH - (contentH * scale) - 5;
+          // Align to Bottom: Keep spectrum bar at the very bottom
+          // Added 2px safety margin
+          const y = wrapperH - (contentH * scale) - 2;
 
           transformRef.current.setTransform(x, y, scale, 200);
       } else {
@@ -312,9 +313,9 @@ const GridSort: React.FC<GridSortProps> = ({
             const state = transformRef.current.instance.transformState;
             
             // 1. Calculate Target Scale
-            // On Mobile: Zoom in by 1.75x from overview
-            // On Desktop: Subtle 1.05x zoom for slight emphasis
-            const targetScale = isMobile ? (state.scale * 1.66) : (state.scale * 1.05);
+            // On Mobile: Zoom in by 1.7x from overview
+            // On Desktop: Subtle 1.1x zoom for slight emphasis
+            const targetScale = isMobile ? (state.scale * 1.7) : (state.scale * 1.1);
 
             // 2. Manual Coordinate Calculation for PERFECT Centering
             const wrapperW = wrapperRef.current.clientWidth;
