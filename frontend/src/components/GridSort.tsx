@@ -314,8 +314,8 @@ const GridSort: React.FC<GridSortProps> = ({
             
             // 1. Calculate Target Scale
             // On Mobile: Zoom in by 1.7x from overview
-            // On Desktop: Subtle 1.1x zoom for slight emphasis
-            const targetScale = isMobile ? (state.scale * 1.7) : (state.scale * 1.1);
+            // On Desktop: 1.25x zoom for emphasis
+            const targetScale = isMobile ? (state.scale * 1.7) : (state.scale * 1.25);
 
             // 2. Manual Coordinate Calculation for PERFECT Centering
             const wrapperW = wrapperRef.current.clientWidth;
