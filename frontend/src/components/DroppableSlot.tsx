@@ -20,7 +20,7 @@ const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, 
       style={style} // Apply style
       {...props}
       className={`
-        rounded border-2 
+        rounded-2xl border-2 
         flex items-center justify-center 
         transition-colors duration-200
         cursor-pointer 

@@ -235,7 +235,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.disagree')}
                     >
                         {/* Unified: Frown + Text for all screens */}
@@ -263,7 +263,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.agree')}
                     >
                         {/* Unified: Smile + Text for all screens */}
@@ -279,7 +279,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleNeutral, opacity: opacityNeutral }}
                         onClick={() => handleVote('neutral')}
-                        className="w-[18.2rem] h-[5.6rem] rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
+                        className="w-[18.2rem] h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
                         aria-label={t('common.neutral')}
                     >
                          {/* Unified: Meh + Text for all screens */}

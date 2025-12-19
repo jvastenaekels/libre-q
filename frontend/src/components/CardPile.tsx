@@ -45,8 +45,8 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
       {/* 1. Underlying Stack Visuals (Pseudo-depth) */}
       {!isEmpty && (
         <div aria-hidden="true">
-            <div className={`absolute top-1 left-1 w-full h-full rounded-lg border ${config.borderColor} bg-white opacity-50 z-0`} />
-            <div className={`absolute top-2 left-2 w-full h-full rounded-lg border ${config.borderColor} bg-white opacity-30 z-[-1]`} />
+            <div className={`absolute top-1 left-1 w-full h-full rounded-2xl border ${config.borderColor} bg-white opacity-50 z-0`} />
+            <div className={`absolute top-2 left-2 w-full h-full rounded-2xl border ${config.borderColor} bg-white opacity-30 z-[-1]`} />
         </div>
       )}
 
@@ -58,7 +58,7 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
               // Empty State
               <div 
                   className={`
-                      w-full h-full rounded-lg border-2 border-dashed ${config.borderColor} ${config.bgColor}
+                      w-full h-full rounded-2xl border-2 border-dashed ${config.borderColor} ${config.bgColor}
                       flex flex-col items-center justify-center gap-2 opacity-50
                   `}
                   aria-label={t('fine.deck.all_placed')}

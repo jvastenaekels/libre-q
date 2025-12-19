@@ -824,7 +824,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                                                 height: cardDimensions.height 
                                                             }}
                                                             className={`
-                                                                border-2 border-dashed border-slate-300/80 rounded-xl 
+                                                                border-2 border-dashed border-slate-300/80 rounded-2xl 
                                                                 flex items-center justify-center
                                                                 ${columnTint} bg-opacity-40
                                                                 transition-all duration-300

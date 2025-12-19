@@ -117,7 +117,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
                 }}
                 className={`
                     w-full h-full
-                    bg-white rounded-lg shadow-sm border 
+                    bg-white rounded-2xl shadow-sm border 
                     ${isSelected 
                         ? 'border-blue-500 ring-2 ring-blue-300 shadow-md scale-[1.02] z-10' 
                         : 'border-slate-200 hover:border-indigo-300 hover:shadow-md'
