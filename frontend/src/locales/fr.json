@@ -58,7 +58,7 @@
     "header": {
       "title": "Cette affirmation correspond-elle à votre point de vue ?",
       "subtitle": "Glissez à gauche pour « Ne me correspond pas », à droite pour « Me correspond », ou en bas si vous êtes indécis.",
-      "hint": "Fiez-vous à votre première impression. Cette étape sert à organiser vos pensées avant le classement final."
+      "hint": "Fiez-vous à votre première impression. Ce tri rapide organise vos idées et simplifie la suite : vous pourrez affiner chaque position lors de l'étape finale."
     },
     "complete": {
       "title": "Premier tri terminé",

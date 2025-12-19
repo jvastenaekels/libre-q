@@ -58,7 +58,7 @@
     "header": {
       "title": "Does this statement represent your point of view?",
       "subtitle": "Swipe left if it is unlike your view, right if it is like your view, or down if unsure.",
-      "hint": "Trust your first impression. This step helps organize your thoughts before the detailed sorting."
+      "hint": "Trust your first impression. This quick sort organizes your thoughts and simplifies the next steps: you will be able to refine every position during the final stage."
     },
     "complete": {
       "title": "Rough sort complete",

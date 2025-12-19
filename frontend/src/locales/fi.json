@@ -58,7 +58,7 @@
     "header": {
       "title": "Vastaako tämä väite sinun näkemystäsi?",
       "subtitle": "Pyyhkäise vasemmalle, jos se ei vastaa näkemystäsi, oikealle jos se vastaa, tai alas jos olet epävarma.",
-      "hint": "Luota ensivaikutelmaasi. Tämä vaihe auttaa jäsentämään ajatuksiasi ennen tarkempaa lajittelua."
+      "hint": "Luota ensivaikutelmaasi. Tämä alustava lajittelu jäsentää ajatuksesi ja tekee jatkosta helpompaa: voit tarkentaa jokaista sijaintia lopullisessa vaiheessa."
     },
     "complete": {
       "title": "Alustava lajittelu valmis",
