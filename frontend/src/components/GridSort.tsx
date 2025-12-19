@@ -555,7 +555,7 @@ const GridSort: React.FC<GridSortProps> = ({
                     className={`
                         ${activeCards.length === 0 
                             ? 'flex w-full h-full justify-center items-center' 
-                            : 'flex flex-row lg:grid lg:grid-cols-1 2xl:lg:grid-cols-2 gap-2 lg:gap-3'}
+                            : 'flex flex-row lg:grid lg:grid-cols-2 gap-2 lg:gap-3'}
                   `}>
                       <AnimatePresence mode="popLayout">
                           {activeCards.length > 0 ? activeCards.map(card => (
@@ -566,7 +566,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                   animate={{ x: 0, opacity: 1 }}
                                   exit={{ x: -20, opacity: 0 }}
                                   transition={{ duration: 0.4, ease: "easeOut" }}
-                                  className="flex-none w-[120px] sm:w-[140px] lg:w-full lg:max-w-[220px] mx-auto"
+                                  className="flex-none w-[120px] sm:w-[140px] lg:w-full mx-auto"
                               >
                                      <SortableCard 
                                        key={card.id}
