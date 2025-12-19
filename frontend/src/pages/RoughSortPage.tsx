@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMotionValue, useTransform, motion } from 'framer-motion';
 import { useStudyStore } from '../store/useStudyStore';
@@ -14,9 +14,7 @@ const RoughSortPage: React.FC = () => {
     const cardStackRef = useRef<CardStackHandle>(null);
     const { t } = useTranslation();
 
-
-
-    const [showTip, setShowTip] = React.useState(true);
+    const [showTip, setShowTip] = useState(true);
 
     // Motion Values lifted from CardStack
     const x = useMotionValue(0);
@@ -58,9 +56,6 @@ const RoughSortPage: React.FC = () => {
     const sortedCount = responses.rough.history.length;
     const currentCard = unsortedCards[0];
     const progress = config ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100 : 0;
-
-    // Hoist "Next" Action when complete - REMOVED for content-aware nav
-    // content-aware: button is now rendered in the body when complete
 
     // --- Micro-interactions ---
 
@@ -111,7 +106,6 @@ const RoughSortPage: React.FC = () => {
     const onVoteComplete = (direction: 'agree' | 'disagree' | 'neutral') => {
         if (currentCard) {
             categorizeCard(currentCard.id, direction);
-            // Reset motion values manually if needed, though card unmount usually handles it
             x.set(0); 
             y.set(0);
         }
@@ -132,6 +126,21 @@ const RoughSortPage: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [currentCard, responses.rough.history.length, undoRoughSort]);
 
+    // Calculate shared font size for buttons (Harmonization)
+    const sharedFontSize = useMemo(() => {
+        if (typeof window === 'undefined' || window.innerWidth >= 1024) return 'text-sm';
+        
+        const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
+        // Extract words and find the longest one
+        const words = labels.flatMap(l => l.split(/[\s/]+/));
+        const maxWordLength = Math.max(...words.map(w => w.length));
+        
+        // Thresholds based on w-20 (80px)
+        if (maxWordLength > 10) return 'text-[10px]';
+        if (maxWordLength > 8) return 'text-xs';
+        return 'text-sm';
+    }, [t]);
+
     if (!config) return null;
 
     // Completed State
@@ -146,7 +155,6 @@ const RoughSortPage: React.FC = () => {
                      {t('rough.complete.subtitle')}
                  </p>
                   
-                {/* Actions: Context-Aware Navigation */}
                   <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
                         onClick={() => navigate(`/study/${slug}/sort`)} 
@@ -180,24 +188,21 @@ const RoughSortPage: React.FC = () => {
 
             {/* 2. Instruction Bar (Visual Separation) */}
             <div className={`flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 overflow-hidden ${sortedCount >= 3 ? 'py-1 max-h-12' : 'py-3 max-h-24'}`}>
-                {/* Desktop Spacer / Mobile Context */}
                 <div className="w-12 lg:w-20 hidden sm:block" />
 
-                {/* Pedagogical Header (Progressive) - Aligned with FineSort / GridSort */}
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
                     <h3 className={`font-bold text-slate-700 leading-tight text-center transition-all duration-500 ${sortedCount >= 3 ? 'text-sm opacity-60 lg:text-lg lg:opacity-100' : 'text-lg sm:text-xl'}`}>
                         {t('rough.header.title')}
                     </h3>
                 </div>
 
-                {/* Desktop Spacer */}
                 <div className="w-12 lg:w-20 hidden sm:block" />
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
                 
-                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable */}
+                {/* FLOATING TIP */}
                 {showTip && (
                     <div className="absolute top-4 left-4 z-40 max-w-xs block select-none pointer-events-auto">
                         <motion.div 
@@ -205,7 +210,6 @@ const RoughSortPage: React.FC = () => {
                             dragConstraints={{ left: 0, right: 0 }}
                             dragElastic={0.8}
                             onDragEnd={(_, info) => {
-                                // Ultra sensitivity: 20px distance or 50 velocity
                                 if (Math.abs(info.offset.x) > 20 || Math.abs(info.velocity.x) > 50) {
                                     setShowTip(false);
                                 }
@@ -235,18 +239,17 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex-none flex flex-col items-center justify-center w-28 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-2"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.disagree')}
                     >
-                        {/* Unified: Frown + Text for all screens */}
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                              <Frown size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                             <span className="text-sm font-bold uppercase tracking-wide">{t('common.disagree')}</span>
+                             <span className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight`}>{t('common.disagree')}</span>
                         </div>
                     </motion.button>
 
-                    {/* Card Zone - Enlarged on mobile */}
-                    <div className="relative w-full max-w-[14rem] sm:max-w-sm md:max-w-md h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 shrink">
+                    {/* Card Zone */}
+                    <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md">
                         <div className="w-full h-full relative">
                             <CardStack 
                                 ref={cardStackRef}
@@ -263,13 +266,12 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex-none flex flex-col items-center justify-center w-28 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-2"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.agree')}
                     >
-                        {/* Unified: Smile + Text for all screens */}
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                             <Smile size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                            <span className="text-sm font-bold uppercase tracking-wide">{t('common.agree')}</span>
+                            <span className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight`}>{t('common.agree')}</span>
                         </div>
                     </motion.button>
                 </div>
@@ -282,14 +284,12 @@ const RoughSortPage: React.FC = () => {
                         className="w-[18.2rem] h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
                         aria-label={t('common.neutral')}
                     >
-                         {/* Unified: Meh + Text for all screens */}
                          <div className="flex items-center gap-2 text-gray-600">
                              <Meh size={20} strokeWidth={2.5} className="opacity-80" />
-                             <span className="text-sm font-bold tracking-wide">{t('common.neutral')}</span>
+                             <span className={`${sharedFontSize} font-bold tracking-wide`}>{t('common.neutral')}</span>
                         </div>
                     </motion.button>
 
-                    {/* Ergonomic Undo Button (Bottom) */}
                     <button
                         onClick={undoRoughSort}
                         disabled={responses.rough.history.length === 0}
@@ -299,12 +299,9 @@ const RoughSortPage: React.FC = () => {
                         {t('common.undo')}
                     </button>
                 </div>
-                
             </div>
-
         </div>
     );
-
 };
 
 export default RoughSortPage;
