@@ -11,6 +11,12 @@ export const useStudyConfig = () => {
 
     useEffect(() => {
         if (!slug) return;
+
+        // Reset session if the slug in URL doesn't match the current config (stale data)
+        if (config && config.slug !== slug) {
+            useStudyStore.getState().resetSession();
+            return;
+        }
         
         const fetchConfig = async () => {
             // Only show full loading state if we don't have a config yet (stale-while-revalidating)

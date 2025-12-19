@@ -18,16 +18,36 @@ const RoughSortPage: React.FC = () => {
 
     const [showTip, setShowTip] = React.useState(true);
 
+    // Motion Values lifted from CardStack
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
     // Set Step 3 on mount
     useEffect(() => {
         setStep(3);
     }, [setStep]);
 
-
-
-    // Motion Values lifted from CardStack
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
+    // Auto-dismiss tip on first interaction (mobile only)
+    useEffect(() => {
+        if (!showTip || typeof window === 'undefined' || window.innerWidth >= 1024) return;
+        
+        const unsubscribeX = x.on('change', (latest) => {
+            if (Math.abs(latest) > 5) {
+                setShowTip(false);
+            }
+        });
+        
+        const unsubscribeY = y.on('change', (latest) => {
+            if (Math.abs(latest) > 5) {
+                setShowTip(false);
+            }
+        });
+        
+        return () => {
+            unsubscribeX();
+            unsubscribeY();
+        };
+    }, [showTip, x, y]);
 
     const unsortedCards = useMemo(() => {
         if (!config) return [];
@@ -77,6 +97,10 @@ const RoughSortPage: React.FC = () => {
     );
 
     const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
+        // Auto-dismiss tip on button click (mobile)
+        if (showTip && typeof window !== 'undefined' && window.innerWidth < 1024) {
+            setShowTip(false);
+        }
         // We now delegate to the card stack to animate first
         if (cardStackRef.current) {
             cardStackRef.current.swipe(direction);
@@ -179,9 +203,10 @@ const RoughSortPage: React.FC = () => {
                         <motion.div 
                             drag="x"
                             dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={0.2}
+                            dragElastic={0.8}
                             onDragEnd={(_, info) => {
-                                if (Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 500) {
+                                // Ultra sensitivity: 20px distance or 50 velocity
+                                if (Math.abs(info.offset.x) > 20 || Math.abs(info.velocity.x) > 50) {
                                     setShowTip(false);
                                 }
                             }}
@@ -190,7 +215,7 @@ const RoughSortPage: React.FC = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 1.5, ease: "easeOut" }}
-                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
+                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
                         >
                             <span className="text-lg">💡</span>
                             <p className="text-sm text-slate-600 leading-relaxed font-medium">
