@@ -46,7 +46,7 @@ if os.path.exists(FRONTEND_DIST):
     async def serve_spa(full_path: str):
         # Check if a specific file is requested (e.g., favicon.ico, manifest.json)
         file_path = os.path.join(FRONTEND_DIST, full_path)
-        if os.path.exists(file_path):
+        if os.path.isfile(file_path):
              return FileResponse(file_path)
         # Otherwise serve index.html
         return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
