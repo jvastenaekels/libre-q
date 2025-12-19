@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStudyStore } from '../store/useStudyStore';
+import { post } from '../api/client';
 
 export const useSubmitStudy = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +25,7 @@ export const useSubmitStudy = () => {
             // Transform Q-Sort data to match backend schema
             // Frontend: { statementId, col, row }
             // Backend: { statement_id, grid_score, card_comment }
-            const qsortPayload = responses.qsort.map(item => {
+            const qsortPayload = responses.qsort.map((item: { statementId: number; col: number; row: number }) => {
                 const colKey = item.col; // col index
                 // Grid config is array of { score, capacity } sorted by col index?
                 // Or map? The type says { score, capacity }[] in store.
@@ -50,23 +51,7 @@ export const useSubmitStudy = () => {
                 }
             };
             
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-
-            const response = await fetch(`${API_BASE_URL}/api/submit`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || 'Submission failed');
-            }
-
-            const data = await response.json();
-            
+            const data = await post<{ confirmation_code: string }>('/api/submit', payload);
             
             if (status === 'completed') {
                 setIsSuccess(true);
@@ -77,9 +62,9 @@ export const useSubmitStudy = () => {
                  console.log('Partial save successful');
             }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            setError(err.message || 'An unexpected error occurred');
+            setError(err instanceof Error ? err.message : 'An unexpected error occurred');
         } finally {
             if (!options?.silent) {
                 setIsLoading(false);
