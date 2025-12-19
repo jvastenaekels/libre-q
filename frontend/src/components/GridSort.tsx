@@ -671,8 +671,18 @@ const GridSort: React.FC<GridSortProps> = ({
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md" role="toolbar" aria-label={t('fine.toolbar.label', 'Grid controls')}>
                         <button 
                             onClick={() => {
-                                if (transformRef.current) {
-                                    transformRef.current.zoomIn(0.2); 
+                                if (transformRef.current && wrapperRef.current) {
+                                    const { scale, positionX, positionY } = transformRef.current.instance.transformState;
+                                    const nextScale = Math.min(3.0, scale + 0.2);
+                                    
+                                    const wrapper = wrapperRef.current;
+                                    const centerX = wrapper.clientWidth / 2;
+                                    const centerY = wrapper.clientHeight / 2;
+                                    
+                                    const nextX = centerX - (centerX - positionX) * (nextScale / scale);
+                                    const nextY = centerY - (centerY - positionY) * (nextScale / scale);
+                                    
+                                    transformRef.current.setTransform(nextX, nextY, nextScale, 300, "easeOut");
                                 }
                             }} 
                             className="p-2 hover:bg-slate-100 rounded text-slate-600" 
@@ -682,8 +692,18 @@ const GridSort: React.FC<GridSortProps> = ({
                         </button>
                         <button 
                             onClick={() => {
-                                if (transformRef.current) {
-                                    transformRef.current.zoomOut(0.2);
+                                if (transformRef.current && wrapperRef.current) {
+                                    const { scale, positionX, positionY } = transformRef.current.instance.transformState;
+                                    const nextScale = Math.max(0.1, scale - 0.2);
+                                    
+                                    const wrapper = wrapperRef.current;
+                                    const centerX = wrapper.clientWidth / 2;
+                                    const centerY = wrapper.clientHeight / 2;
+                                    
+                                    const nextX = centerX - (centerX - positionX) * (nextScale / scale);
+                                    const nextY = centerY - (centerY - positionY) * (nextScale / scale);
+                                    
+                                    transformRef.current.setTransform(nextX, nextY, nextScale, 300, "easeOut");
                                 }
                             }} 
                             className="p-2 hover:bg-slate-100 rounded text-slate-600" 
