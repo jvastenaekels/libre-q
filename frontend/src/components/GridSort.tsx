@@ -238,11 +238,16 @@ const GridSort: React.FC<GridSortProps> = ({
         // Disable auto-fit during card selection to prevent zoom when statement bar updates
         setAutoFitEnabled(false);
     } else if (!selectedCardId) {
-        // Re-enable auto-fit after a delay when selection is cleared
-        const timer = setTimeout(() => setAutoFitEnabled(true), 500);
-        return () => clearTimeout(timer);
+        // We DON'T automatically re-enable auto-fit just because selection is cleared.
+        // This prevents the de-zoom when a card is placed.
+        // Auto-fit will only be re-enabled when the pile changes or via manual reset.
     }
   }, [selectedCardId, calculateOptimalSize]);
+
+  // Handle Pile Changes specifically to re-enable auto-fit for the new zone
+  useEffect(() => {
+    setAutoFitEnabled(true);
+  }, [activePile]);
 
   useEffect(() => {
       // Logic for transient transition could go here if needed in the future
@@ -303,7 +308,7 @@ const GridSort: React.FC<GridSortProps> = ({
             // 1. Calculate Target Scale
             // On Mobile: Zoom in by 1.75x from overview
             // On Desktop: Subtle 1.05x zoom for slight emphasis
-            const targetScale = isMobile ? (state.scale * 1.75) : (state.scale * 1.05);
+            const targetScale = isMobile ? (state.scale * 1.66) : (state.scale * 1.05);
 
             // 2. Manual Coordinate Calculation for PERFECT Centering
             const wrapperW = wrapperRef.current.clientWidth;
@@ -664,10 +669,26 @@ const GridSort: React.FC<GridSortProps> = ({
                 
                 {/* FLOATING CONTROLS (Top Right now for Mobile Compat) */}
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md" role="toolbar" aria-label={t('fine.toolbar.label', 'Grid controls')}>
-                        <button onClick={() => transformRef.current?.zoomIn()} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_in')}>
+                        <button 
+                            onClick={() => {
+                                if (transformRef.current) {
+                                    transformRef.current.zoomIn(0.2); 
+                                }
+                            }} 
+                            className="p-2 hover:bg-slate-100 rounded text-slate-600" 
+                            aria-label={t('fine.toolbar.zoom_in')}
+                        >
                             <ZoomIn size={20} aria-hidden="true" />
                         </button>
-                        <button onClick={() => transformRef.current?.zoomOut()} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_out')}>
+                        <button 
+                            onClick={() => {
+                                if (transformRef.current) {
+                                    transformRef.current.zoomOut(0.2);
+                                }
+                            }} 
+                            className="p-2 hover:bg-slate-100 rounded text-slate-600" 
+                            aria-label={t('fine.toolbar.zoom_out')}
+                        >
                             <ZoomOut size={20} aria-hidden="true" />
                         </button>
                         <div className="h-px bg-slate-200 my-0.5" aria-hidden="true"></div>
@@ -832,7 +853,11 @@ const GridSort: React.FC<GridSortProps> = ({
                                 </div>
 
                                     {/* 2. THE BOTTOM SPECTRUM LEGEND */}
-                                    <div className="w-full max-w-[90%] flex flex-col gap-3 pt-4 border-t border-slate-200/50" role="complementary" aria-label={t('fine.legend.label', 'Spectrum legend')}>
+                                    <div 
+                                        className="w-full flex flex-col gap-3 pt-4 border-t border-slate-200/50" 
+                                        role="complementary" 
+                                        aria-label={t('fine.legend.label', 'Spectrum legend')}
+                                    >
                                          {/* Labels */}
                                           <div className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4">
                                               {(() => {
