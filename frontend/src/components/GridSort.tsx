@@ -42,6 +42,7 @@ const GridSort: React.FC<GridSortProps> = ({
   const [dimmingActive, setDimmingActive] = useState(false);       // Controls Dimming
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
   const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
+  const [autoFitEnabled, setAutoFitEnabled] = useState(true); // Control auto-fit to prevent zoom during interactions
 
   // Initial Auto-Fit & Delayed Smart Focus
   useEffect(() => {
@@ -234,6 +235,12 @@ const GridSort: React.FC<GridSortProps> = ({
     // Auto-close tips on mobile when a card is selected
     if (selectedCardId && window.innerWidth < 1024) {
         setClosedTips({ extremes: true, vertical: true });
+        // Disable auto-fit during card selection to prevent zoom when statement bar updates
+        setAutoFitEnabled(false);
+    } else if (!selectedCardId) {
+        // Re-enable auto-fit after a delay when selection is cleared
+        const timer = setTimeout(() => setAutoFitEnabled(true), 500);
+        return () => clearTimeout(timer);
     }
   }, [selectedCardId, calculateOptimalSize]);
 
@@ -357,10 +364,12 @@ const GridSort: React.FC<GridSortProps> = ({
 
   // Panning Trigger
   useEffect(() => {
+     // Skip auto-fit if disabled (during card selection)
+     if (!autoFitEnabled) return;
      // Wait for DOM
      const t = setTimeout(performAutoFit, 100);
      return () => clearTimeout(t);
-  }, [cardDimensions]);
+  }, [cardDimensions, autoFitEnabled]);
 
   return (
     // MAIN CONTAINER: Flex Column Reverse for Mobile (Deck at bottom), Row for Desktop
