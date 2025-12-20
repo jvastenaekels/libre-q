@@ -9,6 +9,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useStudyStore } from '../store/useStudyStore';
+import { useLocation } from 'react-router-dom';
 
 const CardZoomOverlay: React.FC = () => {
     const zoomedCard = useStudyStore((state) => state.zoomedCard);
@@ -23,6 +24,12 @@ const CardZoomOverlay: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Clear overlay on navigation
+    const location = useLocation();
+    React.useEffect(() => {
+        setZoomedCard(null);
+    }, [location.pathname, setZoomedCard]);
+
     return createPortal(
         <AnimatePresence>
             {zoomedCard && (
@@ -32,10 +39,10 @@ const CardZoomOverlay: React.FC = () => {
                     exit={{ opacity: 0 }}
                     // Desktop: Bottom Left Bubble | Mobile: Full Width Bottom Sheet
                     className={`
-                        fixed z-[9999] pointer-events-none flex 
+                        fixed z-[9999] flex 
                         ${isMobile 
-                            ? 'inset-x-0 bottom-0 items-end justify-center' 
-                            : 'bottom-8 left-8 items-end justify-start max-w-sm'
+                            ? 'inset-x-0 bottom-0 items-end justify-center pointer-events-auto' 
+                            : 'bottom-8 left-8 items-end justify-start max-w-sm pointer-events-none'
                         }
                     `}
                     onClick={() => isMobile && setZoomedCard(null)} // Dismiss on tap for mobile
@@ -54,6 +61,7 @@ const CardZoomOverlay: React.FC = () => {
                             : { scale: 0.9, x: -20, opacity: 0 }
                         }
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                        onClick={(e) => e.stopPropagation()} // Prevent dismissal when clicking content
                         className={`
                             relative bg-white shadow-2xl pointer-events-auto
                             ${isMobile 
