@@ -251,16 +251,31 @@ const GridSort: React.FC<GridSortProps> = ({
      return () => clearTimeout(t);
   }, [cardDimensions, autoFitEnabled]);
 
+  // 4. Derived: active statement for the hub
+  const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
+  const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
+
   return (
-    <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden">
+    <div className="flex flex-col-reverse lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden">
       
        {/* PANEL: THE GRID (Canvas) */}
-      <div className="flex-1 h-full bg-slate-50 relative flex flex-col overflow-hidden order-1 lg:order-2">
-            {/* Desktop Instructions */}
+      <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden">
+            {/* Desktop-only Instructions + Statement Hub */}
             <div className={`hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20`}>
-                <span className="text-xl font-bold text-slate-700 text-center leading-tight">
-                    <Trans i18nKey="fine.toolbar.desktop" components={[<strong className="text-red-600" key="0" />, <strong className="text-green-600" key="1" />]} />
-                </span>
+                <AnimatePresence mode="wait">
+                    {selectedCard ? (
+                        <motion.div key="dsk-st" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
+                            <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-0.5">{t('fine.deck.selected_card', 'Active Statement')}</span>
+                            <span className="text-sm font-bold text-slate-700 text-center leading-tight line-clamp-2 max-w-2xl px-8">
+                                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
+                            </span>
+                        </motion.div>
+                    ) : (
+                        <motion.span key="dsk-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-xl font-bold text-slate-700 text-center leading-tight">
+                            <Trans i18nKey="fine.toolbar.desktop" components={[<strong className="text-red-600" key="0" />, <strong className="text-green-600" key="1" />]} />
+                        </motion.span>
+                    )}
+                </AnimatePresence>
             </div>
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
@@ -391,40 +406,38 @@ const GridSort: React.FC<GridSortProps> = ({
           w-full lg:w-[320px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
-          flex flex-col h-[220px] lg:h-full transition-all duration-300
-          overflow-hidden pb-safe lg:pb-0 order-2 lg:order-1
+          flex flex-col h-[240px] lg:h-full transition-all duration-300
+          overflow-hidden pb-safe lg:pb-0
       ">
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
-                  {(() => {
-                      const isMob = typeof window !== 'undefined' && window.innerWidth < 1024;
-                      const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-                      const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
-                      if (!isMob) return null;
-                      return (
-                          <div className="mb-3">
-                              <AnimatePresence mode="wait">
-                                  {selectedCard ? (
-                                      <motion.div key="st-bar" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm"
-                                      >
-                                          <div className="text-sm font-bold text-indigo-700 text-center leading-tight">
-                                              <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
-                                          </div>
-                                          <button onClick={() => onCardClick?.(selectedCard.id)} className="flex-none p-1.5 text-indigo-400"><X size={18} /></button>
-                                      </motion.div>
-                                  ) : (
-                                      <motion.div key="inst-bar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                          className="text-center py-1 flex items-center justify-center h-[52px]"
-                                      >
-                                          <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2">
-                                              <Trans i18nKey="fine.toolbar.mobile" components={[<strong className="text-red-400" key="0" />, <strong className="text-green-400" key="1" />]} />
-                                          </span>
-                                      </motion.div>
-                                  )}
-                              </AnimatePresence>
-                          </div>
-                      );
-                  })()}
+                  {/* UNIFIED MOBILE INFO HUB (Thumb Zone) */}
+                  <div className="lg:hidden mb-3">
+                      <AnimatePresence mode="wait">
+                          {selectedCard ? (
+                              <motion.div key="mob-st" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm"
+                              >
+                                  <div className="flex flex-col gap-0.5 text-center leading-tight">
+                                      <div className="text-sm font-bold text-indigo-700">
+                                          <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
+                                      </div>
+                                      <div className="text-[10px] uppercase tracking-wider text-indigo-400 font-bold animate-pulse">
+                                          {t('fine.toolbar.tap_hint', 'Tap a slot on grid to place')}
+                                      </div>
+                                  </div>
+                                  <button onClick={() => onCardClick?.(selectedCard.id)} className="flex-none p-1.5 text-indigo-400 hover:text-indigo-600 transition-colors"><X size={18} /></button>
+                              </motion.div>
+                          ) : (
+                              <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                  className="text-center py-1 flex items-center justify-center h-[52px]"
+                              >
+                                  <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2">
+                                      <Trans i18nKey="fine.toolbar.mobile" components={[<strong className="text-red-400" key="0" />, <strong className="text-green-400" key="1" />]} />
+                                  </span>
+                              </motion.div>
+                          )}
+                      </AnimatePresence>
+                  </div>
 
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block">{t('fine.deck.title')}</h3>
                   <div className="hidden lg:block mb-4 text-center border-y border-slate-50 py-3">
