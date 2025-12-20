@@ -10,10 +10,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useStudyStore } from '../store/useStudyStore';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const CardZoomOverlay: React.FC = () => {
     const zoomedCard = useStudyStore((state) => state.zoomedCard);
     const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
+    const { t } = useTranslation();
     
     // Simple responsive check
     const [isMobile, setIsMobile] = React.useState(typeof window !== 'undefined' && window.innerWidth < 1024);
@@ -88,7 +90,7 @@ const CardZoomOverlay: React.FC = () => {
                         {isMobile && (
                             <div className="mt-8 text-center">
                                 <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
-                                    Tap to close
+                                    {t('common.tap_to_close', 'Tap to close')}
                                 </span>
                             </div>
                         )}
