@@ -406,7 +406,7 @@ const GridSort: React.FC<GridSortProps> = ({
           w-full lg:w-[320px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
-          flex flex-col h-[240px] lg:h-full transition-all duration-300
+          flex flex-col h-[280px] lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
       ">
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
@@ -415,17 +415,17 @@ const GridSort: React.FC<GridSortProps> = ({
                       <AnimatePresence mode="wait">
                           {selectedCard ? (
                               <motion.div key="mob-st" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm"
+                                  className="w-full flex items-center justify-center gap-2 py-1.5 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm"
                               >
                                   <div className="flex flex-col gap-0.5 text-center leading-tight">
-                                      <div className="text-sm font-bold text-indigo-700">
+                                      <div className="text-xs font-bold text-indigo-700 line-clamp-2">
                                           <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
                                       </div>
-                                      <div className="text-[10px] uppercase tracking-wider text-indigo-400 font-bold animate-pulse">
+                                      <div className="text-[9px] uppercase tracking-wider text-indigo-400 font-bold animate-pulse">
                                           {t('fine.toolbar.tap_hint', 'Tap a slot on grid to place')}
                                       </div>
                                   </div>
-                                  <button onClick={() => onCardClick?.(selectedCard.id)} className="flex-none p-1.5 text-indigo-400 hover:text-indigo-600 transition-colors"><X size={18} /></button>
+                                  <button onClick={() => onCardClick?.(selectedCard.id)} className="flex-none p-1 text-indigo-400 hover:text-indigo-600 transition-colors"><X size={16} /></button>
                               </motion.div>
                           ) : (
                               <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
