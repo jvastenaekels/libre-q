@@ -99,6 +99,7 @@ describe('SortableCard', () => {
     });
 
     it('shows zoom overlay on hover', async () => {
+        vi.useFakeTimers();
         // useStudyStore is REAL here, reset it
         useStudyStore.setState({ zoomedCard: null });
 
@@ -117,21 +118,27 @@ describe('SortableCard', () => {
              fireEvent.mouseEnter(cardContainer);
         });
 
+        // Should NOT appear immediately (due to 300ms delay)
+        expect(screen.getAllByText('Test Card Content').length).toBe(1);
+
+        // Fast-forward 300ms
+        await act(async () => {
+            vi.advanceTimersByTime(310);
+        });
+
         // Zoom portal should appear
-        await waitFor(() => {
-             const textElements = screen.getAllByText('Test Card Content');
-             expect(textElements.length).toBe(2);
-        }, { timeout: 2000 });
+        const textElements = screen.getAllByText('Test Card Content');
+        expect(textElements.length).toBe(2);
 
         // Trigger leave
         await act(async () => {
             fireEvent.mouseLeave(cardContainer);
         });
         
-        await waitFor(() => {
-            const textElements = screen.getAllByText('Test Card Content');
-            expect(textElements.length).toBe(1);
-        }, { timeout: 2000 });
+        const textElementsAfterLeave = screen.getAllByText('Test Card Content');
+        expect(textElementsAfterLeave.length).toBe(1);
+
+        vi.useRealTimers();
     });
 
     it('styling changes when selected', () => {

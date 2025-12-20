@@ -45,6 +45,38 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
 
   const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
   const isZoomed = useStudyStore((state) => state.zoomedCard?.id === id);
+  const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timer on unmount
+  React.useEffect(() => {
+    return () => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+        }
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (isDragging || isOverlay || disableHoverZoom) return;
+    
+    // Clear any existing timer
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    
+    // Set 300ms intent delay
+    hoverTimerRef.current = setTimeout(() => {
+        setZoomedCard({ id, text });
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
+    }
+    if (isZoomed) {
+        setZoomedCard(null);
+    }
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -54,7 +86,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
     ...(dimensions && { width: dimensions.width, height: dimensions.height })
   };
 
-  // ... (switch remains same) ...
   // Typography Logic
   let textSizeClass = '';
   let containerPadding = '';
@@ -87,12 +118,16 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
             {...attributes}
             {...listeners}
             onClick={() => {
+                if (hoverTimerRef.current) {
+                    clearTimeout(hoverTimerRef.current);
+                    hoverTimerRef.current = null;
+                }
                 if (onClick) {
                     onClick();
                 }
             }}
-            onMouseEnter={() => !isDragging && !isOverlay && !disableHoverZoom && setZoomedCard({ id, text })}
-            onMouseLeave={() => isZoomed && setZoomedCard(null)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             className={`
                 relative
                 ${!dimensions ? 'w-full' : ''} ${aspectClass}

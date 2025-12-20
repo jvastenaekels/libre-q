@@ -305,7 +305,7 @@ const FineSortPage: React.FC = () => {
                     isSelected={selectedCardId === statement.id}
                     onClick={() => handleCardClick(statement.id)}
                     dimensions={dimensions}
-                    disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
+                    disableHoverZoom={activeId !== null || (typeof window !== 'undefined' && window.innerWidth < 1024)}
                 />
             );
          }
@@ -328,6 +328,7 @@ const FineSortPage: React.FC = () => {
                     gridColumns={gridColumns}
                     renderSlotContent={renderSlotContent}
                     forcedTipsClosed={responses.qsort.length >= 3}
+                    disableHoverZoom={activeId !== null}
                     
                     // Tap-to-Place Props
                     selectedCardId={selectedCardId}

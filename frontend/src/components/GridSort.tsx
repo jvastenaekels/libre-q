@@ -27,6 +27,7 @@ interface GridSortProps {
   onSlotClick?: (col: number, row: number) => void;
   onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
   forcedTipsClosed?: boolean;
+  disableHoverZoom?: boolean;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -42,7 +43,8 @@ const GridSort: React.FC<GridSortProps> = ({
   onCardClick,
   onSlotClick,
   onDimensionsChange,
-  forcedTipsClosed = false
+  forcedTipsClosed = false,
+  disableHoverZoom = false
 }) => {
   const { t } = useTranslation();
   const [activePile, setActivePile] = useState<PileType>('disagree');
@@ -580,7 +582,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                        onClick={() => onCardClick?.(card.id)}
                                        aspectRatio={cardDimensions.width / cardDimensions.height}
                                        // Only disable hover zoom on mobile browsers to prevent obstructing the grid
-                                       disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
+                                       disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)}
                                    />
                               </motion.div>
                           )) : (

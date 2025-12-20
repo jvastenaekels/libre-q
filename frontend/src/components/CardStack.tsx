@@ -97,6 +97,37 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
     // In our case, key={currentCard.id} remounts it, so explicit reset in swipe might be redundant but safe.
   };
 
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (!isOverflowing) return;
+    
+    // Clear any existing timer
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    
+    // Set 300ms intent delay
+    hoverTimerRef.current = setTimeout(() => {
+        setZoomedCard({ id: statement.id, text: statement.text });
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
+    }
+    if (zoomedCard?.id === statement.id) {
+        setZoomedCard(null);
+    }
+  };
+
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* Dummy Cards for Depth Effect */}
@@ -108,12 +139,18 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         drag
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }} // Snap back origin
         dragElastic={0.7} // Resistance
-        onDragStart={() => setZoomedCard(null)}
+        onDragStart={() => {
+            if (hoverTimerRef.current) {
+                clearTimeout(hoverTimerRef.current);
+                hoverTimerRef.current = null;
+            }
+            setZoomedCard(null);
+        }}
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
-        onMouseEnter={() => isOverflowing && setZoomedCard({ id: statement.id, text: statement.text })}
-        onMouseLeave={() => zoomedCard?.id === statement.id && setZoomedCard(null)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
       >
         {/* Color Overlays */}
