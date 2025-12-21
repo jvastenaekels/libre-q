@@ -62,10 +62,10 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
     // Clear any existing timer
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     
-    // Set 300ms intent delay
+    // Set 500ms intent delay (increased from 300ms for better clickability)
     hoverTimerRef.current = setTimeout(() => {
         setZoomedCard({ id, text });
-    }, 300);
+    }, 500);
   };
 
   const handleMouseLeave = () => {
