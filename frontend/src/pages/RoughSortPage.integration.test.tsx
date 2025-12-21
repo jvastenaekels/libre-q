@@ -8,13 +8,23 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import RoughSortPage from './RoughSortPage';
-import { useStudyStore } from '../store/useStudyStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useUIStore } from '../store/useUIStore';
 
-// Mock Store
-vi.mock('../store/useStudyStore');
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+// Mock Stores
+vi.mock('../store/useConfigStore');
+vi.mock('../store/useResponseStore');
+vi.mock('../store/useSessionStore');
+vi.mock('../store/useUIStore');
+
+const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseUIStore = useUIStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -41,21 +51,19 @@ describe('RoughSortPage Integration', () => {
 
     it('shows "Next" button in page body when rough sort is complete', () => {
         // Mock State: Complete (history contains all IDs)
-        mockUseStudyStore.mockReturnValue({
-            config: mockConfig,
-            responses: {
-                rough: { history: [1] } // All cards sorted
-            },
-            session: { hasConsented: true, currentStep: 3, isSaving: false },
-            categorizeCard: vi.fn(),
-            undoRoughSort: vi.fn(),
-            setStep: vi.fn(),
-            setConfig: vi.fn(),
-            setConfigLoading: vi.fn(),
-            setConfigError: vi.fn(),
-            triggerConfigRefetch: vi.fn(),
-            setZoomedCard: vi.fn()
+        
+        mockUseConfigStore.mockImplementation((selector: any) => selector ? selector({ config: mockConfig }) : { config: mockConfig });
+        
+        mockUseResponseStore.mockImplementation((selector: any) => {
+            const state = { rough: { history: [1] }, categorizeCard: vi.fn(), undoRoughSort: vi.fn() };
+            return selector ? selector(state) : state;
         });
+        
+        const sessionState = { hasConsented: true, currentStep: 3, isSaving: false, setStep: vi.fn(), setLanguage: vi.fn() };
+        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
+        
+        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/rough']}>
@@ -78,21 +86,18 @@ describe('RoughSortPage Integration', () => {
 
     it('does not show "Next" button when incomplete', () => {
          // Mock State: Incomplete
-         mockUseStudyStore.mockReturnValue({
-             config: mockConfig,
-             responses: {
-                 rough: { history: [] } 
-             },
-            session: { hasConsented: true, currentStep: 3, isSaving: false },
-             categorizeCard: vi.fn(),
-             undoRoughSort: vi.fn(),
-             setStep: vi.fn(),
-             setConfig: vi.fn(),
-             setConfigLoading: vi.fn(),
-             setConfigError: vi.fn(),
-             triggerConfigRefetch: vi.fn(),
-             setZoomedCard: vi.fn()
+         mockUseConfigStore.mockImplementation((selector: any) => selector ? selector({ config: mockConfig }) : { config: mockConfig });
+        
+         mockUseResponseStore.mockImplementation((selector: any) => {
+             const state = { rough: { history: [] }, categorizeCard: vi.fn(), undoRoughSort: vi.fn() };
+             return selector ? selector(state) : state;
          });
+         
+         const sessionState = { hasConsented: true, currentStep: 3, isSaving: false, setStep: vi.fn(), setLanguage: vi.fn() };
+         mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
+         
+         const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+         mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
  
          render(
              <MemoryRouter initialEntries={['/study/demo/sort/rough']}>

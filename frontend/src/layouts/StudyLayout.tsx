@@ -8,7 +8,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { Check, Globe, RefreshCw, X } from 'lucide-react';
 import { LayoutProvider, useLayoutState } from '../contexts/LayoutContext';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -25,7 +26,12 @@ const steps = [
 const StudyLayoutContent: React.FC = () => {
     const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
-    const { session, config, configError, configLoading } = useStudyStore();
+    
+    const config = useConfigStore((state) => state.config);
+    const configLoading = useConfigStore((state) => state.isLoading);
+    const configError = useConfigStore((state) => state.error);
+    const session = useSessionStore();
+    
     const location = useLocation();
     // const navigate = useNavigate(); // Removed as stepper is read-only
     const { headerAction } = useLayoutState();
@@ -57,7 +63,7 @@ const StudyLayoutContent: React.FC = () => {
 
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
-        useStudyStore.getState().setLanguage(lng);
+        useSessionStore.getState().setLanguage(lng);
         setIsLangMenuOpen(false);
     };
 
@@ -144,17 +150,7 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Use config title if available, else static default */}
                         {session.currentStep === 1 ? 'Open-Q' : (config?.title || 'Q-Method Study')}
                     </div>
-                    {/* Passive Save Status Indicator */}
-                    <div className="flex items-center gap-1.5">
-                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                                session.isSaving 
-                                    ? 'bg-amber-400 animate-pulse' 
-                                    : 'bg-green-500'
-                            }`} />
-                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-wider hidden sm:inline">
-                                {session.isSaving ? t('common.saving', 'Saving') : t('common.saved', 'Saved')}
-                            </span>
-                        </div>
+
                     {/* Mobile Step Counter (Next to title) */}
                     <span className="md:hidden text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">
                         {t('layout.mobile_step')} {session.currentStep}/{steps.length}

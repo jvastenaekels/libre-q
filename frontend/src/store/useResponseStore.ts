@@ -1,0 +1,186 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { useConfigStore } from './useConfigStore';
+import { useSessionStore } from './useSessionStore';
+
+interface Responses {
+    presort: Record<string, string | number | boolean>;
+    rough: {
+        agree: number[];
+        disagree: number[];
+        neutral: number[];
+        history: number[];
+    };
+    qsort: { statementId: number; col: number; row: number }[];
+    postsort: {
+        card_comments: Record<number, string>;
+        missing_statement: string;
+        general_comment: string;
+    };
+}
+
+interface ResponseActions {
+    setPresortResponse: (data: Record<string, string | number | boolean>) => void;
+    
+    // Rough Sort
+    categorizeCard: (statementId: number, category: 'agree' | 'disagree' | 'neutral') => void;
+    undoRoughSort: () => void;
+
+    // Fine Sort
+    placeCardInGrid: (statementId: number, col: number, row: number) => void;
+    moveCardInGrid: (statementId: number, col: number, row: number) => void;
+    swapCardsInGrid: (id1: number, id2: number) => void;
+    unplaceCard: (statementId: number) => void;
+    resetFineSort: () => void;
+
+    // Post Sort
+    setPostSortResponse: (field: keyof Responses['postsort'], value: string | Record<number, string>) => void;
+    
+    resetResponses: () => void;
+}
+
+const initialResponses: Responses = {
+    presort: {},
+    rough: { agree: [], disagree: [], neutral: [], history: [] },
+    qsort: [],
+    postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
+};
+
+// Helper: Trigger Saving Indicator
+const triggerAutoSave = () => {
+    useSessionStore.getState().setSaving(true);
+    setTimeout(() => {
+        useSessionStore.getState().setSaving(false);
+    }, 800);
+};
+
+export const useResponseStore = create<Responses & ResponseActions>()(
+    persist(
+        (set, get) => ({
+            ...initialResponses,
+
+            setPresortResponse: (data) => {
+                const current = get().presort;
+                if (JSON.stringify(current) === JSON.stringify(data)) return;
+                set({ presort: data });
+                triggerAutoSave();
+            },
+
+            categorizeCard: (statementId, category) => {
+                set((state) => {
+                    const { rough } = state;
+                    return {
+                        rough: {
+                            ...rough,
+                            [category]: [...rough[category], statementId],
+                            history: [...rough.history, statementId]
+                        },
+                        qsort: [] // Reset Fine Sort logic
+                    };
+                });
+                
+                // Downgrade max step? Logic was in useStudyStore. 
+                // We should probably handle step logic in the component or a dedicated controller, 
+                // but strictly keeping it here mimics old behavior.
+                // However, accessing other store to set step is tricky.
+                // Let's stick to data updates. Step regression logic should be in the UI/Page.
+                triggerAutoSave();
+            },
+
+            undoRoughSort: () => {
+                set((state) => {
+                    const { rough } = state;
+                    if (rough.history.length === 0) return state;
+
+                    const lastCardId = rough.history[rough.history.length - 1];
+                    const newHistory = rough.history.slice(0, -1);
+
+                    return {
+                        rough: {
+                            agree: rough.agree.filter(id => id !== lastCardId),
+                            disagree: rough.disagree.filter(id => id !== lastCardId),
+                            neutral: rough.neutral.filter(id => id !== lastCardId),
+                            history: newHistory
+                        },
+                        qsort: []
+                    };
+                });
+            },
+
+            placeCardInGrid: (statementId, col, row) => {
+                const config = useConfigStore.getState().config;
+                if (!config) return;
+
+                const colConfig = config.grid_config?.[col];
+                if (!colConfig) return;
+
+                const state = get();
+                const cardsInCol = state.qsort.filter(c => c.col === col && c.statementId !== statementId);
+                
+                if (cardsInCol.length >= colConfig.capacity) {
+                    console.warn(`Column ${col} is full.`);
+                    return;
+                }
+
+                const filtered = state.qsort.filter(p => p.statementId !== statementId);
+                set({ qsort: [...filtered, { statementId, col, row }] });
+                triggerAutoSave();
+            },
+
+            moveCardInGrid: (statementId, col, row) => {
+                const config = useConfigStore.getState().config;
+                 if (!config) return;
+
+                const colConfig = config.grid_config?.[col];
+                if (!colConfig) return;
+
+                const state = get();
+                const cardsInCol = state.qsort.filter(c => c.col === col && c.statementId !== statementId);
+                
+                if (cardsInCol.length >= colConfig.capacity) {
+                    return;
+                }
+
+                const filtered = state.qsort.filter(p => p.statementId !== statementId);
+                set({ qsort: [...filtered, { statementId, col, row }] });
+            },
+
+            swapCardsInGrid: (id1, id2) => {
+                const state = get();
+                const card1 = state.qsort.find(p => p.statementId === id1);
+                const card2 = state.qsort.find(p => p.statementId === id2);
+
+                if (!card1 || !card2) return;
+
+                const newCard1 = { ...card1, col: card2.col, row: card2.row };
+                const newCard2 = { ...card2, col: card1.col, row: card1.row };
+
+                const others = state.qsort.filter(p => p.statementId !== id1 && p.statementId !== id2);
+                set({ qsort: [...others, newCard1, newCard2] });
+            },
+
+            unplaceCard: (statementId) => {
+                set((state) => ({
+                    qsort: state.qsort.filter(p => p.statementId !== statementId)
+                }));
+            },
+
+            resetFineSort: () => set({ qsort: [] }),
+
+            setPostSortResponse: (field, value) => {
+                set((state) => ({
+                    postsort: {
+                        ...state.postsort,
+                        [field]: value
+                    }
+                }));
+            },
+
+            resetResponses: () => set(initialResponses)
+        }),
+        {
+            name: 'open-q-responses',
+            version: 1
+        }
+    )
+);

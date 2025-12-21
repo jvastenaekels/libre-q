@@ -10,7 +10,8 @@ import Markdown from 'react-markdown';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -26,10 +27,12 @@ const WelcomePage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { 
-        session, config, 
-        setConsent, setToken, setStep 
-    } = useStudyStore();
+    
+    const config = useConfigStore((state) => state.config);
+    const session = useSessionStore();
+    const setConsent = useSessionStore((state) => state.setConsent);
+    const setToken = useSessionStore((state) => state.setToken);
+    const setStep = useSessionStore((state) => state.setStep);
 
     const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<ConsentForm>({
         resolver: zodResolver(consentSchema),

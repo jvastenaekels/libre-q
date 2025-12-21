@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ReactMarkdown from 'react-markdown';
-import { useStudyStore } from '../store/useStudyStore';
+import { useUIStore } from '../store/useUIStore';
 
 interface SortableCardProps {
   id: number;
@@ -43,8 +43,8 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
     isDragging
   } = useSortable({ id });
 
-  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
-  const isZoomed = useStudyStore((state) => state.zoomedCard?.id === id);
+  const setZoomedCard = useUIStore((state) => state.setZoomedCard);
+  const isZoomed = useUIStore((state) => state.zoomedCard?.id === id);
   const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timer on unmount

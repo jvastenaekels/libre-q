@@ -21,7 +21,12 @@ import {
 } from '@dnd-kit/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+// ...
+
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useUIStore } from '../store/useUIStore';
 import { useLayoutAction } from '../contexts/LayoutContext';
 import { Check } from 'lucide-react';
 import GridSort from '../components/GridSort';
@@ -31,46 +36,37 @@ import { useFineSortDrag } from '../hooks/useFineSortDrag';
 const FineSortPage: React.FC = () => {
     // ... hooks ...
 
-    // Custom Collision Strategy:
-    // 1. Priority: Pointer within a slot (Intuitive "under my finger/mouse")
-    // 2. Fallback: Intersection with slot (Coverage)
-    // 3. Last Resort: Closest Center (Magnet behavior)
+    // Custom Collision Strategy (omitted for brevity in replacement, kept in file)
     const collisionStrategy: CollisionDetection = (args) => {
-        // First, check if pointer is strictly inside a droppable
         const pointerCollisions = pointerWithin(args);
-        if (pointerCollisions.length > 0) {
-            return pointerCollisions;
-        }
-
-        // If not, check if the card rect intersects with any droppable
+        if (pointerCollisions.length > 0) return pointerCollisions;
         const rectCollisions = rectIntersection(args);
-        if (rectCollisions.length > 0) {
-            return rectCollisions;
-        }
-
-        // Finally, fallback to searching for the closest center (magnet)
+        if (rectCollisions.length > 0) return rectCollisions;
         return closestCenter(args);
     };
 
-    // ... function continues ...
-    // Update DndContext prop: collisionDetection={collisionStrategy}
-
+    const config = useConfigStore((state) => state.config);
+    const responses = useResponseStore((state) => ({ 
+        rough: state.rough, 
+        qsort: state.qsort 
+    }));
     const { 
-        config, 
-        responses, 
         placeCardInGrid, 
         moveCardInGrid, 
         swapCardsInGrid, 
         unplaceCard,
-        setStep,
-        resetFineSort,
-        setZoomedCard
-    } = useStudyStore();
+        resetFineSort
+    } = useResponseStore();
+    
+    const setStep = useSessionStore((state) => state.setStep);
+    const setZoomedCard = useUIStore((state) => state.setZoomedCard);
 
     const navigate = useNavigate();
     const { slug } = useParams();
     const { setHeaderAction } = useLayoutAction(); // Get Layout Setter
     const { t } = useTranslation();
+
+
     
     // Set Step 4 on mount
     React.useEffect(() => {

@@ -8,13 +8,13 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { useStudyStore } from '../store/useStudyStore';
+import { useUIStore } from '../store/useUIStore';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const CardZoomOverlay: React.FC = () => {
-    const zoomedCard = useStudyStore((state) => state.zoomedCard);
-    const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
+    const zoomedCard = useUIStore((state) => state.zoomedCard);
+    const setZoomedCard = useUIStore((state) => state.setZoomedCard);
     const { t } = useTranslation();
     
     // Simple responsive check

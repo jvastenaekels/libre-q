@@ -7,7 +7,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMotionValue, useTransform, motion } from 'framer-motion';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
 import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +18,18 @@ import { useTranslation } from 'react-i18next';
 const RoughSortPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { config, responses, categorizeCard, undoRoughSort, setStep } = useStudyStore();
+    
+    // Config Store
+    const config = useConfigStore((state) => state.config);
+    
+    // Response Store
+    const responses = useResponseStore((state) => ({ rough: state.rough }));
+    const categorizeCard = useResponseStore((state) => state.categorizeCard);
+    const undoRoughSort = useResponseStore((state) => state.undoRoughSort);
+    
+    // Session Store
+    const setStep = useSessionStore((state) => state.setStep);
+    
     const cardStackRef = useRef<CardStackHandle>(null);
     const { t } = useTranslation();
 

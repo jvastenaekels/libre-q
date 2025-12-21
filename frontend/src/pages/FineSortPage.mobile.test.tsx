@@ -10,11 +10,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useUIStore } from '../store/useUIStore';
 
-// Mock Store
-vi.mock('../store/useStudyStore');
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+// Mock Stores
+vi.mock('../store/useConfigStore');
+vi.mock('../store/useResponseStore');
+vi.mock('../store/useSessionStore');
+vi.mock('../store/useUIStore');
+
+const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseUIStore = useUIStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -31,6 +41,17 @@ global.ResizeObserver = class {
 describe('FineSortPage Mobile Interaction', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Default mocks
+        const defaultSessionState = {
+            token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false,
+            setStep: vi.fn(),
+            setLanguage: vi.fn() 
+        };
+        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(defaultSessionState) : defaultSessionState);
+
+        mockUseUIStore.mockImplementation((selector: any) => selector ? selector({
+            zoomedCard: null, setZoomedCard: vi.fn()
+        }) : { zoomedCard: null, setZoomedCard: vi.fn() });
     });
 
     const mockConfig = {
@@ -41,50 +62,44 @@ describe('FineSortPage Mobile Interaction', () => {
         grid_config: [
             { score: -1, capacity: 1 }, 
             { score: 1, capacity: 1 }
-        ]
+        ],
+        title: 'Demo', description: 'Demo', instructions: 'Demo', presort_config: {}, language_code: 'en'
     };
 
     it('allows "Tap-to-Place" interaction: Select Card -> Tap Slot -> Move', async () => {
-        // 1. Setup State: Card 1 is in Neutral Pile (Deck). Grid is empty.
+        // Setup State
         const placeCardInGridSpy = vi.fn();
         
-        const mockState = {
-            config: {
-                ...mockConfig,
-                title: 'Demo',
-                description: 'Demo',
-                instructions: 'Demo',
-                presort_config: {},
-                language_code: 'en'
-            },
-            responses: {
-                presort: {},
-                rough: { agree: [], disagree: [1], neutral: [], history: [] }, 
-                qsort: [],
-                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
-            },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
-            setStep: vi.fn(),
+        mockUseConfigStore.mockImplementation((selector) => selector({ config: mockConfig }));
+        
+        mockUseResponseStore.mockReturnValue({ // useResponseStore is used for both selector AND actions in component
+            rough: { agree: [], disagree: [1], neutral: [], history: [] },
+            qsort: [],
             placeCardInGrid: placeCardInGridSpy,
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: vi.fn(),
             unplaceCard: vi.fn(),
-            resetFineSort: vi.fn(),
-            setConfig: vi.fn(),
-            setConsent: vi.fn(),
-            setToken: vi.fn(),
-            setPresortResponse: vi.fn(),
-            setPostSortResponse: vi.fn(),
-            categorizeCard: vi.fn(),
-            undoRoughSort: vi.fn(),
-            completeSession: vi.fn(),
-            resetSession: vi.fn(),
-            setLanguage: vi.fn(),
-            setZoomedCard: vi.fn(),
-            zoomedCard: null
+            resetFineSort: vi.fn()
+        });
+        // Note: In component:
+        // const responses = useResponseStore((state) => ({ rough, qsort }))
+        // const actions = useResponseStore()
+        // We need the mock to handle both. simpler to mock implementation? 
+        // Or just mockReturnValue works if the component usage is compatible.
+        // Component usage 1: useResponseStore((state) => ({...})) 
+        // Component usage 2: useResponseStore()
+        
+        // Better mock implementation to handle selector vs no-selector
+        const mockResponsesState = {
+            rough: { agree: [], disagree: [1], neutral: [], history: [] },
+            qsort: [],
+            placeCardInGrid: placeCardInGridSpy,
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+            resetFineSort: vi.fn()
         };
-
-        mockUseStudyStore.mockImplementation((selector) => selector ? selector(mockState) : mockState);
+        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(mockResponsesState) : mockResponsesState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -125,46 +140,24 @@ describe('FineSortPage Mobile Interaction', () => {
         // 1. Setup State: Card 2 in Disagree Pile. Card 1 already in Grid at 0,0.
         const unplaceCardSpy = vi.fn();
         const placeCardInGridSpy = vi.fn();
+        const swapCardsInGridSpy = vi.fn();
 
-        const mockState = {
-            config: {
-                ...mockConfig,
-                title: 'Demo',
-                description: 'Demo',
-                instructions: 'Demo',
-                presort_config: {},
-                language_code: 'en'
-            },
-            responses: {
-                presort: {},
-                rough: { agree: [], disagree: [2], neutral: [], history: [] }, 
-                qsort: [
-                    { statementId: 1, col: 0, row: 0 }
-                ],
-                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
-            },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
-            setStep: vi.fn(),
+        mockUseConfigStore.mockImplementation((selector) => selector({ config: mockConfig }));
+
+        const mockResponsesState = {
+            rough: { agree: [], disagree: [2], neutral: [], history: [] }, 
+            qsort: [
+                { statementId: 1, col: 0, row: 0 }
+            ],
+            postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
             placeCardInGrid: placeCardInGridSpy,
             moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
+            swapCardsInGrid: swapCardsInGridSpy,
             unplaceCard: unplaceCardSpy,
-            resetFineSort: vi.fn(),
-            setConfig: vi.fn(),
-            setConsent: vi.fn(),
-            setToken: vi.fn(),
-            setPresortResponse: vi.fn(),
-            setPostSortResponse: vi.fn(),
-            categorizeCard: vi.fn(),
-            undoRoughSort: vi.fn(),
-            completeSession: vi.fn(),
-            resetSession: vi.fn(),
-            setLanguage: vi.fn(),
-            setZoomedCard: vi.fn(),
-            zoomedCard: null
+            resetFineSort: vi.fn()
         };
-
-        mockUseStudyStore.mockImplementation((selector) => selector ? selector(mockState) : mockState);
+        
+        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(mockResponsesState) : mockResponsesState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>

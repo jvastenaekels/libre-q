@@ -42,7 +42,7 @@
     "description": "Veuillez lire attentivement les instructions.",
     "start": "Commencer l'étude",
     "consent": {
-      "label": "Je certifie avoir au moins 18 ans. Je consens au traitement anonyme de mes données conformément au RGPD.",
+      "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
       "error": "Vous devez accepter les conditions pour continuer."
     },
     "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",

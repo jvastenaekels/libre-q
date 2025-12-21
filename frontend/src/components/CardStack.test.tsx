@@ -45,8 +45,8 @@ describe('CardStack', () => {
         
         const setZoomedCardSpy = vi.fn();
 
-        import('../store/useStudyStore').then(m => {
-            m.useStudyStore.setState({ setZoomedCard: setZoomedCardSpy });
+        import('../store/useUIStore').then(m => {
+            m.useUIStore.setState({ setZoomedCard: setZoomedCardSpy });
         });
 
         render(<CardStackWrapper statement={statement} />);

@@ -10,6 +10,7 @@ import { MemoryRouter } from 'react-router-dom';
 import SortableCard from './SortableCard';
 import CardZoomOverlay from './CardZoomOverlay';
 import { useStudyStore } from '../store/useStudyStore';
+import { useUIStore } from '../store/useUIStore';
 import { act } from 'react';
 
 // Mock dnd-kit hook
@@ -45,6 +46,7 @@ vi.mock('framer-motion', () => ({
 describe('SortableCard', () => {
     beforeEach(() => {
         // Reset store to initial state
+        useUIStore.setState({ zoomedCard: null });
         useStudyStore.setState({ 
             zoomedCard: null,
             session: {
@@ -105,14 +107,14 @@ describe('SortableCard', () => {
 
     it('shows zoom overlay on hover', async () => {
         vi.useFakeTimers();
-        // useStudyStore is REAL here, reset it
-        useStudyStore.setState({ zoomedCard: null });
+        // useUIStore is REAL here, reset it
+        useUIStore.setState({ zoomedCard: null });
 
         render(
-            <>
+            <MemoryRouter>
                 <SortableCard {...defaultProps} />
                 <CardZoomOverlay />
-            </>
+            </MemoryRouter>
         );
         
         const cardContainer = screen.getByText('Test Card Content').closest('.relative');

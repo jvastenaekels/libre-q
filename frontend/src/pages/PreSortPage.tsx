@@ -10,14 +10,21 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { ArrowRight } from 'lucide-react';
 import type { PreSortField } from '../schemas/study';
 
 const PreSortPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { config, setPresortResponse, setStep, responses } = useStudyStore();
+    
+    const config = useConfigStore((state) => state.config);
+    const setStep = useSessionStore((state) => state.setStep);
+    const presortResponse = useResponseStore((state) => state.presort);
+    const setPresortResponse = useResponseStore((state) => state.setPresortResponse);
+    
     const { t, i18n } = useTranslation();
     
     // Generate Dynamic Zod Schema based on config
@@ -54,7 +61,7 @@ const PreSortPage: React.FC = () => {
     const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({
         resolver: zodResolver(dynamicSchema),
         mode: 'onChange',
-        defaultValues: responses.presort
+        defaultValues: presortResponse
     });
 
     // Auto-save form data to store using subscription to avoid render loops

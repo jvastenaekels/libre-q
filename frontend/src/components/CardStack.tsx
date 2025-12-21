@@ -7,7 +7,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { useStudyStore } from '../store/useStudyStore';
+import { useUIStore } from '../store/useUIStore';
 
 interface CardStackProps {
   statement: { id: number; text: string };
@@ -22,8 +22,8 @@ export interface CardStackHandle {
 
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
-  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
-  const zoomedCard = useStudyStore((state) => state.zoomedCard);
+  const setZoomedCard = useUIStore((state) => state.setZoomedCard);
+  const zoomedCard = useUIStore((state) => state.zoomedCard);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
