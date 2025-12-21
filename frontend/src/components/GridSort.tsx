@@ -277,23 +277,6 @@ const GridSort: React.FC<GridSortProps> = ({
       
        {/* PANEL: THE GRID (Canvas) */}
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden">
-            {/* Desktop-only Instructions + Statement Hub */}
-            <div className={`hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20`}>
-                <AnimatePresence mode="wait">
-                    {selectedCard ? (
-                        <motion.div key="dsk-st" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                            <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-0.5">{t('fine.deck.selected_card', 'Active Statement')}</span>
-                            <span className="text-sm font-bold text-slate-700 text-center leading-tight line-clamp-2 max-w-2xl px-8">
-                                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
-                            </span>
-                        </motion.div>
-                    ) : (
-                        <motion.span key="dsk-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-xl font-bold text-slate-700 text-center leading-tight">
-                            <Trans i18nKey="fine.toolbar.desktop" components={[<strong className="text-red-600" key="0" />, <strong className="text-green-600" key="1" />]} />
-                        </motion.span>
-                    )}
-                </AnimatePresence>
-            </div>
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
