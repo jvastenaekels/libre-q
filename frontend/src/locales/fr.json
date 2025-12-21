@@ -77,8 +77,8 @@
       "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
     "toolbar": {
-      "mobile": "Touchez une affirmation pour la sélectionner, puis la grille pour la placer selon son degré de correspondance avec votre point de vue.",
-      "desktop": "Glissez les cartes sur la grille pyramidale en comparant leurs degrés de correspondance avec votre point de vue.",
+      "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
+      "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
       "zoom_in": "Zoom avant",
       "zoom_out": "Zoom arrière",
       "fit_screen": "Ajuster à l'écran",

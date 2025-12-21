@@ -210,7 +210,7 @@ const GridSort: React.FC<GridSortProps> = ({
             {/* Desktop-only Instruction */}
             <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
                 <span className="text-lg font-bold text-slate-700 text-center leading-tight">
-                    Drag cards onto the pyramid grid according to how well they match your view.
+                    {t('fine.toolbar.desktop')}
                 </span>
             </div>
 

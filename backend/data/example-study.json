@@ -164,12 +164,12 @@
             "consent_decline": "I do not agree"
         },
         "fr": {
-            "title": "Exemple d \u00e9tude",
-            "instructions": "**Bienvenue !** Cette \u00e9tude utilise la m\u00e9thode Q pour cartographier les diff\u00e9rents points de vue sur un sujet.\n\nVotre participation se d\u00e9roule en 4 \u00e9tapes fluides :\n1. **Contexte** : Quelques questions anonymes pour mieux vous conna\u00eetre.\n2. **Premi\u00e8re impression** : Triez instinctivement les affirmations selon votre accord.\n3. **Nuances** : Affinez votre position en organisant les cartes sur une grille.\n4. **R\u00e9flexions** : Expliquez vos choix les plus marquants pour clore l \u00e9tude.\n\nIl n y a pas de bonne ou de mauvaise r\u00e9ponse, c est votre propre vision qui nous int\u00e9resse.",
-            "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l arr\u00eater \u00e0 tout moment. Je consens au traitement anonyme de mes donn\u00e9es \u00e0 des fins de recherche, conform\u00e9ment au RGPD.",
+            "title": "Exemple d\u2019\u00e9tude",
+            "instructions": "**Bienvenue !** Cette \u00e9tude utilise la m\u00e9thode Q pour cartographier les diff\u00e9rents points de vue sur un sujet.\n\nVotre participation se d\u00e9roule en 4 \u00e9tapes fluides :\n1. **Contexte** : Quelques questions anonymes pour mieux vous conna\u00eetre.\n2. **Premi\u00e8re impression** : Triez instinctivement les affirmations selon votre accord.\n3. **Nuances** : Affinez votre position en organisant les cartes sur une grille.\n4. **R\u00e9flexions** : Expliquez vos choix les plus marquants pour clore l\u2019\u00e9tude.\n\nIl n y a pas de bonne ou de mauvaise r\u00e9ponse, c\u2019est votre propre vision qui nous int\u00e9resse.",
+            "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l\u2019arr\u00eater \u00e0 tout moment. Je consens au traitement anonyme de mes donn\u00e9es \u00e0 des fins de recherche, conform\u00e9ment au RGPD.",
             "consent_description": "Les donn\u00e9es seront utilis\u00e9es uniquement pour la recherche scientifique et stock\u00e9es de mani\u00e8re s\u00e9curis\u00e9e.",
             "ui_labels": {
-                "start_button": "Commencer l \u00e9tude"
+                "start_button": "Commencer l\u2019\u00e9tude"
             }
         },
         "fi": {

@@ -77,8 +77,8 @@
         "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
     },
   "toolbar": {
-      "mobile": "Tap a card to select it, then tap the grid to place it according to how well it matches your view.",
-      "desktop": "Drag cards onto the pyramid grid according to how well they match your view.",
+      "mobile": "Tap or drag cards to place them on the grid.",
+      "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
       "zoom_in": "Zoom In",
       "zoom_out": "Zoom Out",
       "fit_screen": "Fit to Screen",
