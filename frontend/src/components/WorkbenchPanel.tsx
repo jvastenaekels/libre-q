@@ -29,8 +29,8 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={`
                 absolute bottom-0 left-0 right-0 
-                h-[35vh] lg:h-auto lg:relative lg:flex-1
-                bg-white border-t-4 border-indigo-500 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]
+                h-[35vh] lg:h-auto lg:relative lg:w-[400px] lg:flex-none lg:border-l lg:border-t-0 border-slate-200
+                bg-white border-t-4 border-indigo-500 lg:border-indigo-500 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]
                 z-50 flex flex-col
                 ${className}
             `}
