@@ -6,7 +6,9 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../contexts/LayoutContext';
@@ -15,7 +17,19 @@ import ReactMarkdown from 'react-markdown';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
 
 const PostSortPage: React.FC = () => {
-    const { config, session, responses, setPostSortResponse, setStep } = useStudyStore();
+    const config = useConfigStore(state => state.config);
+    const session = useSessionStore(state => ({
+        isCompleted: state.isCompleted,
+        confirmationCode: state.confirmationCode
+    }));
+    const setStep = useSessionStore(state => state.setStep);
+    
+    const responses = useResponseStore(state => ({
+        qsort: state.qsort,
+        postsort: state.postsort
+    }));
+    const setPostSortResponse = useResponseStore(state => state.setPostSortResponse);
+    
     const { setHeaderAction } = useLayoutAction();
     const { t } = useTranslation();
     const navigate = useNavigate();

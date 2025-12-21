@@ -218,6 +218,31 @@ const FineSortPage: React.FC = () => {
          return null;
     };
 
+    // Modifier to snap the drag overlay center to the cursor
+    const snapCenterToCursor = ({ activatorEvent, draggingNodeRect, transform }: any) => {
+        if (draggingNodeRect && activatorEvent) {
+            const activatorCenter = {
+                x: draggingNodeRect.left + draggingNodeRect.width / 2,
+                y: draggingNodeRect.top + draggingNodeRect.height / 2,
+            };
+
+            const event = 'nativeEvent' in activatorEvent ? activatorEvent.nativeEvent : activatorEvent;
+            const eventX = event instanceof MouseEvent || event instanceof PointerEvent ? event.clientX : (event instanceof TouchEvent ? event.touches[0].clientX : 0);
+            const eventY = event instanceof MouseEvent || event instanceof PointerEvent ? event.clientY : (event instanceof TouchEvent ? event.touches[0].clientY : 0);
+
+            const offsetX = eventX - activatorCenter.x;
+            const offsetY = eventY - activatorCenter.y;
+
+            return {
+                ...transform,
+                x: transform.x + offsetX,
+                y: transform.y + offsetY,
+            };
+        }
+
+        return transform;
+    };
+
     return (
         <DndContext 
             sensors={sensors} 
@@ -225,6 +250,7 @@ const FineSortPage: React.FC = () => {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             autoScroll
+            modifiers={[snapCenterToCursor]}
         >
              <div className="h-full overflow-hidden">
                 <GridSort 
@@ -254,9 +280,12 @@ const FineSortPage: React.FC = () => {
 
              {/* Drag Overlay */}
              {createPortal(
-                <DragOverlay>
+                <DragOverlay dropAnimation={{
+                    duration: 250,
+                    easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+                }}>
                     {activeCardData ? (
-                        <div style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }}>
+                        <div style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center' }}>
                             <SortableCard 
                                 id={activeCardData.id} 
                                 text={activeCardData.text} 

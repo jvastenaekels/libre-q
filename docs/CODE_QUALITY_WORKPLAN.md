@@ -39,17 +39,19 @@ _Goal: Stop the bleeding. Prevent new bad code from entering._
 
 _Goal: Make the code easier to read and safer to change._
 
-- [ ] **Split `useStudyStore`**:
+- [x] **Split `useStudyStore`**:
   - The store is becoming a "God Object".
   - **Refactor**: Split into slices:
     - `useSessionStore`: Auth, Steps, Persistence.
     - `useResponseStore`: Sort data (Rough, Fine, Post).
     - `useUIStore`: Zoom, Modals, Tips (Ephemeral UI state).
+  - _Note: PostSortPage and some tests still rely on legacy store._
 - [ ] **Pattern Enforcement**:
   - **Container/Presenter Pattern**: Separate heavy logic (fetching, calculation) from rendering components.
   - **Custom Hooks**: Extract logic from large components (e.g., `GridSort.tsx` is >400 lines).
-    - Extract `useGridCalculations` (geometry).
-    - Extract `useDeckManagement` (pile handling).
+    - [x] Extract `useGridZoom` (partial).
+    - [ ] Extract `useGridCalculations` (geometry).
+    - [ ] Extract `useDeckManagement` (pile handling).
 - [ ] **Error Boundary Implementation**:
   - Wrap major features (Sort Pages) in granular Error Boundaries to prevent full app crashes.
 

@@ -9,12 +9,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PostSortPage from './PostSortPage';
 import { MemoryRouter } from 'react-router-dom';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { LayoutProvider } from '../contexts/LayoutContext';
 
-// Mock Store
-vi.mock('../store/useStudyStore');
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+// Mock Stores
+vi.mock('../store/useConfigStore');
+vi.mock('../store/useSessionStore');
+vi.mock('../store/useResponseStore');
+
+const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock translation
 vi.mock('react-i18next', () => ({
@@ -32,7 +39,18 @@ describe('PostSortPage', () => {
             { id: 2, text: 'Card 2 (Extreme +4)' },
             { id: 3, text: 'Card 3 (Neutral 0)' }
         ],
-        postsort_config: { extreme_columns: [-4, 4] }
+        postsort_config: { extreme_columns: [-4, 4] },
+        grid_config: [ // Need grid config for col lookup
+             { score: -4, capacity: 1 }, 
+             { score: -3, capacity: 1 }, 
+             { score: -2, capacity: 1 }, 
+             { score: -1, capacity: 1 }, 
+             { score: 0, capacity: 1 }, 
+             { score: 1, capacity: 1 }, 
+             { score: 2, capacity: 1 }, 
+             { score: 3, capacity: 1 }, 
+             { score: 4, capacity: 1 }
+        ]
     };
 
     const mockResponses = {
@@ -52,24 +70,38 @@ describe('PostSortPage', () => {
         const setPostSortResponseSpy = vi.fn();
         const setStepSpy = vi.fn();
 
-        mockUseStudyStore.mockReturnValue({
-            config: mockConfig,
-            responses: mockResponses,
-            setPostSortResponse: setPostSortResponseSpy,
-            setStep: setStepSpy,
-            session: { hasConsented: true, isSaving: false }
+        // 1. Config Store Mock
+        mockUseConfigStore.mockImplementation((selector: any) => {
+             return selector({ config: mockConfig });
+        });
+
+        // 2. Session Store Mock
+        mockUseSessionStore.mockImplementation((selector: any) => {
+             return selector({ 
+                 isCompleted: false, 
+                 confirmationCode: null,
+                 setStep: setStepSpy 
+             });
+        });
+
+        // 3. Response Store Mock
+        mockUseResponseStore.mockImplementation((selector: any) => {
+             return selector({
+                 qsort: mockResponses.qsort,
+                 postsort: mockResponses.postsort,
+                 setPostSortResponse: setPostSortResponseSpy
+             });
         });
 
         return { setPostSortResponseSpy, setStepSpy };
     };
 
     it('renders null if config is missing', () => {
-        mockUseStudyStore.mockReturnValue({ 
-            config: null, 
-            session: { isCompleted: false, isSaving: false }, 
-            responses: { qsort: [], postsort: {} },
-            setStep: vi.fn() 
-        });
+        mockUseConfigStore.mockImplementation((selector: any) => selector({ config: null }));
+        // Other stores still need valid returns
+        mockUseSessionStore.mockImplementation((selector: any) => selector({ isCompleted: false, confirmationCode: null, setStep: vi.fn() }));
+        mockUseResponseStore.mockImplementation((selector: any) => selector({ qsort: [], postsort: {} }));
+        
         const { container } = render(
              <MemoryRouter>
                 <LayoutProvider>
@@ -166,19 +198,18 @@ describe('PostSortPage', () => {
 
     it('persists comments when re-navigating', async () => {
         let externalComments: Record<number, string> = {};
-        vi.mocked(useStudyStore).mockImplementation(() => ({
-            config: mockConfig as any,
-            responses: {
-                ...mockResponses,
-                postsort: { ...mockResponses.postsort, card_comments: externalComments }
-            } as any,
+        
+        // Custom setup for this test to link state update to externalComments
+        mockUseConfigStore.mockImplementation((selector: any) => selector({ config: mockConfig }));
+        mockUseSessionStore.mockImplementation((selector: any) => selector({ isCompleted: false, confirmationCode: null, setStep: vi.fn() }));
+        
+        mockUseResponseStore.mockImplementation((selector: any) => selector({ 
+            qsort: mockResponses.qsort,
+            postsort: { ...mockResponses.postsort, card_comments: externalComments },
             setPostSortResponse: (field: string, val: unknown) => {
-                if (field === 'card_comments') externalComments = val as Record<number, string>;
-            },
-            setStep: vi.fn(),
-            session: { hasConsented: true, isCompleted: false, isSaving: false } as any,
-            triggerConfigRefetch: vi.fn()
-        }) as any);
+                 if (field === 'card_comments') externalComments = val as Record<number, string>;
+            }
+        }));
 
         const { unmount } = render(
             <MemoryRouter>

@@ -10,12 +10,24 @@ import ErrorPage from './ErrorPage';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockResetSession = vi.fn();
+const mockResetConfig = vi.fn();
+const mockResetResponses = vi.fn();
 const mockNavigate = vi.fn();
 
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: () => ({
-        resetSession: mockResetSession
-    })
+vi.mock('../store/useSessionStore', () => ({
+    useSessionStore: {
+        getState: () => ({ resetSession: mockResetSession })
+    }
+}));
+vi.mock('../store/useConfigStore', () => ({
+    useConfigStore: {
+        getState: () => ({ resetConfig: mockResetConfig })
+    }
+}));
+vi.mock('../store/useResponseStore', () => ({
+    useResponseStore: {
+        getState: () => ({ resetResponses: mockResetResponses })
+    }
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -63,6 +75,8 @@ describe('ErrorPage', () => {
         fireEvent.click(resetButton);
 
         expect(mockResetSession).toHaveBeenCalled();
+        expect(mockResetConfig).toHaveBeenCalled();
+        expect(mockResetResponses).toHaveBeenCalled();
         expect(window.location.href).toBe('/');
     });
 

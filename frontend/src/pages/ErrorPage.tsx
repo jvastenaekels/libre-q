@@ -6,18 +6,27 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStudyStore } from '../store/useStudyStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { RefreshCcw, AlertTriangle, Home } from 'lucide-react';
 
 const ErrorPage: React.FC = () => {
   // const error: any = useRouteError(); // Not available in BrowserRouter
   const navigate = useNavigate();
-  const { resetSession } = useStudyStore();
-
+  // We don't need to destructure here since we accessgetState directly for resets
+  
   const handleReset = () => {
-    resetSession();
+    // Atomic reset of all stores
+    useSessionStore.getState().resetSession();
+    useConfigStore.getState().resetConfig();
+    useResponseStore.getState().resetResponses();
+    
     // Also clear localStorage manually to be safe if persist fails
-    localStorage.removeItem('q-method-storage');
+    localStorage.removeItem('q-method-storage'); // Legacy
+    localStorage.removeItem('open-q-session');
+    localStorage.removeItem('open-q-responses');
+    
     window.location.href = '/'; // Hard reload to clear any memory state
   };
 

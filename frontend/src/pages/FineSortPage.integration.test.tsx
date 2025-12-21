@@ -8,23 +8,23 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useUIStore } from '../store/useUIStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
 
-// Mock Store
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: Object.assign(vi.fn(), {
-        getState: vi.fn(() => ({
-            session: { token: null, hasConsented: true, currentStep: 4, isSaving: false },
-            resetSession: vi.fn(),
-            setZoomedCard: vi.fn(),
-        })),
-        setState: vi.fn(),
-        subscribe: vi.fn(),
-    }),
-}));
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+// Mock Stores
+vi.mock('../store/useConfigStore');
+vi.mock('../store/useSessionStore');
+vi.mock('../store/useResponseStore');
+vi.mock('../store/useUIStore');
+
+const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
+const mockUseUIStore = useUIStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -37,9 +37,6 @@ vi.mock('react-i18next', () => ({
     Trans: ({ children, i18nKey }: any) => children || i18nKey,
     initReactI18next: { type: '3rdParty', init: () => {} }
 }));
-
-// Mock Drag and Drop (difficult to test full drag interaction in unit tests, so we mock basics)
-// Or we just test that the button renders if we mock the STATE as empty.
 
 // Mock GridSort to avoid complex DND logic in integration tests
 vi.mock('../components/GridSort', () => ({
@@ -68,28 +65,27 @@ describe('FineSortPage Integration', () => {
 
     it('renders "Finish Sorting" button in Header when grid is full', () => {
         // Mock State: All cards placed
-        // placed in grid -> responses.qsort
-        // piles empty -> responses.rough
-        const state = {
-            config: mockConfig,
-            responses: {
-                rough: { agree: [], disagree: [], neutral: [] },
-                qsort: [
-                    { statementId: 1, col: 0, row: 0 },
-                    { statementId: 2, col: 0, row: 1 }
-                ]
-            },
-            session: { hasConsented: true, currentStep: 4, isSaving: false },
-            setStep: vi.fn(),
-            placeCardInGrid: vi.fn(),
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-            resetFineSort: vi.fn(),
-            setZoomedCard: vi.fn(),
-            zoomedCard: null
+        const configState = { config: mockConfig, isLoading: false };
+        const sessionState = { 
+            currentStep: 4, 
+            hasConsented: true, 
+            isSaving: false,
+            language: 'en',
+            setStep: vi.fn(), 
         };
-        mockUseStudyStore.mockImplementation((selector: any) => selector ? selector(state) : state);
+        const responseState = {
+            rough: { agree: [], disagree: [], neutral: [] },
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 0, row: 1 }
+            ]
+        };
+        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+
+        mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
+        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
+        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(responseState) : responseState);
+        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -102,7 +98,6 @@ describe('FineSortPage Integration', () => {
         );
 
         // Check for Header Action (Desktop/Mobile)
-        // Since we are validating behaviors, we look for "fine.actions.finish" or "fine.actions.validate"
         // Logic says: if isAllPlaced -> "Validate"
         expect(screen.getAllByText(/fine.actions.validate/i).length).toBeGreaterThan(0);
         
@@ -113,19 +108,24 @@ describe('FineSortPage Integration', () => {
 
     it('renders disabled "Finish Sorting" button when grid is NOT full', () => {
         // Mock State: Cards remaining in Neutral pile
-        const state = {
-            config: mockConfig,
-            responses: {
-                rough: { agree: [], disagree: [], neutral: [1, 2] },
-                qsort: []
-            },
-            session: { hasConsented: true, currentStep: 4, isSaving: false },
-            setStep: vi.fn(),
-            resetFineSort: vi.fn(),
-            setZoomedCard: vi.fn(),
-            zoomedCard: null
+        const configState = { config: mockConfig, isLoading: false };
+        const sessionState = { 
+            currentStep: 4, 
+            hasConsented: true, 
+            isSaving: false,
+            language: 'en',
+            setStep: vi.fn(), 
         };
-        mockUseStudyStore.mockImplementation((selector: any) => selector ? selector(state) : state);
+        const responseState = {
+            rough: { agree: [], disagree: [], neutral: [1, 2] },
+            qsort: []
+        };
+        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+
+        mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
+        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
+        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(responseState) : responseState);
+        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>

@@ -6,23 +6,30 @@
 
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStudyStore } from '../store/useStudyStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { RefreshCw } from 'lucide-react';
 
 const ResetPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { resetSession } = useStudyStore();
+    
+    // We access stores directly in useEffect to avoid unnecessary subscriptions
+
 
     useEffect(() => {
-        // Atomic reset
-        resetSession();
+        // Atomic reset of all stores
+        useSessionStore.getState().resetSession();
+        useConfigStore.getState().resetConfig();
+        useResponseStore.getState().resetResponses();
+        
         // Short delay to ensure state clears before redirect
         const timer = setTimeout(() => {
             navigate(`/study/${slug}/welcome`, { replace: true });
         }, 500);
         return () => clearTimeout(timer);
-    }, [resetSession, navigate, slug]);
+    }, [navigate, slug]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">

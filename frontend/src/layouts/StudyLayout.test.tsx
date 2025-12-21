@@ -7,7 +7,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import StudyLayout from './StudyLayout';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 import i18n from '../i18n';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
@@ -27,42 +28,36 @@ vi.mock('../hooks/useStudyConfig', () => ({
     useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
 }));
 
-// We need to Mock LayoutContext properly or wrap it. StudyLayout uses it.
-// StudyLayout wraps itself in LayoutProvider, so we don't need to wrap it externally?
-// Line 191: const StudyLayout ... return <LayoutProvider> ...
-// Yes.
-
 describe('StudyLayout Language Sync', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset and seed store
-        useStudyStore.setState({
+        useConfigStore.setState({
             config: {
                 title: 'Test Study',
                 slug: 'test',
                 statements: [],
                 grid_config: [],
-                available_languages: ['en', 'fr']
+                presort_config: {},
+                postsort_config: {},
+                available_languages: ['en', 'fr'],
+                require_code: false,
+                require_consent: true,
+                consent_text: 'Consent'
             } as any,
-            configLoading: false,
-            configError: null,
-            session: { 
-                token: null, 
-                hasConsented: true, 
-                currentStep: 1, 
-                maxReachedStep: 1, 
-                language: 'en', 
-                isCompleted: false, 
-                confirmationCode: null,
-                isSaving: false
-            },
-            responses: {
-                presort: {},
-                rough: { agree: [], disagree: [], neutral: [], history: [] },
-                qsort: [],
-                postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
-            },
-            zoomedCard: null
+            isLoading: false,
+            error: null
+        });
+        
+        useSessionStore.setState({
+            token: null, 
+            hasConsented: true, 
+            currentStep: 1, 
+            maxReachedStep: 1, 
+            language: 'en', 
+            isCompleted: false, 
+            confirmationCode: null,
+            isSaving: false
         });
     });
 
@@ -79,7 +74,7 @@ describe('StudyLayout Language Sync', () => {
 
         // Change Store Language DIRECTLY (Simulating State Change)
         act(() => {
-            useStudyStore.getState().setLanguage('fi');
+            useSessionStore.getState().setLanguage('fi');
         });
 
         // Verify i18n was updated
@@ -98,14 +93,12 @@ describe('StudyLayout Language Sync', () => {
         fireEvent.click(globeBtn);
 
         // Click French
-        const frBtn = screen.getByText('fr'); // Uppercase in UI? "FR" or "fr"? 
-        // In code: <span className="uppercase">{lang}</span> -> So it renders FR
-        // But map key is 'fr'. Let's check text content.
+        const frBtn = screen.getByText('fr'); 
         
         fireEvent.click(frBtn);
 
         // Verify Store Updated
-        expect(useStudyStore.getState().session.language).toBe('fr');
+        expect(useSessionStore.getState().language).toBe('fr');
         
         // Verify i18n updated
         expect(i18n.changeLanguage).toHaveBeenCalledWith('fr');

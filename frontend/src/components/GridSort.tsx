@@ -359,7 +359,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
        {/* PANEL: WORKBENCH STAGE (Bottom Fixed) */}
        <AnimatePresence>
-            {selectedCardId && (
+            {selectedCardId && isMobile && (
                 <WorkbenchPanel 
                     key="workbench"
                     card={selectedCard || null}
@@ -374,7 +374,7 @@ const GridSort: React.FC<GridSortProps> = ({
        {/* Actually, for simplicity/performance in this revamp, lets conditionally render or use display:none */}
       <div 
         className={`
-          w-full lg:w-[320px] flex-none 
+          w-full lg:w-[360px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
           flex flex-col lg:h-full transition-all duration-300
@@ -422,7 +422,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
               {!isDeckCollapsed && (
                 <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
-                    className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar"
+                    className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:content-start lg:gap-2"
                 >
 {renderDeckCards()}
               </motion.div>

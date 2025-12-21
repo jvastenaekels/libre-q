@@ -10,6 +10,7 @@ import i18n from '../i18n';
 import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { Check, Globe, RefreshCw, X } from 'lucide-react';
 import { LayoutProvider, useLayoutState } from '../contexts/LayoutContext';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -259,7 +260,9 @@ const StudyLayoutContent: React.FC = () => {
                 )}
                 {/* Transition Overlay / Dimming */}
                 <div className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                    <Outlet />
+                    <ErrorBoundary>
+                        <Outlet />
+                    </ErrorBoundary>
                 </div>
             </main>
 
