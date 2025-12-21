@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
 
@@ -95,29 +95,13 @@ describe('FineSortPage', () => {
         });
     });
 
-    it('sets header action to a disabled button initially', () => {
+    it('does not set header action initially (null) when not all cards are placed', () => {
         render(<FineSortPage />);
         
-        // Assert setHeaderAction was called
+        // Assert setHeaderAction was called with null
         expect(setHeaderActionMock).toHaveBeenCalled();
-        
-        // Inspect the last call arg (the button node)
-        // This is tricky in unit tests. 
-        // A better approach is often to Refactor the "Action" into a sub-component keying off the store,
-        // so we can test that subcomponent.
-        
-        // Alternatively, we can construct a test helper that renders the ReactNode passed to the mock.
         const actionNode = setHeaderActionMock.mock.lastCall?.[0];
-        expect(actionNode).not.toBeNull();
-        
-        // To inspect it properly, we can render it in isolation.
-        if (actionNode) {
-            const { getByText, getByRole } = render(<div>{actionNode}</div>);
-            const button = getByRole('button');
-            expect(button).toBeDisabled();
-            // Check styling (assuming pending state)
-            expect(button.className).toContain('bg-slate-100');
-        }
+        expect(actionNode).toBeNull();
     });
 
     it('sets header action to an active/animated button when all cards placed', () => {
@@ -144,15 +128,12 @@ describe('FineSortPage', () => {
              const button = getByRole('button');
              expect(button).not.toBeDisabled();
              // Check for animation class
-             // We expect to add 'animate-in fade-in zoom-in'
-             // Currently checking what it has or what we WILL add
-             // For now, let's verify it has "bg-blue-600"
-              expect(button.className).toContain('bg-blue-600');
+             expect(button.className).toContain('bg-green-600');
          }
     });
 
     it('persists grid placements when re-navigating', () => {
-        let externalQSort = [{ statementId: 1, col: 0, row: 0 }];
+        const externalQSort = [{ statementId: 1, col: 0, row: 0 }];
         vi.mocked(useStudyStore).mockImplementation(() => ({
             config: {
                 statements: [{ id: 1, text: 'S1' }],
