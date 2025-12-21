@@ -138,6 +138,10 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const calculateOptimalSize = React.useCallback(() => {
       if (!wrapperRef.current) return;
+      // Grid Anchoring: Do not resize cards when in Mobile Focus Mode (Deck Collapsed)
+      // This prevents "Layout Thrashing" / Chaos.
+      if (selectedCardId && window.innerWidth < 1024) return;
+
       const wrapper = wrapperRef.current;
       const W = wrapper.clientWidth;
       const H = wrapper.clientHeight;
@@ -161,7 +165,7 @@ const GridSort: React.FC<GridSortProps> = ({
           onDimensionsChange?.(next);
           return next;
       });
-  }, [gridColumns, onDimensionsChange]);
+  }, [gridColumns, onDimensionsChange, selectedCardId]);
 
   useEffect(() => {
       // 1. Perform initial auto-fit
@@ -184,7 +188,11 @@ const GridSort: React.FC<GridSortProps> = ({
 
   // Responsive: Close tips and disable autofit on mobile selection
   useEffect(() => {
-    calculateOptimalSize();
+    // Only calculate if NOT in focus mode (anchoring)
+    if (!selectedCardId || window.innerWidth >= 1024) {
+        calculateOptimalSize();
+    }
+    
     if (selectedCardId && window.innerWidth < 1024) {
         setClosedTips({ extremes: true, vertical: true });
         setAutoFitEnabled(false);
@@ -368,7 +376,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                   <div className="w-full flex items-stretch gap-0 bg-white rounded-lg border-2 border-indigo-500 shadow-md overflow-hidden">
                                       {/* Content Area: Tap to Read/Zoom */}
                                       <div 
-                                          className="flex-1 flex flex-col justify-center p-3 cursor-zoom-in active:bg-indigo-50 transition-colors border-r border-indigo-100 hover:bg-slate-50"
+                                          className="flex-1 flex flex-col justify-center p-3 cursor-zoom-in active:bg-indigo-50 transition-colors border-r border-indigo-100 hover:bg-slate-50 touch-manipulation"
                                           onClick={() => setZoomedCard(selectedCard)}
                                       >
                                           <div className="flex items-center gap-2 mb-1">
@@ -382,7 +390,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
                                       {/* Action Area: Cancel */}
                                       <div 
-                                          className="flex-none w-14 flex items-center justify-center bg-slate-50 cursor-pointer hover:bg-red-50 hover:text-red-500 active:bg-red-100 transition-colors border-l border-slate-100"
+                                          className="flex-none w-14 flex items-center justify-center bg-slate-50 cursor-pointer hover:bg-red-50 hover:text-red-500 active:bg-red-100 transition-colors border-l border-slate-100 touch-manipulation"
                                           onClick={() => onCardClick?.(selectedCard.id)}
                                           title={t('common.cancel')}
                                       >
