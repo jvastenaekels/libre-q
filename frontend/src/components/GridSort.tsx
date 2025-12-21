@@ -351,7 +351,8 @@ const GridSort: React.FC<GridSortProps> = ({
                                   initial={{ opacity: 0, y: 10 }} 
                                   animate={{ opacity: 1, y: 0 }} 
                                   exit={{ opacity: 0, y: -10 }}
-                                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm"
+                                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm cursor-pointer active:scale-95 transition-transform"
+                                  onClick={() => onCardClick?.(selectedCard.id)}
                               >
                                   <div className="flex flex-col gap-0.5 text-center leading-tight flex-1">
                                       <div className="text-xs font-bold text-indigo-700 line-clamp-4">
