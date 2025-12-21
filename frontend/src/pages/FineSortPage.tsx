@@ -14,8 +14,6 @@ import {
     PointerSensor, 
     TouchSensor, 
     closestCenter,
-    type DragStartEvent,
-    type DragEndEvent
 } from '@dnd-kit/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -24,6 +22,7 @@ import { useLayoutAction } from '../contexts/LayoutContext';
 import { Check } from 'lucide-react';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
+import { useFineSortDrag } from '../hooks/useFineSortDrag';
 
 const FineSortPage: React.FC = () => {
     const { 
@@ -48,7 +47,7 @@ const FineSortPage: React.FC = () => {
         setStep(4);
     }, [setStep]);
 
-    const [activeId, setActiveId] = useState<number | null>(null);
+
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null); // Tap-to-Place State
     const [cardDimensions, setCardDimensions] = useState<{ width: number, height: number } | null>(null);
 
@@ -147,151 +146,37 @@ const FineSortPage: React.FC = () => {
     // Line 276: renderSlotContent (function)
     // Line 292: Return JSX.
     
+    // --- Refactored Drag Logic via Hook ---
+    const [zoomLevel, setZoomLevel] = useState(1);
+
+    const { 
+        activeId, 
+        handleDragStart, 
+        handleDragEnd, 
+        handleCardClick, 
+        handleSlotClick 
+    } = useFineSortDrag({
+        responses,
+        gridColumns,
+        actions: {
+             placeCardInGrid,
+             moveCardInGrid,
+             swapCardsInGrid,
+             unplaceCard,
+             setZoomedCard
+        },
+        onSelectionChange: setSelectedCardId,
+        selectedId: selectedCardId
+    });
+    
     if (!config) return null;
 
-    // Helper: Smart Placement
-    const findClosestEmptyRow = (col: number, targetRow: number): number | null => {
-        const capacity = gridColumns[col]?.capacity || 0;
-        const cardsInCol = responses.qsort.filter(c => c.col === col);
-        const occupiedRows = new Set(cardsInCol.map(c => c.row));
-        
-        // Find all empty rows
-        const emptyRows: number[] = [];
-        for (let r = 0; r < capacity; r++) {
-            if (!occupiedRows.has(r)) {
-                emptyRows.push(r);
-            }
-        }
-        
-        if (emptyRows.length === 0) {
-            console.log(`[SmartPlace] Col ${col} is full. Capacity: ${capacity}, Occ: ${occupiedRows.size}`);
-            return null;
-        }
-
-        // Sort by distance to targetRow
-        emptyRows.sort((a, b) => {
-            const distA = Math.abs(a - targetRow);
-            const distB = Math.abs(b - targetRow);
-            // Tie-break: Prefer top-down (smaller index) to ensure determinism
-            if (distA === distB) return a - b;
-            return distA - distB;
-        });
-        
-        const best = emptyRows[0];
-        console.log(`[SmartPlace] Col ${col}. Target ${targetRow}. Empty: ${emptyRows.join(',')}. Closest: ${best}`);
-        return best;
-    };
-
-    // Tap-to-Place Handlers
-    const handleCardClick = (id: number) => {
-        // Toggle selection
-        setSelectedCardId(prev => prev === id ? null : id);
-    };
-
-    const handleSlotClick = (col: number, row: number) => {
-        if (selectedCardId !== null) {
-            const existingCard = responses.qsort.find(c => c.col === col && c.row === row);
-            
-            // Smart Placement Check
-            let finalRow = row;
-            let shouldSwap = false;
-
-            if (existingCard) {
-                // If the target slot is occupied, try to find an empty one
-                const emptyRow = findClosestEmptyRow(col, row);
-                if (emptyRow !== null) {
-                    finalRow = emptyRow; // Redirect to empty slot
-                } else {
-                    shouldSwap = true; // Column is full, must swap
-                }
-            }
-
-            if (shouldSwap && existingCard) {
-                // Swap
-                swapCardsInGrid(selectedCardId, existingCard.statementId);
-            } else {
-                // Move/Place to finalRow
-                // Note: We don't check if finalRow is occupied because findClosestEmptyRow guarantees it's empty
-                // UNLESS race condition, but store actions are synchronous usually.
-                const isPlaced = responses.qsort.find(c => c.statementId === selectedCardId);
-                if (isPlaced) {
-                     moveCardInGrid(selectedCardId, col, finalRow);
-                } else {
-                     placeCardInGrid(selectedCardId, col, finalRow);
-                }
-            }
-            setSelectedCardId(null); // Clear selection after action
-        }
-    };
-
-
-    // Drag Handlers
-    const handleDragStart = (event: DragStartEvent) => {
-        setZoomedCard(null); // Clear zoom on drag start
-        setActiveId(event.active.id as number);
-        setSelectedCardId(null); // Clear selection on drag start to avoid confusion
-    };
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        setActiveId(null);
-
-        if (!over) return;
-
-        const cardId = active.id as number;
-
-        // Dropped on a Grid Slot? format "slot_col_row"
-        const overIdString = String(over.id);
-        if (overIdString.startsWith('slot_')) {
-            const parts = overIdString.split('_');
-            if (parts.length === 3) {
-                const col = parseInt(parts[1]);
-                const targetRow = parseInt(parts[2]);
-
-                const existingCard = responses.qsort.find(c => c.col === col && c.row === targetRow);
-                
-                // Smart Placement Check
-                let finalRow = targetRow;
-                let shouldSwap = false;
-
-                if (existingCard) {
-                     const emptyRow = findClosestEmptyRow(col, targetRow);
-                     if (emptyRow !== null) {
-                         finalRow = emptyRow;
-                     } else {
-                         shouldSwap = true;
-                     }
-                }
-
-                if (shouldSwap && existingCard) {
-                    // Swap Logic
-                    const activeCardPlaced = responses.qsort.find(c => c.statementId === cardId);
-                    if (activeCardPlaced) {
-                        swapCardsInGrid(cardId, existingCard.statementId);
-                    } else {
-                        // Kicks existing back to source
-                        unplaceCard(existingCard.statementId);
-                        placeCardInGrid(cardId, col, finalRow); // finalRow is targetRow here
-                    }
-                } else {
-                    // Empty Slot (or redirected to empty)
-                    const activeCardPlaced = responses.qsort.find(c => c.statementId === cardId);
-                    if (activeCardPlaced) {
-                        moveCardInGrid(cardId, col, finalRow);
-                    } else {
-                        placeCardInGrid(cardId, col, finalRow);
-                    }
-                }
-            }
-        }
-    };
-    
-    const activeCardData = config?.statements.find(s => s.id === activeId);
+    const activeCardData = config.statements.find(s => s.id === activeId);
 
     // Helpers
     const renderSlotContent = (col: number, row: number, dimensions: { width: number, height: number }) => {
          const cardInSlot = responses.qsort.find(c => c.col === col && c.row === row);
-         const statement = cardInSlot ? config?.statements.find(s => s.id === cardInSlot.statementId) : null;
+         const statement = cardInSlot ? config.statements.find(s => s.id === cardInSlot.statementId) : null;
          if (statement) {
              return (
                 <SortableCard 
@@ -336,6 +221,7 @@ const FineSortPage: React.FC = () => {
                             resetFineSort();
                         }
                     }}
+                    onZoomChange={setZoomLevel}
 
                 />
              </div>
@@ -344,13 +230,15 @@ const FineSortPage: React.FC = () => {
              {createPortal(
                 <DragOverlay>
                     {activeCardData ? (
-                        <SortableCard 
-                            id={activeCardData.id} 
-                            text={activeCardData.text} 
-                            isOverlay 
-                            dimensions={cardDimensions || undefined}
-                            aspectRatio={cardDimensions ? cardDimensions.width / cardDimensions.height : undefined}
-                        />
+                        <div style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }}>
+                            <SortableCard 
+                                id={activeCardData.id} 
+                                text={activeCardData.text} 
+                                isOverlay 
+                                dimensions={cardDimensions || undefined}
+                                aspectRatio={cardDimensions ? cardDimensions.width / cardDimensions.height : undefined}
+                            />
+                        </div>
                     ) : null}
                 </DragOverlay>,
                 document.body

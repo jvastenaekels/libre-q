@@ -4,16 +4,16 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DroppableSlot from './DroppableSlot';
 import SortableCard from './SortableCard';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Check, ZoomIn, ZoomOut, RotateCcw, X, Frown, Meh, Smile } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useGridZoom } from '../hooks/useGridZoom';
 
 interface GridSortProps {
   agreeCards: { id: number; text: string }[];
@@ -28,6 +28,7 @@ interface GridSortProps {
   onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
   forcedTipsClosed?: boolean;
   disableHoverZoom?: boolean;
+  onZoomChange?: (scale: number) => void;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -44,7 +45,8 @@ const GridSort: React.FC<GridSortProps> = ({
   onSlotClick,
   onDimensionsChange,
   forcedTipsClosed = false,
-  disableHoverZoom = false
+  disableHoverZoom = false,
+  onZoomChange
 }) => {
   const { t } = useTranslation();
   const [activePile, setActivePile] = useState<PileType>('disagree');
@@ -56,18 +58,32 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
 
+  // Refs for Zoom Hook
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const pyramidRef = useRef<HTMLDivElement>(null);
+
+  // Zoom Hook
+  const { transformRef, performAutoFit, zoomIn, zoomOut, onTransformed } = useGridZoom({
+      wrapperRef,
+      contentRef,
+      pyramidRef,
+      gridColumns,
+      activePile,
+      hasPerformedZonalFocus,
+      setDimmingActive,
+      onZoomChange
+  });
+
   // Calculate optimal deck height based on longest statement
   const calculateDeckHeight = () => {
     const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-    if (allCards.length === 0) return 280; // Default minimum
+    if (allCards.length === 0) return 280; 
     
-    const maxLength = Math.max(...allCards.map(card => card.text.length));
-    
-    // Heuristic: ~50 chars per line, 20px per line, base 200px
-    // Min: 280px, Max: 400px
+    // Safety check for empty text
+    const maxLength = Math.max(...allCards.map(card => card.text?.length || 0));
     const estimatedLines = Math.ceil(maxLength / 50);
     const calculatedHeight = 200 + (estimatedLines * 20);
-    
     return Math.min(Math.max(calculatedHeight, 280), 400);
   };
 
@@ -105,48 +121,6 @@ const GridSort: React.FC<GridSortProps> = ({
       if (activePile === 'neutral' && Math.abs(score) >= 3) return true; 
       return false;
   };
-  
-  const transformRef = React.useRef<ReactZoomPanPinchRef>(null);
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
-  const contentRef = React.useRef<HTMLDivElement>(null);
-  const pyramidRef = React.useRef<HTMLDivElement>(null);
-
-  const performAutoFit = () => {
-      if (!transformRef.current || !wrapperRef.current || !contentRef.current) return;
-      const wrapper = wrapperRef.current;
-      const content = contentRef.current;
-      const wrapperW = wrapper.clientWidth;
-      const wrapperH = wrapper.clientHeight;
-      const contentW = content.offsetWidth; 
-      const contentH = content.offsetHeight;
-      if (contentW === 0 || contentH === 0) return;
-
-      const isMobile = window.innerWidth < 1024;
-      if (isMobile) {
-          const widthScale = (wrapperW * 0.98) / contentW; 
-          const heightScale = (wrapperH * 0.92) / contentH; 
-          const scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.75));
-          const x = (wrapperW - (contentW * scale)) / 2;
-          const y = wrapperH - (contentH * scale) - 2;
-          transformRef.current.setTransform(x, y, scale, 200);
-      } else {
-          const padding = 100;
-          const availableW = wrapperW - padding;
-          const availableH = wrapperH - padding;
-          const scaleX = availableW / contentW;
-          const scaleY = availableH / contentH;
-          const fitScale = Math.min(scaleX, scaleY, 1.1); 
-          let x = (wrapperW - (contentW * fitScale)) / 2;
-          const y = (wrapperH - (contentH * fitScale)) / 2;
-          if (pyramidRef.current) {
-              const pyramid = pyramidRef.current;
-              const pyramidW = pyramid.offsetWidth;
-              const pyramidOffsetLeft = pyramid.offsetLeft;
-              x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * fitScale);
-          }
-          transformRef.current.setTransform(x, y, fitScale, 200);
-      }
-  };
 
   const calculateOptimalSize = React.useCallback(() => {
       if (!wrapperRef.current) return;
@@ -165,8 +139,8 @@ const GridSort: React.FC<GridSortProps> = ({
       let targetCardRatio = (rawGridRatio + goldenRatio) / 2;
       targetCardRatio = Math.max(1.0, Math.min(targetCardRatio, 2.2)); 
       const targetArea = 160 * 96; 
-      let newWidth = Math.sqrt(targetArea * targetCardRatio);
-      let newHeight = targetArea / newWidth;
+      const newWidth = Math.sqrt(targetArea * targetCardRatio);
+      const newHeight = targetArea / newWidth;
       setCardDimensions(prev => {
           if (Math.abs(prev.width - newWidth) < 1.5 && Math.abs(prev.height - newHeight) < 1.5) return prev;
           const next = { width: newWidth, height: newHeight };
@@ -192,8 +166,9 @@ const GridSort: React.FC<GridSortProps> = ({
           setDimmingActive(false);
       }, 5000);
       return () => { clearTimeout(tFit); clearTimeout(tFocus); clearTimeout(tDimEnd); };
-  }, []); 
+  }, [performAutoFit]); 
 
+  // Responsive: Close tips and disable autofit on mobile selection
   useEffect(() => {
     calculateOptimalSize();
     if (selectedCardId && window.innerWidth < 1024) {
@@ -204,52 +179,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
   useEffect(() => { setAutoFitEnabled(true); }, [activePile]);
 
-  useEffect(() => {
-    if (!transformRef.current || !hasPerformedZonalFocus) return;
-    const fitTimer = setTimeout(performAutoFit, 30);
-    setDimmingActive(true);
-    const timer = setTimeout(() => {    
-        if (!transformRef.current) return;
-        const isMobile = window.innerWidth < 1024;
-        let targetId = '';
-        const sortedScores = [...gridColumns].map(c => c.score).sort((a, b) => a - b);
-        const minScore = sortedScores[0];
-        const maxScore = sortedScores[sortedScores.length - 1];
-        if (activePile === 'disagree') {
-            const targetScore = isMobile ? Math.min(minScore + 2, -1) : -1;
-            targetId = `column-${targetScore}`;
-            if (!document.getElementById(targetId)) targetId = 'column--2';
-            if (!document.getElementById(targetId)) targetId = 'column--1';
-        } else if (activePile === 'agree') {
-            const targetScore = isMobile ? Math.max(maxScore - 2, 1) : 1;
-            targetId = `column-${targetScore}`;
-            if (!document.getElementById(targetId)) targetId = 'column-2';
-            if (!document.getElementById(targetId)) targetId = 'column-1';
-        } else {
-            targetId = 'column-0';
-        }
-        const targetNode = document.getElementById(targetId);
-        if (targetNode && wrapperRef.current && pyramidRef.current && contentRef.current && transformRef.current) {
-            const state = transformRef.current.instance.transformState;
-            const targetScale = isMobile ? (state.scale * 1.7) : (state.scale * 1.25);
-            const wrapperW = wrapperRef.current.clientWidth;
-            const wrapperH = wrapperRef.current.clientHeight;
-            const pyramid = pyramidRef.current;
-            const pyramidOffsetLeft = pyramid.offsetLeft;
-            const targetColumnCenter = targetNode.offsetLeft + (targetNode.offsetWidth / 2);
-            const targetX = (wrapperW / 2) - ((pyramidOffsetLeft + targetColumnCenter) * targetScale);
-            const contentH = contentRef.current.offsetHeight;
-            const targetY = isMobile 
-                ? (wrapperH - (contentH * targetScale) - 20) 
-                : (wrapperH - (contentH * targetScale)) / 3.0; 
-            transformRef.current.setTransform(targetX, targetY, targetScale, 500, 'easeOut');
-        }
-        const dimTimer = setTimeout(() => { setDimmingActive(false); }, 8000);
-        return () => clearTimeout(dimTimer);
-    }, 550); 
-    return () => { clearTimeout(fitTimer); clearTimeout(timer); };
-  }, [activePile, hasPerformedZonalFocus, gridColumns]);
-
+  // Resize Observer
   React.useEffect(() => {
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
@@ -266,7 +196,7 @@ const GridSort: React.FC<GridSortProps> = ({
      if (!autoFitEnabled) return;
      const t = setTimeout(performAutoFit, 100);
      return () => clearTimeout(t);
-  }, [cardDimensions, autoFitEnabled]);
+  }, [cardDimensions, autoFitEnabled, performAutoFit]);
 
   // 4. Derived: active statement for the hub
   const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
@@ -286,32 +216,10 @@ const GridSort: React.FC<GridSortProps> = ({
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
-                        <button onClick={() => {
-                            if (transformRef.current && wrapperRef.current) {
-                                const { scale, positionX, positionY } = transformRef.current.instance.transformState;
-                                const nextScale = Math.min(3.0, scale + 0.2);
-                                const wrapper = wrapperRef.current;
-                                const centerX = wrapper.clientWidth / 2;
-                                const centerY = wrapper.clientHeight / 2;
-                                const nextX = centerX - (centerX - positionX) * (nextScale / scale);
-                                const nextY = centerY - (centerY - positionY) * (nextScale / scale);
-                                transformRef.current.setTransform(nextX, nextY, nextScale, 300, "easeOut");
-                            }
-                        }} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_in')}>
+                        <button onClick={zoomIn} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_in')}>
                             <ZoomIn size={20} />
                         </button>
-                        <button onClick={() => {
-                            if (transformRef.current && wrapperRef.current) {
-                                const { scale, positionX, positionY } = transformRef.current.instance.transformState;
-                                const nextScale = Math.max(0.1, scale - 0.2);
-                                const wrapper = wrapperRef.current;
-                                const centerX = wrapper.clientWidth / 2;
-                                const centerY = wrapper.clientHeight / 2;
-                                const nextX = centerX - (centerX - positionX) * (nextScale / scale);
-                                const nextY = centerY - (centerY - positionY) * (nextScale / scale);
-                                transformRef.current.setTransform(nextX, nextY, nextScale, 300, "easeOut");
-                            }
-                        }} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_out')}>
+                        <button onClick={zoomOut} className="p-2 hover:bg-slate-100 rounded text-slate-600" aria-label={t('fine.toolbar.zoom_out')}>
                             <ZoomOut size={20} />
                         </button>
                         <div className="h-px bg-slate-200 my-0.5"></div>
@@ -355,6 +263,7 @@ const GridSort: React.FC<GridSortProps> = ({
                     ref={transformRef} initialScale={0.8} minScale={0.1} maxScale={3.0}
                     centerOnInit={false} limitToBounds={false} wheel={{ step: 0.1 }}
                     panning={{ excluded: ['dnd-prevent-pan'] }} doubleClick={{ disabled: true }}
+                    onTransformed={onTransformed}
                 >
                     <TransformComponent wrapperClass="w-full h-full !overflow-hidden">
                         <div data-testid="grid-container" ref={contentRef} className="flex flex-col items-center gap-8 px-4 relative">
@@ -457,7 +366,10 @@ const GridSort: React.FC<GridSortProps> = ({
                            const Icon = pile === 'disagree' ? Frown : pile === 'neutral' ? Meh : Smile;
                            const col = pile === 'disagree' ? 'red' : pile === 'neutral' ? 'slate' : 'green';
                            return (
-                               <button key={pile} onClick={() => { setActivePile(pile as any); setHasPerformedZonalFocus(true); }}
+                               <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
+                                   role="tab"
+                                   aria-selected={isActive}
+                                   aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
                                    className={`relative group flex-1 min-w-[80px] h-14 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
                                      ${isActive ? `bg-${col}-50 border-${col}-300 shadow-md scale-105 z-10` : `bg-white border-slate-200 opacity-80`}
                                    `}

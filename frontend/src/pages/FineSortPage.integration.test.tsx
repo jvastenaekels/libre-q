@@ -18,6 +18,7 @@ vi.mock('../store/useStudyStore', () => ({
         getState: vi.fn(() => ({
             session: { token: null, hasConsented: true, currentStep: 4, isSaving: false },
             resetSession: vi.fn(),
+            setZoomedCard: vi.fn(),
         })),
         setState: vi.fn(),
         subscribe: vi.fn(),
@@ -69,7 +70,7 @@ describe('FineSortPage Integration', () => {
         // Mock State: All cards placed
         // placed in grid -> responses.qsort
         // piles empty -> responses.rough
-        mockUseStudyStore.mockReturnValue({
+        const state = {
             config: mockConfig,
             responses: {
                 rough: { agree: [], disagree: [], neutral: [] },
@@ -84,8 +85,11 @@ describe('FineSortPage Integration', () => {
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: vi.fn(),
             unplaceCard: vi.fn(),
-            resetFineSort: vi.fn()
-        });
+            resetFineSort: vi.fn(),
+            setZoomedCard: vi.fn(),
+            zoomedCard: null
+        };
+        mockUseStudyStore.mockImplementation((selector: any) => selector ? selector(state) : state);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -109,18 +113,19 @@ describe('FineSortPage Integration', () => {
 
     it('renders disabled "Finish Sorting" button when grid is NOT full', () => {
         // Mock State: Cards remaining in Neutral pile
-        mockUseStudyStore.mockReturnValue({
+        const state = {
             config: mockConfig,
             responses: {
-                rough: { agree: [], disagree: [], neutral: [1, 2] }, // Just IDs usually in real app, but logic depends on mapping
+                rough: { agree: [], disagree: [], neutral: [1, 2] },
                 qsort: []
             },
-            // Note: In FineSortPage:
-            // const unplacedNeutral = responses.rough.neutral... map id to statement
             session: { hasConsented: true, currentStep: 4, isSaving: false },
             setStep: vi.fn(),
-            resetFineSort: vi.fn()
-        });
+            resetFineSort: vi.fn(),
+            setZoomedCard: vi.fn(),
+            zoomedCard: null
+        };
+        mockUseStudyStore.mockImplementation((selector: any) => selector ? selector(state) : state);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -132,12 +137,12 @@ describe('FineSortPage Integration', () => {
             </MemoryRouter>
         );
 
-        // Logic says: if !isAllPlaced -> "Finish Sorting"
-        // Note: StudyLayout might render it twice (Header + Mobile Footer), so we allow multiple.
-        const btns = screen.getAllByRole('button', { name: /fine.actions.finish/i });
-        expect(btns.length).toBeGreaterThan(0);
+        // Logic says: if !isAllPlaced -> Button should NOT be visible
+        // We check for both potential keys just in case, or ensure the query returns nothing
+        const finishBtns = screen.queryAllByRole('button', { name: /fine.actions.finish/i });
+        const validateBtns = screen.queryAllByRole('button', { name: /fine.actions.validate/i });
         
-        // They should be disabled
-        btns.forEach(btn => expect((btn as HTMLButtonElement).disabled).toBe(true));
+        expect(finishBtns.length).toBe(0);
+        expect(validateBtns.length).toBe(0);
     });
 });
