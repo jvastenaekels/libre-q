@@ -7,14 +7,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
-import { XCircle, ChevronDown } from 'lucide-react';
+import { ChevronUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface WorkbenchPanelProps {
     card: { id: number; text: string } | null;
     onClose: () => void;
     className?: string;
-    height?: number; // Optional height to match deck
+    height?: number;
 }
 
 const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height }) => {
@@ -38,55 +38,37 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
             }}
             className={`
                 absolute bottom-0 left-0 right-0 
-                lg:h-auto lg:relative lg:w-[400px] lg:flex-none lg:border-l lg:border-t-0 border-slate-200
-                bg-white rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)]
+                bg-gradient-to-b from-white to-slate-50 rounded-t-3xl 
+                shadow-[0_-8px_30px_rgba(0,0,0,0.15)]
                 z-50 flex flex-col cursor-grab active:cursor-grabbing
                 ${className}
             `}
             style={{
-                height: height ? `${height}px` : '35vh',
+                height: height ? `${height}px` : '200px',
             }}
         >
             {/* Slide Handle */}
-            <div className="flex-none flex flex-col items-center pt-3 pb-2">
+            <div className="flex-none flex flex-col items-center pt-2 pb-1">
                 <div className="w-10 h-1 bg-slate-300 rounded-full" />
-                <div className="w-6 h-1 bg-slate-200 rounded-full mt-1" />
             </div>
 
-            {/* Instruction Header (Now at top!) */}
-            <div className="flex-none px-4 pb-2 text-center">
-                <div className="flex items-center justify-center gap-2 text-xs font-bold text-indigo-500 uppercase tracking-wider">
-                    <ChevronDown size={14} className="rotate-180 animate-bounce" />
+            {/* Instruction (at top) */}
+            <div className="flex-none px-4 pb-1 text-center">
+                <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+                    <ChevronUp size={12} className="animate-bounce" />
                     {t('fine.workbench.place_on_grid', 'Tap Grid to Place')}
-                    <ChevronDown size={14} className="rotate-180 animate-bounce" />
+                    <ChevronUp size={12} className="animate-bounce" />
                 </div>
             </div>
 
-            {/* Header / Actions */}
-            <div className="flex-none flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50/30">
-                <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded-md">
-                        {t('fine.workbench.active_card', 'Active Card')}
-                    </span>
-                    <span className="text-xs text-slate-400 font-medium">
-                        #{card.id}
-                    </span>
-                </div>
-                
-                <button 
-                    onClick={onClose}
-                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors touch-manipulation"
-                    aria-label={t('common.cancel')}
-                >
-                    <XCircle size={20} />
-                </button>
-            </div>
-
-            {/* Content "The Stage" */}
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar touch-manipulation">
-                <div className="max-w-3xl mx-auto">
-                    <div className="prose prose-sm prose-indigo text-slate-800 leading-relaxed font-medium">
-                        <ReactMarkdown components={{ p: ({ children }) => <span className="block mb-3 last:mb-0">{children}</span> }}>
+            {/* Card Content "The Magnifier" */}
+            <div 
+                className="flex-1 mx-3 mb-3 overflow-y-auto rounded-2xl bg-white border-2 border-indigo-200 shadow-inner p-4"
+                onClick={onClose}
+            >
+                <div className="h-full flex items-center justify-center">
+                    <div className="text-center text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
+                        <ReactMarkdown components={{ p: ({ children }) => <span className="block">{children}</span> }}>
                             {card.text}
                         </ReactMarkdown>
                     </div>
