@@ -57,6 +57,16 @@ const GridSort: React.FC<GridSortProps> = ({
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
 
   const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+      const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const isDeckCollapsed = isMobile && !!selectedCardId;
 
   // Refs for Zoom Hook
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -325,11 +335,15 @@ const GridSort: React.FC<GridSortProps> = ({
           flex flex-col lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
         "
-        style={{ height: window.innerWidth < 1024 ? `${deckHeight}px` : 'auto' }}
+        style={{ 
+            height: isMobile 
+                ? (isDeckCollapsed ? 'auto' : `${deckHeight}px`) 
+                : 'auto' 
+        }}
       >
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
                   {/* UNIFIED MOBILE INFO HUB (Thumb Zone) */}
-                  <div className="lg:hidden mb-3">
+                  <div className="lg:hidden mb-1">
                       <AnimatePresence mode="wait">
                           {selectedCard ? (
                               <motion.div 
@@ -357,9 +371,10 @@ const GridSort: React.FC<GridSortProps> = ({
                       </AnimatePresence>
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block">{t('fine.deck.title')}</h3>
+                  <h3 className={`text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block`}>{t('fine.deck.title')}</h3>
 
-                  <div className="flex gap-3 w-full mb-4 px-2 justify-center" role="tablist">
+                  {!isDeckCollapsed && (
+                      <div className="flex gap-3 w-full mb-4 px-2 justify-center" role="tablist">
                        {['disagree', 'neutral', 'agree'].map((pile) => {
                            const isActive = activePile === pile;
                            const cards = pile === 'disagree' ? disagreeCards : pile === 'neutral' ? neutralCards : agreeCards;
@@ -385,11 +400,13 @@ const GridSort: React.FC<GridSortProps> = ({
                            );
                        })}
                   </div>
+                  )}
               </div>
 
-              <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
-                className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar"
-              >
+              {!isDeckCollapsed && (
+                <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
+                    className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar"
+                >
                   <SortableContext items={activeCards.map(c => c.id)} strategy={rectSortingStrategy}>
                       <motion.div initial="hidden" animate="show" className={`${activeCards.length === 0 ? 'flex w-full h-full justify-center items-center' : 'flex flex-row lg:grid lg:grid-cols-2 gap-2 lg:gap-3'}`}>
                           <AnimatePresence mode="popLayout">
@@ -407,7 +424,8 @@ const GridSort: React.FC<GridSortProps> = ({
                       </motion.div>
                    </SortableContext>
               </motion.div>
-              {onReset && (
+              )}
+              {(onReset && !isDeckCollapsed) && (
                   <div className="flex-none p-2 border-t border-gray-100 bg-slate-50/50 hidden lg:flex justify-center z-10">
                       <button onClick={onReset} className="text-xs font-bold text-slate-400 hover:text-red-500 px-3 py-1.5 rounded hover:bg-red-50">{t('fine.deck.reset')}</button>
                   </div>
