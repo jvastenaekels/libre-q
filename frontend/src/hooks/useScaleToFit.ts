@@ -37,7 +37,6 @@ export const useScaleToFit = (
             const scaleY = containerHeight / contentHeight;
 
             // Use the smaller scale to fit both dimensions
-            const newScale = Math.min(scaleX, scaleY, 1); // Never zoom in past 100%? User said "If large, it scales up." so remove 1 limit.
             
             // User requirement: "Improve auto-scaling" -> Allow slight upscale (1.5 max) if screen allows
             const finalScale = Math.min(scaleX, scaleY, 1.5);

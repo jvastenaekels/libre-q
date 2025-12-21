@@ -5,7 +5,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import SortableCard from './SortableCard';
 import CardZoomOverlay from './CardZoomOverlay';
 import { useStudyStore } from '../store/useStudyStore';

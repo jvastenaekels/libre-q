@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useScaleToFit } from './useScaleToFit';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -17,7 +17,7 @@ describe('useScaleToFit', () => {
         content = document.createElement('div');
         
         // Mock ResizeObserver
-        global.ResizeObserver = vi.fn().mockImplementation((callback) => ({
+        global.ResizeObserver = vi.fn().mockImplementation((_callback) => ({
             observe: vi.fn(),
             disconnect: vi.fn(),
         }));

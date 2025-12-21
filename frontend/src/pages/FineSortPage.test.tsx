@@ -20,7 +20,7 @@ vi.mock('../store/useStudyStore', () => ({
 
 vi.mock('../contexts/LayoutContext', () => ({
     useLayoutAction: () => ({
-        setHeaderAction: vi.fn((node) => {
+        setHeaderAction: vi.fn((_node) => {
             // Render the node so we can query it?
             // In integration tests, Layout renders it. Here we might need to mimic it or just inspect the calls.
             // Better: Render the node in a test wrapper if possible, or Mock LayoutContext to act as a portal?

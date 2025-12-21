@@ -44,7 +44,7 @@ describe('CardStack', () => {
         const statement = { id: 1, text: 'A very long statement that should definitely overflow the card container on almost any screen size to ensure the search icon appears.' };
         
         const setZoomedCardSpy = vi.fn();
-        // @ts-ignore
+
         import('../store/useStudyStore').then(m => {
             m.useStudyStore.setState({ setZoomedCard: setZoomedCardSpy });
         });

@@ -15,12 +15,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import SortableCard from './SortableCard';
 import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
 import WorkbenchPanel from './WorkbenchPanel';
-import { useStudyStore } from '../store/useStudyStore';
+
 
 interface GridSortProps {
   agreeCards: { id: number; text: string }[];
@@ -66,8 +65,7 @@ const GridSort: React.FC<GridSortProps> = ({
   const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
   const [isMobile, setIsMobile] = useState(false);
 
-  // Store access for manual zoom trigger
-  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
+
 
   useEffect(() => {
       const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -364,7 +362,7 @@ const GridSort: React.FC<GridSortProps> = ({
             {selectedCardId && (
                 <WorkbenchPanel 
                     key="workbench"
-                    card={selectedCard}
+                    card={selectedCard || null}
                     onClose={() => onCardClick?.(selectedCardId)} // Deselect
                 />
             )}
