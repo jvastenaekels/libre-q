@@ -314,7 +314,8 @@ const GridSort: React.FC<GridSortProps> = ({
                 <WorkbenchPanel 
                     key="workbench"
                     card={selectedCard || null}
-                    onClose={() => onCardClick?.(selectedCardId)} // Deselect
+                    onClose={() => onCardClick?.(selectedCardId)}
+                    height={deckHeight}
                 />
             )}
        </AnimatePresence>
