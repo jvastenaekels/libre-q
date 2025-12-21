@@ -277,6 +277,12 @@ const GridSort: React.FC<GridSortProps> = ({
       
        {/* PANEL: THE GRID (Canvas) */}
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden">
+            {/* Desktop-only Instruction */}
+            <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
+                <span className="text-lg font-bold text-slate-700 text-center leading-tight">
+                    Drag cards onto the pyramid grid according to how well they match your view.
+                </span>
+            </div>
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
