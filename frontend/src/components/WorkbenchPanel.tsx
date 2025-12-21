@@ -8,7 +8,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import SortableCard from './SortableCard';
+import ReactMarkdown from 'react-markdown';
 
 interface WorkbenchPanelProps {
     card: { id: number; text: string } | null;
@@ -17,10 +17,20 @@ interface WorkbenchPanelProps {
     height?: number;
 }
 
+// Dynamic text sizing based on text length
+const getTextSizeClass = (textLength: number): string => {
+    if (textLength < 50) return 'text-lg';
+    if (textLength < 100) return 'text-base';
+    if (textLength < 200) return 'text-sm';
+    return 'text-xs';
+};
+
 const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height }) => {
     const { t } = useTranslation();
 
     if (!card) return null;
+
+    const textSizeClass = getTextSizeClass(card.text.length);
 
     return (
         <motion.div
@@ -36,7 +46,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                 ${className}
             `}
             style={{
-                height: height ? `${height}px` : '200px',
+                height: height ? `${height}px` : '220px',
             }}
         >
             {/* Header with Slide Handle and Close */}
@@ -55,7 +65,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
             </div>
 
             {/* Instruction */}
-            <div className="flex-none px-4 pb-1 text-center">
+            <div className="flex-none px-4 pb-2 text-center">
                 <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
                     <ChevronUp size={12} className="animate-bounce" />
                     {t('fine.workbench.drag_or_tap', 'Drag to Grid or Tap Slot')}
@@ -63,16 +73,16 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                 </div>
             </div>
 
-            {/* Draggable Card - Full width */}
-            <div className="flex-1 flex items-center justify-center px-3 pb-2 min-h-0">
-                <div className="w-full h-full flex items-center justify-center">
-                    <SortableCard 
-                        id={card.id} 
-                        text={card.text} 
-                        variant="hand"
-                        isSelected={true}
-                        disableHoverZoom={true}
-                    />
+            {/* Card Content - Smart fit, no aspect ratio, centered text */}
+            <div className="flex-1 flex items-center justify-center px-6 pb-4 min-h-0">
+                <div 
+                    className="w-full bg-white rounded-2xl border-2 border-indigo-200 shadow-md p-4 text-center"
+                >
+                    <div className={`font-medium text-slate-800 ${textSizeClass} leading-relaxed`}>
+                        <ReactMarkdown components={{ p: ({ children }) => <span className="block">{children}</span> }}>
+                            {card.text}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             </div>
         </motion.div>

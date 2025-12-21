@@ -15,6 +15,7 @@ export const useGridZoom = ({
     wrapperRef,
     contentRef,
     pyramidRef,
+    gridColumns,
     activePile,
     hasPerformedZonalFocus,
     setDimmingActive,
@@ -82,6 +83,34 @@ export const useGridZoom = ({
         }
     }, []);
 
+    // Auto-fit on significant window resize (debounced)
+    useEffect(() => {
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+
+        const handleResize = () => {
+            const widthChange = Math.abs(window.innerWidth - lastWidth);
+            const heightChange = Math.abs(window.innerHeight - lastHeight);
+            
+            // Only trigger for significant changes (> 50px)
+            if (widthChange > 50 || heightChange > 50) {
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    performAutoFit();
+                    lastWidth = window.innerWidth;
+                    lastHeight = window.innerHeight;
+                }, 300);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [performAutoFit]);
+
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone
     useEffect(() => {
@@ -97,32 +126,58 @@ export const useGridZoom = ({
              const isMobile = window.innerWidth < 1024;
              if (!isMobile) return; 
 
-             // Determine Target Column based on Pile
-             // Disagree -> Column -2, Neutral -> Column 0, Agree -> Column +2
-             const targetColumnId = activePile === 'disagree' ? 'column--2' 
-                                  : activePile === 'agree' ? 'column-2' 
-                                  : 'column-0';
+             // Calculate dynamic target column based on grid limits
+             // Disagree: minScore + 2, Neutral: 0, Agree: maxScore - 2
+             const scores = gridColumns.map(c => c.score);
+             const minScore = Math.min(...scores);
+             const maxScore = Math.max(...scores);
+             
+             let targetScore: number;
+             if (activePile === 'disagree') {
+                 targetScore = minScore + 2; // e.g., -4 -> -2
+             } else if (activePile === 'agree') {
+                 targetScore = maxScore - 2; // e.g., +4 -> +2
+             } else {
+                 targetScore = 0; // neutral
+             }
+
+             // Format column ID (handle negative scores like -2 -> "column--2")
+             const targetColumnId = `column-${targetScore}`;
              
              const targetColumn = document.getElementById(targetColumnId);
              if (!targetColumn) return;
 
-             // Fixed Scale for Zonal Zoom (subtle)
-             const targetScale = 1.2;
+             // Subtle scale for zonal focus (just pan, minimal zoom)
+             const targetScale = 1.05;
 
-             // Calculate Pan to center on target column
+             // Get current transform state
+             const currentState = transformRef.current.instance.transformState;
+             const currentScale = currentState.scale;
+             
+             // Calculate column center relative to wrapper
              const wrapperW = wrapperRef.current.clientWidth;
              const wrapperH = wrapperRef.current.clientHeight;
              const contentH = contentRef.current.offsetHeight;
              
-             // Get column position relative to content
+             // Get column position accounting for current transform
              const columnRect = targetColumn.getBoundingClientRect();
-             const contentRect = contentRef.current.getBoundingClientRect();
-             const columnCenterInContent = (columnRect.left - contentRect.left) + (columnRect.width / 2);
+             const wrapperRect = wrapperRef.current.getBoundingClientRect();
              
-             // Center horizontally on column
-             const targetX = (wrapperW / 2) - (columnCenterInContent * targetScale);
+             // Column center in screen coords
+             const columnCenterScreen = columnRect.left + (columnRect.width / 2);
              
-             // Position vertically to keep spectrum bar visible (anchor to bottom)
+             // Where we want it (center of wrapper)
+             const wrapperCenterScreen = wrapperRect.left + (wrapperW / 2);
+             
+             // Current X offset
+             const currentX = currentState.positionX;
+             
+             // Calculate new X to center column
+             const deltaX = wrapperCenterScreen - columnCenterScreen;
+             const scaleRatio = targetScale / currentScale;
+             const targetX = (currentX + deltaX) * scaleRatio;
+             
+             // Bottom anchor for Y
              const targetY = wrapperH - (contentH * targetScale) - 10;
 
              transformRef.current.setTransform(targetX, targetY, targetScale, 800, 'easeOutQuad');
@@ -134,7 +189,7 @@ export const useGridZoom = ({
         }, 800); // Delay after autoFit completes
 
         return () => clearTimeout(zoomTimer);
-    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit]);
+    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
 
     return {
         transformRef,
