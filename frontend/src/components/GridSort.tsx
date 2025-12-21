@@ -6,18 +6,17 @@
  */
 
 // Imports
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ZoomIn, ZoomOut, RotateCcw,
-    ChevronDown, ChevronUp, Check, X,
+    Check, X,
     Smile, Meh, Frown
 } from 'lucide-react';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { DndContext, useDraggable, useDroppable, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
-import { SortableCard } from './SortableCard';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import SortableCard from './SortableCard';
 import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
 import WorkbenchPanel from './WorkbenchPanel';

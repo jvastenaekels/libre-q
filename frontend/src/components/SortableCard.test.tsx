@@ -65,7 +65,11 @@ describe('SortableCard', () => {
     };
 
     it('renders card text correctly', () => {
-        render(<SortableCard {...defaultProps} />);
+        render(
+      <MemoryRouter>
+        <SortableCard {...defaultProps} />
+      </MemoryRouter>
+    );
         expect(screen.getByText('Test Card Content')).toBeTruthy();
     });
 

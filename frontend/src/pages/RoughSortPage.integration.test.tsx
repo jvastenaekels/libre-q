@@ -53,7 +53,8 @@ describe('RoughSortPage Integration', () => {
             setConfig: vi.fn(),
             setConfigLoading: vi.fn(),
             setConfigError: vi.fn(),
-            triggerConfigRefetch: vi.fn()
+            triggerConfigRefetch: vi.fn(),
+            setZoomedCard: vi.fn()
         });
 
         render(
@@ -89,7 +90,8 @@ describe('RoughSortPage Integration', () => {
              setConfig: vi.fn(),
              setConfigLoading: vi.fn(),
              setConfigError: vi.fn(),
-             triggerConfigRefetch: vi.fn()
+             triggerConfigRefetch: vi.fn(),
+             setZoomedCard: vi.fn()
          });
  
          render(

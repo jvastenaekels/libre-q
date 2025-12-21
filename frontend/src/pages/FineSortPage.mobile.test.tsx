@@ -48,7 +48,7 @@ describe('FineSortPage Mobile Interaction', () => {
         // 1. Setup State: Card 1 is in Neutral Pile (Deck). Grid is empty.
         const placeCardInGridSpy = vi.fn();
         
-        vi.mocked(useStudyStore).mockReturnValue({
+        const mockState = {
             config: {
                 ...mockConfig,
                 title: 'Demo',
@@ -80,7 +80,11 @@ describe('FineSortPage Mobile Interaction', () => {
             completeSession: vi.fn(),
             resetSession: vi.fn(),
             setLanguage: vi.fn(),
-        });
+            setZoomedCard: vi.fn(),
+            zoomedCard: null
+        };
+
+        mockUseStudyStore.mockImplementation((selector) => selector ? selector(mockState) : mockState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -119,9 +123,10 @@ describe('FineSortPage Mobile Interaction', () => {
 
     it('allows "Tap-to-Swap" interaction: Select Card -> Tap Occupied Slot -> Swap', async () => {
         // 1. Setup State: Card 2 in Disagree Pile. Card 1 already in Grid at 0,0.
-        const swapCardsInGridSpy = vi.fn();
+        const unplaceCardSpy = vi.fn();
+        const placeCardInGridSpy = vi.fn();
 
-        vi.mocked(useStudyStore).mockReturnValue({
+        const mockState = {
             config: {
                 ...mockConfig,
                 title: 'Demo',
@@ -140,10 +145,10 @@ describe('FineSortPage Mobile Interaction', () => {
             },
             session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
             setStep: vi.fn(),
-            placeCardInGrid: vi.fn(),
+            placeCardInGrid: placeCardInGridSpy,
             moveCardInGrid: vi.fn(),
-            swapCardsInGrid: swapCardsInGridSpy,
-            unplaceCard: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: unplaceCardSpy,
             resetFineSort: vi.fn(),
             setConfig: vi.fn(),
             setConsent: vi.fn(),
@@ -155,7 +160,11 @@ describe('FineSortPage Mobile Interaction', () => {
             completeSession: vi.fn(),
             resetSession: vi.fn(),
             setLanguage: vi.fn(),
-        });
+            setZoomedCard: vi.fn(),
+            zoomedCard: null
+        };
+
+        mockUseStudyStore.mockImplementation((selector) => selector ? selector(mockState) : mockState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -175,9 +184,11 @@ describe('FineSortPage Mobile Interaction', () => {
         const slot = screen.getByTestId('slot_0_0');
         fireEvent.click(slot);
 
-        // 4. Verify Swap
-        // swapCardsInGrid(incomingId, existingId)
-        expect(swapCardsInGridSpy).toHaveBeenCalledTimes(1);
-        expect(swapCardsInGridSpy).toHaveBeenCalledWith(2, 1);
+        // 4. Verify Swap (Implemented as Unplace + Place for Deck->Grid items)
+        expect(unplaceCardSpy).toHaveBeenCalledTimes(1);
+        expect(unplaceCardSpy).toHaveBeenCalledWith(1); // Unplace Card 1
+
+        expect(placeCardInGridSpy).toHaveBeenCalledTimes(1);
+        expect(placeCardInGridSpy).toHaveBeenCalledWith(2, 0, 0); // Place Card 2 at 0,0
     });
 });

@@ -59,7 +59,7 @@ const RoughSortPage: React.FC = () => {
         return config.statements.filter(s => !sortedIds.has(s.id));
     }, [config, responses.rough.history]);
 
-    const sortedCount = responses.rough.history.length;
+
     const currentCard = unsortedCards[0];
     const progress = config ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100 : 0;
 

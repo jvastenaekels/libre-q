@@ -32,7 +32,8 @@ describe('App Routing Protection', () => {
             session: { hasConsented: false, currentStep: 1 },
             config: { slug: 'demo' },
             setConfigLoading: vi.fn(),
-            setConfigError: vi.fn()
+            setConfigError: vi.fn(),
+            setZoomedCard: vi.fn()
         });
 
         render(
@@ -63,7 +64,8 @@ describe('App Routing Protection', () => {
         mockUseStudyStore.mockReturnValue({ 
             session: { hasConsented: true, currentStep: 4 },
             setConfigLoading: vi.fn(),
-            setConfigError: vi.fn()
+            setConfigError: vi.fn(),
+            setZoomedCard: vi.fn()
         });
 
         render(

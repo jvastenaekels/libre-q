@@ -34,7 +34,8 @@ global.ResizeObserver = class {
 
 describe('GridSort Workbench Interaction', () => {
     const defaultProps = {
-        columns: [{ score: -1, capacity: 1 }, { score: 1, capacity: 1 }],
+        gridColumns: [{ score: -1, capacity: 1 }, { score: 1, capacity: 1 }],
+        renderSlotContent: () => <div>Slot</div>,
         placedCards: [],
         cards: [
             { id: 1, text: 'Card One Text' },
