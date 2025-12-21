@@ -406,7 +406,7 @@ const GridSort: React.FC<GridSortProps> = ({
           w-full lg:w-[320px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
-          flex flex-col h-[280px] lg:h-full transition-all duration-300
+          flex flex-col h-[320px] lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
       ">
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
@@ -419,15 +419,11 @@ const GridSort: React.FC<GridSortProps> = ({
                                   initial={{ opacity: 0, y: 10 }} 
                                   animate={{ opacity: 1, y: 0 }} 
                                   exit={{ opacity: 0, y: -10 }}
-                                  onClick={() => onCardClick?.(selectedCard.id)}
-                                  className="w-full flex items-center justify-center gap-2 py-1.5 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm cursor-pointer active:scale-95 transition-transform"
+                                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm"
                               >
                                   <div className="flex flex-col gap-0.5 text-center leading-tight flex-1">
-                                      <div className="text-xs font-bold text-indigo-700 line-clamp-2">
+                                      <div className="text-xs font-bold text-indigo-700 line-clamp-4">
                                           <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
-                                      </div>
-                                      <div className="text-[9px] uppercase tracking-wider text-indigo-400 font-bold">
-                                          {t('fine.toolbar.tap_to_zoom', 'Tap to view full text')}
                                       </div>
                                   </div>
                               </motion.div>
