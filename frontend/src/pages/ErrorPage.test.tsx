@@ -8,11 +8,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ErrorPage from './ErrorPage';
 import { MemoryRouter } from 'react-router-dom';
+import { ApiError } from '../api/client';
 
 const mockResetSession = vi.fn();
 const mockResetConfig = vi.fn();
 const mockResetResponses = vi.fn();
 const mockNavigate = vi.fn();
+
+// Mock I18n
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+}));
 
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
@@ -55,23 +61,36 @@ describe('ErrorPage', () => {
         window.location = originalLocation;
     });
 
-    it('renders error message', () => {
+    it('renders generic error message by default', () => {
         render(
             <MemoryRouter>
                 <ErrorPage />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Oops! Something went wrong/)).toBeInTheDocument();
+        // "common.errors.default_title" matches mock translation key
+        expect(screen.getByText('common.errors.default_title')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.unknown')).toBeInTheDocument();
     });
 
-    it('resets session on button click', () => {
+    it('renders specific 404 UI', () => {
+        render(
+            <MemoryRouter>
+                <ErrorPage error={new ApiError(404, 'Not found')} />
+            </MemoryRouter>
+        );
+        expect(screen.getByText('common.errors.404.title')).toBeInTheDocument();
+        expect(screen.queryByText('common.errors.default_title')).not.toBeInTheDocument();
+    });
+
+    it('resets session on button click for generic error', () => {
         render(
             <MemoryRouter>
                 <ErrorPage />
             </MemoryRouter>
         );
         
-        const resetButton = screen.getByRole('button', { name: /Reset Session/i });
+        // Button text is now from translation keys
+        const resetButton = screen.getByRole('button', { name: 'common.errors.reset' });
         fireEvent.click(resetButton);
 
         expect(mockResetSession).toHaveBeenCalled();
@@ -80,16 +99,16 @@ describe('ErrorPage', () => {
         expect(window.location.href).toBe('/');
     });
 
-    it('navigates to home on home button click', () => {
+    it('shows retry button for 429', () => {
+        const onRetry = vi.fn();
         render(
             <MemoryRouter>
-                <ErrorPage />
+                <ErrorPage error={new ApiError(429, 'Rate limited')} onRetry={onRetry} />
             </MemoryRouter>
         );
         
-        const homeButton = screen.getByRole('button', { name: /Go to Home/i });
-        fireEvent.click(homeButton);
-
-        expect(mockNavigate).toHaveBeenCalledWith('/');
+        const retryButton = screen.getByRole('button', { name: 'common.errors.retry' });
+        fireEvent.click(retryButton);
+        expect(onRetry).toHaveBeenCalled();
     });
 });

@@ -35,7 +35,11 @@ const App = () => {
                 <Route path="post-sort" element={<PostSortPage />} />
                 <Route path="reset" element={<ResetPage />} /> 
     
-                <Route path="*" element={<ErrorPage />} />
+import { ApiError } from './api/client';
+
+// ...
+
+                <Route path="*" element={<ErrorPage error={new ApiError(404, 'Page not found')} />} />
               </Route>
             </Routes>
           </Suspense>

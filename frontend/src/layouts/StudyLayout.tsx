@@ -65,29 +65,28 @@ const StudyLayoutContent: React.FC = () => {
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
         useSessionStore.getState().setLanguage(lng);
-        setIsLangMenuOpen(false);
-    };
+// ...
+import { ApiError } from '../api/client';
+
+// ...
 
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
+        // Map known error keys to ApiErrors for better UI
+        let errorObj: Error | ApiError | null = null;
+        if (configError === 'common.errors.not_found') {
+            errorObj = new ApiError(404, 'Study not found');
+        } else if (configError === 'common.errors.network') {
+            errorObj = new Error('Network error');
+        }
+
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-white rounded-2xl border border-red-100 shadow-xl p-8 text-center space-y-6">
-                    <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
-                        <X size={40} />
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-2xl font-bold text-slate-900">{t('common.error')}</h2>
-                        <p className="text-slate-600">{t(configError)}</p>
-                    </div>
-                    <button
-                        onClick={retry}
-                        className="w-full py-3 px-6 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <RefreshCw size={18} /> {t('common.errors.retry')}
-                    </button>
-                </div>
-            </div>
+            <ErrorPage 
+                error={errorObj}
+                title={!errorObj ? t('common.error') : undefined} 
+                message={!errorObj ? t(configError) : undefined} 
+                onRetry={retry} 
+            />
         );
     }
 
@@ -245,21 +244,30 @@ const StudyLayoutContent: React.FC = () => {
 
             {/* Main Content */}
             <main className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some(path => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-                {/* Error Banner (Stale-while-revalidating failure) */}
-                {configError && config && (
-                    <div className="bg-red-600 text-white px-6 py-2 flex items-center justify-between animate-in slide-in-from-top duration-300">
-                        <div className="flex items-center gap-2 text-sm font-medium">
-                            <X size={16} />
-                            {t(configError)}
-                        </div>
-                        <button
-                            onClick={retry}
-                            className="flex items-center gap-1.5 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs font-bold transition-colors"
-                        >
-                            <RefreshCw size={14} /> {t('common.errors.retry')}
-                        </button>
-                    </div>
-                )}
+// ...
+import { ApiError } from '../api/client';
+
+// ...
+
+    // Full Page Error State (if we have no config at all)
+    if (configError && !config) {
+        // Map known error keys to ApiErrors for better UI
+        let errorObj: Error | ApiError | null = null;
+        if (configError === 'common.errors.not_found') {
+            errorObj = new ApiError(404, 'Study not found');
+        } else if (configError === 'common.errors.network') {
+            errorObj = new Error('Network error');
+        }
+
+        return (
+            <ErrorPage 
+                error={errorObj}
+                title={!errorObj ? t('common.error') : undefined} 
+                message={!errorObj ? t(configError) : undefined} 
+                onRetry={retry} 
+            />
+        );
+    }
                 {/* Transition Overlay / Dimming */}
                 <div className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                     <ErrorBoundary>

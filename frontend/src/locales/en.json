@@ -22,7 +22,23 @@
       "not_found": "Study not found.",
       "validation": "System error: Data validation failed.",
       "unknown": "An unexpected error occurred.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "404": {
+          "title": "Page Not Found",
+          "message": "The page or study you are looking for does not exist."
+      },
+      "429": {
+          "title": "Too Many Requests",
+          "message": "You are doing that too fast. Please wait a moment."
+      },
+      "500": {
+          "title": "Server Error",
+          "message": "Our servers encountered an issue. Please try again later."
+      },
+      "network_title": "Connection Lost",
+      "home": "Go to Home",
+      "reset": "Reset Session",
+      "default_title": "Oops! Something went wrong."
     }
   },
   "layout": {

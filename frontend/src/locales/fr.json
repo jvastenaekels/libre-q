@@ -22,7 +22,23 @@
       "not_found": "Étude non trouvée.",
       "validation": "Erreur système : Échec de la validation des données.",
       "unknown": "Une erreur inattendue est survenue.",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "404": {
+          "title": "Page introuvable",
+          "message": "La page ou l'étude que vous cherchez n'existe pas."
+      },
+      "429": {
+          "title": "Trop de requêtes",
+          "message": "Vous allez trop vite. Veuillez patienter un instant."
+      },
+      "500": {
+          "title": "Erreur serveur",
+          "message": "Nos serveurs ont rencontré un problème. Veuillez réessayer plus tard."
+      },
+      "network_title": "Connexion perdue",
+      "home": "Retour à l'accueil",
+      "reset": "Réinitialiser la session",
+      "default_title": "Oups ! Quelque chose a mal tourné."
     }
   },
   "layout": {
