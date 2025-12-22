@@ -8,7 +8,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronUp, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import SortableCard from './SortableCard';
 
 interface WorkbenchPanelProps {
     card: { id: number; text: string } | null;
@@ -18,20 +18,10 @@ interface WorkbenchPanelProps {
     cardDimensions?: { width: number; height: number };
 }
 
-// Dynamic text sizing based on text length
-const getTextSizeClass = (textLength: number): string => {
-    if (textLength < 50) return 'text-lg';
-    if (textLength < 100) return 'text-base';
-    if (textLength < 200) return 'text-sm';
-    return 'text-xs';
-};
-
 const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height, cardDimensions }) => {
     const { t } = useTranslation();
 
     if (!card) return null;
-
-    const textSizeClass = getTextSizeClass(card.text.length);
     
     // Calculate aspect ratio from card dimensions (default to 3/4 if not provided)
     const aspectRatio = cardDimensions 
@@ -72,7 +62,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
 
             {/* Card + Instruction - Horizontal layout */}
             <div className="flex-1 flex items-center justify-center gap-3 px-4 pb-3 min-h-0">
-                {/* Instruction - Left side, vertical text */}
+                {/* Instruction - Left side */}
                 <div className="flex-none flex items-center">
                     <div className="flex flex-col items-center gap-1 text-[9px] font-bold text-indigo-500 uppercase tracking-wider">
                         <ChevronUp size={12} className="animate-bounce" />
@@ -80,23 +70,25 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                     </div>
                 </div>
 
-                {/* Card Content - Consistent aspect ratio with grid cards, scroll fallback */}
+                {/* Draggable Card - Using SortableCard for dnd-kit integration */}
                 <div 
-                    className="bg-white rounded-2xl border-2 border-indigo-200 shadow-md p-3 flex items-center justify-center overflow-y-auto flex-1"
+                    className="flex-1 flex items-center justify-center"
                     style={{ 
-                        aspectRatio: `${aspectRatio}`,
                         maxHeight: '100%',
-                        maxWidth: '60%'
+                        maxWidth: '55%'
                     }}
                 >
-                    <div className={`font-medium text-slate-800 ${textSizeClass} leading-relaxed text-center`}>
-                        <ReactMarkdown components={{ p: ({ children }) => <span className="block">{children}</span> }}>
-                            {card.text}
-                        </ReactMarkdown>
-                    </div>
+                    <SortableCard 
+                        id={card.id} 
+                        text={card.text}
+                        aspectRatio={aspectRatio}
+                        variant="grid"
+                        isSelected={true}
+                        disableHoverZoom={true}
+                    />
                 </div>
 
-                {/* Instruction - Right side, vertical text */}
+                {/* Instruction - Right side */}
                 <div className="flex-none flex items-center">
                     <div className="flex flex-col items-center gap-1 text-[9px] font-bold text-indigo-500 uppercase tracking-wider">
                         <ChevronUp size={12} className="animate-bounce" />
