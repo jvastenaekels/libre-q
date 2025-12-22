@@ -15,6 +15,7 @@ import ErrorPage from './pages/ErrorPage';
 import LandingPage from './pages/LandingPage';
 import ResetPage from './pages/ResetPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ApiError } from './api/client';
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
@@ -35,9 +36,7 @@ const App = () => {
                 <Route path="post-sort" element={<PostSortPage />} />
                 <Route path="reset" element={<ResetPage />} /> 
     
-import { ApiError } from './api/client';
 
-// ...
 
                 <Route path="*" element={<ErrorPage error={new ApiError(404, 'Page not found')} />} />
               </Route>

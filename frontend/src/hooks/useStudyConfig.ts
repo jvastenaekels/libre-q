@@ -78,11 +78,17 @@ export const useStudyConfig = () => {
                 if (err instanceof ApiError) {
                     if (err.status === 404) {
                         errorKey = 'common.errors.not_found';
+                    } else if (err.status === 429) {
+                        errorKey = 'common.errors.rate_limited';
                     }
                 } else if (err instanceof ZodError) {
                     errorKey = 'common.errors.validation';
-                } else if (err instanceof TypeError && err.message === 'Failed to fetch') {
-                    errorKey = 'common.errors.network';
+                } else {
+                    // Fallback for network errors (often TypeError: Failed to fetch)
+                    // or other unknown errors
+                     if (err instanceof TypeError || (err instanceof Error && err.name === 'TypeError')) {
+                        errorKey = 'common.errors.network';
+                     }
                 }
                 
                 setConfigError(errorKey);

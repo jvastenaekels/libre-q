@@ -103,13 +103,32 @@ Submit participant data after completing the study.
 
 ---
 
+## Rate Limiting
+
+To ensure fair usage and system stability, the API implements rate limiting via `slowapi`.
+
+| Endpoint                | Limit                |
+| ----------------------- | -------------------- |
+| `GET /api/study/{slug}` | 60 requests / minute |
+| `POST /api/submit`      | 5 requests / minute  |
+
+**Response Headers:**
+When a request is made, the following headers are included to inform the client about their current status:
+
+- `X-RateLimit-Limit`: The number of requests allowed within the time window.
+- `X-RateLimit-Remaining`: The number of requests remaining in the current window.
+- `X-RateLimit-Reset`: The time at which the current window resets (in UTC epoch seconds).
+
+---
+
 ## Error Responses
 
-| Status | Description                     |
-| ------ | ------------------------------- |
-| `404`  | Study not found                 |
-| `422`  | Validation error (invalid data) |
-| `500`  | Internal server error           |
+| Status | Description                             |
+| ------ | --------------------------------------- |
+| `404`  | Study not found                         |
+| `422`  | Validation error (invalid data)         |
+| `429`  | Too Many Requests (Rate limit exceeded) |
+| `500`  | Internal server error                   |
 
 ---
 

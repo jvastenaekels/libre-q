@@ -11,10 +11,12 @@ import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { Check, Globe, RefreshCw, X } from 'lucide-react';
+import { Check, Globe } from 'lucide-react';
 import { LayoutProvider, useLayoutState } from '../contexts/LayoutContext';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import CardZoomOverlay from '../components/CardZoomOverlay';
+import { ApiError } from '../api/client';
+import ErrorPage from '../pages/ErrorPage';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -34,7 +36,6 @@ const StudyLayoutContent: React.FC = () => {
     const session = useSessionStore();
     
     const location = useLocation();
-    // const navigate = useNavigate(); // Removed as stepper is read-only
     const { headerAction } = useLayoutState();
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
     const langMenuRef = useRef<HTMLDivElement>(null);
@@ -65,10 +66,8 @@ const StudyLayoutContent: React.FC = () => {
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
         useSessionStore.getState().setLanguage(lng);
-// ...
-import { ApiError } from '../api/client';
-
-// ...
+        setIsLangMenuOpen(false);
+    };
 
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
@@ -76,6 +75,8 @@ import { ApiError } from '../api/client';
         let errorObj: Error | ApiError | null = null;
         if (configError === 'common.errors.not_found') {
             errorObj = new ApiError(404, 'Study not found');
+        } else if (configError === 'common.errors.rate_limited') {
+            errorObj = new ApiError(429, 'Too many requests');
         } else if (configError === 'common.errors.network') {
             errorObj = new Error('Network error');
         }
@@ -244,30 +245,7 @@ import { ApiError } from '../api/client';
 
             {/* Main Content */}
             <main className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some(path => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-// ...
-import { ApiError } from '../api/client';
 
-// ...
-
-    // Full Page Error State (if we have no config at all)
-    if (configError && !config) {
-        // Map known error keys to ApiErrors for better UI
-        let errorObj: Error | ApiError | null = null;
-        if (configError === 'common.errors.not_found') {
-            errorObj = new ApiError(404, 'Study not found');
-        } else if (configError === 'common.errors.network') {
-            errorObj = new Error('Network error');
-        }
-
-        return (
-            <ErrorPage 
-                error={errorObj}
-                title={!errorObj ? t('common.error') : undefined} 
-                message={!errorObj ? t(configError) : undefined} 
-                onRetry={retry} 
-            />
-        );
-    }
                 {/* Transition Overlay / Dimming */}
                 <div className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                     <ErrorBoundary>
