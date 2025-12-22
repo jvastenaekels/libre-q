@@ -108,7 +108,7 @@ const GridSort: React.FC<GridSortProps> = ({
       pyramidRef,
       gridColumns,
       activePile,
-      activePileCount: getActiveCards().length,
+      activePileCount: activeCards.length,
       hasPerformedZonalFocus,
       setDimmingActive,
       onZoomChange
