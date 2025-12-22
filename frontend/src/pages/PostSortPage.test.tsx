@@ -165,4 +165,31 @@ describe('PostSortPage', () => {
 
         expect(screen.getByDisplayValue('Persisted comment for card 1')).toBeTruthy();
     });
+    it('uses custom prompts from config if provided', () => {
+        const customConfig = {
+            ...mockConfig,
+            postsort_config: {
+                ...mockConfig.postsort_config,
+                prompts: {
+                    extreme: 'Custom Why?',
+                    missing: 'Custom Missing?',
+                    general: 'Custom General?'
+                }
+            }
+        };
+        useConfigStore.getState().setConfig(customConfig as any);
+        
+        render(
+             <MemoryRouter>
+                <LayoutProvider>
+                    <PostSortPage />
+                </LayoutProvider>
+            </MemoryRouter>
+        );
+
+        // Check for custom prompts (using queryAllByText for "Custom Why?" since it appears for multiple cards)
+        expect(screen.getAllByText('Custom Why?').length).toBeGreaterThan(0);
+        expect(screen.getByText('Custom Missing?')).toBeTruthy();
+        expect(screen.getByText('Custom General?')).toBeTruthy();
+    });
 });

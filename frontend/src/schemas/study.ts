@@ -47,6 +47,13 @@ export const StudyConfigSchema = z.object({
   grid_config: z.array(GridConfigSchema).optional(),
   postsort_config: z.object({
     extreme_columns: z.array(z.number()).optional(),
+    ask_missing: z.boolean().optional(),
+    ask_general_comment: z.boolean().optional(),
+    prompts: z.object({
+      extreme: z.union([z.string(), z.record(z.string())]).optional(),
+      missing: z.union([z.string(), z.record(z.string())]).optional(),
+      general: z.union([z.string(), z.record(z.string())]).optional(),
+    }).optional(),
   }).optional(),
   statements: z.array(StatementSchema),
   consent: ConsentSchema.optional(),

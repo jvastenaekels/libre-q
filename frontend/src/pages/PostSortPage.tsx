@@ -31,7 +31,7 @@ const PostSortPage: React.FC = () => {
     const setPostSortResponse = useResponseStore(state => state.setPostSortResponse);
     
     const { setHeaderAction } = useLayoutAction();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { slug } = useParams();
     
@@ -73,6 +73,24 @@ const PostSortPage: React.FC = () => {
             return () => clearTimeout(timer);
         }
     }, [config, responses.qsort.length, navigate, slug, session.isCompleted, submit]); 
+
+    // Helper to resolve custom prompts
+    const getPrompt = (key: 'extreme' | 'missing' | 'general', defaultText: string) => {
+
+        const prompts = config?.postsort_config?.prompts;
+
+        const promptConfig = prompts?.[key];
+        
+        if (!promptConfig) return defaultText;
+        
+        if (typeof promptConfig === 'string') {
+            return promptConfig;
+        }
+        
+        const currentLang = i18n.language || 'en';
+        return promptConfig[currentLang] || promptConfig['en'] || defaultText;
+    };
+ 
     
     if (!config) return null;
 
@@ -245,7 +263,7 @@ const PostSortPage: React.FC = () => {
                                         htmlFor={`comment-${card.statementId}`}
                                         className="block text-sm font-semibold text-slate-700 mb-2"
                                     >
-                                        {t('post.extreme.why')}
+                                        {getPrompt('extreme', t('post.extreme.why'))}
                                     </label>
                                     <textarea
                                         id={`comment-${card.statementId}`}
@@ -277,7 +295,7 @@ const PostSortPage: React.FC = () => {
                 {/* 2. MISSING STATEMENTS */}
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label htmlFor="missing_statement" className="block text-lg font-bold text-slate-800 mb-2">
-                        {t('post.missing.label')}
+                        {getPrompt('missing', t('post.missing.label'))}
                     </label>
                     <p className="text-sm text-slate-500 mb-4">{t('post.missing.description')}</p>
                     <textarea
@@ -293,7 +311,7 @@ const PostSortPage: React.FC = () => {
                 {/* 3. GENERAL COMMENTS */}
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label htmlFor="general_comment" className="block text-lg font-bold text-slate-800 mb-2">
-                        {t('post.general.label')}
+                        {getPrompt('general', t('post.general.label'))}
                     </label>
                     <p className="text-sm text-slate-500 mb-4">{t('post.general.description')}</p>
                     <textarea
