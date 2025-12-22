@@ -15,8 +15,6 @@ import {
     TouchSensor, 
     closestCenter,
     pointerWithin,
-    rectIntersection,
-    // getFirstCollision, 
     type CollisionDetection
 } from '@dnd-kit/core';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -37,13 +35,38 @@ const FineSortPage: React.FC = () => {
     // ... hooks ...
 
     // Custom Collision Strategy (omitted for brevity in replacement, kept in file)
-    const collisionStrategy: CollisionDetection = (args) => {
+    // Custom Collision Strategy: Resolves card hits to slots and falls back to closestCenter for snapping
+    const collisionStrategy: CollisionDetection = React.useCallback((args) => {
         const pointerCollisions = pointerWithin(args);
-        if (pointerCollisions.length > 0) return pointerCollisions;
-        const rectCollisions = rectIntersection(args);
-        if (rectCollisions.length > 0) return rectCollisions;
-        return closestCenter(args);
-    };
+        
+        const resolveToSlot = (id: any) => {
+            const idString = String(id);
+            if (idString.startsWith('slot_')) return idString;
+            const cardId = parseInt(idString);
+            if (!isNaN(cardId)) {
+                const placed = responses.qsort.find(p => p.statementId === cardId);
+                return placed ? `slot_${placed.col}_${placed.row}` : null;
+            }
+            return null;
+        };
+
+        const resolvedPointer = pointerCollisions
+            .map(c => {
+                const slotId = resolveToSlot(c.id);
+                return slotId ? { ...c, id: slotId } : null;
+            })
+            .filter((c): c is NonNullable<typeof c> => c !== null);
+
+        if (resolvedPointer.length > 0) return resolvedPointer;
+
+        const centerCollisions = closestCenter(args);
+        return centerCollisions
+            .map(c => {
+                const slotId = resolveToSlot(c.id);
+                return slotId ? { ...c, id: slotId } : null;
+            })
+            .filter((c): c is NonNullable<typeof c> => c !== null);
+    }, [responses.qsort]);
 
     const config = useConfigStore((state) => state.config);
     const responses = useResponseStore((state) => ({ 
@@ -175,6 +198,7 @@ const FineSortPage: React.FC = () => {
     // --- Refactored Drag Logic via Hook ---
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<any>(null);
+    const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
 
     const { 
         activeId, 
@@ -195,7 +219,10 @@ const FineSortPage: React.FC = () => {
         },
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
-        interactionUtils
+        interactionUtils,
+        activePileCount: unplacedAgree.length + unplacedDisagree.length + unplacedNeutral.length,
+        hasPerformedZonalFocus: responses.qsort.length > 0, // Simple heuristic for now
+        onZoomChange: setZoomLevel
     });
     
     if (!config) return null;

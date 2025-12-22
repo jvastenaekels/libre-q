@@ -102,7 +102,7 @@ export const useStudyConfig = () => {
 
         fetchConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slug, session.language, configRefetchTag, setConfig, setConfigLoading, setConfigError]); 
+    }, [slug, configRefetchTag, setConfig, setConfigLoading, setConfigError]); 
 
     return { 
         retry: triggerConfigRefetch 

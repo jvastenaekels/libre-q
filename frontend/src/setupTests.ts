@@ -6,6 +6,11 @@
 
 import { vi } from 'vitest';
 import '@testing-library/jest-dom'; 
+import { server } from './tests/server';
+import { useConfigStore } from './store/useConfigStore';
+import { useResponseStore } from './store/useResponseStore';
+import { useSessionStore } from './store/useSessionStore';
+import { useUIStore } from './store/useUIStore';
 
 // Mock react-i18next globally
 vi.mock('react-i18next', () => ({
@@ -44,3 +49,15 @@ global.ResizeObserver = class ResizeObserver {
     unobserve() {}
     disconnect() {}
 };
+
+// MSW Server Setup
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+afterEach(() => {
+    server.resetHandlers();
+    // Reset Zustand stores
+    useConfigStore.getState().resetConfig();
+    useResponseStore.getState().resetResponses();
+    useSessionStore.getState().resetSession();
+    useUIStore.getState().setZoomedCard(null);
+});
+afterAll(() => server.close());

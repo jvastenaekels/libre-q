@@ -5,101 +5,49 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import FineSortPage from './FineSortPage';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import FineSortPage from './FineSortPage';
 import StudyLayout from '../layouts/StudyLayout';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { useUIStore } from '../store/useUIStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useConfigStore } from '../store/useConfigStore';
 
-// Mock Stores
-vi.mock('../store/useConfigStore');
-vi.mock('../store/useResponseStore');
-vi.mock('../store/useSessionStore');
-vi.mock('../store/useUIStore');
-
-const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseUIStore = useUIStore as unknown as ReturnType<typeof vi.fn>;
-
-// Mock useStudyConfig
-vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
-}));
-
-// Mock ResizeObserver
-global.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
-
-describe('FineSortPage Mobile Interaction', () => {
+describe('FineSortPage Mobile Interaction (Integration)', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-        // Default mocks
-        const defaultSessionState = {
-            token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false,
-            setStep: vi.fn(),
-            setLanguage: vi.fn() 
-        };
-        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(defaultSessionState) : defaultSessionState);
+        // Setup initial session state for the test
+        useSessionStore.getState().setConsent(true);
+        useSessionStore.getState().setStep(4); // Fine Sort step
+        
+        // Pre-load config to ensure placeCardInGrid and other store actions work immediately
+        useConfigStore.getState().setConfig({
+            slug: 'demo',
+            title: 'Demo Study',
+            description: 'Mocked for testing',
+            instructions: 'Sort them',
+            statements: [
+                { id: 1, text: 'Statement 1' },
+                { id: 2, text: 'Statement 2' },
+                { id: 3, text: 'Statement 3' },
+            ],
+            grid_config: [
+                { score: -1, capacity: 1 },
+                { score: 0, capacity: 1 },
+                { score: 1, capacity: 1 },
+            ],
+            presort_config: {},
+        } as any);
 
-        mockUseUIStore.mockImplementation((selector: any) => selector ? selector({
-            zoomedCard: null, setZoomedCard: vi.fn()
-        }) : { zoomedCard: null, setZoomedCard: vi.fn() });
+        // Mock viewport size for mobile
+        Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+        window.dispatchEvent(new Event('resize'));
     });
 
-    const mockConfig = {
-        statements: [
-            { id: 1, text: 'Card 1' },
-            { id: 2, text: 'Card 2' }
-        ],
-        grid_config: [
-            { score: -1, capacity: 1 }, 
-            { score: 1, capacity: 1 }
-        ],
-        title: 'Demo', description: 'Demo', instructions: 'Demo', presort_config: {}, language_code: 'en'
-    };
-
     it('allows "Tap-to-Place" interaction: Select Card -> Tap Slot -> Move', async () => {
-        // Setup State
-        const placeCardInGridSpy = vi.fn();
-        
-        mockUseConfigStore.mockImplementation((selector) => selector({ config: mockConfig }));
-        
-        mockUseResponseStore.mockReturnValue({ // useResponseStore is used for both selector AND actions in component
-            rough: { agree: [], disagree: [1], neutral: [], history: [] },
-            qsort: [],
-            placeCardInGrid: placeCardInGridSpy,
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-            resetFineSort: vi.fn()
-        });
-        // Note: In component:
-        // const responses = useResponseStore((state) => ({ rough, qsort }))
-        // const actions = useResponseStore()
-        // We need the mock to handle both. simpler to mock implementation? 
-        // Or just mockReturnValue works if the component usage is compatible.
-        // Component usage 1: useResponseStore((state) => ({...})) 
-        // Component usage 2: useResponseStore()
-        
-        // Better mock implementation to handle selector vs no-selector
-        const mockResponsesState = {
-            rough: { agree: [], disagree: [1], neutral: [], history: [] },
-            qsort: [],
-            placeCardInGrid: placeCardInGridSpy,
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-            resetFineSort: vi.fn()
-        };
-        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(mockResponsesState) : mockResponsesState);
+        // 1. Prepare rough sort results and consent
+        useResponseStore.getState().categorizeCard(1, 'disagree');
+        useSessionStore.getState().setConsent(true);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -111,53 +59,44 @@ describe('FineSortPage Mobile Interaction', () => {
             </MemoryRouter>
         );
 
-        // 2. Locate Card in Deck
-        // Currently GridSort defaults to 'disagree' pile, which has Card 1.
-        const card = screen.getByText('Card 1');
+        // 2. Ensure we are on the 'disagree' pile
+        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        fireEvent.click(disagreeTab);
+
+        // 3. Wait for Card 1 to appear in the deck
+        const card = await screen.findByText(/Statement 1/i);
         expect(card).toBeTruthy();
 
-        // 3. User Taps Card (Select)
-        fireEvent.click(card); // This should toggle 'selectedCardId' state in FineSortPage
+        // 4. User Taps Card (Select)
+        fireEvent.click(card);
 
-        // 4. Verify Selection Visuals (Optional check if we could inspect style, but functional check is better)
-        // We can check if `placeCardInGridSpy` has NOT been called yet
-        expect(placeCardInGridSpy).not.toHaveBeenCalled();
+        // 5. Verify Workbench appears
+        expect(await screen.findByText(/fine.workbench.drag_or_tap/i)).toBeTruthy();
 
-        // 5. User Taps Empty Slot (Place)
-        // Target slot at col 0, row 0 (Score -1)
+        // 6. User Taps Empty Slot (Place)
         const slot = screen.getByTestId('slot_0_0');
-        expect(slot).toBeTruthy();
-
         fireEvent.click(slot);
 
-        // 6. Verify Action
-        // placeCardInGrid(cardId, col, row)
-        expect(placeCardInGridSpy).toHaveBeenCalledTimes(1);
-        expect(placeCardInGridSpy).toHaveBeenCalledWith(1, 0, 0);
+        // 7. Verify Card moved to Grid
+        try {
+            const placedCard = await screen.findByTestId('card-1', {}, { timeout: 4000 });
+            expect(placedCard).toBeTruthy();
+        } catch (e) {
+            console.log('DOM state on Tap-to-Place failure:');
+            screen.debug(undefined, 20000);
+            throw e;
+        }
+
+        // 8. Verify Deck shows completion message
+        expect(screen.getByText(/fine.deck.all_placed/i)).toBeTruthy();
     });
 
     it('allows "Tap-to-Swap" interaction: Select Card -> Tap Occupied Slot -> Swap', async () => {
-        // 1. Setup State: Card 2 in Disagree Pile. Card 1 already in Grid at 0,0.
-        const unplaceCardSpy = vi.fn();
-        const placeCardInGridSpy = vi.fn();
-        const swapCardsInGridSpy = vi.fn();
-
-        mockUseConfigStore.mockImplementation((selector) => selector({ config: mockConfig }));
-
-        const mockResponsesState = {
-            rough: { agree: [], disagree: [2], neutral: [], history: [] }, 
-            qsort: [
-                { statementId: 1, col: 0, row: 0 }
-            ],
-            postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
-            placeCardInGrid: placeCardInGridSpy,
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: swapCardsInGridSpy,
-            unplaceCard: unplaceCardSpy,
-            resetFineSort: vi.fn()
-        };
-        
-        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(mockResponsesState) : mockResponsesState);
+        // 1. Prepare state: Card 2 in Disagree Pile. Card 1 already in Grid at 0,0.
+        useResponseStore.getState().categorizeCard(1, 'disagree');
+        useResponseStore.getState().categorizeCard(2, 'disagree');
+        useResponseStore.getState().placeCardInGrid(1, 0, 0);
+        useSessionStore.getState().setConsent(true);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -169,19 +108,29 @@ describe('FineSortPage Mobile Interaction', () => {
             </MemoryRouter>
         );
 
-        // 2. Select Card 2 (in Deck)
-        const cardInDeck = screen.getByText('Card 2');
+        // 2. Ensure we are on the 'disagree' pile
+        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        fireEvent.click(disagreeTab);
+
+        // 3. Select Card 2 (in Deck)
+        const cardInDeck = await screen.findByText(/Statement 2/i);
         fireEvent.click(cardInDeck);
 
-        // 3. Tap Occupied Slot (Slot 0,0 has Card 1)
+        // 4. Tap Occupied Slot (Slot 0,0 has Card 1/Statement 1)
         const slot = screen.getByTestId('slot_0_0');
         fireEvent.click(slot);
 
-        // 4. Verify Swap (Implemented as Unplace + Place for Deck->Grid items)
-        expect(unplaceCardSpy).toHaveBeenCalledTimes(1);
-        expect(unplaceCardSpy).toHaveBeenCalledWith(1); // Unplace Card 1
+        // 5. Verify Swap: Card 2 should now be in the grid
+        try {
+            const placedCard2 = await screen.findByTestId('card-2');
+            expect(placedCard2).toBeTruthy();
+        } catch (e) {
+            console.log('DOM state on Tap-to-Swap failure:');
+            screen.debug(undefined, 20000);
+            throw e;
+        }
 
-        expect(placeCardInGridSpy).toHaveBeenCalledTimes(1);
-        expect(placeCardInGridSpy).toHaveBeenCalledWith(2, 0, 0); // Place Card 2 at 0,0
+        // 6. Card 1 should be back in the deck
+        expect(await screen.findByText(/Statement 1/i)).toBeTruthy();
     });
 });

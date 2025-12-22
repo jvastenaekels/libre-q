@@ -41,12 +41,7 @@ interface GridSortProps {
     zoomIn: () => void; 
     zoomOut: () => void; 
     performAutoFit: () => void;
-    transformRef: React.RefObject<{ 
-      instance: { 
-        transformState: { positionX: number; positionY: number; scale: number; } 
-      }; 
-      setTransform: (x: number, y: number, scale: number, duration: number, animationType?: string) => void;
-    }>;
+    transformRef: React.RefObject<any>;
     wrapperRef: React.RefObject<HTMLDivElement>;
   }) => void;
 }
@@ -97,7 +92,7 @@ const GridSort: React.FC<GridSortProps> = ({
       onDimensionsChange
   });
 
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 
 
 
@@ -115,7 +110,13 @@ const GridSort: React.FC<GridSortProps> = ({
   const pyramidRef = useRef<HTMLDivElement>(null);
 
   // Zoom Hook
-  const { transformRef, performAutoFit, zoomIn, zoomOut, onTransformed } = useGridZoom({
+  const { 
+    zoomIn, 
+    zoomOut, 
+    performAutoFit, 
+    transformRef, 
+    onTransformed 
+  } = useGridZoom({
       wrapperRef,
       contentRef,
       pyramidRef,
@@ -123,7 +124,6 @@ const GridSort: React.FC<GridSortProps> = ({
       activePile,
       activePileCount: activeCards.length,
       hasPerformedZonalFocus,
-      setDimmingActive,
       onZoomChange
   });
 
@@ -155,14 +155,6 @@ const GridSort: React.FC<GridSortProps> = ({
     return 'text-base sm:text-lg';
   };
   
-  const isColumnDimmed = (score: number) => {
-      if (!dimmingActive) return false; 
-      if (activePile === 'disagree' && score > 0) return true;
-      if (activePile === 'agree' && score < 0) return true;
-      if (activePile === 'neutral' && Math.abs(score) >= 3) return true; 
-      return false;
-  };
-
 
 
   useEffect(() => {
@@ -208,7 +200,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const renderDeckCards = () => {
     return activeCards.length > 0 ? activeCards.map(card => (
-        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[130px] sm:w-[140px] lg:w-full">
+        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[130px] sm:w-[140px] lg:w-full lg:flex-none">
                <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
         </motion.div>
     )) : (
@@ -289,7 +281,7 @@ const GridSort: React.FC<GridSortProps> = ({
                         <div data-testid="grid-container" ref={contentRef} className="flex flex-col items-center gap-8 px-4 relative">
                             <div ref={pyramidRef} className="flex flex-row gap-2 items-end flex-nowrap" role="grid">
                                 {gridColumns.map((col, colIndex) => (
-                                    <div key={col.score} id={`column-${col.score}`} className={`flex flex-col gap-2 items-center flex-shrink-0 transition-opacity duration-1000 ${isColumnDimmed(col.score) ? 'opacity-50 grayscale-[30%]' : 'opacity-100'}`}>
+                                    <div key={col.score} id={`column-${col.score}`} className="flex flex-col gap-2 items-center flex-shrink-0">
                                         <div className="flex flex-col gap-2" role="row">
                                             {Array.from({ length: col.capacity }).map((_, rowIndex) => (
                                                 <DroppableSlot
@@ -428,8 +420,13 @@ const GridSort: React.FC<GridSortProps> = ({
               </div>
 
               {!isDeckCollapsed && (
-                <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
-                    className="flex-1 p-2 flex flex-row gap-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:content-start lg:gap-2"
+                <motion.div 
+                    key={activePile} 
+                    initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} 
+                    animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} 
+                    transition={{ duration: 0.8 }}
+                    className="flex-1 p-2 flex flex-row gap-2 overflow-x-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:content-start"
+                    data-testid="deck-cards-container"
                 >
 {renderDeckCards()}
               </motion.div>

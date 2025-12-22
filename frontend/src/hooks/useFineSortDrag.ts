@@ -174,7 +174,16 @@ export const useFineSortDrag = ({
         if (!over) return;
 
         const cardId = active.id as number;
-        const overIdString = String(over.id);
+        let overIdString = String(over.id);
+
+        // If dropped on another card, resolve to its slot
+        if (!overIdString.startsWith('slot_')) {
+            const cardIdAtOver = over.id as number;
+            const placedCard = responses.qsort.find(c => c.statementId === cardIdAtOver);
+            if (placedCard) {
+                overIdString = `slot_${placedCard.col}_${placedCard.row}`;
+            }
+        }
 
         if (overIdString.startsWith('slot_')) {
             const parts = overIdString.split('_');

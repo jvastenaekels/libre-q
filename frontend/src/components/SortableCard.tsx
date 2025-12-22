@@ -121,6 +121,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
             style={{ ...style, ...aspectStyle }}
             {...attributes}
             {...listeners}
+            data-testid={`card-${id}`}
             onClick={() => {
                 if (hoverTimerRef.current) {
                     clearTimeout(hoverTimerRef.current);
