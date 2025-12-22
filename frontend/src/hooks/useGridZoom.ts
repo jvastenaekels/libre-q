@@ -83,7 +83,7 @@ export const useGridZoom = ({
             y = (wrapperH - (contentH * scale)) / 2;
         }
         
-        transformRef.current.setTransform(x, y, scale, 200);
+        transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
     }, [wrapperRef, contentRef, pyramidRef]);
 
     const zoomIn = useCallback(() => {
@@ -205,12 +205,12 @@ export const useGridZoom = ({
              // Bottom anchor for Y (spectrum bar visible)
              const targetY = wrapperH - (contentH * targetScale) - 10;
 
-             // Apply zoom and pan
-             transformRef.current.setTransform(clampedX, targetY, targetScale, 600, 'easeOutQuad');
+             // Apply zoom and pan with smooth easing
+             transformRef.current.setTransform(clampedX, targetY, targetScale, 800, 'easeInOutQuad');
              
              // (No dimming cue)
 
-        }, 800); // Delay after autoFit completes
+        }, 500); // Reduced delay for smoother transition
 
         return () => clearTimeout(zoomTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
