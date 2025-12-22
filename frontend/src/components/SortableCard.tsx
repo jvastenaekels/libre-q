@@ -94,18 +94,18 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
   switch(variant) {
       case 'hand': 
           textSizeClass = 'text-sm sm:text-base leading-relaxed';
-          if (!isOverlay && !isZoomed && !allowScroll) textSizeClass += ' line-clamp-5';
+          if (!allowScroll) textSizeClass += ' line-clamp-5';
           containerPadding = 'px-2 py-2';
           break;
       case 'compact': 
           textSizeClass = 'text-xs leading-tight text-slate-700'; 
-          if (!isOverlay && !isZoomed && !allowScroll) textSizeClass += ' line-clamp-4';
+          if (!allowScroll) textSizeClass += ' line-clamp-4';
           containerPadding = 'p-1.5';
           break;
       case 'grid': 
       default:
           textSizeClass = 'text-sm font-medium leading-snug text-slate-800';
-          if (!isOverlay && !isZoomed && !allowScroll) textSizeClass += ' line-clamp-4';
+          if (!allowScroll) textSizeClass += ' line-clamp-4';
           containerPadding = 'p-3'; 
           break;
   }
@@ -163,7 +163,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                     ${isOverlay ? 'shadow-xl ring-2 ring-indigo-500' : ''}
                 `}
             >
-                <div className={`w-full h-full flex items-center justify-center ${isOverlay || isZoomed || allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}>
+                <div className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}>
                     <div 
                         className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}
                     >

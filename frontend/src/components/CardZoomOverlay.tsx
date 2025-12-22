@@ -79,11 +79,7 @@ const CardZoomOverlay: React.FC = () => {
 
                         <div className={`
                             font-medium text-slate-800 font-sans leading-relaxed
-                            overflow-y-auto custom-scrollbar
-                            ${isMobile 
-                                ? 'text-xl leading-normal text-center px-4 py-2 max-h-[60vh]' 
-                                : 'text-lg max-h-[400px] pr-2'
-                            }
+                            ${isMobile ? 'text-2xl leading-normal text-center px-4 py-2' : 'text-lg'}
                         `}>
                             <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                                 {zoomedCard.text}
