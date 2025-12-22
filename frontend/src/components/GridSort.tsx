@@ -349,7 +349,7 @@ const GridSort: React.FC<GridSortProps> = ({
                            const isActive = activePile === pile;
                            const cards = pile === 'disagree' ? disagreeCards : pile === 'neutral' ? neutralCards : agreeCards;
                            const Icon = pile === 'disagree' ? Frown : pile === 'neutral' ? Meh : Smile;
-                           const col = pile === 'disagree' ? 'red' : pile === 'neutral' ? 'slate' : 'green';
+                           const col = pile === 'disagree' ? 'red' : pile === 'neutral' ? 'indigo' : 'green';
                            return (
                                <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
                                    role="tab"

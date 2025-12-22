@@ -184,7 +184,8 @@ export const useGridZoom = ({
         }, 800); // Delay after autoFit completes
 
         return () => clearTimeout(zoomTimer);
-    }, [activePile, activePileCount, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
 
     return {
         transformRef,
