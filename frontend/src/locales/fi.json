@@ -2,10 +2,10 @@
   "common": {
     "agree": "Vastaa näkemystäni",
     "disagree": "Ei vastaa näkemystäni",
-    "neutral": "Neutraali / Epävarma",
+    "neutral": "Ei kumpaakaan",
     "undo": "Kumoa",
     "next": "Seuraava vaihe",
-    "submit": "Tallenna näkemykseni",
+    "submit": "Jaa näkemykseni",
     "loading": "Ladataan...",
     "lang_code": "fi",
     "yes": "Kyllä",
@@ -57,7 +57,7 @@
   },
   "rough": {
     "header": {
-      "title": "Vastaako tämä väite sinun näkemystäsi?",
+      "title": "Miten tämä väite resonoi kanssasi?",
       "subtitle": "Pyyhkäise vasemmalle, jos se ei vastaa näkemystäsi, oikealle jos se vastaa, tai alas jos olet epävarma.",
       "hint": "Luota vaistoosi. Tämä ensimmäinen kierros jäsentää ajatuksesi—seuraavassa vaiheessa hienosäädät kaiken."
     },
@@ -72,7 +72,7 @@
   "fine": {
     "deck": {
         "title": "Jäljellä olevat kortit",
-        "all_placed": "Pakka tyhjä",
+        "all_placed": "Kaikki väitteet sijoitettu",
         "reset": "Palauta alkuun",
         "confirm_reset": "Haluatko aloittaa sijoittelun alusta? Kaikki kortit palautuvat pakkaan."
     },
@@ -117,14 +117,14 @@
     "title": "Viimeiset kysymykset",
     "description": "Olet melkein valmis! Perustelusi merkittävimmille valinnoille ovat arvokkaita analyysin kannalta.",
     "extreme": {
-        "why": "Mikä henkilökohtaisessa kokemuksessasi sai sinut sijoittamaan tämän kortin tähän?",
+        "why": "Mikä tekee tästä väitteestä niin merkityksellisen sinun näkymyksessisi?",
         "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
         "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään asiayhteyden.",
         "label_agree": "Vastaa minua parhaiten",
         "label_disagree": "Ei vastaa minua lainkaan"
     },
     "missing": {
-        "label": "Puuttuuko jokin olennainen väite, joka kuvaisi näkemystäsi?",
+        "label": "Onko näkemyksessasi jotain tärkeää, mikä ei tullut esiin?",
         "description": "Jos koet, että jokin tärkeä näkökulma jäi puuttumaan, kuvaile se lyhyesti tässä.",
         "placeholder": "Valinnainen..."
     },

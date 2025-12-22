@@ -2,10 +2,10 @@
   "common": {
     "agree": "Like my view",
     "disagree": "Unlike my view",
-    "neutral": "Neutral / Unsure",
+    "neutral": "Neither",
     "undo": "Undo",
     "next": "Next step",
-    "submit": "Save my perspective",
+    "submit": "Share my perspective",
     "loading": "Loading...",
     "lang_code": "en",
     "yes": "Yes",
@@ -57,7 +57,7 @@
   },
   "rough": {
     "header": {
-      "title": "Does this statement represent your point of view?",
+      "title": "How does this resonate with you?",
       "subtitle": "Swipe left if it is unlike your view, right if it is like your view, or down if unsure.",
       "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
     },
@@ -72,7 +72,7 @@
   "fine": {
     "deck": {
         "title": "Cards available",
-        "all_placed": "Deck empty",
+        "all_placed": "All statements placed",
         "reset": "Reset deck",
         "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
     },
@@ -118,14 +118,14 @@
     "title": "To conclude",
     "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
     "extreme": {
-        "why": "What in your personal experience led you to place this card here?",
+        "why": "What makes this statement so significant to how you see things?",
         "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
         "min_chars": "A few words are enough to help us understand the context.",
         "label_agree": "Most Like my view",
         "label_disagree": "Most Unlike my view"
     },
     "missing": {
-        "label": "Is there any key statement missing to fully reflect your view?",
+        "label": "Is there something important about your view that wasn't captured?",
         "description": "If you feel an important aspect was left out, please describe it here.",
         "placeholder": "Optional..."
     },

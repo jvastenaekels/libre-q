@@ -2,10 +2,10 @@
   "common": {
     "agree": "Correspond à mon point de vue",
     "disagree": "Ne correspond pas à mon point de vue",
-    "neutral": "Neutre / Indécis",
+    "neutral": "Ni l'un ni l'autre",
     "undo": "Annuler",
     "next": "Étape suivante",
-    "submit": "Enregistrer",
+    "submit": "Partager mon point de vue",
     "loading": "Chargement...",
     "lang_code": "fr",
     "yes": "Oui",
@@ -57,7 +57,7 @@
   },
   "rough": {
     "header": {
-      "title": "Cette affirmation correspond-elle à votre point de vue ?",
+      "title": "Comment cette affirmation résonne-t-elle avec vous ?",
       "subtitle": "Glissez à gauche pour « Ne me correspond pas », à droite pour « Me correspond », ou en bas si vous êtes indécis.",
       "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées—vous affinerez tout à l'étape suivante."
     },
@@ -72,7 +72,7 @@
   "fine": {
     "deck": {
       "title": "Cartes disponibles",
-      "all_placed": "Pile vide",
+      "all_placed": "Toutes les affirmations placées",
       "reset": "Réinitialiser",
       "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
@@ -118,14 +118,14 @@
     "title": "Pour conclure",
     "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
     "extreme": {
-      "why": "Qu'est-ce qui, dans votre expérience personnelle, vous a fait placer cette carte ici ?",
+      "why": "Qu'est-ce qui rend cette affirmation si significative pour vous ?",
       "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
       "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
       "label_agree": "Me correspond le plus",
       "label_disagree": "Ne me correspond pas du tout"
     },
     "missing": {
-      "label": "Y a-t-il une affirmation importante qui manque pour refléter votre avis ?",
+      "label": "Y a-t-il quelque chose d'important dans votre point de vue qui n'a pas été capturé ?",
       "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
       "placeholder": "Optionnel..."
     },
