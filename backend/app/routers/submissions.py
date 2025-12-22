@@ -16,7 +16,7 @@ from app.limiter import limiter
 router = APIRouter()
 
 @router.post("/submit")
-@limiter.limit("5/minute")
+@limiter.limit("60/minute")
 async def submit_study(data: SubmissionInput, request: Request, db: AsyncSession = Depends(get_db)):
     # Metadata
     raw_ip = request.client.host if request.client else "unknown"
@@ -164,7 +164,7 @@ async def submit_study(data: SubmissionInput, request: Request, db: AsyncSession
     return {"status": "success", "confirmation_code": confirmation_code}
 
 @router.get("/study/{slug}")
-@limiter.limit("60/minute")
+@limiter.limit("120/minute")
 async def get_study(
     request: Request,
     slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
