@@ -186,9 +186,11 @@ const GridSort: React.FC<GridSortProps> = ({
                <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
         </motion.div>
     )) : (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-slate-300 flex flex-col items-center gap-2">
-            <Check size={24} className="text-green-400" />
-            <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full flex items-center justify-center text-center text-slate-400">
+            <div className="flex flex-col items-center gap-2">
+                <Check size={24} className="text-green-400" />
+                <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
+            </div>
         </motion.div>
     );
   };
@@ -345,25 +347,51 @@ const GridSort: React.FC<GridSortProps> = ({
 
                   {!isDeckCollapsed && (
                       <div className="flex gap-3 w-full mb-4 px-2 justify-center" role="tablist">
-                       {['disagree', 'neutral', 'agree'].map((pile) => {
+                       {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
                            const isActive = activePile === pile;
                            const cards = pile === 'disagree' ? disagreeCards : pile === 'neutral' ? neutralCards : agreeCards;
                            const Icon = pile === 'disagree' ? Frown : pile === 'neutral' ? Meh : Smile;
-                           const col = pile === 'disagree' ? 'red' : pile === 'neutral' ? 'indigo' : 'green';
+                           
+                           // Explicit class mappings to ensure Tailwind generates them
+                           const pileStyles = {
+                               disagree: {
+                                   icon: 'text-red-500',
+                                   activeBg: 'bg-red-50 border-red-300',
+                                   activeText: 'text-red-700',
+                                   activeBadge: 'bg-red-600 text-white border-white',
+                                   activeBar: 'bg-red-200'
+                               },
+                               neutral: {
+                                   icon: 'text-indigo-500',
+                                   activeBg: 'bg-indigo-50 border-indigo-300',
+                                   activeText: 'text-indigo-700',
+                                   activeBadge: 'bg-indigo-600 text-white border-white',
+                                   activeBar: 'bg-indigo-200'
+                               },
+                               agree: {
+                                   icon: 'text-green-500',
+                                   activeBg: 'bg-green-50 border-green-300',
+                                   activeText: 'text-green-700',
+                                   activeBadge: 'bg-green-600 text-white border-white',
+                                   activeBar: 'bg-green-200'
+                               }
+                           };
+                           const style = pileStyles[pile];
+                           
                            return (
                                <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
                                    role="tab"
                                    aria-selected={isActive}
                                    aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
                                    className={`relative group flex-1 min-w-[80px] h-14 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
-                                     ${isActive ? `bg-${col}-50 border-${col}-300 shadow-md scale-105 z-10` : `bg-white border-slate-200 opacity-80`}
+                                     ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
                                    `}
                                 >
-                                  <Icon size={24} className={`lg:hidden text-${col}-500`} />
-                                  <span className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? `text-${col}-700` : 'text-slate-400'}`}>{t(`common.${pile}`)}</span>
-                                  <div className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? `bg-${col}-200` : 'bg-slate-100'}`}></div>
-                                  <div className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? `bg-${col}-200` : 'bg-slate-100'}`}></div>
-                                  <motion.span key={cards.length} className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? `bg-${col}-600 text-white border-white` : 'bg-slate-100 text-slate-500 border-white'}`}>
+                                  <Icon size={24} className={`lg:hidden ${style.icon}`} />
+                                  <span className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}>{t(`common.${pile}`)}</span>
+                                  <div className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
+                                  <div className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
+                                  <motion.span key={cards.length} className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}>
                                       {cards.length}
                                   </motion.span>
                                </button>
