@@ -1,4 +1,3 @@
-
 /*
  * Open-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
@@ -37,12 +36,14 @@ interface GridSortProps {
   forcedTipsClosed?: boolean;
   disableHoverZoom?: boolean;
   onZoomChange?: (scale: number) => void;
+  onTransformChange?: () => void;
   onInteractionUtils?: (utils: { 
     zoomIn: () => void; 
     zoomOut: () => void; 
     performAutoFit: () => void;
     transformRef: React.RefObject<any>;
     wrapperRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
   }) => void;
 }
 
@@ -62,6 +63,7 @@ const GridSort: React.FC<GridSortProps> = ({
   forcedTipsClosed = false,
   disableHoverZoom = false,
   onZoomChange,
+  onTransformChange,
   onInteractionUtils
 }) => {
   const { t } = useTranslation();
@@ -80,8 +82,6 @@ const GridSort: React.FC<GridSortProps> = ({
       neutralCards
   });
 
-  const [smartFocusActive, setSmartFocusActive] = useState(false); 
-  const [dimmingActive, setDimmingActive] = useState(false);       
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
 
@@ -93,8 +93,6 @@ const GridSort: React.FC<GridSortProps> = ({
   });
 
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
-
-
 
   useEffect(() => {
       const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -124,7 +122,8 @@ const GridSort: React.FC<GridSortProps> = ({
       activePile,
       activePileCount: activeCards.length,
       hasPerformedZonalFocus,
-      onZoomChange
+      onZoomChange,
+      onTransformChange
   });
 
   // Pass interaction utils up to parent
@@ -135,17 +134,18 @@ const GridSort: React.FC<GridSortProps> = ({
             zoomOut,
             performAutoFit,
             transformRef,
-            wrapperRef
+            wrapperRef,
+            contentRef
         });
     }
-  }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef]);
+  }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef, contentRef]);
 
   const getColumnTint = (score: number) => {
       if (score <= -3) return 'bg-red-50/50';
       if (score < 0) return 'bg-orange-50/30';
-      if (score === 0) return 'bg-slate-50';
-      if (score >= 3) return 'bg-green-50/50';
-      if (score > 0) return 'bg-emerald-50/30';
+      if (score === 0) return 'bg-slate-50/50';
+      if (score < 3) return 'bg-green-50/30';
+      if (score <= 4) return 'bg-green-50/50';
       return 'bg-transparent';
   };
   
@@ -156,24 +156,10 @@ const GridSort: React.FC<GridSortProps> = ({
   };
   
 
-
   useEffect(() => {
-      // 1. Perform initial auto-fit
+      // Perform initial auto-fit
       const tFit = setTimeout(() => performAutoFit(), 100);
-
-      // 2. Activate Dimming immediately for guidance
-      setDimmingActive(true);
-
-      // 3. Activate Tips after 2s
-      const tFocus = setTimeout(() => {
-          setSmartFocusActive(true);
-      }, 2000);
-
-      // 4. Deactivate Dimming after 5s total
-      const tDimEnd = setTimeout(() => {
-          setDimmingActive(false);
-      }, 5000);
-      return () => { clearTimeout(tFit); clearTimeout(tFocus); clearTimeout(tDimEnd); };
+      return () => clearTimeout(tFit);
   }, [performAutoFit]); 
 
   // Responsive: Close tips and disable autofit on mobile selection
@@ -186,15 +172,13 @@ const GridSort: React.FC<GridSortProps> = ({
 
   useEffect(() => { setAutoFitEnabled(true); }, [activePile]);
 
-
-
   useEffect(() => {
      if (!autoFitEnabled) return;
      const t = setTimeout(performAutoFit, 100);
      return () => clearTimeout(t);
   }, [cardDimensions, autoFitEnabled, performAutoFit]);
 
-  // 4. Derived: active statement for the hub
+  // Derived: active statement for the hub
   const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
   const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
 
@@ -204,7 +188,11 @@ const GridSort: React.FC<GridSortProps> = ({
                <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
         </motion.div>
     )) : (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full flex items-center justify-center text-center text-slate-400">
+        <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center"
+        >
             <div className="flex flex-col items-center gap-2">
                 <Check size={24} className="text-green-400" />
                 <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
@@ -240,7 +228,8 @@ const GridSort: React.FC<GridSortProps> = ({
                         </button>
                 </div>
 
-                {smartFocusActive && (
+                {/* Always show tips if not forced closed */}
+                {!forcedTipsClosed && (
                     <div className="absolute top-4 left-4 z-40 max-w-[85vw] md:max-w-sm pointer-events-none select-none flex flex-col gap-2">
                         <AnimatePresence mode="popLayout">
                             {!closedTips.extremes && !forcedTipsClosed && (
@@ -342,9 +331,6 @@ const GridSort: React.FC<GridSortProps> = ({
        </AnimatePresence>
 
        {/* PANEL: SOURCE INVENTORY (Deck) */}
-       {/* Only show Deck if Workbench is NOT active (OR show it hidden/collapsed) */}
-       {/* To preserve state, we keep it rendered but hidden or minimized? */}
-       {/* Actually, for simplicity/performance in this revamp, lets conditionally render or use display:none */}
       <div 
         className={`
           w-full lg:w-[360px] flex-none 
@@ -355,66 +341,64 @@ const GridSort: React.FC<GridSortProps> = ({
           ${selectedCardId && isMobile ? 'hidden' : ''} 
         `}
         style={{ 
-            height: isMobile 
+          height: isMobile 
                 ? (isDeckCollapsed ? 'auto' : `${deckHeight}px`) 
-                : 'auto' 
+                : '100%' 
         }}
       >
-              <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
-                  <h3 className={`text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block`}>{t('fine.deck.title')}</h3>
-
+              {/* Category selector (Piles) */}
+              <div className="flex-none p-4 pb-2">
                   {!isDeckCollapsed && (
-                      <div className="flex gap-3 w-full mb-4 px-2 justify-center" role="tablist">
-                       {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
-                           const isActive = activePile === pile;
-                           const cards = pile === 'disagree' ? disagreeCards : pile === 'neutral' ? neutralCards : agreeCards;
-                           const Icon = pile === 'disagree' ? Frown : pile === 'neutral' ? Meh : Smile;
-                           
-                           // Explicit class mappings to ensure Tailwind generates them
-                           const pileStyles = {
-                               disagree: {
-                                   icon: 'text-red-500',
-                                   activeBg: 'bg-red-50 border-red-300',
-                                   activeText: 'text-red-700',
-                                   activeBadge: 'bg-red-600 text-white border-white',
-                                   activeBar: 'bg-red-200'
-                               },
-                               neutral: {
-                                   icon: 'text-gray-500',
-                                   activeBg: 'bg-gray-100 border-gray-300',
-                                   activeText: 'text-gray-700',
-                                   activeBadge: 'bg-gray-600 text-white border-white',
-                                   activeBar: 'bg-gray-200'
-                               },
-                               agree: {
-                                   icon: 'text-green-500',
-                                   activeBg: 'bg-green-50 border-green-300',
-                                   activeText: 'text-green-700',
-                                   activeBadge: 'bg-green-600 text-white border-white',
-                                   activeBar: 'bg-green-200'
-                               }
-                           };
-                           const style = pileStyles[pile];
-                           
-                           return (
-                               <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
-                                   role="tab"
-                                   aria-selected={isActive}
-                                   aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
-                                   className={`relative group flex-1 min-w-[80px] h-14 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
-                                     ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
-                                   `}
-                                >
-                                  <Icon size={24} className={`lg:hidden ${style.icon}`} />
-                                  <span className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}>{t(`common.${pile}`)}</span>
-                                  <div className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
-                                  <div className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
-                                  <motion.span key={cards.length} className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}>
-                                      {cards.length}
-                                  </motion.span>
-                               </button>
-                           );
-                       })}
+                  <div className="flex lg:grid lg:grid-cols-3 gap-2" role="tablist">
+                      {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
+                            const isActive = activePile === pile;
+                            const cards = pile === 'disagree' ? disagreeCards : pile === 'agree' ? agreeCards : neutralCards;
+                            const Icon = pile === 'disagree' ? Frown : pile === 'agree' ? Smile : Meh;
+                            
+                            const pileStyles = {
+                                disagree: {
+                                    icon: 'text-red-500',
+                                    activeBg: 'bg-red-50 border-red-300',
+                                    activeText: 'text-red-700',
+                                    activeBadge: 'bg-red-600 text-white border-white',
+                                    activeBar: 'bg-red-200'
+                                },
+                                neutral: {
+                                    icon: 'text-gray-500',
+                                    activeBg: 'bg-gray-100 border-gray-300',
+                                    activeText: 'text-gray-700',
+                                    activeBadge: 'bg-gray-600 text-white border-white',
+                                    activeBar: 'bg-gray-200'
+                                },
+                                agree: {
+                                    icon: 'text-green-500',
+                                    activeBg: 'bg-green-50 border-green-300',
+                                    activeText: 'text-green-700',
+                                    activeBadge: 'bg-green-600 text-white border-white',
+                                    activeBar: 'bg-green-200'
+                                }
+                            };
+                            const style = pileStyles[pile];
+                            
+                            return (
+                                <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
+                                    role="tab"
+                                    aria-selected={isActive}
+                                    aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
+                                    className={`relative group flex-1 min-w-[80px] h-14 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
+                                      ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
+                                    `}
+                                 >
+                                   <Icon size={24} className={`lg:hidden ${style.icon}`} />
+                                   <span className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}>{t(`common.${pile}`)}</span>
+                                   <div className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
+                                   <div className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}></div>
+                                   <motion.span key={cards.length} className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}>
+                                       {cards.length}
+                                   </motion.span>
+                                </button>
+                            );
+                        })}
                   </div>
                   )}
               </div>
@@ -425,10 +409,15 @@ const GridSort: React.FC<GridSortProps> = ({
                     initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} 
                     animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} 
                     transition={{ duration: 0.8 }}
-                    className="flex-1 p-2 flex flex-row gap-2 overflow-x-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:content-start"
+                    className={`
+                        flex-1 p-2 flex flex-row gap-2 overflow-x-auto min-h-0 custom-scrollbar 
+                        ${activeCards.length === 0 ? 'items-center justify-center' : ''}
+                        lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden 
+                        ${activeCards.length === 0 ? 'lg:place-content-center' : 'lg:content-start'}
+                    `}
                     data-testid="deck-cards-container"
                 >
-{renderDeckCards()}
+                    {renderDeckCards()}
               </motion.div>
               )}
               {(onReset && !isDeckCollapsed) && (

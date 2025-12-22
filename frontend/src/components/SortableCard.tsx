@@ -21,6 +21,7 @@ interface SortableCardProps {
   dimensions?: { width: number; height: number };
   aspectRatio?: number;
   disableHoverZoom?: boolean;
+  allowScroll?: boolean;
 }
 
 const SortableCard: React.FC<SortableCardProps> = React.memo(({ 

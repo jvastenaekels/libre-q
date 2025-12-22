@@ -5,7 +5,9 @@
  */
 
 import { useState } from 'react';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { post } from '../api/client';
 
 export const useSubmitStudy = () => {
@@ -14,7 +16,9 @@ export const useSubmitStudy = () => {
     const [error, setError] = useState<string | null>(null);
     const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
 
-    const { config, session, responses } = useStudyStore();
+    const config = useConfigStore((state) => state.config);
+    const session = useSessionStore();
+    const responses = useResponseStore();
 
     const submit = async (status: 'started' | 'completed' = 'completed', options?: { silent?: boolean }) => {
         if (!options?.silent) {
@@ -62,8 +66,8 @@ export const useSubmitStudy = () => {
             if (status === 'completed') {
                 setIsSuccess(true);
                 setConfirmationCode(data.confirmation_code);
-                // Mark session as completed in store
-                 useStudyStore.getState().completeSession(data.confirmation_code);
+                // Sync session completion (if session store has this, or remove if not needed)
+                // useSessionStore.getState().completeSession(data.confirmation_code);
             } else {
                  console.log('Partial save successful');
             }

@@ -9,7 +9,8 @@ interface UseGridZoomProps {
     activePile: 'agree' | 'disagree' | 'neutral';
     activePileCount: number;
     hasPerformedZonalFocus: boolean;
-    setDimmingActive: (active: boolean) => void;
+    onZoomChange?: (scale: number) => void;
+    onTransformChange?: () => void;
 }
 
 export const useGridZoom = ({
@@ -20,14 +21,15 @@ export const useGridZoom = ({
     activePile,
     activePileCount,
     hasPerformedZonalFocus,
-    setDimmingActive,
-    onZoomChange
-}: UseGridZoomProps & { onZoomChange?: (scale: number) => void }) => {
+    onZoomChange,
+    onTransformChange
+}: UseGridZoomProps) => {
     const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
     const onTransformed = useCallback((ref: ReactZoomPanPinchRef, state: { scale: number }) => {
         onZoomChange?.(state.scale);
-    }, [onZoomChange]);
+        onTransformChange?.();
+    }, [onZoomChange, onTransformChange]);
 
     const performAutoFit = useCallback(() => {
         if (!transformRef.current || !wrapperRef.current || !contentRef.current) return;
@@ -206,15 +208,13 @@ export const useGridZoom = ({
              // Apply zoom and pan
              transformRef.current.setTransform(clampedX, targetY, targetScale, 600, 'easeOutQuad');
              
-             // Subtle visual cue
-             setDimmingActive(true);
-             setTimeout(() => setDimmingActive(false), 1000);
+             // (No dimming cue)
 
         }, 800); // Delay after autoFit completes
 
         return () => clearTimeout(zoomTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
+    }, [activePile, hasPerformedZonalFocus, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
 
     return {
         transformRef,
