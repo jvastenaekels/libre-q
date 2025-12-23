@@ -8,14 +8,18 @@ import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
 // Targets relative from common center? No, let's keep relative to Deck.
 // Deck is at (0,0).
 // Targets (Up):
-// Layout: Disagree (Left/Up), Agree (Right/Up), Neutral (Center/Down)
-// Calibrated to match the visual "Inverted Triangle"
+// Targets (Up):
+// Layout: Starburst / Swipe Mimic
+// Deck is Center (0,0)
+// Disagree: Top-Left
+// Agree: Top-Right
+// Neutral: Bottom (Swipe Down)
 const ROUGH_TARGETS = [
-    { x: -50, y: -90, pileId: 'disagree' },
-    { x: 50, y: -90, pileId: 'agree' },
-    { x: 0, y: -45, pileId: 'neutral' },
-    { x: -50, y: -90, pileId: 'disagree' },
-    { x: 0, y: -45, pileId: 'neutral' }
+    { x: -64, y: -48, pileId: 'disagree' },
+    { x: 64, y: -48, pileId: 'agree' },
+    { x: 0, y: 64, pileId: 'neutral' },
+    { x: -64, y: -48, pileId: 'disagree' },
+    { x: 0, y: 64, pileId: 'neutral' }
 ];
 
 // FINE SORT
@@ -128,31 +132,13 @@ const SortingAnimation: React.FC = () => {
         <div className="w-full flex flex-col justify-center items-center gap-12 py-6 select-none pointer-events-none" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
-            <div className={`relative flex flex-col items-center gap-8 transition-all duration-700 z-10 ${phase === 'ROUGH' ? 'opacity-100' : 'opacity-50 grayscale-[0.5]'}`}>
+            {/* --- ROUGH SORT (Centered Starburst) --- */}
+            <div className={`relative flex items-center justify-center w-64 h-48 transition-all duration-700 z-10 ${phase === 'ROUGH' ? 'opacity-100' : 'opacity-0 absolute scale-50'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">1</div>
 
-                {/* Piles */}
-                {/* Render only in ROUGH phase so they can 'move' to FINE phase via layoutId */}
-                {/* Piles (Triangle Layout) */}
-                {/* Render only in ROUGH phase so they can 'move' to FINE phase via layoutId */}
-                <div className="relative z-10 mb-8 flex flex-col items-center gap-2"> 
-                    {phase === 'ROUGH' && (
-                        <>
-                            {/* Top Row: Opposites */}
-                            <div className="flex gap-16">
-                                <DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" />
-                                <DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" />
-                            </div>
-                            {/* Bottom Row: Neutral */}
-                            <div>
-                                <DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" />
-                            </div>
-                        </>
-                    )}
-                </div>
-                {/* Deck */}
-                <div className="relative z-10">
+                {/* Deck (Center) */}
+                <div className="relative z-20">
                     <DynamicStack count={roughDeckCount} type="deck" />
                     <AnimatePresence>
                         {activeRoughTarget && (
@@ -167,10 +153,28 @@ const SortingAnimation: React.FC = () => {
                         )}
                     </AnimatePresence>
                 </div>
+
+                {/* Piles (Absolute Positions) */}
+                {phase === 'ROUGH' && (
+                    <>
+                        {/* Disagree: Top Left */}
+                        <div className="absolute top-2 left-6 z-10">
+                            <DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" />
+                        </div>
+                        {/* Agree: Top Right */}
+                        <div className="absolute top-2 right-6 z-10">
+                            <DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" />
+                        </div>
+                        {/* Neutral: Bottom Center */}
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+                            <DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" />
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* --- FINE SORT (Compact) --- */}
-            <div className={`relative flex flex-col items-center gap-2 transition-all duration-700 z-10 ${phase === 'FINE' ? 'opacity-100' : 'opacity-50 grayscale-[0.5]'}`}>
+            <div className={`relative flex flex-col items-center gap-2 transition-all duration-700 z-10 ${phase === 'FINE' ? 'opacity-100' : 'opacity-0 absolute scale-50'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
 
