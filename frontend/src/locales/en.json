@@ -62,7 +62,8 @@
       "error": "Please accept the terms to continue."
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-    "restart": "Start a new session"
+    "restart": "Start a new session",
+    "preview_title": "It's child's play!"
   },
   "presort": {
     "title": "About you",

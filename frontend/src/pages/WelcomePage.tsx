@@ -7,22 +7,11 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SortingAnimation from '../components/SortingAnimation';
-
-const consentSchema = z.object({
-    consent: z.boolean().refine(val => val === true, { 
-        message: "You must consent to participate." 
-    }),
-});
-
-type ConsentForm = z.infer<typeof consentSchema>;
 
 const WelcomePage: React.FC = () => {
     const { slug } = useParams();
@@ -30,25 +19,7 @@ const WelcomePage: React.FC = () => {
     const { t } = useTranslation();
     
     const config = useConfigStore((state) => state.config);
-    const session = useSessionStore();
-    const setConsent = useSessionStore((state) => state.setConsent);
-    const setToken = useSessionStore((state) => state.setToken);
     const setStep = useSessionStore((state) => state.setStep);
-
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<ConsentForm>({
-        resolver: zodResolver(consentSchema),
-        defaultValues: { consent: session.hasConsented }
-    });
-
-    // Auto-save consent to store
-    React.useEffect(() => {
-        const subscription = watch((value) => {
-            if (value.consent !== undefined) {
-                setConsent(value.consent);
-            }
-        });
-        return () => subscription.unsubscribe();
-    }, [watch, setConsent]);
 
     // Set Step 1 on mount
     React.useEffect(() => {
@@ -57,92 +28,42 @@ const WelcomePage: React.FC = () => {
 
     if (!config) return null; 
     
-    // Note: We use config from store directly
     const study = config;
 
-    const onSubmit = (data: ConsentForm) => {
-        if (data.consent) {
-            setConsent(true);
-            if (!session.token) {
-                setToken(crypto.randomUUID());
-            }
-            setStep(2); // Move to Pre-Sort
-            navigate(`/study/${slug}/presort`);
-        }
+    const handleContinue = () => {
+        navigate(`/study/${slug}/consent`);
     };
 
     return (
         <div className="max-w-3xl mx-auto py-12 space-y-8 animate-in fade-in duration-500 px-4">
             <div className="prose prose-blue max-w-none">
-                <div className="flex justify-center mb-8">
-                    <img src="/images/open-q-logo.svg" alt={study.title} className="h-16 md:h-20 w-auto object-contain" />
-                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">{study.title}</h1>
                 <p className="lead text-xl text-gray-600">{study.description}</p>
                 
-                <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 my-8">
+                <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 prose prose-blue max-w-none text-sm leading-relaxed my-8">
                     <Markdown>{study.instructions}</Markdown>
                 </div>
 
                 {/* Animated Sorting Example */}
-                <div className="mb-8 border-t border-gray-100 pt-8">
-                    <h3 className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                         {t('welcome.goal_title', 'Your Goal')}
+                <div className="mb-12 pt-8">
+                     <h3 className="text-center text-lg font-medium text-slate-600 mb-6 font-handwriting">
+                        {t('welcome.preview_title', "It's child's play!")}
                     </h3>
-                    <div className="bg-slate-50/50 p-4 rounded-xl border border-gray-100 shadow-inner overflow-hidden">
+                    <div className="bg-slate-50/50 p-8 rounded-xl border border-gray-100 shadow-inner overflow-hidden w-full max-w-4xl mx-auto">
                             <SortingAnimation />
-                            <p className="text-xs text-center text-slate-400 mt-2 italic">
-                                {t('welcome.visual_example_caption', 'Sort statements from text to the grid.')}
-                            </p>
                     </div>
                 </div>
             </div>
 
-        <form id="consent-form" onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
-            <div className="flex items-start gap-4">
-                <div className="flex h-6 items-center">
-                    <input
-                        id="consent"
-                        type="checkbox"
-                        {...register("consent")}
-                        className="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer" // 24px (~44px touch area handled by padding usually, but explicitly large here)
-                    />
-                </div>
-                <div className="text-sm">
-                    <label htmlFor="consent" className="font-medium text-gray-900 cursor-pointer block py-1">
-                         {config.consent?.title || t('welcome.consent.label')}
-                     </label>
-                     {/* Description */}
-                     {config.consent?.description && (
-                         <p className="text-gray-500">{config.consent.description}</p>
-                     )}
-                     {errors.consent && <p className="text-red-600 mt-1">{t('welcome.consent.error')}</p>}
-                </div>
-            </div>
-
-            <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-                <button
-                    type="submit"
-                    disabled={!isValid && !session.hasConsented}
-                    className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            {/* Continue Button */}
+            <div className="flex justify-center pt-8">
+                 <button
+                    onClick={handleContinue}
+                    className="w-full sm:w-auto px-12 py-3 bg-blue-600 text-white rounded-md font-bold text-lg hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02]"
                 >
-                     {study.ui_labels?.start_button || t('welcome.start')} <ArrowRight size={18} />
+                    {t('common.continue', 'Continue')} <ArrowRight size={20} />
                 </button>
-
-                {(session.hasConsented || session.isCompleted) && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            if (window.confirm(t('welcome.reset_confirm', 'Are you sure you want to start a new session? This will clear your current progress.'))) {
-                                navigate(`/study/${slug}/reset`);
-                            }
-                        }}
-                        className="text-slate-400 hover:text-slate-600 text-sm font-medium underline underline-offset-4 decoration-slate-200 transition-colors"
-                    >
-                        {t('welcome.restart', 'Start a new session')}
-                    </button>
-                )}
             </div>
-        </form>
     </div>
 );
 };

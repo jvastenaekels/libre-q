@@ -62,7 +62,8 @@
       "error": "Vous devez accepter les conditions pour continuer."
     },
     "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
-    "restart": "Commencer une nouvelle session"
+    "restart": "Commencer une nouvelle session",
+    "preview_title": "Un jeu d'enfant !"
   },
   "presort": {
     "title": "À propos de vous",

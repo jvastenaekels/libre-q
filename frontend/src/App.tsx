@@ -8,6 +8,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import StudyLayout from './layouts/StudyLayout';
 import WelcomePage from './pages/WelcomePage';
+import ConsentPage from './pages/ConsentPage';
 import PreSortPage from './pages/PreSortPage';
 import RoughSortPage from './pages/RoughSortPage';
 import PostSortPage from './pages/PostSortPage';
@@ -30,6 +31,7 @@ const App = () => {
               
               <Route path="/study/:slug" element={<StudyLayout />}>
                 <Route path="welcome" element={<WelcomePage />} />
+                <Route path="consent" element={<ConsentPage />} />
                 <Route path="presort" element={<PreSortPage />} />
                 <Route path="rough-sort" element={<RoughSortPage />} />
                 <Route path="sort" element={<FineSortPage />} /> 
