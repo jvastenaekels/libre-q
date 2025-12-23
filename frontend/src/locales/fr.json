@@ -123,9 +123,9 @@
       "vertical": "La position verticale n'a pas d'importance—seul l'ordre gauche-droite compte."
     },
     "legend": {
-      "disagree": "Plutôt pas d'accord",
-      "neutral": "Pas d'avis tranché",
-      "agree": "Plutôt d'accord",
+      "disagree": "Le plus en désaccord",
+      "neutral": "Neutre",
+      "agree": "Le plus en accord",
       "label": "Légende du spectre"
     },
     "actions": {

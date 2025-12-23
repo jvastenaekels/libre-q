@@ -59,15 +59,8 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
   }, []);
 
   const handleMouseEnter = () => {
-    if (isDragging || isOverlay || disableHoverZoom) return;
-    
-    // Clear any existing timer
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    
-    // Set 300ms intent delay
-    hoverTimerRef.current = setTimeout(() => {
-        setZoomedCard({ id, text });
-    }, 300);
+    // Dwell zoom disabled by user request
+    return;
   };
 
   const handleMouseLeave = () => {
@@ -75,9 +68,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
         clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
     }
-    if (isZoomed) {
-        setZoomedCard(null);
-    }
+    // We strictly avoid clearing global zoomed card here to avoid flickering if it's controlled elsewhere
   };
 
   const style = {

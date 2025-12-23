@@ -123,9 +123,9 @@
     "vertical": "Vertical position doesn't matter—only left-to-right order counts."
 },
     "legend": {
-        "disagree": "Tend to disagree",
-        "neutral": "No strong feelings",
-        "agree": "Tend to agree",
+        "disagree": "Most Disagree",
+        "neutral": "Neutral",
+        "agree": "Most Agree",
         "label": "Spectrum legend"
     },
     "actions": {

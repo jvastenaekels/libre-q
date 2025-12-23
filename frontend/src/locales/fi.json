@@ -123,9 +123,9 @@
     "vertical": "Vertical position doesn't matter—only left-to-right order counts."
 },
     "legend": {
-        "disagree": "Jokseenkin eri mieltä",
-        "neutral": "Ei vahvaa mielipidettä",
-        "agree": "Jokseenkin samaa mieltä",
+        "disagree": "Täysin eri mieltä",
+        "neutral": "Neutraali",
+        "agree": "Täysin samaa mieltä",
         "label": "Spectrum legend"
     },
     "actions": {

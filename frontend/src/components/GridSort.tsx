@@ -333,10 +333,9 @@ const GridSort: React.FC<GridSortProps> = ({
                                          );
                                      })()}
                                  </div>
-                                 <div className="w-full h-5 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-full relative backdrop-blur-sm">
+                                 <div className="w-full h-5 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-md relative backdrop-blur-sm overflow-hidden ring-1 ring-slate-200/50">
                                      <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-400/50 -translate-x-1/2"></div>
-                                     <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-red-400/50"></div>
-                                     <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-green-400/50"></div>
+                                     {/* Removed side dividers to prevent glitches at corners */}
                                  </div>
                             </div>
                         </div>
@@ -409,7 +408,13 @@ const GridSort: React.FC<GridSortProps> = ({
                             const style = pileStyles[pile];
                             
                             return (
-                                <button key={pile} onClick={() => { setActivePile(pile as PileType); setHasPerformedZonalFocus(true); }}
+                                <button key={pile} onClick={() => { 
+                                    setActivePile(pile as PileType); 
+                                    // Only trigger zonal focus/zoom on mobile
+                                    if (window.innerWidth < 1024) {
+                                        setHasPerformedZonalFocus(true); 
+                                    }
+                                }}
                                     role="tab"
                                     aria-selected={isActive}
                                     aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
