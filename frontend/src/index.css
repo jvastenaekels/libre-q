@@ -10,37 +10,37 @@
 
 /* Mobile-First Base Styles */
 @layer base {
-  html {
-    font-size: 16px; /* Explicit base size for iOS */
-    font-family: "Google Sans Flex", sans-serif;
-  }
+    html {
+        font-size: 16px; /* Explicit base size for iOS */
+        font-family: 'Inter', sans-serif;
+    }
 }
 
 @layer utilities {
-  @keyframes loading-line {
-    0% {
-      transform: translateX(-100%);
+    @keyframes loading-line {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(300%);
+        }
     }
-    100% {
-      transform: translateX(300%);
+    .animate-loading-line {
+        animation: loading-line 1.5s infinite linear;
     }
-  }
-  .animate-loading-line {
-    animation: loading-line 1.5s infinite linear;
-  }
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-  /* Hide scrollbar by default, show on hover/scrolling if possible, 
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    /* Hide scrollbar by default, show on hover/scrolling if possible, 
      but standard utilities are usually enough for modern browsers */
 }
