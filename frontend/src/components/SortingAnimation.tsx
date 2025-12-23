@@ -262,16 +262,13 @@ const SortingAnimation: React.FC = () => {
                    Grid Bottom aligned to: `50% + (currentGridBaseY + 12)px`.
                 */}
                 <div 
-                    className="absolute z-10 flex items-end justify-center left-1/2 -translate-x-1/2"
+                    className="absolute z-10 flex items-end justify-center left-1/2"
                     style={{
                         // 26px = 12px (half card) + safety. 
                         // The `bottom` edge of this div aligns with the bottom of the slots.
                         // We want `bottom` edge to be at CenterY + GridBaseY + 12px.
-                        top: `calc(50% + ${currentGridBaseY + 12}px - 100%)` 
-                        // The div's bottom edge is at Top position + Height (100%).
-                        // If Top is `50% + Y - 100%`, then Bottom is `50% + Y`.
-                        // Y = GridBaseY + 12.
-                        // So Bottom is at Center + GridBaseY + 12. Correct.
+                        top: `calc(50% + ${currentGridBaseY + 12}px)`,
+                        transform: 'translate(-50%, -100%)'
                     }}
                 >
                      {/* Pyramid Grid (Flex Row) */}
