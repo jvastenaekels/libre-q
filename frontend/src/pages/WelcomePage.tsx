@@ -106,6 +106,21 @@ const WelcomePage: React.FC = () => {
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
             </div>
+            
+            {/* Reset Session Link */}
+            <div className="mt-6 flex justify-center">
+                 <button 
+                    onClick={() => {
+                        if (window.confirm(t('welcome.reset_confirm'))) {
+                            useSessionStore.getState().resetSession();
+                            window.location.reload();
+                        }
+                    }}
+                    className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                >
+                    {t('welcome.restart', 'Start a new session')}
+                </button>
+            </div>
     </div>
 );
 };
