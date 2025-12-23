@@ -10,9 +10,9 @@
 
 /* Mobile-First Base Styles */
 @layer base {
-    /* Self-hosted Roboto Flex aliased as Google Sans Flex for mobile capability */
+    /* Self-hosted Roboto Flex aliased as Google Sans Flex Local for fallback */
     @font-face {
-        font-family: 'Google Sans Flex';
+        font-family: 'Google Sans Flex Local';
         src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
         font-weight: 100 1000;
         font-display: swap;
@@ -20,7 +20,7 @@
 
     html {
         font-size: 16px; /* Explicit base size for iOS */
-        font-family: "Google Sans Flex", sans-serif;
+        font-family: "Google Sans Flex", "Google Sans Flex Local", sans-serif;
     }
 }
 
