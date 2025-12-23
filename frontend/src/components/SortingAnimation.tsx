@@ -130,8 +130,8 @@ const SortingAnimation: React.FC = () => {
     }, []);
 
     // Configuration for Desktop Layout
-    const DESKTOP_GRID_OFFSET_X = -50; // Shift Grid Left
-    const DESKTOP_DECK_OFFSET_X = 60;  // Shift Deck Right relative to center
+    const DESKTOP_GRID_OFFSET_X = 0; // Shift Grid Left
+    const DESKTOP_DECK_OFFSET_X = 42;  // Shift Deck Right relative to center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -145,11 +145,31 @@ const SortingAnimation: React.FC = () => {
     // Source X (Deck Position)
     // Mobile: 0 (Center), -36, +36 relative to center
     // Desktop: +60 (Center), -36, +36 relative to THAT center? No, source piles in desktop are vertical or horizontal? 
-    // User said "decks are positioned to the right". Let's assume a similar horizontal stack but shifted right.
+    // User said "decks are positioned to the right" AND "one above the other".
+    // So on Desktop: Fixed X, Varying Y.
     const fineSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
-    const fineSourceOffset = activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0;
+    
+    // Desktop: center (0), -36? No, vertical stack means X is constant (0 relative to stack center).
+    // Mobile: horizontal row means X varies (-36, 0, 36).
+    const fineSourceOffset = isDesktop ? 0 : (activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0);
     const fineSourceX = fineSourceBaseX + fineSourceOffset;
-    const fineSourceY = 8; // Consistent start height
+
+    // Source Y (Deck Position)
+    // Mobile: Constant 8 (row)
+    // Desktop: Vertical Stack. 
+    // Stack is 3 items of h=24px with gap-2 (8px). Total height = 24*3 + 8*2 = 72+16 = 88px.
+    // Center of stack is at Y=0 relative to container center? 
+    // Let's assume the stack is centered vertically in the parent.
+    // Pile 0 (Top): -32px
+    // Pile 1 (Mid): 0px
+    // Pile 2 (Bot): +32px
+    // Note: Our "activeFineStep.source" is 0=Disagree(Top?), 1=Middle, 2=Agree(Bottom?)
+    // Let's verify rendering order below... yes: Disagree, Neutral, Agree.
+    const fineSourceBaseY = isDesktop ? 0 : 8; // Mobile stays at 8
+    const fineSourceOffsetY = isDesktop 
+        ? (activeFineStep ? (activeFineStep.source === 0 ? -32 : activeFineStep.source === 2 ? 32 : 0) : 0)
+        : 0;
+    const fineSourceY = fineSourceBaseY + fineSourceOffsetY;
 
     // Target X (Grid Slot) 
     // Mobile: Just the slot x
@@ -218,7 +238,7 @@ const SortingAnimation: React.FC = () => {
 
                 {/* Wrapper regarding Desktop Offsets -> Actually we need to visually move the children */}
                 {/* Left Side (Desktop): Grid + Bottom Thumbs */}
-                <div className={`flex flex-col items-center z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[-50px]' : ''}`}>
+                <div className={`flex flex-col items-center z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[0px]' : ''}`}>
                     
                     {/* Grid Container with Side Thumbs (Mobile Only) */}
                     <div className="flex items-end gap-2 mb-2 md:mb-4">
@@ -243,18 +263,21 @@ const SortingAnimation: React.FC = () => {
                     </div>
 
                     {/* Bottom Thumbs (Desktop Only) */}
-                    <div className="hidden md:flex justify-between w-full px-4 mt-1 opacity-40">
-                         <ThumbsDown size={16} className="text-slate-500" />
-                         <ThumbsUp size={16} className="text-slate-500" />
+                    {/* Bottom Thumbs (Desktop Only) - Aligned with Grid Columns */}
+                    <div className="hidden md:flex items-center gap-[2px] mt-1 opacity-60">
+                         {/* Under L2 (Disagree) */}
+                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
+                         {/* Spacers for L1, C0, R1 */}
+                         <div className="w-[18px]" />
+                         <div className="w-[18px]" />
+                         <div className="w-[18px]" />
+                         {/* Under R2 (Agree) */}
+                         <div className="w-[18px] flex justify-center"><ThumbsUp size={14} className="text-slate-500" /></div>
                     </div>
                 </div>
 
-                {/* Right Side (Desktop): Source Piles */}
-                {/* On Mobile: It's just below in the flex-col. On Desktop: It's to the right because parent is flex-row (if we change parent). */}
-                {/* Wait, the parent is `flex-col md:flex-row` now. */}
-                {/* We need to position this group relative to the center or use the same translate trick */}
-                
-                <div className={`relative flex gap-6 pt-2 h-[24px] z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[60px] translate-y-[-20px]' : ''}`}>
+                {/* Right Side (Desktop): Source Piles - Vertical Stack */}
+                <div className={`relative flex gap-6 md:gap-2 md:flex-col pt-2 md:pt-0 h-[24px] md:h-auto z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[42px] translate-y-[-10px]' : ''}`}>
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
                         <>
