@@ -11,15 +11,15 @@ import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
 // Targets (Up):
 // Layout: Starburst / Swipe Mimic
 // Deck is Center (0,0)
-// Disagree: Top-Left
+// Disagree: Top-Left (Tightened for smaller cards)
 // Agree: Top-Right
 // Neutral: Bottom (Swipe Down)
 const ROUGH_TARGETS = [
-    { x: -64, y: -48, pileId: 'disagree' },
-    { x: 64, y: -48, pileId: 'agree' },
-    { x: 0, y: 64, pileId: 'neutral' },
-    { x: -64, y: -48, pileId: 'disagree' },
-    { x: 0, y: 64, pileId: 'neutral' }
+    { x: -32, y: -24, pileId: 'disagree' },
+    { x: 32, y: -24, pileId: 'agree' },
+    { x: 0, y: 32, pileId: 'neutral' },
+    { x: -32, y: -24, pileId: 'disagree' },
+    { x: 0, y: 32, pileId: 'neutral' }
 ];
 
 // FINE SORT
@@ -129,11 +129,11 @@ const SortingAnimation: React.FC = () => {
     const fineTargetY = activeFineStep ? (GRID_BASE_Y + activeFineStep.y) : 0;
 
     return (
-        <div className="w-full flex flex-col justify-center items-center gap-12 py-6 select-none pointer-events-none" aria-hidden="true">
+        <div className="relative w-full h-56 flex justify-center items-center py-6 select-none pointer-events-none" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
             {/* --- ROUGH SORT (Centered Starburst) --- */}
-            <div className={`relative flex items-center justify-center w-64 h-48 transition-all duration-700 z-10 ${phase === 'ROUGH' ? 'opacity-100' : 'opacity-0 absolute scale-50'}`}>
+            <div className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out ${phase === 'ROUGH' ? 'opacity-100 scale-100 z-20' : 'opacity-0 scale-90 z-10'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">1</div>
 
@@ -145,10 +145,10 @@ const SortingAnimation: React.FC = () => {
                             <motion.div
                                 key={`rough-fly-${step}`}
                                 initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                                animate={{ x: activeRoughTarget.x, y: activeRoughTarget.y, scale: 0.9 }}
+                                animate={{ x: activeRoughTarget.x, y: activeRoughTarget.y, scale: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: ROUGH_DURATION, ease: "easeInOut" }}
-                                className="absolute top-0 left-0 w-8 h-11 bg-blue-50 border-2 border-blue-600 rounded-sm shadow-xl z-50 pointer-events-none"
+                                className="absolute top-0 left-0 w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl z-50 pointer-events-none"
                             />
                         )}
                     </AnimatePresence>
@@ -158,15 +158,15 @@ const SortingAnimation: React.FC = () => {
                 {phase === 'ROUGH' && (
                     <>
                         {/* Disagree: Top Left */}
-                        <div className="absolute top-2 left-6 z-10">
+                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10">
                             <DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" />
                         </div>
                         {/* Agree: Top Right */}
-                        <div className="absolute top-2 right-6 z-10">
+                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10">
                             <DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" />
                         </div>
                         {/* Neutral: Bottom Center */}
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10">
                             <DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" />
                         </div>
                     </>
@@ -174,7 +174,7 @@ const SortingAnimation: React.FC = () => {
             </div>
 
             {/* --- FINE SORT (Compact) --- */}
-            <div className={`relative flex flex-col items-center gap-2 transition-all duration-700 z-10 ${phase === 'FINE' ? 'opacity-100' : 'opacity-0 absolute scale-50'}`}>
+            <div className={`absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out ${phase === 'FINE' ? 'opacity-100 scale-100 z-20' : 'opacity-0 scale-90 z-10'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
 
@@ -246,16 +246,14 @@ interface StackProps {
     layoutId?: string;
 }
 
-const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, type, layoutId }) => {
-    // Determine visual style based on type
-    const isSource = type === 'source';
-
+const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId }) => {
+    // Determine visual style
+    
     // Base dimensions
-    // Consistency: Rough Sort uses "Big Cards". Fine Sort uses "Small Cards".
-
-    const isSmall = isSource; // Fine sort uses small cards
-    const width = isSmall ? 'w-[18px]' : 'w-8';
-    const height = isSmall ? 'h-[24px]' : 'h-11';
+    // Consistency: User requested identical size for both phases.
+    // We align on the Fine Sort size (small) to fit the grid.
+    const width = 'w-[18px]';
+    const height = 'h-[24px]';
 
     return (
         <motion.div 
@@ -264,20 +262,20 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, type, layoutId 
             className={`relative ${width} ${height} flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-30' : 'opacity-100'}`}
         >
             {/* Placeholder / Empty Slot border */}
-            <div className={`absolute inset-0 border-2 border-dashed border-slate-300 rounded-[3px] ${count === 0 ? 'block' : 'hidden'}`} />
+            <div className={`absolute inset-0 border-2 border-dashed border-slate-300 rounded-[2px] ${count === 0 ? 'block' : 'hidden'}`} />
 
             {/* Stack Layers */}
             {count > 2 && (
-                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-300 rounded-[3px] shadow-sm translate-x-[3px] -translate-y-[3px] z-0`} />
+                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-300 rounded-[2px] shadow-sm translate-x-[2px] -translate-y-[2px] z-0`} />
             )}
             {count > 1 && (
-                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-300 rounded-[3px] shadow-sm translate-x-[1.5px] -translate-y-[1.5px] z-10`} />
+                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-300 rounded-[2px] shadow-sm translate-x-[1px] -translate-y-[1px] z-10`} />
             )}
             {/* Top Card */}
             {count > 0 && (
-                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-400 rounded-[3px] shadow-sm z-20 flex items-center justify-center`}>
-                    {Icon && <Icon size={isSmall ? 10 : 14} className="text-slate-500" />}
-                    {!Icon && !isSmall && <div className="w-5 h-8 border border-slate-100 rounded-[2px]" />}
+                <div className={`absolute top-0 left-0 ${width} ${height} bg-white border border-slate-400 rounded-[2px] shadow-sm z-20 flex items-center justify-center`}>
+                    {Icon && <Icon size={10} className="text-slate-500" />}
+                    {!Icon && <div className="w-5 h-8 border border-slate-100 rounded-[1px]" />}
                 </div>
             )}
         </motion.div>
