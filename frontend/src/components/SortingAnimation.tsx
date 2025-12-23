@@ -119,13 +119,43 @@ const SortingAnimation: React.FC = () => {
         return filled;
     }, [phase, step]);
 
+    // Responsive Breakpoint
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.matchMedia('(min-width: 768px)').matches);
+        checkDesktop();
+        window.addEventListener('resize', checkDesktop);
+        return () => window.removeEventListener('resize', checkDesktop);
+    }, []);
+
+    // Configuration for Desktop Layout
+    const DESKTOP_GRID_OFFSET_X = -50; // Shift Grid Left
+    const DESKTOP_DECK_OFFSET_X = 60;  // Shift Deck Right relative to center
+
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
     const activeFineStep = phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
 
     // Fine card flying positions
-    const fineSourceX = activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0;
-    const fineTargetX = activeFineStep ? activeFineStep.x : 0;
+    // Mobile: Source is centered (0,0 relative to source container). Target is relative to Grid.
+    // Desktop: We need a common coordinate space since we are moving containers apart.
+    // Let's assume the "Flying Card" is positioned relative to the Center of the Phase 2 container.
+    
+    // Source X (Deck Position)
+    // Mobile: 0 (Center), -36, +36 relative to center
+    // Desktop: +60 (Center), -36, +36 relative to THAT center? No, source piles in desktop are vertical or horizontal? 
+    // User said "decks are positioned to the right". Let's assume a similar horizontal stack but shifted right.
+    const fineSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
+    const fineSourceOffset = activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0;
+    const fineSourceX = fineSourceBaseX + fineSourceOffset;
+    const fineSourceY = 8; // Consistent start height
+
+    // Target X (Grid Slot) 
+    // Mobile: Just the slot x
+    // Desktop: Grid is shifted left.
+    const fineTargetBaseX = isDesktop ? DESKTOP_GRID_OFFSET_X : 0;
+    const fineTargetX = fineTargetBaseX + (activeFineStep ? activeFineStep.x : 0);
     const fineTargetY = activeFineStep ? (GRID_BASE_Y + activeFineStep.y) : 0;
 
     return (
@@ -179,37 +209,52 @@ const SortingAnimation: React.FC = () => {
 
             {/* --- FINE SORT (Compact) --- */}
             <div className={`
-                absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
+                absolute top-0 left-0 w-full h-full flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0 transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
                 ${phase === 'FINE' ? 'opacity-100 scale-100 z-20 md:filter-none' : 'opacity-0 scale-90 z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
 
-                {/* Grid Container with Side Thumbs */}
-                <div className="flex items-end gap-2 mb-4 z-10">
-                    {/* Left Thumb */}
-                    <div className="flex items-center pb-1 opacity-40">
-                        <ThumbsDown size={16} className="text-slate-500" />
+                {/* Wrapper regarding Desktop Offsets -> Actually we need to visually move the children */}
+                {/* Left Side (Desktop): Grid + Bottom Thumbs */}
+                <div className={`flex flex-col items-center z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[-50px]' : ''}`}>
+                    
+                    {/* Grid Container with Side Thumbs (Mobile Only) */}
+                    <div className="flex items-end gap-2 mb-2 md:mb-4">
+                        {/* Left Thumb (Mobile) */}
+                        <div className="flex items-center pb-1 opacity-40 md:hidden">
+                            <ThumbsDown size={16} className="text-slate-500" />
+                        </div>
+
+                        {/* Pyramid Grid */}
+                        <div className="flex items-end gap-[2px]">
+                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L2_0')} /></div>
+                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L1_1')} /><MiniSlot filled={fineFilledIds.has('L1_0')} /></div>
+                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('C0_2')} /><MiniSlot filled={fineFilledIds.has('C0_1')} /><MiniSlot filled={fineFilledIds.has('C0_0')} /></div>
+                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R1_1')} /><MiniSlot filled={fineFilledIds.has('R1_0')} /></div>
+                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R2_0')} /></div>
+                        </div>
+
+                        {/* Right Thumb (Mobile) */}
+                        <div className="flex items-center pb-1 opacity-40 md:hidden">
+                            <ThumbsUp size={16} className="text-slate-500" />
+                        </div>
                     </div>
 
-                    {/* Pyramid Grid */}
-                    <div className="flex items-end gap-[2px]">
-                        <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L2_0')} /></div>
-                        <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L1_1')} /><MiniSlot filled={fineFilledIds.has('L1_0')} /></div>
-                        <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('C0_2')} /><MiniSlot filled={fineFilledIds.has('C0_1')} /><MiniSlot filled={fineFilledIds.has('C0_0')} /></div>
-                        <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R1_1')} /><MiniSlot filled={fineFilledIds.has('R1_0')} /></div>
-                        <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R2_0')} /></div>
-                    </div>
-
-                    {/* Right Thumb */}
-                    <div className="flex items-center pb-1 opacity-40">
-                        <ThumbsUp size={16} className="text-slate-500" />
+                    {/* Bottom Thumbs (Desktop Only) */}
+                    <div className="hidden md:flex justify-between w-full px-4 mt-1 opacity-40">
+                         <ThumbsDown size={16} className="text-slate-500" />
+                         <ThumbsUp size={16} className="text-slate-500" />
                     </div>
                 </div>
 
-                {/* Source Piles */}
-                <div className="relative flex gap-6 pt-2 h-[24px] z-10">
+                {/* Right Side (Desktop): Source Piles */}
+                {/* On Mobile: It's just below in the flex-col. On Desktop: It's to the right because parent is flex-row (if we change parent). */}
+                {/* Wait, the parent is `flex-col md:flex-row` now. */}
+                {/* We need to position this group relative to the center or use the same translate trick */}
+                
+                <div className={`relative flex gap-6 pt-2 h-[24px] z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[60px] translate-y-[-20px]' : ''}`}>
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
                         <>
@@ -218,22 +263,23 @@ const SortingAnimation: React.FC = () => {
                             <DynamicStack count={fineSourceCounts[2]} icon={Smile} type="source" layoutId="pile-agree" />
                         </>
                     )}
+                </div>
 
-                    {/* Flying Card Overlay */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0">
-                        <AnimatePresence>
-                            {activeFineStep && (
-                                <motion.div
-                                    key={`fine-fly-${step}`}
-                                    initial={{ x: fineSourceX, y: 8, opacity: 1 }}
-                                    animate={{ x: fineTargetX, y: fineTargetY }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: FINE_DURATION, ease: "easeInOut" }}
-                                    className="absolute top-0 left-[-9px] w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl z-50 pointer-events-none"
-                                />
-                            )}
-                        </AnimatePresence>
-                    </div>
+                {/* Flying Card Overlay - Positioned Absolute Relative to Phase Container center */}
+                {/* We lift this OUT of the source piles container so it can fly freely between the two potentially separated areas */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 z-50">
+                    <AnimatePresence>
+                        {activeFineStep && (
+                            <motion.div
+                                key={`fine-fly-${step}`}
+                                initial={{ x: fineSourceX, y: fineSourceY, opacity: 1 }}
+                                animate={{ x: fineTargetX, y: fineTargetY }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: FINE_DURATION, ease: "easeInOut" }}
+                                className="absolute top-0 left-[-9px] w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl pointer-events-none"
+                            />
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
