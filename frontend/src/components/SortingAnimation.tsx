@@ -198,7 +198,7 @@ const SortingAnimation: React.FC = () => {
             <div className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
-                ${phase === 'ROUGH' ? 'opacity-100 scale-100 z-20 md:filter-none' : 'opacity-0 scale-90 z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
+                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">1</div>
@@ -243,7 +243,7 @@ const SortingAnimation: React.FC = () => {
             <div className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
-                ${phase === 'FINE' ? 'opacity-100 scale-100 z-20 md:filter-none' : 'opacity-0 scale-90 z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
+                ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
