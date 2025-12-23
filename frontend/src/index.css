@@ -12,7 +12,7 @@
 @layer base {
     html {
         font-size: 16px; /* Explicit base size for iOS */
-        font-family: 'Inter', sans-serif;
+        font-family: "Google Sans Flex", sans-serif;
     }
 }
 
