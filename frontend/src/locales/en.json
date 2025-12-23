@@ -59,7 +59,7 @@
     "description": "Please read the instructions carefully.",
     "start": "Start Study",
     "consent": {
-      "label": "I verify that I am at least 18 years old. I consent to the anonymous processing of my data in accordance with GDPR.",
+      "label": "I certify that I am at least 18 years old, have read and understood the information above, and freely agree to participate in this study.",
       "error": "Please accept the terms to continue."
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
@@ -72,7 +72,7 @@
   "consent": {
     "title": "Consent to Participate",
     "subtitle": "Please review the following information carefully.",
-    "default_text": "Before starting, please review the following information:\n\nThis academic study uses Q-methodology to analyze human subjectivity. There are no right or wrong answers here. Your role is simply to express your own point of view.\n\n**Confidentiality and Anonymity:**\nYour responses will be treated as strictly confidential and anonymized. Results will be aggregated to identify general trends (viewpoint factors) and will never identify you individually.\n\n**Data Usage:**\nCollected data will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to refuse to participate or to stop the study at any time without having to justify your decision."
+    "default_text": "Before starting, please read the following information:\n\nThis academic study uses Q-methodology to analyze human subjectivity. There are no right or wrong answers here. Your role is simply to express your own point of view.\n\n**Confidentiality and Anonymity:**\nYour responses will be treated as strictly confidential, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nCollected data will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to refuse to participate or to stop the study at any time without having to justify your decision."
   },
   "presort": {
     "title": "About you",
