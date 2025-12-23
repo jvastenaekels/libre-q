@@ -218,6 +218,8 @@ async def get_study(
     title = translation.title if (translation and hasattr(translation, 'title')) else study.slug
     description = translation.description if (translation and hasattr(translation, 'description')) else ""
     instructions = translation.instructions if (translation and hasattr(translation, 'instructions')) else ""
+    subtitle = translation.subtitle if (translation and hasattr(translation, 'subtitle')) else None
+    objective = translation.objective if (translation and hasattr(translation, 'objective')) else None
     
     statements_data = []
     for s in study.statements:
@@ -235,27 +237,16 @@ async def get_study(
         statements_data.append({"id": s.id, "text": text})
 
 
-    # Transform grid_config from dict {"-4": 2} or list [{"score": -4, "capacity": 2}] to list [{"score": -4, "capacity": 2}]
-    grid_config_list = []
-    if study.grid_config:
-        if isinstance(study.grid_config, list):
-            for item in study.grid_config:
-                if isinstance(item, dict) and "score" in item and "capacity" in item:
-                    grid_config_list.append({"score": int(item["score"]), "capacity": item["capacity"]})
-        elif isinstance(study.grid_config, dict):
-            for score_str, capacity in study.grid_config.items():
-                try:
-                    grid_config_list.append({"score": int(score_str), "capacity": capacity})
-                except ValueError:
-                    pass
-        
-        # Sort by score
-        grid_config_list.sort(key=lambda x: x["score"])
+    # Grid Config is standardized as List[GridColumn]
+    # Pydantic schema validation ensures structure
+    grid_config_list = study.grid_config
 
     return {
         "slug": study.slug,
         "title": title,
+        "subtitle": subtitle,
         "description": description,
+        "objective": objective,
         "instructions": instructions,
         "presort_config": study.presort_config,
         "grid_config": grid_config_list, 

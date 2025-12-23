@@ -15,14 +15,21 @@ import { useSessionStore } from '../store/useSessionStore';
 // Mocks
 const mockConfig = {
     title: 'Test Study',
+    subtitle: 'Test Subtitle',
+    slug: 'test-study',
     description: 'Test Description',
-    instructions: 'Test **Instructions**',
+    objective: 'Test Objective',
+    instructions: 'Test **Content**',
     statements: [],
     consent: {
         title: null,
         description: null
     }
 };
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
+}));
 
 vi.mock('../hooks/useStudyConfig', () => ({
     useStudyConfig: () => ({ isLoading: false, error: null })
@@ -36,14 +43,16 @@ describe('WelcomePage', () => {
         useSessionStore.getState().resetSession();
     });
 
-    it('renders study title and description', () => {
+    it('renders study details (title, subtitle, description, objective)', () => {
         render(
             <MemoryRouter>
                 <WelcomePage />
             </MemoryRouter>
         );
-        expect(screen.getByAltText('Test Study')).toBeInTheDocument();
+        expect(screen.getByText('Test Study')).toBeInTheDocument();
+        expect(screen.getByText('Test Subtitle')).toBeInTheDocument();
         expect(screen.getByText('Test Description')).toBeInTheDocument();
+        expect(screen.getByText('Test Objective')).toBeInTheDocument();
     });
 
     it('renders instructions markdown', () => {
@@ -52,74 +61,35 @@ describe('WelcomePage', () => {
                 <WelcomePage />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Instructions/)).toBeInTheDocument();
-        // Check for bold tag or just text content depending on markdown renderer
+        // Label
+        expect(screen.getByText('Instructions')).toBeInTheDocument();
+        
+        // Markdown Content - split check to be resilient to formatting/newlines
+        expect(screen.getByText('Content')).toBeInTheDocument();
+        
+        // Check for bold tag
         const strong = document.querySelector('strong');
         expect(strong).toBeInTheDocument();
-        expect(strong?.textContent).toBe('Instructions');
+        expect(strong?.textContent).toBe('Content');
     });
 
-    it('handles consent checkbox', async () => {
+    it('renders continue button and navigates to consent', async () => {
         render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
-        
-        const checkbox = screen.getByLabelText(/welcome\.consent\.label/i); 
-        const button = screen.getByRole('button', { name: /welcome\.start/i });
-
-        expect(button).toBeDisabled();
-
-        fireEvent.click(checkbox);
-        await waitFor(() => {
-            expect(button).not.toBeDisabled();
-        });
-    });
-
-    it('submits consent and navigates', async () => {
-         render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <Routes>
-                    <Route path="/study/:slug/welcome" element={<WelcomePage />} />
-                </Routes>
-            </MemoryRouter>
-        );
-
-        const checkbox = screen.getByLabelText(/welcome\.consent\.label/i);
-        fireEvent.click(checkbox);
-        
-        // Wait for validation - checkbox click should make form valid
-        const form = document.querySelector('form');
-        if (form) {
-            fireEvent.submit(form);
-        }
-
-        await waitFor(() => {
-            expect(useSessionStore.getState().hasConsented).toBe(true);
-        });
-    });
-
-    it('persists consent when re-navigating', async () => {
-        const { unmount } = render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
-
-        const checkbox = screen.getByLabelText(/welcome\.consent\.label/i);
-        fireEvent.click(checkbox);
-        
-        await waitFor(() => expect(useSessionStore.getState().hasConsented).toBe(true));
-
-        unmount();
-
-        render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
-
-        expect(screen.getByLabelText(/welcome\.consent\.label/i)).toBeChecked();
+             <MemoryRouter initialEntries={['/study/test-study/welcome']}>
+                 <Routes>
+                     <Route path="/study/:slug/welcome" element={<WelcomePage />} />
+                     <Route path="/study/:slug/consent" element={<div>Consent Page</div>} />
+                 </Routes>
+             </MemoryRouter>
+         );
+ 
+         const button = screen.getByRole('button', { name: /Continue/i });
+         expect(button).toBeInTheDocument();
+         
+         fireEvent.click(button);
+ 
+         await waitFor(() => {
+             expect(screen.getByText('Consent Page')).toBeInTheDocument();
+         });
     });
 });

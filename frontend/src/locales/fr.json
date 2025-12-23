@@ -1,11 +1,12 @@
 {
   "common": {
-    "agree": "Correspond à mon point de vue",
-    "disagree": "Ne correspond pas à mon point de vue",
-    "neutral": "Ni l'un ni l'autre",
+    "agree": "Plutôt d'accord",
+    "disagree": "Plutôt pas d'accord",
+    "neutral": "Pas d'avis tranché",
     "undo": "Annuler",
     "next": "Étape suivante",
     "submit": "Partager mon point de vue",
+    "continue": "Continuer",
     "loading": "Chargement...",
     "lang_code": "fr",
     "yes": "Oui",
@@ -46,8 +47,8 @@
     "steps": {
       "welcome": "Bienvenue",
       "presort": "Profil",
-      "rough": "Première impression",
-      "fine": "Nuances",
+      "rough": "Tri préliminaire",
+      "fine": "Tri détaillé",
       "review": "Réflexions"
     },
     "mobile_step": "Étape",
@@ -63,7 +64,15 @@
     },
     "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
     "restart": "Commencer une nouvelle session",
-    "preview_title": "Un jeu d'enfant !"
+    "preview_title": "Aperçu du tri",
+    "objective_label": "Objectif de l'étude",
+    "instructions_label": "Déroulement",
+    "default_instructions": "**Comment participer :**\n\n1. Lisez chaque affirmation.\n2. Triez-la selon votre ressenti.\n3. Affinez ensuite votre tri dans la grille."
+  },
+  "consent": {
+    "title": "Consentement à la participation",
+    "subtitle": "Veuillez lire attentivement les informations suivantes.",
+    "default_text": "En cochant la case ci-dessous, vous acceptez de participer à cette étude. Votre participation est volontaire et vous pouvez vous retirer à tout moment."
   },
   "presort": {
     "title": "À propos de vous",
@@ -75,7 +84,7 @@
   "rough": {
     "header": {
       "title": "Comment cette affirmation résonne-t-elle avec vous ?",
-      "subtitle": "Glissez à gauche pour « Ne me correspond pas », à droite pour « Me correspond », ou en bas si vous êtes indécis.",
+      "subtitle": "Glissez à gauche pour « Plutôt pas d'accord », à droite pour « Plutôt d'accord », ou en bas si vous n'avez pas d'avis tranché.",
       "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées—vous affinerez tout à l'étape suivante."
     },
     "complete": {
@@ -114,9 +123,9 @@
       "vertical": "La position verticale n'a pas d'importance—seul l'ordre gauche-droite compte."
     },
     "legend": {
-      "disagree": "Ne correspond pas à mon point de vue",
-      "neutral": "Neutre",
-      "agree": "Correspond à mon point de vue",
+      "disagree": "Plutôt pas d'accord",
+      "neutral": "Pas d'avis tranché",
+      "agree": "Plutôt d'accord",
       "label": "Légende du spectre"
     },
     "actions": {

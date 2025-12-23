@@ -35,33 +35,75 @@ const WelcomePage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto py-12 space-y-8 animate-in fade-in duration-500 px-4">
-            <div className="prose prose-blue max-w-none">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">{study.title}</h1>
-                <p className="lead text-xl text-gray-600">{study.description}</p>
-                
-                <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 prose prose-blue max-w-none text-sm leading-relaxed my-8">
-                    <Markdown>{study.instructions}</Markdown>
+        <div className="max-w-5xl mx-auto py-12 px-4 animate-in fade-in duration-500">
+            
+            {/* 1. Context Section (The "Why") */}
+            <div className="text-center max-w-3xl mx-auto mb-16 space-y-6">
+                <div>
+                     <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{study.title}</h1>
+                     {study.subtitle && (
+                        <h2 className="text-xl text-slate-600 font-normal mt-3">{study.subtitle}</h2>
+                     )}
                 </div>
+                
+                <p className="text-xl text-gray-800 leading-relaxed font-medium">{study.description}</p>
 
-                {/* Animated Sorting Example */}
-                <div className="mb-12 pt-8">
-                     <h3 className="text-center text-lg font-medium text-slate-600 mb-6 font-handwriting">
-                        {t('welcome.preview_title', "It's child's play!")}
-                    </h3>
-                    <div className="bg-slate-50/50 p-8 rounded-xl border border-gray-100 shadow-inner overflow-hidden w-full max-w-4xl mx-auto">
-                            <SortingAnimation />
+                {/* Objective Frame */}
+                {study.objective && (
+                    <div className="bg-white border border-slate-200 rounded-xl p-8 max-w-2xl mx-auto mt-10 text-left shadow-md relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                        <h4 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
+                             <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            {t('welcome.objective_label', 'Objective of the study')}
+                        </h4>
+                        <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
+                            <Markdown>{study.objective}</Markdown>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* 2. Process Section (The "How") */}
+            <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden mb-12">
+                <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    
+                    {/* Instructions Column */}
+                    <div className="p-8 md:p-10 bg-blue-50 flex flex-col justify-center">
+                        <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
+                            {t('welcome.instructions_label', 'Instructions')}
+                        </div>
+                        <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium">
+                            <Markdown>{study.instructions || t('welcome.default_instructions')}</Markdown>
+                        </div>
+                    </div>
+
+                    {/* Visual Column */}
+                    <div className="p-8 md:p-10 bg-slate-100 flex flex-col items-start min-h-[400px] relative overflow-hidden">
+                         <div className="relative z-10 uppercase tracking-wider text-xs font-bold text-slate-600 mb-4 bg-slate-200 w-fit px-3 py-1.5 rounded-md border border-slate-300">
+                            {t('welcome.preview_title', "It's child's play!")}
+                        </div>
+                        
+                        <div className="w-full flex-1 flex items-center justify-center relative">
+                            {/* Anchor Shape */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
+                            
+                            {/* Scaled Animation */}
+                            <div className="scale-150 transform origin-center grayscale-[0.2] contrast-125 z-10">
+                                <SortingAnimation />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Continue Button */}
-            <div className="flex justify-center pt-8">
+            <div className="flex justify-center">
                  <button
                     onClick={handleContinue}
-                    className="w-full sm:w-auto px-12 py-3 bg-blue-600 text-white rounded-md font-bold text-lg hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02]"
+                    className="group w-full sm:w-auto px-10 py-4 bg-blue-600 text-white rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
                 >
-                    {t('common.continue', 'Continue')} <ArrowRight size={20} />
+                    {t('common.continue', 'Continue')} 
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
             </div>
     </div>

@@ -5,7 +5,9 @@
 export const mockStudyConfig = {
   slug: 'e2e-test',
   title: 'E2E Test Study',
+  subtitle: 'Exploring perspectives on Testing through Q-Methodology',
   description: 'A study for end-to-end testing',
+  objective: 'The goal of this study is to identify distinct viewpoints regarding testing automation.',
   instructions: 'Please complete this study by following the on-screen instructions.',
   require_consent: true,
   consent_text: 'I consent to participate in this study.',

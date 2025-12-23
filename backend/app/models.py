@@ -62,7 +62,9 @@ class StudyTranslation(Base):
     language_code: Mapped[str] = mapped_column(String(5)) # e.g. "en", "fr-FR"
     
     title: Mapped[str] = mapped_column(String)
+    subtitle: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String)
+    objective: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     instructions: Mapped[str] = mapped_column(String) # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(JSON, default=dict) # Button adjustments
     consent_title: Mapped[Optional[str]] = mapped_column(String, nullable=True)

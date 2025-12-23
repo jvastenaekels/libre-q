@@ -1,11 +1,12 @@
 {
   "common": {
-    "agree": "Like my view",
-    "disagree": "Unlike my view",
-    "neutral": "Neither",
+    "agree": "Tend to agree",
+    "disagree": "Tend to disagree",
+    "neutral": "No strong feelings",
     "undo": "Undo",
     "next": "Next step",
     "submit": "Share my perspective",
+    "continue": "Continue",
     "loading": "Loading...",
     "lang_code": "en",
     "yes": "Yes",
@@ -46,8 +47,8 @@
     "steps": {
       "welcome": "Welcome",
       "presort": "Background",
-      "rough": "First impression",
-      "fine": "Distinctions",
+      "rough": "Preliminary Sort",
+      "fine": "Detailed Sort",
       "review": "Reflections"
     },
     "mobile_step": "Step",
@@ -63,7 +64,15 @@
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
     "restart": "Start a new session",
-    "preview_title": "It's child's play!"
+    "preview_title": "Sorting Preview",
+    "objective_label": "Study Objective",
+    "instructions_label": "Process",
+    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Sort it based on your feeling.\n3. Refine your sort on the grid."
+  },
+  "consent": {
+    "title": "Consent to Participate",
+    "subtitle": "Please review the following information carefully.",
+    "default_text": "By checking the box below, you agree to participate in this study. Your participation is voluntary and you may withdraw at any time."
   },
   "presort": {
     "title": "About you",
@@ -75,7 +84,7 @@
   "rough": {
     "header": {
       "title": "How does this resonate with you?",
-      "subtitle": "Swipe left if it is unlike your view, right if it is like your view, or down if unsure.",
+      "subtitle": "Swipe left if you tend to disagree, right if you tend to agree, or down if you have no strong feelings.",
       "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
     },
     "complete": {
@@ -114,9 +123,9 @@
     "vertical": "Vertical position doesn't matter—only left-to-right order counts."
 },
     "legend": {
-        "disagree": "Unlike my view",
-        "neutral": "Neutral",
-        "agree": "Like my view",
+        "disagree": "Tend to disagree",
+        "neutral": "No strong feelings",
+        "agree": "Tend to agree",
         "label": "Spectrum legend"
     },
     "actions": {

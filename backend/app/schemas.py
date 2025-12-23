@@ -49,11 +49,15 @@ class StatementRead(StatementBase):
     translations: List[StatementTranslationRead] = []
     model_config = ConfigDict(from_attributes=True)
 
+class GridColumn(BaseModel):
+    score: int
+    capacity: int
+
 # Study Schemas
 class StudyBase(BaseModel):
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
     state: StudyState = StudyState.draft
-    grid_config: Dict[str, Any]
+    grid_config: List[GridColumn]
     presort_config: Dict[str, Any]
     postsort_config: Dict[str, Any]
 
@@ -65,6 +69,8 @@ class StudyCreate(StudyBase):
 class StudyRead(StudyBase):
     id: int
     owner_id: int
+    subtitle: Optional[str] = None
+    objective: Optional[str] = None
     created_at: Any
     translations: List[StudyTranslationRead] = []
     statements: List[StatementRead] = []

@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import RoughSortPage from './RoughSortPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -67,7 +67,9 @@ describe('RoughSortPage', () => {
         );
         
         // Fast-forward time to trigger the hint (1500ms delay)
-        vi.advanceTimersByTime(2000);
+        act(() => {
+            vi.advanceTimersByTime(2000);
+        });
 
         // Check for Hint (now at bottom)
         expect(screen.getByText('rough.header.hint')).toBeTruthy();

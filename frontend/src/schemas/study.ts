@@ -41,7 +41,9 @@ export const PreSortFieldSchema = z.object({
 export const StudyConfigSchema = z.object({
   slug: z.string(),
   title: z.string(),
+  subtitle: z.string().optional().nullable(),
   description: z.string(),
+  objective: z.string().optional().nullable(),
   instructions: z.string(),
   presort_config: z.record(PreSortFieldSchema),
   grid_config: z.array(GridConfigSchema).optional(),
