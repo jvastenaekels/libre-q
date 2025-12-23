@@ -78,7 +78,7 @@ const WelcomePage: React.FC = () => {
                     </div>
 
                     {/* Visual Column */}
-                    <div className="p-8 md:p-10 bg-slate-100 flex flex-col items-start min-h-[400px] relative overflow-hidden">
+                    <div className="p-8 md:p-10 bg-slate-100 flex flex-col items-start min-h-[550px] relative overflow-hidden">
                          <div className="relative z-10 uppercase tracking-wider text-xs font-bold text-slate-600 mb-4 bg-slate-200 w-fit px-3 py-1.5 rounded-md border border-slate-300">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
