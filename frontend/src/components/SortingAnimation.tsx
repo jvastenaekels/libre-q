@@ -175,9 +175,9 @@ const SortingAnimation: React.FC = () => {
                 </div>
                 {phase === 'ROUGH' && (
                     <>
-                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" /></div>
-                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" /></div>
-                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10"><DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" /></div>
+                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" highlighted={activeRoughTarget?.pileId === 'disagree'} /></div>
+                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" highlighted={activeRoughTarget?.pileId === 'agree'} /></div>
+                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10"><DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" highlighted={activeRoughTarget?.pileId === 'neutral'} /></div>
                     </>
                 )}
             </div>
