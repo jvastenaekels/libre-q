@@ -214,13 +214,7 @@ const FineSortPage: React.FC = () => {
     }, [config, responses.qsort, selectedCardId, handleCardClick, activeId]);
 
     // 10. Condition Check (After all hooks)
-    if (!config) return null;
-
-    // 11. Memoized card data - these need to be after config null check
-    const activeCardData = activeId !== null ? config.statements.find(s => s.id === activeId) : undefined;
-    const selectedCard = selectedCardId !== null ? config.statements.find(s => s.id === selectedCardId) ?? null : null;
-
-    const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+    const snapCenterToCursor: Modifier = useCallback(({ activatorEvent, draggingNodeRect, transform }) => {
         if (draggingNodeRect && activatorEvent) {
             const activatorCenter = {
                 x: draggingNodeRect.left + draggingNodeRect.width / 2,
@@ -236,7 +230,19 @@ const FineSortPage: React.FC = () => {
             };
         }
         return transform;
-    };
+    }, []);
+
+    const handleTransformChange = useCallback(() => setPanVersion(v => v + 1), []);
+    const handleReset = useCallback(() => {  if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort(); }, [resetFineSort, t]);
+    const handleValidate = useCallback(() => navigate(`/study/${slug}/post-sort`), [navigate, slug]);
+
+    if (!config) return null;
+
+    // 11. Memoized card data - these need to be after config null check
+    const activeCardData = activeId !== null ? config.statements.find(s => s.id === activeId) : undefined;
+    const selectedCard = selectedCardId !== null ? config.statements.find(s => s.id === selectedCardId) ?? null : null;
+
+
 
     return (
         <DndContext 
@@ -265,12 +271,12 @@ const FineSortPage: React.FC = () => {
                     onCardClick={handleCardClick}
                     onSlotClick={handleSlotClick}
                     onDimensionsChange={setCardDimensions}
-                    onReset={() => { if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort(); }}
+                    onReset={handleReset}
                     onZoomChange={setZoomLevel}
-                    onTransformChange={() => setPanVersion(v => v + 1)}
+                    onTransformChange={handleTransformChange}
                     onInteractionUtils={setInteractionUtils}
                     isAllPlaced={isAllPlaced}
-                    onValidate={() => navigate(`/study/${slug}/post-sort`)}
+                    onValidate={handleValidate}
                     activeCard={activeCardData}
                 />
              </div>

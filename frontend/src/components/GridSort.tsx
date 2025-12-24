@@ -48,7 +48,7 @@ interface GridSortProps {
 
 type PileType = 'disagree' | 'neutral' | 'agree';
 
-const GridSort: React.FC<GridSortProps> = ({
+const GridSort: React.FC<GridSortProps> = React.memo(({
   agreeCards,
   disagreeCards,
   neutralCards,
@@ -633,6 +633,6 @@ const GridSort: React.FC<GridSortProps> = ({
       </AnimatePresence>
     </div>
   );
-};
+});
 
 export default GridSort;
