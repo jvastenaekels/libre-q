@@ -14,6 +14,7 @@
     "no": "Non",
     "ok": "OK",
     "cancel": "Annuler",
+    "check": "Vérifier",
     "attention": "Note",
     "error": "Erreur",
     "submitting": "Envoi...",
@@ -93,7 +94,8 @@
       "subtitle": "Nous allons maintenant affiner les nuances."
     },
     "instructions": {
-      "swipe": "Glissez ou appuyez pour catégoriser"
+      "swipe": "Glissez ou appuyez pour catégoriser",
+      "desktop_tip": "Glissez ou cliquez pour trier"
     }
   },
   "fine": {

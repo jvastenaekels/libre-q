@@ -312,7 +312,7 @@ const RoughSortPage: React.FC = () => {
                                         <div className="text-slate-400 text-xs font-semibold uppercase tracking-widest py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-70">
                                             {window.innerWidth < 1024 
                                                 ? t('fine.workbench.drag_or_tap') 
-                                                : "Glissez ou cliquez pour trier"}
+                                                : t('rough.instructions.desktop_tip')}
                                         </div>
                                     </motion.div>
                                 )}
