@@ -129,7 +129,7 @@
       "label": "Légende du spectre"
     },
     "actions": {
-      "validate": "Confirmer la grille",
+      "validate": "Confirmer le tri",
       "finish": "Terminer le tri",
       "ready": "Voir la vue d'ensemble",
       "not_ready": "Placez toutes les cartes pour continuer"

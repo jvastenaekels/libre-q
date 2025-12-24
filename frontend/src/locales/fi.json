@@ -129,7 +129,7 @@
         "label": "Spectrum legend"
     },
     "actions": {
-        "validate": "Confirm Grid",
+        "validate": "Vahvista lajittelu",
         "finish": "Finish sorting",
         "ready": "Review my perspective",
         "not_ready": "Place all cards to continue"
