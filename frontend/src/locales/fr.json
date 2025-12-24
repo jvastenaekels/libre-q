@@ -150,7 +150,7 @@
       "methodology": {
         "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
         "extremes_title": "Pôles et Extrémités",
-        "vertical": "Verticalité : L'ordre haut-bas n'importe pas, seul l'axe horizontal compte.",
+        "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
         "vertical_title": "Axe de Tri",
         "constraint": "Choix forcé : Vous devez placer toutes les cartes. Il faut parfois faire des choix difficiles !",
         "constraint_title": "Challenge",

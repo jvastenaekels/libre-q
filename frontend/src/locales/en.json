@@ -150,7 +150,7 @@
       "methodology": {
         "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
         "extremes_title": "Poles & Extremes",
-        "vertical": "Verticality: The top-bottom order doesn't matter, only the horizontal axis counts.",
+        "vertical": "Vertical position doesn't matter. Cards in the same column have the exact same score.",
         "vertical_title": "Sorting Axis",
         "constraint": "Forced Choice: You must place every card to finish. Sometimes you'll have to make tough choices!",
         "constraint_title": "Challenge",
