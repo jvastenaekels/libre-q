@@ -1,6 +1,6 @@
 {
   "common": {
-    "agree": "D'accord",
+    "agree": "Plutôt d'accord",
     "disagree": "Plutôt pas d'accord",
     "neutral": "Pas d'avis tranché",
     "select_card": "Sélectionnez une carte",
@@ -84,9 +84,9 @@
   },
   "rough": {
     "header": {
-      "title": "Comment cette affirmation résonne-t-elle avec vous ?",
+      "title": "Comment cette affirmation résonne-t-elle avec votre propre perspective ?",
       "subtitle": "Glissez à gauche pour « Plutôt pas d'accord », à droite pour « Plutôt d'accord », ou en bas si vous n'avez pas d'avis tranché.",
-      "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées—vous affinerez tout à l'étape suivante."
+      "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées. Vous affinerez tout à l'étape suivante."
     },
     "complete": {
       "title": "Premier tri terminé",
