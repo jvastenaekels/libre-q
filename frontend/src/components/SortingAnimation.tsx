@@ -44,15 +44,18 @@ const SortingAnimation: React.FC = () => {
 
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
+        // Hesitation Logic: 30% chance to wait extra time (simulating "thinking")
+        const hesitation = Math.random() > 0.7 ? 800 : 0;
+
         if (phase === 'ROUGH') {
             if (step < ROUGH_TARGETS.length) {
-                timer = setTimeout(() => setStep(s => s + 1), ROUGH_DURATION * 1000 + 100);
+                timer = setTimeout(() => setStep(s => s + 1), ROUGH_DURATION * 1000 + 100 + hesitation);
             } else {
                 timer = setTimeout(() => { setPhase('FINE'); setStep(0); }, PAUSE);
             }
         } else {
             if (step < FINE_STEPS.length) {
-                timer = setTimeout(() => setStep(s => s + 1), FINE_DURATION * 1000 + 100);
+                timer = setTimeout(() => setStep(s => s + 1), FINE_DURATION * 1000 + 100 + hesitation);
             } else {
                 timer = setTimeout(() => { setPhase('ROUGH'); setStep(0); }, PAUSE);
             }
