@@ -296,7 +296,10 @@ const SortingAnimation: React.FC = () => {
                 {/* Center Y = GridBaseY + 12 + 4 + 7 (half thumb height 14) = GridBaseY + 23. */}
                 <div 
                     className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
-                    style={{ top: `calc(50% + ${currentGridBaseY + 23}px - 7px)` }} // Top = Center - HalfHeight
+                    style={{ 
+                        top: `calc(50% + ${currentGridBaseY + 23}px - 7px)`,
+                        left: `calc(50% - 60px)` // ALIGN WITH GRID LEFT OFFSET
+                    }}
                 >
                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
                         <div className="w-[18px]" />
