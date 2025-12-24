@@ -155,7 +155,7 @@ const StudyLayoutContent: React.FC = () => {
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use logo if on step 1, else config title */}
                         {session.currentStep === 1 ? (
-                            <img src="/images/open-q-logo.svg" alt="Open-Q" className="h-8 w-auto object-contain" />
+                            <img src="/open-q-logo.svg" alt="Open-Q" className="h-8 w-auto object-contain" />
                         ) : (config?.title || 'Q-Method Study')}
                     </div>
 

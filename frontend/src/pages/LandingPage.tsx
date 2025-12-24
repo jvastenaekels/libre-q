@@ -26,7 +26,7 @@ const LandingPage: React.FC = () => {
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
                 <div className="text-center space-y-2">
                     <div className="flex justify-center mb-6">
-                        <img src="/images/open-q-logo.svg" alt="Open-Q" className="h-20 w-auto object-contain" />
+                        <img src="/open-q-logo.svg" alt="Open-Q" className="h-20 w-auto object-contain" />
                     </div>
                     <p className="text-gray-500">Enter your study code to begin.</p>
                 </div>
