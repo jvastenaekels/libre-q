@@ -31,6 +31,13 @@ class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
 
+    // Auto-report to backend
+    // We import dynamically or rely on the imported module if accessible to avoid cycles, 
+    // but here direct import is fine assuming no circular deps with components.
+    import('../api/client').then(({ reportBug }) => {
+        reportBug(error, { componentStack: errorInfo.componentStack });
+    });
+
     // Deployment Handling: Failed to fetch dynamically imported module
     // This happens when a new version is deployed and old chunks are 404ing.
     // We force a hard reload to get the new index.html and assets.

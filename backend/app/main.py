@@ -4,7 +4,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import submissions
+from app.routers import submissions, logs
 
 app = FastAPI()
 
@@ -47,6 +47,7 @@ app.add_middleware(
 )
 
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
+app.include_router(logs.router, prefix="/api", tags=["logs"])
 
 @app.get("/health")
 def health_check():
