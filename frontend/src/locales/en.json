@@ -44,7 +44,12 @@
       "network_title": "Connection Lost",
       "home": "Go to Home",
       "reset": "Reset Session",
-      "default_title": "Oops! Something went wrong."
+      "default_title": "Oops! Something went wrong.",
+      "study_not_found": {
+        "title": "Study Not Found",
+        "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
+        "action": "Go to Home"
+      }
     }
   },
   "layout": {

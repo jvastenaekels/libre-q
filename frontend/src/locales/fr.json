@@ -44,7 +44,12 @@
       "network_title": "Connexion perdue",
       "home": "Retour à l'accueil",
       "reset": "Réinitialiser la session",
-      "default_title": "Oups ! Quelque chose a mal tourné."
+      "default_title": "Oups ! Quelque chose a mal tourné.",
+      "study_not_found": {
+        "title": "Étude introuvable",
+        "message": "Nous n'avons pas trouvé d'étude avec ce nom. Veuillez vérifier l'URL ou contacter le chercheur.",
+        "action": "Retour à l'accueil"
+      }
     }
   },
   "layout": {

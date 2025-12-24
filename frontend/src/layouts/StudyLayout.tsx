@@ -17,6 +17,7 @@ import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import { ApiError } from '../api/client';
 import ErrorPage from '../pages/ErrorPage';
+import StudyNotFound from '../pages/StudyNotFound';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -71,11 +72,15 @@ const StudyLayoutContent: React.FC = () => {
 
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
+        // Special Case: Study Not Found (404) -> Custom User Friendly Page
+        if (configError === 'common.errors.not_found') {
+            return <StudyNotFound />;
+        }
+
         // Map known error keys to ApiErrors for better UI
         let errorObj: Error | ApiError | null = null;
-        if (configError === 'common.errors.not_found') {
-            errorObj = new ApiError(404, 'Study not found');
-        } else if (configError === 'common.errors.rate_limited') {
+        
+        if (configError === 'common.errors.rate_limited') {
             errorObj = new ApiError(429, 'Too many requests');
         } else if (configError === 'common.errors.network') {
             errorObj = new Error('Network error');

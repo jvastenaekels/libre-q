@@ -277,6 +277,7 @@ interface StackProps {
     icon?: React.ElementType;
     type: 'deck' | 'pile' | 'source';
     layoutId?: string;
+    highlighted?: boolean;
 }
 
 const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type }) => {
