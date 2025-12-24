@@ -20,6 +20,9 @@ describe('SortingAnimation', () => {
                 dispatchEvent: vi.fn(),
             })),
         });
+
+        // Mock Math.random to avoid hesitation (logic uses > 0.7, so 0.5 is safe)
+        vi.spyOn(Math, 'random').mockReturnValue(0.5);
     });
 
     afterEach(() => {

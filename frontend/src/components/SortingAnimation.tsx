@@ -151,6 +151,7 @@ const SortingAnimation: React.FC = () => {
             
             {/* ROUGH PHASE */}
             <div 
+                data-testid="phase-1"
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
             >
@@ -184,6 +185,7 @@ const SortingAnimation: React.FC = () => {
 
             {/* FINE PHASE */}
             <div 
+                data-testid="phase-2"
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'FINE' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
             >
