@@ -88,10 +88,10 @@ const SortingAnimation: React.FC = () => {
         // Calculate initial source pile sizes based on what will be used in FINE steps
         FINE_STEPS.forEach(s => totals[s.source]++);
         
-        // Add some "extra" cards that remain in piles to make them look fuller
-        totals[0] += 2; 
-        totals[1] += 2;
-        totals[2] += 2;
+        // REMOVED: Extra cards that made piles look fuller but prevented empty state
+        // totals[0] += 2; 
+        // totals[1] += 2;
+        // totals[2] += 2;
 
         const effectiveStep = phase === 'FINE' ? step : 0;
         for (let i = 0; i < effectiveStep; i++) {
