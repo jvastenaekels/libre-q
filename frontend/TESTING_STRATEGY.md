@@ -19,6 +19,14 @@ This document outlines the testing patterns and best practices for the Open-Q fr
     - Use `renderWithProviders` from `src/test/test-utils.tsx` to wrap the component in necessary contexts (`MemoryRouter`, `LayoutProvider`).
     - Use `setupStoreMocks` to define the state of `useConfigStore`, `useResponseStore`, etc.
     - Verify that UI elements (like "Next" or "Validate" buttons) appear correctly based on complex store states.
+    - **Error Scenarios**: Mock store to return error states (e.g., `configError: 'common.errors.not_found'`) and assert that the correct Error Component (e.g., `<StudyNotFound />`) is rendered.
+
+### Error Management & Reporting
+
+- **API Client Tests (`src/api/client.test.ts`)**:
+    - Verify that network failures throw `ApiError` with correct status codes.
+    - **Critical**: Verify that 5xx errors trigger the `reportBug` function.
+    - **Safety**: Verify that `reportBug` does NOT recursively call itself if the log endpoint fails.
 
 ### End-to-End Tests (`e2e/*.spec.ts`)
 
