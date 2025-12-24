@@ -1,7 +1,7 @@
-
 import { renderHook, act } from '@testing-library/react';
 import { useFineSortDrag } from './useFineSortDrag';
 import { vi, describe, it, expect } from 'vitest';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 describe('useFineSortDrag', () => {
     const mockActions = {
@@ -26,9 +26,9 @@ describe('useFineSortDrag', () => {
 
         act(() => {
             result.current.handleDragEnd({
-                active: { id: 101 } as any,
-                over: { id: 'slot_0_0' } as any,
-            } as any);
+                active: { id: 101 } as unknown,
+                over: { id: 'slot_0_0' } as unknown,
+            } as unknown as DragEndEvent);
         });
 
         expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(101, 0, 0);
@@ -96,9 +96,9 @@ describe('useFineSortDrag', () => {
 
         act(() => {
             result.current.handleDragEnd({
-                active: { id: 101 } as any,
-                over: { id: 'slot_1_0' } as any,
-            } as any);
+                active: { id: 101 } as unknown,
+                over: { id: 'slot_1_0' } as unknown,
+            } as unknown as DragEndEvent);
         });
 
         expect(mockActions.unplaceCard).toHaveBeenCalledWith(200);

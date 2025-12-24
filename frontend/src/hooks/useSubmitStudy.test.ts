@@ -10,6 +10,7 @@ import { useSubmitStudy } from './useSubmitStudy';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
+import type { StudyConfig } from '../schemas/study';
 
 // Mock the API client
 const mockPost = vi.fn();
@@ -32,7 +33,7 @@ describe('useSubmitStudy', () => {
         mockPost.mockReset();
         
         // Setup stores
-        useConfigStore.getState().setConfig(mockConfig as any);
+        useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
         
         useSessionStore.getState().resetSession();
         useSessionStore.getState().setToken('test-token');

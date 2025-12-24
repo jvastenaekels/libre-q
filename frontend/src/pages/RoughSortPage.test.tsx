@@ -11,6 +11,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import type { StudyConfig } from '../schemas/study';
 
 // Mocks
 vi.mock('react-i18next', () => ({
@@ -40,7 +41,7 @@ const mockConfig = {
 describe('RoughSortPage', () => {
     beforeEach(() => {
         // Reset all stores
-        useConfigStore.getState().setConfig(mockConfig as any);
+        useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
         useSessionStore.getState().resetSession();
         useResponseStore.getState().resetResponses();
     });

@@ -4,7 +4,9 @@ import { mockStudyAPI } from './fixtures/study-config';
 const visualTestConfig = {
   slug: 'visual-test',
   title: 'Visual Test Study',
+  subtitle: 'Visual Test Subtitle',
   description: 'Study for visual regression testing',
+  objective: 'Visual Test Objective',
   instructions: 'Test instructions',
   require_consent: true,
   consent_text: 'I consent.',
@@ -42,11 +44,11 @@ test.describe('Visual Regression', () => {
   });
 
   // Skip navigation-dependent tests for now
-  test.skip('Rough Sort Page Screenshot', async ({ page }) => {
+  test.skip('Rough Sort Page Screenshot', async () => {
     // This test requires full navigation flow which is complex to mock
   });
 
-  test.skip('Fine Sort Grid Screenshot', async ({ page }) => {
+  test.skip('Fine Sort Grid Screenshot', async () => {
     // This test requires full navigation flow which is complex to mock
   });
 });

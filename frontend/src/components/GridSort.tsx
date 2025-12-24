@@ -9,8 +9,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ZoomIn, ZoomOut, RotateCcw,
-    Check, X, Eye,
-    Smile, Meh, Frown, HelpCircle,
+    Check, Eye,
+    Smile, Meh, Frown, 
     Lightbulb, Sparkles, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,7 +21,6 @@ import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useUIStore } from '../store/useUIStore';
-import { useResponseStore } from '../store/useResponseStore';
 import type { InteractionUtils } from '../hooks/useFineSortDrag';
 
 
@@ -91,7 +90,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
  
 
-  const [showHelpModal, setShowHelpModal] = useState(false);
   const [methodologyStep, setMethodologyStep] = useState(0);
   const methodologyTips = [
       t('fine.workbench.methodology.extremes'),
@@ -155,7 +153,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
             zoomIn,
             zoomOut,
             performAutoFit,
-            transformRef: transformRef as any,
+            transformRef,
             wrapperRef,
             contentRef
         });
@@ -521,7 +519,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                                     <>
                                         <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">1</span>
                                         <span className="text-xs font-bold uppercase tracking-wide">
-                                            {t('common.select_card')}
+                                            {t('fine.workbench.initial_instruction')}
                                         </span>
                                     </>
                                 )}
@@ -538,86 +536,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
               </div>
       </div>
 
-      {/* Help Modal */}
-      <AnimatePresence>
-          {showHelpModal && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                  <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => setShowHelpModal(false)}
-                      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                  />
-                  <motion.div 
-                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                      className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
-                  >
-                      <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-indigo-50/30">
-                          <div className="flex items-center gap-3">
-                              <div className="p-2 bg-indigo-500 text-white rounded-xl">
-                                  <HelpCircle size={24} />
-                              </div>
-                              <h2 className="text-xl font-extrabold text-slate-800">{t('fine.workbench.help')}</h2>
-                          </div>
-                          <button 
-                              onClick={() => setShowHelpModal(false)}
-                              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
-                          >
-                              <X size={24} />
-                          </button>
-                      </div>
-                      
-                      <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                          <section className="space-y-3">
-                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                                  {t('fine.workbench.methodology.extremes_title')}
-                              </h3>
-                              <p className="text-slate-600 leading-relaxed font-medium">
-                                  {t('fine.workbench.methodology.extremes')}
-                              </p>
-                          </section>
-
-                          <section className="space-y-3">
-                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                                  {t('fine.workbench.methodology.vertical_title')}
-                              </h3>
-                              <p className="text-slate-600 leading-relaxed font-medium">
-                                  {t('fine.workbench.methodology.vertical')}
-                              </p>
-                          </section>
-
-                          <section className="space-y-3">
-                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                                  {t('fine.workbench.methodology.interaction_title')}
-                              </h3>
-                              <p className="text-slate-600 leading-relaxed font-medium">
-                                  {t('fine.workbench.methodology.interaction')}
-                              </p>
-                          </section>
-
-                          <div className="pt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 italic text-sm text-slate-500 text-center">
-                              {t('fine.workbench.methodology.footer_note')}
-                          </div>
-                      </div>
-
-                      <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
-                          <button 
-                              onClick={() => setShowHelpModal(false)}
-                              className="px-10 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700 transition-all active:scale-95"
-                          >
-                              {t('fine.workbench.methodology.close')}
-                          </button>
-                      </div>
-                  </motion.div>
-              </div>
-          )}
-      </AnimatePresence>
     </div>
   );
 });

@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import i18n from '../i18n';
 import { applyStudyOverrides, resetBaseLocales } from './i18nOverrides';
+import i18n from '../i18n';
+import type { StudyConfig } from '../schemas/study';
 
 // Mock the locales to keep tests stable and fast
 vi.mock('../locales/en.json', () => ({
@@ -40,6 +40,22 @@ vi.mock('../locales/fi.json', () => ({
 vi.spyOn(i18n, 'addResourceBundle');
 
 describe('i18nOverrides utility', () => {
+  it('should apply study overrides from config successfully', () => {
+    const config = {
+      ui_labels: { 'common.next': 'Localized Next' }
+    } as unknown as StudyConfig;
+
+    applyStudyOverrides('en', config.ui_labels);
+
+    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+      'en',
+      'translation',
+      config.ui_labels,
+      true,
+      true
+    );
+  });
+
   it('should apply study overrides successfully', () => {
     const labels = {
       'common.agree': 'Approuve',

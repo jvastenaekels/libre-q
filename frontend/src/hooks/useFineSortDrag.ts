@@ -6,6 +6,7 @@
 
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import React, { useState, useCallback, useRef } from 'react';
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
 interface DragCard {
@@ -26,15 +27,10 @@ interface Actions {
 }
 
 export interface InteractionUtils {
-    zoomIn: () => void;
-    zoomOut: () => void;
+    zoomIn: (step?: number) => void;
+    zoomOut: (step?: number) => void;
     performAutoFit: () => void;
-    transformRef: React.RefObject<{ 
-        instance: { 
-            transformState: { positionX: number; positionY: number; scale: number; } 
-        }; 
-        setTransform: (x: number, y: number, scale: number, duration: number, animationType?: any) => void;
-    }>;
+    transformRef: React.RefObject<ReactZoomPanPinchRef>;
     wrapperRef: React.RefObject<HTMLDivElement>;
     contentRef: React.RefObject<HTMLDivElement>;
 }

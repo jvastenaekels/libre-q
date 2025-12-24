@@ -68,8 +68,6 @@ export const useSubmitStudy = () => {
                 setConfirmationCode(data.confirmation_code);
                 // Sync session completion (if session store has this, or remove if not needed)
                 // useSessionStore.getState().completeSession(data.confirmation_code);
-            } else {
-                 console.log('Partial save successful');
             }
 
         } catch (err: unknown) {

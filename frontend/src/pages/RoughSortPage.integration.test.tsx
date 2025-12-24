@@ -13,6 +13,7 @@ import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import type { StudyConfig } from '../schemas/study';
 import { useUIStore } from '../store/useUIStore';
 
 // Mock Stores
@@ -41,6 +42,9 @@ vi.mock('react-i18next', () => ({
 describe('RoughSortPage Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
+        useSessionStore.getState().resetSession();
+        useResponseStore.getState().resetResponses();
     });
 
     const mockConfig = {

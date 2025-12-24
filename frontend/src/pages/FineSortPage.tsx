@@ -24,7 +24,7 @@ import { createPortal } from 'react-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { useLayoutAction } from '../contexts/LayoutContext';
+import { useLayoutAction } from '../hooks/useLayout';
 import { } from 'lucide-react';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';

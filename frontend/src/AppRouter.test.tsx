@@ -10,23 +10,30 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import StudyLayout from './layouts/StudyLayout';
 import { useSessionStore } from './store/useSessionStore';
 import { useConfigStore } from './store/useConfigStore';
+import type { StudyConfig } from './schemas/study';
+
+vi.mock('./pages/PreSortPage', () => ({ default: () => <div data-testid="presort-page">PreSortPage</div> }));
+vi.mock('./pages/RoughSortPage', () => ({ default: () => <div data-testid="rough-sort-page">RoughSortPage</div> }));
 
 // Mock Pages
 const MockFineSort = () => <div data-testid="page-fine">Fine Page</div>;
 const MockWelcome = () => <div data-testid="page-welcome">Welcome Page</div>;
 
-const mockConfig = {
+const mockConfig: StudyConfig = {
     slug: 'demo',
     title: 'Test',
     description: 'Test',
     instructions: 'Test',
-    statements: []
+    statements: [],
+    presort_config: {},
+    grid_config: []
 };
 
 describe('App Routing Protection', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        useConfigStore.getState().setConfig(mockConfig as any);
+        // Use unknown to acknowledge the cast for mock payload
+        useConfigStore.getState().setConfig(mockConfig);
         useSessionStore.getState().resetSession();
     });
 

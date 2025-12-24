@@ -9,6 +9,7 @@ import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
 import { useResponseStore } from './useResponseStore';
 import { resetBaseLocales } from '../utils/i18nOverrides';
+import type { StudyConfig } from '../schemas/study';
 
 // Mock the i18n overrides utility
 vi.mock('../utils/i18nOverrides', () => ({
@@ -69,7 +70,7 @@ describe('Atomic Stores', () => {
             useConfigStore.getState().setConfig({
                 statements: [{ id: 1, text: 'Test' }],
                 grid_config: [{ score: 0, capacity: 5 }]
-            } as any);
+            } as unknown as StudyConfig);
             
             useResponseStore.getState().placeCardInGrid(1, 0, 0);
             const state = useResponseStore.getState();
@@ -83,9 +84,9 @@ describe('Atomic Stores', () => {
             expect(state.config).toBeNull();
         });
 
-        it('sets config', () => {
+        it('sets config correctly', () => {
             const mockConfig = { title: 'Test', statements: [] };
-            useConfigStore.getState().setConfig(mockConfig as any);
+            useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
             expect(useConfigStore.getState().config?.title).toBe('Test');
         });
     });

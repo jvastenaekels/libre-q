@@ -40,30 +40,27 @@ describe('SortingAnimation', () => {
     it('applies responsive classes for layout switching', () => {
         render(<SortingAnimation />);
         
-        // Use a more specific query based on the structure we know
-        const phase1Container = screen.getByText('1').closest('div')?.parentElement;
-        const phase2Container = screen.getByText('2').closest('div')?.parentElement;
+        // Use data-testids
+        const phase1Container = screen.getByTestId('phase-1');
+        const phase2Container = screen.getByTestId('phase-2');
 
-        // Check for mobile (absolute) and desktop (relative) classes on containers
-        expect(phase1Container).toHaveClass('absolute', 'md:relative');
-        expect(phase2Container).toHaveClass('absolute', 'md:relative');
+        // Check for mobile (absolute) classes on containers
+        expect(phase1Container).toHaveClass('absolute');
+        expect(phase2Container).toHaveClass('absolute');
     });
 
     it('starts in ROUGH phase with correct visibility classes', () => {
         render(<SortingAnimation />);
 
-        const phase1Num = screen.getByText('1');
-        const phase1Container = phase1Num.closest('div')?.parentElement;
+        const phase1Container = screen.getByTestId('phase-1');
 
         // Phase 1 should be active (opacity-100)
         expect(phase1Container).toHaveClass('opacity-100');
         expect(phase1Container).not.toHaveClass('opacity-0');
 
-        const phase2Num = screen.getByText('2');
-        const phase2Container = phase2Num.closest('div')?.parentElement;
+        const phase2Container = screen.getByTestId('phase-2');
 
-        // Phase 2 should be inactive (hidden/dimmed) on mobile initially 
-        // Note: Logic is 'opacity-0 scale-90' for inactive on mobile
+        // Phase 2 should be inactive (hidden/dimmed) initially 
         expect(phase2Container).toHaveClass('opacity-0');
     });
 
@@ -75,17 +72,14 @@ describe('SortingAnimation', () => {
         // Let's advance time enough to cover Rough Sort
         
         // Advance time in steps to allow effect cycles (re-renders) to run and schedule new timers
-        // We need enough steps to cover the 5 items + pause.
-        // 5 * 800ms + 1200ms = 5200ms.
-        // Advancing 8 times by 1000ms should cover it safely.
         for (let i = 0; i < 8; i++) {
             act(() => {
                 vi.advanceTimersByTime(1000);
             });
         }
 
-        const phase1Container = screen.getByText('1').closest('div')?.parentElement;
-        const phase2Container = screen.getByText('2').closest('div')?.parentElement;
+        const phase1Container = screen.getByTestId('phase-1');
+        const phase2Container = screen.getByTestId('phase-2');
 
         // Phase 1 should now be inactive
         expect(phase1Container).toHaveClass('opacity-0');

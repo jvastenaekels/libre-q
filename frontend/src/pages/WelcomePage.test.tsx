@@ -10,6 +10,7 @@ import WelcomePage from './WelcomePage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import { useConfigStore } from '../store/useConfigStore';
+import type { StudyConfig } from '../schemas/study';
 import { useSessionStore } from '../store/useSessionStore';
 
 // Mocks
@@ -39,7 +40,7 @@ describe('WelcomePage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Setup initial state
-        useConfigStore.getState().setConfig(mockConfig as any);
+        useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
         useSessionStore.getState().resetSession();
     });
 

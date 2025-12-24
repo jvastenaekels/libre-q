@@ -199,7 +199,9 @@ const SortingAnimation: React.FC = () => {
         <div className="relative w-full h-80 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
-            <div className={`
+            <div 
+                data-testid="phase-1"
+                className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] md:scale-[1.8] -translate-y-8 md:-translate-y-12 z-10'}
             `}>
@@ -241,7 +243,9 @@ const SortingAnimation: React.FC = () => {
             </div>
 
             {/* --- FINE SORT (Layout via Geometry Constants) --- */}
-            <div className={`
+            <div 
+                data-testid="phase-2"
+                className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
                 ${phase === 'FINE' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] md:scale-[1.8] -translate-y-8 md:-translate-y-12 z-10'}
             `}>

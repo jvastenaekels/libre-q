@@ -11,7 +11,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { useLayoutAction } from '../contexts/LayoutContext';
+import { useLayoutAction } from '../hooks/useLayout';
 import { AlertCircle, Check, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';

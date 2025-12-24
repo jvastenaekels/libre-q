@@ -14,9 +14,27 @@ import { useResponseStore } from '../store/useResponseStore';
 import { useUIStore } from '../store/useUIStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
+import type { StudyConfig } from '../schemas/study';
+
+const mockConfig: StudyConfig = {
+    slug: 'demo',
+    title: 'Test',
+    description: 'Test',
+    instructions: 'Test',
+    statements: [
+        { id: 1, text: 'S1' },
+        { id: 2, text: 'S2' }
+    ],
+    grid_config: [{ score: 0, capacity: 2 }],
+    presort_config: {}
+};
 
 // Mock Stores
-vi.mock('../store/useConfigStore');
+vi.mock('../store/useConfigStore', () => ({
+    useConfigStore: Object.assign((fn: (s: any) => any) => fn({ config: mockConfig }), {
+        getState: () => ({ setConfig: vi.fn(), config: mockConfig })
+    })
+}));
 vi.mock('../store/useSessionStore');
 vi.mock('../store/useResponseStore');
 vi.mock('../store/useUIStore');
@@ -40,7 +58,14 @@ vi.mock('react-i18next', () => ({
 
 // Mock GridSort to avoid complex DND logic in integration tests
 vi.mock('../components/GridSort', () => ({
-    default: () => <div data-testid="grid-sort">GridSort</div>
+    default: ({ isAllPlaced, onValidate }: { isAllPlaced: boolean; onValidate: () => void }) => (
+        <div data-testid="grid-sort">
+            GridSort
+            {isAllPlaced && (
+                <button onClick={onValidate}>fine.actions.validate</button>
+            )}
+        </div>
+    )
 }));
 
 // Mock ResizeObserver
@@ -55,21 +80,13 @@ describe('FineSortPage Integration', () => {
         vi.clearAllMocks();
     });
 
-    const mockConfig = {
-        statements: [
-            { id: 1, text: 'S1' },
-            { id: 2, text: 'S2' }
-        ],
-        grid_config: [{ score: 0, capacity: 2 }]
-    };
-
     it('renders "Finish Sorting" button in Header when grid is full', () => {
         // Mock State: All cards placed
         const configState = { config: mockConfig, isLoading: false };
         const sessionState = { 
-            currentStep: 4, 
             hasConsented: true, 
-            isSaving: false,
+            currentStep: 4, 
+            isCompleted: false, 
             language: 'en',
             setStep: vi.fn(), 
         };
@@ -82,10 +99,10 @@ describe('FineSortPage Integration', () => {
         };
         const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
 
-        mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
-        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
-        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(responseState) : responseState);
-        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
+        mockUseConfigStore.mockImplementation((selector: (s: any) => any) => selector ? selector(configState) : configState);
+        mockUseSessionStore.mockImplementation((selector: (s: any) => any) => selector ? selector(sessionState) : sessionState);
+        mockUseResponseStore.mockImplementation((selector: (s: any) => any) => selector ? selector(responseState) : responseState);
+        mockUseUIStore.mockImplementation((selector: (s: any) => any) => selector ? selector(uiState) : uiState);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>

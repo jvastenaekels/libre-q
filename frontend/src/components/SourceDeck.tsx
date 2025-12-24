@@ -10,10 +10,15 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import SortableCard from './SortableCard';
 import { motion } from 'framer-motion';
 
+interface Card {
+    id: number;
+    text: string;
+}
+
 interface SourceDeckProps {
-    agree: any[];
-    disagree: any[];
-    neutral: any[];
+    agree: Card[];
+    disagree: Card[];
+    neutral: Card[];
 }
 
 const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => {
@@ -39,7 +44,7 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id as 'disagree' | 'neutral' | 'agree')}
                         className={`
                             flex-1 py-3 text-xs sm:text-sm font-bold tracking-wide
                             transition-colors relative
