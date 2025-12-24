@@ -378,7 +378,7 @@ const GridSort: React.FC<GridSortProps> = ({
       >
               {/* Reading Zone (L'Oeil du Tri) */}
               <div className="flex-none p-4 pb-0">
-                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 min-h-[140px] flex flex-col justify-center relative transition-all duration-300">
+                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 h-40 overflow-y-auto flex flex-col justify-center relative transition-all duration-300 custom-scrollbar">
                       {hoveredCard || selectedCard ? (
                          <div className="animate-in fade-in zoom-in-95 duration-200">
                              <div className="text-xs font-bold text-indigo-400 mb-1 uppercase tracking-wider">
