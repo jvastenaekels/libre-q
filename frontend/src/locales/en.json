@@ -52,8 +52,8 @@
     "steps": {
       "welcome": "Welcome",
       "presort": "Background",
-      "rough": "Preliminary Sort",
-      "fine": "Detailed Sort",
+      "rough": "Rough Sort",
+      "fine": "Fine Sort",
       "review": "Reflections"
     },
     "mobile_step": "Step",
