@@ -148,7 +148,7 @@ const SortingAnimation: React.FC = () => {
 
     // DESKTOP (Grid Left, Deck Right)
     const DESKTOP_GRID_ROW0_Y = 0; // Center vertically
-    const DESKTOP_DECK_OFFSET_X = 60; // Push deck to the right (Balanced with Grid -60)
+    const DESKTOP_DECK_OFFSET_X = 80; // Push deck to the right (Balanced with Grid -80)
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -197,7 +197,7 @@ const SortingAnimation: React.FC = () => {
             {/* --- ROUGH SORT (Compact) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.3] md:scale-[1.8] z-20' : 'opacity-0 scale-[1.2] md:scale-[1.6] z-10'}
+                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.3] md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.2] md:scale-[1.8] md:-translate-y-12 z-10'}
             `}>
 
                 {/* Deck (Center) */}
@@ -239,7 +239,7 @@ const SortingAnimation: React.FC = () => {
             {/* --- FINE SORT (Layout via Geometry Constants) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
-                ${phase === 'FINE' ? 'opacity-100 scale-[1.3] md:scale-[1.8] z-20' : 'opacity-0 scale-[1.2] md:scale-[1.6] z-10'}
+                ${phase === 'FINE' ? 'opacity-100 scale-[1.3] md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.2] md:scale-[1.8] md:-translate-y-12 z-10'}
             `}>
 
                 {/* 
@@ -263,7 +263,7 @@ const SortingAnimation: React.FC = () => {
                         // We want `bottom` edge to be at CenterY + GridBaseY + 12px.
                         top: `calc(50% + ${currentGridBaseY + 12}px)`,
                         transform: 'translate(-50%, -100%)',
-                        left: isDesktop ? `calc(50% - 60px)` : '50%' // Desktop: Shift Grid Left to balance Deck Right
+                        left: isDesktop ? `calc(50% - 80px)` : '50%' // Desktop: Shift Grid Left to balance Deck Right
                     }}
                 >
                      {/* Pyramid Grid (Flex Row) */}
@@ -298,7 +298,7 @@ const SortingAnimation: React.FC = () => {
                     className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
                     style={{ 
                         top: `calc(50% + ${currentGridBaseY + 23}px - 7px)`,
-                        left: `calc(50% - 60px)` // ALIGN WITH GRID LEFT OFFSET
+                        left: `calc(50% - 80px)` // ALIGN WITH GRID LEFT OFFSET
                     }}
                 >
                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
@@ -357,7 +357,7 @@ const SortingAnimation: React.FC = () => {
 
             {/* Progress Indicator (Bottom) */}
             {/* Progress Indicator (Bottom) */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-4">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-8">
                 <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] w-6 h-6 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 text-white shadow-md scale-110' : 'bg-slate-100 border-slate-300 text-slate-400'}`}>
                     1
                 </div>
