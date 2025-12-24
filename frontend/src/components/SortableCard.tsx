@@ -167,9 +167,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                     <div 
                         className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}
                     >
-                        <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
-                            {text}
-                        </ReactMarkdown>
+                        {/[*_~#]/.test(text) ? (
+                            <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                                {text}
+                            </ReactMarkdown>
+                        ) : (
+                            <span>{text}</span>
+                        )}
                     </div>
                 </div>
                 

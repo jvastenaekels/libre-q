@@ -24,6 +24,7 @@ import { createPortal } from 'react-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { useUIStore } from '../store/useUIStore';
 import { useLayoutAction } from '../hooks/useLayout';
 import { } from 'lucide-react';
 import GridSort from '../components/GridSort';
@@ -57,6 +58,17 @@ const FineSortPage: React.FC = () => {
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
     const [panVersion, setPanVersion] = useState(0);
+
+    const setSelectedCard = useUIStore((state) => state.setSelectedCard);
+
+    useEffect(() => {
+        if (!config) {
+            setSelectedCard(null);
+            return;
+        }
+        const selectedCard = selectedCardId !== null ? config.statements.find(s => s.id === selectedCardId) ?? null : null;
+        setSelectedCard(selectedCard);
+    }, [selectedCardId, config, setSelectedCard]);
 
     // 3. Sensors (Always stable)
     const sensors = useSensors(
@@ -106,18 +118,6 @@ const FineSortPage: React.FC = () => {
             }
             return null;
         };
-
-        if (elAtPoint) {
-            let curr = elAtPoint as HTMLElement;
-            while (curr && curr !== document.body) {
-                const id = curr.getAttribute('id') || curr.dataset.testid;
-                if (id && id.startsWith('slot_')) {
-                    resolvedPointId = id;
-                    break;
-                }
-                curr = curr.parentElement as HTMLElement;
-            }
-        }
 
         if (resolvedPointId) return [{ id: resolvedPointId }];
 
@@ -190,7 +190,8 @@ const FineSortPage: React.FC = () => {
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,
-        onPan: handlePan
+        onPan: handlePan,
+        statements: config?.statements || []
     });
 
     // 9. Memoized render function for slot content
@@ -239,10 +240,7 @@ const FineSortPage: React.FC = () => {
     if (!config) return null;
 
     // 11. Memoized card data - these need to be after config null check
-    const activeCardData = activeId !== null ? config.statements.find(s => s.id === activeId) : undefined;
-    const selectedCard = selectedCardId !== null ? config.statements.find(s => s.id === selectedCardId) ?? null : null;
-
-
+    const activeCardData = activeId !== null ? config?.statements.find(s => s.id === activeId) : undefined;
 
     return (
         <DndContext 
@@ -267,7 +265,6 @@ const FineSortPage: React.FC = () => {
                     renderSlotContent={renderSlotContent}
                     disableHoverZoom={activeId !== null}
                     selectedCardId={selectedCardId}
-                    selectedCard={selectedCard}
                     onCardClick={handleCardClick}
                     onSlotClick={handleSlotClick}
                     onDimensionsChange={setCardDimensions}
@@ -277,7 +274,6 @@ const FineSortPage: React.FC = () => {
                     onInteractionUtils={setInteractionUtils}
                     isAllPlaced={isAllPlaced}
                     onValidate={handleValidate}
-                    activeCard={activeCardData}
                 />
              </div>
              {createPortal(

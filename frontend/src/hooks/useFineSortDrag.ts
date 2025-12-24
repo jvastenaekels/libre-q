@@ -5,10 +5,15 @@
  */
 
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { useUIStore } from '../store/useUIStore';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
+interface Statement {
+    id: number;
+    text: string;
+}
 interface DragCard {
     statementId: number;
     col: number;
@@ -45,6 +50,7 @@ interface UseFineSortDragProps {
     selectedId?: number | null;
     interactionUtils?: InteractionUtils | null;
     onPan?: () => void;
+    statements: Statement[];
 }
 
 export const useFineSortDrag = ({
@@ -54,9 +60,16 @@ export const useFineSortDrag = ({
     onSelectionChange,
     selectedId,
     interactionUtils,
-    onPan
+    onPan,
+    statements
 }: UseFineSortDragProps) => {
     const [activeId, setActiveId] = useState<number | null>(null);
+    const setActiveCard = useUIStore((state) => state.setActiveCard);
+
+    useEffect(() => {
+        const activeCard = activeId !== null ? statements.find(s => s.id === activeId) : null;
+        setActiveCard(activeCard || null);
+    }, [activeId, statements, setActiveCard]);
     
     // Advanced Drag Interaction Refs
     const lastPos = useRef({ x: 0, y: 0 });

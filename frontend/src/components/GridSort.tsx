@@ -9,18 +9,18 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ZoomIn, ZoomOut, RotateCcw,
-    Check, Eye,
+    Check,
     Smile, Meh, Frown, 
-    Lightbulb, Sparkles, Target
+    Target
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import SortableCard from './SortableCard';
 import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
-import { useUIStore } from '../store/useUIStore';
+import ReadingZone from './ReadingZone';
 import type { InteractionUtils } from '../hooks/useFineSortDrag';
 
 
@@ -32,8 +32,6 @@ interface GridSortProps {
   renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
   selectedCardId?: number | null;
-  selectedCard?: { id: number, text: string } | null;
-  activeCard?: { id: number; text: string } | null;
   onCardClick?: (id: number) => void;
   onSlotClick?: (col: number, row: number) => void;
   onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
@@ -55,7 +53,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
   renderSlotContent,
   onReset,
   selectedCardId,
-  selectedCard: selectedCardProp,
   onCardClick,
   onSlotClick,
   onDimensionsChange,
@@ -64,8 +61,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
   onTransformChange,
   onInteractionUtils,
   isAllPlaced = false,
-  onValidate,
-  activeCard
+  onValidate
 }) => {
   const { t } = useTranslation();
 
@@ -82,28 +78,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
       disagreeCards,
       neutralCards
   });
-  
 
-  const selectedCard = selectedCardProp;
-
-  const hoveredCard = useUIStore((state) => state.hoveredCard);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
- 
-
-  const [methodologyStep, setMethodologyStep] = useState(0);
-  const methodologyTips = [
-      t('fine.workbench.methodology.extremes'),
-      t('fine.workbench.methodology.vertical'),
-      t('fine.workbench.methodology.interaction')
-  ];
-
-  useEffect(() => {
-      if (activeCard || hoveredCard || selectedCard) return;
-      const interval = setInterval(() => {
-          setMethodologyStep(prev => (prev + 1) % methodologyTips.length);
-      }, 6000);
-      return () => clearInterval(interval);
-  }, [activeCard, hoveredCard, selectedCard, methodologyTips.length]);
 
   // Grid Calculations Hook
   const { wrapperRef, cardDimensions } = useGridCalculations({
@@ -242,49 +218,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
             </div>
 
             {/* Reading Zone - Responsive Placement */}
-            {isMobile && (
-                /* Mobile: Sticky Reading Zone at the top (Fixed height to prevent layout shifts) */
-                <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm">
-                    <div className="p-3 h-20 overflow-y-auto custom-scrollbar">
-                        {activeCard || hoveredCard || selectedCard ? (
-                            <div className="animate-in fade-in slide-in-from-top-1 duration-300">
-                                <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Eye size={12} strokeWidth={2.5} />
-                                    {activeCard ? t('fine.workbench.active_card') : hoveredCard ? t('fine.toolbar.preview') : t('fine.workbench.active_card')}
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <p className="text-slate-800 text-sm font-medium leading-relaxed">
-                                        {activeCard?.text || hoveredCard?.text || selectedCard?.text}
-                                    </p>
-
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="h-full flex flex-col items-center justify-center gap-1.5 text-indigo-400">
-                                <AnimatePresence mode="wait">
-                                    <motion.div 
-                                        key={methodologyStep}
-                                        initial={{ opacity: 0, y: 5 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -5 }}
-                                        className="text-center flex flex-col items-center"
-                                    >
-                                        <div className="flex items-center gap-1.5 opacity-60 mb-0.5">
-                                            <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
-                                            <p className="text-[10px] font-bold uppercase tracking-widest">
-                                                {t('fine.workbench.help')}
-                                            </p>
-                                        </div>
-                                        <p className="text-xs font-semibold leading-relaxed px-4 italic text-indigo-600/80">
-                                            {methodologyTips[methodologyStep]}
-                                        </p>
-                                    </motion.div>
-                                </AnimatePresence>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
+            {isMobile && <ReadingZone variant="mobile" />}
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
@@ -371,48 +305,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                 : '100%' 
         }}
       >
-              {/* Reading Zone (L'Oeil du Tri) - Desktop Sidebar version */}
+              {/* Reading Zone - Desktop Sidebar version */}
               {!isMobile && (
               <div className="flex-none p-4 pb-0">
-                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 h-40 overflow-y-auto relative transition-all duration-300 custom-scrollbar group">
-                       {activeCard || hoveredCard || selectedCard ? (
-                          <div className="animate-in fade-in zoom-in-95 duration-200">
-                              <div className="text-xs font-bold text-indigo-400 mb-1.5 uppercase tracking-wider flex items-center gap-2">
-                                  <Eye size={14} strokeWidth={2.5} />
-                                  {activeCard ? t('fine.workbench.active_card') : hoveredCard ? t('fine.toolbar.preview') : t('fine.workbench.active_card')}
-                              </div>
-                              <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
-                                  {activeCard?.text || hoveredCard?.text || selectedCard?.text}
-                              </p>
-                          </div>
-                       ) : (
-                         <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400 py-2">
-                             <AnimatePresence mode="wait">
-                                 <motion.div 
-                                    key={methodologyStep}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="flex flex-col items-center gap-3 px-6"
-                                 >
-                                     <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative">
-                                        <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
-                                        <motion.div 
-                                            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity }}
-                                            className="absolute -top-1 -right-1 text-amber-400"
-                                        >
-                                            <Sparkles size={12} />
-                                        </motion.div>
-                                     </div>
-                                     <p className="text-sm font-medium leading-relaxed italic text-indigo-600/70">
-                                         {methodologyTips[methodologyStep]}
-                                     </p>
-                                 </motion.div>
-                             </AnimatePresence>
-                         </div>
-                      )}
-                  </div>
+                  <ReadingZone variant="desktop" />
               </div>
               )}
 
