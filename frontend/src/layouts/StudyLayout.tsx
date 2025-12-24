@@ -14,7 +14,6 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { Check, Globe } from 'lucide-react';
 import { LayoutProvider, useLayoutState } from '../contexts/LayoutContext';
 import { useStudyConfig } from '../hooks/useStudyConfig';
-import CardZoomOverlay from '../components/CardZoomOverlay';
 import { ApiError } from '../api/client';
 import ErrorPage from '../pages/ErrorPage';
 
@@ -268,7 +267,6 @@ const StudyLayout: React.FC = () => {
     return (
         <LayoutProvider>
             <StudyLayoutContent />
-            <CardZoomOverlay />
         </LayoutProvider>
     );
 };

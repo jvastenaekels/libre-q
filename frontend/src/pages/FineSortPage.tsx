@@ -24,7 +24,6 @@ import { createPortal } from 'react-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { useUIStore } from '../store/useUIStore';
 import { useLayoutAction } from '../contexts/LayoutContext';
 import { Check } from 'lucide-react';
 import GridSort from '../components/GridSort';
@@ -47,7 +46,6 @@ const FineSortPage: React.FC = () => {
     } = useResponseStore();
     
     const setStep = useSessionStore((state) => state.setStep);
-    const setZoomedCard = useUIStore((state) => state.setZoomedCard);
     const navigate = useNavigate();
     const { slug } = useParams();
     const { setHeaderAction } = useLayoutAction();
@@ -173,7 +171,7 @@ const FineSortPage: React.FC = () => {
     } = useFineSortDrag({
         responses,
         gridColumns,
-        actions: { placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, setZoomedCard },
+        actions: { placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard },
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,

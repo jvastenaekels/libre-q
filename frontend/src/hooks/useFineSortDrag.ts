@@ -23,7 +23,6 @@ interface Actions {
     moveCardInGrid: (id: number, col: number, row: number) => void;
     swapCardsInGrid: (id1: number, id2: number) => void;
     unplaceCard: (id: number) => void;
-    setZoomedCard: (card: { id: number; text: string } | null) => void; 
 }
 
 export interface InteractionUtils {
@@ -70,7 +69,6 @@ export const useFineSortDrag = ({
     const panSpeed = useRef({ dx: 0, dy: 0 });
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
-        actions.setZoomedCard(null);
         setActiveId(event.active.id as number);
         onSelectionChange?.(null);
         
