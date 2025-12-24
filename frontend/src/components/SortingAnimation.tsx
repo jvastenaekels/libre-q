@@ -146,9 +146,9 @@ const SortingAnimation: React.FC = () => {
     const MOBILE_GRID_ROW0_Y = -12;
     const MOBILE_SOURCE_CENTER_Y = 40;
 
-    // DESKTOP
+    // DESKTOP (Now single view centered)
     const DESKTOP_GRID_ROW0_Y = 28;
-    const DESKTOP_DECK_OFFSET_X = 66;
+    const DESKTOP_DECK_OFFSET_X = 0; // Centered like mobile
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -192,16 +192,15 @@ const SortingAnimation: React.FC = () => {
 
 
     return (
-        <div className="relative w-full h-56 md:h-auto md:flex md:flex-col md:justify-center md:items-center py-6 select-none pointer-events-none md:gap-4" aria-hidden="true">
+        <div className="relative w-full h-56 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
-                md:relative md:w-full md:h-40
-                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
+                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-[2.0] z-20' : 'opacity-0 scale-[1.35] md:scale-[1.8] z-10'}
             `}>
-                {/* Step Badge (Mobile only) */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-semibold rounded-full z-50 md:hidden">
+                {/* Step Badge */}
+                <div className="absolute top-0 md:-top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] md:text-xs font-semibold rounded-full z-50 shadow-sm border border-slate-300">
                     1 / 2
                 </div>
 
@@ -244,11 +243,10 @@ const SortingAnimation: React.FC = () => {
             {/* --- FINE SORT (Layout via Geometry Constants) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
-                md:relative md:w-full md:h-40
-                ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
+                ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-[2.0] z-20' : 'opacity-0 scale-[1.35] md:scale-[1.8] z-10'}
             `}>
-                {/* Step Badge (Mobile only) */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-semibold rounded-full z-50 md:hidden">
+                {/* Step Badge */}
+                <div className="absolute top-0 md:-top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] md:text-xs font-semibold rounded-full z-50 shadow-sm border border-slate-300">
                     2 / 2
                 </div>
 
@@ -322,8 +320,8 @@ const SortingAnimation: React.FC = () => {
                 */}
                 <div 
                     className={`
-                        absolute z-10 flex gap-6 md:gap-2 items-center justify-center
-                        ${isDesktop ? 'flex-col' : 'flex-row'}
+                        absolute z-10 flex gap-6 md:gap-6 items-center justify-center
+                        ${isDesktop ? 'flex-row' : 'flex-row'}
                     `}
                     style={{
                         top: `calc(50% + ${currentSourceBaseY}px)`, // Top becomes Center Y
