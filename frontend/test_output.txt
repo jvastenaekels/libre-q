@@ -26319,35 +26319,72 @@ This ensures that you're testing the behavior the user would see in the browser.
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x20
-[2K[1A[2K[G/span>[39m
-            [36m</div>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"flex items-center"[39m
-            [36m>[39m
-              [36m<div[39m
-                [33mclass[39m=[32m"w-8 h-0.5 mx-2 transition-colors duration-300 bg-slate-200"[39m
-              [36m/>[39m
-              [36m<div[39m
-                [33mclass[39m=[32m"
-                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                           border-slate-200 bg-slate-50 text-slate-300
-                       "[39m
-              [36m>[39m
-                [36m<div[39m
-                  [33mclass[39m=[32m"w-2 h-2 bg-slate-300 rounded-full"[39m
-                [36m/>[39m
-              [36m</div>[39m
-            [36m</div>[39m
-          [36m</div>[39m
-        [36m</div>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex items-center gap-3"[39m
-        [36m>[39m
-          [36m<div[39m
-            [33mclass[39m=[32m"relative"[39m
-          [36m>[39m
-            [36m<button[39m
-              [33mclass[39m=[32m"p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"[39m
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x2
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:38:37
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x2
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x3
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:42:00
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x3
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/visual-regression.spec.ts x1
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:42:04
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x1
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x4
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:43:25
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x4
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/visual-regression.spec.ts x2
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:43:28
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x2
+[2K[1A[2K[Grs"[39m
               [33mtitle[39m=[32m"Change language"[39m
             [36m>[39m
               [36m<svg[39m
@@ -37703,4 +37740,69 @@ This ensures that you're testing the behavior the user would see in the browser.
  PASS  Waiting for file changes...
        press h to show help, press q to quit
        rerun x27
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x2
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:38:37
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x2
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x3
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:42:00
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x3
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/visual-regression.spec.ts x1
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:42:04
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x1
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/basic-flow.spec.ts x4
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:43:25
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x4
+[2K[1A[2K[G[3Jc
+ RERUN  e2e/visual-regression.spec.ts x2
+
+
+ Test Files  no tests
+      Tests  no tests
+   Start at  03:43:28
+   Duration  0ms
+
+
+ PASS  Waiting for file changes...
+       press h to show help, press q to quit
+       rerun x2
 [2K[1A[2K[G
