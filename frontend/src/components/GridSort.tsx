@@ -226,12 +226,40 @@ const GridSort: React.FC<GridSortProps> = ({
        {/* PANEL: THE GRID (Canvas) */}
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300"
       >
-            {/* Desktop-only Instruction */}
-            <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
-                <span className="text-lg font-bold text-slate-700 text-center leading-tight">
-                    {t('fine.toolbar.desktop')}
-                </span>
-            </div>
+            {/* Reading Zone - Responsive Placement */}
+            {!isMobile ? (
+                /* Desktop: Legacy Instruction bar (optional, we could also put the reading zone here?) 
+                   The user approved the sidebar, so we keep this minimal or replace it with a horizontal reading zone if preferred.
+                   For now, let's keep the sidebar version as the primary one for desktop to respect the 'oui'.
+                */
+                <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
+                    <span className="text-lg font-bold text-slate-700 text-center leading-tight">
+                        {t('fine.toolbar.desktop')}
+                    </span>
+                </div>
+            ) : (
+                /* Mobile: Sticky Reading Zone at the top */
+                <div className="sticky top-0 z-30 flex-none bg-white border-b border-indigo-100 shadow-sm transition-all duration-300">
+                    <div className={`p-3 transition-all duration-300 ${hoveredCard || selectedCard ? 'min-h-[100px] h-[100px]' : 'h-[50px]'} overflow-y-auto custom-scrollbar`}>
+                        {hoveredCard || selectedCard ? (
+                            <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                                    {hoveredCard ? 'Aperçu' : 'Sélection'}
+                                </div>
+                                <p className="text-slate-800 text-sm font-medium leading-relaxed">
+                                    {hoveredCard?.text || selectedCard?.text}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="h-full flex items-center justify-center gap-2 text-slate-400 opacity-60">
+                                <span className="text-xl">👁️</span>
+                                <span className="text-xs font-semibold uppercase tracking-widest">{t('fine.toolbar.read_full') || "Toucher pour lire"}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
@@ -376,7 +404,8 @@ const GridSort: React.FC<GridSortProps> = ({
                 : '100%' 
         }}
       >
-              {/* Reading Zone (L'Oeil du Tri) */}
+              {/* Reading Zone (L'Oeil du Tri) - Desktop Sidebar version */}
+              {!isMobile && (
               <div className="flex-none p-4 pb-0">
                   <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 h-40 overflow-y-auto relative transition-all duration-300 custom-scrollbar">
                       {hoveredCard || selectedCard ? (
@@ -398,6 +427,7 @@ const GridSort: React.FC<GridSortProps> = ({
                       )}
                   </div>
               </div>
+              )}
 
                {/* Category selector (Piles) */}
                <div className="flex-none p-4 pb-2">
