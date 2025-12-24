@@ -11,9 +11,9 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
-import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh, Eye } from 'lucide-react';
+import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useUIStore } from '../store/useUIStore';
+
 
 
 const RoughSortPage: React.FC = () => {
@@ -218,8 +218,11 @@ const RoughSortPage: React.FC = () => {
                 <div className="w-12 lg:w-20 hidden sm:block" />
 
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-base sm:text-lg">
+                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-base sm:text-lg flex items-center gap-2">
                         {t('rough.header.title')}
+                        <span className="text-slate-400 text-sm font-medium">
+                            {config && `(${config.statements.length - unsortedCards.length + 1}/${config.statements.length})`}
+                        </span>
                     </h3>
                 </div>
 
@@ -306,8 +309,7 @@ const RoughSortPage: React.FC = () => {
                                         exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                                         className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
                                     >
-                                        <div className="bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest py-2 px-4 rounded-full shadow-lg flex items-center justify-center gap-2 border border-indigo-400/30 whitespace-nowrap">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                        <div className="text-slate-400 text-xs font-semibold uppercase tracking-widest py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-70">
                                             {window.innerWidth < 1024 
                                                 ? t('fine.workbench.drag_or_tap') 
                                                 : "Glissez ou cliquez pour trier"}
