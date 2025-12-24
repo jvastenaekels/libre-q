@@ -352,14 +352,15 @@ const SortingAnimation: React.FC = () => {
             </div>
 
             {/* Progress Indicator (Bottom) */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
-                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] ${phase === 'ROUGH' ? 'w-6 h-6 bg-blue-600 text-white scale-110 shadow-md ring-2 ring-blue-100' : 'w-5 h-5 bg-slate-200 text-slate-400'}`}>
+            {/* Progress Indicator (Bottom) */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-4">
+                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] w-6 h-6 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 text-white shadow-md scale-110' : 'bg-slate-100 border-slate-300 text-slate-400'}`}>
                     1
                 </div>
-                <div className="w-8 h-0.5 bg-slate-200 overflow-hidden rounded-full">
+                <div className="w-10 h-0.5 bg-slate-200 overflow-hidden rounded-full">
                     <div className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`} />
                 </div>
-                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] ${phase === 'FINE' ? 'w-6 h-6 bg-blue-600 text-white scale-110 shadow-md ring-2 ring-blue-100' : 'w-5 h-5 bg-slate-200 text-slate-400'}`}>
+                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] w-6 h-6 border ${phase === 'FINE' ? 'bg-blue-600 border-blue-600 text-white shadow-md scale-110' : 'bg-slate-100 border-slate-300 text-slate-400'}`}>
                     2
                 </div>
             </div>
