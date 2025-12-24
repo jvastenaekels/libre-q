@@ -279,61 +279,93 @@ interface StackProps {
     layoutId?: string;
 }
 
-const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId }) => {
+const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type }) => {
     // How many cards to visualize under the top one?
-    // We cap at 4 visual layers for performance + aesthetic.
-    // If count=1, layers=0. count=2, layers=1.
     const visibleLayers = Math.min(Math.max(0, count - 1), 4);
     
-    // Deterministic random offsets based on count/type so it doesn't jitter during renders
-    // but looks "messy" enough to be a pile.
+    // Deterministic random offsets
     const getOffset = (index: number) => {
         const seed = (index * 17) % 7;
-        const rotate = (seed - 3) * 1.5; // -4.5 to 4.5 deg
-        const tx = (seed % 3) - 1; // -1, 0, 1 px
+        const rotate = (seed - 3) * 1.5; 
+        const tx = (seed % 3) - 1; 
         const ty = ((seed * 2) % 3) - 1;
         return { rotate, tx, ty };
     };
 
+    // Stacking Effect Logic
+    const [showPlusOne, setShowPlusOne] = useState(false);
+    const [isBumping, setIsBumping] = useState(false);
+    const prevCount = React.useRef(count);
+
+    useEffect(() => {
+        // Only trigger for piles (receiving cards) and when count INCREASES
+        if (type === 'pile' && count > prevCount.current) {
+            setShowPlusOne(true);
+            setIsBumping(true);
+            const t1 = setTimeout(() => setShowPlusOne(false), 600);
+            const t2 = setTimeout(() => setIsBumping(false), 200);
+            return () => { clearTimeout(t1); clearTimeout(t2); };
+        }
+        prevCount.current = count;
+    }, [count, type]);
+
     return (
-        <motion.div 
-            layoutId={layoutId} 
-             // We don't animate container size, it's fixed 18x24
-            className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-40' : 'opacity-100'}`}
-        >
-            {/* Empty State Placeholder */}
-             {count === 0 && (
-                <div className="absolute inset-0 border-2 border-dashed border-slate-200 rounded-[2px]" />
-            )}
+        <div className="relative">
+            {/* +1 Indicator */}
+            <AnimatePresence>
+                {showPlusOne && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.8 }}
+                        animate={{ opacity: 1, y: -25, scale: 1 }}
+                        exit={{ opacity: 0, y: -30 }}
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+                    >
+                        <span className="text-[10px] font-bold text-blue-600 bg-white/90 px-1 py-0.5 rounded shadow-sm border border-blue-100">
+                            +1
+                        </span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Under Layers */}
-            {count > 1 && Array.from({ length: visibleLayers }).map((_, i) => {
-                const layerIdx = i; // 0 is bottom-most visible
-                const offset = getOffset(layerIdx);
-                // Stack them: index 0 is lowest in Z.
-                return (
+            <motion.div 
+                layoutId={layoutId} 
+                animate={isBumping ? { scale: 1.15 } : { scale: 1 }}
+                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
+                className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-40' : 'opacity-100'}`}
+            >
+                {/* Empty State */}
+                {count === 0 && (
+                    <div className="absolute inset-0 border-2 border-dashed border-slate-200 rounded-[2px]" />
+                )}
+
+                {/* Under Layers */}
+                {count > 1 && Array.from({ length: visibleLayers }).map((_, i) => {
+                    const layerIdx = i; 
+                    const offset = getOffset(layerIdx);
+                    return (
+                        <div 
+                            key={i}
+                            className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm"
+                            style={{
+                                transform: `translate(${offset.tx}px, ${offset.ty}px) rotate(${offset.rotate}deg)`,
+                                zIndex: i
+                            }}
+                        />
+                    );
+                })}
+
+                {/* Top Card */}
+                {count > 0 && (
                     <div 
-                        key={i}
-                        className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm"
-                        style={{
-                            transform: `translate(${offset.tx}px, ${offset.ty}px) rotate(${offset.rotate}deg)`,
-                            zIndex: i
-                        }}
-                    />
-                );
-            })}
-
-            {/* Top Card */}
-            {count > 0 && (
-                <div 
-                    className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm flex items-center justify-center z-10"
-                    style={{ transform: 'rotate(-1deg)' }} // Slight organic tilt
-                >
-                     {Icon && <Icon size={10} className="text-slate-500" />}
-                     {!Icon && <div className="w-2 h-0.5 bg-slate-200 rounded-full" />}
-                </div>
-            )}
-        </motion.div>
+                        className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm flex items-center justify-center z-10"
+                        style={{ transform: 'rotate(-1deg)' }} 
+                    >
+                        {Icon && <Icon size={10} className="text-slate-500" />}
+                        {!Icon && <div className="w-2 h-0.5 bg-slate-200 rounded-full" />}
+                    </div>
+                )}
+            </motion.div>
+        </div>
     );
 };
 
