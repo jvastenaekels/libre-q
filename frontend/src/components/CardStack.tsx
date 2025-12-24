@@ -161,10 +161,10 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
                     e.stopPropagation();
                     setHoveredCard({ id: statement.id, text: statement.text });
                 }}
-                className="absolute bottom-4 right-6 p-3 bg-indigo-50/90 rounded-full text-indigo-600 shadow-md lg:p-2 transition-colors hover:bg-indigo-100"
+                className="absolute bottom-2 right-2 p-1.5 bg-indigo-50/90 rounded-full text-indigo-600 shadow-sm lg:p-1.5 transition-colors hover:bg-indigo-100 z-20"
                 aria-label="Read statement"
             >
-                <Eye size={32} strokeWidth={2.5} />
+                <Eye size={20} strokeWidth={3} />
             </motion.button>
         )}
       </motion.div>
