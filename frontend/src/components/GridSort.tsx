@@ -9,7 +9,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ZoomIn, ZoomOut, RotateCcw,
-    Check, X,
+    Check, X, Eye,
     Smile, Meh, Frown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +19,6 @@ import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
-import WorkbenchPanel from './WorkbenchPanel';
 import { useUIStore } from '../store/useUIStore';
 
 
@@ -242,8 +241,8 @@ const GridSort: React.FC<GridSortProps> = ({
                                 </p>
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center gap-2 text-slate-400 opacity-60">
-                                <span className="text-xl">👁️</span>
+                            <div className="h-full flex items-center justify-center gap-2 text-indigo-400 opacity-60">
+                                <Eye size={18} strokeWidth={2.5} />
                                 <span className="text-[10px] font-bold uppercase tracking-widest">{t('fine.toolbar.read_full') || "Toucher pour lire"}</span>
                             </div>
                         )}
@@ -365,19 +364,6 @@ const GridSort: React.FC<GridSortProps> = ({
             </div>
       </div>
 
-       {/* PANEL: WORKBENCH STAGE (Bottom Fixed) */}
-       <AnimatePresence>
-            {selectedCardId && isMobile && (
-                <WorkbenchPanel 
-                    key="workbench"
-                    card={selectedCard || null}
-                    onClose={() => onCardClick?.(selectedCardId)}
-                    height={deckHeight}
-                    cardDimensions={cardDimensions}
-                />
-            )}
-       </AnimatePresence>
-
        {/* PANEL: SOURCE INVENTORY (Deck) */}
       <div 
         className={`
@@ -386,7 +372,6 @@ const GridSort: React.FC<GridSortProps> = ({
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
           flex flex-col lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
-          ${selectedCardId && isMobile ? 'hidden' : ''} 
         `}
         style={{ 
           height: isMobile 
@@ -408,10 +393,12 @@ const GridSort: React.FC<GridSortProps> = ({
                              </p>
                          </div>
                       ) : (
-                         <div className="flex flex-col items-center justify-center h-full text-center text-slate-400 py-2">
-                             <div className="mb-2 text-2xl opacity-50">👁️</div>
-                             <p className="text-sm font-medium">
-                                 {t('fine.toolbar.read_full') || "Survolez ou touchez une carte pour lire"}
+                         <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400/50 py-2">
+                             <div className="mb-2 transition-transform duration-500 group-hover:scale-110">
+                                <Eye size={32} strokeWidth={1.5} />
+                             </div>
+                             <p className="text-xs font-bold uppercase tracking-widest">
+                                 {t('fine.toolbar.read_full') || "Survoler ou toucher pour lire"}
                              </p>
                          </div>
                       )}

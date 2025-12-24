@@ -8,7 +8,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SortableCard from './SortableCard';
-import CardZoomOverlay from './CardZoomOverlay';
 import { useUIStore } from '../store/useUIStore';
 import { act } from 'react';
 
@@ -45,7 +44,7 @@ vi.mock('framer-motion', () => ({
 describe('SortableCard', () => {
     beforeEach(() => {
         // Reset UI store
-        useUIStore.setState({ zoomedCard: null });
+        useUIStore.setState({ hoveredCard: null });
     });
 
     const defaultProps = {
@@ -82,14 +81,10 @@ describe('SortableCard', () => {
         expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    it('shows zoom overlay on hover', async () => {
-        vi.useFakeTimers();
-        useUIStore.setState({ zoomedCard: null });
-
+    it('updates ui store on hover', async () => {
         render(
             <MemoryRouter>
                 <SortableCard {...defaultProps} />
-                <CardZoomOverlay />
             </MemoryRouter>
         );
         
@@ -101,27 +96,15 @@ describe('SortableCard', () => {
              fireEvent.mouseEnter(cardContainer);
         });
 
-        // Should NOT appear immediately (due to 300ms delay)
-        expect(screen.getAllByText('Test Card Content').length).toBe(1);
-
-        // Fast-forward 300ms
-        await act(async () => {
-            vi.advanceTimersByTime(310);
-        });
-
-        // Zoom portal should appear
-        const textElements = screen.getAllByText('Test Card Content');
-        expect(textElements.length).toBe(2);
+        // Store should be updated immediately
+        expect(useUIStore.getState().hoveredCard?.text).toBe('Test Card Content');
 
         // Trigger leave
         await act(async () => {
             fireEvent.mouseLeave(cardContainer);
         });
         
-        const textElementsAfterLeave = screen.getAllByText('Test Card Content');
-        expect(textElementsAfterLeave.length).toBe(1);
-
-        vi.useRealTimers();
+        expect(useUIStore.getState().hoveredCard).toBe(null);
     });
 
     it('styling changes when selected', () => {
