@@ -27,9 +27,9 @@ const FINE_STEPS = [
     { id: 'R2_0', x: 2 * COL_OFFSET, y: 0, source: 2 },
     { id: 'L1_0', x: -1 * COL_OFFSET, y: 0, source: 0 },
     { id: 'R1_0', x: 1 * COL_OFFSET, y: 0, source: 2 },
-    { id: 'C0_0', x: 0, y: 0, source: 1 },
     { id: 'L1_1', x: -1 * COL_OFFSET, y: -ROW_H, source: 0 },
     { id: 'R1_1', x: 1 * COL_OFFSET, y: -ROW_H, source: 2 },
+    { id: 'C0_0', x: 0, y: 0, source: 1 },
     { id: 'C0_1', x: 0, y: -ROW_H, source: 1 },
     { id: 'C0_2', x: 0, y: -ROW_H * 2, source: 1 },
 ];
