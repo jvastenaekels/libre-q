@@ -148,7 +148,8 @@ const SortingAnimation: React.FC = () => {
 
     // DESKTOP (Grid Left, Deck Right)
     const DESKTOP_GRID_ROW0_Y = 0; // Center vertically
-    const DESKTOP_DECK_OFFSET_X = 80; // Push deck to the right (Balanced with Grid -80)
+    const DESKTOP_GRID_OFFSET_X = -50; // Grid visual center relative to container center
+    const DESKTOP_DECK_OFFSET_X = 90; // Deck visual center relative to container center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -187,7 +188,9 @@ const SortingAnimation: React.FC = () => {
     }, [isDesktop, activeFineStep, currentSourceBaseY]);
 
     // Target Coordinates (Flying Card End)
-    const fineTargetX = (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? 0 : 0); // Mobile grid x is 0 offset
+    // Target Coordinates (Flying Card End)
+    // Must match the visual offset of the Grid container!
+    const fineTargetX = (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
     const fineTargetY = currentGridBaseY + (activeFineStep ? activeFineStep.y : 0);
 
 
@@ -263,7 +266,7 @@ const SortingAnimation: React.FC = () => {
                         // We want `bottom` edge to be at CenterY + GridBaseY + 12px.
                         top: `calc(50% + ${currentGridBaseY + 12}px)`,
                         transform: 'translate(-50%, -100%)',
-                        left: isDesktop ? `calc(50% - 80px)` : '50%' // Desktop: Shift Grid Left to balance Deck Right
+                        left: isDesktop ? `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)` : '50%' // Desktop: Shift Grid Left
                     }}
                 >
                      {/* Pyramid Grid (Flex Row) */}
@@ -298,7 +301,7 @@ const SortingAnimation: React.FC = () => {
                     className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
                     style={{ 
                         top: `calc(50% + ${currentGridBaseY + 23}px - 7px)`,
-                        left: `calc(50% - 80px)` // ALIGN WITH GRID LEFT OFFSET
+                        left: `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)` // ALIGN WITH GRID 
                     }}
                 >
                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
@@ -348,8 +351,13 @@ const SortingAnimation: React.FC = () => {
                                 animate={{ x: fineTargetX - 9, y: fineTargetY - 12 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: FINE_DURATION, ease: "easeInOut" }}
-                                className="absolute top-0 left-0 w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl pointer-events-none"
-                            />
+                                className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-blue-600 rounded-[2px] shadow-xl pointer-events-none flex items-center justify-center z-50"
+                            >
+                                {/* Render Icon based on Source */}
+                                {activeFineStep.source === 0 && <Frown size={10} className="text-blue-600" />}
+                                {activeFineStep.source === 1 && <Meh size={10} className="text-blue-600" />}
+                                {activeFineStep.source === 2 && <Smile size={10} className="text-blue-600" />}
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
@@ -357,7 +365,7 @@ const SortingAnimation: React.FC = () => {
 
             {/* Progress Indicator (Bottom) */}
             {/* Progress Indicator (Bottom) */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-8">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-12">
                 <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] w-6 h-6 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 text-white shadow-md scale-110' : 'bg-slate-100 border-slate-300 text-slate-400'}`}>
                     1
                 </div>
