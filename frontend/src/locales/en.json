@@ -1,8 +1,8 @@
 {
   "common": {
-    "agree": "Tend to agree",
-    "disagree": "Tend to disagree",
-    "neutral": "Neutral",
+    "agree": "Somewhat agree",
+    "disagree": "Somewhat disagree",
+    "neutral": "No strong opinion",
     "undo": "Undo",
     "next": "Next step",
     "submit": "Share my perspective",
@@ -56,9 +56,9 @@
     "title": "Open-Q",
     "steps": {
       "welcome": "Welcome",
-      "presort": "Background",
-      "rough": "Rough Sort",
-      "fine": "Fine Sort",
+      "presort": "Profile",
+      "rough": "Spontaneous Sort",
+      "fine": "Grid Sort",
       "review": "Reflections"
     },
     "mobile_step": "Step",
@@ -74,10 +74,10 @@
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
     "restart": "Start a new session",
-    "preview_title": "Sorting Preview",
+    "preview_title": "Preview",
     "objective_label": "Study Objective",
     "instructions_label": "Process",
-    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Categorize it based on your viewpoint.\n3. Refine your arrangement on the grid."
+    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Categorize it based on your **perspective**.\n3. Refine your arrangement on the grid."
   },
   "consent": {
     "title": "Consent to Participate",
@@ -94,11 +94,11 @@
   "rough": {
     "header": {
       "title": "What is your position regarding this statement?",
-      "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Uncertain.",
-      "hint": "Trust your **first impression**. This is a rough sort—you will refine your choices in the next step."
+      "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Undecided.",
+      "hint": "Trust your **first impression**. This is a **spontaneous sort**—you will refine your choices in the next step."
     },
     "complete": {
-      "title": "Rough sort complete",
+      "title": "First step completed",
       "subtitle": "Now, let's refine the nuance."
     },
     "instructions": {
@@ -108,7 +108,7 @@
   },
   "fine": {
     "header": {
-      "title": "Place the statements on the grid to reflect your perspective.",
+      "title": "Place the statements on the grid to reflect your **perspective**.",
       "mobile_title": "Sort statements based on your point of view"
     },
     "deck": {
