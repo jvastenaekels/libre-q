@@ -2,50 +2,23 @@
     "slug": "example-study",
     "default_language": "en",
     "grid_config": [
-        {
-            "score": -4,
-            "capacity": 2
-        },
-        {
-            "score": -3,
-            "capacity": 3
-        },
-        {
-            "score": -2,
-            "capacity": 4
-        },
-        {
-            "score": -1,
-            "capacity": 5
-        },
-        {
-            "score": 0,
-            "capacity": 6
-        },
-        {
-            "score": 1,
-            "capacity": 5
-        },
-        {
-            "score": 2,
-            "capacity": 4
-        },
-        {
-            "score": 3,
-            "capacity": 3
-        },
-        {
-            "score": 4,
-            "capacity": 2
-        }
+        { "score": -4, "capacity": 2 },
+        { "score": -3, "capacity": 3 },
+        { "score": -2, "capacity": 4 },
+        { "score": -1, "capacity": 5 },
+        { "score": 0, "capacity": 6 },
+        { "score": 1, "capacity": 5 },
+        { "score": 2, "capacity": 4 },
+        { "score": 3, "capacity": 3 },
+        { "score": 4, "capacity": 2 }
     ],
     "presort_config": {
         "age": {
             "type": "number",
             "label": {
                 "en": "Age",
-                "fr": "\u00c2ge",
-                "fi": "Ik\u00e4"
+                "fr": "Âge",
+                "fi": "Ikä"
             },
             "required": true,
             "min": 18,
@@ -75,15 +48,15 @@
                     "label": {
                         "en": "Non-binary",
                         "fr": "Non-binaire",
-                        "fi": "Ei-bin\u00e4\u00e4rinen"
+                        "fi": "Muunsukupuolinen"
                     }
                 },
                 {
                     "value": "Prefer not to say",
                     "label": {
-                        "en": "Prefer not to say",
-                        "fr": "Pr\u00e9f\u00e8re ne pas dire",
-                        "fi": "En halua sanoa"
+                        "en": "Prefer not to answer",
+                        "fr": "Je préfère ne pas répondre",
+                        "fi": "En halua vastata"
                     }
                 }
             ],
@@ -100,31 +73,31 @@
                 {
                     "value": "High School",
                     "label": {
-                        "en": "High School",
-                        "fr": "Lyc\u00e9e",
-                        "fi": "Lukio"
+                        "en": "High School / Secondary",
+                        "fr": "Études secondaires",
+                        "fi": "Toisen asteen koulutus"
                     }
                 },
                 {
                     "value": "Bachelor",
                     "label": {
-                        "en": "Bachelor",
-                        "fr": "Licence",
-                        "fi": "Kandidaatti"
+                        "en": "Bachelor's Degree",
+                        "fr": "Licence / Bachelor",
+                        "fi": "Kandidaatti (Bachelor)"
                     }
                 },
                 {
                     "value": "Master",
                     "label": {
-                        "en": "Master",
-                        "fr": "Master",
-                        "fi": "Maisteri"
+                        "en": "Master's Degree",
+                        "fr": "Master / Maîtrise",
+                        "fi": "Maisteri (Master)"
                     }
                 },
                 {
                     "value": "PhD",
                     "label": {
-                        "en": "PhD",
+                        "en": "PhD / Doctorate",
                         "fr": "Doctorat",
                         "fi": "Tohtori"
                     }
@@ -140,7 +113,7 @@
             ],
             "label": {
                 "en": "Education Level",
-                "fr": "Niveau d'éducation",
+                "fr": "Niveau d'études",
                 "fi": "Koulutustaso"
             },
             "required": true
@@ -156,27 +129,27 @@
     },
     "translations": {
         "en": {
-            "title": "Open-Q Discovery",
+            "title": "Discover Open-Q",
             "subtitle": "Experience Q-Methodology in Action",
-            "objective": "This demo illustrates the use of **Open-Q**, a platform dedicated to **Q-methodology**. Introduced in 1935 by **William Stephenson**, this method allows for the scientific study of **human subjectivity** and today brings together an international community of researchers.\n\nBy sorting statements according to your point of view, you help reveal distinct **patterns of thought**. This application modernizes this process by offering a **seamless and engaging** data collection experience.",
+            "objective": "This demo showcases **Open-Q**, a dedicated platform for **Q-methodology**. Originally introduced in 1935 by **William Stephenson**, this method enables the scientific exploration of **human subjectivity** and unites a global community of researchers.\n\nBy sorting statements according to your perspective, you help uncover distinct **patterns of thought**. This application brings the process into the modern age, offering a **seamless and engaging** experience.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Start Study"
             }
         },
         "fr": {
-            "title": "Découverte Open-Q",
-            "subtitle": "Expérimentez la méthode Q en action",
-            "objective": "Cette démo illustre l'usage d'**Open-Q**, une plateforme dédiée à la **méthodologie Q**. Introduite en 1935 par **William Stephenson**, cette méthode permet d'étudier scientifiquement la **subjectivité humaine** et fédère aujourd'hui une communauté internationale de chercheurs.\n\nEn triant les affirmations selon votre point de vue, vous aidez à faire émerger des **structures de pensée** distinctes. Cette application modernise ce processus en offrant une expérience de collecte de données **fluide et engageante**.",
+            "title": "Découverte d'Open-Q",
+            "subtitle": "La méthodologie Q en action",
+            "objective": "Cette démonstration vous présente **Open-Q**, une plateforme dédiée à la **méthodologie Q**. Créée en 1935 par **William Stephenson**, cette méthode permet d'étudier scientifiquement la **subjectivité humaine** et rassemble aujourd'hui une communauté internationale de chercheurs.\n\nEn classant les affirmations selon votre propre point de vue, vous révélez des **structures de pensée** uniques. Cette application modernise l'approche traditionnelle en rendant la collecte de données **fluide et intuitive**.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Commencer l'étude"
             }
         },
         "fi": {
-            "title": "Tutkimusesimerkki",
-            "subtitle": "Interaktiivinen esittely",
-            "objective": "Tämä esittely havainnollistaa **Open-Q**-alustan käyttöä, joka on omistettu **Q-metodologialle**. **William Stephensonin** vuonna 1935 esittelemä menetelmä mahdollistaa **ihmisen subjektiivisuuden** tieteellisen tutkimisen ja yhdistää nykyään kansainvälisen tutkijayhteisön.\n\nLajittelemalla väittämiä oman näkökulmasi mukaan autat paljastamaan erillisiä **ajatusmalleja**. Tämä sovellus modernisoi tätä prosessia tarjoamalla **sujuvan ja osallistavan** tiedonkeruukokemuksen.",
+            "title": "Tutustu Open-Q-alustaan",
+            "subtitle": "Koe Q-metodologia käytännössä",
+            "objective": "Tämä demo esittelee **Open-Q**-alustaa, joka on suunniteltu **Q-metodologian** hyödyntämiseen. **William Stephensonin** vuonna 1935 kehittämä menetelmä mahdollistaa **inhimillisen subjektiivisuuden** tieteellisen tutkimisen ja yhdistää tutkijoita ympäri maailman.\n\nJärjestämällä väittämiä oman näkemyksesi mukaan autat hahmottamaan erilaisia **ajatusmalleja**. Tämä sovellus tuo perinteisen menetelmän nykypäivään tarjoten **sujuvan ja mielekkään** käyttökokemuksen.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"
