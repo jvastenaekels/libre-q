@@ -171,7 +171,7 @@
         "fr": {
             "title": "Découverte Open-Q",
             "subtitle": "Expérimentez la méthode Q en action",
-            "objective": "Cette démo interactive illustre les capacités d'Open-Q. Vous explorerez une série d'affirmations pour révéler votre perspective unique, nous aidant à valider le design intuitif et l'architecture flexible de la plateforme.",
+            "objective": "Cette démo illustre l'usage d'Open-Q, un outil open-source dédié à la méthodologie Q. Cette méthode de recherche mixte permet d'étudier scientifiquement la subjectivité humaine. En triant les affirmations selon votre propre point de vue, vous permettez de faire émerger des structures de pensée distinctes. Cette application facilite la collecte de ces données complexes, offrant une alternative fluide et engageante aux méthodes traditionnelles.",
             "instructions": "1. **Profil** : Répondez à quelques questions pour nous aider à comprendre votre contexte.\n2. **Tri préliminaire** : Classez les cartes en trois piles (D'accord, Neutre, Pas d'accord) selon votre première impression.\n3. **Tri détaillé** : Affinez votre position en plaçant toutes les cartes sur la grille.\n4. **Analyse** : Expliquez les raisons de vos choix les plus marqués.",
             "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "ui_labels": {
