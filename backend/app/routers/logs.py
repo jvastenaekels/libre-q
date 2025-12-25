@@ -32,7 +32,7 @@ async def report_log(entry: LogEntry, request: Request):
     log_payload = {
         "source": "frontend",
         "level": entry.level,
-        "message": entry.message,
+        "client_message": entry.message,
         "stack": entry.stack,
         "context": entry.context,
         "url": entry.url,

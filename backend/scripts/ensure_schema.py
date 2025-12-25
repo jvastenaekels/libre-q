@@ -12,22 +12,28 @@ from sqlalchemy import text, inspect
 async def migrate():
     print("Checking database schema for 'show_statement_codes'...")
     async with engine.begin() as conn:
-        # We need to inspect table asynchronously? 
-        # SQLAlchemy AsyncEngine doesn't support inspection directly in same way.
-        # simpler: try to select the column, if error, add it.
+        dialect = conn.dialect.name
+        print(f"Detected dialect: {dialect}")
         
-        try:
-            await conn.execute(text("SELECT show_statement_codes FROM studies LIMIT 1"))
+        # Check column existence safely
+        if dialect == 'sqlite':
+            # SQLite: PRAGMA table_info
+            result = await conn.execute(text("PRAGMA table_info(studies)"))
+            columns = [row.name for row in result.fetchall()]
+            exists = 'show_statement_codes' in columns
+        else:
+            # PostgreSQL: information_schema
+            result = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_name='studies' AND column_name='show_statement_codes'"
+            ))
+            exists = result.scalar() is not None
+
+        if exists:
             print("Column 'show_statement_codes' already exists.")
-        except Exception:
+        else:
             print("Column missing. Adding 'show_statement_codes'...")
-            # Detect dialect
-            dialect = conn.dialect.name
-            print(f"Detected dialect: {dialect}")
-            
             if dialect == 'sqlite':
-                # SQLite doesn't support TRUE/FALSE literals in default clause in all versions easily without check constraints
-                # typically DEFAULT 0 is safer
                 await conn.execute(text("ALTER TABLE studies ADD COLUMN show_statement_codes BOOLEAN DEFAULT 0"))
             else:
                 # PostgreSQL
