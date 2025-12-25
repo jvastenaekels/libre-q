@@ -119,7 +119,7 @@ const SortingAnimation: React.FC = () => {
 
     const MOBILE_GRID_ROW0_Y = -12;
     const MOBILE_SOURCE_CENTER_Y = 40;
-    const DESKTOP_GRID_ROW0_Y = 0;
+    const DESKTOP_GRID_ROW0_Y = 26;
     const DESKTOP_GRID_OFFSET_X = -40;
     const DESKTOP_DECK_OFFSET_X = 60;
 
