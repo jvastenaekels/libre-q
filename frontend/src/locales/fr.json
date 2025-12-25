@@ -95,7 +95,7 @@
     "header": {
       "title": "Quelle est votre position face à cette affirmation ?",
       "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
-      "hint": "Fiez-vous à votre **première impression**. C'est un tri grossier — vous affinerez vos choix à l'étape suivante."
+      "hint": "Fiez-vous à votre **première impression**. C'est un **tri spontané** — vous affinerez vos choix à l'étape suivante."
     },
     "complete": {
       "title": "Première étape validée",

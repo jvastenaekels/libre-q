@@ -250,9 +250,11 @@ const RoughSortPage: React.FC = () => {
                             >
                                 <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-sm">
                                     <span className="text-lg">💡</span>
-                                    <p className="text-xs text-yellow-800 font-medium leading-tight text-left">
-                                        {t('rough.header.hint')}
-                                    </p>
+                                    <div className="text-xs text-yellow-800 font-medium leading-tight text-left [&_strong]:font-bold">
+                                        <ReactMarkdown components={{ p: ({children}) => <span>{children}</span> }}>
+                                            {t('rough.header.hint')}
+                                        </ReactMarkdown>
+                                    </div>
                                     <button 
                                         onClick={() => setShowTip(false)}
                                         className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
