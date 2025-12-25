@@ -74,7 +74,7 @@
     },
     "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
     "restart": "Commencer une nouvelle session",
-    "preview_title": "Aperçu du tri",
+    "preview_title": "Aperçu",
     "objective_label": "Objectif de l'étude",
     "instructions_label": "Déroulement",
     "default_instructions": "**Comment participer :**\n\n1. Lisez chaque affirmation.\n2. Catégorisez-la selon votre **point de vue**.\n3. Affinez ensuite votre arrangement sur la grille."
