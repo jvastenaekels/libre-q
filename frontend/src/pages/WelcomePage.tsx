@@ -72,7 +72,7 @@ const WelcomePage: React.FC = () => {
                 <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                     
                     {/* Instructions Column */}
-                    <div className="p-8 md:p-10 bg-blue-50 flex flex-col justify-center">
+                    <div className="p-8 md:p-10 bg-blue-50 flex flex-col justify-start">
                         <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
                             {t('welcome.instructions_label', 'Instructions')}
                         </div>
