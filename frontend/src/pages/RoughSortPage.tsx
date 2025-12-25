@@ -309,7 +309,7 @@ const RoughSortPage: React.FC = () => {
                                         exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                                         className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
                                     >
-                                        <div className="text-slate-400 text-xs font-semibold uppercase tracking-widest py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-70">
+                                        <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-80">
                                             {t('rough.instructions.desktop_tip')}
                                         </div>
                                     </motion.div>

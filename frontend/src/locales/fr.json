@@ -103,7 +103,7 @@
     },
     "instructions": {
       "swipe": "Glissez ou appuyez pour catégoriser",
-      "desktop_tip": "Glissez, cliquez ou utilisez le clavier ( ← ↓ → ) pour trier"
+      "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour trier"
     }
   },
   "fine": {

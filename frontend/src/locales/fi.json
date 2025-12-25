@@ -96,7 +96,7 @@
     },
     "instructions": {
         "swipe": "Pyyhkäise tai napauta luokitellaksesi",
-        "desktop_tip": "Vedä, klikkaa tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
+        "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
     }
   },
   "fine": {
