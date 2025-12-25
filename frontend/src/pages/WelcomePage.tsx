@@ -54,7 +54,7 @@ const WelcomePage: React.FC = () => {
 
                 {/* Objective Frame */}
                 {study.objective && (
-                    <div className="bg-white border border-slate-200 rounded-xl p-8 max-w-2xl mx-auto mt-10 text-left shadow-md relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-2xl mx-auto mt-8 text-left shadow-md relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                         <h4 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
                              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
