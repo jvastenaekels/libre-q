@@ -21,6 +21,7 @@ export const GridConfigSchema = z.object({
 export const StatementSchema = z.object({
   id: z.number(),
   text: z.string(),
+  code: z.string().optional(),
 });
 
 export const PreSortFieldSchema = z.object({

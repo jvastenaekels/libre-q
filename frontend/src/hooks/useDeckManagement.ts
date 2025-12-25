@@ -8,17 +8,17 @@ import { useState, useMemo } from 'react';
 
 type PileType = 'disagree' | 'neutral' | 'agree';
 
-interface UseDeckManagementProps {
-    agreeCards: { id: number; text: string }[];
-    disagreeCards: { id: number; text: string }[];
-    neutralCards: { id: number; text: string }[];
+interface UseDeckManagementProps<T extends { id: number; text: string }> {
+    agreeCards: T[];
+    disagreeCards: T[];
+    neutralCards: T[];
 }
 
-export const useDeckManagement = ({
+export const useDeckManagement = <T extends { id: number; text: string }>({
     agreeCards,
     disagreeCards,
     neutralCards
-}: UseDeckManagementProps) => {
+}: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
     const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
 

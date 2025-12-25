@@ -234,7 +234,7 @@ async def get_study(
              s_trans = s.translations[0]
              
         text = s_trans.text if s_trans else s.code
-        statements_data.append({"id": s.id, "text": text})
+        statements_data.append({"id": s.id, "text": text, "code": s.code})
 
 
     # Grid Config is standardized as List[GridColumn]

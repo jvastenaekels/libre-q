@@ -394,8 +394,8 @@ const RoughSortPage: React.FC = () => {
                         >
                             <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
                                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-                                     {t('common.statement')} {hoveredCard.id}
-                                </h3>
+                                     {t('common.statement')} {hoveredCard.id} {hoveredCard.code && <span>• {hoveredCard.code}</span>}
+                                 </h3>
                                 <div className="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
                                      <ReactMarkdown components={{ p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p> }}>
                                          {hoveredCard.text}

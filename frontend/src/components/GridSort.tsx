@@ -26,9 +26,9 @@ import type { InteractionUtils } from '../hooks/useFineSortDrag';
 
 
 interface GridSortProps {
-  agreeCards: { id: number; text: string }[];
-  disagreeCards: { id: number; text: string }[];
-  neutralCards: { id: number; text: string }[];
+  agreeCards: { id: number; text: string; code?: string }[];
+  disagreeCards: { id: number; text: string; code?: string }[];
+  neutralCards: { id: number; text: string; code?: string }[];
   gridColumns: { score: number; capacity: number }[];
   renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
@@ -183,6 +183,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                <SortableCard 
                 id={card.id} 
                 text={card.text} 
+                code={card.code}
                 variant="compact" 
                 isSelected={selectedCardId === card.id} 
                 onClick={() => onCardClick?.(card.id)} 

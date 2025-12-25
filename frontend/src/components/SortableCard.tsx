@@ -15,6 +15,7 @@ import { Eye } from 'lucide-react';
 interface SortableCardProps {
   id: number;
   text: string;
+  code?: string;
   isOverlay?: boolean;
   variant?: 'hand' | 'grid' | 'compact';
   isSelected?: boolean;
@@ -28,6 +29,7 @@ interface SortableCardProps {
 const SortableCard: React.FC<SortableCardProps> = React.memo(({ 
     id, 
     text, 
+    code,
     isOverlay, 
     variant = 'grid',
     isSelected,
@@ -60,7 +62,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
 
   const handleMouseEnter = () => {
      // Immediate hover feedback for Reading Zone
-     setHoveredCard({ id, text });
+     setHoveredCard({ id, text, code });
   };
 
   const handleMouseLeave = () => {
@@ -163,6 +165,15 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                     ${isOverlay ? 'shadow-xl ring-2 ring-indigo-500' : ''}
                 `}
             >
+                {/* Statement Code Watermark */}
+                {code && (
+                    <div className="absolute top-2 left-2.5 z-10">
+                        <span className="text-[10px] font-bold text-slate-300/80 uppercase tracking-wider select-none">
+                            {code}
+                        </span>
+                    </div>
+                )}
+
                 <div className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}>
                     <div 
                         className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}

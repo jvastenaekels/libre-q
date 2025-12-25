@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 interface Card {
     id: number;
     text: string;
+    code?: string;
 }
 
 interface SourceDeckProps {
@@ -78,7 +79,7 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
                     ) : (
                         activeCards.map((card) => (
                             <div key={card.id} className="min-w-[100px] w-[100px] h-[133px] sm:min-w-[120px] sm:w-[120px] sm:h-[160px]">
-                                <SortableCard id={card.id} text={card.text} />
+                                <SortableCard id={card.id} text={card.text} code={card.code} />
                             </div>
                         ))
                     )}

@@ -204,6 +204,7 @@ const FineSortPage: React.FC = () => {
                 <SortableCard 
                     id={statement.id} 
                     text={statement.text} 
+                    code={statement.code}
                     isSelected={selectedCardId === statement.id}
                     onClick={() => handleCardClick(statement.id)}
                     dimensions={dimensions}
@@ -281,7 +282,7 @@ const FineSortPage: React.FC = () => {
                     {activeCardData ? (
                         <div className="pointer-events-none" style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center' }}>
                             <SortableCard 
-                                id={activeCardData.id} text={activeCardData.text} isOverlay 
+                                id={activeCardData.id} text={activeCardData.text} code={activeCardData.code} isOverlay 
                                 dimensions={cardDimensions || undefined}
                                 aspectRatio={cardDimensions ? cardDimensions.width / cardDimensions.height : undefined}
                             />

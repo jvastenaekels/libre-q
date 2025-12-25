@@ -11,7 +11,7 @@ import { useUIStore } from '../store/useUIStore';
 import { Eye } from 'lucide-react';
 
 interface CardStackProps {
-  statement: { id: number; text: string };
+  statement: { id: number; text: string; code?: string };
   onVote: (direction: 'agree' | 'disagree' | 'neutral') => void;
   x: MotionValue<number>;
   y: MotionValue<number>;
@@ -141,6 +141,15 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
             className="absolute inset-0 bg-gray-100/50 pointer-events-none border-4 border-gray-500 rounded-3xl" 
         />
 
+        {/* Statement Code Watermark - Similar to SortableCard style */}
+        {statement.code && (
+            <div className="absolute top-3 left-4 z-20">
+                <span className="text-xs font-bold text-slate-300/80 uppercase tracking-wider select-none">
+                    {statement.code}
+                </span>
+            </div>
+        )}
+
         {/* Content - No scroll to avoid drag conflict */}
         <div className="flex-1 w-full flex flex-col p-2 overflow-hidden pointer-events-none">
             <div 
@@ -159,7 +168,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
                 whileTap={{ scale: 0.9 }}
                 onClick={(e) => {
                     e.stopPropagation();
-                    setHoveredCard({ id: statement.id, text: statement.text });
+                    setHoveredCard({ id: statement.id, text: statement.text, code: statement.code });
                 }}
                 className="absolute bottom-2 right-2 p-1.5 bg-indigo-50/90 rounded-full text-indigo-600 shadow-sm lg:p-1.5 transition-colors hover:bg-indigo-100 z-20"
                 aria-label="Read statement"

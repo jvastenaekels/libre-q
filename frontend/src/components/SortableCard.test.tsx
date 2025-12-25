@@ -116,4 +116,17 @@ describe('SortableCard', () => {
         expect(card.style.width).toBe('100px');
         expect(card.style.height).toBe('150px');
     });
+    it('renders statement code when provided', () => {
+        render(<SortableCard {...defaultProps} code="S1" />);
+        expect(screen.getByText('S1')).toBeTruthy();
+    });
+
+    it('renders statement code in hover store', async () => {
+         render(<SortableCard {...defaultProps} code="S1" />);
+         const card = screen.getByTestId('card-123');
+         await act(async () => {
+             fireEvent.mouseEnter(card);
+         });
+         expect(useUIStore.getState().hoveredCard?.code).toBe('S1');
+    });
 });

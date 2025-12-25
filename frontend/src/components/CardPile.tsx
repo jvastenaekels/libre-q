@@ -11,7 +11,7 @@ import SortableCard from './SortableCard';
 interface CardPileProps {
   type: 'agree' | 'disagree' | 'neutral';
   count: number;
-  topCard?: { id: number; text: string };
+  topCard?: { id: number; text: string; code?: string };
 }
 
 const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
@@ -59,7 +59,7 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
       {/* 2. Top Card (Draggable) OR Placeholder */}
       <div className="relative w-full h-full z-10">
           {topCard ? (
-              <SortableCard id={topCard.id} text={topCard.text} />
+              <SortableCard id={topCard.id} text={topCard.text} code={topCard.code} />
           ) : (
               // Empty State
               <div 
