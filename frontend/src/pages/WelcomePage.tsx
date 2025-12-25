@@ -69,10 +69,10 @@ const WelcomePage: React.FC = () => {
 
             {/* 2. Process Section (The "How") */}
             <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden mb-12">
-                <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                <div className="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                     
                     {/* Instructions Column */}
-                    <div className="p-8 md:px-10 md:pt-10 md:pb-6 bg-blue-50 flex flex-col justify-start">
+                    <div className="md:col-span-7 p-8 md:px-10 md:pt-10 md:pb-6 bg-blue-50 flex flex-col justify-start">
                         <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
                             {t('welcome.instructions_label', 'Instructions')}
                         </div>
@@ -104,7 +104,7 @@ const WelcomePage: React.FC = () => {
                         </div>
 
                     {/* Visual Column */}
-                    <div className="p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[500px] relative overflow-hidden">
+                    <div className="md:col-span-5 p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[500px] relative overflow-hidden">
                          <div className="relative z-10 uppercase tracking-wider text-xs font-bold text-slate-600 mb-4 bg-slate-200 w-fit px-3 py-1.5 rounded-md border border-slate-300">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
