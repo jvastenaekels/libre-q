@@ -131,7 +131,7 @@
         "en": {
             "title": "Discover Open-Q",
             "subtitle": "Experience Q-Methodology in Action",
-            "objective": "This demo showcases **Open-Q**, a dedicated platform for **Q-methodology**. Originally introduced in 1935 by **William Stephenson**, this method enables the scientific exploration of **human subjectivity** and unites a global community of researchers.\n\nBy sorting statements according to your perspective, you help uncover distinct **patterns of thought**. This application brings the process into the modern age, offering a **seamless and engaging** experience.",
+            "objective": "Welcome! The idea is simple: we want to understand how you see things, going beyond just 'yes' or 'no'. By placing various statements based on what rings truest to you, you help us map out your unique perspective. This approach captures the richness of human opinions, and this app just makes the process simple and easy to follow.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Start Study"
@@ -140,7 +140,7 @@
         "fr": {
             "title": "Découverte d'Open-Q",
             "subtitle": "La méthodologie Q en action",
-            "objective": "Cette démonstration vous présente **Open-Q**, une plateforme dédiée à la **méthodologie Q**. Créée en 1935 par **William Stephenson**, cette méthode permet d'étudier scientifiquement la **subjectivité humaine** et rassemble aujourd'hui une communauté internationale de chercheurs.\n\nEn classant les affirmations selon votre propre point de vue, vous révélez des **structures de pensée** uniques. Cette application modernise l'approche traditionnelle en rendant la collecte de données **fluide et intuitive**.",
+            "objective": "Bienvenue dans cette démonstration ! L'idée est simple : nous cherchons à comprendre comment vous percevez les choses, au-delà d'un simple 'oui' ou 'non'. En classant une série d'affirmations selon ce qui vous ressemble le plus, vous nous aidez à dessiner votre propre vision du monde. C'est une approche qui permet de capturer la richesse des opinions humaines, et cette application la rend simplement plus facile et agréable à utiliser.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Commencer l'étude"
@@ -149,7 +149,7 @@
         "fi": {
             "title": "Tutustu Open-Q-alustaan",
             "subtitle": "Koe Q-metodologia käytännössä",
-            "objective": "Tämä demo esittelee **Open-Q**-alustaa, joka on suunniteltu **Q-metodologian** hyödyntämiseen. **William Stephensonin** vuonna 1935 kehittämä menetelmä mahdollistaa **inhimillisen subjektiivisuuden** tieteellisen tutkimisen ja yhdistää tutkijoita ympäri maailman.\n\nJärjestämällä väittämiä oman näkemyksesi mukaan autat hahmottamaan erilaisia **ajatusmalleja**. Tämä sovellus tuo perinteisen menetelmän nykypäivään tarjoten **sujuvan ja mielekkään** käyttökokemuksen.",
+            "objective": "Tervetuloa kokeilemaan! Idea on yksinkertainen: haluamme ymmärtää näkemyksiäsi syvällisemmin kuin vain 'kyllä' tai 'ei' -tasolla. Järjestämällä väitteitä sen mukaan, mikä tuntuu sinusta oikeimmalta, autat meitä hahmottamaan oman ainutlaatuisen näkökulmasi. Tämä menetelmä tavoittaa mielipiteiden rikkauden, ja tämä sovellus tekee osallistumisesta helppoa ja vaivatonta.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"

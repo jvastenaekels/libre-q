@@ -57,8 +57,8 @@
     "steps": {
       "welcome": "Bienvenue",
       "presort": "Profil",
-      "rough": "Tri spontané",
-      "fine": "Tri sur la grille",
+      "rough": "Classement spontané",
+      "fine": "Classement sur la grille",
       "review": "Réflexions"
     },
     "mobile_step": "Étape",
@@ -87,7 +87,7 @@
   "presort": {
     "title": "À propos de vous",
     "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
-    "submit": "Continuer vers le tri",
+    "submit": "Continuer vers le classement",
     "select_placeholder": "Sélectionner...",
     "error_required": "Merci de répondre à cette question."
   },
@@ -95,7 +95,7 @@
     "header": {
       "title": "Quelle est votre position face à cette affirmation ?",
       "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
-      "hint": "Fiez-vous à votre **première impression**. C'est un **tri spontané** — vous affinerez vos choix à l'étape suivante."
+      "hint": "Fiez-vous à votre **première impression**. C'est un **classement spontané** — vous affinerez vos choix à l'étape suivante."
     },
     "complete": {
       "title": "Première étape validée",
@@ -103,13 +103,13 @@
     },
     "instructions": {
       "swipe": "Glissez ou appuyez pour catégoriser",
-      "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour trier"
+      "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour classer"
     }
   },
   "fine": {
     "header": {
       "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
-      "mobile_title": "Triez les affirmations selon votre point de vue"
+      "mobile_title": "Classez les affirmations selon votre point de vue"
     },
     "deck": {
       "title": "Cartes disponibles",
@@ -129,7 +129,7 @@
       "label": "Contrôles de la grille"
     },
     "grid": {
-      "label": "Grille de tri",
+      "label": "Grille de classement",
       "column": "Colonne",
       "slot": "Emplacement",
       "in_column": "dans la colonne"
@@ -141,8 +141,8 @@
       "label": "Légende du spectre"
     },
     "actions": {
-      "validate": "Confirmer le tri",
-      "finish": "Terminer le tri",
+      "validate": "Confirmer le classement",
+      "finish": "Terminer le classement",
       "ready": "Voir la vue d'ensemble",
       "not_ready": "Placez toutes les cartes pour continuer"
     },
@@ -156,10 +156,10 @@
         "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
         "extremes_title": "Pôles et Extrémités",
         "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
-        "vertical_title": "Axe de Tri",
+        "vertical_title": "Axe de Classement",
         "constraint": "Choix forcé : Vous devez placer toutes les cartes. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
         "constraint_title": "Challenge",
-        "footer_note": "Chaque carte doit être placée pour pouvoir valider le tri final.",
+        "footer_note": "Chaque carte doit être placée pour pouvoir valider le classement final.",
         "close": "Compris !"
       }
     }
