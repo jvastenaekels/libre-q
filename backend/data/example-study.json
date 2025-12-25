@@ -158,7 +158,7 @@
         "en": {
             "title": "Open-Q Discovery",
             "subtitle": "Experience Q-Methodology in Action",
-            "objective": "This interactive demo showcases Open-Q's capabilities. You will explore a set of statements to reveal your unique perspective, helping us validate the platform's intuitive design and flexible architecture.",
+            "objective": "This demo illustrates the use of **Open-Q**, a platform dedicated to **Q-methodology**. Introduced in 1935 by **William Stephenson**, this method allows for the scientific study of **human subjectivity** and today brings together an international community of researchers.\n\nBy sorting statements according to your point of view, you help reveal distinct **patterns of thought**. This application modernizes this process by offering a **seamless and engaging** data collection experience.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Start Study"
