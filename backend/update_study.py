@@ -7,14 +7,9 @@ import sys
 # Add project root to path for imports
 sys.path.append(os.getcwd())
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm.attributes import flag_modified
+from app.database import SessionLocal, engine
 from sqlalchemy import select, delete, update
 from app.models import Study, StudyTranslation, Statement, StatementTranslation
-
-DATABASE_URL = "sqlite+aiosqlite:///./q_method.db"
-engine = create_async_engine(DATABASE_URL, echo=False)
-SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 async def update_study():
     # Relative path from where we run it (backend dir)
