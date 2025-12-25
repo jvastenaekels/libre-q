@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 import logging
 
 # Configure logger specifically for frontend errors
@@ -13,7 +13,7 @@ frontend_logger.setLevel(logging.ERROR)
 router = APIRouter()
 
 class LogEntry(BaseModel):
-    level: str  # 'error', 'warn', 'info'
+    level: Literal['error', 'warn', 'info', 'debug']
     message: str
     stack: Optional[str] = None
     context: Optional[Dict[str, Any]] = None

@@ -34,10 +34,10 @@ describe('SortingAnimation', () => {
         
         // Check for presence of key elements from both phases
         // Rough Sort (Phase 1)
-        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByTestId('phase-1')).toBeInTheDocument();
         
         // Fine Sort (Phase 2)
-        expect(screen.getByText('2')).toBeInTheDocument();
+        expect(screen.getByTestId('phase-2')).toBeInTheDocument();
     });
 
     it('applies responsive classes for layout switching', () => {

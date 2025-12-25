@@ -28,9 +28,22 @@ if "sslmode=" in SQLALCHEMY_DATABASE_URL:
     q.pop("sslmode", None)
     SQLALCHEMY_DATABASE_URL = urlunparse(u._replace(query=urlencode(q, doseq=True)))
 
+engine_kwargs = {
+    "echo": False,
+}
+
+# SQLite doesn't support these pool settings
+if not SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine_kwargs.update({
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 30,
+        "pool_recycle": 1800,
+    })
+
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
-    echo=False, # Set to False in production
+    **engine_kwargs
 )
 
 SessionLocal = async_sessionmaker(

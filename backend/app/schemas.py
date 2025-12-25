@@ -60,6 +60,7 @@ class StudyBase(BaseModel):
     grid_config: List[GridColumn]
     presort_config: Dict[str, Any]
     postsort_config: Dict[str, Any]
+    default_language: Optional[str] = Field(None, max_length=5)
     show_statement_codes: bool = False
 
 class StudyCreate(StudyBase):

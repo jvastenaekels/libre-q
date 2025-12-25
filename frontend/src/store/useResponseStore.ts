@@ -105,6 +105,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         qsort: []
                     };
                 });
+                triggerAutoSave();
             },
 
             placeCardInGrid: (statementId, col, row) => {
@@ -129,7 +130,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
 
             moveCardInGrid: (statementId, col, row) => {
                 const config = useConfigStore.getState().config;
-                 if (!config) return;
+                if (!config) return;
 
                 const colConfig = config.grid_config?.[col];
                 if (!colConfig) return;
@@ -137,12 +138,11 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 const state = get();
                 const cardsInCol = state.qsort.filter(c => c.col === col && c.statementId !== statementId);
                 
-                if (cardsInCol.length >= colConfig.capacity) {
-                    return;
-                }
+                if (cardsInCol.length >= colConfig.capacity) return;
 
                 const filtered = state.qsort.filter(p => p.statementId !== statementId);
                 set({ qsort: [...filtered, { statementId, col, row }] });
+                triggerAutoSave();
             },
 
             swapCardsInGrid: (id1, id2) => {
@@ -157,15 +157,20 @@ export const useResponseStore = create<Responses & ResponseActions>()(
 
                 const others = state.qsort.filter(p => p.statementId !== id1 && p.statementId !== id2);
                 set({ qsort: [...others, newCard1, newCard2] });
+                triggerAutoSave();
             },
 
             unplaceCard: (statementId) => {
                 set((state) => ({
                     qsort: state.qsort.filter(p => p.statementId !== statementId)
                 }));
+                triggerAutoSave();
             },
 
-            resetFineSort: () => set({ qsort: [] }),
+            resetFineSort: () => {
+                set({ qsort: [] });
+                triggerAutoSave();
+            },
 
             setPostSortResponse: (field, value) => {
                 set((state) => ({
@@ -174,6 +179,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         [field]: value
                     }
                 }));
+                triggerAutoSave();
             },
 
             resetResponses: () => set(initialResponses)
