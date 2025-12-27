@@ -6,21 +6,16 @@
  */
 
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
-import React, { useState, useCallback, useEffect } from 'react';
-import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { useState, useCallback, useEffect } from 'react';
 import { useUIStore } from '../store/useUIStore';
 import { useGridPlacement } from './useGridPlacement';
+import type { DragCard, InteractionUtils } from '../types/grid';
 import { useDragAutoInteraction } from './useDragAutoInteraction';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
 interface Statement {
     id: number;
     text: string;
-}
-export interface DragCard {
-    statementId: number;
-    col: number;
-    row: number;
 }
 
 interface GridColumn {
@@ -32,15 +27,6 @@ interface Actions {
     moveCardInGrid: (id: number, col: number, row: number) => void;
     swapCardsInGrid: (id1: number, id2: number) => void;
     unplaceCard: (id: number) => void;
-}
-
-export interface InteractionUtils {
-    zoomIn: (step?: number) => void;
-    zoomOut: (step?: number) => void;
-    performAutoFit: () => void;
-    transformRef: React.RefObject<ReactZoomPanPinchRef>;
-    wrapperRef: React.RefObject<HTMLDivElement>;
-    contentRef: React.RefObject<HTMLDivElement>;
 }
 
 interface UseFineSortDragProps {

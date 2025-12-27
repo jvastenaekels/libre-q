@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useRef } from 'react';
-import type { InteractionUtils } from './useFineSortDrag';
+import type { InteractionUtils } from '../types/grid';
 
 interface UseDragAutoInteractionProps {
     interactionUtils: InteractionUtils | null | undefined;
