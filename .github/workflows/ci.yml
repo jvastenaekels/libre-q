@@ -69,7 +69,7 @@ jobs:
         run: vulture backend/app backend/vulture_whitelist.py --min-confidence 60
 
       - name: Unit Tests (Pytest)
-        run: pytest backend/tests
+        run: python -m pytest backend/tests
 
   frontend-quality-tests:
     name: Frontend Quality & Tests
@@ -109,7 +109,7 @@ jobs:
         run: npm audit --audit-level=high
 
       - name: Unit Tests (Vitest)
-        run: npm run test -- --run
+        run: npm run test -- --run --coverage --minWorkers=1 --maxWorkers=1
 
   e2e-tests:
     name: E2E Tests (Playwright)

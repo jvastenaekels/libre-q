@@ -1,0 +1,11 @@
+# Localhost
+http://localhost:8000
+http://localhost:5173
+http://127.0.0.1
+
+# GitHub Actions Badge (Likely private or not created yet)
+https://github.com/jvastenaekels/open-q/actions/workflows/ci.yml/badge.svg
+https://github.com/jvastenaekels/open-q/actions/workflows/ci.yml
+
+# Rate Limited External
+https://www.gnu.org/licenses/agpl-3.0
