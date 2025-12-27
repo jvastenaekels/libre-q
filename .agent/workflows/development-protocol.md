@@ -11,6 +11,9 @@ description: Standard robust workflow for implementing features or bug fixes.
 2. **Implementation Cycle**:
    - **Plan**: Analyze requirements and create an implementation plan if complex.
    - **Edit**: Make necessary code changes.
+   - **Update Tests**:
+     - _If logic changed_: Update existing tests immediately.
+     - _If new feature_: Add new corresponding unit/E2E tests.
    - **Verify**: Run relevant tests locally.
 
 3. **Quality Gate**:

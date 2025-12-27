@@ -180,7 +180,13 @@ const PreSortPage: React.FC = () => {
                 <div className="pt-4 flex justify-end w-full">
                     <button
                         type="submit"
-                        disabled={!isValid}
+                        // If no config, always valid. Otherwise respect form validation.
+                        disabled={
+                            (config?.presort_config &&
+                                Object.keys(config.presort_config).length > 0 &&
+                                !isValid) ||
+                            false
+                        }
                         className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md font-bold text-sm hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {t('presort.submit')} <ArrowRight size={16} />

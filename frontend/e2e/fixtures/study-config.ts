@@ -60,6 +60,11 @@ export async function mockStudyAPI(
             body: JSON.stringify(config),
         });
     });
+
+    // Mock generic logs to prevent proxy errors
+    await page.route('**/api/logs', async (route) => {
+        await route.fulfill({ status: 200, body: '{}' });
+    });
 }
 
 /**
