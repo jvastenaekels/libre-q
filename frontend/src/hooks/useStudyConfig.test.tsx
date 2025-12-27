@@ -12,10 +12,10 @@ import { useSessionStore } from '../store/useSessionStore';
 import * as apiClient from '../api/client';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 
-// Mock specific parts 
+// Mock specific parts
 vi.mock('../api/client', () => ({
     get: vi.fn(),
-    post: vi.fn()
+    post: vi.fn(),
 }));
 
 // Mock the i18n overrides utility
@@ -28,8 +28,8 @@ vi.mock('../utils/i18nOverrides', () => ({
 vi.mock('../i18n', () => ({
     default: {
         changeLanguage: vi.fn(),
-        language: 'en'
-    }
+        language: 'en',
+    },
 }));
 
 // Mock react-router-dom
@@ -62,14 +62,14 @@ describe('useStudyConfig', () => {
         await waitFor(() => {
             expect(mockGet).toHaveBeenCalled();
         });
-        
+
         expect(useConfigStore.getState().config?.title).toBe('Test Title EN');
     });
 
     it('applies UI overrides when present in config', async () => {
         const mockGet = vi.mocked(apiClient.get);
         const uiLabels = { 'common.agree': 'Approve' };
-        
+
         mockGet.mockResolvedValue({
             slug: 'test-study',
             title: 'Test Title',
@@ -78,7 +78,7 @@ describe('useStudyConfig', () => {
             presort_config: {},
             statements: [],
             ui_labels: uiLabels,
-            language: 'en'
+            language: 'en',
         });
 
         renderHook(() => useStudyConfig());

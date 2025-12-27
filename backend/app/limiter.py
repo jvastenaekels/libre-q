@@ -1,4 +1,7 @@
+"""Rate limiting configuration using SlowAPI."""
+
 import os
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 

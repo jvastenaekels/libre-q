@@ -25,8 +25,8 @@ const mockConfig = {
     statements: [],
     consent: {
         title: null,
-        description: null
-    }
+        description: null,
+    },
 };
 
 vi.mock('react-i18next', () => ({
@@ -34,7 +34,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null })
+    useStudyConfig: () => ({ isLoading: false, error: null }),
 }));
 
 describe('WelcomePage', () => {
@@ -65,10 +65,10 @@ describe('WelcomePage', () => {
         );
         // Label
         expect(screen.getByText('Instructions')).toBeInTheDocument();
-        
+
         // Markdown Content - split check to be resilient to formatting/newlines
         expect(screen.getByText('Content')).toBeInTheDocument();
-        
+
         // Check for bold tag
         const strong = document.querySelector('strong');
         expect(strong).toBeInTheDocument();
@@ -77,24 +77,24 @@ describe('WelcomePage', () => {
 
     it('renders continue button and navigates to consent', async () => {
         render(
-             <MemoryRouter initialEntries={['/study/test-study/welcome']}>
-                 <Routes>
-                     <Route path="/study/:slug/welcome" element={<WelcomePage />} />
-                     <Route path="/study/:slug/consent" element={<div>Consent Page</div>} />
-                 </Routes>
-             </MemoryRouter>
-         );
- 
-         const button = screen.getByRole('button', { name: /Continue/i });
-         expect(button).toBeInTheDocument();
-         
-         fireEvent.click(button);
- 
-         await waitFor(() => {
-             expect(screen.getByText('Consent Page')).toBeInTheDocument();
-         });
+            <MemoryRouter initialEntries={['/study/test-study/welcome']}>
+                <Routes>
+                    <Route path="/study/:slug/welcome" element={<WelcomePage />} />
+                    <Route path="/study/:slug/consent" element={<div>Consent Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        const button = screen.getByRole('button', { name: /Continue/i });
+        expect(button).toBeInTheDocument();
+
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(screen.getByText('Consent Page')).toBeInTheDocument();
+        });
     });
-    
+
     it('conditionally renders "Start a new session" link based on session state', async () => {
         const { unmount } = render(
             <MemoryRouter>
@@ -104,7 +104,7 @@ describe('WelcomePage', () => {
 
         // Initially (reset session), the link should NOT be there
         expect(screen.queryByText('Start a new session')).not.toBeInTheDocument();
-        
+
         unmount();
 
         // Case 1: user has consented
@@ -115,28 +115,28 @@ describe('WelcomePage', () => {
             </MemoryRouter>
         );
         expect(screen.getByText('Start a new session')).toBeInTheDocument();
-        
+
         // Use cleanup for re-render
         // Instead of unmount/remount significantly, we can just update store and trigger re-render if we were using a real app,
         // but for unit tests, re-rendering with new store state is cleaner.
     });
 
     it('resets session when link is clicked and confirmed', async () => {
-         // Setup active session
-         useSessionStore.getState().setConsent(true);
-         useResponseStore.getState().setPresortResponse({ test: 'data' });
-         
-         // Mock window.confirm
-         const confirmSpy = vi.spyOn(window, 'confirm');
-         confirmSpy.mockImplementation(() => true);
-         
-         // Mock window.location.reload (optional, but good practice since we call it)
-         Object.defineProperty(window, 'location', {
+        // Setup active session
+        useSessionStore.getState().setConsent(true);
+        useResponseStore.getState().setPresortResponse({ test: 'data' });
+
+        // Mock window.confirm
+        const confirmSpy = vi.spyOn(window, 'confirm');
+        confirmSpy.mockImplementation(() => true);
+
+        // Mock window.location.reload (optional, but good practice since we call it)
+        Object.defineProperty(window, 'location', {
             configurable: true,
             value: { reload: vi.fn() },
-          });
+        });
 
-         render(
+        render(
             <MemoryRouter>
                 <WelcomePage />
             </MemoryRouter>
@@ -147,7 +147,7 @@ describe('WelcomePage', () => {
 
         expect(confirmSpy).toHaveBeenCalled();
         expect(window.location.reload).toHaveBeenCalled();
-        
+
         // Verify store was reset (hasConsented should be false)
         // Note: useSessionStore.getState() might reflect the change immediately
         expect(useSessionStore.getState().hasConsented).toBe(false);

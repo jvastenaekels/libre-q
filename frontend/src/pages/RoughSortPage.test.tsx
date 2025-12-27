@@ -34,8 +34,8 @@ const mockConfig = {
     statements: [
         { id: 1, text: 'Card 1' },
         { id: 2, text: 'Card 2' },
-        { id: 3, text: 'Card 3' }
-    ]
+        { id: 3, text: 'Card 3' },
+    ],
 };
 
 describe('RoughSortPage', () => {
@@ -61,12 +61,12 @@ describe('RoughSortPage', () => {
         vi.useFakeTimers();
         render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
                 </Routes>
             </MemoryRouter>
         );
-        
+
         // Fast-forward time to trigger the hint (1500ms delay)
         act(() => {
             vi.advanceTimersByTime(2000);
@@ -76,14 +76,14 @@ describe('RoughSortPage', () => {
         expect(screen.getByText('rough.header.hint')).toBeTruthy();
         // Check for Title
         expect(screen.getByText('rough.header.title')).toBeTruthy();
-        
+
         vi.useRealTimers();
     });
 
     it('renders the Control Cluster buttons', () => {
         render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
                 </Routes>
             </MemoryRouter>
@@ -100,9 +100,9 @@ describe('RoughSortPage', () => {
         useResponseStore.getState().categorizeCard(2, 'agree');
         useResponseStore.getState().categorizeCard(3, 'agree');
 
-         render(
+        render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
                 </Routes>
             </MemoryRouter>

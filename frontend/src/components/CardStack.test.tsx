@@ -18,7 +18,6 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe('CardStack', () => {
-    
     // Wrapper to use hooks correctly
     const CardStackWrapper = ({ statement }: { statement: any }) => {
         const x = useMotionValue(0);
@@ -36,7 +35,7 @@ describe('CardStack', () => {
 
     it('renders the statement text', () => {
         const statement = { id: 1, text: 'This is a test statement' };
-        
+
         render(<CardStackWrapper statement={statement} />);
 
         expect(screen.getByText('This is a test statement')).toBeTruthy();
@@ -44,8 +43,13 @@ describe('CardStack', () => {
 
     it('updates hoveredCard in store on 👁️ icon click', async () => {
         // We need a long statement to trigger isOverflowing
-        const statement = { id: 1, text: 'A very long statement that should definitely overflow the card container on almost any screen size to ensure the reading icon appears.'.repeat(10) };
-        
+        const statement = {
+            id: 1,
+            text: 'A very long statement that should definitely overflow the card container on almost any screen size to ensure the reading icon appears.'.repeat(
+                10
+            ),
+        };
+
         render(<CardStackWrapper statement={statement} />);
 
         // The button is rendered when Overflowing. In JSDOM we might need to mock or force it.

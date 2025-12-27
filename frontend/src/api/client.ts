@@ -2,6 +2,13 @@
  * Open-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
+/**
+ * API Client
+ *
+ * Wrapper for fetch API to handle standard HTTP methods, error parsing, and automated bug reporting.
  */
 
 export class ApiError extends Error {
@@ -46,9 +53,9 @@ export async function reportBug(error: Error | string, context?: ErrorContext) {
                 stack,
                 url: window.location.href,
                 userAgent: navigator.userAgent,
-                context
+                context,
             }),
-            keepalive: true // Ensure request is sent even if page unloads
+            keepalive: true, // Ensure request is sent even if page unloads
         });
     } catch (e) {
         console.warn('Failed to report bug:', e);
@@ -66,10 +73,13 @@ export async function post<T>(endpoint: string, data: unknown): Promise<T> {
 
     if (!response.ok) {
         const errorText = await response.text();
-        
+
         // Auto-report 500 Server Errors
         if (response.status >= 500) {
-            reportBug(`Server Error ${response.status} at ${endpoint}: ${errorText}`, { endpoint, status: response.status });
+            reportBug(`Server Error ${response.status} at ${endpoint}: ${errorText}`, {
+                endpoint,
+                status: response.status,
+            });
         }
 
         throw new ApiError(response.status, errorText || 'Request failed');
@@ -91,7 +101,10 @@ export async function get<T>(endpoint: string): Promise<T> {
 
         // Auto-report 500 Server Errors
         if (response.status >= 500) {
-            reportBug(`Server Error ${response.status} at ${endpoint}: ${errorText}`, { endpoint, status: response.status });
+            reportBug(`Server Error ${response.status} at ${endpoint}: ${errorText}`, {
+                endpoint,
+                status: response.status,
+            });
         }
 
         throw new ApiError(response.status, errorText || 'Request failed');

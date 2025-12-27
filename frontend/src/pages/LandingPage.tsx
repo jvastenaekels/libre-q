@@ -26,14 +26,20 @@ const LandingPage: React.FC = () => {
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
                 <div className="text-center space-y-2">
                     <div className="flex justify-center mb-6">
-                        <img src="/open-q-logo.svg" alt="Open-Q" className="h-20 w-auto object-contain" />
+                        <img
+                            src="/open-q-logo.svg"
+                            alt="Open-Q"
+                            className="h-20 w-auto object-contain"
+                        />
                     </div>
                     <p className="text-gray-500">Enter your study code to begin.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="study-code" className="sr-only">Study Code</label>
+                        <label htmlFor="study-code" className="sr-only">
+                            Study Code
+                        </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Search className="h-5 w-5 text-gray-400" />

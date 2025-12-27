@@ -11,28 +11,30 @@ import { DndContext } from '@dnd-kit/core';
 
 // Mock dependencies
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  horizontalListSortingStrategy: {},
-  rectSortingStrategy: {},
+    SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    horizontalListSortingStrategy: {},
+    rectSortingStrategy: {},
 }));
 
 // Mock SortableCard to check props passed to it
 const MockSortableCard = vi.fn(({ aspectRatio }: { aspectRatio?: number }) => (
-    <div data-testid="mock-card" data-aspect={aspectRatio}>Card</div>
+    <div data-testid="mock-card" data-aspect={aspectRatio}>
+        Card
+    </div>
 ));
 vi.mock('./SortableCard', () => ({
-  default: (props: any) => <MockSortableCard {...props} />
+    default: (props: any) => <MockSortableCard {...props} />,
 }));
 
 vi.mock('./DroppableSlot', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+    default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 // Mock ResizeObserver
 const ResizeObserverMock = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
 }));
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
@@ -47,12 +49,16 @@ describe('GridSort Mobile Layout Refinements', () => {
 
     beforeEach(() => {
         // Mock viewport size for mobile
-        Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 375,
+        });
         window.dispatchEvent(new Event('resize'));
         vi.clearAllMocks();
     });
 
-    // Note: These tests are skipped because they rely on specific DOM structures that 
+    // Note: These tests are skipped because they rely on specific DOM structures that
     // are fragile and subject to change. Consider using visual regression testing instead.
     it.skip('applies fixed h-20 height to mobile Reading Zone and h-12 to categories', () => {
         render(
@@ -61,7 +67,9 @@ describe('GridSort Mobile Layout Refinements', () => {
             </DndContext>
         );
 
-        const readingZone = screen.getByText(/fine\.workbench\.help/i).closest('div')?.parentElement;
+        const readingZone = screen
+            .getByText(/fine\.workbench\.help/i)
+            .closest('div')?.parentElement;
         expect(readingZone?.className).toContain('h-20');
 
         const agreeTab = screen.getByRole('tab', { name: /common\.disagree/i });

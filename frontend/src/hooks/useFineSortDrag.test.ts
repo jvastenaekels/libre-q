@@ -18,12 +18,14 @@ describe('useFineSortDrag', () => {
 
     it('should place card in empty slot', () => {
         const responses = { qsort: [] };
-        const { result } = renderHook(() => useFineSortDrag({ 
-            responses, 
-            gridColumns: mockGridColumns, 
-            actions: mockActions,
-            statements: []
-        }));
+        const { result } = renderHook(() =>
+            useFineSortDrag({
+                responses,
+                gridColumns: mockGridColumns,
+                actions: mockActions,
+                statements: [],
+            })
+        );
 
         act(() => {
             result.current.handleDragEnd({
@@ -37,12 +39,14 @@ describe('useFineSortDrag', () => {
 
     it('should redirect to closest empty row if target is occupied but column has space', () => {
         const responses = { qsort: [{ statementId: 200, col: 0, row: 0 }] }; // Slot 0_0 occupied
-        const { result } = renderHook(() => useFineSortDrag({ 
-            responses, 
-            gridColumns: mockGridColumns, 
-            actions: mockActions,
-            statements: []
-        }));
+        const { result } = renderHook(() =>
+            useFineSortDrag({
+                responses,
+                gridColumns: mockGridColumns,
+                actions: mockActions,
+                statements: [],
+            })
+        );
 
         act(() => {
             // Drag to 0_0 (Occupied) -> Should go to 0_1 (Empty)
@@ -59,18 +63,20 @@ describe('useFineSortDrag', () => {
         // Col 1 has capacity 1.
         // Card 200 is at 1_0.
         // Drag Card 300 (which is at 0_0) to 1_0.
-        const responses = { 
+        const responses = {
             qsort: [
                 { statementId: 200, col: 1, row: 0 },
-                { statementId: 300, col: 0, row: 0 }
-            ] 
+                { statementId: 300, col: 0, row: 0 },
+            ],
         };
-        const { result } = renderHook(() => useFineSortDrag({ 
-            responses, 
-            gridColumns: mockGridColumns, 
-            actions: mockActions,
-            statements: []
-        }));
+        const { result } = renderHook(() =>
+            useFineSortDrag({
+                responses,
+                gridColumns: mockGridColumns,
+                actions: mockActions,
+                statements: [],
+            })
+        );
 
         act(() => {
             result.current.handleDragEnd({
@@ -86,17 +92,17 @@ describe('useFineSortDrag', () => {
         // Col 1 has capacity 1.
         // Card 200 is at 1_0.
         // Drag Card 101 (from Deck) to 1_0.
-        const responses = { 
-            qsort: [
-                { statementId: 200, col: 1, row: 0 }
-            ] 
+        const responses = {
+            qsort: [{ statementId: 200, col: 1, row: 0 }],
         };
-        const { result } = renderHook(() => useFineSortDrag({ 
-            responses, 
-            gridColumns: mockGridColumns, 
-            actions: mockActions,
-            statements: []
-        }));
+        const { result } = renderHook(() =>
+            useFineSortDrag({
+                responses,
+                gridColumns: mockGridColumns,
+                actions: mockActions,
+                statements: [],
+            })
+        );
 
         act(() => {
             result.current.handleDragEnd({

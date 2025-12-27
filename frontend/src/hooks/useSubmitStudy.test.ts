@@ -15,7 +15,7 @@ import type { StudyConfig } from '../schemas/study';
 // Mock the API client
 const mockPost = vi.fn();
 vi.mock('../api/client', () => ({
-    post: (...args: unknown[]) => mockPost(...args)
+    post: (...args: unknown[]) => mockPost(...args),
 }));
 
 const mockConfig = {
@@ -24,31 +24,38 @@ const mockConfig = {
     description: '',
     instructions: '',
     presort_config: {},
-    grid_config: [{ score: -4, capacity: 1 }, { score: 4, capacity: 1 }],
-    statements: [{ id: 1, text: 'S1' }, { id: 2, text: 'S2' }]
+    grid_config: [
+        { score: -4, capacity: 1 },
+        { score: 4, capacity: 1 },
+    ],
+    statements: [
+        { id: 1, text: 'S1' },
+        { id: 2, text: 'S2' },
+    ],
 };
 
 describe('useSubmitStudy', () => {
     beforeEach(() => {
         mockPost.mockReset();
-        
+
         // Setup stores
         useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
-        
+
         useSessionStore.getState().resetSession();
         useSessionStore.getState().setToken('test-token');
         useSessionStore.getState().setConsent(true);
         useSessionStore.getState().setLanguage('en');
         useSessionStore.getState().setStep(5);
-        
+
         useResponseStore.getState().resetResponses();
         useResponseStore.getState().setPresortResponse({ age: 30 });
         useResponseStore.getState().placeCardInGrid(1, 0, 0); // Score -4
         useResponseStore.getState().placeCardInGrid(2, 1, 0); // Score 4
-        useResponseStore.getState().setPostSortResponse('card_comments', { 1: "Why -4", 2: "Why 4" });
-        useResponseStore.getState().setPostSortResponse('missing_statement', "Missed this");
-        useResponseStore.getState().setPostSortResponse('general_comment', "Good study");
-
+        useResponseStore
+            .getState()
+            .setPostSortResponse('card_comments', { 1: 'Why -4', 2: 'Why 4' });
+        useResponseStore.getState().setPostSortResponse('missing_statement', 'Missed this');
+        useResponseStore.getState().setPostSortResponse('general_comment', 'Good study');
     });
 
     afterEach(() => {
@@ -70,7 +77,7 @@ describe('useSubmitStudy', () => {
 
         expect(mockPost).toHaveBeenCalledTimes(1);
         const [url, payload] = mockPost.mock.calls[0];
-        
+
         expect(url).toBe('/api/submit');
         expect(payload).toEqual({
             session_token: 'test-token',
@@ -79,14 +86,14 @@ describe('useSubmitStudy', () => {
             language_used: 'en',
             presort_answers: { age: 30 },
             qsort: [
-                { statement_id: 1, grid_score: -4, card_comment: "Why -4" },
-                { statement_id: 2, grid_score: 4, card_comment: "Why 4" }
+                { statement_id: 1, grid_score: -4, card_comment: 'Why -4' },
+                { statement_id: 2, grid_score: 4, card_comment: 'Why 4' },
             ],
             postsort_answers: {
-                card_comments: { 1: "Why -4", 2: "Why 4" },
-                missing_statement: "Missed this",
-                general_comment: "Good study"
-            }
+                card_comments: { 1: 'Why -4', 2: 'Why 4' },
+                missing_statement: 'Missed this',
+                general_comment: 'Good study',
+            },
         });
     });
 

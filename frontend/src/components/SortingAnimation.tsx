@@ -8,19 +8,19 @@ import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
 // 6 Cards sorted in a "random-looking" sequence
 // Disagree (Left), Agree (Right), Neutral (Down)
 const ROUGH_TARGETS = [
-    { x: 32, y: -24, pileId: 'agree' },     // 1. Agree (Right) - Immediate decisive action
-    { x: 0, y: 32, pileId: 'neutral' },     // 2. Neutral (Down) - Hesitation looking
+    { x: 32, y: -24, pileId: 'agree' }, // 1. Agree (Right) - Immediate decisive action
+    { x: 0, y: 32, pileId: 'neutral' }, // 2. Neutral (Down) - Hesitation looking
     { x: -32, y: -24, pileId: 'disagree' }, // 3. Disagree (Left)
-    { x: 32, y: -24, pileId: 'agree' },     // 4. Agree (Right)
+    { x: 32, y: -24, pileId: 'agree' }, // 4. Agree (Right)
     { x: -32, y: -24, pileId: 'disagree' }, // 5. Disagree (Left)
-    { x: 0, y: 32, pileId: 'neutral' }      // 6. Neutral (Down)
+    { x: 0, y: 32, pileId: 'neutral' }, // 6. Neutral (Down)
 ];
 
 // FINE SORT
-const COL_W = 18; 
-const COL_GAP = 2; 
+const COL_W = 18;
+const COL_GAP = 2;
 const COL_OFFSET = COL_W + COL_GAP;
-const ROW_H = 26; 
+const ROW_H = 26;
 
 const FINE_STEPS = [
     { id: 'L2_0', x: -2 * COL_OFFSET, y: 0, source: 0 },
@@ -49,15 +49,27 @@ const SortingAnimation: React.FC = () => {
 
         if (phase === 'ROUGH') {
             if (step < ROUGH_TARGETS.length) {
-                timer = setTimeout(() => setStep(s => s + 1), ROUGH_DURATION * 1000 + 100 + hesitation);
+                timer = setTimeout(
+                    () => setStep((s) => s + 1),
+                    ROUGH_DURATION * 1000 + 100 + hesitation
+                );
             } else {
-                timer = setTimeout(() => { setPhase('FINE'); setStep(0); }, PAUSE);
+                timer = setTimeout(() => {
+                    setPhase('FINE');
+                    setStep(0);
+                }, PAUSE);
             }
         } else {
             if (step < FINE_STEPS.length) {
-                timer = setTimeout(() => setStep(s => s + 1), FINE_DURATION * 1000 + 100 + hesitation);
+                timer = setTimeout(
+                    () => setStep((s) => s + 1),
+                    FINE_DURATION * 1000 + 100 + hesitation
+                );
             } else {
-                timer = setTimeout(() => { setPhase('ROUGH'); setStep(0); }, PAUSE);
+                timer = setTimeout(() => {
+                    setPhase('ROUGH');
+                    setStep(0);
+                }, PAUSE);
             }
         }
         return () => clearTimeout(timer);
@@ -86,10 +98,10 @@ const SortingAnimation: React.FC = () => {
     const fineSourceCounts = useMemo(() => {
         const totals = [0, 0, 0];
         // Calculate initial source pile sizes based on what will be used in FINE steps
-        FINE_STEPS.forEach(s => totals[s.source]++);
-        
+        FINE_STEPS.forEach((s) => totals[s.source]++);
+
         // REMOVED: Extra cards that made piles look fuller but prevented empty state
-        // totals[0] += 2; 
+        // totals[0] += 2;
         // totals[1] += 2;
         // totals[2] += 2;
 
@@ -127,30 +139,45 @@ const SortingAnimation: React.FC = () => {
     const currentSourceBaseY = isDesktop ? 0 : MOBILE_SOURCE_CENTER_Y;
     const currentSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
 
-    const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
+    const activeRoughTarget =
+        phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
     const activeFineStep = phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
 
     const fineSourceX = useMemo(() => {
         if (!activeFineStep) return 0;
-        const offset = isDesktop ? 0 : (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0);
+        const offset = isDesktop
+            ? 0
+            : activeFineStep.source === 0
+              ? -36
+              : activeFineStep.source === 2
+                ? 36
+                : 0;
         return currentSourceBaseX + offset;
     }, [isDesktop, activeFineStep, currentSourceBaseX]);
 
     const fineSourceY = useMemo(() => {
         if (!activeFineStep) return 0;
-        const offset = isDesktop ? (activeFineStep.source === 0 ? -32 : activeFineStep.source === 2 ? 32 : 0) : 0;
+        const offset = isDesktop
+            ? activeFineStep.source === 0
+                ? -32
+                : activeFineStep.source === 2
+                  ? 32
+                  : 0
+            : 0;
         return currentSourceBaseY + offset;
     }, [isDesktop, activeFineStep, currentSourceBaseY]);
 
-    const fineTargetX = (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
+    const fineTargetX =
+        (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
     const fineTargetY = currentGridBaseY + (activeFineStep ? activeFineStep.y : 0);
 
-
     return (
-        <div className="relative w-full h-80 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none" aria-hidden="true">
-            
+        <div
+            className="relative w-full h-80 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none"
+            aria-hidden="true"
+        >
             {/* ROUGH PHASE */}
-            <div 
+            <div
                 data-testid="phase-1"
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
@@ -162,9 +189,14 @@ const SortingAnimation: React.FC = () => {
                             <motion.div
                                 key={`rough-fly-${step}`}
                                 initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                                animate={{ x: activeRoughTarget.x, y: activeRoughTarget.y, scale: 1, rotate: Math.random() * 10 - 5 }}
+                                animate={{
+                                    x: activeRoughTarget.x,
+                                    y: activeRoughTarget.y,
+                                    scale: 1,
+                                    rotate: Math.random() * 10 - 5,
+                                }}
                                 exit={{ opacity: 0 }}
-                                transition={{ duration: ROUGH_DURATION, ease: "easeInOut" }}
+                                transition={{ duration: ROUGH_DURATION, ease: 'easeInOut' }}
                                 className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm z-50 pointer-events-none"
                             >
                                 <div className="w-full h-full bg-slate-50 rounded-[1px] flex items-center justify-center">
@@ -176,58 +208,128 @@ const SortingAnimation: React.FC = () => {
                 </div>
                 {phase === 'ROUGH' && (
                     <>
-                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" highlighted={activeRoughTarget?.pileId === 'disagree'} /></div>
-                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10"><DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" highlighted={activeRoughTarget?.pileId === 'agree'} /></div>
-                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10"><DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" highlighted={activeRoughTarget?.pileId === 'neutral'} /></div>
+                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10">
+                            <DynamicStack
+                                count={roughPileCounts.disagree}
+                                icon={Frown}
+                                type="pile"
+                                layoutId="pile-disagree"
+                                highlighted={activeRoughTarget?.pileId === 'disagree'}
+                            />
+                        </div>
+                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10">
+                            <DynamicStack
+                                count={roughPileCounts.agree}
+                                icon={Smile}
+                                type="pile"
+                                layoutId="pile-agree"
+                                highlighted={activeRoughTarget?.pileId === 'agree'}
+                            />
+                        </div>
+                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10">
+                            <DynamicStack
+                                count={roughPileCounts.neutral}
+                                icon={Meh}
+                                type="pile"
+                                layoutId="pile-neutral"
+                                highlighted={activeRoughTarget?.pileId === 'neutral'}
+                            />
+                        </div>
                     </>
                 )}
             </div>
 
             {/* FINE PHASE */}
-            <div 
+            <div
                 data-testid="phase-2"
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'FINE' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
             >
-                 <div 
+                <div
                     className="absolute z-10 flex items-end justify-center left-1/2"
                     style={{
                         top: `calc(50% + ${currentGridBaseY + 12}px)`,
                         transform: 'translate(-50%, -100%)',
-                        left: isDesktop ? `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)` : '50%'
+                        left: isDesktop ? `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)` : '50%',
                     }}
                 >
-                     <div className="flex items-end gap-2">
-                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}><ThumbsDown size={16} className="text-slate-500" /></div>
-                        <div className="flex items-end gap-[2px]">
-                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L2_0')} /></div>
-                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L1_1')} /><MiniSlot filled={fineFilledIds.has('L1_0')} /></div>
-                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('C0_2')} /><MiniSlot filled={fineFilledIds.has('C0_1')} /><MiniSlot filled={fineFilledIds.has('C0_0')} /></div>
-                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R1_1')} /><MiniSlot filled={fineFilledIds.has('R1_0')} /></div>
-                            <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('R2_0')} /></div>
+                    <div className="flex items-end gap-2">
+                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}>
+                            <ThumbsDown size={16} className="text-slate-500" />
                         </div>
-                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}><ThumbsUp size={16} className="text-slate-500" /></div>
+                        <div className="flex items-end gap-[2px]">
+                            <div className="flex flex-col gap-[2px]">
+                                <MiniSlot filled={fineFilledIds.has('L2_0')} />
+                            </div>
+                            <div className="flex flex-col gap-[2px]">
+                                <MiniSlot filled={fineFilledIds.has('L1_1')} />
+                                <MiniSlot filled={fineFilledIds.has('L1_0')} />
+                            </div>
+                            <div className="flex flex-col gap-[2px]">
+                                <MiniSlot filled={fineFilledIds.has('C0_2')} />
+                                <MiniSlot filled={fineFilledIds.has('C0_1')} />
+                                <MiniSlot filled={fineFilledIds.has('C0_0')} />
+                            </div>
+                            <div className="flex flex-col gap-[2px]">
+                                <MiniSlot filled={fineFilledIds.has('R1_1')} />
+                                <MiniSlot filled={fineFilledIds.has('R1_0')} />
+                            </div>
+                            <div className="flex flex-col gap-[2px]">
+                                <MiniSlot filled={fineFilledIds.has('R2_0')} />
+                            </div>
+                        </div>
+                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}>
+                            <ThumbsUp size={16} className="text-slate-500" />
+                        </div>
                     </div>
                 </div>
 
-                <div 
+                <div
                     className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
-                    style={{ top: `calc(50% + ${currentGridBaseY + 23}px - 7px)`, left: `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)` }}
+                    style={{
+                        top: `calc(50% + ${currentGridBaseY + 23}px - 7px)`,
+                        left: `calc(50% + ${DESKTOP_GRID_OFFSET_X}px)`,
+                    }}
                 >
-                        <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
-                        <div className="w-[18px]" /><div className="w-[18px]" /><div className="w-[18px]" />
-                        <div className="w-[18px] flex justify-center"><ThumbsUp size={14} className="text-slate-500" /></div>
+                    <div className="w-[18px] flex justify-center">
+                        <ThumbsDown size={14} className="text-slate-500" />
+                    </div>
+                    <div className="w-[18px]" />
+                    <div className="w-[18px]" />
+                    <div className="w-[18px]" />
+                    <div className="w-[18px] flex justify-center">
+                        <ThumbsUp size={14} className="text-slate-500" />
+                    </div>
                 </div>
 
-                <div 
+                <div
                     className={`absolute z-10 flex gap-6 md:gap-4 items-center justify-center ${isDesktop ? 'flex-col' : 'flex-row'}`}
-                    style={{ top: `calc(50% + ${currentSourceBaseY}px)`, left: `calc(50% + ${currentSourceBaseX}px)`, transform: 'translate(-50%, -50%)' }}
+                    style={{
+                        top: `calc(50% + ${currentSourceBaseY}px)`,
+                        left: `calc(50% + ${currentSourceBaseX}px)`,
+                        transform: 'translate(-50%, -50%)',
+                    }}
                 >
                     {phase === 'FINE' && (
                         <>
-                            <DynamicStack count={fineSourceCounts[0]} icon={Frown} type="source" layoutId="pile-disagree" />
-                            <DynamicStack count={fineSourceCounts[1]} icon={Meh} type="source" layoutId="pile-neutral" />
-                            <DynamicStack count={fineSourceCounts[2]} icon={Smile} type="source" layoutId="pile-agree" />
+                            <DynamicStack
+                                count={fineSourceCounts[0]}
+                                icon={Frown}
+                                type="source"
+                                layoutId="pile-disagree"
+                            />
+                            <DynamicStack
+                                count={fineSourceCounts[1]}
+                                icon={Meh}
+                                type="source"
+                                layoutId="pile-neutral"
+                            />
+                            <DynamicStack
+                                count={fineSourceCounts[2]}
+                                icon={Smile}
+                                type="source"
+                                layoutId="pile-agree"
+                            />
                         </>
                     )}
                 </div>
@@ -237,15 +339,30 @@ const SortingAnimation: React.FC = () => {
                         {activeFineStep && (
                             <motion.div
                                 key={`fine-fly-${step}`}
-                                initial={{ x: fineSourceX - 9, y: fineSourceY - 12, opacity: 1, scale: 1 }}
-                                animate={{ x: fineTargetX - 9, y: fineTargetY - 12, rotate: Math.random() * 4 - 2 }}
+                                initial={{
+                                    x: fineSourceX - 9,
+                                    y: fineSourceY - 12,
+                                    opacity: 1,
+                                    scale: 1,
+                                }}
+                                animate={{
+                                    x: fineTargetX - 9,
+                                    y: fineTargetY - 12,
+                                    rotate: Math.random() * 4 - 2,
+                                }}
                                 exit={{ opacity: 0 }}
-                                transition={{ duration: FINE_DURATION, ease: "easeInOut" }}
+                                transition={{ duration: FINE_DURATION, ease: 'easeInOut' }}
                                 className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm pointer-events-none flex items-center justify-center z-50"
-                            > 
-                                {activeFineStep.source === 0 && <Frown size={10} className="text-slate-500" />}
-                                {activeFineStep.source === 1 && <Meh size={10} className="text-slate-500" />}
-                                {activeFineStep.source === 2 && <Smile size={10} className="text-slate-500" />}
+                            >
+                                {activeFineStep.source === 0 && (
+                                    <Frown size={10} className="text-slate-500" />
+                                )}
+                                {activeFineStep.source === 1 && (
+                                    <Meh size={10} className="text-slate-500" />
+                                )}
+                                {activeFineStep.source === 2 && (
+                                    <Smile size={10} className="text-slate-500" />
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -253,22 +370,33 @@ const SortingAnimation: React.FC = () => {
             </div>
 
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
-                <div className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`} />
-                <div className="w-10 h-0.5 bg-slate-200 overflow-hidden rounded-full"><div className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`} /></div>
-                <div className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'FINE' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`} />
+                <div
+                    className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
+                />
+                <div className="w-10 h-0.5 bg-slate-200 overflow-hidden rounded-full">
+                    <div
+                        className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`}
+                    />
+                </div>
+                <div
+                    className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'FINE' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
+                />
             </div>
         </div>
     );
 };
 
 const MiniSlot = ({ filled }: { filled: boolean }) => (
-    <div className={`
+    <div
+        className={`
         w-[18px] h-[24px] rounded-[2px] transition-all duration-300
-        ${filled 
-            ? 'bg-blue-600 border border-blue-700 shadow-sm scale-105 z-10' // Filled: High contrast (Blue card)
-            : 'bg-slate-50 border-2 border-dashed border-slate-300' // Empty: Dashed placeholder
+        ${
+            filled
+                ? 'bg-blue-600 border border-blue-700 shadow-sm scale-105 z-10' // Filled: High contrast (Blue card)
+                : 'bg-slate-50 border-2 border-dashed border-slate-300' // Empty: Dashed placeholder
         }
-    `} />
+    `}
+    />
 );
 
 // --- IMPROVED DYNAMIC STACK --- //
@@ -285,12 +413,12 @@ interface StackProps {
 const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type }) => {
     // How many cards to visualize under the top one?
     const visibleLayers = Math.min(Math.max(0, count - 1), 4);
-    
+
     // Deterministic random offsets
     const getOffset = (index: number) => {
         const seed = (index * 17) % 7;
-        const rotate = (seed - 3) * 1.5; 
-        const tx = (seed % 3) - 1; 
+        const rotate = (seed - 3) * 1.5;
+        const tx = (seed % 3) - 1;
         const ty = ((seed * 2) % 3) - 1;
         return { rotate, tx, ty };
     };
@@ -307,7 +435,10 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type 
             setIsBumping(true);
             const t1 = setTimeout(() => setShowPlusOne(false), 600);
             const t2 = setTimeout(() => setIsBumping(false), 200);
-            return () => { clearTimeout(t1); clearTimeout(t2); };
+            return () => {
+                clearTimeout(t1);
+                clearTimeout(t2);
+            };
         }
         prevCount.current = count;
     }, [count, type]);
@@ -330,11 +461,11 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type 
                 )}
             </AnimatePresence>
 
-            <motion.div 
-                layoutId={layoutId} 
+            <motion.div
+                layoutId={layoutId}
                 animate={isBumping ? { scale: 1.15 } : { scale: 1 }}
-                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
-                className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${(count === 0 && type !== 'source') ? 'opacity-40' : 'opacity-100'}`}
+                transition={{ duration: 0.2, type: 'spring', stiffness: 300 }}
+                className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${count === 0 && type !== 'source' ? 'opacity-40' : 'opacity-100'}`}
             >
                 {/* Empty State */}
                 {count === 0 && (
@@ -342,26 +473,27 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type 
                 )}
 
                 {/* Under Layers */}
-                {count > 1 && Array.from({ length: visibleLayers }).map((_, i) => {
-                    const layerIdx = i; 
-                    const offset = getOffset(layerIdx);
-                    return (
-                        <div 
-                            key={i}
-                            className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm"
-                            style={{
-                                transform: `translate(${offset.tx}px, ${offset.ty}px) rotate(${offset.rotate}deg)`,
-                                zIndex: i
-                            }}
-                        />
-                    );
-                })}
+                {count > 1 &&
+                    Array.from({ length: visibleLayers }).map((_, i) => {
+                        const layerIdx = i;
+                        const offset = getOffset(layerIdx);
+                        return (
+                            <div
+                                key={i}
+                                className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm"
+                                style={{
+                                    transform: `translate(${offset.tx}px, ${offset.ty}px) rotate(${offset.rotate}deg)`,
+                                    zIndex: i,
+                                }}
+                            />
+                        );
+                    })}
 
                 {/* Top Card */}
                 {count > 0 && (
-                    <div 
+                    <div
                         className="absolute inset-0 bg-white border border-slate-300 rounded-[2px] shadow-sm flex items-center justify-center z-10"
-                        style={{ transform: 'rotate(-1deg)' }} 
+                        style={{ transform: 'rotate(-1deg)' }}
                     >
                         {Icon && <Icon size={10} className="text-slate-500" />}
                         {!Icon && <div className="w-2 h-0.5 bg-slate-200 rounded-full" />}

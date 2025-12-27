@@ -27,7 +27,7 @@ export const useScaleToFit = (
             // Assuming the content is rendered at scale(1) initially or we can measure its intrinsic size
             // A safer way is to measure the children or clone logic, but simplified:
             // We expect the content to have a fixed layout size.
-            
+
             const contentWidth = content.scrollWidth;
             const contentHeight = content.scrollHeight;
 
@@ -37,20 +37,20 @@ export const useScaleToFit = (
             const scaleY = containerHeight / contentHeight;
 
             // Use the smaller scale to fit both dimensions
-            
+
             // User requirement: "Improve auto-scaling" -> Allow slight upscale (1.5 max) if screen allows
             const finalScale = Math.min(scaleX, scaleY, 1.5);
-            
+
             setScale(finalScale);
         };
 
         // ResizeObserver is more robust than window.resize
         const observer = new ResizeObserver(handleResize);
         if (containerRef.current) observer.observe(containerRef.current);
-        
+
         // Initial call
         handleResize();
-        
+
         return () => observer.disconnect();
     }, [containerRef, contentRef, padding]);
 

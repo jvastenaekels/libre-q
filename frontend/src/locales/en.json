@@ -1,195 +1,195 @@
 {
-  "common": {
-    "agree": "Somewhat agree",
-    "disagree": "Somewhat disagree",
-    "neutral": "No strong opinion",
-    "undo": "Undo",
-    "next": "Next step",
-    "submit": "Share my perspective",
-    "continue": "Continue",
-    "loading": "Loading...",
-    "lang_code": "en",
-    "yes": "Yes",
-    "no": "No",
-    "ok": "OK",
-    "cancel": "Cancel",
-    "check": "Check",
-    "select_card": "Pick a card",
-    "attention": "Attention",
-    "error": "Error",
-    "submitting": "Submitting...",
-    "cards": "cards",
-    "close": "Close",
-    "statement": "Statement",
-    "errors": {
-      "network": "Network connection error. Please check your internet connection.",
-      "not_found": "Study not found.",
-      "validation": "System error: Data validation failed.",
-      "unknown": "An unexpected error occurred.",
-      "retry": "Retry",
-      "min": "Value must be at least {{min}}",
-      "max": "Value must be at most {{max}}",
-      "404": {
-          "title": "Page Not Found",
-          "message": "The page or study you are looking for does not exist."
-      },
-      "429": {
-          "title": "Too Many Requests",
-          "message": "You are doing that too fast. Please wait a moment."
-      },
-      "500": {
-          "title": "Server Error",
-          "message": "Our servers encountered an issue. Please try again later."
-      },
-      "network_title": "Connection Lost",
-      "home": "Go to Home",
-      "reset": "Reset Session",
-      "default_title": "Oops! Something went wrong.",
-      "study_not_found": {
-        "title": "Study Not Found",
-        "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
-        "action": "Go to Home"
-      }
-    }
-  },
-  "layout": {
-    "title": "Open-Q",
-    "steps": {
-      "welcome": "Welcome",
-      "presort": "Profile",
-      "rough": "Spontaneous Sort",
-      "fine": "Grid Sort",
-      "review": "Reflections"
+    "common": {
+        "agree": "Somewhat agree",
+        "disagree": "Somewhat disagree",
+        "neutral": "No strong opinion",
+        "undo": "Undo",
+        "next": "Next step",
+        "submit": "Share my perspective",
+        "continue": "Continue",
+        "loading": "Loading...",
+        "lang_code": "en",
+        "yes": "Yes",
+        "no": "No",
+        "ok": "OK",
+        "cancel": "Cancel",
+        "check": "Check",
+        "select_card": "Pick a card",
+        "attention": "Attention",
+        "error": "Error",
+        "submitting": "Submitting...",
+        "cards": "cards",
+        "close": "Close",
+        "statement": "Statement",
+        "errors": {
+            "network": "Network connection error. Please check your internet connection.",
+            "not_found": "Study not found.",
+            "validation": "System error: Data validation failed.",
+            "unknown": "An unexpected error occurred.",
+            "retry": "Retry",
+            "min": "Value must be at least {{min}}",
+            "max": "Value must be at most {{max}}",
+            "404": {
+                "title": "Page Not Found",
+                "message": "The page or study you are looking for does not exist."
+            },
+            "429": {
+                "title": "Too Many Requests",
+                "message": "You are doing that too fast. Please wait a moment."
+            },
+            "500": {
+                "title": "Server Error",
+                "message": "Our servers encountered an issue. Please try again later."
+            },
+            "network_title": "Connection Lost",
+            "home": "Go to Home",
+            "reset": "Reset Session",
+            "default_title": "Oops! Something went wrong.",
+            "study_not_found": {
+                "title": "Study Not Found",
+                "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
+                "action": "Go to Home"
+            }
+        }
     },
-    "mobile_step": "Step",
-    "language": "English"
-  },
-  "welcome": {
-    "title": "Welcome",
-    "description": "Please read the instructions carefully.",
-    "start": "Start Study",
+    "layout": {
+        "title": "Open-Q",
+        "steps": {
+            "welcome": "Welcome",
+            "presort": "Profile",
+            "rough": "Spontaneous Sort",
+            "fine": "Grid Sort",
+            "review": "Reflections"
+        },
+        "mobile_step": "Step",
+        "language": "English"
+    },
+    "welcome": {
+        "title": "Welcome",
+        "description": "Please read the instructions carefully.",
+        "start": "Start Study",
+        "consent": {
+            "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
+            "error": "Please accept the terms to continue."
+        },
+        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
+        "restart": "Start a new session",
+        "preview_title": "Preview",
+        "objective_label": "Study Objective",
+        "instructions_label": "Process",
+        "default_instructions": "1. **Getting to know you:** a few quick questions to better understand your background.\n2. **Your first impressions:** discover the statements and give your spontaneous reaction (agree, neutral, or disagree).\n3. **Your tailored vision:** refine your perspective by placing each statement on the grid to precisely reflect your thoughts.\n4. **The \"why\":** a few words to explain your most significant choices."
+    },
     "consent": {
-      "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
-      "error": "Please accept the terms to continue."
+        "title": "Consent to Participate",
+        "subtitle": "Please review the following information carefully.",
+        "default_text": "**Confidentiality and Anonymity:**\nYour responses will be treated as strictly confidential, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nCollected data will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to refuse to participate or to stop the study at any time without having to justify your decision."
     },
-    "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-    "restart": "Start a new session",
-    "preview_title": "Preview",
-    "objective_label": "Study Objective",
-    "instructions_label": "Process",
-    "default_instructions": "1. **Getting to know you:** a few quick questions to better understand your background.\n2. **Your first impressions:** discover the statements and give your spontaneous reaction (agree, neutral, or disagree).\n3. **Your tailored vision:** refine your perspective by placing each statement on the grid to precisely reflect your thoughts.\n4. **The \"why\":** a few words to explain your most significant choices."
-  },
-  "consent": {
-    "title": "Consent to Participate",
-    "subtitle": "Please review the following information carefully.",
-    "default_text": "**Confidentiality and Anonymity:**\nYour responses will be treated as strictly confidential, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nCollected data will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to refuse to participate or to stop the study at any time without having to justify your decision."
-  },
-  "presort": {
-    "title": "About you",
-    "description": "Please answer a few questions to help us contextualize your point of view.",
-    "submit": "Continue to sorting",
-    "select_placeholder": "Select...",
-    "error_required": "This question is required."
-  },
-  "rough": {
-    "header": {
-      "title": "What is your position regarding this statement?",
-      "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Undecided.",
-      "hint": "Trust your **first impression**. This is a **spontaneous sort**—you will refine your choices in the next step."
+    "presort": {
+        "title": "About you",
+        "description": "Please answer a few questions to help us contextualize your point of view.",
+        "submit": "Continue to sorting",
+        "select_placeholder": "Select...",
+        "error_required": "This question is required."
     },
-    "complete": {
-      "title": "First step complete",
-      "subtitle": "Now, let's refine the nuance."
+    "rough": {
+        "header": {
+            "title": "What is your position regarding this statement?",
+            "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Undecided.",
+            "hint": "Trust your **first impression**. This is a **spontaneous sort**—you will refine your choices in the next step."
+        },
+        "complete": {
+            "title": "First step complete",
+            "subtitle": "Now, let's refine the nuance."
+        },
+        "instructions": {
+            "swipe": "Swipe or tap to categorize",
+            "desktop_tip": "Swipe, tap, or use keyboard ( ← ↓ → ) to sort"
+        }
     },
-    "instructions": {
-        "swipe": "Swipe or tap to categorize",
-        "desktop_tip": "Swipe, tap, or use keyboard ( ← ↓ → ) to sort"
+    "fine": {
+        "header": {
+            "title": "Place the statements on the grid to reflect your **perspective**.",
+            "mobile_title": "Sort statements based on your point of view"
+        },
+        "deck": {
+            "title": "Cards available",
+            "all_placed": "All statements from this stack are placed",
+            "reset": "Reset deck",
+            "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
+        },
+        "toolbar": {
+            "mobile": "Tap or drag cards to place them on the grid.",
+            "preview": "Card preview",
+            "place_instruction": "Tap a slot to place",
+            "read_full": "Tap to read full text",
+            "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
+            "zoom_in": "Zoom In",
+            "zoom_out": "Zoom Out",
+            "fit_screen": "Fit to Screen",
+            "label": "Grid controls"
+        },
+        "grid": {
+            "label": "Sorting Grid",
+            "column": "Column",
+            "slot": "Slot",
+            "in_column": "in column"
+        },
+        "legend": {
+            "disagree": "Most Disagree",
+            "neutral": "Neutral",
+            "agree": "Most Agree",
+            "label": "Spectrum legend"
+        },
+        "actions": {
+            "validate": "Confirm Sort",
+            "finish": "Finish sorting",
+            "ready": "Review overview",
+            "not_ready": "Place all cards to continue"
+        },
+        "workbench": {
+            "active_card": "Active Card",
+            "place_on_grid": "Tap Grid to Place",
+            "drag_or_tap": "Drag to grid or tap a slot",
+            "initial_instruction": "Start by placing your strongest opinions at the extremes.",
+            "help": "Help & rules",
+            "methodology": {
+                "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
+                "extremes_title": "Poles & Extremes",
+                "vertical": "Vertical position doesn't matter. Cards in the same column have the exact same score.",
+                "vertical_title": "Sorting Axis",
+                "constraint": "Forced Choice: You must place every card to finish. You will sometimes have to separate statements you feel similarly about.",
+                "constraint_title": "Challenge",
+                "footer_note": "All cards must be placed to finish.",
+                "close": "Got it!"
+            }
+        }
+    },
+    "post": {
+        "title": "To conclude",
+        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
+        "extreme": {
+            "why": "Why is this statement particularly significant to your perspective?",
+            "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
+            "min_chars": "A few words are enough to help us understand the context.",
+            "label_agree": "Most like my view",
+            "label_disagree": "Most unlike my view"
+        },
+        "missing": {
+            "label": "Is there something important about your view that wasn't captured?",
+            "description": "If you feel an important aspect was left out, please describe it here.",
+            "placeholder": "Optional..."
+        },
+        "general": {
+            "label": "General comments",
+            "description": "Any feedback on the study or additional thoughts?",
+            "placeholder": "Optional..."
+        },
+        "submit": "Share my perspective",
+        "validation_error": "Please briefly explain your key choices to continue.",
+        "success": {
+            "title": "Submission Received",
+            "message": "Your contribution to the study has been saved.",
+            "id_label": "Confirmation code"
+        }
     }
-  },
-  "fine": {
-    "header": {
-      "title": "Place the statements on the grid to reflect your **perspective**.",
-      "mobile_title": "Sort statements based on your point of view"
-    },
-    "deck": {
-        "title": "Cards available",
-        "all_placed": "All statements from this stack are placed",
-        "reset": "Reset deck",
-        "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
-    },
-  "toolbar": {
-      "mobile": "Tap or drag cards to place them on the grid.",
-      "preview": "Card preview",
-      "place_instruction": "Tap a slot to place",
-      "read_full": "Tap to read full text",
-      "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
-      "zoom_in": "Zoom In",
-      "zoom_out": "Zoom Out",
-      "fit_screen": "Fit to Screen",
-      "label": "Grid controls"
-  },
-  "grid": {
-      "label": "Sorting Grid",
-      "column": "Column",
-      "slot": "Slot",
-      "in_column": "in column"
-  },
-    "legend": {
-        "disagree": "Most Disagree",
-        "neutral": "Neutral",
-        "agree": "Most Agree",
-        "label": "Spectrum legend"
-    },
-    "actions": {
-        "validate": "Confirm Sort",
-        "finish": "Finish sorting",
-        "ready": "Review overview",
-        "not_ready": "Place all cards to continue"
-    },
-    "workbench": {
-      "active_card": "Active Card",
-      "place_on_grid": "Tap Grid to Place",
-      "drag_or_tap": "Drag to grid or tap a slot",
-      "initial_instruction": "Start by placing your strongest opinions at the extremes.",
-      "help": "Help & rules",
-      "methodology": {
-        "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
-        "extremes_title": "Poles & Extremes",
-        "vertical": "Vertical position doesn't matter. Cards in the same column have the exact same score.",
-        "vertical_title": "Sorting Axis",
-        "constraint": "Forced Choice: You must place every card to finish. You will sometimes have to separate statements you feel similarly about.",
-        "constraint_title": "Challenge",
-        "footer_note": "All cards must be placed to finish.",
-        "close": "Got it!"
-      }
-    }
-  },
-  "post": {
-    "title": "To conclude",
-    "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
-    "extreme": {
-        "why": "Why is this statement particularly significant to your perspective?",
-        "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
-        "min_chars": "A few words are enough to help us understand the context.",
-        "label_agree": "Most like my view",
-        "label_disagree": "Most unlike my view"
-    },
-    "missing": {
-        "label": "Is there something important about your view that wasn't captured?",
-        "description": "If you feel an important aspect was left out, please describe it here.",
-        "placeholder": "Optional..."
-    },
-    "general": {
-        "label": "General comments",
-        "description": "Any feedback on the study or additional thoughts?",
-        "placeholder": "Optional..."
-    },
-    "submit": "Share my perspective",
-    "validation_error": "Please briefly explain your key choices to continue.",
-    "success": {
-        "title": "Submission Received",
-        "message": "Your contribution to the study has been saved.",
-        "id_label": "Confirmation code"
-    }
-  }
 }

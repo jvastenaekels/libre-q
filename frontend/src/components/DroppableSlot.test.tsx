@@ -15,7 +15,6 @@ vi.mock('@dnd-kit/core', () => ({
 }));
 
 describe('DroppableSlot', () => {
-    
     it('renders empty slot styling', () => {
         vi.mocked(useDroppable).mockReturnValue({
             setNodeRef: vi.fn(),
@@ -27,7 +26,7 @@ describe('DroppableSlot', () => {
         });
 
         render(<DroppableSlot id="test-slot" />);
-        
+
         const slot = screen.getByTestId('test-slot');
         // Empty slot default: border-dashed
         expect(slot.className).toContain('border-dashed');
@@ -44,8 +43,12 @@ describe('DroppableSlot', () => {
             over: null,
         });
 
-        render(<DroppableSlot id="test-slot"><span>Occupied</span></DroppableSlot>);
-        
+        render(
+            <DroppableSlot id="test-slot">
+                <span>Occupied</span>
+            </DroppableSlot>
+        );
+
         const slot = screen.getByTestId('test-slot');
         // Occupied: border-transparent
         expect(slot.className).toContain('border-transparent');
@@ -63,7 +66,7 @@ describe('DroppableSlot', () => {
         });
 
         render(<DroppableSlot id="test-slot" />);
-        
+
         const slot = screen.getByTestId('test-slot');
         // Drag over: bg-indigo-50 border-indigo-300
         expect(slot.className).toContain('bg-indigo-50');

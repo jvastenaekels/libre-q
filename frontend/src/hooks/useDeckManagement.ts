@@ -17,29 +17,33 @@ interface UseDeckManagementProps<T extends { id: number; text: string }> {
 export const useDeckManagement = <T extends { id: number; text: string }>({
     agreeCards,
     disagreeCards,
-    neutralCards
+    neutralCards,
 }: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
     const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
 
     const activeCards = useMemo(() => {
-        switch(activePile) {
-            case 'agree': return agreeCards;
-            case 'disagree': return disagreeCards;
-            case 'neutral': return neutralCards;
-            default: return [];
+        switch (activePile) {
+            case 'agree':
+                return agreeCards;
+            case 'disagree':
+                return disagreeCards;
+            case 'neutral':
+                return neutralCards;
+            default:
+                return [];
         }
     }, [activePile, agreeCards, disagreeCards, neutralCards]);
 
     // Calculate optimal deck height based on longest statement
     const deckHeight = useMemo(() => {
         const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-        if (allCards.length === 0) return 220; 
-        
+        if (allCards.length === 0) return 220;
+
         // Safety check for empty text
-        const maxLength = Math.max(...allCards.map(card => card.text?.length || 0));
+        const maxLength = Math.max(...allCards.map((card) => card.text?.length || 0));
         const estimatedLines = Math.ceil(maxLength / 50);
-        const calculatedHeight = 180 + (estimatedLines * 15);
+        const calculatedHeight = 180 + estimatedLines * 15;
         return Math.min(Math.max(calculatedHeight, 250), 340);
     }, [agreeCards, disagreeCards, neutralCards]);
 
@@ -49,6 +53,6 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
         activeCards,
         deckHeight,
         hasPerformedZonalFocus,
-        setHasPerformedZonalFocus
+        setHasPerformedZonalFocus,
     };
 };

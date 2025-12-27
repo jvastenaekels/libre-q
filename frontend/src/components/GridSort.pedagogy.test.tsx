@@ -11,37 +11,39 @@ import { renderWithProviders, setupStoreMocks, screen } from '../test/test-utils
 
 // Mock dependencies
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  horizontalListSortingStrategy: {},
-  rectSortingStrategy: {},
+    SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    horizontalListSortingStrategy: {},
+    rectSortingStrategy: {},
 }));
 
 vi.mock('./SortableCard', () => ({
-  default: ({ onClick, id }: { onClick?: () => void, id: number }) => (
-    <div data-testid={`card-${id}`} onClick={onClick}>Card</div>
-  )
+    default: ({ onClick, id }: { onClick?: () => void; id: number }) => (
+        <div data-testid={`card-${id}`} onClick={onClick}>
+            Card
+        </div>
+    ),
 }));
 
 vi.mock('./DroppableSlot', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+    default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} }
+    initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 // Mock useUIStore
 vi.mock('../store/useUIStore', () => ({
-    useUIStore: vi.fn()
+    useUIStore: vi.fn(),
 }));
 
 // Mock ResizeObserver
 const ResizeObserverMock = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
 }));
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
@@ -60,14 +62,14 @@ describe('GridSort Pedagogy', () => {
 
     it('renders the Objective Bar with Target icon and title', () => {
         setupStoreMocks({
-            useUIStore: { 
-                hoveredCard: null, 
-                activeCard: null, 
+            useUIStore: {
+                hoveredCard: null,
+                activeCard: null,
                 selectedCard: null,
                 setActiveCard: vi.fn(),
                 setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn()
-            }
+                setSelectedCard: vi.fn(),
+            },
         });
 
         renderWithProviders(
@@ -83,29 +85,26 @@ describe('GridSort Pedagogy', () => {
 
     it('shows active card text and Eye icon in Reading Zone when a card is selected', () => {
         const selectedCard = { id: 1, text: 'Selected Statement Text' };
-        
+
         setupStoreMocks({
-            useUIStore: { 
-                hoveredCard: null, 
-                activeCard: null, 
+            useUIStore: {
+                hoveredCard: null,
+                activeCard: null,
                 selectedCard: selectedCard,
                 setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn()
-            }
+                setHoveredCard: vi.fn(),
+            },
         });
 
         renderWithProviders(
             <DndContext>
-                <GridSort 
-                    {...defaultProps} 
-                    selectedCardId={1}
-                />
+                <GridSort {...defaultProps} selectedCardId={1} />
             </DndContext>
         );
 
         expect(screen.getByText('Selected Statement Text')).toBeInTheDocument();
         expect(screen.getByText('fine.workbench.active_card')).toBeInTheDocument();
-        
+
         // The Eye icon is in ReadingZone. In its desktop variant, it has id 'fine.workbench.active_card' or 'fine.toolbar.preview'
         // We look for theEye icon by checking the parent of the label
         const eyeLabel = screen.getByText('fine.workbench.active_card');

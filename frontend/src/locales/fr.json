@@ -1,195 +1,195 @@
 {
-  "common": {
-    "agree": "Plutôt d'accord",
-    "disagree": "Plutôt pas d'accord",
-    "neutral": "Pas d'avis tranché",
-    "select_card": "Sélectionnez une carte",
-    "undo": "Annuler",
-    "next": "Étape suivante",
-    "submit": "Partager mon point de vue",
-    "continue": "Continuer",
-    "loading": "Chargement...",
-    "lang_code": "fr",
-    "yes": "Oui",
-    "no": "Non",
-    "ok": "OK",
-    "cancel": "Annuler",
-    "check": "Vérifier",
-    "attention": "Attention",
-    "error": "Erreur",
-    "submitting": "Envoi en cours...",
-    "cards": "cartes",
-    "close": "Fermer",
-    "statement": "Affirmation",
-    "errors": {
-      "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
-      "not_found": "Étude non trouvée.",
-      "validation": "Erreur système : Échec de la validation des données.",
-      "unknown": "Une erreur inattendue est survenue.",
-      "retry": "Réessayer",
-      "min": "La valeur doit être au moins {{min}}",
-      "max": "La valeur doit être au plus {{max}}",
-      "404": {
-          "title": "Page introuvable",
-          "message": "La page ou l'étude que vous cherchez n'existe pas."
-      },
-      "429": {
-          "title": "Trop de requêtes",
-          "message": "Vous allez trop vite. Veuillez patienter un instant."
-      },
-      "500": {
-          "title": "Erreur serveur",
-          "message": "Nos serveurs ont rencontré un problème. Veuillez réessayer plus tard."
-      },
-      "network_title": "Connexion perdue",
-      "home": "Retour à l'accueil",
-      "reset": "Réinitialiser la session",
-      "default_title": "Oups ! Quelque chose a mal tourné.",
-      "study_not_found": {
-        "title": "Étude introuvable",
-        "message": "Nous n'avons pas trouvé d'étude avec ce nom. Veuillez vérifier l'URL ou contacter le chercheur.",
-        "action": "Retour à l'accueil"
-      }
-    }
-  },
-  "layout": {
-    "title": "Open-Q",
-    "steps": {
-      "welcome": "Bienvenue",
-      "presort": "Profil",
-      "rough": "Classement spontané",
-      "fine": "Classement sur la grille",
-      "review": "Réflexions"
+    "common": {
+        "agree": "Plutôt d'accord",
+        "disagree": "Plutôt pas d'accord",
+        "neutral": "Pas d'avis tranché",
+        "select_card": "Sélectionnez une carte",
+        "undo": "Annuler",
+        "next": "Étape suivante",
+        "submit": "Partager mon point de vue",
+        "continue": "Continuer",
+        "loading": "Chargement...",
+        "lang_code": "fr",
+        "yes": "Oui",
+        "no": "Non",
+        "ok": "OK",
+        "cancel": "Annuler",
+        "check": "Vérifier",
+        "attention": "Attention",
+        "error": "Erreur",
+        "submitting": "Envoi en cours...",
+        "cards": "cartes",
+        "close": "Fermer",
+        "statement": "Affirmation",
+        "errors": {
+            "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
+            "not_found": "Étude non trouvée.",
+            "validation": "Erreur système : Échec de la validation des données.",
+            "unknown": "Une erreur inattendue est survenue.",
+            "retry": "Réessayer",
+            "min": "La valeur doit être au moins {{min}}",
+            "max": "La valeur doit être au plus {{max}}",
+            "404": {
+                "title": "Page introuvable",
+                "message": "La page ou l'étude que vous cherchez n'existe pas."
+            },
+            "429": {
+                "title": "Trop de requêtes",
+                "message": "Vous allez trop vite. Veuillez patienter un instant."
+            },
+            "500": {
+                "title": "Erreur serveur",
+                "message": "Nos serveurs ont rencontré un problème. Veuillez réessayer plus tard."
+            },
+            "network_title": "Connexion perdue",
+            "home": "Retour à l'accueil",
+            "reset": "Réinitialiser la session",
+            "default_title": "Oups ! Quelque chose a mal tourné.",
+            "study_not_found": {
+                "title": "Étude introuvable",
+                "message": "Nous n'avons pas trouvé d'étude avec ce nom. Veuillez vérifier l'URL ou contacter le chercheur.",
+                "action": "Retour à l'accueil"
+            }
+        }
     },
-    "mobile_step": "Étape",
-    "language": "Français"
-  },
-  "welcome": {
-    "title": "Bienvenue",
-    "description": "Veuillez lire attentivement les instructions.",
-    "start": "Commencer l'étude",
+    "layout": {
+        "title": "Open-Q",
+        "steps": {
+            "welcome": "Bienvenue",
+            "presort": "Profil",
+            "rough": "Classement spontané",
+            "fine": "Classement sur la grille",
+            "review": "Réflexions"
+        },
+        "mobile_step": "Étape",
+        "language": "Français"
+    },
+    "welcome": {
+        "title": "Bienvenue",
+        "description": "Veuillez lire attentivement les instructions.",
+        "start": "Commencer l'étude",
+        "consent": {
+            "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
+            "error": "Vous devez accepter les conditions pour continuer."
+        },
+        "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
+        "restart": "Commencer une nouvelle session",
+        "preview_title": "Aperçu",
+        "objective_label": "Objectif de l'étude",
+        "instructions_label": "Déroulement",
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre avis spontané (d'accord, neutre ou pas d'accord).\n3. **Votre vision sur mesure :** affinez votre pensée en plaçant chaque affirmation sur la grille pour refléter précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+    },
     "consent": {
-      "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
-      "error": "Vous devez accepter les conditions pour continuer."
+        "title": "Consentement à la participation",
+        "subtitle": "Veuillez lire attentivement les informations suivantes.",
+        "default_text": "**Confidentialité et anonymat :**\nVos réponses seront traitées de manière strictement confidentielle, anonymisée et en conformité avec le RGPD. Les résultats seront agrégés pour dégager des tendances générales (facteurs de points de vue) et ne permettront jamais de vous identifier individuellement.\n\n**Utilisation des données :**\nLes données collectées serviront exclusivement à des fins de recherche scientifique.\n\n**Liberté de participation :**\nVotre participation est entièrement volontaire. Vous êtes libre de refuser de participer ou d'interrompre l'étude à tout moment sans avoir à vous justifier."
     },
-    "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
-    "restart": "Commencer une nouvelle session",
-    "preview_title": "Aperçu",
-    "objective_label": "Objectif de l'étude",
-    "instructions_label": "Déroulement",
-    "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre avis spontané (d'accord, neutre ou pas d'accord).\n3. **Votre vision sur mesure :** affinez votre pensée en plaçant chaque affirmation sur la grille pour refléter précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
-  },
-  "consent": {
-    "title": "Consentement à la participation",
-    "subtitle": "Veuillez lire attentivement les informations suivantes.",
-    "default_text": "**Confidentialité et anonymat :**\nVos réponses seront traitées de manière strictement confidentielle, anonymisée et en conformité avec le RGPD. Les résultats seront agrégés pour dégager des tendances générales (facteurs de points de vue) et ne permettront jamais de vous identifier individuellement.\n\n**Utilisation des données :**\nLes données collectées serviront exclusivement à des fins de recherche scientifique.\n\n**Liberté de participation :**\nVotre participation est entièrement volontaire. Vous êtes libre de refuser de participer ou d'interrompre l'étude à tout moment sans avoir à vous justifier."
-  },
-  "presort": {
-    "title": "À propos de vous",
-    "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
-    "submit": "Continuer vers le classement",
-    "select_placeholder": "Sélectionner...",
-    "error_required": "Merci de répondre à cette question."
-  },
-  "rough": {
-    "header": {
-      "title": "Quelle est votre position face à cette affirmation ?",
-      "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
-      "hint": "Fiez-vous à votre **première impression**. C'est un **classement spontané** — vous affinerez vos choix à l'étape suivante."
+    "presort": {
+        "title": "À propos de vous",
+        "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
+        "submit": "Continuer vers le classement",
+        "select_placeholder": "Sélectionner...",
+        "error_required": "Merci de répondre à cette question."
     },
-    "complete": {
-      "title": "Première étape validée",
-      "subtitle": "Nous allons maintenant affiner les nuances."
+    "rough": {
+        "header": {
+            "title": "Quelle est votre position face à cette affirmation ?",
+            "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
+            "hint": "Fiez-vous à votre **première impression**. C'est un **classement spontané** — vous affinerez vos choix à l'étape suivante."
+        },
+        "complete": {
+            "title": "Première étape validée",
+            "subtitle": "Nous allons maintenant affiner les nuances."
+        },
+        "instructions": {
+            "swipe": "Glissez ou appuyez pour catégoriser",
+            "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour classer"
+        }
     },
-    "instructions": {
-      "swipe": "Glissez ou appuyez pour catégoriser",
-      "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour classer"
+    "fine": {
+        "header": {
+            "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
+            "mobile_title": "Classez les affirmations selon votre point de vue"
+        },
+        "deck": {
+            "title": "Cartes disponibles",
+            "all_placed": "Toutes les cartes de cette pile sont placées",
+            "reset": "Réinitialiser",
+            "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
+        },
+        "toolbar": {
+            "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
+            "preview": "Aperçu de la carte",
+            "place_instruction": "Appuyez sur une case pour placer",
+            "read_full": "Appuyez sur une carte pour lire le texte",
+            "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
+            "zoom_in": "Zoom avant",
+            "zoom_out": "Zoom arrière",
+            "fit_screen": "Ajuster à l'écran",
+            "label": "Contrôles de la grille"
+        },
+        "grid": {
+            "label": "Grille de classement",
+            "column": "Colonne",
+            "slot": "Emplacement",
+            "in_column": "dans la colonne"
+        },
+        "legend": {
+            "disagree": "Le plus en désaccord",
+            "neutral": "Neutre",
+            "agree": "Le plus en accord",
+            "label": "Légende du spectre"
+        },
+        "actions": {
+            "validate": "Confirmer le classement",
+            "finish": "Terminer le classement",
+            "ready": "Voir la vue d'ensemble",
+            "not_ready": "Placez toutes les cartes pour continuer"
+        },
+        "workbench": {
+            "active_card": "Carte active",
+            "place_on_grid": "Touchez un emplacement sur la grille pour placer la carte.",
+            "drag_or_tap": "Glissez ou touchez une case",
+            "initial_instruction": "Sélectionnez une carte",
+            "help": "Aide et règles",
+            "methodology": {
+                "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
+                "extremes_title": "Pôles et Extrémités",
+                "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
+                "vertical_title": "Axe de Classement",
+                "constraint": "Choix forcé : Vous devez placer toutes les cartes. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
+                "constraint_title": "Challenge",
+                "footer_note": "Chaque carte doit être placée pour pouvoir valider le classement final.",
+                "close": "Compris !"
+            }
+        }
+    },
+    "post": {
+        "title": "Pour conclure",
+        "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
+        "extreme": {
+            "why": "En quoi cette affirmation est-elle particulièrement significative pour votre point de vue ?",
+            "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
+            "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
+            "label_agree": "Me correspond le plus",
+            "label_disagree": "Ne me correspond pas du tout"
+        },
+        "missing": {
+            "label": "Y a-t-il quelque chose d'important dans votre point de vue qui n'a pas été capturé ?",
+            "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
+            "placeholder": "Optionnel..."
+        },
+        "general": {
+            "label": "Commentaires généraux",
+            "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
+            "placeholder": "Optionnel..."
+        },
+        "submit": "Partager mon point de vue",
+        "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
+        "success": {
+            "title": "Contribution bien reçue",
+            "message": "Votre contribution à l'étude a bien été enregistrée.",
+            "id_label": "Code de confirmation"
+        }
     }
-  },
-  "fine": {
-    "header": {
-      "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
-      "mobile_title": "Classez les affirmations selon votre point de vue"
-    },
-    "deck": {
-      "title": "Cartes disponibles",
-      "all_placed": "Toutes les cartes de cette pile sont placées",
-      "reset": "Réinitialiser",
-      "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
-    },
-    "toolbar": {
-      "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
-      "preview": "Aperçu de la carte",
-      "place_instruction": "Appuyez sur une case pour placer",
-      "read_full": "Appuyez sur une carte pour lire le texte",
-      "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
-      "zoom_in": "Zoom avant",
-      "zoom_out": "Zoom arrière",
-      "fit_screen": "Ajuster à l'écran",
-      "label": "Contrôles de la grille"
-    },
-    "grid": {
-      "label": "Grille de classement",
-      "column": "Colonne",
-      "slot": "Emplacement",
-      "in_column": "dans la colonne"
-    },
-    "legend": {
-      "disagree": "Le plus en désaccord",
-      "neutral": "Neutre",
-      "agree": "Le plus en accord",
-      "label": "Légende du spectre"
-    },
-    "actions": {
-      "validate": "Confirmer le classement",
-      "finish": "Terminer le classement",
-      "ready": "Voir la vue d'ensemble",
-      "not_ready": "Placez toutes les cartes pour continuer"
-    },
-    "workbench": {
-      "active_card": "Carte active",
-      "place_on_grid": "Touchez un emplacement sur la grille pour placer la carte.",
-      "drag_or_tap": "Glissez ou touchez une case",
-      "initial_instruction": "Sélectionnez une carte",
-      "help": "Aide et règles",
-      "methodology": {
-        "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
-        "extremes_title": "Pôles et Extrémités",
-        "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
-        "vertical_title": "Axe de Classement",
-        "constraint": "Choix forcé : Vous devez placer toutes les cartes. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
-        "constraint_title": "Challenge",
-        "footer_note": "Chaque carte doit être placée pour pouvoir valider le classement final.",
-        "close": "Compris !"
-      }
-    }
-  },
-  "post": {
-    "title": "Pour conclure",
-    "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
-    "extreme": {
-      "why": "En quoi cette affirmation est-elle particulièrement significative pour votre point de vue ?",
-      "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
-      "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
-      "label_agree": "Me correspond le plus",
-      "label_disagree": "Ne me correspond pas du tout"
-    },
-    "missing": {
-      "label": "Y a-t-il quelque chose d'important dans votre point de vue qui n'a pas été capturé ?",
-      "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
-      "placeholder": "Optionnel..."
-    },
-    "general": {
-      "label": "Commentaires généraux",
-      "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
-      "placeholder": "Optionnel..."
-    },
-    "submit": "Partager mon point de vue",
-    "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
-    "success": {
-      "title": "Contribution bien reçue",
-      "message": "Votre contribution à l'étude a bien été enregistrée.",
-      "id_label": "Code de confirmation"
-    }
-  }
 }

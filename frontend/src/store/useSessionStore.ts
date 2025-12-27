@@ -1,3 +1,10 @@
+/**
+ * Session Store
+ *
+ * Manages the participant's session state including authentication tokens, current step, and consent status.
+ * Persists data to localStorage to allow page reloads.
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { resetBaseLocales } from '../utils/i18nOverrides';
@@ -35,10 +42,11 @@ export const useSessionStore = create<SessionState>()(
 
             setToken: (token) => set({ token }),
             setConsent: (hasConsented) => set({ hasConsented }),
-            setStep: (step) => set((state) => ({
-                currentStep: step,
-                maxReachedStep: Math.max(state.maxReachedStep, step)
-            })),
+            setStep: (step) =>
+                set((state) => ({
+                    currentStep: step,
+                    maxReachedStep: Math.max(state.maxReachedStep, step),
+                })),
             setLanguage: (language) => set({ language }),
             completeSession: (confirmationCode) => set({ isCompleted: true, confirmationCode }),
             setSaving: (isSaving) => set({ isSaving }),
@@ -52,9 +60,9 @@ export const useSessionStore = create<SessionState>()(
                     language: null,
                     isCompleted: false,
                     confirmationCode: null,
-                    isSaving: false
+                    isSaving: false,
                 });
-            }
+            },
         }),
         {
             name: 'open-q-session',

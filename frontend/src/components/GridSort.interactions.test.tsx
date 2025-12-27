@@ -11,30 +11,42 @@ import { DndContext } from '@dnd-kit/core';
 
 // Mock dependencies
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  horizontalListSortingStrategy: {},
-  rectSortingStrategy: {},
+    SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    horizontalListSortingStrategy: {},
+    rectSortingStrategy: {},
 }));
 
 vi.mock('./SortableCard', () => ({
-  default: ({ text, onClick, id }: { text: string, onClick?: () => void, id: number }) => (
-    <div data-testid={`card-${id}`} onClick={onClick}>{text}</div>
-  )
+    default: ({ text, onClick, id }: { text: string; onClick?: () => void; id: number }) => (
+        <div data-testid={`card-${id}`} onClick={onClick}>
+            {text}
+        </div>
+    ),
 }));
 
 vi.mock('./DroppableSlot', () => ({
-  default: ({ children, id, className, onClick }: { children: React.ReactNode, id: string, className: string, onClick?: () => void }) => (
-    <div data-testid="droppable-slot" data-id={id} className={className} onClick={onClick}>
-      {children}
-    </div>
-  )
+    default: ({
+        children,
+        id,
+        className,
+        onClick,
+    }: {
+        children: React.ReactNode;
+        id: string;
+        className: string;
+        onClick?: () => void;
+    }) => (
+        <div data-testid="droppable-slot" data-id={id} className={className} onClick={onClick}>
+            {children}
+        </div>
+    ),
 }));
 
 // Mock ResizeObserver
 const ResizeObserverMock = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
 }));
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
@@ -61,8 +73,8 @@ describe('GridSort Interactions', () => {
 
         // check default state (Disagree)
         expect(screen.getByText('Disagree 1')).toBeInTheDocument();
-        expect(screen.queryByText('Agree 1')).toBeNull(); 
-        
+        expect(screen.queryByText('Agree 1')).toBeNull();
+
         // Find pile tabs
         // Find pile tabs by exact aria-label construction from the mock
         // Mock t returns key. Format is `${key}: ${count} ${key}`
@@ -108,11 +120,11 @@ describe('GridSort Interactions', () => {
         // Get the first slot (col 0, row 0)
         const slots = screen.getAllByTestId('droppable-slot');
         const firstSlot = slots[0];
-        
+
         fireEvent.click(firstSlot);
 
         expect(handleSlotClick).toHaveBeenCalledTimes(1);
-        // We know from props that there are 3 columns. 
+        // We know from props that there are 3 columns.
         // The slot rendering order depends on the loop in GridSort.
         // It iterates columns, then rows. So first slot is col 0, row 0.
         expect(handleSlotClick).toHaveBeenCalledWith(0, 0);

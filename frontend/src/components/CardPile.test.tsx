@@ -21,10 +21,9 @@ vi.mock('./SortableCard', () => ({
 }));
 
 describe('CardPile', () => {
-    
     it('renders empty state correctly', () => {
         render(<CardPile type="neutral" count={0} />);
-        
+
         // Should show "all placed" placeholder
         expect(screen.getByLabelText('fine.deck.all_placed')).toBeTruthy();
         // Should have 0 badge
@@ -33,16 +32,18 @@ describe('CardPile', () => {
 
     it('renders populated stack with top card', () => {
         render(<CardPile type="agree" count={5} topCard={{ id: 1, text: 'Top Card' }} />);
-        
+
         expect(screen.getByTestId('sortable-card')).toHaveTextContent('Top Card');
         expect(screen.getByLabelText('5 common.cards')).toBeTruthy();
         expect(screen.getByText('fine.legend.agree')).toBeTruthy();
     });
 
     it('renders different visual styles for pile types', () => {
-        const { rerender } = render(<CardPile type="disagree" count={1} topCard={{ id: 2, text: 'Bad' }} />);
+        const { rerender } = render(
+            <CardPile type="disagree" count={1} topCard={{ id: 2, text: 'Bad' }} />
+        );
         expect(screen.getByText('fine.legend.disagree')).toBeTruthy();
-        
+
         rerender(<CardPile type="agree" count={1} topCard={{ id: 3, text: 'Good' }} />);
         expect(screen.getByText('fine.legend.agree')).toBeTruthy();
     });

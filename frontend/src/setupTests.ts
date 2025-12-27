@@ -5,7 +5,7 @@
  */
 
 import { vi } from 'vitest';
-import '@testing-library/jest-dom'; 
+import '@testing-library/jest-dom';
 import { server } from './tests/server';
 import { useConfigStore } from './store/useConfigStore';
 import { useResponseStore } from './store/useResponseStore';
@@ -17,10 +17,10 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
         i18n: {
-             changeLanguage: () => new Promise(() => {}),
-             language: 'en',
-             addResourceBundle: vi.fn(),
-        }
+            changeLanguage: () => new Promise(() => {}),
+            language: 'en',
+            addResourceBundle: vi.fn(),
+        },
     }),
     initReactI18next: {
         type: '3rdParty',
@@ -28,7 +28,7 @@ vi.mock('react-i18next', () => ({
     },
     Trans: ({ children }: React.PropsWithChildren) => {
         return children || null;
-    }
+    },
 }));
 
 // Mock local i18n module
@@ -40,7 +40,7 @@ vi.mock('./i18n', () => ({
         init: vi.fn().mockReturnValue(Promise.resolve()),
         use: vi.fn().mockReturnThis(),
     },
-    t: (key: string) => key
+    t: (key: string) => key,
 }));
 
 // Polyfill ResizeObserver

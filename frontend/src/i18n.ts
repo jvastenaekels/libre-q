@@ -13,35 +13,35 @@ import fr from './locales/fr.json';
 import fi from './locales/fi.json';
 
 i18n
-  // detect user language
-  .use(LanguageDetector)
-  // pass the i18n instance to react-i18next.
-  .use(initReactI18next)
-  // init i18next
-  .init({
-    resources: {
-      en: {
-        translation: en
-      },
-      fr: {
-        translation: fr
-      },
-      fi: {
-        translation: fi
-      }
-    },
-    fallbackLng: 'en',
-    supportedLngs: ['en', 'fr', 'fi'], // Allow list
-    debug: false, // Set to true for debugging if needed
+    // detect user language
+    .use(LanguageDetector)
+    // pass the i18n instance to react-i18next.
+    .use(initReactI18next)
+    // init i18next
+    .init({
+        resources: {
+            en: {
+                translation: en,
+            },
+            fr: {
+                translation: fr,
+            },
+            fi: {
+                translation: fi,
+            },
+        },
+        fallbackLng: 'en',
+        supportedLngs: ['en', 'fr', 'fi'], // Allow list
+        debug: false, // Set to true for debugging if needed
 
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
-    },
-    
-    detection: {
-      order: ['navigator', 'htmlTag', 'path', 'subdomain'],
-      caches: ['localStorage']
-    }
-  });
+        interpolation: {
+            escapeValue: false, // not needed for react as it escapes by default
+        },
+
+        detection: {
+            order: ['navigator', 'htmlTag', 'path', 'subdomain'],
+            caches: ['localStorage'],
+        },
+    });
 
 export default i18n;

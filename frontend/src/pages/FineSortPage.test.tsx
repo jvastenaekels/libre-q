@@ -16,17 +16,17 @@ const mockConfig: StudyConfig = {
     instructions: 'Test',
     statements: [
         { id: 1, text: 'S1' },
-        { id: 2, text: 'S2' }
+        { id: 2, text: 'S2' },
     ],
     grid_config: [{ score: 0, capacity: 2 }],
-    presort_config: {}
+    presort_config: {},
 };
 
 // Mock Stores (Core)
 vi.mock('../store/useConfigStore', () => ({
     useConfigStore: Object.assign(vi.fn(), {
-        getState: () => ({ setConfig: vi.fn(), config: mockConfig })
-    })
+        getState: () => ({ setConfig: vi.fn(), config: mockConfig }),
+    }),
 }));
 vi.mock('../store/useSessionStore', () => ({ useSessionStore: vi.fn() }));
 vi.mock('../store/useResponseStore', () => ({ useResponseStore: vi.fn() }));
@@ -45,22 +45,20 @@ vi.mock('../components/GridSort', () => ({
         <div data-testid="grid-sort">
             GridSort
             <span data-testid="show-codes">{String(showCodes)}</span>
-            {isAllPlaced && (
-                <button onClick={onValidate}>fine.actions.validate</button>
-            )}
+            {isAllPlaced && <button onClick={onValidate}>fine.actions.validate</button>}
         </div>
-    )
+    ),
 }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null })
+    useStudyConfig: () => ({ isLoading: false, error: null }),
 }));
 
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} }
+    initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 describe('FineSortPage', () => {
@@ -73,22 +71,25 @@ describe('FineSortPage', () => {
             useConfigStore: { config: mockConfig },
             useResponseStore: {
                 rough: { agree: [1, 2], disagree: [], neutral: [] },
-                qsort: []
+                qsort: [],
             },
-            useSessionStore: { 
-                hasConsented: true, currentStep: 4, isCompleted: false, 
-                language: 'en', setStep: vi.fn() 
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 4,
+                isCompleted: false,
+                language: 'en',
+                setStep: vi.fn(),
             },
-            useUIStore: { 
-                hoveredCard: null, 
-                setActiveCard: vi.fn(), 
+            useUIStore: {
+                hoveredCard: null,
+                setActiveCard: vi.fn(),
                 setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn()
-            }
+                setSelectedCard: vi.fn(),
+            },
         });
 
         renderWithProviders(<FineSortPage />);
-        
+
         expect(screen.queryByText('fine.actions.validate')).toBeNull();
     });
 
@@ -96,58 +97,63 @@ describe('FineSortPage', () => {
         const singleCardConfig: StudyConfig = {
             ...mockConfig,
             statements: [{ id: 1, text: 'S1' }],
-            grid_config: [{ capacity: 1, score: 0 }]
+            grid_config: [{ capacity: 1, score: 0 }],
         };
 
         setupStoreMocks({
             useConfigStore: { config: singleCardConfig },
             useResponseStore: {
                 rough: { agree: [1], disagree: [], neutral: [] },
-                qsort: [{ statementId: 1, col: 0, row: 0 }]
+                qsort: [{ statementId: 1, col: 0, row: 0 }],
             },
-            useSessionStore: { 
-                hasConsented: true, currentStep: 4, isCompleted: false, 
-                language: 'en', setStep: vi.fn() 
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 4,
+                isCompleted: false,
+                language: 'en',
+                setStep: vi.fn(),
             },
-            useUIStore: { 
-                hoveredCard: null, 
-                setActiveCard: vi.fn(), 
+            useUIStore: {
+                hoveredCard: null,
+                setActiveCard: vi.fn(),
                 setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn()
-            }
+                setSelectedCard: vi.fn(),
+            },
         });
 
         renderWithProviders(<FineSortPage />);
-         
+
         expect(screen.getByText('fine.actions.validate')).toBeInTheDocument();
-        });
-    
+    });
+
     it('passes show_statement_codes config to GridSort', () => {
         const configWithCodes: StudyConfig = {
             ...mockConfig,
-            show_statement_codes: true
+            show_statement_codes: true,
         };
 
         setupStoreMocks({
             useConfigStore: { config: configWithCodes },
             useResponseStore: {
                 rough: { agree: [], disagree: [], neutral: [] },
-                qsort: []
+                qsort: [],
             },
-            useSessionStore: { 
-                hasConsented: true, currentStep: 4, isCompleted: false, 
-                language: 'en', setStep: vi.fn() 
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 4,
+                isCompleted: false,
+                language: 'en',
+                setStep: vi.fn(),
             },
-            useUIStore: { 
-                    hoveredCard: null, 
-                    setActiveCard: vi.fn(), 
-                    setHoveredCard: vi.fn(),
-                    setSelectedCard: vi.fn()
-            }
+            useUIStore: {
+                hoveredCard: null,
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
+                setSelectedCard: vi.fn(),
+            },
         });
 
         renderWithProviders(<FineSortPage />);
         expect(screen.getByTestId('show-codes')).toHaveTextContent('true');
     });
 });
-

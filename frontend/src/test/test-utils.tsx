@@ -25,9 +25,7 @@ interface AllTheProvidersProps {
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children, initialEntries = ['/'] }) => {
     return (
         <MemoryRouter initialEntries={initialEntries}>
-            <LayoutProvider>
-                {children}
-            </LayoutProvider>
+            <LayoutProvider>{children}</LayoutProvider>
         </MemoryRouter>
     );
 };
@@ -38,7 +36,9 @@ const renderWithProviders = (
 ) => {
     const { initialEntries, ...renderOptions } = options || {};
     return render(ui, {
-        wrapper: ({ children }) => <AllTheProviders initialEntries={initialEntries}>{children}</AllTheProviders>,
+        wrapper: ({ children }) => (
+            <AllTheProviders initialEntries={initialEntries}>{children}</AllTheProviders>
+        ),
         ...renderOptions,
     });
 };
@@ -57,22 +57,22 @@ export const setupStoreMocks = (mocks: {
     useUIStore?: unknown;
 }) => {
     if (mocks.useConfigStore) {
-        (useConfigStore as unknown as MockableStore).mockImplementation((selector) => 
+        (useConfigStore as unknown as MockableStore).mockImplementation((selector) =>
             selector ? selector(mocks.useConfigStore) : mocks.useConfigStore
         );
     }
     if (mocks.useSessionStore) {
-        (useSessionStore as unknown as MockableStore).mockImplementation((selector) => 
+        (useSessionStore as unknown as MockableStore).mockImplementation((selector) =>
             selector ? selector(mocks.useSessionStore) : mocks.useSessionStore
         );
     }
     if (mocks.useResponseStore) {
-        (useResponseStore as unknown as MockableStore).mockImplementation((selector) => 
+        (useResponseStore as unknown as MockableStore).mockImplementation((selector) =>
             selector ? selector(mocks.useResponseStore) : mocks.useResponseStore
         );
     }
     if (mocks.useUIStore) {
-        (useUIStore as unknown as MockableStore).mockImplementation((selector) => 
+        (useUIStore as unknown as MockableStore).mockImplementation((selector) =>
             selector ? selector(mocks.useUIStore) : mocks.useUIStore
         );
     }

@@ -12,8 +12,12 @@ import { useSessionStore } from './store/useSessionStore';
 import { useConfigStore } from './store/useConfigStore';
 import type { StudyConfig } from './schemas/study';
 
-vi.mock('./pages/PreSortPage', () => ({ default: () => <div data-testid="presort-page">PreSortPage</div> }));
-vi.mock('./pages/RoughSortPage', () => ({ default: () => <div data-testid="rough-sort-page">RoughSortPage</div> }));
+vi.mock('./pages/PreSortPage', () => ({
+    default: () => <div data-testid="presort-page">PreSortPage</div>,
+}));
+vi.mock('./pages/RoughSortPage', () => ({
+    default: () => <div data-testid="rough-sort-page">RoughSortPage</div>,
+}));
 
 // Mock Pages
 const MockFineSort = () => <div data-testid="page-fine">Fine Page</div>;
@@ -26,7 +30,7 @@ const mockConfig: StudyConfig = {
     instructions: 'Test',
     statements: [],
     presort_config: {},
-    grid_config: []
+    grid_config: [],
 };
 
 describe('App Routing Protection', () => {
@@ -41,15 +45,15 @@ describe('App Routing Protection', () => {
         // Session is NOT consented (default after reset)
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug" element={<StudyLayout />}>
-                       <Route path="welcome" element={<MockWelcome />} />
-                       <Route path="sort">
-                         <Route path="fine" element={<MockFineSort />} />
-                       </Route>
-                       <Route path="*" element={<div data-testid="page-error">Error</div>} />
+                        <Route path="welcome" element={<MockWelcome />} />
+                        <Route path="sort">
+                            <Route path="fine" element={<MockFineSort />} />
+                        </Route>
+                        <Route path="*" element={<div data-testid="page-error">Error</div>} />
                     </Route>
-                 </Routes>
+                </Routes>
             </MemoryRouter>
         );
 
@@ -65,11 +69,11 @@ describe('App Routing Protection', () => {
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug" element={<StudyLayout />}>
-                       <Route path="sort/fine" element={<MockFineSort />} />
+                        <Route path="sort/fine" element={<MockFineSort />} />
                     </Route>
-                 </Routes>
+                </Routes>
             </MemoryRouter>
         );
 

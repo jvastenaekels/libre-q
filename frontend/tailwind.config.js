@@ -1,18 +1,24 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['"Google Sans Flex"', '"Google Sans Flex Local"', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-      },
+    content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: [
+                    '"Google Sans Flex"',
+                    '"Google Sans Flex Local"',
+                    'ui-sans-serif',
+                    'system-ui',
+                    '-apple-system',
+                    'BlinkMacSystemFont',
+                    'Segoe UI',
+                    'Roboto',
+                    'Helvetica Neue',
+                    'Arial',
+                    'sans-serif',
+                ],
+            },
+        },
     },
-  },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
-}
-
+    plugins: [require('@tailwindcss/typography')],
+};

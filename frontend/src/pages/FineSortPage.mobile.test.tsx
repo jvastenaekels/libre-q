@@ -19,7 +19,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         // Setup initial session state for the test
         useSessionStore.getState().setConsent(true);
         useSessionStore.getState().setStep(4); // Fine Sort step
-        
+
         // Pre-load config to ensure placeCardInGrid and other store actions work immediately
         useConfigStore.getState().setConfig({
             slug: 'demo',
@@ -40,7 +40,11 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         } as any);
 
         // Mock viewport size for mobile
-        Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 375,
+        });
         window.dispatchEvent(new Event('resize'));
     });
 
@@ -80,10 +84,13 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         fireEvent.click(slot);
 
         // 7. Verify Card moved to Grid (Careful with ambiguity vs Workbench)
-        await waitFor(() => {
-            const cardInSlot = within(slot).getByTestId('card-1');
-            expect(cardInSlot).toBeTruthy();
-        }, { timeout: 4000 });
+        await waitFor(
+            () => {
+                const cardInSlot = within(slot).getByTestId('card-1');
+                expect(cardInSlot).toBeTruthy();
+            },
+            { timeout: 4000 }
+        );
 
         // 8. Verify Deck shows completion message (Updated with precision)
         expect(screen.getByText(/fine.deck.all_placed/i)).toBeTruthy();
@@ -92,7 +99,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
     it('displays the precise "empty pile" message when a category is fully placed', async () => {
         useResponseStore.getState().categorizeCard(1, 'disagree');
         useResponseStore.getState().placeCardInGrid(1, 0, 0);
-        
+
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
                 <Routes>
@@ -141,10 +148,13 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         fireEvent.click(slot);
 
         // 5. Verify Swap: Card 2 should now be in the grid slot
-        await waitFor(() => {
-            const card2InSlot = within(slot).getByTestId('card-2');
-            expect(card2InSlot).toBeTruthy();
-        }, { timeout: 4000 });
+        await waitFor(
+            () => {
+                const card2InSlot = within(slot).getByTestId('card-2');
+                expect(card2InSlot).toBeTruthy();
+            },
+            { timeout: 4000 }
+        );
 
         // 6. Card 1 should be back in the deck
         expect(await screen.findByText(/Statement 1/i)).toBeTruthy();

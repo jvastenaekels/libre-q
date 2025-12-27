@@ -11,21 +11,29 @@ import { DndContext } from '@dnd-kit/core';
 
 // Mock dependencies
 vi.mock('@dnd-kit/sortable', () => ({
-  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  horizontalListSortingStrategy: {},
-  rectSortingStrategy: {},
+    SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    horizontalListSortingStrategy: {},
+    rectSortingStrategy: {},
 }));
 
 vi.mock('./SortableCard', () => ({
-  default: ({ text }: { text: string }) => <div>{text}</div>
+    default: ({ text }: { text: string }) => <div>{text}</div>,
 }));
 
 vi.mock('./DroppableSlot', () => ({
-  default: ({ children, id, className }: { children: React.ReactNode, id: string, className: string }) => (
-    <div data-testid="droppable-slot" data-id={id} className={className}>
-      {children}
-    </div>
-  )
+    default: ({
+        children,
+        id,
+        className,
+    }: {
+        children: React.ReactNode;
+        id: string;
+        className: string;
+    }) => (
+        <div data-testid="droppable-slot" data-id={id} className={className}>
+            {children}
+        </div>
+    ),
 }));
 
 describe('GridSort Layout', () => {
@@ -48,14 +56,14 @@ describe('GridSort Layout', () => {
                 <GridSort {...defaultProps} />
             </DndContext>
         );
-        
+
         const slots = screen.getAllByTestId('droppable-slot');
         // Total capacity: 2 + 4 + 2 = 8
         expect(slots).toHaveLength(8);
     });
 
     it('has sufficient spacing', () => {
-         render(
+        render(
             <DndContext>
                 <GridSort {...defaultProps} />
             </DndContext>
@@ -92,18 +100,18 @@ describe('GridSort Responsive Layout', () => {
 
         // Pile Buttons: Check for "Frown" icon usage logic (by class/presence)
         // Since we mock lucide-react mostly, we check if the mobile-structure is present
-        // In our actual code, we use 'lg:hidden' classes. 
-        // Testing library doesn't process CSS media queries, but we can check if the elements exist in the DOM 
+        // In our actual code, we use 'lg:hidden' classes.
+        // Testing library doesn't process CSS media queries, but we can check if the elements exist in the DOM
         // and have the correct class names.
-        
+
         const disagreeBtn = screen.getByText('common.disagree').closest('button');
         expect(disagreeBtn).toBeDefined();
-        
+
         // We expect the icon container to be present (lg:hidden)
         // And the text span to have 'hidden lg:block'
         const textSpan = screen.getByText('common.disagree');
         expect(textSpan.className).toContain('hidden lg:block');
-        
+
         // Verify Sidebar classes for padding
         const sidebar = screen.getByText('fine.deck.title').closest('div')?.parentElement;
         expect(sidebar?.className).toContain('lg:pb-0');
@@ -118,8 +126,8 @@ describe('GridSort Responsive Layout', () => {
         );
 
         const textSpan = screen.getByText('common.disagree');
-        expect(textSpan.className).toContain('hidden lg:block'); 
-        // Note: unit tests won't "hide" it visually without a real browser layout engine, 
+        expect(textSpan.className).toContain('hidden lg:block');
+        // Note: unit tests won't "hide" it visually without a real browser layout engine,
         // but checking the class presence confirms the logic is wired.
     });
 
@@ -131,7 +139,7 @@ describe('GridSort Responsive Layout', () => {
             </DndContext>
         );
 
-        // Find the card wrapper div. 
+        // Find the card wrapper div.
         // In GridSort.tsx: <div key={card.id} className="flex-none w-[120px] ...">
         const cardText = screen.getByText('Card 1');
         const cardContainer = cardText.closest('div');
@@ -141,11 +149,11 @@ describe('GridSort Responsive Layout', () => {
     // Note: Skipped - transient zone highlighting no longer uses this approach
     it.skip('applies transient zone highlighting (dimming) correctly', () => {
         vi.useFakeTimers();
-        
+
         render(
             <DndContext>
-                <GridSort 
-                    {...defaultProps} 
+                <GridSort
+                    {...defaultProps}
                     gridColumns={[
                         { score: -2, capacity: 2 },
                         { score: 0, capacity: 4 },
@@ -156,7 +164,7 @@ describe('GridSort Responsive Layout', () => {
         );
 
         // Initial State
-        const colPos = document.getElementById('column-2'); 
+        const colPos = document.getElementById('column-2');
         // Logic: Disagree -> Positive columns dimmed.
         expect(colPos?.className).toContain('opacity-50'); // Dimmed initially
 
@@ -171,7 +179,6 @@ describe('GridSort Responsive Layout', () => {
         vi.useRealTimers();
     });
 
-
     // Note: Tips test removed - legacy floating tips were removed in performance optimization PR
 
     // Note: Skipped - relies on specific container structure that changes frequently
@@ -183,10 +190,10 @@ describe('GridSort Responsive Layout', () => {
                 <GridSort {...defaultProps} onReset={onReset} />
             </DndContext>
         );
-        
+
         const resetBtn = screen.getByText('fine.deck.reset');
         expect(resetBtn).toBeInTheDocument();
-        
+
         // Check local parent container
         const container = resetBtn.closest('div');
         expect(container?.className).toContain('flex justify-center'); // Base structure
@@ -196,5 +203,3 @@ describe('GridSort Responsive Layout', () => {
         expect(container?.className).toContain('flex-none');
     });
 });
-
-

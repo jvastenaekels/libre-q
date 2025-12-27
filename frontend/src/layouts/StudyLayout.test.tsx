@@ -17,15 +17,15 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 vi.mock('../i18n', () => ({
     default: {
         changeLanguage: vi.fn(),
-        language: 'en'
+        language: 'en',
     },
     // Adding named export for useTranslation if needed, but it's mocked in layout
-    t: (key: string) => key
+    t: (key: string) => key,
 }));
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -43,21 +43,21 @@ describe('StudyLayout Language Sync', () => {
                 available_languages: ['en', 'fr'],
                 require_code: false,
                 require_consent: true,
-                consent_text: 'Consent'
+                consent_text: 'Consent',
             } as any,
             isLoading: false,
-            error: null
+            error: null,
         });
-        
+
         useSessionStore.setState({
-            token: null, 
-            hasConsented: true, 
-            currentStep: 1, 
-            maxReachedStep: 1, 
-            language: 'en', 
-            isCompleted: false, 
+            token: null,
+            hasConsented: true,
+            currentStep: 1,
+            maxReachedStep: 1,
+            language: 'en',
+            isCompleted: false,
             confirmationCode: null,
-            isSaving: false
+            isSaving: false,
         });
     });
 
@@ -82,24 +82,24 @@ describe('StudyLayout Language Sync', () => {
     });
 
     it('Updates Store when UI Language Button is clicked', () => {
-         render(
+        render(
             <MemoryRouter initialEntries={['/study/test/welcome']}>
                 <StudyLayout />
             </MemoryRouter>
         );
-        
+
         // Open Language Menu (Button with Globe)
         const globeBtn = screen.getByTitle('Change language'); // Based on title attribute I saw in code
         fireEvent.click(globeBtn);
 
         // Click French
-        const frBtn = screen.getByText('fr'); 
-        
+        const frBtn = screen.getByText('fr');
+
         fireEvent.click(frBtn);
 
         // Verify Store Updated
         expect(useSessionStore.getState().language).toBe('fr');
-        
+
         // Verify i18n updated
         expect(i18n.changeLanguage).toHaveBeenCalledWith('fr');
     });
@@ -119,26 +119,25 @@ describe('Layout Scroll Behavior', () => {
                 available_languages: ['en'],
                 require_code: false,
                 require_consent: true,
-                consent_text: 'Consent'
+                consent_text: 'Consent',
             } as any,
             isLoading: false,
-            error: null
+            error: null,
         });
-        
+
         useSessionStore.setState({
-            token: null, 
-            hasConsented: true, 
-            currentStep: 1, 
-            maxReachedStep: 1, 
-            language: 'en', 
-            isCompleted: false, 
+            token: null,
+            hasConsented: true,
+            currentStep: 1,
+            maxReachedStep: 1,
+            language: 'en',
+            isCompleted: false,
             confirmationCode: null,
-            isSaving: false
+            isSaving: false,
         });
     });
 
     it('Applies overflow-hidden on sorting pages', () => {
-
         const { container } = render(
             <MemoryRouter initialEntries={['/study/slug/rough-sort']}>
                 <Routes>
@@ -154,7 +153,7 @@ describe('Layout Scroll Behavior', () => {
     it('Applies overflow-hidden on fine-sort page', () => {
         const { container } = render(
             <MemoryRouter initialEntries={['/study/slug/sort']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug/sort" element={<StudyLayout />} />
                 </Routes>
             </MemoryRouter>
@@ -165,8 +164,8 @@ describe('Layout Scroll Behavior', () => {
 
     it('Applies overflow-y-auto on post-sort page (despite containing "sort")', () => {
         const { container } = render(
-             <MemoryRouter initialEntries={['/study/slug/post-sort']}>
-                 <Routes>
+            <MemoryRouter initialEntries={['/study/slug/post-sort']}>
+                <Routes>
                     <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
                 </Routes>
             </MemoryRouter>
@@ -178,8 +177,8 @@ describe('Layout Scroll Behavior', () => {
 
     it('Applies overflow-y-auto on other pages (e.g. welcome)', () => {
         const { container } = render(
-             <MemoryRouter initialEntries={['/study/slug/welcome']}>
-                 <Routes>
+            <MemoryRouter initialEntries={['/study/slug/welcome']}>
+                <Routes>
                     <Route path="/study/:slug/welcome" element={<StudyLayout />} />
                 </Routes>
             </MemoryRouter>

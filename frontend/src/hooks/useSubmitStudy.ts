@@ -20,14 +20,17 @@ export const useSubmitStudy = () => {
     const session = useSessionStore();
     const responses = useResponseStore();
 
-    const submit = async (status: 'started' | 'completed' = 'completed', options?: { silent?: boolean }) => {
+    const submit = async (
+        status: 'started' | 'completed' = 'completed',
+        options?: { silent?: boolean }
+    ) => {
         if (!options?.silent) {
             setIsLoading(true);
         }
         setError(null);
 
         try {
-            if (!config) throw new Error("Study config is missing");
+            if (!config) throw new Error('Study config is missing');
             // ... (rest of validation)
             if (!config) throw new Error('No configuration loaded');
             if (!session.token) throw new Error('No session token');
@@ -35,41 +38,45 @@ export const useSubmitStudy = () => {
             // Transform Q-Sort data to match backend schema
             // Frontend: { statementId, col, row }
             // Backend: { statement_id, grid_score, card_comment }
-            const qsortPayload = responses.qsort.map((item: { statementId: number; col: number; row: number }) => {
-                const colKey = item.col; // col index
-                // Grid config is array of { score, capacity } sorted by col index?
-                // Or map? The type says { score, capacity }[] in store.
-                // Assuming index matches col.
-                const score = config.grid_config && config.grid_config[colKey] ? config.grid_config[colKey].score : 0; 
-                
-                return {
-                    statement_id: item.statementId,
-                    grid_score: score,
-                    card_comment: responses.postsort.card_comments[item.statementId] || null
-                };
-            });
+            const qsortPayload = responses.qsort.map(
+                (item: { statementId: number; col: number; row: number }) => {
+                    const colKey = item.col; // col index
+                    // Grid config is array of { score, capacity } sorted by col index?
+                    // Or map? The type says { score, capacity }[] in store.
+                    // Assuming index matches col.
+                    const score =
+                        config.grid_config && config.grid_config[colKey]
+                            ? config.grid_config[colKey].score
+                            : 0;
+
+                    return {
+                        statement_id: item.statementId,
+                        grid_score: score,
+                        card_comment: responses.postsort.card_comments[item.statementId] || null,
+                    };
+                }
+            );
 
             const payload = {
                 session_token: session.token,
                 study_slug: config.slug,
                 language_used: session.language,
-                status: status, 
+                status: status,
                 presort_answers: responses.presort,
                 qsort: qsortPayload,
                 postsort_answers: {
                     ...responses.postsort,
-                }
+                },
             };
-            
+
             const data = await post<{ confirmation_code: string }>('/api/submit', payload);
-            
+
             if (status === 'completed') {
                 setIsSuccess(true);
                 setConfirmationCode(data.confirmation_code);
                 // Sync session completion (if session store has this, or remove if not needed)
                 // useSessionStore.getState().completeSession(data.confirmation_code);
             }
-
         } catch (err: unknown) {
             console.error(err);
             setError(err instanceof Error ? err.message : 'An unexpected error occurred');

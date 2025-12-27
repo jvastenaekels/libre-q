@@ -10,104 +10,104 @@ import type { StudyConfig } from '../schemas/study';
 
 // Mock the locales to keep tests stable and fast
 vi.mock('../locales/en.json', () => ({
-  default: {
-    common: {
-      agree: 'Agree',
-      disagree: 'Disagree'
-    }
-  }
+    default: {
+        common: {
+            agree: 'Agree',
+            disagree: 'Disagree',
+        },
+    },
 }));
 
 vi.mock('../locales/fr.json', () => ({
-  default: {
-    common: {
-      agree: "D'accord",
-      disagree: 'Pas d\'accord'
-    }
-  }
+    default: {
+        common: {
+            agree: "D'accord",
+            disagree: "Pas d'accord",
+        },
+    },
 }));
 
 vi.mock('../locales/fi.json', () => ({
-  default: {
-    common: {
-      agree: 'Samaa mieltä',
-      disagree: 'Eri mieltä'
-    }
-  }
+    default: {
+        common: {
+            agree: 'Samaa mieltä',
+            disagree: 'Eri mieltä',
+        },
+    },
 }));
 
 // Mock i18next functions we are using
 vi.spyOn(i18n, 'addResourceBundle');
 
 describe('i18nOverrides utility', () => {
-  it('should apply study overrides from config successfully', () => {
-    const config = {
-      ui_labels: { 'common.next': 'Localized Next' }
-    } as unknown as StudyConfig;
+    it('should apply study overrides from config successfully', () => {
+        const config = {
+            ui_labels: { 'common.next': 'Localized Next' },
+        } as unknown as StudyConfig;
 
-    applyStudyOverrides('en', config.ui_labels);
+        applyStudyOverrides('en', config.ui_labels);
 
-    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-      'en',
-      'translation',
-      config.ui_labels,
-      true,
-      true
-    );
-  });
+        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+            'en',
+            'translation',
+            config.ui_labels,
+            true,
+            true
+        );
+    });
 
-  it('should apply study overrides successfully', () => {
-    const labels = {
-      'common.agree': 'Approuve',
-      'common.disagree': 'Désapprouve'
-    };
+    it('should apply study overrides successfully', () => {
+        const labels = {
+            'common.agree': 'Approuve',
+            'common.disagree': 'Désapprouve',
+        };
 
-    applyStudyOverrides('fr', labels);
+        applyStudyOverrides('fr', labels);
 
-    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-      'fr',
-      'translation',
-      labels,
-      true,
-      true
-    );
-  });
+        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+            'fr',
+            'translation',
+            labels,
+            true,
+            true
+        );
+    });
 
-  it('should do nothing if labels are empty', () => {
-    vi.clearAllMocks();
-    
-    applyStudyOverrides('en', {});
-    applyStudyOverrides('en', undefined as any);
+    it('should do nothing if labels are empty', () => {
+        vi.clearAllMocks();
 
-    expect(i18n.addResourceBundle).not.toHaveBeenCalled();
-  });
+        applyStudyOverrides('en', {});
+        applyStudyOverrides('en', undefined as any);
 
-  it('should reset base locales to original state', () => {
-    vi.clearAllMocks();
+        expect(i18n.addResourceBundle).not.toHaveBeenCalled();
+    });
 
-    resetBaseLocales();
+    it('should reset base locales to original state', () => {
+        vi.clearAllMocks();
 
-    // Check once for each supported language
-    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-      'en',
-      'translation',
-      expect.any(Object),
-      true,
-      true
-    );
-    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-      'fr',
-      'translation',
-      expect.any(Object),
-      true,
-      true
-    );
-    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-      'fi',
-      'translation',
-      expect.any(Object),
-      true,
-      true
-    );
-  });
+        resetBaseLocales();
+
+        // Check once for each supported language
+        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+            'en',
+            'translation',
+            expect.any(Object),
+            true,
+            true
+        );
+        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+            'fr',
+            'translation',
+            expect.any(Object),
+            true,
+            true
+        );
+        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+            'fi',
+            'translation',
+            expect.any(Object),
+            true,
+            true
+        );
+    });
 });

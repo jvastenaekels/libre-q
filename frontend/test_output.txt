@@ -1328,10 +1328,10 @@ Ignored nodes: comments, script, style
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
  ❯ src/components/GridSort.pedagogy.test.tsx:81:23
      79|         });
-     80| 
+     80|
      81|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     82| 
+     82|
      83|         // Advance another 6s
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -1496,12 +1496,12 @@ Ignored nodes: comments, script, style
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
  ❯ src/components/GridSort.pedagogy.test.tsx:122:33
-    120| 
+    120|
     121|         // Close modal
     122|         const closeBtn = screen.getByText('common.close');
        |                                 ^
     123|         fireEvent.click(closeBtn);
-    124| 
+    124|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
 
@@ -1834,11 +1834,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -2179,10 +2179,10 @@ Ignored nodes: comments, script, style
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
  ❯ src/components/GridSort.pedagogy.test.tsx:81:23
      79|         });
-     80| 
+     80|
      81|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     82| 
+     82|
      83|         // Advance another 6s
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
@@ -2190,7 +2190,7 @@ Ignored nodes: comments, script, style
  FAIL  src/components/GridSort.pedagogy.test.tsx > GridSort Pedagogy > opens and closes the Help Modal
 AssertionError: expected <h3 …(1)><span …(1)></span></h3> to be null
  ❯ src/components/GridSort.pedagogy.test.tsx:126:81
-    124| 
+    124|
     125|         // Modal should be hidden
     126|         expect(screen.queryByText('fine.workbench.methodology.extremes…
        |                                                                                 ^
@@ -3375,10 +3375,10 @@ Ignored nodes: comments, script, style
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
  ❯ src/components/GridSort.pedagogy.test.tsx:81:23
      79|         });
-     80| 
+     80|
      81|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     82| 
+     82|
      83|         // Advance another 6s
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -3386,7 +3386,7 @@ Ignored nodes: comments, script, style
  FAIL  src/components/GridSort.pedagogy.test.tsx > GridSort Pedagogy > opens and closes the Help Modal
 AssertionError: expected <h3 …(1)><span …(1)></span></h3> to be null
  ❯ src/components/GridSort.pedagogy.test.tsx:126:81
-    124| 
+    124|
     125|         // Modal should be hidden
     126|         expect(screen.queryByText('fine.workbench.methodology.extremes…
        |                                                                                 ^
@@ -3724,11 +3724,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -4069,10 +4069,10 @@ Ignored nodes: comments, script, style
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
  ❯ src/components/GridSort.pedagogy.test.tsx:81:23
      79|         });
-     80| 
+     80|
      81|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     82| 
+     82|
      83|         // Advance another 6s
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
@@ -4080,7 +4080,7 @@ Ignored nodes: comments, script, style
  FAIL  src/components/GridSort.pedagogy.test.tsx > GridSort Pedagogy > opens and closes the Help Modal
 ReferenceError: waitForElementToBeRemoved is not defined
  ❯ src/components/GridSort.pedagogy.test.tsx:126:9
-    124| 
+    124|
     125|         // Modal should be hidden
     126|         await waitForElementToBeRemoved(() => screen.queryByText('fine…
        |         ^
@@ -5315,11 +5315,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
@@ -6506,11 +6506,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
@@ -6870,7 +6870,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
@@ -8074,7 +8074,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -8413,11 +8413,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -9632,11 +9632,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
@@ -9996,7 +9996,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
@@ -11189,11 +11189,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
@@ -12381,11 +12381,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
@@ -15129,7 +15129,7 @@ Ignored nodes: comments, script, style
 ReferenceError: useCallback is not defined
  ❯ GridSort src/components/GridSort.tsx:165:25
     163|   }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRe…
-    164| 
+    164|
     165|   const getColumnTint = useCallback((score: number) => {
        |                         ^
     166|       if (score <= -3) return 'bg-red-50/50';
@@ -15817,12 +15817,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:63:42
-     61| 
+     61|
      62|         // 2. Ensure we are on the 'disagree' pile
      63|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
      64|         fireEvent.click(disagreeTab);
-     65| 
+     65|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
 
@@ -16497,12 +16497,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:105:42
-    103| 
+    103|
     104|         // Ensure we are on 'disagree'
     105|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     106|         fireEvent.click(disagreeTab);
-    107| 
+    107|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
 
@@ -17177,12 +17177,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:130:42
-    128| 
+    128|
     129|         // 2. Ensure we are on the 'disagree' pile
     130|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     131|         fireEvent.click(disagreeTab);
-    132| 
+    132|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
 
@@ -18379,7 +18379,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -18718,11 +18718,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -19926,7 +19926,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -20265,11 +20265,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -24907,12 +24907,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:107:42
-    105| 
+    105|
     106|         // Ensure we are on 'disagree'
     107|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     108|         fireEvent.click(disagreeTab);
-    109| 
+    109|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
 
@@ -25587,12 +25587,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:132:42
-    130| 
+    130|
     131|         // 2. Ensure we are on the 'disagree' pile
     132|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     133|         fireEvent.click(disagreeTab);
-    134| 
+    134|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
 
@@ -26550,7 +26550,7 @@ This ensures that you're testing the behavior the user would see in the browser.
 ReferenceError: useCallback is not defined
  ❯ GridSort src/components/GridSort.tsx:165:25
     163|   }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRe…
-    164| 
+    164|
     165|   const getColumnTint = useCallback((score: number) => {
        |                         ^
     166|       if (score <= -3) return 'bg-red-50/50';
@@ -27238,12 +27238,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:63:42
-     61| 
+     61|
      62|         // 2. Ensure we are on the 'disagree' pile
      63|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
      64|         fireEvent.click(disagreeTab);
-     65| 
+     65|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
 
@@ -27918,12 +27918,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:105:42
-    103| 
+    103|
     104|         // Ensure we are on 'disagree'
     105|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     106|         fireEvent.click(disagreeTab);
-    107| 
+    107|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
 
@@ -28598,12 +28598,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:130:42
-    128| 
+    128|
     129|         // 2. Ensure we are on the 'disagree' pile
     130|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     131|         fireEvent.click(disagreeTab);
-    132| 
+    132|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
 
@@ -29800,7 +29800,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -30139,11 +30139,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -31347,7 +31347,7 @@ Ignored nodes: comments, script, style
      76|         vi.advanceTimersByTime(6100);
      77|         expect(screen.getByText('fine.workbench.methodology.vertical')…
        |                       ^
-     78| 
+     78|
      79|         // Advance 6s again
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
@@ -31686,11 +31686,11 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:74:29
-     72| 
+     72|
      73|         // 5. Verify Workbench appears
      74|         expect(await screen.findByText(/fine.workbench.place_on_grid/i…
        |                             ^
-     75| 
+     75|
      76|         // 6. User Taps Empty Slot (Place)
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
@@ -36328,12 +36328,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:107:42
-    105| 
+    105|
     106|         // Ensure we are on 'disagree'
     107|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     108|         fireEvent.click(disagreeTab);
-    109| 
+    109|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
 
@@ -37008,12 +37008,12 @@ Ignored nodes: comments, script, style
  ❯ waitForWrapper node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:163:27
  ❯ node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
  ❯ src/pages/FineSortPage.mobile.test.tsx:132:42
-    130| 
+    130|
     131|         // 2. Ensure we are on the 'disagree' pile
     132|         const disagreeTab = await screen.findByRole('tab', { name: /co…
        |                                          ^
     133|         fireEvent.click(disagreeTab);
-    134| 
+    134|
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
 

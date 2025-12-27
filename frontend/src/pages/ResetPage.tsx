@@ -14,16 +14,15 @@ import { RefreshCw } from 'lucide-react';
 const ResetPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    
-    // We access stores directly in useEffect to avoid unnecessary subscriptions
 
+    // We access stores directly in useEffect to avoid unnecessary subscriptions
 
     useEffect(() => {
         // Atomic reset of all stores
         useSessionStore.getState().resetSession();
         useConfigStore.getState().resetConfig();
         useResponseStore.getState().resetResponses();
-        
+
         // Short delay to ensure state clears before redirect
         const timer = setTimeout(() => {
             navigate(`/study/${slug}/welcome`, { replace: true });

@@ -17,7 +17,7 @@ const mockConfig = {
     presort_config: {
         age: { type: 'number', label: 'Age', required: true, min: 18, max: 99 },
         gender: { type: 'select', label: 'Gender', required: true, options: ['Male', 'Female'] },
-        job: { type: 'text', label: 'Job Title', required: false }
+        job: { type: 'text', label: 'Job Title', required: false },
     },
     statements: [],
     title: 'Test Study',
@@ -48,7 +48,7 @@ describe('PreSortPage', () => {
     });
 
     it('validates required fields', async () => {
-         render(
+        render(
             <MemoryRouter>
                 <PreSortPage />
             </MemoryRouter>
@@ -66,7 +66,7 @@ describe('PreSortPage', () => {
     it('submits valid form data', async () => {
         render(
             <MemoryRouter initialEntries={['/study/test/presort']}>
-                 <Routes>
+                <Routes>
                     <Route path="/study/:slug/presort" element={<PreSortPage />} />
                 </Routes>
             </MemoryRouter>
@@ -74,7 +74,7 @@ describe('PreSortPage', () => {
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '30' } });
         fireEvent.change(screen.getByLabelText(/Gender/), { target: { value: 'Female' } });
-        
+
         const button = screen.getByRole('button');
         await waitFor(() => expect(button).not.toBeDisabled());
 
@@ -92,9 +92,13 @@ describe('PreSortPage', () => {
         );
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '45' } });
-        
+
         // Wait for auto-save to trigger
-        await waitFor(() => expect(useResponseStore.getState().presort).toEqual(expect.objectContaining({ age: '45' })));
+        await waitFor(() =>
+            expect(useResponseStore.getState().presort).toEqual(
+                expect.objectContaining({ age: '45' })
+            )
+        );
 
         unmount();
 

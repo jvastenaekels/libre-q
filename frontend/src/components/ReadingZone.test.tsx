@@ -10,23 +10,23 @@ import { render, screen, setupStoreMocks } from '../test/test-utils';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) => key
-    })
+        t: (key: string) => key,
+    }),
 }));
 
 vi.mock('../store/useUIStore', () => ({
-    useUIStore: vi.fn()
+    useUIStore: vi.fn(),
 }));
 
 // Mock MethodologyTips to avoid timer logic in ReadingZone tests
 vi.mock('./MethodologyTips', () => ({
-    default: () => <div data-testid="methodology-tips">Methodology Tips</div>
+    default: () => <div data-testid="methodology-tips">Methodology Tips</div>,
 }));
 
 describe('ReadingZone', () => {
     it('renders methodology tips when no card is active', () => {
         setupStoreMocks({
-            useUIStore: { hoveredCard: null, activeCard: null, selectedCard: null }
+            useUIStore: { hoveredCard: null, activeCard: null, selectedCard: null },
         });
 
         render(<ReadingZone variant="desktop" />);
@@ -35,11 +35,11 @@ describe('ReadingZone', () => {
 
     it('renders hovered card text', () => {
         setupStoreMocks({
-            useUIStore: { 
-                hoveredCard: { id: 1, text: 'Hovered Card Text' }, 
-                activeCard: null, 
-                selectedCard: null 
-            }
+            useUIStore: {
+                hoveredCard: { id: 1, text: 'Hovered Card Text' },
+                activeCard: null,
+                selectedCard: null,
+            },
         });
 
         render(<ReadingZone variant="desktop" />);
@@ -49,11 +49,11 @@ describe('ReadingZone', () => {
 
     it('prioritizes active card over hovered card', () => {
         setupStoreMocks({
-            useUIStore: { 
-                hoveredCard: { id: 1, text: 'Hovered Card' }, 
-                activeCard: { id: 2, text: 'Active Card' }, 
-                selectedCard: null 
-            }
+            useUIStore: {
+                hoveredCard: { id: 1, text: 'Hovered Card' },
+                activeCard: { id: 2, text: 'Active Card' },
+                selectedCard: null,
+            },
         });
 
         render(<ReadingZone variant="desktop" />);
@@ -63,11 +63,11 @@ describe('ReadingZone', () => {
 
     it('renders selected card text', () => {
         setupStoreMocks({
-            useUIStore: { 
-                hoveredCard: null, 
-                activeCard: null, 
-                selectedCard: { id: 3, text: 'Selected Card' } 
-            }
+            useUIStore: {
+                hoveredCard: null,
+                activeCard: null,
+                selectedCard: { id: 3, text: 'Selected Card' },
+            },
         });
 
         render(<ReadingZone variant="desktop" />);

@@ -20,11 +20,11 @@ const mockConfig = {
     statements: [],
     consent: {
         title: 'Consent Title',
-        description: 'Consent Description'
+        description: 'Consent Description',
     },
     ui_labels: {
-        start_button: 'Start Study'
-    }
+        start_button: 'Start Study',
+    },
 };
 
 // Mock i18next
@@ -34,7 +34,7 @@ vi.mock('react-i18next', () => ({
 
 // Mock useStudyConfig logic if strictly needed, but we mock the store directly
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null })
+    useStudyConfig: () => ({ isLoading: false, error: null }),
 }));
 
 describe('ConsentPage', () => {
@@ -62,32 +62,32 @@ describe('ConsentPage', () => {
                 <ConsentPage />
             </MemoryRouter>
         );
-        
+
         const button = screen.getByRole('button', { name: /Start Study/i });
-        
-        // Button might be disabled or enabled depending on form state, 
+
+        // Button might be disabled or enabled depending on form state,
         // but let's try to submit without checking
         fireEvent.click(button);
 
         // Ideally checking the box enables the flow
         const checkbox = screen.getByRole('checkbox');
         expect(checkbox).not.toBeChecked();
-        
+
         // If the button is disabled initially (isValid is false)
         expect(button).toBeDisabled();
 
         fireEvent.click(checkbox);
-        
+
         await waitFor(() => {
             expect(button).not.toBeDisabled();
         });
     });
 
     it('submits consent and navigates to presort', async () => {
-         // We can't easily mock useNavigate inside MemoryRouter without a wrapper or library approach,
-         // but we can check if the route changed by rendering the target route.
-         
-         render(
+        // We can't easily mock useNavigate inside MemoryRouter without a wrapper or library approach,
+        // but we can check if the route changed by rendering the target route.
+
+        render(
             <MemoryRouter initialEntries={['/study/test-study/consent']}>
                 <Routes>
                     <Route path="/study/:slug/consent" element={<ConsentPage />} />
@@ -98,11 +98,11 @@ describe('ConsentPage', () => {
 
         const checkbox = screen.getByRole('checkbox');
         fireEvent.click(checkbox);
-        
+
         const button = screen.getByRole('button', { name: /Start Study/i });
-        
+
         await waitFor(() => expect(button).not.toBeDisabled());
-        
+
         fireEvent.click(button);
 
         await waitFor(() => {
@@ -120,7 +120,7 @@ describe('ConsentPage', () => {
 
         const checkbox = screen.getByRole('checkbox');
         fireEvent.click(checkbox);
-        
+
         await waitFor(() => expect(useSessionStore.getState().hasConsented).toBe(true));
 
         unmount();
@@ -148,7 +148,11 @@ describe('ConsentPage', () => {
 
         // Should use defaults from i18n
         // Note: our mock i18n returns the default value if provided, or the key
-        expect(screen.getByText('I have read and understood the information provided and agree to participate.')).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                'I have read and understood the information provided and agree to participate.'
+            )
+        ).toBeInTheDocument();
         expect(screen.getByText('consent.default_text')).toBeInTheDocument(); // Key fallback from mock
     });
 });

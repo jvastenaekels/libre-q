@@ -4,6 +4,12 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+/**
+ * Root Application Component
+ *
+ * Sets up routing, global error handling, and lazy loading of pages.
+ */
+
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import StudyLayout from './layouts/StudyLayout';
@@ -22,31 +28,38 @@ import { ApiError } from './api/client';
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
 
 const App = () => {
-  return (
-    <ErrorBoundary>
-        <Router>
-          <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">Loading session...</div>}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              
-              <Route path="/study/:slug" element={<StudyLayout />}>
-                <Route path="welcome" element={<WelcomePage />} />
-                <Route path="consent" element={<ConsentPage />} />
-                <Route path="presort" element={<PreSortPage />} />
-                <Route path="rough-sort" element={<RoughSortPage />} />
-                <Route path="sort" element={<FineSortPage />} /> 
-                <Route path="post-sort" element={<PostSortPage />} />
-                <Route path="reset" element={<ResetPage />} /> 
-    
+    return (
+        <ErrorBoundary>
+            <Router>
+                <Suspense
+                    fallback={
+                        <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
+                            Loading session...
+                        </div>
+                    }
+                >
+                    <Routes>
+                        <Route path="/" element={<LandingPage />} />
 
+                        <Route path="/study/:slug" element={<StudyLayout />}>
+                            <Route path="welcome" element={<WelcomePage />} />
+                            <Route path="consent" element={<ConsentPage />} />
+                            <Route path="presort" element={<PreSortPage />} />
+                            <Route path="rough-sort" element={<RoughSortPage />} />
+                            <Route path="sort" element={<FineSortPage />} />
+                            <Route path="post-sort" element={<PostSortPage />} />
+                            <Route path="reset" element={<ResetPage />} />
 
-                <Route path="*" element={<ErrorPage error={new ApiError(404, 'Page not found')} />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </Router>
-    </ErrorBoundary>
-  );
+                            <Route
+                                path="*"
+                                element={<ErrorPage error={new ApiError(404, 'Page not found')} />}
+                            />
+                        </Route>
+                    </Routes>
+                </Suspense>
+            </Router>
+        </ErrorBoundary>
+    );
 };
 
 export default App;

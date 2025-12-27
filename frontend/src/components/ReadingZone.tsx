@@ -21,7 +21,11 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const selectedCard = useUIStore((state) => state.selectedCard);
 
     const displayCard = activeCard || hoveredCard || selectedCard;
-    const labelKey = activeCard ? 'fine.workbench.active_card' : hoveredCard ? 'fine.toolbar.preview' : 'fine.workbench.active_card';
+    const labelKey = activeCard
+        ? 'fine.workbench.active_card'
+        : hoveredCard
+          ? 'fine.toolbar.preview'
+          : 'fine.workbench.active_card';
 
     if (variant === 'mobile') {
         return (
@@ -31,7 +35,11 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                         <div className="animate-in fade-in slide-in-from-top-1 duration-300">
                             <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1.5">
                                 <Eye size={12} strokeWidth={2.5} />
-                                {t(labelKey)} {displayCard.code && <span className="text-indigo-300 mx-1">•</span>} {displayCard.code}
+                                {t(labelKey)}{' '}
+                                {displayCard.code && (
+                                    <span className="text-indigo-300 mx-1">•</span>
+                                )}{' '}
+                                {displayCard.code}
                             </div>
                             <div className="flex flex-col gap-0.5">
                                 <p className="text-slate-800 text-sm font-medium leading-relaxed">
@@ -53,7 +61,9 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 <div className="animate-in fade-in zoom-in-95 duration-200">
                     <div className="text-xs font-bold text-indigo-400 mb-1.5 uppercase tracking-wider flex items-center gap-2">
                         <Eye size={14} strokeWidth={2.5} />
-                        {t(labelKey)} {displayCard.code && <span className="text-indigo-300 mx-1">•</span>} {displayCard.code}
+                        {t(labelKey)}{' '}
+                        {displayCard.code && <span className="text-indigo-300 mx-1">•</span>}{' '}
+                        {displayCard.code}
                     </div>
                     <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
                         {displayCard.text}

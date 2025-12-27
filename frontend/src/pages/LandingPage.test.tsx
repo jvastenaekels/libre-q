@@ -14,7 +14,7 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return {
         ...actual,
-        useNavigate: () => mockNavigate
+        useNavigate: () => mockNavigate,
     };
 });
 
@@ -30,14 +30,14 @@ describe('LandingPage', () => {
     });
 
     it('enables button when input is filled', () => {
-         render(
+        render(
             <MemoryRouter>
                 <LandingPage />
             </MemoryRouter>
         );
         const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
-        
+
         expect(screen.getByRole('button', { name: /go to study/i })).not.toBeDisabled();
     });
 
@@ -50,7 +50,7 @@ describe('LandingPage', () => {
 
         const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
-        
+
         const button = screen.getByRole('button');
         fireEvent.click(button);
 

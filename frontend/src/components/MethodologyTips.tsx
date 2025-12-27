@@ -20,12 +20,12 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const tips = [
         t('fine.workbench.methodology.extremes'),
         t('fine.workbench.methodology.vertical'),
-        t('fine.workbench.methodology.constraint')
+        t('fine.workbench.methodology.constraint'),
     ];
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setStep(prev => (prev + 1) % tips.length);
+            setStep((prev) => (prev + 1) % tips.length);
         }, 6000);
         return () => clearInterval(interval);
     }, [tips.length]);
@@ -34,7 +34,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
         return (
             <div className="h-full flex flex-col items-center justify-center gap-1.5 text-indigo-400">
                 <AnimatePresence mode="wait">
-                    <motion.div 
+                    <motion.div
                         key={step}
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -59,22 +59,22 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     return (
         <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400 py-2">
             <AnimatePresence mode="wait">
-                <motion.div 
-                   key={step}
-                   initial={{ opacity: 0, y: 10 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   exit={{ opacity: 0, y: -10 }}
-                   className="flex flex-col items-center gap-3 px-6"
+                <motion.div
+                    key={step}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex flex-col items-center gap-3 px-6"
                 >
                     <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative">
-                       <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
-                       <motion.div 
-                           animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.2, 1] }}
-                           transition={{ duration: 2, repeat: Infinity }}
-                           className="absolute -top-1 -right-1 text-amber-400"
-                       >
-                           <Sparkles size={12} />
-                       </motion.div>
+                        <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
+                        <motion.div
+                            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.2, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute -top-1 -right-1 text-amber-400"
+                        >
+                            <Sparkles size={12} />
+                        </motion.div>
                     </div>
                     <p className="text-sm font-medium leading-relaxed italic text-indigo-600/70">
                         {tips[step]}

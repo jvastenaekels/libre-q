@@ -1,0 +1,61 @@
+repos:
+  # -------------------------
+  # GENERIC QUALITY CHECKS
+  # -------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  # -------------------------
+  # BACKEND (Python/FastAPI)
+  # -------------------------
+  # Ruff : All-in-one linter/formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.6
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
+
+  # Mypy : Static Type Checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        files: ^backend/
+        args:
+          ["--ignore-missing-imports", "--config-file=backend/pyproject.toml"]
+        additional_dependencies: [types-requests]
+
+  # -------------------------
+  # FRONTEND (React/TypeScript)
+  # -------------------------
+  # Delegate to npm to use local versions
+  - repo: local
+    hooks:
+      - id: frontend-lint
+        name: Frontend Lint (ESLint)
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+
+      - id: frontend-typecheck
+        name: Frontend Typecheck (TSC)
+        entry: bash -c 'cd frontend && npm run type-check'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: frontend-format
+        name: Frontend Format (Prettier)
+        entry: bash -c 'cd frontend && npm run format'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|css|md|json)$
+        pass_filenames: false

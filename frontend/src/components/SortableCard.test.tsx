@@ -18,16 +18,24 @@ vi.mock('@dnd-kit/sortable', () => ({
         setNodeRef: vi.fn(),
         transform: null,
         transition: null,
-        isDragging: false
-    })
+        isDragging: false,
+    }),
 }));
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
     motion: {
-        div: ({ children, className, onClick, onMouseEnter, onMouseLeave, style, ...props }: any) => (
-            <div 
-                className={className} 
+        div: ({
+            children,
+            className,
+            onClick,
+            onMouseEnter,
+            onMouseLeave,
+            style,
+            ...props
+        }: any) => (
+            <div
+                className={className}
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
@@ -36,9 +44,9 @@ vi.mock('framer-motion', () => ({
             >
                 {children}
             </div>
-        )
+        ),
     },
-    AnimatePresence: ({ children }: { children: React.ReactNode }) => children
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 describe('SortableCard', () => {
@@ -69,9 +77,9 @@ describe('SortableCard', () => {
     it('handles click events', () => {
         const handleClick = vi.fn();
         render(<SortableCard {...defaultProps} onClick={handleClick} />);
-        
+
         fireEvent.click(screen.getByTestId('card-123'));
-        
+
         expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
@@ -81,12 +89,12 @@ describe('SortableCard', () => {
                 <SortableCard {...defaultProps} />
             </MemoryRouter>
         );
-        
+
         const card = screen.getByTestId('card-123');
 
         // Trigger hover
         await act(async () => {
-             fireEvent.mouseEnter(card);
+            fireEvent.mouseEnter(card);
         });
 
         // Store should be updated immediately
@@ -96,13 +104,13 @@ describe('SortableCard', () => {
         await act(async () => {
             fireEvent.mouseLeave(card);
         });
-        
+
         expect(useUIStore.getState().hoveredCard).toBe(null);
     });
 
     it('styling changes when selected', () => {
         render(<SortableCard {...defaultProps} isSelected={true} />);
-        
+
         const card = screen.getByTestId('card-123');
         const inner = card.querySelector('.border-blue-500');
         expect(inner).toBeTruthy();
@@ -111,7 +119,7 @@ describe('SortableCard', () => {
     it('applies dimensions correctly', () => {
         const dimensions = { width: 100, height: 150 };
         render(<SortableCard {...defaultProps} dimensions={dimensions} />);
-        
+
         const card = screen.getByTestId('card-123');
         expect(card.style.width).toBe('100px');
         expect(card.style.height).toBe('150px');
@@ -122,12 +130,12 @@ describe('SortableCard', () => {
     });
 
     it('renders statement code in hover store', async () => {
-         render(<SortableCard {...defaultProps} code="S1" />);
-         const card = screen.getByTestId('card-123');
-         await act(async () => {
-             fireEvent.mouseEnter(card);
-         });
-         expect(useUIStore.getState().hoveredCard?.code).toBe('S1');
+        render(<SortableCard {...defaultProps} code="S1" />);
+        const card = screen.getByTestId('card-123');
+        await act(async () => {
+            fireEvent.mouseEnter(card);
+        });
+        expect(useUIStore.getState().hoveredCard?.code).toBe('S1');
     });
 
     it('does not render code when undefined', async () => {
@@ -140,5 +148,5 @@ describe('SortableCard', () => {
             fireEvent.mouseEnter(card);
         });
         expect(useUIStore.getState().hoveredCard?.code).toBeUndefined();
-   });
+    });
 });

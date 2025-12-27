@@ -61,7 +61,7 @@ describe('Atomic Stores', () => {
         it('stores presort responses', () => {
             const response = { age: 25, role: 'Developer' };
             useResponseStore.getState().setPresortResponse(response);
-            
+
             expect(useResponseStore.getState().presort).toEqual(response);
         });
 
@@ -69,9 +69,9 @@ describe('Atomic Stores', () => {
             // Need config for placeCardInGrid to work
             useConfigStore.getState().setConfig({
                 statements: [{ id: 1, text: 'Test' }],
-                grid_config: [{ score: 0, capacity: 5 }]
+                grid_config: [{ score: 0, capacity: 5 }],
             } as unknown as StudyConfig);
-            
+
             useResponseStore.getState().placeCardInGrid(1, 0, 0);
             const state = useResponseStore.getState();
             expect(state.qsort).toContainEqual({ statementId: 1, col: 0, row: 0 });

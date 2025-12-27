@@ -30,20 +30,20 @@ frontend/
 
 1. **Install Dependencies**:
 
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 
 2. **Run Development Server**:
 
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    npm run dev
+    ```
 
 3. **Run Tests**:
-   ```bash
-   npm test
-   ```
+    ```bash
+    npm test
+    ```
 
 ## 🧠 State Management: Zustand
 

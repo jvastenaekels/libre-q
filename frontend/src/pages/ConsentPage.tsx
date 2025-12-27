@@ -16,8 +16,8 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const consentSchema = z.object({
-    consent: z.boolean().refine(val => val === true, { 
-        message: "You must consent to participate." 
+    consent: z.boolean().refine((val) => val === true, {
+        message: 'You must consent to participate.',
     }),
 });
 
@@ -27,16 +27,21 @@ const ConsentPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    
+
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore();
     const setConsent = useSessionStore((state) => state.setConsent);
     const setToken = useSessionStore((state) => state.setToken);
     const setStep = useSessionStore((state) => state.setStep);
 
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<ConsentForm>({
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors, isValid },
+    } = useForm<ConsentForm>({
         resolver: zodResolver(consentSchema),
-        defaultValues: { consent: session.hasConsented }
+        defaultValues: { consent: session.hasConsented },
     });
 
     // Auto-save consent to store
@@ -65,7 +70,7 @@ const ConsentPage: React.FC = () => {
 
     return (
         <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-500">
-             <div className="mb-8 text-center">
+            <div className="mb-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {t('consent.title', 'Consent to Participate')}
                 </h1>
@@ -74,16 +79,19 @@ const ConsentPage: React.FC = () => {
                 </p>
             </div>
 
-            <form id="consent-form" onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8">
-                
+            <form
+                id="consent-form"
+                onSubmit={handleSubmit(onSubmit)}
+                className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
+            >
                 {/* Consent Description/Legal Text */}
                 {/* Consent Description/Legal Text */}
                 <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
-                     {config.consent?.description ? (
-                         <Markdown>{config.consent.description}</Markdown>
-                     ) : (
-                         <Markdown>{t('consent.default_text')}</Markdown>
-                     )}
+                    {config.consent?.description ? (
+                        <Markdown>{config.consent.description}</Markdown>
+                    ) : (
+                        <Markdown>{t('consent.default_text')}</Markdown>
+                    )}
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">
@@ -92,15 +100,26 @@ const ConsentPage: React.FC = () => {
                             <input
                                 id="consent"
                                 type="checkbox"
-                                {...register("consent")}
+                                {...register('consent')}
                                 className="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
                             />
                         </div>
                         <div className="text-base">
-                            <label htmlFor="consent" className="font-medium text-slate-900 cursor-pointer block">
-                                {config.consent?.title || t('welcome.consent.label', 'I have read and understood the information provided and agree to participate.')}
+                            <label
+                                htmlFor="consent"
+                                className="font-medium text-slate-900 cursor-pointer block"
+                            >
+                                {config.consent?.title ||
+                                    t(
+                                        'welcome.consent.label',
+                                        'I have read and understood the information provided and agree to participate.'
+                                    )}
                             </label>
-                            {errors.consent && <p className="text-red-600 mt-2 text-sm">{t('welcome.consent.error', 'Consent is required to proceed.')}</p>}
+                            {errors.consent && (
+                                <p className="text-red-600 mt-2 text-sm">
+                                    {t('welcome.consent.error', 'Consent is required to proceed.')}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -111,7 +130,8 @@ const ConsentPage: React.FC = () => {
                         disabled={!isValid && !session.hasConsented}
                         className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
-                        {config.ui_labels?.start_button || t('welcome.start')} <ArrowRight size={18} />
+                        {config.ui_labels?.start_button || t('welcome.start')}{' '}
+                        <ArrowRight size={18} />
                     </button>
                 </div>
             </form>

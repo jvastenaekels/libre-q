@@ -10,14 +10,18 @@ import { render, screen, act } from '../test/test-utils';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) => key
-    })
+        t: (key: string) => key,
+    }),
 }));
 
 vi.mock('framer-motion', () => ({
     motion: {
-        div: ({ children, ...props }: { children: React.ReactNode }) => <div {...props}>{children}</div>,
-        button: ({ children, ...props }: { children: React.ReactNode }) => <button {...props}>{children}</button>,
+        div: ({ children, ...props }: { children: React.ReactNode }) => (
+            <div {...props}>{children}</div>
+        ),
+        button: ({ children, ...props }: { children: React.ReactNode }) => (
+            <button {...props}>{children}</button>
+        ),
     },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -38,7 +42,7 @@ describe('MethodologyTips', () => {
 
     it('rotates tips after interval', () => {
         render(<MethodologyTips variant="desktop" />);
-        
+
         // Initial tip
         expect(screen.getByText(/fine.workbench.methodology.extremes/i)).toBeInTheDocument();
 
@@ -53,7 +57,7 @@ describe('MethodologyTips', () => {
 
     it('loops back to first tip after reaching the end', () => {
         render(<MethodologyTips variant="desktop" />);
-        
+
         // Step 1 -> 2 -> 3 -> 1
         act(() => {
             vi.advanceTimersByTime(6100 * 3);

@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
-from typing import Optional, Dict, Any, Literal
+"""API router for frontend logs."""
+
 import logging
+from typing import Any, Literal
+
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
 
 # Configure logger specifically for frontend errors
 frontend_logger = logging.getLogger("frontend_error")
@@ -12,23 +15,24 @@ frontend_logger.setLevel(logging.ERROR)
 
 router = APIRouter()
 
+
 class LogEntry(BaseModel):
-    level: Literal['error', 'warn', 'info', 'debug']
+    """Schema for frontend log entries."""
+
+    level: Literal["error", "warn", "info", "debug"]
     message: str
-    stack: Optional[str] = None
-    context: Optional[Dict[str, Any]] = None
-    url: Optional[str] = None
-    userAgent: Optional[str] = None
+    stack: str | None = None
+    context: dict[str, Any] | None = None
+    url: str | None = None
+    userAgent: str | None = None
+
 
 @router.post("/logs")
 async def report_log(entry: LogEntry, request: Request):
-    """
-    Receives logging/error data from the frontend.
-    """
-    
+    """Receives logging/error data from the frontend."""
     # Enrich with IP if needed (caution with proxies)
     client_ip = request.client.host if request.client else "unknown"
-    
+
     log_payload = {
         "source": "frontend",
         "level": entry.level,
@@ -41,13 +45,13 @@ async def report_log(entry: LogEntry, request: Request):
     }
 
     # Format meant for server logs (e.g., CloudWatch, Kibana friendly if JSONified)
-    if entry.level.lower() == 'error':
+    if entry.level.lower() == "error":
         frontend_logger.error(f"FRONTEND ERROR: {entry.message}", extra=log_payload)
         # Also print to standard console for immediate visibility during dev/docker logs
         print(f"[FRONTEND ERROR] {entry.message} | URL: {entry.url}")
         if entry.stack:
             print(f"Stack: {entry.stack}")
-    elif entry.level.lower() == 'warn':
+    elif entry.level.lower() == "warn":
         frontend_logger.warning(f"FRONTEND WARN: {entry.message}", extra=log_payload)
     else:
         frontend_logger.info(f"FRONTEND INFO: {entry.message}", extra=log_payload)

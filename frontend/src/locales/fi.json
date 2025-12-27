@@ -1,184 +1,184 @@
 {
-  "common": {
-    "agree": "Jokseenkin samaa mieltä",
-    "disagree": "Jokseenkin eri mieltä",
-    "neutral": "Ei vahvaa mielipidettä",
-    "undo": "Kumoa",
-    "next": "Seuraava",
-    "submit": "Lähetä vastaukset",
-    "continue": "Jatka",
-    "loading": "Ladataan...",
-    "lang_code": "fi",
-    "yes": "Kyllä",
-    "no": "Ei",
-    "ok": "OK",
-    "cancel": "Peruuta",
-    "attention": "Huomio",
-    "error": "Virhe",
-    "submitting": "Lähetetään...",
-    "cards": "korttia",
-    "close": "Sulje",
-    "statement": "Väite",
-    "errors": {
-      "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
-      "not_found": "Tutkimusta ei löytynyt.",
-      "validation": "Järjestelmävirhe: Tietojen vahvistus epäonnistui.",
-      "unknown": "Tapahtui odottamaton virhe.",
-      "retry": "Yritä uudelleen",
-      "min": "Arvon on oltava vähintään {{min}}",
-      "max": "Arvon on oltava enintään {{max}}",
-      "404": {
-          "title": "Sivua ei löytynyt",
-          "message": "Etsimääsi sivua tai tutkimusta ei ole olemassa."
-      },
-      "429": {
-          "title": "Liikaa pyyntöjä",
-          "message": "Toimit liian nopeasti. Odota hetki."
-      },
-      "500": {
-          "title": "Palvelinvirhe",
-          "message": "Palvelimellamme ilmeni ongelma. Yritä myöhemmin uudelleen."
-      },
-      "network_title": "Yhteys katkesi",
-      "home": "Siirry etusivulle",
-      "reset": "Nollaa istunto",
-      "default_title": "Hups! Jotain meni pieleen."
-    }
-  },
-  "layout": {
-    "title": "Open-Q",
-    "steps": {
-      "welcome": "Welcome",
-      "presort": "Taustatiedot",
-      "rough": "Ensivaikutelma",
-      "fine": "Ruudukkolajittelu",
-      "review": "Pohdinta"
+    "common": {
+        "agree": "Jokseenkin samaa mieltä",
+        "disagree": "Jokseenkin eri mieltä",
+        "neutral": "Ei vahvaa mielipidettä",
+        "undo": "Kumoa",
+        "next": "Seuraava",
+        "submit": "Lähetä vastaukset",
+        "continue": "Jatka",
+        "loading": "Ladataan...",
+        "lang_code": "fi",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "ok": "OK",
+        "cancel": "Peruuta",
+        "attention": "Huomio",
+        "error": "Virhe",
+        "submitting": "Lähetetään...",
+        "cards": "korttia",
+        "close": "Sulje",
+        "statement": "Väite",
+        "errors": {
+            "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
+            "not_found": "Tutkimusta ei löytynyt.",
+            "validation": "Järjestelmävirhe: Tietojen vahvistus epäonnistui.",
+            "unknown": "Tapahtui odottamaton virhe.",
+            "retry": "Yritä uudelleen",
+            "min": "Arvon on oltava vähintään {{min}}",
+            "max": "Arvon on oltava enintään {{max}}",
+            "404": {
+                "title": "Sivua ei löytynyt",
+                "message": "Etsimääsi sivua tai tutkimusta ei ole olemassa."
+            },
+            "429": {
+                "title": "Liikaa pyyntöjä",
+                "message": "Toimit liian nopeasti. Odota hetki."
+            },
+            "500": {
+                "title": "Palvelinvirhe",
+                "message": "Palvelimellamme ilmeni ongelma. Yritä myöhemmin uudelleen."
+            },
+            "network_title": "Yhteys katkesi",
+            "home": "Siirry etusivulle",
+            "reset": "Nollaa istunto",
+            "default_title": "Hups! Jotain meni pieleen."
+        }
     },
-    "mobile_step": "Vaihe",
-    "language": "Suomi"
-  },
-  "welcome": {
-    "title": "Welcome",
-    "description": "Please read the instructions carefully.",
-    "start": "Start Study",
+    "layout": {
+        "title": "Open-Q",
+        "steps": {
+            "welcome": "Welcome",
+            "presort": "Taustatiedot",
+            "rough": "Ensivaikutelma",
+            "fine": "Ruudukkolajittelu",
+            "review": "Pohdinta"
+        },
+        "mobile_step": "Vaihe",
+        "language": "Suomi"
+    },
+    "welcome": {
+        "title": "Welcome",
+        "description": "Please read the instructions carefully.",
+        "start": "Start Study",
+        "consent": {
+            "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
+            "error": "Hyväksy ehdot jatkaaksesi."
+        },
+        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
+        "restart": "Start a new session",
+        "preview_title": "Esikatselu",
+        "objective_label": "Tutkimuksen tavoite",
+        "instructions_label": "Kulku",
+        "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi."
+    },
     "consent": {
-      "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
-      "error": "Hyväksy ehdot jatkaaksesi."
+        "title": "Suostumus osallistumiseen",
+        "subtitle": "Lue seuraavat tiedot huolellisesti.",
+        "default_text": "**Luottamuksellisuus ja anonymiteetti:**\nVastauksesi käsitellään täysin luottamuksellisesti, nimettöminä ja GDPR:n mukaisesti. Tulokset yhdistetään yleisten suuntausten (näkökulmatekijöiden) tunnistamiseksi, eikä sinua voida tunnistaa yksilöllisesti.\n\n**Tietojen käyttö:**\nKerättyjä tietoja käytetään yksinomaan tieteelliseen tutkimukseen.\n\n**Vapaaehtoinen osallistuminen:**\nOsallistumisesi on täysin vapaaehtoista. Olet vapaa kieltäytymään osallistumisesta tai keskeyttämään tutkimuksen milloin tahansa ilman perusteluja."
     },
-    "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-    "restart": "Start a new session",
-    "preview_title": "Esikatselu",
-    "objective_label": "Tutkimuksen tavoite",
-    "instructions_label": "Kulku",
-    "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi."
-  },
-  "consent": {
-    "title": "Suostumus osallistumiseen",
-    "subtitle": "Lue seuraavat tiedot huolellisesti.",
-    "default_text": "**Luottamuksellisuus ja anonymiteetti:**\nVastauksesi käsitellään täysin luottamuksellisesti, nimettöminä ja GDPR:n mukaisesti. Tulokset yhdistetään yleisten suuntausten (näkökulmatekijöiden) tunnistamiseksi, eikä sinua voida tunnistaa yksilöllisesti.\n\n**Tietojen käyttö:**\nKerättyjä tietoja käytetään yksinomaan tieteelliseen tutkimukseen.\n\n**Vapaaehtoinen osallistuminen:**\nOsallistumisesi on täysin vapaaehtoista. Olet vapaa kieltäytymään osallistumisesta tai keskeyttämään tutkimuksen milloin tahansa ilman perusteluja."
-  },
-  "presort": {
-    "title": "About you",
-    "description": "Please answer a few questions to help us contextualize your point of view.",
-    "submit": "Continue to sorting",
-    "select_placeholder": "Select...",
-    "error_required": "This question is required."
-  },
-  "rough": {
-    "header": {
-      "title": "Mikä on kantasi tähän väittämään?",
-      "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Ei vahvaa mielipidettä).",
-      "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
+    "presort": {
+        "title": "About you",
+        "description": "Please answer a few questions to help us contextualize your point of view.",
+        "submit": "Continue to sorting",
+        "select_placeholder": "Select...",
+        "error_required": "This question is required."
     },
-    "complete": {
-      "title": "Ensimmäinen vaihe valmis",
-      "subtitle": "Nyt tarkennetaan nyansseja."
+    "rough": {
+        "header": {
+            "title": "Mikä on kantasi tähän väittämään?",
+            "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Ei vahvaa mielipidettä).",
+            "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
+        },
+        "complete": {
+            "title": "Ensimmäinen vaihe valmis",
+            "subtitle": "Nyt tarkennetaan nyansseja."
+        },
+        "instructions": {
+            "swipe": "Pyyhkäise tai napauta luokitellaksesi",
+            "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
+        }
     },
-    "instructions": {
-        "swipe": "Pyyhkäise tai napauta luokitellaksesi",
-        "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
+    "fine": {
+        "deck": {
+            "title": "Cards available",
+            "all_placed": "All statements placed",
+            "reset": "Reset deck",
+            "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
+        },
+        "toolbar": {
+            "mobile": "Tap or drag cards to place them on the grid.",
+            "preview": "Kortin esikatselu",
+            "place_instruction": "Tap a slot to place",
+            "read_full": "Tap to read full text",
+            "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
+            "zoom_in": "Zoom In",
+            "zoom_out": "Zoom Out",
+            "fit_screen": "Fit to Screen",
+            "label": "Grid controls"
+        },
+        "grid": {
+            "label": "Sorting Grid",
+            "column": "Column",
+            "slot": "Slot",
+            "in_column": "in column"
+        },
+        "legend": {
+            "disagree": "Täysin eri mieltä",
+            "neutral": "Neutraali",
+            "agree": "Täysin samaa mieltä",
+            "label": "Spectrum legend"
+        },
+        "actions": {
+            "validate": "Vahvista lajittelu",
+            "finish": "Finish sorting",
+            "ready": "Review my perspective",
+            "not_ready": "Place all cards to continue"
+        },
+        "workbench": {
+            "active_card": "Active Card",
+            "place_on_grid": "Tap Grid to Place",
+            "drag_or_tap": "Drag to grid or tap a slot",
+            "initial_instruction": "Sijoita vahvimmat mielipiteet ääripäihin.",
+            "help": "Ohjeet ja säännöt",
+            "methodology": {
+                "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",
+                "extremes_title": "Navat ja ääripäät",
+                "vertical": "Pystysuuntaus: Ylhäältä alas -järjestyksellä ei ole merkitystä, vain vaaka-akseli ratkaisee.",
+                "vertical_title": "Lajitteluakseli",
+                "interaction": "Käsittely: Voit vetää kortteja tai vain napauttaa niitä.",
+                "interaction_title": "Kosketuskomennot",
+                "footer_note": "Jokainen kortti on sijoitettava ennen lopullista vahvistusta.",
+                "close": "Selvä!"
+            }
+        }
+    },
+    "post": {
+        "title": "To conclude",
+        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
+        "extreme": {
+            "why": "What makes this statement so significant to how you see things?",
+            "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
+            "min_chars": "A few words are enough to help us understand the context.",
+            "label_agree": "Most like my view",
+            "label_disagree": "Most unlike my view"
+        },
+        "missing": {
+            "label": "Is there something important about your view that wasn't captured?",
+            "description": "If you feel an important aspect was left out, please describe it here.",
+            "placeholder": "Optional..."
+        },
+        "general": {
+            "label": "General comments",
+            "description": "Any feedback on the study or additional thoughts?",
+            "placeholder": "Optional..."
+        },
+        "submit": "Share my perspective",
+        "validation_error": "Please briefly explain your key choices to continue.",
+        "success": {
+            "title": "Perspective recorded",
+            "message": "Your contribution to the study has been saved.",
+            "id_label": "Confirmation code"
+        }
     }
-  },
-  "fine": {
-    "deck": {
-        "title": "Cards available",
-        "all_placed": "All statements placed",
-        "reset": "Reset deck",
-        "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
-    },
-  "toolbar": {
-      "mobile": "Tap or drag cards to place them on the grid.",
-      "preview": "Kortin esikatselu",
-      "place_instruction": "Tap a slot to place",
-      "read_full": "Tap to read full text",
-      "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
-      "zoom_in": "Zoom In",
-      "zoom_out": "Zoom Out",
-      "fit_screen": "Fit to Screen",
-      "label": "Grid controls"
-  },
-  "grid": {
-      "label": "Sorting Grid",
-      "column": "Column",
-      "slot": "Slot",
-      "in_column": "in column"
-  },
-    "legend": {
-        "disagree": "Täysin eri mieltä",
-        "neutral": "Neutraali",
-        "agree": "Täysin samaa mieltä",
-        "label": "Spectrum legend"
-    },
-    "actions": {
-        "validate": "Vahvista lajittelu",
-        "finish": "Finish sorting",
-        "ready": "Review my perspective",
-        "not_ready": "Place all cards to continue"
-    },
-    "workbench": {
-      "active_card": "Active Card",
-      "place_on_grid": "Tap Grid to Place",
-      "drag_or_tap": "Drag to grid or tap a slot",
-      "initial_instruction": "Sijoita vahvimmat mielipiteet ääripäihin.",
-      "help": "Ohjeet ja säännöt",
-      "methodology": {
-        "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",
-        "extremes_title": "Navat ja ääripäät",
-        "vertical": "Pystysuuntaus: Ylhäältä alas -järjestyksellä ei ole merkitystä, vain vaaka-akseli ratkaisee.",
-        "vertical_title": "Lajitteluakseli",
-        "interaction": "Käsittely: Voit vetää kortteja tai vain napauttaa niitä.",
-        "interaction_title": "Kosketuskomennot",
-        "footer_note": "Jokainen kortti on sijoitettava ennen lopullista vahvistusta.",
-        "close": "Selvä!"
-      }
-    }
-  },
-  "post": {
-    "title": "To conclude",
-    "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
-    "extreme": {
-        "why": "What makes this statement so significant to how you see things?",
-        "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
-        "min_chars": "A few words are enough to help us understand the context.",
-        "label_agree": "Most like my view",
-        "label_disagree": "Most unlike my view"
-    },
-    "missing": {
-        "label": "Is there something important about your view that wasn't captured?",
-        "description": "If you feel an important aspect was left out, please describe it here.",
-        "placeholder": "Optional..."
-    },
-    "general": {
-        "label": "General comments",
-        "description": "Any feedback on the study or additional thoughts?",
-        "placeholder": "Optional..."
-    },
-    "submit": "Share my perspective",
-    "validation_error": "Please briefly explain your key choices to continue.",
-    "success": {
-        "title": "Perspective recorded",
-        "message": "Your contribution to the study has been saved.",
-        "id_label": "Confirmation code"
-    }
-  }
 }

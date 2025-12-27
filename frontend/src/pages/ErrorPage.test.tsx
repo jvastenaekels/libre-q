@@ -22,25 +22,25 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
-        getState: () => ({ resetSession: mockResetSession })
-    }
+        getState: () => ({ resetSession: mockResetSession }),
+    },
 }));
 vi.mock('../store/useConfigStore', () => ({
     useConfigStore: {
-        getState: () => ({ resetConfig: mockResetConfig })
-    }
+        getState: () => ({ resetConfig: mockResetConfig }),
+    },
 }));
 vi.mock('../store/useResponseStore', () => ({
     useResponseStore: {
-        getState: () => ({ resetResponses: mockResetResponses })
-    }
+        getState: () => ({ resetResponses: mockResetResponses }),
+    },
 }));
 
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return {
         ...actual,
-        useNavigate: () => mockNavigate
+        useNavigate: () => mockNavigate,
     };
 });
 
@@ -88,7 +88,7 @@ describe('ErrorPage', () => {
                 <ErrorPage />
             </MemoryRouter>
         );
-        
+
         // Button text is now from translation keys
         const resetButton = screen.getByRole('button', { name: 'common.errors.reset' });
         fireEvent.click(resetButton);
@@ -106,7 +106,7 @@ describe('ErrorPage', () => {
                 <ErrorPage error={new ApiError(429, 'Rate limited')} onRetry={onRetry} />
             </MemoryRouter>
         );
-        
+
         const retryButton = screen.getByRole('button', { name: 'common.errors.retry' });
         fireEvent.click(retryButton);
         expect(onRetry).toHaveBeenCalled();

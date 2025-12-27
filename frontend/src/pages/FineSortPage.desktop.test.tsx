@@ -12,9 +12,13 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
         useConfigStore.getState().resetConfig();
         useResponseStore.getState().resetResponses();
         useSessionStore.getState().resetSession();
-        
+
         // Mock viewport size for desktop
-        Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 });
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 1200,
+        });
         window.dispatchEvent(new Event('resize'));
     });
 

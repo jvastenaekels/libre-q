@@ -26,12 +26,24 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
     const [activeTab, setActiveTab] = useState<'disagree' | 'neutral' | 'agree'>('neutral');
 
     const tabs = [
-        { id: 'disagree', label: 'Disagree', cards: disagree, color: 'text-red-600', bg: 'bg-red-50' },
-        { id: 'neutral', label: 'Neutral', cards: neutral, color: 'text-gray-600', bg: 'bg-gray-50' },
+        {
+            id: 'disagree',
+            label: 'Disagree',
+            cards: disagree,
+            color: 'text-red-600',
+            bg: 'bg-red-50',
+        },
+        {
+            id: 'neutral',
+            label: 'Neutral',
+            cards: neutral,
+            color: 'text-gray-600',
+            bg: 'bg-gray-50',
+        },
         { id: 'agree', label: 'Agree', cards: agree, color: 'text-green-600', bg: 'bg-green-50' },
     ];
 
-    const activeCards = tabs.find(t => t.id === activeTab)?.cards || [];
+    const activeCards = tabs.find((t) => t.id === activeTab)?.cards || [];
 
     // The entire deck area is NOT a single droppable, but a SortableContext.
     // The dropping happens if user moves a card back to this area.
@@ -54,9 +66,9 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
                     >
                         {tab.label} ({tab.cards.length})
                         {activeTab === tab.id && (
-                            <motion.div 
+                            <motion.div
                                 layoutId="activeTab"
-                                className={`absolute bottom-0 left-0 right-0 h-1 ${tab.color.replace('text', 'bg')}`} 
+                                className={`absolute bottom-0 left-0 right-0 h-1 ${tab.color.replace('text', 'bg')}`}
                             />
                         )}
                     </button>
@@ -64,12 +76,12 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
             </div>
 
             {/* Card Scroller */}
-            <div 
+            <div
                 ref={setNodeRef}
-                className={`flex-1 overflow-x-auto overflow-y-hidden p-4 flex items-center gap-4 ${tabs.find(t=>t.id===activeTab)?.bg}`}
+                className={`flex-1 overflow-x-auto overflow-y-hidden p-4 flex items-center gap-4 ${tabs.find((t) => t.id === activeTab)?.bg}`}
             >
-                <SortableContext 
-                    items={activeCards.map(c => c.id)} 
+                <SortableContext
+                    items={activeCards.map((c) => c.id)}
                     strategy={rectSortingStrategy}
                 >
                     {activeCards.length === 0 ? (
@@ -78,7 +90,10 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
                         </div>
                     ) : (
                         activeCards.map((card) => (
-                            <div key={card.id} className="min-w-[100px] w-[100px] h-[133px] sm:min-w-[120px] sm:w-[120px] sm:h-[160px]">
+                            <div
+                                key={card.id}
+                                className="min-w-[100px] w-[100px] h-[133px] sm:min-w-[120px] sm:w-[120px] sm:h-[160px]"
+                            >
                                 <SortableCard id={card.id} text={card.text} code={card.code} />
                             </div>
                         ))

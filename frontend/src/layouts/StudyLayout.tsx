@@ -2,6 +2,14 @@
  * Open-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
+/**
+ * Study Layout
+ *
+ * Wraps the entire study flow (Welcome -> Presort -> Rough -> Fine -> Post).
+ * Manages the top navigation bar, step progress, and locale switching.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -30,12 +38,12 @@ const steps = [
 const StudyLayoutContent: React.FC = () => {
     const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
-    
+
     const config = useConfigStore((state) => state.config);
     const configLoading = useConfigStore((state) => state.isLoading);
     const configError = useConfigStore((state) => state.error);
     const session = useSessionStore();
-    
+
     const location = useLocation();
     const { headerAction } = useLayoutState();
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -79,7 +87,7 @@ const StudyLayoutContent: React.FC = () => {
 
         // Map known error keys to ApiErrors for better UI
         let errorObj: Error | ApiError | null = null;
-        
+
         if (configError === 'common.errors.rate_limited') {
             errorObj = new ApiError(429, 'Too many requests');
         } else if (configError === 'common.errors.network') {
@@ -87,11 +95,11 @@ const StudyLayoutContent: React.FC = () => {
         }
 
         return (
-            <ErrorPage 
+            <ErrorPage
                 error={errorObj}
-                title={!errorObj ? t('common.error') : undefined} 
-                message={!errorObj ? t(configError) : undefined} 
-                onRetry={retry} 
+                title={!errorObj ? t('common.error') : undefined}
+                message={!errorObj ? t(configError) : undefined}
+                onRetry={retry}
             />
         );
     }
@@ -115,7 +123,9 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Basic Protection Check
-    const isProtected = ['presort', 'sort', 'review'].some(path => location.pathname.includes(path));
+    const isProtected = ['presort', 'sort', 'review'].some((path) =>
+        location.pathname.includes(path)
+    );
     if (isProtected && !session.hasConsented) {
         return <Navigate to={`/study/${slug}/welcome`} replace />;
     }
@@ -134,7 +144,6 @@ const StudyLayoutContent: React.FC = () => {
         <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
             {/* Header */}
             <header className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm">
-
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/20 overflow-hidden">
@@ -155,8 +164,14 @@ const StudyLayoutContent: React.FC = () => {
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use logo if on step 1, else config title */}
                         {session.currentStep === 1 ? (
-                            <img src="/open-q-logo.svg" alt="Open-Q" className="h-8 w-auto object-contain" />
-                        ) : (config?.title || 'Q-Method Study')}
+                            <img
+                                src="/open-q-logo.svg"
+                                alt="Open-Q"
+                                className="h-8 w-auto object-contain"
+                            />
+                        ) : (
+                            config?.title || 'Q-Method Study'
+                        )}
                     </div>
 
                     {/* Mobile Step Counter (Next to title) */}
@@ -169,26 +184,35 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
                     <div className="flex items-center gap-1">
                         {steps.map((step, index) => {
-                            const status = session.currentStep === step.id
-                                ? 'current'
-                                : session.currentStep > step.id
-                                    ? 'completed'
-                                    : 'upcoming';
+                            const status =
+                                session.currentStep === step.id
+                                    ? 'current'
+                                    : session.currentStep > step.id
+                                      ? 'completed'
+                                      : 'upcoming';
 
                             return (
                                 <div key={step.id} className="flex items-center">
                                     {/* Connection Line */}
                                     {index > 0 && (
-                                        <div className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${status === 'upcoming' ? 'bg-slate-200' : 'bg-blue-600'}`} />
+                                        <div
+                                            className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${status === 'upcoming' ? 'bg-slate-200' : 'bg-blue-600'}`}
+                                        />
                                     )}
 
                                     {/* Step Node */}
-                                    <div className={`
+                                    <div
+                                        className={`
                            w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                           ${status === 'current' ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50' :
-                                            status === 'completed' ? 'bg-blue-600 border-blue-600 text-white' :
-                                                'border-slate-200 bg-slate-50 text-slate-300'}
-                       `}>
+                           ${
+                               status === 'current'
+                                   ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
+                                   : status === 'completed'
+                                     ? 'bg-blue-600 border-blue-600 text-white'
+                                     : 'border-slate-200 bg-slate-50 text-slate-300'
+                           }
+                       `}
+                                    >
                                         {status === 'completed' ? (
                                             <Check size={16} strokeWidth={3} />
                                         ) : status === 'current' ? (
@@ -226,7 +250,11 @@ const StudyLayoutContent: React.FC = () => {
                         {isLangMenuOpen && (
                             <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in zoom-in-95">
                                 {['en', 'fr', 'fi']
-                                    .filter(lang => !config?.available_languages || config.available_languages.includes(lang))
+                                    .filter(
+                                        (lang) =>
+                                            !config?.available_languages ||
+                                            config.available_languages.includes(lang)
+                                    )
                                     .map((lang) => (
                                         <button
                                             key={lang}
@@ -242,17 +270,18 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
 
                     {/* Primary Action (Desktop) */}
-                    <div className="hidden md:block">
-                        {headerAction}
-                    </div>
+                    <div className="hidden md:block">{headerAction}</div>
                 </div>
             </header>
 
             {/* Main Content */}
-            <main className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some(path => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-
+            <main
+                className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
+            >
                 {/* Transition Overlay / Dimming */}
-                <div className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                <div
+                    className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                >
                     <ErrorBoundary>
                         <Outlet />
                     </ErrorBoundary>

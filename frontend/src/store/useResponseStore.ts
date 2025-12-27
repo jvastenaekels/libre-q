@@ -21,7 +21,7 @@ interface Responses {
 
 interface ResponseActions {
     setPresortResponse: (data: Record<string, string | number | boolean>) => void;
-    
+
     // Rough Sort
     categorizeCard: (statementId: number, category: 'agree' | 'disagree' | 'neutral') => void;
     undoRoughSort: () => void;
@@ -34,8 +34,11 @@ interface ResponseActions {
     resetFineSort: () => void;
 
     // Post Sort
-    setPostSortResponse: (field: keyof Responses['postsort'], value: string | Record<number, string>) => void;
-    
+    setPostSortResponse: (
+        field: keyof Responses['postsort'],
+        value: string | Record<number, string>
+    ) => void;
+
     resetResponses: () => void;
 }
 
@@ -73,14 +76,14 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         rough: {
                             ...rough,
                             [category]: [...rough[category], statementId],
-                            history: [...rough.history, statementId]
+                            history: [...rough.history, statementId],
                         },
-                        qsort: [] // Reset Fine Sort logic
+                        qsort: [], // Reset Fine Sort logic
                     };
                 });
-                
-                // Downgrade max step? Logic was in useStudyStore. 
-                // We should probably handle step logic in the component or a dedicated controller, 
+
+                // Downgrade max step? Logic was in useStudyStore.
+                // We should probably handle step logic in the component or a dedicated controller,
                 // but strictly keeping it here mimics old behavior.
                 // However, accessing other store to set step is tricky.
                 // Let's stick to data updates. Step regression logic should be in the UI/Page.
@@ -97,12 +100,12 @@ export const useResponseStore = create<Responses & ResponseActions>()(
 
                     return {
                         rough: {
-                            agree: rough.agree.filter(id => id !== lastCardId),
-                            disagree: rough.disagree.filter(id => id !== lastCardId),
-                            neutral: rough.neutral.filter(id => id !== lastCardId),
-                            history: newHistory
+                            agree: rough.agree.filter((id) => id !== lastCardId),
+                            disagree: rough.disagree.filter((id) => id !== lastCardId),
+                            neutral: rough.neutral.filter((id) => id !== lastCardId),
+                            history: newHistory,
                         },
-                        qsort: []
+                        qsort: [],
                     };
                 });
                 triggerAutoSave();
@@ -116,14 +119,16 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 if (!colConfig) return;
 
                 const state = get();
-                const cardsInCol = state.qsort.filter(c => c.col === col && c.statementId !== statementId);
-                
+                const cardsInCol = state.qsort.filter(
+                    (c) => c.col === col && c.statementId !== statementId
+                );
+
                 if (cardsInCol.length >= colConfig.capacity) {
                     console.warn(`Column ${col} is full.`);
                     return;
                 }
 
-                const filtered = state.qsort.filter(p => p.statementId !== statementId);
+                const filtered = state.qsort.filter((p) => p.statementId !== statementId);
                 set({ qsort: [...filtered, { statementId, col, row }] });
                 triggerAutoSave();
             },
@@ -136,33 +141,37 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 if (!colConfig) return;
 
                 const state = get();
-                const cardsInCol = state.qsort.filter(c => c.col === col && c.statementId !== statementId);
-                
+                const cardsInCol = state.qsort.filter(
+                    (c) => c.col === col && c.statementId !== statementId
+                );
+
                 if (cardsInCol.length >= colConfig.capacity) return;
 
-                const filtered = state.qsort.filter(p => p.statementId !== statementId);
+                const filtered = state.qsort.filter((p) => p.statementId !== statementId);
                 set({ qsort: [...filtered, { statementId, col, row }] });
                 triggerAutoSave();
             },
 
             swapCardsInGrid: (id1, id2) => {
                 const state = get();
-                const card1 = state.qsort.find(p => p.statementId === id1);
-                const card2 = state.qsort.find(p => p.statementId === id2);
+                const card1 = state.qsort.find((p) => p.statementId === id1);
+                const card2 = state.qsort.find((p) => p.statementId === id2);
 
                 if (!card1 || !card2) return;
 
                 const newCard1 = { ...card1, col: card2.col, row: card2.row };
                 const newCard2 = { ...card2, col: card1.col, row: card1.row };
 
-                const others = state.qsort.filter(p => p.statementId !== id1 && p.statementId !== id2);
+                const others = state.qsort.filter(
+                    (p) => p.statementId !== id1 && p.statementId !== id2
+                );
                 set({ qsort: [...others, newCard1, newCard2] });
                 triggerAutoSave();
             },
 
             unplaceCard: (statementId) => {
                 set((state) => ({
-                    qsort: state.qsort.filter(p => p.statementId !== statementId)
+                    qsort: state.qsort.filter((p) => p.statementId !== statementId),
                 }));
                 triggerAutoSave();
             },
@@ -176,17 +185,17 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 set((state) => ({
                     postsort: {
                         ...state.postsort,
-                        [field]: value
-                    }
+                        [field]: value,
+                    },
                 }));
                 triggerAutoSave();
             },
 
-            resetResponses: () => set(initialResponses)
+            resetResponses: () => set(initialResponses),
         }),
         {
             name: 'open-q-responses',
-            version: 1
+            version: 1,
         }
     )
 );

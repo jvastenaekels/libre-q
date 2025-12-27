@@ -14,40 +14,38 @@ const mockConfig: StudyConfig = {
     title: 'Test',
     description: 'Test',
     instructions: 'Test',
-    statements: [
-        { id: 1, text: 'S1' }
-    ],
+    statements: [{ id: 1, text: 'S1' }],
     grid_config: [],
-    presort_config: {}
+    presort_config: {},
 };
 
 // Mock Stores (Core)
 vi.mock('../store/useConfigStore', () => ({
     useConfigStore: Object.assign(vi.fn(), {
-        getState: () => ({ setConfig: vi.fn(), config: mockConfig })
-    })
+        getState: () => ({ setConfig: vi.fn(), config: mockConfig }),
+    }),
 }));
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: Object.assign(vi.fn(), {
-        getState: () => ({ resetSession: vi.fn() })
-    })
+        getState: () => ({ resetSession: vi.fn() }),
+    }),
 }));
 vi.mock('../store/useResponseStore', () => ({
     useResponseStore: Object.assign(vi.fn(), {
-        getState: () => ({ resetResponses: vi.fn() })
-    })
+        getState: () => ({ resetResponses: vi.fn() }),
+    }),
 }));
 vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
 }));
 
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} }
+    initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 describe('RoughSortPage Integration', () => {
@@ -58,20 +56,23 @@ describe('RoughSortPage Integration', () => {
     it('shows "Next" button in page body when rough sort is complete', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
-            useResponseStore: { 
-                rough: { history: [1] }, 
-                categorizeCard: vi.fn(), 
-                undoRoughSort: vi.fn() 
+            useResponseStore: {
+                rough: { history: [1] },
+                categorizeCard: vi.fn(),
+                undoRoughSort: vi.fn(),
             },
-            useSessionStore: { 
-                hasConsented: true, currentStep: 3, isSaving: false, 
-                setStep: vi.fn(), setLanguage: vi.fn() 
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 3,
+                isSaving: false,
+                setStep: vi.fn(),
+                setLanguage: vi.fn(),
             },
-            useUIStore: { hoveredCard: null, setHoveredCard: vi.fn() }
+            useUIStore: { hoveredCard: null, setHoveredCard: vi.fn() },
         });
 
-        renderWithProviders(<RoughSortPage />, { 
-            initialEntries: ['/study/demo/sort/rough'] 
+        renderWithProviders(<RoughSortPage />, {
+            initialEntries: ['/study/demo/sort/rough'],
         });
 
         const nextBtns = screen.getAllByText('common.next');
@@ -81,20 +82,23 @@ describe('RoughSortPage Integration', () => {
     it('does not show "Next" button when incomplete', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
-            useResponseStore: { 
-                rough: { history: [] }, 
-                categorizeCard: vi.fn(), 
-                undoRoughSort: vi.fn() 
+            useResponseStore: {
+                rough: { history: [] },
+                categorizeCard: vi.fn(),
+                undoRoughSort: vi.fn(),
             },
-            useSessionStore: { 
-                hasConsented: true, currentStep: 3, isSaving: false, 
-                setStep: vi.fn(), setLanguage: vi.fn() 
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 3,
+                isSaving: false,
+                setStep: vi.fn(),
+                setLanguage: vi.fn(),
             },
-            useUIStore: { hoveredCard: null, setHoveredCard: vi.fn() }
+            useUIStore: { hoveredCard: null, setHoveredCard: vi.fn() },
         });
 
-        renderWithProviders(<RoughSortPage />, { 
-            initialEntries: ['/study/demo/sort/rough'] 
+        renderWithProviders(<RoughSortPage />, {
+            initialEntries: ['/study/demo/sort/rough'],
         });
 
         expect(screen.queryByText('common.next')).toBeNull();

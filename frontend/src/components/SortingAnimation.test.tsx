@@ -5,11 +5,11 @@ import SortingAnimation from './SortingAnimation';
 describe('SortingAnimation', () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        
+
         // Mock matchMedia
         Object.defineProperty(window, 'matchMedia', {
             writable: true,
-            value: vi.fn().mockImplementation(query => ({
+            value: vi.fn().mockImplementation((query) => ({
                 matches: false,
                 media: query,
                 onchange: null,
@@ -31,18 +31,18 @@ describe('SortingAnimation', () => {
 
     it('renders both Rough and Fine sort containers', () => {
         render(<SortingAnimation />);
-        
+
         // Check for presence of key elements from both phases
         // Rough Sort (Phase 1)
         expect(screen.getByTestId('phase-1')).toBeInTheDocument();
-        
+
         // Fine Sort (Phase 2)
         expect(screen.getByTestId('phase-2')).toBeInTheDocument();
     });
 
     it('applies responsive classes for layout switching', () => {
         render(<SortingAnimation />);
-        
+
         // Use data-testids
         const phase1Container = screen.getByTestId('phase-1');
         const phase2Container = screen.getByTestId('phase-2');
@@ -63,7 +63,7 @@ describe('SortingAnimation', () => {
 
         const phase2Container = screen.getByTestId('phase-2');
 
-        // Phase 2 should be inactive (hidden/dimmed) initially 
+        // Phase 2 should be inactive (hidden/dimmed) initially
         expect(phase2Container).toHaveClass('opacity-0');
     });
 
@@ -73,7 +73,7 @@ describe('SortingAnimation', () => {
         // Rough sort duration calculation roughly:
         // 5 cards * (0.6s + 0.2s gap) + 1.2s pause = ~5.2s
         // Let's advance time enough to cover Rough Sort
-        
+
         // Advance time in steps to allow effect cycles (re-renders) to run and schedule new timers
         for (let i = 0; i < 8; i++) {
             act(() => {
@@ -86,7 +86,7 @@ describe('SortingAnimation', () => {
 
         // Phase 1 should now be inactive
         expect(phase1Container).toHaveClass('opacity-0');
-        
+
         // Phase 2 should now be active
         expect(phase2Container).toHaveClass('opacity-100');
     });

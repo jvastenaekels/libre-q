@@ -19,27 +19,35 @@ import type { PreSortField } from '../schemas/study';
 const PreSortPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    
+
     const config = useConfigStore((state) => state.config);
     const setStep = useSessionStore((state) => state.setStep);
     const presortResponse = useResponseStore((state) => state.presort);
     const setPresortResponse = useResponseStore((state) => state.setPresortResponse);
-    
+
     const { t, i18n } = useTranslation();
-    
+
     // Generate Dynamic Zod Schema based on config
     const dynamicSchema = useMemo(() => {
         if (!config?.presort_config) return z.object({});
-        
+
         const shape: Record<string, z.ZodTypeAny> = {};
-        
+
         Object.entries(config.presort_config).forEach(([key, field]) => {
             let fieldSchema: z.ZodTypeAny;
-            
+
             if (field.type === 'number') {
                 fieldSchema = z.coerce.number();
-                if (field.min !== undefined) fieldSchema = (fieldSchema as z.ZodNumber).min(field.min, t('common.errors.min', { min: field.min }));
-                if (field.max !== undefined) fieldSchema = (fieldSchema as z.ZodNumber).max(field.max, t('common.errors.max', { max: field.max }));
+                if (field.min !== undefined)
+                    fieldSchema = (fieldSchema as z.ZodNumber).min(
+                        field.min,
+                        t('common.errors.min', { min: field.min })
+                    );
+                if (field.max !== undefined)
+                    fieldSchema = (fieldSchema as z.ZodNumber).max(
+                        field.max,
+                        t('common.errors.max', { max: field.max })
+                    );
             } else {
                 fieldSchema = z.string();
             }
@@ -51,17 +59,22 @@ const PreSortPage: React.FC = () => {
             } else {
                 fieldSchema = fieldSchema.optional().nullable();
             }
-            
+
             shape[key] = fieldSchema;
         });
-        
+
         return z.object(shape);
     }, [config?.presort_config, t]);
 
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors, isValid },
+    } = useForm({
         resolver: zodResolver(dynamicSchema),
         mode: 'onChange',
-        defaultValues: presortResponse
+        defaultValues: presortResponse,
     });
 
     // Auto-save form data to store using subscription to avoid render loops
@@ -93,10 +106,11 @@ const PreSortPage: React.FC = () => {
     };
 
     const renderField = (key: string, fieldConfig: PreSortField) => {
-        const commonClasses = "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[44px] text-base"; 
+        const commonClasses =
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[44px] text-base';
         const labelText = getLocalizedText(fieldConfig.label);
-        
-            switch (fieldConfig.type) {
+
+        switch (fieldConfig.type) {
             case 'number':
                 return (
                     <input
@@ -104,21 +118,22 @@ const PreSortPage: React.FC = () => {
                         type="number"
                         {...register(key)}
                         className={commonClasses}
-                        placeholder={labelText} 
+                        placeholder={labelText}
                     />
                 );
             case 'select':
                 return (
-                    <select
-                        id={key}
-                        {...register(key)}
-                        className={commonClasses}
-                    >
+                    <select id={key} {...register(key)} className={commonClasses}>
                         <option value="">{t('presort.select_placeholder')}</option>
                         {fieldConfig.options?.map((opt) => {
                             const optValue = typeof opt === 'object' ? opt.value : opt;
-                            const optLabel = typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
-                            return <option key={optValue} value={optValue}>{optLabel}</option>;
+                            const optLabel =
+                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
+                            return (
+                                <option key={optValue} value={optValue}>
+                                    {optLabel}
+                                </option>
+                            );
                         })}
                     </select>
                 );
@@ -142,7 +157,11 @@ const PreSortPage: React.FC = () => {
                 <p className="text-gray-600">{t('presort.description')}</p>
             </div>
 
-            <form id="presort-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <form
+                id="presort-form"
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
+            >
                 {Object.entries(config.presort_config || {}).map(([key, fieldConfig]) => (
                     <div key={key}>
                         <label htmlFor={key} className="block text-sm font-medium text-gray-700">
@@ -152,7 +171,7 @@ const PreSortPage: React.FC = () => {
                         {renderField(key, fieldConfig as PreSortField)}
                         {errors[key] && (
                             <p className="text-red-500 text-sm mt-1">
-                                {errors[key]?.message as string || t('presort.error_required')}
+                                {(errors[key]?.message as string) || t('presort.error_required')}
                             </p>
                         )}
                     </div>
