@@ -6,7 +6,7 @@
 
 from collections import Counter
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from fastapi import HTTPException
 from sqlalchemy import delete, select
@@ -40,7 +40,7 @@ class StudyService:
             )
         )
         result = await db.execute(stmt)
-        return result.scalar_one_or_none()
+        return cast(Study | None, result.scalar_one_or_none())
 
     @staticmethod
     def resolve_translation(
@@ -172,7 +172,8 @@ class StudyService:
             participant.language_used = data.language_used
             participant.presort_answers = data.presort_answers
             participant.postsort_answers = data.postsort_answers
-            participant.status = data.status
+            if data.status:
+                participant.status = data.status
             participant.confirmation_code = confirmation_code
             participant.ip_address = hashed_ip
             participant.submitted_at = datetime.now()

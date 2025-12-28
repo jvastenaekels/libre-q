@@ -44,7 +44,7 @@ test.describe('Full Study Flow (Desktop)', () => {
             await page.keyboard.press(key);
 
             // Wait for animation
-            await page.waitForTimeout(1000);
+            await page.waitForTimeout(800);
         }
 
         // Click Next to proceed to Fine Sort (Rough Sort Complete screen)
@@ -54,8 +54,10 @@ test.describe('Full Study Flow (Desktop)', () => {
             .click();
 
         // Wait for redirection to Fine Sort
-        // Use visible UI element check instead of just URL to be more robust
-        await expect(page.getByText(/Grid Sort|Step 4/i).first()).toBeVisible();
+        await expect(page).toHaveURL(/.*\/fine-sort/);
+        
+        // Verify we are on Fine Sort by deck or grid existence
+        await expect(page.getByTestId('deck-cards-container')).toBeVisible();
 
         // 4. FINE SORT PAGE
         // This is complex on desktop (drag and drop).

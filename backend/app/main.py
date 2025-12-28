@@ -4,7 +4,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -45,7 +45,18 @@ app = FastAPI(title="Open-Q API", lifespan=lifespan)
 
 # Rate Limiter
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+# Fix MyPy: Handler for RateLimitExceeded needs to match expected signature
+async def _rate_limit_exceeded_handler_wrapper(
+    request: Request, exc: Exception
+) -> Response:
+    if isinstance(exc, RateLimitExceeded):
+        return _rate_limit_exceeded_handler(request, exc)
+    return Response("Internal Server Error", status_code=500)
+
+
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler_wrapper)
 app.add_exception_handler(Exception, global_exception_handler)
 
 # Security Headers (Pure ASGI)

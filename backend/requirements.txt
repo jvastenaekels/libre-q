@@ -9,3 +9,5 @@ aiofiles==24.1.0
 slowapi==0.1.9
 passlib[bcrypt]==1.7.4
 gunicorn==23.0.0
+starlette==0.37.2
+pydantic==2.7.4

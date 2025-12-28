@@ -8,6 +8,8 @@ test.describe('Mobile UX (Focus Flow)', () => {
         hasTouch: true,
     });
 
+    test.skip(({ browserName }) => browserName === 'firefox', 'Firefox does not support mobile emulation');
+
     test.beforeEach(async ({ page }) => {
         await mockStudyAPI(page);
     });
@@ -31,7 +33,8 @@ test.describe('Mobile UX (Focus Flow)', () => {
         for (let i = 0; i < cardsTotal; i++) {
             const key = keys[i % 3];
             await page.keyboard.press(key);
-            await page.waitForTimeout(1000);
+            await page.keyboard.press(key);
+            await page.waitForTimeout(800);
         }
 
         // Click Next (Intermediate screen)

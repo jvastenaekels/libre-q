@@ -46,7 +46,7 @@ const App = () => {
                             <Route path="consent" element={<ConsentPage />} />
                             <Route path="presort" element={<PreSortPage />} />
                             <Route path="rough-sort" element={<RoughSortPage />} />
-                            <Route path="sort" element={<FineSortPage />} />
+                            <Route path="fine-sort" element={<FineSortPage />} />
                             <Route path="post-sort" element={<PostSortPage />} />
                             <Route path="reset" element={<ResetPage />} />
 

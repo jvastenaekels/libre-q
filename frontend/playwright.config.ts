@@ -35,7 +35,7 @@ export default defineConfig({
         headless: true,
 
         /* Base URL for navigation */
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://127.0.0.1:5173',
 
         /* Collect trace when retrying the failed test */
         trace: 'on-first-retry',
@@ -56,6 +56,7 @@ export default defineConfig({
             name: 'chromium',
             use: { ...devices['Desktop Chrome'] },
         },
+        // Firefox doesn't support isMobile option well in Playwright
         {
             name: 'firefox',
             use: { ...devices['Desktop Firefox'] },
@@ -77,7 +78,7 @@ export default defineConfig({
     /* Run local dev server before starting tests */
     webServer: {
         command: 'npm run dev',
-        url: 'http://localhost:5173',
+        url: 'http://127.0.0.1:5173',
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,
     },

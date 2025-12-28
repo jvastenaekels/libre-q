@@ -193,7 +193,7 @@ const RoughSortPage: React.FC = () => {
 
                 <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
-                        onClick={() => navigate(`/study/${slug}/sort`)}
+                        onClick={() => navigate(`/study/${slug}/fine-sort`)}
                         className="px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
                     >
                         {t('common.next')} <ArrowRight size={18} />

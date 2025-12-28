@@ -57,3 +57,33 @@ omit = ["tests/*"]
 
 [tool.coverage.report]
 fail_under = 80
+
+[tool.deptry]
+ignore_notebooks = true
+requirements_txt = ["requirements.txt", "requirements-dev.txt"]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["app"]
+DEP002 = [
+    "uvicorn",
+    "gunicorn",
+    "aiosqlite",
+    "asyncpg",
+    "passlib",
+    "email-validator",
+    "python-multipart",
+    "pydantic-settings",
+    "aiofiles",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "bandit",
+    "pre-commit",
+    "pip-audit",
+    "mypy",
+    "radon",
+    "vulture",
+    "import-linter",
+    "deptry",
+    "ruff"
+]
