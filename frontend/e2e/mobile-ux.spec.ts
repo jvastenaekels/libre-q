@@ -8,7 +8,10 @@ test.describe('Mobile UX (Focus Flow)', () => {
         hasTouch: true,
     });
 
-    test.skip(({ browserName }) => browserName === 'firefox', 'Firefox does not support mobile emulation');
+    test.skip(
+        ({ browserName }) => browserName === 'firefox',
+        'Firefox does not support mobile emulation'
+    );
 
     test.beforeEach(async ({ page }) => {
         await mockStudyAPI(page);

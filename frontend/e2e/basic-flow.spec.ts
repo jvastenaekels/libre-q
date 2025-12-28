@@ -55,7 +55,7 @@ test.describe('Full Study Flow (Desktop)', () => {
 
         // Wait for redirection to Fine Sort
         await expect(page).toHaveURL(/.*\/fine-sort/);
-        
+
         // Verify we are on Fine Sort by deck or grid existence
         await expect(page.getByTestId('deck-cards-container')).toBeVisible();
 
