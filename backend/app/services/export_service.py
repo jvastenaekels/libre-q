@@ -64,7 +64,8 @@ class ExportService:
                 entry.statement_id: entry.grid_score for entry in p.qsort_entries
             }
             for s in study.statements:
-                row.append(scores_map.get(s.id, ""))
+                score = scores_map.get(s.id)
+                row.append(str(score) if score is not None else "")
 
             # Postsort
             for k in postsort_keys:
