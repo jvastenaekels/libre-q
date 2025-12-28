@@ -1,4 +1,5 @@
 """Integration tests for admin study exports."""
+
 import io
 import zipfile
 

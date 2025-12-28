@@ -1,4 +1,5 @@
 """Integration tests for edge cases in the submissions router, properly mocking DB and Service layers."""
+
 import pytest
 
 from app.models import Statement, Study, StudyState, User

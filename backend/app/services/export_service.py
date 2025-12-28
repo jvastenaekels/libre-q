@@ -1,4 +1,5 @@
 """Service for exporting study results in various formats."""
+
 import csv
 import io
 import zipfile

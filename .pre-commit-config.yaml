@@ -9,56 +9,66 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+      - id: check-json
+        exclude: ^frontend/tsconfig.*\.json$
 
   # -------------------------
   # BACKEND (Python/FastAPI)
   # -------------------------
-  # Ruff : All-in-one linter/formatter
+  # Ruff : Linter/Formatter (Aligné sur la version récente)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.8.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
         files: ^backend/
-        exclude: backend/vulture_whitelist.py
       - id: ruff-format
-        files: ^backend/
-        exclude: backend/vulture_whitelist.py
-
-  # Radon : Cyclomatic Complexity
-  - repo: local
-    hooks:
-      - id: radon-cc
-        name: Radon (Complexity)
-        entry: backend/venv/bin/radon cc
-        language: system
-        args: ["-a", "-nb", "--min", "B"]
         files: ^backend/
 
   # Mypy : Static Type Checking
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.13.0
     hooks:
       - id: mypy
         files: ^backend/
-        args:
-          ["--ignore-missing-imports", "--config-file=backend/pyproject.toml"]
-        additional_dependencies: [types-requests]
-        exclude: backend/vulture_whitelist.py
+        args: ["--config-file=backend/pyproject.toml"]
+        additional_dependencies: [types-requests, pydantic]
+
+  # Sécurité & Hygiène (Local System Hooks)
+  - repo: local
+    hooks:
+      # Radon : Complexity
+      - id: radon-cc
+        name: Radon (Complexity)
+        entry: radon cc
+        language: system
+        args: ["-a", "-nb", "--min", "B"]
+        files: ^backend/
+        types: [python]
+
+      # Deptry : Dependency Hygiene
+      - id: deptry
+        name: Deptry (Check Dependencies)
+        entry: bash -c 'cd backend && deptry app'
+        language: system
+        files: ^backend/pyproject.toml|backend/.*\.py$
+        pass_filenames: false
+
+      # Bandit : Security SAST
+      - id: bandit
+        name: Bandit (Security)
+        entry: bandit
+        language: system
+        args: ["-r", "backend/app", "-ll"]
+        files: ^backend/
+        pass_filenames: false
 
   # -------------------------
   # FRONTEND (React/TypeScript)
   # -------------------------
-  # Delegate to npm to use local versions
   - repo: local
     hooks:
-      - id: frontend-lint
-        name: Frontend Lint (ESLint)
-        entry: bash -c 'cd frontend && npm run lint'
-        language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-
+      # TypeScript Check
       - id: frontend-typecheck
         name: Frontend Typecheck (TSC)
         entry: bash -c 'cd frontend && npm run type-check'
@@ -66,9 +76,26 @@ repos:
         files: ^frontend/.*\.(ts|tsx)$
         pass_filenames: false
 
+      # Linting standard
+      - id: frontend-lint
+        name: Frontend Lint (ESLint)
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+
+      # Formatage
       - id: frontend-format
         name: Frontend Format (Prettier)
         entry: bash -c 'cd frontend && npm run format'
         language: system
         files: ^frontend/.*\.(ts|tsx|css|md|json)$
+        pass_filenames: false
+
+      # Architecture/Dead Code
+      - id: frontend-knip
+        name: Frontend Dead Code (Knip)
+        entry: bash -c 'cd frontend && npm run lint:deadcode'
+        language: system
+        files: ^frontend/
         pass_filenames: false
