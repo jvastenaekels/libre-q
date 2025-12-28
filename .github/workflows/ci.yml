@@ -63,7 +63,7 @@ jobs:
           PYTHONPATH: ./backend
 
       - name: Dependency Hygiene (Deptry)
-        run: deptry backend/app
+        run: cd backend && deptry app
 
       - name: Dead Code (Vulture)
         run: python -m vulture backend/app backend/vulture_whitelist.py --min-confidence 60
