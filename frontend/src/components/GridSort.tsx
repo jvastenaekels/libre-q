@@ -101,8 +101,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             return () => window.removeEventListener('resize', checkMobile);
         }, []);
 
-        const isDeckCollapsed = false; // Never collapse deck anymore as per user request
-
         // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
         const contentRef = useRef<HTMLDivElement>(null);
         const pyramidRef = useRef<HTMLDivElement>(null);
@@ -179,9 +177,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             const t = setTimeout(performAutoFit, 100);
             return () => clearTimeout(t);
         }, [cardDimensions, autoFitEnabled, performAutoFit]);
-
-        // Derived: active statement for the hub
-        // const selectedCard = selectedCardProp; (already moved up)
 
         const renderDeckCards = useCallback(() => {
             return activeCards.length > 0 ? (
@@ -399,7 +394,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
           overflow-hidden pb-safe lg:pb-0
         `}
                     style={{
-                        height: isMobile ? (isDeckCollapsed ? 'auto' : `${deckHeight}px`) : '100%',
+                        height: isMobile ? `${deckHeight}px` : '100%',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -411,114 +406,106 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
                     {/* Category selector (Piles) */}
                     <div className="flex-none p-4 pb-2">
-                        {!isDeckCollapsed && (
-                            <div className="flex lg:grid lg:grid-cols-3 gap-2" role="tablist">
-                                {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
-                                    const isActive = activePile === pile;
-                                    const cards =
-                                        pile === 'disagree'
-                                            ? disagreeCards
-                                            : pile === 'agree'
-                                              ? agreeCards
-                                              : neutralCards;
-                                    const Icon =
-                                        pile === 'disagree'
-                                            ? Frown
-                                            : pile === 'agree'
-                                              ? Smile
-                                              : Meh;
+                        <div className="flex lg:grid lg:grid-cols-3 gap-2" role="tablist">
+                            {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
+                                const isActive = activePile === pile;
+                                const cards =
+                                    pile === 'disagree'
+                                        ? disagreeCards
+                                        : pile === 'agree'
+                                          ? agreeCards
+                                          : neutralCards;
+                                const Icon =
+                                    pile === 'disagree' ? Frown : pile === 'agree' ? Smile : Meh;
 
-                                    const pileStyles = {
-                                        disagree: {
-                                            icon: 'text-red-500',
-                                            activeBg: 'bg-red-50 border-red-300',
-                                            activeText: 'text-red-700',
-                                            activeBadge: 'bg-red-600 text-white border-white',
-                                            activeBar: 'bg-red-200',
-                                        },
-                                        neutral: {
-                                            icon: 'text-gray-500',
-                                            activeBg: 'bg-gray-100 border-gray-300',
-                                            activeText: 'text-gray-700',
-                                            activeBadge: 'bg-gray-600 text-white border-white',
-                                            activeBar: 'bg-gray-200',
-                                        },
-                                        agree: {
-                                            icon: 'text-green-500',
-                                            activeBg: 'bg-green-50 border-green-300',
-                                            activeText: 'text-green-700',
-                                            activeBadge: 'bg-green-600 text-white border-white',
-                                            activeBar: 'bg-green-200',
-                                        },
-                                    };
-                                    const style = pileStyles[pile];
+                                const pileStyles = {
+                                    disagree: {
+                                        icon: 'text-red-500',
+                                        activeBg: 'bg-red-50 border-red-300',
+                                        activeText: 'text-red-700',
+                                        activeBadge: 'bg-red-600 text-white border-white',
+                                        activeBar: 'bg-red-200',
+                                    },
+                                    neutral: {
+                                        icon: 'text-gray-500',
+                                        activeBg: 'bg-gray-100 border-gray-300',
+                                        activeText: 'text-gray-700',
+                                        activeBadge: 'bg-gray-600 text-white border-white',
+                                        activeBar: 'bg-gray-200',
+                                    },
+                                    agree: {
+                                        icon: 'text-green-500',
+                                        activeBg: 'bg-green-50 border-green-300',
+                                        activeText: 'text-green-700',
+                                        activeBadge: 'bg-green-600 text-white border-white',
+                                        activeBar: 'bg-green-200',
+                                    },
+                                };
+                                const style = pileStyles[pile];
 
-                                    return (
-                                        <button
-                                            key={pile}
-                                            onClick={() => {
-                                                setActivePile(pile as PileType);
-                                                // Only trigger zonal focus/zoom on mobile
-                                                if (isMobile) {
-                                                    setHasPerformedZonalFocus(true);
-                                                }
-                                            }}
-                                            role="tab"
-                                            aria-selected={isActive}
-                                            aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
-                                            className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
+                                return (
+                                    <button
+                                        key={pile}
+                                        onClick={() => {
+                                            setActivePile(pile as PileType);
+                                            // Only trigger zonal focus/zoom on mobile
+                                            if (isMobile) {
+                                                setHasPerformedZonalFocus(true);
+                                            }
+                                        }}
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
+                                        className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
                                       ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
                                     `}
+                                    >
+                                        <Icon size={24} className={`lg:hidden ${style.icon}`} />
+                                        <span
+                                            className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}
                                         >
-                                            <Icon size={24} className={`lg:hidden ${style.icon}`} />
-                                            <span
-                                                className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}
-                                            >
-                                                {t(`common.${pile}`)}
-                                            </span>
-                                            <div
-                                                className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}
-                                            ></div>
-                                            <div
-                                                className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}
-                                            ></div>
-                                            <motion.span
-                                                key={cards.length}
-                                                className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}
-                                            >
-                                                {cards.length}
-                                            </motion.span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
+                                            {t(`common.${pile}`)}
+                                        </span>
+                                        <div
+                                            className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}
+                                        ></div>
+                                        <div
+                                            className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}
+                                        ></div>
+                                        <motion.span
+                                            key={cards.length}
+                                            className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}
+                                        >
+                                            {cards.length}
+                                        </motion.span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    {!isDeckCollapsed && (
-                        <motion.div
-                            key={activePile}
-                            initial={{
-                                backgroundColor:
-                                    activePile === 'disagree'
-                                        ? '#fee2e2'
-                                        : activePile === 'agree'
-                                          ? '#dcfce7'
-                                          : '#f1f5f9',
-                            }}
-                            animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }}
-                            transition={{ duration: 0.8 }}
-                            className={`
+                    <motion.div
+                        key={activePile}
+                        initial={{
+                            backgroundColor:
+                                activePile === 'disagree'
+                                    ? '#fee2e2'
+                                    : activePile === 'agree'
+                                      ? '#dcfce7'
+                                      : '#f1f5f9',
+                        }}
+                        animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }}
+                        transition={{ duration: 0.8 }}
+                        className={`
                         flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-center justify-start custom-scrollbar
                         ${activeCards.length === 0 ? 'justify-center' : ''}
                         lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:p-2
                         ${activeCards.length === 0 ? 'lg:place-content-center' : 'lg:content-start'}
                     `}
-                            data-testid="deck-cards-container"
-                        >
-                            {renderDeckCards()}
-                        </motion.div>
-                    )}
+                        data-testid="deck-cards-container"
+                    >
+                        {renderDeckCards()}
+                    </motion.div>
                     {/* PANEL FOOTER: Guidance or Validation */}
                     <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
                         {isAllPlaced && !selectedCardId ? (
