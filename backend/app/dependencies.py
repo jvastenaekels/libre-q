@@ -54,63 +54,43 @@ ROLE_HIERARCHY = {StudyRole.owner: 30, StudyRole.editor: 20, StudyRole.viewer: 1
 
 
 def check_study_permission(required_role: StudyRole) -> Callable:
-    """Factory creating a dependency to check if current_user has 'required_role' (or higher) on 'study_id'."""
+    """Factory creating a dependency to check if current_user has 'required_role' (or higher) on 'slug'."""
 
     async def permission_dependency(
-        study_slug: str = Path(
-            ..., description="The slug of the study"
-        ),  # Using slug usually, or ID?
-        # CAUTION: The user request mentioned 'study_id', but URLs usually use 'slug'.
-        # Let's support both or check what usage implies.
-        # The prompt said "Prendre study_id...". But mostly we use slugs in routes.
-        # Let's assume we might need to look up study by ID or slug.
-        # If the route uses `study_id`, we expect `study_id`.
-        # If the route uses `slug`, we need to resolve it or expect `slug`.
-        # Standard Rest permissions usually act on resources identified by ID.
-        # Let's try to be flexible or check route param.
-        # For now, let's implement for standard `study_slug` since that's what we used in `submissions.py` /study/{slug}
-        # But wait, `submissions.py` is public. Administrative routes usually use ID or slug.
-        # Let's implement for `slug` as it acts as ID in this app mostly.
+        slug: str = Path(..., description="The slug of the study"),
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
-    ) -> StudyCollaborator:
-        # 1. Resolve Study (need ID to check collaborator)
-        # We can join or just look up.
-        # Optimized query: select role from study_collaborator join study
-
-        # Determine required level
-        required_level = ROLE_HIERARCHY[required_role]
-
+    ) -> Study:
+        """Dependency that returns the study if the user has the required permission."""
+        # Query study and collaborator in one go
         query = (
-            select(StudyCollaborator)
-            .join(Study)
-            .where(Study.slug == study_slug)
+            select(Study, StudyCollaborator)
+            .join(StudyCollaborator)
+            .where(Study.slug == slug)
             .where(StudyCollaborator.user_id == current_user.id)
         )
 
         result = await db.execute(query)
-        collaborator = cast(StudyCollaborator | None, result.scalar_one_or_none())
+        row = result.one_or_none()
 
-        if not collaborator:
-            # Maybe the user IS the owner stored in study.owner_id?
-            # We decided owner_id is creator, but maybe we should ensure creators are added as owners in collaborators table?
-            # Ideally yes. Checks should be uniform on collaborators table.
-            # If migration didn't add creators to collaborators, we might fail here.
-            # Let's stick to strict collaborator check as per prompt ("Interroger la table StudyCollaborator").
+        if not row:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have access to this study.",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Study not found or access denied",
             )
 
-        # 2. Check Role Hierarchy
+        study, collaborator = row
+
+        # Check Role Hierarchy
+        required_level = ROLE_HIERARCHY[required_role]
         user_level = ROLE_HIERARCHY[collaborator.role]
 
         if user_level < required_level:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions. Required: {required_role}",
+                detail=f"Insufficient permissions. Required: {required_role.value}",
             )
 
-        return collaborator
+        return cast(Study, study)
 
     return permission_dependency

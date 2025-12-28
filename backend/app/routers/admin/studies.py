@@ -1,15 +1,25 @@
 """Admin routes for study management."""
 
-from typing import cast
-
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
-from app.models import Study, StudyCollaborator, StudyRole, StudyState, User
-from app.schemas import StudyCreate, StudyRead, StudyUpdate
+from app.dependencies import check_study_permission, get_current_user
+from app.models import (
+    Study,
+    StudyCollaborator,
+    StudyRole,
+    StudyState,
+    User,
+)
+from app.schemas import (
+    StudyCollaboratorAdd,
+    StudyCollaboratorRead,
+    StudyCreate,
+    StudyRead,
+    StudyUpdate,
+)
 
 router = APIRouter()
 
@@ -50,7 +60,7 @@ async def create_study(
     )
     db.add(owner_collab)
 
-    # TODO: Handle translations and statements creation here
+    # TODO: Handle translations and statements creation here if included in StudyCreate
 
     await db.commit()
     await db.refresh(db_study)
@@ -75,69 +85,25 @@ async def list_studies(
 
 @router.get("/{slug}", response_model=StudyRead)
 async def get_study(
-    slug: str,
-    current_user: User = Depends(get_current_user),
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Get study details."""
-    query = (
-        select(Study)
-        .join(StudyCollaborator)
-        .where(Study.slug == slug)
-        .where(StudyCollaborator.user_id == current_user.id)
-    )
-    result = await db.execute(query)
-    study = result.scalar_one_or_none()
-
-    if not study:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Study not found or access denied",
-        )
     await db.refresh(
         study, attribute_names=["translations", "statements", "collaborators"]
     )
-    return cast(Study, study)
+    return study
 
 
 @router.patch("/{slug}", response_model=StudyRead)
 async def update_study(
-    slug: str,
     study_update: StudyUpdate,
-    current_user: User = Depends(get_current_user),
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Update study configuration."""
-    # Check permission (Editor or Owner)
-    # We need to fetch the collaborator record to check role AND the study to check state.
-    query = (
-        select(Study, StudyCollaborator)
-        .join(StudyCollaborator)
-        .where(Study.slug == slug)
-        .where(StudyCollaborator.user_id == current_user.id)
-    )
-    result = await db.execute(query)
-    row = result.one_or_none()
-
-    if not row:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Study not found or access denied",
-        )
-
-    db_study, collaborator = row
-
-    if collaborator.role == StudyRole.viewer:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions",
-        )
-
     # Structural changes only allowed in DRAFT
-    if db_study.state != StudyState.draft:
-        # Check if we are trying to change structural fields
-        # For now, let's just block all updates if not draft, or define safe updates.
-        # Prompt said: "Active: configuration locked".
+    if study.state != StudyState.draft:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot modify configuration of an active or closed study.",
@@ -146,91 +112,124 @@ async def update_study(
     update_data = study_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         if field == "grid_config" and value is not None:
-            setattr(db_study, field, [col.model_dump() for col in value])
+            setattr(study, field, [col.model_dump() for col in value])
         else:
-            setattr(db_study, field, value)
+            setattr(study, field, value)
 
     await db.commit()
-    await db.refresh(db_study)
-    return cast(Study, db_study)
+    await db.refresh(study)
+    return study
 
 
 @router.post("/{slug}/state", response_model=StudyRead)
 async def change_study_state(
-    slug: str,
     new_state: StudyState,
-    current_user: User = Depends(get_current_user),
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Change study state (Draft <-> Active <-> Closed)."""
-    # Check permission (Owner only? or Editor?)
-    query = (
-        select(Study, StudyCollaborator)
-        .join(StudyCollaborator)
-        .where(Study.slug == slug)
-        .where(StudyCollaborator.user_id == current_user.id)
-    )
-    result = await db.execute(query)
-    row = result.one_or_none()
-
-    if not row:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Study not found or access denied",
-        )
-
-    db_study, collaborator = row
-
-    # Only owner can publish/close? Or editors too?
-    # Let's say Owner and Editor can manage state for now, or maybe just Owner for publishing.
-    # Plan said: "Owner: Full access... Editor: Can modify config".
-    # Usually State change is significant. Let's restrict to Owner for now to be safe, or allow Editor.
-    # Let's allow Editor for now to facilitate workflow.
-    if collaborator.role == StudyRole.viewer:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions",
-        )
-
-    db_study.state = new_state
+    study.state = new_state
     await db.commit()
-    await db.refresh(db_study)
-    return cast(Study, db_study)
+    await db.refresh(study)
+    return study
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_study(
-    slug: str,
-    current_user: User = Depends(get_current_user),
+    study: Study = Depends(check_study_permission(StudyRole.owner)),
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a study (Owner only)."""
-    # Fetch study with access check
+    await db.delete(study)
+    await db.commit()
+    return None
+
+
+# --- Collaborator Management ---
+
+
+@router.get("/{slug}/collaborators", response_model=list[StudyCollaboratorRead])
+async def list_collaborators(
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+):
+    """List collaborators for a study."""
     query = (
-        select(Study, StudyCollaborator)
-        .join(StudyCollaborator)
-        .where(Study.slug == slug)
-        .where(StudyCollaborator.user_id == current_user.id)
+        select(StudyCollaborator, User.email)
+        .join(User, StudyCollaborator.user_id == User.id)
+        .where(StudyCollaborator.study_id == study.id)
     )
     result = await db.execute(query)
-    row = result.one_or_none()
+    collaborators = []
+    for collab, email in result.all():
+        collab_read = StudyCollaboratorRead.model_validate(collab)
+        collab_read.user_email = email
+        collaborators.append(collab_read)
+    return collaborators
 
-    if not row:
-        # To avoid leaking existence, maybe 404?
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Study not found or access denied",
+
+@router.post("/{slug}/collaborators", response_model=StudyCollaboratorRead)
+async def add_collaborator(
+    collab_in: StudyCollaboratorAdd,
+    study: Study = Depends(check_study_permission(StudyRole.owner)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Add or update a collaborator."""
+    # 1. Find User
+    user_query = select(User).where(User.email == collab_in.email)
+    user_res = await db.execute(user_query)
+    user = user_res.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # 2. Check if already collaborator
+    collab_query = select(StudyCollaborator).where(
+        StudyCollaborator.study_id == study.id, StudyCollaborator.user_id == user.id
+    )
+    collab_res = await db.execute(collab_query)
+    db_collab = collab_res.scalar_one_or_none()
+
+    if db_collab:
+        # Update role
+        db_collab.role = collab_in.role
+    else:
+        # Create new
+        db_collab = StudyCollaborator(
+            study_id=study.id, user_id=user.id, role=collab_in.role
         )
+        db.add(db_collab)
 
-    db_study, collaborator = row
+    await db.commit()
+    await db.refresh(db_collab)
 
-    # Only Owner can delete
-    if collaborator.role != StudyRole.owner:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only the owner can delete a study",
+    res = StudyCollaboratorRead.model_validate(db_collab)
+    res.user_email = user.email
+    return res
+
+
+@router.delete("/{slug}/collaborators/{email}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_collaborator(
+    email: str,
+    study: Study = Depends(check_study_permission(StudyRole.owner)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove a collaborator."""
+    # 1. Find User
+    user_query = select(User).where(User.email == email)
+    user_res = await db.execute(user_query)
+    user = user_res.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Prevent removing oneself if owner?
+    # Usually owner shouldn't be able to remove themselves via this endpoint to avoid orphan studies.
+    if user.id == study.owner_id:
+        raise HTTPException(status_code=400, detail="Cannot remove the study owner")
+
+    await db.execute(
+        delete(StudyCollaborator).where(
+            StudyCollaborator.study_id == study.id, StudyCollaborator.user_id == user.id
         )
-
-    await db.delete(db_study)
+    )
     await db.commit()
     return None

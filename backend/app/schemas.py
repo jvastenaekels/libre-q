@@ -128,10 +128,18 @@ class StudyCollaboratorRead(BaseModel):
     """Schema for reading study collaborator details."""
 
     user_id: int
+    user_email: str | None = None
     role: StudyRole
     added_at: Any
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class StudyCollaboratorAdd(BaseModel):
+    """Schema for adding/updating a collaborator."""
+
+    email: str
+    role: StudyRole
 
 
 # Study Schemas
