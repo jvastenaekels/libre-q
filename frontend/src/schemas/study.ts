@@ -72,6 +72,7 @@ export const StudyConfigSchema = z.object({
     available_languages: z.array(z.string()).optional(),
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
+    state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

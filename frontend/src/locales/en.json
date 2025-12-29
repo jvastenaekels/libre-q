@@ -50,6 +50,23 @@
                 "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
                 "action": "Go to Home"
             }
+        },
+        "status": {
+            "draft": {
+                "title": "Study Under Preparation",
+                "message": "This study is not available for participation yet. Please check back later.",
+                "action": "Back to Home"
+            },
+            "paused": {
+                "title": "Maintenance in Progress",
+                "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
+                "action": "Retry"
+            },
+            "closed": {
+                "title": "Data Collection Closed",
+                "message": "This study is now closed. Participation is no longer possible.",
+                "action": "Back to Home"
+            }
         }
     },
     "layout": {

@@ -25,7 +25,8 @@ import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import { ApiError } from '../api/client';
 import ErrorPage from '../pages/ErrorPage';
-import StudyNotFound from '../pages/StudyNotFound';
+import StudyStatusPage from '../pages/StudyStatusPage';
+import type { StudyStatusType } from '../pages/StudyStatusPage';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -82,7 +83,7 @@ const StudyLayoutContent: React.FC = () => {
     if (configError && !config) {
         // Special Case: Study Not Found (404) -> Custom User Friendly Page
         if (configError === 'common.errors.not_found') {
-            return <StudyNotFound />;
+            return <StudyStatusPage type="not_found" />;
         }
 
         // Map known error keys to ApiErrors for better UI
@@ -113,13 +114,17 @@ const StudyLayoutContent: React.FC = () => {
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
                     <p className="text-slate-400 text-sm">Preparing your study session...</p>
                 </div>
-                {/* Minimal Skeleton */}
                 <div className="w-full max-w-md space-y-3 pt-8">
                     <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse"></div>
                     <div className="h-4 bg-slate-200 rounded w-1/2 mx-auto animate-pulse"></div>
                 </div>
             </div>
         );
+    }
+
+    // Study State Check (Draft, Paused, Closed)
+    if (config?.state && config.state !== 'active') {
+        return <StudyStatusPage type={config.state as StudyStatusType} onRetry={retry} />;
     }
 
     // Basic Protection Check

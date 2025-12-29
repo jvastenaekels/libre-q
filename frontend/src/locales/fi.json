@@ -42,7 +42,29 @@
             "network_title": "Yhteys katkesi",
             "home": "Siirry etusivulle",
             "reset": "Nollaa istunto",
-            "default_title": "Hups! Jotain meni pieleen."
+            "default_title": "Hups! Jotain meni pieleen.",
+            "study_not_found": {
+                "title": "Tutkimusta ei löytynyt",
+                "message": "Emme löytäneet tutkimusta tällä nimellä. Tarkista osoite tai ota yhteyttä tutkijaan.",
+                "action": "Siirry etusivulle"
+            },
+            "status": {
+                "draft": {
+                    "title": "Tutkimus valmisteilla",
+                    "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Ole hyvä ja palaa myöhemmin.",
+                    "action": "Siirry etusivulle"
+                },
+                "paused": {
+                    "title": "Huoltotauko",
+                    "message": "Tiedonkeruu on tilapäisesti keskeytetty huollon ajaksi. Palaamme pian.",
+                    "action": "Yritä uudelleen"
+                },
+                "closed": {
+                    "title": "Tiedonkeruu päättynyt",
+                    "message": "Tämä tutkimus on suljettu. Osallistuminen ei ole enää mahdollista.",
+                    "action": "Siirry etusivulle"
+                }
+            }
         }
     },
     "layout": {

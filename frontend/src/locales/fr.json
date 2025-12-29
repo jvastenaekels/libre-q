@@ -50,6 +50,23 @@
                 "message": "Nous n'avons pas trouvé d'étude avec ce nom. Veuillez vérifier l'URL ou contacter le chercheur.",
                 "action": "Retour à l'accueil"
             }
+        },
+        "status": {
+            "draft": {
+                "title": "Étude en préparation",
+                "message": "Cette étude n'est pas encore accessible pour recueillir des participations. Merci de revenir plus tard.",
+                "action": "Retour à l'accueil"
+            },
+            "paused": {
+                "title": "Maintenance en cours",
+                "message": "La collecte de données est temporairement suspendue pour maintenance. Nous serons de retour très prochainement.",
+                "action": "Réessayer"
+            },
+            "closed": {
+                "title": "Collecte terminée",
+                "message": "Cette étude est désormais close. Il n'est plus possible d'y participer.",
+                "action": "Retour à l'accueil"
+            }
         }
     },
     "layout": {
