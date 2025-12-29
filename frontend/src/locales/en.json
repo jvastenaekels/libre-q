@@ -14,11 +14,11 @@
         "ok": "OK",
         "cancel": "Cancel",
         "check": "Check",
-        "select_card": "Pick a card",
+        "select_card": "Pick a statement",
         "attention": "Attention",
         "error": "Error",
         "submitting": "Submitting...",
-        "cards": "cards",
+        "cards": "statements",
         "close": "Close",
         "statement": "Statement",
         "errors": {
@@ -83,7 +83,7 @@
     },
     "welcome": {
         "title": "Welcome",
-        "description": "Please read the instructions carefully.",
+        "description": "By sorting these statements according to how well they match your view, you help us understand your perspective. This approach captures the diversity of viewpoints in a simple and engaging way through this application.",
         "start": "Start Study",
         "consent": {
             "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
@@ -129,17 +129,17 @@
             "mobile_title": "Sort statements based on your point of view"
         },
         "deck": {
-            "title": "Cards available",
+            "title": "Statements available",
             "all_placed": "All statements from this stack are placed",
             "reset": "Reset deck",
-            "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
+            "confirm_reset": "Restart the grid placement? Your statements will return to the deck."
         },
         "toolbar": {
-            "mobile": "Tap or drag cards to place them on the grid.",
-            "preview": "Card preview",
+            "mobile": "Tap or drag statements to place them on the grid.",
+            "preview": "Statement preview",
             "place_instruction": "Tap a slot to place",
             "read_full": "Tap to read full text",
-            "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
+            "desktop": "Drag or tap statements to place them on the grid according to how well they match your view.",
             "zoom_in": "Zoom In",
             "zoom_out": "Zoom Out",
             "fit_screen": "Fit to Screen",
@@ -161,10 +161,10 @@
             "validate": "Confirm Sort",
             "finish": "Finish sorting",
             "ready": "Review overview",
-            "not_ready": "Place all cards to continue"
+            "not_ready": "Place all statements to continue"
         },
         "workbench": {
-            "active_card": "Active Card",
+            "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
             "drag_or_tap": "Drag to grid or tap a slot",
             "initial_instruction": "Start by placing your strongest opinions at the extremes.",
@@ -172,11 +172,11 @@
             "methodology": {
                 "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
                 "extremes_title": "Poles & Extremes",
-                "vertical": "Vertical position doesn't matter. Cards in the same column have the exact same score.",
+                "vertical": "Vertical position doesn't matter. Statements in the same column have the exact same score.",
                 "vertical_title": "Sorting Axis",
-                "constraint": "Forced Choice: You must place every card to finish. You will sometimes have to separate statements you feel similarly about.",
+                "constraint": "Forced Choice: You must place every statement to finish. You will sometimes have to separate statements you feel similarly about.",
                 "constraint_title": "Challenge",
-                "footer_note": "All cards must be placed to finish.",
+                "footer_note": "All statements must be placed to finish.",
                 "close": "Got it!"
             }
         }
@@ -204,7 +204,7 @@
         "submit": "Share my perspective",
         "validation_error": "Please briefly explain your key choices to continue.",
         "success": {
-            "title": "Submission Received",
+            "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
             "id_label": "Confirmation code"
         }

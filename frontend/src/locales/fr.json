@@ -3,7 +3,7 @@
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
         "neutral": "Pas d'avis tranché",
-        "select_card": "Sélectionnez une carte",
+        "select_card": "Sélectionnez une affirmation",
         "undo": "Annuler",
         "next": "Étape suivante",
         "submit": "Partager mon point de vue",
@@ -18,7 +18,7 @@
         "attention": "Attention",
         "error": "Erreur",
         "submitting": "Envoi en cours...",
-        "cards": "cartes",
+        "cards": "affirmations",
         "close": "Fermer",
         "statement": "Affirmation",
         "errors": {
@@ -83,7 +83,7 @@
     },
     "welcome": {
         "title": "Bienvenue",
-        "description": "Veuillez lire attentivement les instructions.",
+        "description": "En classant ces affirmations selon ce qui vous correspond le mieux, vous nous aidez à cerner votre vision du monde. Cette approche permet de saisir la diversité des points de vue, de manière simple et agréable grâce à cette application.",
         "start": "Commencer l'étude",
         "consent": {
             "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
@@ -125,21 +125,21 @@
     },
     "fine": {
         "header": {
-            "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
-            "mobile_title": "Classez les affirmations selon votre point de vue"
+            "title": "Classez les affirmations sur la grille",
+            "mobile_title": "Classez les affirmations sur la grille"
         },
         "deck": {
-            "title": "Cartes disponibles",
-            "all_placed": "Toutes les cartes de cette pile sont placées",
+            "title": "Affirmations disponibles",
+            "all_placed": "Toutes les affirmations de cette pile sont placées",
             "reset": "Réinitialiser",
-            "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
+            "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les affirmations retourneront dans la pile."
         },
         "toolbar": {
-            "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
-            "preview": "Aperçu de la carte",
+            "mobile": "Appuyez ou glissez les affirmations pour les placer sur la grille.",
+            "preview": "Aperçu de l'affirmation",
             "place_instruction": "Appuyez sur une case pour placer",
-            "read_full": "Appuyez sur une carte pour lire le texte",
-            "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
+            "read_full": "Appuyez sur une affirmation pour lire le texte",
+            "desktop": "Glissez ou appuyez sur les affirmations pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
             "zoom_in": "Zoom avant",
             "zoom_out": "Zoom arrière",
             "fit_screen": "Ajuster à l'écran",
@@ -161,22 +161,22 @@
             "validate": "Confirmer le classement",
             "finish": "Terminer le classement",
             "ready": "Voir la vue d'ensemble",
-            "not_ready": "Placez toutes les cartes pour continuer"
+            "not_ready": "Placez toutes les affirmations pour continuer"
         },
         "workbench": {
-            "active_card": "Carte active",
-            "place_on_grid": "Touchez un emplacement sur la grille pour placer la carte.",
+            "active_card": "Affirmation active",
+            "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation.",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Sélectionnez une carte",
+            "initial_instruction": "Commencez par placer vos avis les plus tranchés aux extrémités.",
             "help": "Aide et règles",
             "methodology": {
                 "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
                 "extremes_title": "Pôles et Extrémités",
-                "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
+                "vertical": "La position verticale n'importe pas. Les affirmations d'une même colonne ont toutes le même score.",
                 "vertical_title": "Axe de Classement",
-                "constraint": "Choix forcé : Vous devez placer toutes les cartes. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
+                "constraint": "Choix forcé : Vous devez placer toutes les affirmations. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
                 "constraint_title": "Challenge",
-                "footer_note": "Chaque carte doit être placée pour pouvoir valider le classement final.",
+                "footer_note": "Chaque affirmation doit être placée pour pouvoir valider le classement final.",
                 "close": "Compris !"
             }
         }
@@ -189,7 +189,7 @@
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
             "label_agree": "Me correspond le plus",
-            "label_disagree": "Ne me correspond pas du tout"
+            "label_disagree": "Le plus en désaccord"
         },
         "missing": {
             "label": "Y a-t-il quelque chose d'important dans votre point de vue qui n'a pas été capturé ?",
@@ -204,7 +204,7 @@
         "submit": "Partager mon point de vue",
         "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
         "success": {
-            "title": "Contribution bien reçue",
+            "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
             "id_label": "Code de confirmation"
         }
