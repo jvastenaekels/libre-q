@@ -306,9 +306,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 {/* Top Column Score Label */}
                                                 <div
                                                     id={`header-score-${col.score}`}
-                                                    className="text-slate-300 mb-1"
+                                                    className="text-slate-400 mb-1"
                                                 >
-                                                    <span className="text-xl font-bold leading-none opacity-40">
+                                                    <span className="text-3xl font-bold leading-none">
                                                         {col.score > 0
                                                             ? `+${col.score}`
                                                             : col.score}

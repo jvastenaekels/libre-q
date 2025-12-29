@@ -62,9 +62,30 @@ describe('SortingAnimation', () => {
         expect(phase1Container).not.toHaveClass('opacity-0');
 
         const phase2Container = screen.getByTestId('phase-2');
-
-        // Phase 2 should be inactive (hidden/dimmed) initially
         expect(phase2Container).toHaveClass('opacity-0');
+    });
+
+    it('does NOT show flying card during initial delay', () => {
+        render(<SortingAnimation />);
+
+        // At t=0, delay (isReady=false) is active
+        expect(screen.queryByTestId('flying-card')).not.toBeInTheDocument();
+
+        // Advance 1s (still less than 1.5s delay)
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+        expect(screen.queryByTestId('flying-card')).not.toBeInTheDocument();
+
+        // Advance past 1.5s -> isReady=true -> Active Target (Step 0) renders
+        act(() => {
+            vi.advanceTimersByTime(600);
+        });
+        // We need to identify the flying card by some means.
+        // In SortingAnimation.tsx, the motion.div has no test-id, but we can look for it.
+        // Let's add a test-id to the flying card in SortingAnimation.tsx first or verify existence differently.
+        // Check finding by class used for the card: "absolute top-0 left-0 w-[18px]..."
+        // Or better, let's assume we will add data-testid="flying-card" in the next step.
     });
 
     it('switches to FINE phase after timeout', () => {

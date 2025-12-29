@@ -188,6 +188,7 @@ class StudyUpdate(BaseModel):
     """Schema for updating a study."""
 
     slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
+    state: StudyState | None = None
     grid_config: list[GridColumn] | None = None
     presort_config: dict[str, Any] | None = None
     postsort_config: dict[str, Any] | None = None

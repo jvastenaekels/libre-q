@@ -148,8 +148,9 @@ const SortingAnimation: React.FC = () => {
     const currentSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
 
     const activeRoughTarget =
-        phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
-    const activeFineStep = phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
+        isReady && phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
+    const activeFineStep =
+        isReady && phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
 
     const fineSourceX = useMemo(() => {
         if (!activeFineStep) return 0;
@@ -206,6 +207,7 @@ const SortingAnimation: React.FC = () => {
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: ROUGH_DURATION, ease: 'easeInOut' }}
                                 className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm z-50 pointer-events-none"
+                                data-testid="flying-card"
                             >
                                 <div className="w-full h-full bg-slate-50 rounded-[1px] flex items-center justify-center">
                                     <div className="w-2 h-0.5 bg-slate-200" />

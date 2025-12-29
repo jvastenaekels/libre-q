@@ -108,7 +108,7 @@
     },
     "rough": {
         "header": {
-            "title": "Mikä on kantasi tähän väittämään?",
+            "title": "Mikä on kantasi tähän väitteeseen?",
             "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Ei vahvaa mielipidettä).",
             "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
         },
@@ -122,6 +122,10 @@
         }
     },
     "fine": {
+        "header": {
+            "title": "Järjestä väitteet ruudukkoon näkemyksesi mukaisesti.",
+            "mobile_title": "Järjestä väitteet näkökulmasi mukaan"
+        },
         "deck": {
             "title": "Vapaat väitteet",
             "all_placed": "Kaikki väitteet on sijoitettu",

@@ -1,5 +1,6 @@
 {
     "slug": "example-study",
+    "state": "active",
     "default_language": "en",
     "grid_config": [
         { "score": -4, "capacity": 2 },

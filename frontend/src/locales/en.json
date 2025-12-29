@@ -125,8 +125,8 @@
     },
     "fine": {
         "header": {
-            "title": "Place the statements on the grid to reflect your **perspective**.",
-            "mobile_title": "Sort statements based on your point of view"
+            "title": "Arrange the statements on the grid to reflect your **perspective**.",
+            "mobile_title": "Arrange statements to reflect your point of view"
         },
         "deck": {
             "title": "Statements available",
