@@ -137,7 +137,7 @@ class StudyService:
         if study.state != StudyState.active:
             raise HTTPException(
                 status_code=400,
-                detail=f"Study is currently {study.state.value}. Submissions are not allowed.",
+                detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
             )
 
         # 3. Validation: Statement Ownership
