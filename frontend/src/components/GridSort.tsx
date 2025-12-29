@@ -17,7 +17,7 @@ import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import ReadingZone from './ReadingZone';
-import type { InteractionUtils } from '../hooks/useFineSortDrag';
+import type { InteractionUtils } from '../types/grid';
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -303,6 +303,18 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 id={`column-${col.score}`}
                                                 className="flex flex-col gap-2 items-center flex-shrink-0"
                                             >
+                                                {/* Top Column Score Label */}
+                                                <div
+                                                    id={`header-score-${col.score}`}
+                                                    className="text-slate-300 mb-1"
+                                                >
+                                                    <span className="text-xl font-bold leading-none opacity-40">
+                                                        {col.score > 0
+                                                            ? `+${col.score}`
+                                                            : col.score}
+                                                    </span>
+                                                </div>
+
                                                 <div className="flex flex-col gap-2" role="row">
                                                     {Array.from({ length: col.capacity }).map(
                                                         (_, rowIndex) => (

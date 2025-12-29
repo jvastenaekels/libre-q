@@ -18,7 +18,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ReactMarkdown from 'react-markdown';
 import { useUIStore } from '../store/useUIStore';
-import { Eye } from 'lucide-react';
+import { Eye, ChevronDown } from 'lucide-react';
 
 interface SortableCardProps {
     id: number;
@@ -53,6 +53,24 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
 
         const setHoveredCard = useUIStore((state) => state.setHoveredCard);
         const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+        const scrollRef = React.useRef<HTMLDivElement>(null);
+        const [hasOverflow, setHasOverflow] = React.useState(false);
+
+        // Detect overflow for scroll indicator
+        React.useEffect(() => {
+            const checkOverflow = () => {
+                if (scrollRef.current) {
+                    const { scrollHeight, clientHeight } = scrollRef.current;
+                    setHasOverflow(scrollHeight > clientHeight + 2); // Small threshold
+                }
+            };
+
+            checkOverflow();
+            // Also check on window resize though cards are usually fixed in a grid
+            window.addEventListener('resize', checkOverflow);
+            return () => window.removeEventListener('resize', checkOverflow);
+        }, [text, variant, allowScroll]);
 
         // Cleanup timer on unmount
         React.useEffect(() => {
@@ -148,13 +166,29 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             `}
                 >
                     <motion.div
-                        layoutId={isOverlay ? undefined : `card-${id}`}
+                        layoutId={
+                            process.env.NODE_ENV === 'test'
+                                ? undefined
+                                : isOverlay
+                                  ? undefined
+                                  : `card-${id}`
+                        }
                         transition={{
                             type: 'spring',
                             stiffness: 350,
                             damping: 25,
                             duration: 0.4,
                         }}
+                        // Trigger a subtle pulse/flash when the card content (id) changes or on mount
+                        animate={
+                            process.env.NODE_ENV === 'test'
+                                ? undefined
+                                : {
+                                      scale: [1, 1.03, 1],
+                                      filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
+                                  }
+                        }
+                        key={id} // Ensure animation re-triggers if ID changes in this slot
                         className={`
                     w-full h-full
                     bg-white rounded-2xl shadow-sm border
@@ -179,6 +213,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         )}
 
                         <div
+                            ref={scrollRef}
                             className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
                         >
                             <div
@@ -203,6 +238,18 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                                 <div className="bg-indigo-50/50 p-1 rounded-full text-indigo-400">
                                     <Eye size={14} strokeWidth={2.5} />
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Scroll Indicator (Shadow/Gradient) */}
+                        {hasOverflow && (
+                            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none rounded-b-2xl flex items-end justify-center pb-1">
+                                <motion.div
+                                    animate={{ y: [0, 2, 0] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                >
+                                    <ChevronDown size={12} className="text-slate-400 opacity-60" />
+                                </motion.div>
                             </div>
                         )}
                     </motion.div>

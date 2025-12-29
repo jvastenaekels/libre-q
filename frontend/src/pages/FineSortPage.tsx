@@ -37,7 +37,8 @@ import { useLayoutAction } from '../hooks/useLayout';
 import {} from 'lucide-react';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
-import { useFineSortDrag, type InteractionUtils } from '../hooks/useFineSortDrag';
+import { useFineSortDrag } from '../hooks/useFineSortDrag';
+import type { InteractionUtils } from '../types/grid';
 
 const FineSortPage: React.FC = () => {
     // 1. Hooks (Store / Router) - Top Level

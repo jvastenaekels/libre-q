@@ -38,11 +38,19 @@ const SortingAnimation: React.FC = () => {
     const [phase, setPhase] = useState<'ROUGH' | 'FINE'>('ROUGH');
     const [step, setStep] = useState(0);
 
+    const [isReady, setIsReady] = useState(false);
+
     const ROUGH_DURATION = 0.5; // Slightly faster for 6 cards
     const FINE_DURATION = 0.8;
     const PAUSE = 1200;
 
     useEffect(() => {
+        const t = setTimeout(() => setIsReady(true), 1500);
+        return () => clearTimeout(t);
+    }, []);
+
+    useEffect(() => {
+        if (!isReady) return;
         let timer: ReturnType<typeof setTimeout>;
         // Hesitation Logic: 30% chance to wait extra time (simulating "thinking")
         const hesitation = Math.random() > 0.7 ? 800 : 0;
@@ -73,7 +81,7 @@ const SortingAnimation: React.FC = () => {
             }
         }
         return () => clearTimeout(timer);
-    }, [phase, step]);
+    }, [isReady, phase, step]);
 
     // ROUGH COUNTS
     // Deck decreases from N to 0.
