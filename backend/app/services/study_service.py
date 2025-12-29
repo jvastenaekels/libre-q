@@ -132,10 +132,12 @@ class StudyService:
             raise HTTPException(status_code=404, detail="Study not found")
 
         # 2.5 Validation: Study State
-        if study.state != "active":
+        from ..models import StudyState
+
+        if study.state != StudyState.active:
             raise HTTPException(
                 status_code=400,
-                detail=f"Study is not active (state: {study.state}). Submissions invalid.",
+                detail=f"Study is currently {study.state.value}. Submissions are not allowed.",
             )
 
         # 3. Validation: Statement Ownership

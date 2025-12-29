@@ -31,6 +31,7 @@ class StudyState(str, Enum):
 
     draft = "draft"
     active = "active"
+    paused = "paused"
     closed = "closed"
     archived = "archived"
 
@@ -91,7 +92,9 @@ class Study(Base):
     )
 
     # JSON Configs
-    grid_config: Mapped[dict[str, Any]] = mapped_column(JSON)  # e.g. {"-4": 2, ...}
+    grid_config: Mapped[Any] = mapped_column(
+        JSON
+    )  # e.g. [{"score": -4, "capacity": 2}, ...]
     presort_config: Mapped[dict[str, Any]] = mapped_column(
         JSON
     )  # e.g. Schema for usage fields

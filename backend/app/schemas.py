@@ -1,9 +1,6 @@
-# Open-Q - Open-source platform for conducting Q-methodology research
-# Copyright (C) 2025 Julien Vastenekels
-# Licensed under the GNU Affero General Public License v3.0 or later.
+"""Pydantic schemas for data validation and serialization."""
 
-"""Pydantic schemas for API and database models."""
-
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
@@ -11,52 +8,65 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .models import ParticipantStatus, StudyRole, StudyState
 
-
 # Auth Schemas
+
+
 class Token(BaseModel):
-    """Schema for JWT access token."""
+    """Schema for returning an access token."""
 
     access_token: str
     token_type: str
 
 
 class TokenData(BaseModel):
-    """Schema for token payload data."""
+    """Schema for data stored in JWT."""
 
     email: str | None = None
 
 
 # User Schemas
+
+
 class UserBase(BaseModel):
     """Base schema for users."""
 
     email: str
+
+
+class UserCreate(UserBase):
+    """Schema for creating a new user."""
+
+    password: str
     is_active: bool = True
     is_superuser: bool = False
 
 
-class UserCreate(UserBase):
-    """Schema for creating a new user with password."""
-
-    password: str = Field(..., min_length=8)
-
-
 class UserRead(UserBase):
-    """Schema for reading user information."""
+    """Schema for reading user details."""
 
     id: int
+    is_active: bool
+    is_superuser: bool
     model_config = ConfigDict(from_attributes=True)
 
 
 # Translation Schemas
+
+
 class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
 
-    language_code: str = Field(..., max_length=5)
-    title: str
-    description: str
-    instructions: str
-    ui_labels: dict[str, str] = {}
+    language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = ""
+    instructions: str = ""
+    subtitle: str | None = None
+    objective: str | None = None
+    consent_title: str | None = None
+    consent_description: str | None = None
+    consent_accept: str | None = None
+    consent_decline: str | None = None
+    ui_labels: dict[str, Any] = {}
 
 
 class StudyTranslationCreate(StudyTranslationBase):
@@ -76,8 +86,8 @@ class StudyTranslationRead(StudyTranslationBase):
 class StatementTranslationBase(BaseModel):
     """Base schema for statement translations."""
 
-    language_code: str = Field(..., max_length=5)
-    text: str
+    language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
+    text: str = Field(..., min_length=1)
 
 
 class StatementTranslationCreate(StatementTranslationBase):
@@ -95,6 +105,8 @@ class StatementTranslationRead(StatementTranslationBase):
 
 
 # Statement Schemas
+
+
 class StatementBase(BaseModel):
     """Base schema for statements."""
 
@@ -111,9 +123,15 @@ class StatementRead(StatementBase):
     """Schema for reading a statement."""
 
     id: int
-    study_id: int
     translations: list[StatementTranslationRead] = []
     model_config = ConfigDict(from_attributes=True)
+
+
+class StatementUpdate(BaseModel):
+    """Schema for updating a statement text (by code)."""
+
+    code: str
+    translations: list[StatementTranslationCreate]
 
 
 class GridColumn(BaseModel):
@@ -124,6 +142,8 @@ class GridColumn(BaseModel):
 
 
 # Collaborator Schemas
+
+
 class StudyCollaboratorRead(BaseModel):
     """Schema for reading study collaborator details."""
 
@@ -143,6 +163,8 @@ class StudyCollaboratorAdd(BaseModel):
 
 
 # Study Schemas
+
+
 class StudyBase(BaseModel):
     """Base schema for studies."""
 
@@ -171,9 +193,8 @@ class StudyUpdate(BaseModel):
     postsort_config: dict[str, Any] | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None
-
-    # Nested updates might be complex (translations, statements).
-    # For now, we assume simple field updates. Complex updates usually need dedicated endpoints or full replace strategies.
+    translations: list[StudyTranslationCreate] | None = None
+    statements: list[StatementUpdate] | None = None
 
 
 class StudyRead(StudyBase):
@@ -181,21 +202,18 @@ class StudyRead(StudyBase):
 
     id: int
     owner_id: int
-    subtitle: str | None = None
-    objective: str | None = None
-    created_at: Any
+    created_at: datetime
+    collaborators: list[StudyCollaboratorRead] = []
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
-    collaborators: list[StudyCollaboratorRead] = []
-
-    # This field could be populated dynamically if needed,
-    # but for now we expose the full translations list.
     model_config = ConfigDict(from_attributes=True)
 
 
-# Q-Sort Submission Schemas
+# Submission Schemas
+
+
 class QSortEntryInput(BaseModel):
-    """Schema for a single Q-sort entry."""
+    """Schema for individual statement placement during submission."""
 
     statement_id: int
     grid_score: int
@@ -203,10 +221,10 @@ class QSortEntryInput(BaseModel):
 
 
 class SubmissionInput(BaseModel):
-    """Schema for a full participant submission."""
+    """Schema for the full study submission/completion."""
 
+    study_slug: str
     session_token: UUID
-    study_slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
     language_used: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     status: ParticipantStatus | None = (
         ParticipantStatus.completed
@@ -248,9 +266,9 @@ class SubmissionInput(BaseModel):
         import json
 
         try:
-            text = json.dumps(v)
-            if len(text) > 100000:  # 100KB limit
-                raise ValueError("Data too large")
-        except (ValueError, TypeError):
-            raise ValueError("Invalid JSON data")
+            dumped = json.dumps(v)
+            if len(dumped) > 100_000:  # 100KB limit
+                raise ValueError("Answers dictionary too large")
+        except (TypeError, ValueError):
+            raise ValueError("Invalid answers dictionary")
         return v

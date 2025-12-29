@@ -103,22 +103,87 @@ async def update_study(
 ) -> Study:
     """Update study configuration."""
     # Structural changes only allowed in DRAFT
-    if study.state != StudyState.draft:
+    is_structural_edit = any(
+        f in study_update.model_dump(exclude_unset=True) for f in ["grid_config"]
+    )
+
+    if is_structural_edit and study.state != StudyState.draft:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot modify configuration of an active or closed study.",
+            detail="Cannot modify grid structure of an active, paused, or closed study.",
         )
 
+    if study.state == StudyState.closed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot update a closed study.",
+        )
+
+    # 1. Update basic fields
     update_data = study_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
-        if field == "grid_config" and value is not None:
-            setattr(study, field, [col.model_dump() for col in value])
-        else:
-            setattr(study, field, value)
+        if field in ["translations", "statements", "grid_config"]:
+            continue
+        setattr(study, field, value)
+
+    # 2. Update grid_config (DRAFT only)
+    if study_update.grid_config is not None:
+        study.grid_config = [col.model_dump() for col in study_update.grid_config]
+
+    # 3. Update translations
+    if study_update.translations is not None:
+        from ...models import StudyTranslation
+
+        # Replace all translations for simplicity or update existing?
+        # For now, we'll implement a "sync" logic: update existing, add new, remove old.
+        current_trans = {t.language_code: t for t in study.translations}
+        new_trans_list = []
+        for t_in in study_update.translations:
+            if t_in.language_code in current_trans:
+                t_obj = current_trans[t_in.language_code]
+                for k, v in t_in.model_dump().items():
+                    setattr(t_obj, k, v)
+                new_trans_list.append(t_obj)
+            else:
+                new_trans_list.append(StudyTranslation(**t_in.model_dump()))
+        study.translations = new_trans_list
+
+    # 4. Update statements
+    if study_update.statements is not None:
+        from ...models import StatementTranslation
+
+        # We only allow updating translations for existing statements by code
+        # No adding/removing statements here if not in DRAFT (but let's keep it safe for all)
+        current_statements = {s.code: s for s in study.statements}
+        for s_up in study_update.statements:
+            if s_up.code in current_statements:
+                target_s = current_statements[s_up.code]
+                # Update translations for this statement
+                curr_s_trans = {t.language_code: t for t in target_s.translations}
+                new_s_trans_list = []
+                for st_in in s_up.translations:
+                    if st_in.language_code in curr_s_trans:
+                        st_obj = curr_s_trans[st_in.language_code]
+                        st_obj.text = st_in.text
+                        new_s_trans_list.append(st_obj)
+                    else:
+                        new_s_trans_list.append(
+                            StatementTranslation(**st_in.model_dump())
+                        )
+                target_s.translations = new_s_trans_list
+            elif study.state == StudyState.draft:
+                # In DRAFT, we could technically allow adding by code, but StudyUpdate is for partials.
+                # Usually creation handles the bulk.
+                pass
 
     await db.commit()
-    await db.refresh(study)
-    return study
+    # Re-fetch with relationships for Response Serialization
+    from ...services.study_service import StudyService
+
+    updated_study = await StudyService.get_study_by_slug(db, study.slug)
+    if updated_study is None:
+        raise HTTPException(status_code=404, detail="Study not found after update")
+    return updated_study
 
 
 @router.post("/{slug}/state", response_model=StudyRead)
@@ -130,8 +195,15 @@ async def change_study_state(
     """Change study state (Draft <-> Active <-> Closed)."""
     study.state = new_state
     await db.commit()
-    await db.refresh(study)
-    return study
+    # Re-fetch with relationships for Response Serialization
+    from ...services.study_service import StudyService
+
+    updated_study = await StudyService.get_study_by_slug(db, study.slug)
+    if updated_study is None:
+        raise HTTPException(
+            status_code=404, detail="Study not found after state change"
+        )
+    return updated_study
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
