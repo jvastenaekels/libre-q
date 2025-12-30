@@ -55,7 +55,10 @@ const SortingAnimation: React.FC = () => {
         // Hesitation Logic: 30% chance to wait extra time (simulating "thinking")
         const hesitation = Math.random() > 0.7 ? 800 : 0;
 
-        if (phase === 'ROUGH') {
+        if (step === -1) {
+            // TRANSITION PHASE: Wait for fade-in to complete before starting action
+            timer = setTimeout(() => setStep(0), 1000);
+        } else if (phase === 'ROUGH') {
             if (step < ROUGH_TARGETS.length) {
                 timer = setTimeout(
                     () => setStep((s) => s + 1),
@@ -64,7 +67,7 @@ const SortingAnimation: React.FC = () => {
             } else {
                 timer = setTimeout(() => {
                     setPhase('FINE');
-                    setStep(0);
+                    setStep(-1);
                 }, PAUSE);
             }
         } else {
@@ -76,7 +79,7 @@ const SortingAnimation: React.FC = () => {
             } else {
                 timer = setTimeout(() => {
                     setPhase('ROUGH');
-                    setStep(0);
+                    setStep(-1);
                 }, PAUSE);
             }
         }
@@ -85,13 +88,14 @@ const SortingAnimation: React.FC = () => {
 
     // ROUGH COUNTS
     // Deck decreases from N to 0.
-    const roughDeckCount = phase === 'ROUGH' ? Math.max(0, ROUGH_TARGETS.length - step) : 0;
+    const roughDeckCount =
+        phase === 'ROUGH' ? Math.max(0, ROUGH_TARGETS.length - Math.max(0, step)) : 0;
 
     // Piles accumulate
     const roughPileCounts = useMemo(() => {
         // Start with base base to look "played"
         const counts = { disagree: 2, neutral: 1, agree: 2 };
-        const effectiveStep = phase === 'ROUGH' ? step : ROUGH_TARGETS.length;
+        const effectiveStep = phase === 'ROUGH' ? Math.max(0, step) : ROUGH_TARGETS.length;
 
         for (let i = 0; i < effectiveStep; i++) {
             if (i < ROUGH_TARGETS.length) {
@@ -108,12 +112,7 @@ const SortingAnimation: React.FC = () => {
         // Calculate initial source pile sizes based on what will be used in FINE steps
         FINE_STEPS.forEach((s) => totals[s.source]++);
 
-        // REMOVED: Extra cards that made piles look fuller but prevented empty state
-        // totals[0] += 2;
-        // totals[1] += 2;
-        // totals[2] += 2;
-
-        const effectiveStep = phase === 'FINE' ? step : 0;
+        const effectiveStep = phase === 'FINE' ? Math.max(0, step) : 0;
         for (let i = 0; i < effectiveStep; i++) {
             if (i < FINE_STEPS.length) totals[FINE_STEPS[i].source]--;
         }
@@ -123,7 +122,7 @@ const SortingAnimation: React.FC = () => {
     const fineFilledIds = useMemo(() => {
         const filled = new Set<string>();
         if (phase === 'FINE') {
-            for (let i = 0; i < step; i++) filled.add(FINE_STEPS[i].id);
+            for (let i = 0; i < Math.max(0, step); i++) filled.add(FINE_STEPS[i].id);
         }
         return filled;
     }, [phase, step]);
@@ -148,9 +147,13 @@ const SortingAnimation: React.FC = () => {
     const currentSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
 
     const activeRoughTarget =
-        isReady && phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
+        isReady && phase === 'ROUGH' && step >= 0 && step < ROUGH_TARGETS.length
+            ? ROUGH_TARGETS[step]
+            : null;
     const activeFineStep =
-        isReady && phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
+        isReady && phase === 'FINE' && step >= 0 && step < FINE_STEPS.length
+            ? FINE_STEPS[step]
+            : null;
 
     const fineSourceX = useMemo(() => {
         if (!activeFineStep) return 0;

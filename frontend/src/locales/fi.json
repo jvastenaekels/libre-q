@@ -2,7 +2,7 @@
     "common": {
         "agree": "Jokseenkin samaa mieltä",
         "disagree": "Jokseenkin eri mieltä",
-        "neutral": "Ei vahvaa mielipidettä",
+        "neutral": "Neutraali",
         "undo": "Kumoa",
         "next": "Seuraava",
         "submit": "Lähetä vastaukset",
@@ -109,7 +109,7 @@
     "rough": {
         "header": {
             "title": "Mikä on kantasi tähän väitteeseen?",
-            "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Ei vahvaa mielipidettä).",
+            "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
             "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
         },
         "complete": {
@@ -165,7 +165,7 @@
             "active_card": "Aktiivinen väite",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
-            "initial_instruction": "Sijoita vahvimmat mielipiteet ääripäihin.",
+            "initial_instruction": "Napauta väitettä aloittaaksesi.",
             "help": "Ohjeet ja säännöt",
             "methodology": {
                 "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",

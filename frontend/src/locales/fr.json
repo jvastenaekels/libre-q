@@ -2,7 +2,7 @@
     "common": {
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
-        "neutral": "Pas d'avis tranché",
+        "neutral": "Neutre",
         "select_card": "Sélectionnez une affirmation",
         "undo": "Annuler",
         "next": "Étape suivante",
@@ -94,7 +94,7 @@
         "preview_title": "Aperçu",
         "objective_label": "Objectif de l'étude",
         "instructions_label": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre avis spontané (d'accord, neutre ou pas d'accord).\n3. **Votre vision sur mesure :** affinez votre pensée en plaçant chaque affirmation sur la grille pour refléter précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre vision sur mesure :** affinez votre pensée en plaçant chaque affirmation sur la grille pour refléter précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
     },
     "consent": {
         "title": "Consentement à la participation",
@@ -167,14 +167,14 @@
             "active_card": "Affirmation active",
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation.",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Commencez par placer vos avis les plus tranchés aux extrémités.",
+            "initial_instruction": "Appuyez sur une affirmation pour commencer.",
             "help": "Aide et règles",
             "methodology": {
-                "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
+                "extremes": "Conseil : Commencez par placer vos perspectives les plus marquées aux extrémités.",
                 "extremes_title": "Pôles et Extrémités",
                 "vertical": "La position verticale n'importe pas. Les affirmations d'une même colonne ont toutes le même score.",
                 "vertical_title": "Axe de Classement",
-                "constraint": "Choix forcé : Vous devez placer toutes les affirmations. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
+                "constraint": "Choix forcé : Vous devez placer toutes les affirmations. Vous devrez parfois départager des affirmations pour lesquelles vous avez une perspective similaire.",
                 "constraint_title": "Challenge",
                 "footer_note": "Chaque affirmation doit être placée pour pouvoir valider le classement final.",
                 "close": "Compris !"

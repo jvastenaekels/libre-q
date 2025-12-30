@@ -2,7 +2,7 @@
     "common": {
         "agree": "Somewhat agree",
         "disagree": "Somewhat disagree",
-        "neutral": "No strong opinion",
+        "neutral": "Neutral",
         "undo": "Undo",
         "next": "Next step",
         "submit": "Share my perspective",
@@ -167,10 +167,10 @@
             "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
             "drag_or_tap": "Drag to grid or tap a slot",
-            "initial_instruction": "Start by placing your strongest opinions at the extremes.",
+            "initial_instruction": "Tap a statement to start.",
             "help": "Help & rules",
             "methodology": {
-                "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
+                "extremes": "Tip: Start by placing your strongest views at the extremes.",
                 "extremes_title": "Poles & Extremes",
                 "vertical": "Vertical position doesn't matter. Statements in the same column have the exact same score.",
                 "vertical_title": "Sorting Axis",
