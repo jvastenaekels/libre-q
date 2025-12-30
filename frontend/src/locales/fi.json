@@ -165,15 +165,15 @@
             "active_card": "Aktiivinen väite",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
-            "initial_instruction": "Napauta väitettä aloittaaksesi.",
+            "initial_instruction": "Napauta väitettä",
             "help": "Ohjeet ja säännöt",
             "methodology": {
-                "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",
-                "extremes_title": "Navat ja ääripäät",
-                "vertical": "Pystysuuntaus: Ylhäältä alas -järjestyksellä ei ole merkitystä, vain vaaka-akseli ratkaisee.",
+                "extremes": "Vinkki: Aloita sijoittamalla ääripäihin väitteet, joista olet vahvimmin samaa tai eri mieltä.",
+                "extremes_title": "Lajittelustrategia",
+                "vertical": "Samassa sarakkeessa olevilla väitteillä on sama pistearvo. Vain järjestyksellä vasemmalta oikealle on merkitystä.",
                 "vertical_title": "Lajitteluakseli",
-                "interaction": "Käsittely: Voit vetää väitteitä tai vain napauttaa niitä.",
-                "interaction_title": "Kosketuskomennot",
+                "constraint": "Kaikki väitteet on sijoitettava. Jotkut valinnat voivat olla vaikeita, mutta se kuuluu menetelmään.",
+                "constraint_title": "Pakotetut valinnat",
                 "footer_note": "Jokainen väite on sijoitettava ennen lopullista vahvistusta.",
                 "close": "Selvä!"
             }

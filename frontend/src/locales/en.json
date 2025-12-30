@@ -167,15 +167,15 @@
             "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
             "drag_or_tap": "Drag to grid or tap a slot",
-            "initial_instruction": "Tap a statement to start.",
+            "initial_instruction": "Tap a statement",
             "help": "Help & rules",
             "methodology": {
-                "extremes": "Tip: Start by placing your strongest views at the extremes.",
-                "extremes_title": "Poles & Extremes",
-                "vertical": "Vertical position doesn't matter. Statements in the same column have the exact same score.",
-                "vertical_title": "Sorting Axis",
-                "constraint": "Forced Choice: You must place every statement to finish. You will sometimes have to separate statements you feel similarly about.",
-                "constraint_title": "Challenge",
+                "extremes": "Tip: Start by placing the statements you most strongly agree or disagree with at the extremes.",
+                "extremes_title": "Sorting strategy",
+                "vertical": "Statements in the same column have the same score. Only the ranking from left to right matters.",
+                "vertical_title": "Sorting axis",
+                "constraint": "You must place every statement. Some choices might be difficult, but that's part of the methodology.",
+                "constraint_title": "Forced choices",
                 "footer_note": "All statements must be placed to finish.",
                 "close": "Got it!"
             }

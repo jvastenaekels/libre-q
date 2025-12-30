@@ -46,11 +46,13 @@ def main():
     # 2. Ensure Database Schema (Legacy/Manual Migrations)
     run_task("scripts/ensure_schema.py", "Schema Verification")
 
-    # 3. Seed/Sync Study Configuration
-    # We run both seed and update to ensure the study exists AND is up to date
+    # 3. Sync Study Configuration (Idempotent: Create or Update)
     if os.path.exists("data/example-study.json"):
-        run_task("seed.py", "Study Seeding", ["data/example-study.json"])
-        run_task("update_study.py", "Study Configuration Sync")
+        run_task(
+            "scripts/sync_study.py",
+            "Study Configuration Sync",
+            ["data/example-study.json"],
+        )
     else:
         print("[PostDeploy] Skipping Study Tasks: data/example-study.json not found.")
 

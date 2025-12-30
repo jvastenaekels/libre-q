@@ -94,7 +94,7 @@
         "preview_title": "Aperçu",
         "objective_label": "Objectif de l'étude",
         "instructions_label": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre vision sur mesure :** affinez votre pensée en plaçant chaque affirmation sur la grille pour refléter précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en plaçant chaque affirmation sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
     },
     "consent": {
         "title": "Consentement à la participation",
@@ -125,8 +125,8 @@
     },
     "fine": {
         "header": {
-            "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
-            "mobile_title": "Disposez les affirmations pour refléter votre point de vue"
+            "title": "Disposez les affirmations sur la grille pour refléter votre perspective.",
+            "mobile_title": "Disposez les affirmations sur la grille"
         },
         "deck": {
             "title": "Affirmations disponibles",
@@ -135,7 +135,7 @@
             "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les affirmations retourneront dans la pile."
         },
         "toolbar": {
-            "mobile": "Appuyez ou glissez les affirmations pour les placer sur la grille.",
+            "mobile": "Appuyez ou glissez les affirmations pour les placer sur la grille",
             "preview": "Aperçu de l'affirmation",
             "place_instruction": "Appuyez sur une case pour placer",
             "read_full": "Appuyez sur une affirmation pour lire le texte",
@@ -165,17 +165,17 @@
         },
         "workbench": {
             "active_card": "Affirmation active",
-            "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation.",
+            "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Appuyez sur une affirmation pour commencer.",
+            "initial_instruction": "Appuyez sur une affirmation",
             "help": "Aide et règles",
             "methodology": {
-                "extremes": "Conseil : Commencez par placer vos perspectives les plus marquées aux extrémités.",
-                "extremes_title": "Pôles et Extrémités",
-                "vertical": "La position verticale n'importe pas. Les affirmations d'une même colonne ont toutes le même score.",
-                "vertical_title": "Axe de Classement",
-                "constraint": "Choix forcé : Vous devez placer toutes les affirmations. Vous devrez parfois départager des affirmations pour lesquelles vous avez une perspective similaire.",
-                "constraint_title": "Challenge",
+                "extremes": "Conseil : Commencez par placer les affirmations suscitant le plus fort accord ou désaccord aux extrémités.",
+                "extremes_title": "Stratégie de classement",
+                "vertical": "Les affirmations d'une même colonne ont toutes le même score. Seul le classement de gauche à droite compte.",
+                "vertical_title": "Axe de classement",
+                "constraint": "Vous devez placer toutes les affirmations. Certains choix seront peut-être difficiles mais cela fait partie de la méthodologie.",
+                "constraint_title": "Choix forcés",
                 "footer_note": "Chaque affirmation doit être placée pour pouvoir valider le classement final.",
                 "close": "Compris !"
             }
