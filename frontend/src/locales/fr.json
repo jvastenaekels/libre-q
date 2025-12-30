@@ -167,7 +167,7 @@
             "active_card": "Affirmation active",
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Appuyez sur une affirmation",
+            "initial_instruction": "Glissez ou appuyez sur une affirmation",
             "help": "Aide et règles",
             "methodology": {
                 "extremes": "Conseil : Commencez par placer les affirmations suscitant le plus fort accord ou désaccord aux extrémités.",

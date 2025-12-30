@@ -167,7 +167,7 @@
             "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
             "drag_or_tap": "Drag to grid or tap a slot",
-            "initial_instruction": "Tap a statement",
+            "initial_instruction": "Drag or tap a statement",
             "help": "Help & rules",
             "methodology": {
                 "extremes": "Tip: Start by placing the statements you most strongly agree or disagree with at the extremes.",

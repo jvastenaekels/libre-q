@@ -165,7 +165,7 @@
             "active_card": "Aktiivinen väite",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
-            "initial_instruction": "Napauta väitettä",
+            "initial_instruction": "Vedä tai napauta väitettä",
             "help": "Ohjeet ja säännöt",
             "methodology": {
                 "extremes": "Vinkki: Aloita sijoittamalla ääripäihin väitteet, joista olet vahvimmin samaa tai eri mieltä.",
