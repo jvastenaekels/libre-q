@@ -2,9 +2,9 @@ import { useRef, useCallback, useEffect } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 interface UseGridZoomProps {
-    wrapperRef: React.RefObject<HTMLDivElement>;
-    contentRef: React.RefObject<HTMLDivElement>;
-    pyramidRef: React.RefObject<HTMLDivElement>;
+    wrapperRef: React.RefObject<HTMLDivElement | null>;
+    contentRef: React.RefObject<HTMLDivElement | null>;
+    pyramidRef: React.RefObject<HTMLDivElement | null>;
     gridColumns: { score: number; capacity: number }[];
     activePile: 'agree' | 'disagree' | 'neutral';
     activePileCount: number;

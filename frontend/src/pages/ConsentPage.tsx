@@ -14,7 +14,8 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { recordConsent, reportBug } from '../api/client';
+import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
+import { reportBug } from '../api/client';
 
 const consentSchema = z.object({
     consent: z.boolean().refine((val) => val === true, {
@@ -64,6 +65,8 @@ const ConsentPage: React.FC = () => {
         return () => subscription.unsubscribe();
     }, [watch, setConsent]);
 
+    const { mutateAsync: recordConsentMutation } = useRecordConsentApiStudySlugConsentPost();
+
     // If no config, redirect home or show loading
     if (!config) return null;
 
@@ -80,7 +83,15 @@ const ConsentPage: React.FC = () => {
                 const consentText = config.consent?.description || t('consent.default_text');
                 const consentHash = await hashConsent(consentText);
 
-                await recordConsent(slug || '', token, i18n.language, consentHash);
+                await recordConsentMutation({
+                    slug: slug || '',
+                    data: {
+                        study_slug: slug || '',
+                        session_token: token,
+                        language_code: i18n.language,
+                        consent_hash: consentHash,
+                    },
+                });
             } catch (err) {
                 // Non-blocking: we still allow user to proceed but log the error
                 console.error('Failed to record consent proof:', err);

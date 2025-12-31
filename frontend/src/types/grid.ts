@@ -11,7 +11,7 @@ export interface InteractionUtils {
     zoomIn: (step?: number) => void;
     zoomOut: (step?: number) => void;
     performAutoFit: () => void;
-    transformRef: React.RefObject<ReactZoomPanPinchRef>;
-    wrapperRef: React.RefObject<HTMLDivElement>;
-    contentRef: React.RefObject<HTMLDivElement>;
+    transformRef: React.RefObject<ReactZoomPanPinchRef | null>;
+    wrapperRef: React.RefObject<HTMLDivElement | null>;
+    contentRef: React.RefObject<HTMLDivElement | null>;
 }

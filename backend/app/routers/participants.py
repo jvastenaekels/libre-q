@@ -1,6 +1,6 @@
 """API router for participant actions."""
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -14,7 +14,12 @@ router = APIRouter()
 @router.post("/consent")
 @limiter.limit("60/minute")
 async def record_consent(
-    data: ConsentInput, request: Request, db: AsyncSession = Depends(get_db)
+    data: ConsentInput,
+    request: Request,
+    slug: str = Path(
+        ..., title="Study Slug", description="The distinct slug of the study"
+    ),
+    db: AsyncSession = Depends(get_db),
 ):
     """Records participant consent with timestamp and version."""
     client_ip = request.client.host if request.client else "unknown"

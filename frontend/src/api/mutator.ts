@@ -1,0 +1,53 @@
+import { reportBug, ApiError } from './client';
+
+// Re-using the logic from client.ts but adaptable for Orval's signature
+const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+
+export const customInstance = async <T>({
+    url,
+    method,
+    params,
+    data,
+}: {
+    url: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    params?: Record<string, string | number | boolean | undefined>;
+    data?: unknown;
+}): Promise<T> => {
+    // Filter undefined params
+    const cleanParams = Object.fromEntries(
+        Object.entries(params || {}).filter(([_, v]) => v !== undefined)
+    ) as Record<string, string>;
+
+    const query = new URLSearchParams(cleanParams).toString();
+    const fullUrl = `${BASE_URL}${url}${query ? `?${query}` : ''}`;
+
+    const response = await fetch(fullUrl, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: data ? JSON.stringify(data) : undefined,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+
+        // Auto-report 500 Server Errors
+        if (response.status >= 500) {
+            reportBug(`Server Error ${response.status} at ${url}: ${errorText}`, {
+                endpoint: url,
+                status: response.status,
+            });
+        }
+
+        throw new ApiError(response.status, errorText || 'Request failed');
+    }
+
+    // Handle 204 No Content
+    if (response.status === 204) {
+        return {} as T;
+    }
+
+    return response.json();
+};

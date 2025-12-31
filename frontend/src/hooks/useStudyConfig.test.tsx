@@ -1,21 +1,14 @@
-/*
- * Open-Q - Open-source platform for conducting Q-methodology research
- * Copyright (C) 2025 Julien Vastenekels
- * Licensed under the GNU Affero General Public License v3.0 or later.
- */
-
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStudyConfig } from './useStudyConfig';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
-import * as apiClient from '../api/client';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
+import { useGetStudyConfig } from './useGetStudyConfig';
 
-// Mock specific parts
-vi.mock('../api/client', () => ({
-    get: vi.fn(),
-    post: vi.fn(),
+// Mock the query hook
+vi.mock('./useGetStudyConfig', () => ({
+    useGetStudyConfig: vi.fn(),
 }));
 
 // Mock the i18n overrides utility
@@ -47,30 +40,33 @@ describe('useStudyConfig', () => {
     });
 
     it('fetches study config on mount', async () => {
-        const mockGet = vi.mocked(apiClient.get);
-        mockGet.mockResolvedValue({
+        const mockData = {
             slug: 'test-study',
             title: 'Test Title EN',
             description: 'Test Description EN',
             instructions: 'Test Instructions EN',
             presort_config: {},
             statements: [],
-        });
+        };
+
+        // Mock hook response
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: mockData,
+            isLoading: false,
+            error: null,
+            refetch: vi.fn(),
+        } as any);
 
         renderHook(() => useStudyConfig());
 
         await waitFor(() => {
-            expect(mockGet).toHaveBeenCalled();
+            expect(useConfigStore.getState().config?.title).toBe('Test Title EN');
         });
-
-        expect(useConfigStore.getState().config?.title).toBe('Test Title EN');
     });
 
     it('applies UI overrides when present in config', async () => {
-        const mockGet = vi.mocked(apiClient.get);
         const uiLabels = { 'common.agree': 'Approve' };
-
-        mockGet.mockResolvedValue({
+        const mockData = {
             slug: 'test-study',
             title: 'Test Title',
             description: 'Desc',
@@ -79,7 +75,14 @@ describe('useStudyConfig', () => {
             statements: [],
             ui_labels: uiLabels,
             language: 'en',
-        });
+        };
+
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: mockData,
+            isLoading: false,
+            error: null,
+            refetch: vi.fn(),
+        } as any);
 
         renderHook(() => useStudyConfig());
 

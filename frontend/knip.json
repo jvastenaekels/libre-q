@@ -6,7 +6,9 @@
         "src/test/**",
         "src/hooks/useFineSortDrag.ts",
         "src/contexts/LayoutContext.context.ts",
-        "src/schemas/study.ts"
+        "src/schemas/study.ts",
+        "src/api/generated.ts",
+        "src/api/model/**"
     ],
     "ignoreBinaries": ["jscpd", "python3"],
     "ignoreDependencies": [

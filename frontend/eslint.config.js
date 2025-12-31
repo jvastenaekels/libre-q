@@ -14,6 +14,8 @@ export default tseslint.config(
             'playwright-report',
             '*.config.js',
             '*.config.ts',
+            'src/api/generated.ts',
+            'src/api/model',
         ],
     },
     {

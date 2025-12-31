@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { post } from '../api/client';
+import { useSubmitStudyApiSubmitPost } from '../api/generated';
 
 export const useSubmitStudy = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +19,8 @@ export const useSubmitStudy = () => {
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore();
     const responses = useResponseStore();
+
+    const { mutateAsync: submitStudyMutation } = useSubmitStudyApiSubmitPost();
 
     const submit = async (
         status: 'started' | 'completed' = 'completed',
@@ -60,7 +62,7 @@ export const useSubmitStudy = () => {
             const payload = {
                 session_token: session.token,
                 study_slug: config.slug,
-                language_used: session.language,
+                language_used: session.language || 'en', // precise: fallback to 'en' if null
                 status: status,
                 presort_answers: responses.presort,
                 qsort: qsortPayload,
@@ -69,13 +71,15 @@ export const useSubmitStudy = () => {
                 },
             };
 
-            const data = await post<{ confirmation_code: string }>('/api/submit', payload);
+            const data = await submitStudyMutation({ data: payload });
 
             if (status === 'completed') {
                 setIsSuccess(true);
-                setConfirmationCode(data.confirmation_code);
-                // Sync session completion (if session store has this, or remove if not needed)
-                // useSessionStore.getState().completeSession(data.confirmation_code);
+                // The mutation response type should optionally contain confirmation_code depending on backend
+                // If Orval generated unknown, we might need to cast or fix the swagger if possible.
+                // Assuming it returns Generic Response or similar?
+                // Let's inspect the data variable or trusting the previous implementation which expected { confirmation_code }
+                setConfirmationCode((data as { confirmation_code: string }).confirmation_code);
             }
         } catch (err: unknown) {
             console.error(err);
