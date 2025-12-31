@@ -4,12 +4,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSessionStore } from '../store/useSessionStore';
+import { RefreshCw } from 'lucide-react';
+import type React from 'react';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { RefreshCw } from 'lucide-react';
+import { useSessionStore } from '../store/useSessionStore';
 
 const ResetPage: React.FC = () => {
     const { slug } = useParams();

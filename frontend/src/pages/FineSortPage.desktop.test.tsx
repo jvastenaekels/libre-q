@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { Routes, Route } from 'react-router-dom';
-import FineSortPage from './FineSortPage';
+import { Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it } from 'vitest';
 import StudyLayout from '../layouts/StudyLayout';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { renderWithProviders } from '../test/test-utils';
+import FineSortPage from './FineSortPage';
 
 describe('FineSortPage Desktop Layout (Integration)', () => {
     beforeEach(() => {

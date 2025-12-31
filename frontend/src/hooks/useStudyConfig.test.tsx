@@ -1,10 +1,10 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useStudyConfig } from './useStudyConfig';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { useGetStudyConfig } from './useGetStudyConfig';
+import { useStudyConfig } from './useStudyConfig';
 
 // Mock the query hook
 vi.mock('./useGetStudyConfig', () => ({

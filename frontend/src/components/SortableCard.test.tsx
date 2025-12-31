@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import SortableCard from './SortableCard';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useUIStore } from '../store/useUIStore';
+import SortableCard from './SortableCard';
 
 // Mock dnd-kit hook
 vi.mock('@dnd-kit/sortable', () => ({

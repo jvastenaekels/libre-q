@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { screen, fireEvent } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../test/test-utils';
-import { describe, it, expect, vi } from 'vitest';
 import LandingPage from './LandingPage';
 
 const mockNavigate = vi.fn();

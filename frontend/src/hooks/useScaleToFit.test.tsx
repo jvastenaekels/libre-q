@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useScaleToFit } from './useScaleToFit';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('useScaleToFit', () => {
     let container: HTMLDivElement;
@@ -17,9 +17,10 @@ describe('useScaleToFit', () => {
         content = document.createElement('div');
 
         // Mock ResizeObserver
+        // biome-ignore lint/suspicious/noExplicitAny: Mocking global requires loose typing
         vi.stubGlobal(
             'ResizeObserver',
-            vi.fn().mockImplementation(function (_callback) {
+            vi.fn(function (_callback) {
                 return {
                     observe: vi.fn(),
                     disconnect: vi.fn(),
@@ -40,7 +41,7 @@ describe('useScaleToFit', () => {
         expect(result.current).toBe(1);
     });
 
-    it('should calculate correct scale when content is larger than container (Zoom Out)', () => {
+    it('should calculate correct scale when content is larger than container (Zoom Out)', async () => {
         // Mock Dimensions
         // Container: 500x500 (minus 64 padding = 436x436)
         Object.defineProperty(container, 'clientWidth', { value: 500, configurable: true });
@@ -58,10 +59,10 @@ describe('useScaleToFit', () => {
         // React effect runs asynchronously maybe?
         // ResizeObserver usually triggers callback. The hook triggers handleResize on mount too.
 
-        expect(result.current).toBe(0.5);
+        await waitFor(() => expect(result.current).toBe(0.5));
     });
 
-    it('should calculate correct scale when content is smaller (Zoom In - Capped at 1.5)', () => {
+    it('should calculate correct scale when content is smaller (Zoom In - Capped at 1.5)', async () => {
         // Container: 1000x1000 (minus 64 = 936)
         Object.defineProperty(container, 'clientWidth', { value: 1000, configurable: true });
         Object.defineProperty(container, 'clientHeight', { value: 1000, configurable: true });
@@ -75,10 +76,10 @@ describe('useScaleToFit', () => {
         );
 
         // Logic: 936 / 468 = 2 -> Capped at 1.5
-        expect(result.current).toBe(1.5);
+        await waitFor(() => expect(result.current).toBe(1.5));
     });
 
-    it('should respect the smaller dimension (fit width vs fit height)', () => {
+    it('should respect the smaller dimension (fit width vs fit height)', async () => {
         // Container: 1000w x 500h (minus 64 = 936w x 436h)
         Object.defineProperty(container, 'clientWidth', { value: 1000, configurable: true });
         Object.defineProperty(container, 'clientHeight', { value: 500, configurable: true });
@@ -93,6 +94,6 @@ describe('useScaleToFit', () => {
         const { result } = renderHook(() =>
             useScaleToFit({ current: container }, { current: content })
         );
-        expect(result.current).toBe(0.5);
+        await waitFor(() => expect(result.current).toBe(0.5));
     });
 });

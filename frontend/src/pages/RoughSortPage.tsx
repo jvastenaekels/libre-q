@@ -4,17 +4,18 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, X } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMotionValue, useTransform, motion, AnimatePresence } from 'framer-motion';
+import CardStack, { type CardStackHandle } from '../components/CardStack';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
-import ReactMarkdown from 'react-markdown';
-import CardStack, { type CardStackHandle } from '../components/CardStack';
-import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const RoughSortPage: React.FC = () => {
     const { slug } = useParams();

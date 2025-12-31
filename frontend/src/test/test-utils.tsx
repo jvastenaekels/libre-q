@@ -5,13 +5,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
+import { type RenderOptions, render } from '@testing-library/react';
+import type React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 
 /**

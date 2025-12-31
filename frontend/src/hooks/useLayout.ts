@@ -5,7 +5,7 @@
  */
 
 import { useContext } from 'react';
-import { LayoutStateContext, LayoutActionContext } from '../contexts/LayoutContext.context';
+import { LayoutActionContext, LayoutStateContext } from '../contexts/LayoutContext.context';
 
 export const useLayoutState = () => {
     const context = useContext(LayoutStateContext);

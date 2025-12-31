@@ -92,9 +92,7 @@ export const useDragAutoInteraction = ({
             if (!interactionUtils || !interactionUtils.transformRef.current) return;
 
             const threshold = 10;
-            const dist = Math.sqrt(
-                Math.pow(x - lastPos.current.x, 2) + Math.pow(y - lastPos.current.y, 2)
-            );
+            const dist = Math.sqrt((x - lastPos.current.x) ** 2 + (y - lastPos.current.y) ** 2);
 
             // Dwell Zoom
             if (dist > threshold) {

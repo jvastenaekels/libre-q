@@ -4,11 +4,12 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import SortableCard from './SortableCard';
+import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { motion } from 'framer-motion';
+import type React from 'react';
+import { useState } from 'react';
+import SortableCard from './SortableCard';
 
 interface Card {
     id: number;

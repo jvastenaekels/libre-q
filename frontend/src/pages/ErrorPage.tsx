@@ -4,14 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { AlertOctagon, AlertTriangle, Home, RefreshCcw, WifiOff } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useSessionStore } from '../store/useSessionStore';
+import { useNavigate } from 'react-router-dom';
+import { ApiError } from '../api/client';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { RefreshCcw, AlertTriangle, Home, WifiOff, AlertOctagon } from 'lucide-react';
-import { ApiError } from '../api/client';
+import { useSessionStore } from '../store/useSessionStore';
 
 interface ErrorPageProps {
     error?: Error | ApiError | null;

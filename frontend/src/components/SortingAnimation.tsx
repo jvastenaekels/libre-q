@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Frown, Meh, Smile, ThumbsDown, ThumbsUp } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 // --- Configuration ---
 
@@ -110,7 +110,9 @@ const SortingAnimation: React.FC = () => {
     const fineSourceCounts = useMemo(() => {
         const totals = [0, 0, 0];
         // Calculate initial source pile sizes based on what will be used in FINE steps
-        FINE_STEPS.forEach((s) => totals[s.source]++);
+        for (const s of FINE_STEPS) {
+            totals[s.source]++;
+        }
 
         const effectiveStep = phase === 'FINE' ? Math.max(0, step) : 0;
         for (let i = 0; i < effectiveStep; i++) {

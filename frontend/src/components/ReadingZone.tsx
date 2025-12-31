@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { Eye } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Eye } from 'lucide-react';
 import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
 
@@ -40,7 +40,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         checkOverflow();
         window.addEventListener('resize', checkOverflow);
         return () => window.removeEventListener('resize', checkOverflow);
-    }, [displayCard]);
+    }, []);
 
     const ScrollIndicator = () => (
         <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/90 via-white/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-lg z-10">

@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 type PileType = 'disagree' | 'neutral' | 'agree';
 

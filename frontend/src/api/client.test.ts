@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { reportBug, ApiError } from './client';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { server } from '../test/server';
+import { ApiError, reportBug } from './client';
 
 // Mock global fetch
 const fetchMock = vi.fn();
@@ -55,7 +55,7 @@ describe('API Client', () => {
             );
 
             expect(logCall).toBeDefined();
-            expect(logCall![1]).toEqual(
+            expect(logCall?.[1]).toEqual(
                 expect.objectContaining({
                     method: 'POST',
                     body: expect.stringContaining('Test Error'),

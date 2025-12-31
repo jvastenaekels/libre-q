@@ -4,8 +4,8 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
+import React from 'react';
 
 interface DroppableSlotProps extends React.HTMLAttributes<HTMLDivElement> {
     id: string; // Format: "col-row"

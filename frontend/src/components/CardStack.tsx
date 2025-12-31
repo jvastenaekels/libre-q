@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
-import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
+import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } from 'framer-motion';
+import { Eye } from 'lucide-react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useUIStore } from '../store/useUIStore';
-import { Eye } from 'lucide-react';
 
 interface CardStackProps {
     statement: { id: number; text: string; code?: string };
@@ -55,7 +55,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(
             // Re-check on statement change or window resize (typography auto-scale might change things)
             window.addEventListener('resize', checkOverflow);
             return () => window.removeEventListener('resize', checkOverflow);
-        }, [statement.text, fontSizeClass]);
+        }, []);
 
         useImperativeHandle(ref, () => ({
             swipe: async (direction) => {

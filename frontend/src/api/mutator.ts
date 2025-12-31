@@ -1,4 +1,4 @@
-import { reportBug, ApiError } from './client';
+import { ApiError, reportBug } from './client';
 
 // Re-using the logic from client.ts but adaptable for Orval's signature
 const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';

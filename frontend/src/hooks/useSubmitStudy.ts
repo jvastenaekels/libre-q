@@ -5,10 +5,10 @@
  */
 
 import { useState } from 'react';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useSubmitStudyApiSubmitPost } from '../api/generated';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 export const useSubmitStudy = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -46,10 +46,9 @@ export const useSubmitStudy = () => {
                     // Grid config is array of { score, capacity } sorted by col index?
                     // Or map? The type says { score, capacity }[] in store.
                     // Assuming index matches col.
-                    const score =
-                        config.grid_config && config.grid_config[colKey]
-                            ? config.grid_config[colKey].score
-                            : 0;
+                    const score = config.grid_config?.[colKey]
+                        ? config.grid_config[colKey].score
+                        : 0;
 
                     return {
                         statement_id: item.statementId,

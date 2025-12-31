@@ -4,10 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import RoughSortPage from './RoughSortPage';
-import { renderWithProviders, setupStoreMocks, screen } from '../test/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
+import { renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import RoughSortPage from './RoughSortPage';
 
 const mockConfig: StudyConfig = {
     slug: 'demo',

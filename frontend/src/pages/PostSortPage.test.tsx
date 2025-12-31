@@ -4,14 +4,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PostSortPage from './PostSortPage';
+import { fireEvent, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { renderWithProviders } from '../test/test-utils';
+import PostSortPage from './PostSortPage';
 
 // Mock translation
 vi.mock('react-i18next', () => ({

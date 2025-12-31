@@ -76,20 +76,12 @@ repos:
         files: ^frontend/.*\.(ts|tsx)$
         pass_filenames: false
 
-      # Linting standard
-      - id: frontend-lint
-        name: Frontend Lint (ESLint)
+      # Linting & Formatting (Biome)
+      - id: frontend-biome
+        name: Frontend Lint & Format (Biome)
         entry: bash -c 'cd frontend && npm run lint'
         language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-
-      # Formatage
-      - id: frontend-format
-        name: Frontend Format (Prettier)
-        entry: bash -c 'cd frontend && npm run format'
-        language: system
-        files: ^frontend/.*\.(ts|tsx|css|md|json)$
+        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css)$
         pass_filenames: false
 
       # Architecture/Dead Code

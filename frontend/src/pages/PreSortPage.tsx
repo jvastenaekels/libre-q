@@ -4,17 +4,17 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { ArrowRight } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 const PreSortPage: React.FC = () => {
     const { slug } = useParams();
@@ -102,7 +102,7 @@ const PreSortPage: React.FC = () => {
     const getLocalizedText = (obj: string | Record<string, string>) => {
         if (typeof obj === 'string') return obj;
         if (!obj) return '';
-        return obj[i18n.language] || obj['en'] || Object.values(obj)[0] || '';
+        return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
     };
 
     const renderField = (key: string, fieldConfig: PreSortField) => {

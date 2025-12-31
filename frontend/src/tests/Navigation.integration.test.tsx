@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, act } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { act, screen } from '@testing-library/react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StudyLayout from '../layouts/StudyLayout';
-import { useSessionStore } from '../store/useSessionStore';
-import { useConfigStore } from '../store/useConfigStore';
 import type { StudyConfig } from '../schemas/study';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { renderWithProviders } from '../test/test-utils';
 
 // Mocks for pages that simulate navigation
 const MockWelcome = () => {

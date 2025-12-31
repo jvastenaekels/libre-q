@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 interface UseGridZoomProps {
@@ -27,7 +27,7 @@ export const useGridZoom = ({
     const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
     const onTransformed = useCallback(
-        (ref: ReactZoomPanPinchRef, state: { scale: number }) => {
+        (_ref: ReactZoomPanPinchRef, state: { scale: number }) => {
             onZoomChange?.(state.scale);
             onTransformChange?.();
         },
@@ -256,6 +256,7 @@ export const useGridZoom = ({
         pyramidRef,
         performAutoFit,
         gridColumns,
+        activePileCount,
     ]);
 
     return {

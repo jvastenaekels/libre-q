@@ -4,12 +4,12 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useConfigStore } from './useConfigStore';
-import { useSessionStore } from './useSessionStore';
-import { useResponseStore } from './useResponseStore';
-import { resetBaseLocales } from '../utils/i18nOverrides';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
+import { resetBaseLocales } from '../utils/i18nOverrides';
+import { useConfigStore } from './useConfigStore';
+import { useResponseStore } from './useResponseStore';
+import { useSessionStore } from './useSessionStore';
 
 // Mock the i18n overrides utility
 vi.mock('../utils/i18nOverrides', () => ({

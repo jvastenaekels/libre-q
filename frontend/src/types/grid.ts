@@ -1,5 +1,5 @@
+import type React from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
-import React from 'react';
 
 export interface DragCard {
     statementId: number;

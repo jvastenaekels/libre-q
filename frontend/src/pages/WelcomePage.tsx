@@ -12,15 +12,15 @@
  * Acts as the entry point for a study session.
  */
 
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Markdown from 'react-markdown';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { ArrowRight, Target } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
+import { useNavigate, useParams } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 const WelcomePage: React.FC = () => {
     const { slug } = useParams();

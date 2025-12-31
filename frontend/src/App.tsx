@@ -10,19 +10,19 @@
  * Sets up routing, global error handling, and lazy loading of pages.
  */
 
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { ApiError } from './api/client';
+import ErrorBoundary from './components/ErrorBoundary';
 import StudyLayout from './layouts/StudyLayout';
-import WelcomePage from './pages/WelcomePage';
 import ConsentPage from './pages/ConsentPage';
-import PreSortPage from './pages/PreSortPage';
-import RoughSortPage from './pages/RoughSortPage';
-import PostSortPage from './pages/PostSortPage';
 import ErrorPage from './pages/ErrorPage';
 import LandingPage from './pages/LandingPage';
+import PostSortPage from './pages/PostSortPage';
+import PreSortPage from './pages/PreSortPage';
 import ResetPage from './pages/ResetPage';
-import ErrorBoundary from './components/ErrorBoundary';
-import { ApiError } from './api/client';
+import RoughSortPage from './pages/RoughSortPage';
+import WelcomePage from './pages/WelcomePage';
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));

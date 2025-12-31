@@ -6,8 +6,8 @@
 
 import i18n from '../i18n';
 import en from '../locales/en.json';
-import fr from '../locales/fr.json';
 import fi from '../locales/fi.json';
+import fr from '../locales/fr.json';
 
 /**
  * Applies study-specific overrides to the i18n resource bundle.

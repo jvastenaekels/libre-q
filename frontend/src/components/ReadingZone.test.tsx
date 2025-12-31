@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import ReadingZone from './ReadingZone';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, setupStoreMocks } from '../test/test-utils';
+import ReadingZone from './ReadingZone';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({

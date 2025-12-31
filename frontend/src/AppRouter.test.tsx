@@ -4,14 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
-import { renderWithProviders } from './test/test-utils';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StudyLayout from './layouts/StudyLayout';
-import { useSessionStore } from './store/useSessionStore';
-import { useConfigStore } from './store/useConfigStore';
 import type { StudyConfig } from './schemas/study';
+import { useConfigStore } from './store/useConfigStore';
+import { useSessionStore } from './store/useSessionStore';
+import { renderWithProviders } from './test/test-utils';
 
 vi.mock('./pages/PreSortPage', () => ({
     default: () => <div data-testid="presort-page">PreSortPage</div>,

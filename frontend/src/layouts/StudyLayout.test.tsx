@@ -4,14 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { screen, fireEvent, act } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import StudyLayout from './StudyLayout';
+import { act, fireEvent, screen } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
-import i18n from '../i18n';
-import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../test/test-utils';
+import StudyLayout from './StudyLayout';
 
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.

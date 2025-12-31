@@ -4,20 +4,20 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-// Imports
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ZoomIn, ZoomOut, RotateCcw, Check, Smile, Meh, Frown, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
+// Imports
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import SortableCard from './SortableCard';
-import DroppableSlot from './DroppableSlot';
-import { useGridZoom } from '../hooks/useGridZoom';
-import { useGridCalculations } from '../hooks/useGridCalculations';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useDeckManagement } from '../hooks/useDeckManagement';
-import ReadingZone from './ReadingZone';
+import { useGridCalculations } from '../hooks/useGridCalculations';
+import { useGridZoom } from '../hooks/useGridZoom';
 import type { InteractionUtils } from '../types/grid';
+import DroppableSlot from './DroppableSlot';
+import ReadingZone from './ReadingZone';
+import SortableCard from './SortableCard';
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -129,15 +129,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     contentRef,
                 });
             }
-        }, [
-            onInteractionUtils,
-            zoomIn,
-            zoomOut,
-            performAutoFit,
-            transformRef,
-            wrapperRef,
-            contentRef,
-        ]);
+        }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef]);
 
         const getColumnTint = useCallback((score: number) => {
             if (score <= -3) return 'bg-red-50/50';
@@ -169,13 +161,13 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         useEffect(() => {
             setAutoFitEnabled(true);
-        }, [activePile]);
+        }, []);
 
         useEffect(() => {
             if (!autoFitEnabled) return;
             const t = setTimeout(performAutoFit, 100);
             return () => clearTimeout(t);
-        }, [cardDimensions, autoFitEnabled, performAutoFit]);
+        }, [autoFitEnabled, performAutoFit]);
 
         const renderDeckCards = useCallback(() => {
             return activeCards.length > 0 ? (

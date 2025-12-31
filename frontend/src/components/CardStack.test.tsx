@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, fireEvent, act } from '@testing-library/react';
-import CardStack from './CardStack';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { useMotionValue } from 'framer-motion';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useUIStore } from '../store/useUIStore';
+import CardStack from './CardStack';
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {

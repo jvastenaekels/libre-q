@@ -4,10 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 // import { useTranslation } from 'react-i18next';
 import { ArrowRight, Search } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
     const [slug, setSlug] = useState('');

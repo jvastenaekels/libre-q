@@ -12,13 +12,13 @@
  * Supports multiple variants (hand, grid, compact) and handles selection/hover states.
  */
 
-import React from 'react';
-import { motion } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { motion } from 'framer-motion';
+import { Eye } from 'lucide-react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useUIStore } from '../store/useUIStore';
-import { Eye } from 'lucide-react';
 
 interface SortableCardProps {
     id: number;
@@ -97,7 +97,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                 if (!allowScroll) textSizeClass += ' line-clamp-4';
                 containerPadding = 'p-1.5';
                 break;
-            case 'grid':
             default:
                 textSizeClass = 'text-sm font-medium leading-snug text-slate-800';
                 if (!allowScroll) textSizeClass += ' line-clamp-4';
@@ -117,29 +116,28 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         };
 
         return (
-            <>
-                <div
-                    ref={setNodeRef}
-                    style={{ ...style, ...aspectStyle }}
-                    {...attributes}
-                    {...listeners}
-                    data-testid={`card-${id}`}
-                    onPointerDown={handlePointerDown}
-                    onClick={() => {
-                        // Prevent event from bubbling if it's a drag activation
-                        if (isDragging) return;
+            <div
+                ref={setNodeRef}
+                style={{ ...style, ...aspectStyle }}
+                {...attributes}
+                {...listeners}
+                data-testid={`card-${id}`}
+                onPointerDown={handlePointerDown}
+                onClick={() => {
+                    // Prevent event from bubbling if it's a drag activation
+                    if (isDragging) return;
 
-                        if (hoverTimerRef.current) {
-                            clearTimeout(hoverTimerRef.current);
-                            hoverTimerRef.current = null;
-                        }
-                        if (onClick) {
-                            onClick();
-                        }
-                    }}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    className={`
+                    if (hoverTimerRef.current) {
+                        clearTimeout(hoverTimerRef.current);
+                        hoverTimerRef.current = null;
+                    }
+                    if (onClick) {
+                        onClick();
+                    }
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                className={`
                 relative
                 ${!dimensions ? 'w-full' : ''} ${aspectClass}
                 flex items-center justify-center p-0
@@ -148,32 +146,32 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                 ${isDragging ? '[touch-action:none]' : '[touch-action:manipulation]'}
                 ${isOverlay ? 'z-50 cursor-grabbing' : ''}
             `}
-                >
-                    <motion.div
-                        layoutId={
-                            process.env.NODE_ENV === 'test'
-                                ? undefined
-                                : isOverlay
-                                  ? undefined
-                                  : `card-${id}`
-                        }
-                        transition={{
-                            type: 'spring',
-                            stiffness: 350,
-                            damping: 25,
-                            duration: 0.4,
-                        }}
-                        // Trigger a subtle pulse/flash when the card content (id) changes or on mount
-                        animate={
-                            process.env.NODE_ENV === 'test'
-                                ? undefined
-                                : {
-                                      scale: [1, 1.03, 1],
-                                      filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
-                                  }
-                        }
-                        key={id} // Ensure animation re-triggers if ID changes in this slot
-                        className={`
+            >
+                <motion.div
+                    layoutId={
+                        process.env.NODE_ENV === 'test'
+                            ? undefined
+                            : isOverlay
+                              ? undefined
+                              : `card-${id}`
+                    }
+                    transition={{
+                        type: 'spring',
+                        stiffness: 350,
+                        damping: 25,
+                        duration: 0.4,
+                    }}
+                    // Trigger a subtle pulse/flash when the card content (id) changes or on mount
+                    animate={
+                        process.env.NODE_ENV === 'test'
+                            ? undefined
+                            : {
+                                  scale: [1, 1.03, 1],
+                                  filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
+                              }
+                    }
+                    key={id} // Ensure animation re-triggers if ID changes in this slot
+                    className={`
                     w-full h-full
                     bg-white rounded-2xl shadow-sm border
                     ${
@@ -186,47 +184,46 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     select-none group
                     ${isOverlay ? 'shadow-xl ring-2 ring-indigo-500' : ''}
                 `}
-                    >
-                        {/* Statement Code Watermark */}
-                        {code && (
-                            <div className="absolute top-2 left-2.5 z-10">
-                                <span className="text-[10px] font-bold text-slate-300/80 uppercase tracking-wider select-none">
-                                    {code}
-                                </span>
-                            </div>
-                        )}
+                >
+                    {/* Statement Code Watermark */}
+                    {code && (
+                        <div className="absolute top-2 left-2.5 z-10">
+                            <span className="text-[10px] font-bold text-slate-300/80 uppercase tracking-wider select-none">
+                                {code}
+                            </span>
+                        </div>
+                    )}
 
+                    <div
+                        ref={scrollRef}
+                        className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
+                    >
                         <div
-                            ref={scrollRef}
-                            className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
+                            className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}
                         >
-                            <div
-                                className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}
-                            >
-                                {/[*_~#]/.test(text) ? (
-                                    <ReactMarkdown
-                                        components={{
-                                            p: ({ children }) => <span>{children}</span>,
-                                        }}
-                                    >
-                                        {text}
-                                    </ReactMarkdown>
-                                ) : (
-                                    <span>{text}</span>
-                                )}
+                            {/[*_~#]/.test(text) ? (
+                                <ReactMarkdown
+                                    components={{
+                                        p: ({ children }) => <span>{children}</span>,
+                                    }}
+                                >
+                                    {text}
+                                </ReactMarkdown>
+                            ) : (
+                                <span>{text}</span>
+                            )}
+                        </div>
+                    </div>
+
+                    {!disableHoverZoom && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-70 transition-opacity">
+                            <div className="bg-indigo-50/50 p-1 rounded-full text-indigo-400">
+                                <Eye size={14} strokeWidth={2.5} />
                             </div>
                         </div>
-
-                        {!disableHoverZoom && (
-                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-70 transition-opacity">
-                                <div className="bg-indigo-50/50 p-1 rounded-full text-indigo-400">
-                                    <Eye size={14} strokeWidth={2.5} />
-                                </div>
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
-            </>
+                    )}
+                </motion.div>
+            </div>
         );
     }
 );

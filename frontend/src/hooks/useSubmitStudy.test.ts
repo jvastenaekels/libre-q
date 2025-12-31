@@ -4,14 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { StudyConfig } from '../schemas/study';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { AllTheProviders } from '../test/test-utils';
 import { useSubmitStudy } from './useSubmitStudy';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
-import type { StudyConfig } from '../schemas/study';
 
 // Mock the mutator
 const mockCustomInstance = vi.fn();

@@ -4,10 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Lightbulb, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MethodologyTipsProps {
     variant: 'mobile' | 'desktop';

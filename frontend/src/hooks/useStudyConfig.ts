@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { ApiError } from '../api/client';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
+import { ApiError } from '../api/client';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { useGetStudyConfig } from './useGetStudyConfig';
 

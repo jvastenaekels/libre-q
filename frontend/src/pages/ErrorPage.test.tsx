@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import ErrorPage from './ErrorPage';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../api/client';
+import ErrorPage from './ErrorPage';
 
 const mockResetSession = vi.fn();
 const mockResetConfig = vi.fn();

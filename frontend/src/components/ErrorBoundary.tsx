@@ -4,8 +4,8 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
 
 import ErrorPage from '../pages/ErrorPage';
 
@@ -51,7 +51,7 @@ class ErrorBoundary extends Component<Props, State> {
             const lastReload = sessionStorage.getItem(storageKey);
             const now = Date.now();
 
-            if (!lastReload || now - parseInt(lastReload) > 10000) {
+            if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
                 sessionStorage.setItem(storageKey, now.toString());
                 window.location.reload();
                 return;

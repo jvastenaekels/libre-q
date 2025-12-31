@@ -4,16 +4,15 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import WelcomePage from './WelcomePage';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
-
-import { useConfigStore } from '../store/useConfigStore';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { useSessionStore } from '../store/useSessionStore';
+import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { renderWithProviders } from '../test/test-utils';
+import WelcomePage from './WelcomePage';
 
 // Mocks
 const mockConfig = {

@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { applyStudyOverrides, resetBaseLocales } from './i18nOverrides';
 import i18n from '../i18n';
 import type { StudyConfig } from '../schemas/study';
+import { applyStudyOverrides, resetBaseLocales } from './i18nOverrides';
 
 // Mock the locales to keep tests stable and fast
 vi.mock('../locales/en.json', () => ({

@@ -5,12 +5,12 @@
  * Configures DndKit sensors, drag events, and interactions with the grid placement logic.
  */
 
-import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
-import { useState, useCallback, useEffect } from 'react';
+import type { DragEndEvent, DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
+import { useCallback, useEffect, useState } from 'react';
 import { useUIStore } from '../store/useUIStore';
-import { useGridPlacement } from './useGridPlacement';
 import type { DragCard, InteractionUtils } from '../types/grid';
 import { useDragAutoInteraction } from './useDragAutoInteraction';
+import { useGridPlacement } from './useGridPlacement';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
 interface Statement {
@@ -119,8 +119,8 @@ export const useFineSortDrag = ({
             if (overIdString.startsWith('slot_')) {
                 const parts = overIdString.split('_');
                 if (parts.length === 3) {
-                    const col = parseInt(parts[1]);
-                    const row = parseInt(parts[2]);
+                    const col = parseInt(parts[1], 10);
+                    const row = parseInt(parts[2], 10);
                     handlePlacement(cardId, col, row);
                 }
             }

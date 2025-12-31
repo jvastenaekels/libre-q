@@ -1,6 +1,6 @@
-import React from 'react';
+import { ClipboardList, Construction, Home, LockKeyhole, SearchX } from 'lucide-react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchX, Home, Construction, LockKeyhole, ClipboardList } from 'lucide-react';
 
 export type StudyStatusType = 'not_found' | 'draft' | 'paused' | 'closed';
 

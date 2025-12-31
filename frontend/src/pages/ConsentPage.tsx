@@ -4,18 +4,18 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import Markdown from 'react-markdown';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight } from 'lucide-react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { reportBug } from '../api/client';
+import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { ArrowRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
-import { reportBug } from '../api/client';
 
 const consentSchema = z.object({
     consent: z.boolean().refine((val) => val === true, {

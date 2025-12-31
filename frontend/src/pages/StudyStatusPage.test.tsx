@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { screen, fireEvent } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { useConfigStore } from '../store/useConfigStore';
 import { renderWithProviders } from '../test/test-utils';
 import StudyStatusPage from './StudyStatusPage';
-import { useConfigStore } from '../store/useConfigStore';
 
 // Mock Lucide icons to avoid rendering issues
 vi.mock('lucide-react', () => ({

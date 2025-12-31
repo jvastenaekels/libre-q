@@ -4,17 +4,16 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { AlertCircle, Check, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
-
+import ReactMarkdown from 'react-markdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
-import { AlertCircle, Check, Loader2 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 const PostSortPage: React.FC = () => {
     const config = useConfigStore((state) => state.config);
@@ -93,7 +92,7 @@ const PostSortPage: React.FC = () => {
         }
 
         const currentLang = i18n.language || 'en';
-        return promptConfig[currentLang] || promptConfig['en'] || defaultText;
+        return promptConfig[currentLang] || promptConfig.en || defaultText;
     };
 
     if (!config) return null;
@@ -346,8 +345,8 @@ const PostSortPage: React.FC = () => {
                             className="flex-1 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
                             onChange={(e) => {
                                 if (e.target.value) {
-                                    const id = parseInt(e.target.value);
-                                    if (!isNaN(id)) {
+                                    const id = parseInt(e.target.value, 10);
+                                    if (!Number.isNaN(id)) {
                                         // Initialize with empty string if not exists
                                         if (!responses.postsort.card_comments?.[id]) {
                                             handleCommentChange(id, '');
@@ -375,7 +374,7 @@ const PostSortPage: React.FC = () => {
                                     // Exclude already commented/added (check if key exists in card_comments)
                                     const isAdded =
                                         responses.postsort.card_comments &&
-                                        Object.prototype.hasOwnProperty.call(
+                                        Object.hasOwn(
                                             responses.postsort.card_comments,
                                             s.statementId
                                         );
@@ -393,7 +392,7 @@ const PostSortPage: React.FC = () => {
                     {/* List of Optional Cards */}
                     <div className="space-y-6">
                         {Object.keys(responses.postsort.card_comments || {}).map((key) => {
-                            const id = parseInt(key);
+                            const id = parseInt(key, 10);
                             // Skip extremes (handled in section 1)
                             if (extremeCards.some((c) => c.statementId === id)) return null;
 

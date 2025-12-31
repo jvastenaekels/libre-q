@@ -12,32 +12,32 @@
  * Handles complex drag-and-drop logic (dnd-kit), slot collisions, and validations.
  */
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
+    type CollisionDetection,
+    closestCenter,
     DndContext,
     DragOverlay,
-    useSensors,
-    useSensor,
-    MouseSensor,
-    TouchSensor,
-    closestCenter,
     MeasuringStrategy,
-    type CollisionDetection,
     type Modifier,
+    MouseSensor,
     pointerWithin,
+    TouchSensor,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
-import { useNavigate, useParams } from 'react-router-dom';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import GridSort from '../components/GridSort';
+import SortableCard from '../components/SortableCard';
+import { useFineSortDrag } from '../hooks/useFineSortDrag';
+import { useLayoutAction } from '../hooks/useLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
-import { useLayoutAction } from '../hooks/useLayout';
-import {} from 'lucide-react';
-import GridSort from '../components/GridSort';
-import SortableCard from '../components/SortableCard';
-import { useFineSortDrag } from '../hooks/useFineSortDrag';
 import type { InteractionUtils } from '../types/grid';
 
 const FineSortPage: React.FC = () => {
@@ -106,7 +106,7 @@ const FineSortPage: React.FC = () => {
                 let curr = elAtPoint as HTMLElement;
                 while (curr && curr !== document.body) {
                     const id = curr.getAttribute('id') || curr.dataset.testid;
-                    if (id && id.startsWith('slot_')) {
+                    if (id?.startsWith('slot_')) {
                         resolvedPointId = id;
                         break;
                     }
@@ -120,9 +120,9 @@ const FineSortPage: React.FC = () => {
 
                 // Handle card-ID format (from data-testid)
                 const cardIdMatch = idString.match(/^card-(\d+)$/);
-                const cardId = cardIdMatch ? parseInt(cardIdMatch[1]) : parseInt(idString);
+                const cardId = cardIdMatch ? parseInt(cardIdMatch[1], 10) : parseInt(idString, 10);
 
-                if (!isNaN(cardId)) {
+                if (!Number.isNaN(cardId)) {
                     const placed = responses.qsort.find((p) => p.statementId === cardId);
                     return placed ? `slot_${placed.col}_${placed.row}` : null;
                 }

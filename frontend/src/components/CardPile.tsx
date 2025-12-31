@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import SortableCard from './SortableCard';
 

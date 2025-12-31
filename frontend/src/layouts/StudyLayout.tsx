@@ -12,21 +12,22 @@
  * Manages the top navigation bar, step progress, and locale switching.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
-import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import ErrorBoundary from '../components/ErrorBoundary';
 import { Check, Globe } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, Outlet, useLocation, useParams } from 'react-router-dom';
+import { ApiError } from '../api/client';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
-import { ApiError } from '../api/client';
+import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
-import StudyStatusPage from '../pages/StudyStatusPage';
 import type { StudyStatusType } from '../pages/StudyStatusPage';
+import StudyStatusPage from '../pages/StudyStatusPage';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },

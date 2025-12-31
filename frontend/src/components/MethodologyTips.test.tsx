@@ -4,9 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen } from '../test/test-utils';
 import MethodologyTips from './MethodologyTips';
-import { render, screen, act } from '../test/test-utils';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({

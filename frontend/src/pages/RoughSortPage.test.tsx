@@ -4,15 +4,15 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, act } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { StudyConfig } from '../schemas/study';
+import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test/test-utils';
 import RoughSortPage from './RoughSortPage';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { Route, Routes } from 'react-router-dom';
-import type { StudyConfig } from '../schemas/study';
 
 // Mocks
 vi.mock('react-i18next', () => ({

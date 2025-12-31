@@ -4,10 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import DroppableSlot from './DroppableSlot';
 import { useDroppable } from '@dnd-kit/core';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import DroppableSlot from './DroppableSlot';
 
 // Mock dnd-kit core
 vi.mock('@dnd-kit/core', () => ({

@@ -4,10 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import GridSort from './GridSort';
 import { DndContext } from '@dnd-kit/core';
+import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import GridSort from './GridSort';
 
 // Mock dependencies
 vi.mock('@dnd-kit/sortable', () => ({

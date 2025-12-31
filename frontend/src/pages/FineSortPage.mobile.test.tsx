@@ -4,16 +4,15 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
-import { screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { renderWithProviders } from '../test/test-utils';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
-import FineSortPage from './FineSortPage';
+import { beforeEach, describe, expect, it } from 'vitest';
 import StudyLayout from '../layouts/StudyLayout';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { renderWithProviders } from '../test/test-utils';
+import FineSortPage from './FineSortPage';
 
 describe('FineSortPage Mobile Interaction (Integration)', () => {
     beforeEach(() => {

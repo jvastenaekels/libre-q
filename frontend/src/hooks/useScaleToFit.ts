@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useState, useEffect, type RefObject } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
 
 export const useScaleToFit = (
     containerRef: RefObject<HTMLElement>,
