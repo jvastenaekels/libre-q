@@ -14,20 +14,23 @@ from app.models import (
     QSortEntry,
     Statement,
     Study,
-    StudyCollaborator,
-    StudyRole,
     User,
+    Workspace,
+    WorkspaceMember,
+    WorkspaceRole,
 )
 from app.utils.security import create_access_token
 
 
 @pytest_asyncio.fixture
-async def export_ready_study(db: AsyncSession, test_user: User):
+async def export_ready_study(
+    db: AsyncSession, test_user: User, test_workspace: Workspace
+):
     """Creates a study with statements and participant data for export tests."""
-    # 1. Study
+    # 1. Study associated with test_workspace (where test_user is admin)
     study = Study(
         slug="export-study",
-        owner_id=test_user.id,
+        workspace_id=test_workspace.id,
         state="active",
         grid_config={"0": 2, "1": 1},
         presort_config={"age": "number"},
@@ -35,12 +38,6 @@ async def export_ready_study(db: AsyncSession, test_user: User):
     )
     db.add(study)
     await db.flush()
-
-    # Add owner as collaborator
-    collab = StudyCollaborator(
-        study_id=study.id, user_id=test_user.id, role=StudyRole.owner
-    )
-    db.add(collab)
 
     # 2. Statements
     stmts = [
@@ -78,7 +75,7 @@ async def export_ready_study(db: AsyncSession, test_user: User):
 async def test_export_csv_success(
     client: AsyncClient, test_user: User, export_ready_study: Study
 ):
-    """Test successful CSV export."""
+    """Test successful CSV export (User is Admin/researcher in workspace)."""
     access_token = create_access_token(subject=test_user.email)
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -138,14 +135,17 @@ async def test_export_rbac_denied(
     client: AsyncClient, db: AsyncSession, export_ready_study: Study
 ):
     """Test that a viewer cannot export data."""
-    # Create another user as viewer
+    # Create another user as viewer in the SAME workspace
     viewer_user = User(email="viewer@example.com", hashed_password="hashedpassword")
     db.add(viewer_user)
     await db.flush()
-    collab = StudyCollaborator(
-        study_id=export_ready_study.id, user_id=viewer_user.id, role=StudyRole.viewer
+
+    # Add as viewer to valid workspace
+    workspace_id = export_ready_study.workspace_id
+    member = WorkspaceMember(
+        workspace_id=workspace_id, user_id=viewer_user.id, role=WorkspaceRole.viewer
     )
-    db.add(collab)
+    db.add(member)
     await db.commit()
 
     access_token = create_access_token(subject=viewer_user.email)

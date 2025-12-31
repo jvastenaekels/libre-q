@@ -27,36 +27,28 @@ backend/
    ```
 
 2. **Database Initialization**:
-   By default, the app uses **SQLite** (`q_method.db`). This script creates the database schema and an initial admin user.
+   By default, the app uses **SQLite** (`q_method.db`). This script creates the database schema, an initial admin user (`admin@example.com`), and a default **Example Workspace** for that user.
 
    ```bash
    python init_db.py
    ```
 
-3. **Seeding**:
-   Populate the database with studies defined in JSON files. **Requires the API server to be running** (use default admin credentials or set `ADMIN_EMAIL`/`ADMIN_PASSWORD`).
+3. **Seeding & Updating Content**:
+   Populate or update the database with studies defined in JSON files.
+
+   > **Note**: This script uses the API, so **the backend server must be running locally** (e.g., `uvicorn app.main:app`). It uses the default admin credentials or `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars.
 
    ```bash
+   # Create or Update a study
    python seed.py data/example-study.json
    ```
 
-   ```bash
-   python seed.py data/example-study.json
-   ```
-
-4. **Updating Study Configuration**:
-   To update an existing study (translations, statements, etc.) from a JSON file:
-
-   ```bash
-   python update_study.py data/example-study.json
-   ```
-
-5. **Utility Scripts**:
+4. **Utility Scripts**:
    Additional management scripts are located in `scripts/`:
    - `scripts/create_user.py`: Create admin users interactively.
    - `scripts/ensure_schema.py`: Verify database schema consistency.
 
-6. **Running Locally**:
+5. **Running Locally**:
    ```bash
    uvicorn app.main:app --reload
    ```

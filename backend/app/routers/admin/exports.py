@@ -9,12 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ...database import get_db
-from ...dependencies import check_study_permission
+from ...dependencies import check_workspace_permission
 from ...models import (
     Participant,
     Statement,
     Study,
-    StudyRole,
+    WorkspaceRole,
 )
 from ...services.export_service import ExportService
 
@@ -23,7 +23,7 @@ router = APIRouter(tags=["Admin Exports"])
 
 @router.get("/{slug}/export/csv")
 async def export_csv(
-    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    study: Study = Depends(check_workspace_permission(WorkspaceRole.researcher)),
     db: AsyncSession = Depends(get_db),
 ):
     """Export study results as CSV."""
@@ -59,7 +59,7 @@ async def export_csv(
 
 @router.get("/{slug}/export/pqmethod")
 async def export_pqmethod(
-    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    study: Study = Depends(check_workspace_permission(WorkspaceRole.researcher)),
     db: AsyncSession = Depends(get_db),
 ):
     """Export study results in PQMethod format (ZIP)."""

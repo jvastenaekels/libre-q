@@ -43,12 +43,56 @@ class ParticipantStatus(str, Enum):
     completed = "completed"
 
 
-class StudyRole(str, Enum):
-    """Enum for collaborator roles."""
+class WorkspaceRole(str, Enum):
+    """Enum for workspace roles."""
 
-    owner = "owner"
-    editor = "editor"
+    admin = "admin"
+    researcher = "researcher"
     viewer = "viewer"
+
+
+# Workspace Models
+class Workspace(Base):
+    """SQLAlchemy model for workspaces."""
+
+    __tablename__ = "workspaces"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String)
+    slug: Mapped[str] = mapped_column(String, unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    # Relationships
+    studies: Mapped[list["Study"]] = relationship(
+        back_populates="workspace", cascade="all, delete-orphan"
+    )
+    members: Mapped[list["WorkspaceMember"]] = relationship(
+        back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
+    )
+
+
+class WorkspaceMember(Base):
+    """Association model for workspace members with roles."""
+
+    __tablename__ = "workspace_members"
+
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[WorkspaceRole] = mapped_column(
+        SAEnum(WorkspaceRole), default=WorkspaceRole.viewer
+    )
+    joined_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    workspace: Mapped["Workspace"] = relationship(back_populates="members")
+    user: Mapped["User"] = relationship(back_populates="memberships")
 
 
 # User Model
@@ -64,10 +108,9 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Relationships
-    collaborations: Mapped[list["StudyCollaborator"]] = relationship(
+    memberships: Mapped[list["WorkspaceMember"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
-        foreign_keys="StudyCollaborator.user_id",
     )
 
 
@@ -79,7 +122,9 @@ class Study(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))  # Original creator
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
+    )
     state: Mapped[StudyState] = mapped_column(
         SAEnum(StudyState), default=StudyState.draft
     )
@@ -103,6 +148,7 @@ class Study(Base):
     )  # e.g. Logic for follow-up
 
     # Relationships
+    workspace: Mapped["Workspace"] = relationship(back_populates="studies")
     translations: Mapped[list["StudyTranslation"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
@@ -112,36 +158,6 @@ class Study(Base):
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="study", cascade="all, delete-orphan"
     )
-    collaborators: Mapped[list["StudyCollaborator"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
-    )
-
-
-class StudyCollaborator(Base):
-    """Association model for study collaborators with roles."""
-
-    __tablename__ = "study_collaborators"
-
-    study_id: Mapped[int] = mapped_column(
-        ForeignKey("studies.id", ondelete="CASCADE"), primary_key=True
-    )
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
-    )
-    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
-
-    added_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-    added_by_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
-
-    study: Mapped["Study"] = relationship(back_populates="collaborators")
-    user: Mapped["User"] = relationship(
-        back_populates="collaborations", foreign_keys=[user_id]
-    )
-    added_by: Mapped["User"] = relationship(foreign_keys=[added_by_id])
 
 
 class StudyTranslation(Base):

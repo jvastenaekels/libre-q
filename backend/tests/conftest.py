@@ -20,11 +20,12 @@ from app.models import (
     Statement,
     StatementTranslation,
     Study,
-    StudyCollaborator,
-    StudyRole,
     StudyState,
     StudyTranslation,
     User,
+    Workspace,
+    WorkspaceMember,
+    WorkspaceRole,
 )
 from app.utils.security import get_password_hash
 
@@ -102,11 +103,24 @@ async def test_user(db: AsyncSession):
 
 
 @pytest_asyncio.fixture
-async def seed_study(db, test_user):
-    """Seeds a complete study with statements and configs."""
-    # 1. Owner (use test_user)
-    owner = test_user
+async def test_workspace(db: AsyncSession, test_user: User):
+    """Create a test workspace and add test_user as admin."""
+    ws = Workspace(title="Test Workspace", slug="test-workspace")
+    db.add(ws)
+    await db.flush()
 
+    member = WorkspaceMember(
+        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.admin
+    )
+    db.add(member)
+    await db.commit()
+    await db.refresh(ws)
+    return ws
+
+
+@pytest_asyncio.fixture
+async def seed_study(db, test_user, test_workspace):
+    """Seeds a complete study with statements and configs."""
     # 2. Study
     grid_config = [
         {"score": -1, "capacity": 1},
@@ -117,7 +131,7 @@ async def seed_study(db, test_user):
 
     study = Study(
         slug="test-study",
-        owner_id=owner.id,
+        workspace_id=test_workspace.id,
         state=StudyState.active,
         grid_config=grid_config,
         presort_config={
@@ -137,12 +151,6 @@ async def seed_study(db, test_user):
     )
     db.add(study)
     await db.flush()
-
-    # Add owner as collaborator
-    collab = StudyCollaborator(
-        study_id=study.id, user_id=owner.id, role=StudyRole.owner
-    )
-    db.add(collab)
 
     # 3. Translation
     trans = StudyTranslation(

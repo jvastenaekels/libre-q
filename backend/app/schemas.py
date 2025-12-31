@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .models import ParticipantStatus, StudyRole, StudyState
+from .models import ParticipantStatus, StudyState, WorkspaceRole
 
 # Auth Schemas
 
@@ -48,6 +48,37 @@ class UserRead(UserBase):
     is_active: bool
     is_superuser: bool
     model_config = ConfigDict(from_attributes=True)
+
+
+# Workspace Schemas
+
+
+class WorkspaceMemberRead(BaseModel):
+    """Schema for reading workspace member details."""
+
+    user_id: int
+    user_email: str | None = None
+    role: WorkspaceRole
+    joined_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WorkspaceRead(BaseModel):
+    """Schema for reading a workspace."""
+
+    id: int
+    title: str
+    slug: str
+    created_at: datetime
+    members: list[WorkspaceMemberRead] = []
+    model_config = ConfigDict(from_attributes=True)
+
+
+class WorkspaceCreate(BaseModel):
+    """Schema for creating a workspace."""
+
+    title: str
+    slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
 
 
 # Translation Schemas
@@ -141,27 +172,6 @@ class GridColumn(BaseModel):
     capacity: int
 
 
-# Collaborator Schemas
-
-
-class StudyCollaboratorRead(BaseModel):
-    """Schema for reading study collaborator details."""
-
-    user_id: int
-    user_email: str | None = None
-    role: StudyRole
-    added_at: Any
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class StudyCollaboratorAdd(BaseModel):
-    """Schema for adding/updating a collaborator."""
-
-    email: str
-    role: StudyRole
-
-
 # Study Schemas
 
 
@@ -202,9 +212,8 @@ class StudyRead(StudyBase):
     """Schema for reading a study."""
 
     id: int
-    owner_id: int
+    workspace_id: int
     created_at: datetime
-    collaborators: list[StudyCollaboratorRead] = []
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
     model_config = ConfigDict(from_attributes=True)

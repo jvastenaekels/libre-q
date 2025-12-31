@@ -5,16 +5,16 @@ import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Statement, Study, StudyState, User
+from app.models import Statement, Study, StudyState, User, Workspace
 
 
 @pytest_asyncio.fixture
-async def active_study(db: AsyncSession, test_user: User):
+async def active_study(db: AsyncSession, test_user: User, test_workspace: Workspace):
     """Creates a healthy ACTIVE study for testing submissions."""
     study = Study(
         slug="active-study",
         state=StudyState.active,
-        owner_id=test_user.id,
+        workspace_id=test_workspace.id,
         grid_config={"-1": 1, "0": 1, "1": 1},  # Simple 3-card grid
         presort_config={},
         postsort_config={},
@@ -37,12 +37,12 @@ async def active_study(db: AsyncSession, test_user: User):
 
 
 @pytest_asyncio.fixture
-async def draft_study(db: AsyncSession, test_user: User):
+async def draft_study(db: AsyncSession, test_user: User, test_workspace: Workspace):
     """Creates a DRAFT study."""
     study = Study(
         slug="draft-study",
         state=StudyState.draft,
-        owner_id=test_user.id,
+        workspace_id=test_workspace.id,
         grid_config={"0": 1},
         presort_config={},
         postsort_config={},

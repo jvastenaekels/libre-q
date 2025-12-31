@@ -2,7 +2,7 @@
 
 import pytest
 
-from app.models import Statement, Study, StudyState, User
+from app.models import Statement, Study, StudyState, User, Workspace
 
 
 @pytest.mark.asyncio
@@ -13,10 +13,14 @@ async def test_get_study_no_translations(client, db):
     db.add(owner)
     await db.flush()
 
+    ws = Workspace(title="Empty WS", slug="empty-ws")
+    db.add(ws)
+    await db.flush()
+
     # Create study without any StudyTranslation
     study = Study(
         slug="empty-study",
-        owner_id=owner.id,
+        workspace_id=ws.id,
         state=StudyState.active,
         default_language="en",
         grid_config=[],
@@ -46,9 +50,13 @@ async def test_get_study_statement_fallbacks_to_code(client, db):
     db.add(owner)
     await db.flush()
 
+    ws = Workspace(title="Fallback WS", slug="fallback-ws")
+    db.add(ws)
+    await db.flush()
+
     study = Study(
         slug="code-fallback-study",
-        owner_id=owner.id,
+        workspace_id=ws.id,
         state=StudyState.active,
         grid_config=[],
         presort_config={},

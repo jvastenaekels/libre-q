@@ -10,6 +10,7 @@ from app.models import (
     StudyState,
     StudyTranslation,
     User,
+    Workspace,
 )
 
 
@@ -42,9 +43,13 @@ async def test_language_resolution_cascade(client, db):
     db.add(owner)
     await db.flush()
 
+    ws = Workspace(title="Lang WS", slug="lang-ws")
+    db.add(ws)
+    await db.flush()
+
     study = Study(
         slug="lang-study",
-        owner_id=owner.id,
+        workspace_id=ws.id,
         state=StudyState.active,
         default_language="fr",  # STUDY DEFAULT IS FR
         grid_config=[],
@@ -132,9 +137,13 @@ async def test_get_study_optional_fields_and_statement_fallbacks(client, db):
     db.add(owner)
     await db.flush()
 
+    ws = Workspace(title="Opts WS", slug="opts-ws")
+    db.add(ws)
+    await db.flush()
+
     study = Study(
         slug="opts-study",
-        owner_id=owner.id,
+        workspace_id=ws.id,
         state=StudyState.active,
         grid_config=[],
         presort_config={},
@@ -184,9 +193,13 @@ async def test_get_study_show_statement_codes(client, db):
     db.add(owner)
     await db.flush()
 
+    ws = Workspace(title="Codes WS", slug="codes-ws")
+    db.add(ws)
+    await db.flush()
+
     study = Study(
         slug="codes-study",
-        owner_id=owner.id,
+        workspace_id=ws.id,
         state=StudyState.active,
         show_statement_codes=True,
         grid_config=[],

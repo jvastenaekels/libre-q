@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.utils.script_utils as script_utils_module
-from app.models import Study, User
+from app.models import Study, User, Workspace
 from app.utils.script_utils import APIClient, sync_study_from_file
 
 
@@ -28,7 +28,7 @@ async def test_api_client_login(client: AsyncClient, test_user: User):
 
 @pytest.mark.asyncio
 async def test_sync_study_create(
-    client: AsyncClient, db: AsyncSession, test_user: User
+    client: AsyncClient, db: AsyncSession, test_user: User, test_workspace: Workspace
 ):
     """Test sync_study_from_file logic (create mode)."""
     from tests.conftest import TEST_EMAIL, TEST_PASSWORD
@@ -74,6 +74,8 @@ async def test_sync_study_create(
         study = result.scalars().first()
         assert study is not None
         assert study.slug == "seed-via-api"
+        # It should be automatically assigned to the test_workspace
+        assert study.workspace_id == test_workspace.id
     finally:
         script_utils_module.APIClient = orig_api_cls  # type: ignore
         if os.path.exists(tmp_path):

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.database import get_db
-from app.models import Study, StudyCollaborator, StudyRole, User
+from app.models import Study, User, WorkspaceMember, WorkspaceRole
 from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
@@ -51,40 +51,48 @@ async def get_current_user(
 
 # --- RBAC Logic ---
 
-ROLE_HIERARCHY = {StudyRole.owner: 30, StudyRole.editor: 20, StudyRole.viewer: 10}
+ROLE_HIERARCHY = {
+    WorkspaceRole.admin: 30,
+    WorkspaceRole.researcher: 20,
+    WorkspaceRole.viewer: 10,
+}
 
 
-def check_study_permission(required_role: StudyRole) -> Callable:
-    """Factory creating a dependency to check if current_user has 'required_role' (or higher) on 'slug'."""
+def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
+    """Factory creating a dependency to verify workspace access (via Study slug)."""
 
     async def permission_dependency(
         slug: str = Path(..., description="The slug of the study"),
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
     ) -> Study:
-        """Dependency that returns the study if the user has the required permission."""
-        # Query study and collaborator in one go
+        """Dependency that returns the Study if the user has required workspace role."""
+        # 1. Access Study joined with Workspace joined with Member
+        # We need to find the study by slug, ensure it belongs to a workspace,
+        # and ensure the current user is a member of that workspace with sufficient role.
         query = (
-            select(Study, StudyCollaborator)
-            .join(StudyCollaborator)
+            select(Study, WorkspaceMember)
+            .join(Study.workspace)
+            .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
             .where(Study.slug == slug)
-            .where(StudyCollaborator.user_id == current_user.id)
+            .where(WorkspaceMember.user_id == current_user.id)
         )
 
         result = await db.execute(query)
         row = result.one_or_none()
 
         if not row:
+            # Either study doesn't exist, or user is not in the workspace
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Study not found or access denied",
             )
 
-        study, collaborator = row
+        study, member = row
 
         # Check Role Hierarchy
         required_level = ROLE_HIERARCHY[required_role]
-        user_level = ROLE_HIERARCHY[collaborator.role]
+        user_level = ROLE_HIERARCHY[member.role]
 
         if user_level < required_level:
             raise HTTPException(
