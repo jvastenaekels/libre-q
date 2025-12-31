@@ -35,32 +35,41 @@ TEST_PASSWORD = "testpassword"
 # Use in-memory SQLite for testing
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
-engine = create_async_engine(
-    TEST_DATABASE_URL,
-    echo=False,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = async_sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    expire_on_commit=False,
-    bind=engine,
-    class_=AsyncSession,
-)
+
+@pytest_asyncio.fixture
+async def db_engine():
+    """Create a fresh database engine for each test."""
+    engine = create_async_engine(
+        TEST_DATABASE_URL,
+        echo=False,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    yield engine
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
-async def db():
+async def db(db_engine):
+    """Create a fresh database session for each test."""
     # Create tables
-    async with engine.begin() as conn:
+    async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # Create session factory bound to this engine
+    TestingSessionLocal = async_sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False,
+        bind=db_engine,
+        class_=AsyncSession,
+    )
 
     async with TestingSessionLocal() as session:
         yield session
 
     # Drop tables (optional for in-memory, but good practice)
-    async with engine.begin() as conn:
+    async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
