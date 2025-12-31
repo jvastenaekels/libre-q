@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WelcomePage from './WelcomePage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -108,7 +108,10 @@ describe('WelcomePage', () => {
         unmount();
 
         // Case 1: user has consented
-        useSessionStore.getState().setConsent(true);
+        act(() => {
+            useSessionStore.getState().setConsent(true);
+        });
+
         render(
             <MemoryRouter>
                 <WelcomePage />

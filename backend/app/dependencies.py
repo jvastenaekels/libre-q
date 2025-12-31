@@ -3,9 +3,10 @@
 from collections.abc import Callable
 from typing import cast
 
+import jwt
 from fastapi import Depends, HTTPException, Path, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,7 +36,7 @@ async def get_current_user(
             raise credentials_exception
         email: str = cast(str, sub)
         token_data = TokenData(email=email)
-    except JWTError:
+    except InvalidTokenError:
         raise credentials_exception
 
     query = select(User).where(User.email == token_data.email)

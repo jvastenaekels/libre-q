@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
-import { renderWithProviders, setupStoreMocks, screen } from '../test/test-utils';
+import { renderWithProviders, setupStoreMocks, screen, act } from '../test/test-utils';
 import type { StudyConfig } from '../schemas/study';
 
 const mockConfig: StudyConfig = {
@@ -88,7 +88,9 @@ describe('FineSortPage', () => {
             },
         });
 
-        renderWithProviders(<FineSortPage />);
+        act(() => {
+            renderWithProviders(<FineSortPage />);
+        });
 
         expect(screen.queryByText('fine.actions.validate')).toBeNull();
     });
@@ -121,7 +123,9 @@ describe('FineSortPage', () => {
             },
         });
 
-        renderWithProviders(<FineSortPage />);
+        act(() => {
+            renderWithProviders(<FineSortPage />);
+        });
 
         expect(screen.getByText('fine.actions.validate')).toBeInTheDocument();
     });
@@ -153,7 +157,9 @@ describe('FineSortPage', () => {
             },
         });
 
-        renderWithProviders(<FineSortPage />);
+        act(() => {
+            renderWithProviders(<FineSortPage />);
+        });
         expect(screen.getByTestId('show-codes')).toHaveTextContent('true');
     });
 });

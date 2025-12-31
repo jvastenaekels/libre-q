@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ConsentPage from './ConsentPage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -138,7 +138,9 @@ describe('ConsentPage', () => {
     it('falls back to UI defaults when config consent is missing', () => {
         // Clear config consent
         const configWithoutConsent = { ...mockConfig, consent: null };
-        useConfigStore.getState().setConfig(configWithoutConsent as any);
+        act(() => {
+            useConfigStore.getState().setConfig(configWithoutConsent as any);
+        });
 
         render(
             <MemoryRouter>

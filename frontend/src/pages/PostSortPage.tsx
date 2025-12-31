@@ -328,7 +328,146 @@ const PostSortPage: React.FC = () => {
 
                 <hr className="border-slate-200 my-8" />
 
-                {/* 2. MISSING STATEMENTS */}
+                {/* 2. OPTIONAL COMMENTS */}
+                <div className="space-y-6">
+                    <h2 className="text-xl font-bold text-slate-800">
+                        {t('post.optional.title', 'Additional Comments (Optional)')}
+                    </h2>
+                    <p className="text-slate-600">
+                        {t(
+                            'post.optional.description',
+                            'Feel free to add comments to any other statement if you wish to elaborate on your choices.'
+                        )}
+                    </p>
+
+                    {/* Dropdown to add */}
+                    <div className="flex gap-2">
+                        <select
+                            className="flex-1 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    const id = parseInt(e.target.value);
+                                    if (!isNaN(id)) {
+                                        // Initialize with empty string if not exists
+                                        if (!responses.postsort.card_comments?.[id]) {
+                                            handleCommentChange(id, '');
+                                        }
+                                        // Reset select
+                                        e.target.value = '';
+                                        // Scroll to new card logic could go here
+                                    }
+                                }
+                            }}
+                            defaultValue=""
+                        >
+                            <option value="" disabled>
+                                {t(
+                                    'post.optional.select_placeholder',
+                                    'Select a statement to comment...'
+                                )}
+                            </option>
+                            {responses.qsort
+                                .filter((s) => {
+                                    // Exclude extremes (they are handled above)
+                                    const isExtreme = extremeCards.some(
+                                        (e) => e.statementId === s.statementId
+                                    );
+                                    // Exclude already commented/added (check if key exists in card_comments)
+                                    const isAdded =
+                                        responses.postsort.card_comments &&
+                                        Object.prototype.hasOwnProperty.call(
+                                            responses.postsort.card_comments,
+                                            s.statementId
+                                        );
+                                    return !isExtreme && !isAdded;
+                                })
+                                .sort((a, b) => a.statementId - b.statementId)
+                                .map((s) => (
+                                    <option key={s.statementId} value={s.statementId}>
+                                        {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 60)}...`}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+
+                    {/* List of Optional Cards */}
+                    <div className="space-y-6">
+                        {Object.keys(responses.postsort.card_comments || {}).map((key) => {
+                            const id = parseInt(key);
+                            // Skip extremes (handled in section 1)
+                            if (extremeCards.some((c) => c.statementId === id)) return null;
+
+                            // Get card info (placement score etc)
+                            const cardPlacement = responses.qsort.find((c) => c.statementId === id);
+                            if (!cardPlacement) return null; // Should include all placed cards
+
+                            const colDef = gridColumns[cardPlacement.col];
+                            const scoreVal = colDef ? colDef.score : 0;
+                            const scoreLabel = scoreVal > 0 ? `+${scoreVal}` : `${scoreVal}`;
+                            const isPositive = scoreVal > 0;
+                            const isNeutral = scoreVal === 0;
+
+                            let badgeColor = 'bg-slate-100 text-slate-700';
+                            if (isPositive) badgeColor = 'bg-green-100 text-green-700';
+                            if (!isPositive && !isNeutral) badgeColor = 'bg-red-100 text-red-700';
+
+                            return (
+                                <div
+                                    key={id}
+                                    className="p-6 rounded-xl border border-slate-200 shadow-sm bg-white relative group"
+                                >
+                                    <button
+                                        onClick={() => {
+                                            // Remove comment: delete key from object
+                                            const current = { ...responses.postsort.card_comments };
+                                            delete current[id];
+                                            setPostSortResponse('card_comments', current);
+                                        }}
+                                        className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors p-1"
+                                        title={t('common.remove', 'Remove')}
+                                    >
+                                        <div className="w-5 h-5 flex items-center justify-center font-bold text-xl leading-none">
+                                            &times;
+                                        </div>
+                                    </button>
+
+                                    <div className="flex items-center gap-2 mb-4 pr-8">
+                                        <span
+                                            className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${badgeColor}`}
+                                        >
+                                            {t('post.score', 'Score')}: {scoreLabel}
+                                        </span>
+                                    </div>
+
+                                    <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic">
+                                        <ReactMarkdown
+                                            components={{
+                                                p: ({ children }) => <span>{children}</span>,
+                                            }}
+                                        >
+                                            {getCardText(id)}
+                                        </ReactMarkdown>
+                                    </blockquote>
+
+                                    <textarea
+                                        value={responses.postsort.card_comments[id] || ''}
+                                        onChange={(e) => handleCommentChange(id, e.target.value)}
+                                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 min-h-[100px]"
+                                        placeholder={t(
+                                            'post.optional.placeholder',
+                                            'Your comment here...'
+                                        )}
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <hr className="border-slate-200 my-8" />
+
+                {/* 3. MISSING STATEMENTS */}
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label
                         htmlFor="missing_statement"
@@ -347,7 +486,7 @@ const PostSortPage: React.FC = () => {
                     />
                 </div>
 
-                {/* 3. GENERAL COMMENTS */}
+                {/* 4. GENERAL COMMENTS */}
                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label
                         htmlFor="general_comment"
