@@ -65,7 +65,8 @@ export const useStudyConfig = () => {
             let errorKey = 'common.errors.unknown';
 
             if (error instanceof ApiError) {
-                if (error.status === 404) errorKey = 'common.errors.not_found';
+                if (error.status === 404 || error.status === 422)
+                    errorKey = 'common.errors.not_found';
                 if (error.status === 429) errorKey = 'common.errors.rate_limited';
             } else if (error instanceof ZodError) {
                 errorKey = 'common.errors.validation';
