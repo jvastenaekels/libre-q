@@ -158,17 +158,12 @@ const PostSortPage: React.FC = () => {
     const handleSubmit = async () => {
         if (!validateAll()) {
             markAllTouched();
-            setValidationError(
-                t(
-                    'post.validation_error',
-                    'Please complete all required comments (min 10 characters).'
-                )
-            );
+            setValidationError(t('post.validation_error'));
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
         setValidationError(null);
-        navigate(`/study/${slug}/summary`);
+        submit();
     };
 
     // Success View
@@ -359,10 +354,7 @@ const PostSortPage: React.FC = () => {
                             defaultValue=""
                         >
                             <option value="" disabled>
-                                {t(
-                                    'post.optional.select_placeholder',
-                                    'Select a statement...'
-                                )}
+                                {t('post.optional.select_placeholder', 'Select a statement...')}
                             </option>
                             {responses.qsort
                                 .filter((s) => {
@@ -505,7 +497,7 @@ const PostSortPage: React.FC = () => {
                 <div className="flex justify-center pt-8">
                     <button
                         type="button"
-                        onClick={() => submit()}
+                        onClick={handleSubmit}
                         disabled={isLoading}
                         className="
                             bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg

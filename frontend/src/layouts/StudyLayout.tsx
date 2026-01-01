@@ -20,7 +20,7 @@ import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-rou
 import { ApiError } from '../api/client';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
-import { useLayoutAction, useLayoutState } from '../hooks/useLayout';
+import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
@@ -256,9 +256,11 @@ const StudyLayoutContent: React.FC = () => {
                                             <span className="text-sm">
                                                 {step.id}. {t(step.labelKey)}
                                             </span>
-                                            {isReached && !isCurrent && session.currentStep > step.id && (
-                                                <Check size={14} className="text-blue-500" />
-                                            )}
+                                            {isReached &&
+                                                !isCurrent &&
+                                                session.currentStep > step.id && (
+                                                    <Check size={14} className="text-blue-500" />
+                                                )}
                                         </button>
                                     );
                                 })}
