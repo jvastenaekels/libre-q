@@ -26,7 +26,11 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import {
+    rectSortingStrategy,
+    SortableContext,
+    sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -327,25 +331,30 @@ const FineSortPage: React.FC = () => {
             modifiers={[snapCenterToCursor]}
         >
             <div className="h-full overflow-hidden">
-                <GridSort
-                    agreeCards={unplacedAgree}
-                    disagreeCards={unplacedDisagree}
-                    neutralCards={unplacedNeutral}
-                    gridColumns={gridColumns}
-                    renderSlotContent={renderSlotContent}
-                    disableHoverZoom={activeId !== null}
-                    selectedCardId={selectedCardId}
-                    onCardClick={handleCardClick}
-                    onSlotClick={handleSlotClick}
-                    onDimensionsChange={setCardDimensions}
-                    onReset={handleReset}
-                    onZoomChange={setZoomLevel}
-                    onTransformChange={handleTransformChange}
-                    onInteractionUtils={setInteractionUtils}
-                    isAllPlaced={isAllPlaced}
-                    onValidate={handleValidate}
-                    showCodes={showCodes}
-                />
+                <SortableContext
+                    items={config.statements.map((s) => s.id)}
+                    strategy={rectSortingStrategy}
+                >
+                    <GridSort
+                        agreeCards={unplacedAgree}
+                        disagreeCards={unplacedDisagree}
+                        neutralCards={unplacedNeutral}
+                        gridColumns={gridColumns}
+                        renderSlotContent={renderSlotContent}
+                        disableHoverZoom={activeId !== null}
+                        selectedCardId={selectedCardId}
+                        onCardClick={handleCardClick}
+                        onSlotClick={handleSlotClick}
+                        onDimensionsChange={setCardDimensions}
+                        onReset={handleReset}
+                        onZoomChange={setZoomLevel}
+                        onTransformChange={handleTransformChange}
+                        onInteractionUtils={setInteractionUtils}
+                        isAllPlaced={isAllPlaced}
+                        onValidate={handleValidate}
+                        showCodes={showCodes}
+                    />
+                </SortableContext>
             </div>
             {createPortal(
                 <DragOverlay
