@@ -249,7 +249,7 @@ const StudyLayoutContent: React.FC = () => {
                                                         ? 'bg-blue-50 text-blue-700 font-semibold'
                                                         : isReached
                                                           ? 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
-                                                          : 'text-slate-300 cursor-not-allowed opacity-50'
+                                                          : 'text-slate-400 cursor-not-allowed pointer-events-none opacity-60'
                                                 }
                                             `}
                                         >
@@ -301,7 +301,7 @@ const StudyLayoutContent: React.FC = () => {
                                    ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
                                    : status === 'completed'
                                      ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer'
-                                     : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed'
+                                     : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
                            }
                        `}
                                     >
