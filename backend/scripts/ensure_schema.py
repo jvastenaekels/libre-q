@@ -1,4 +1,4 @@
-"""Script to ensure database schema exists."""
+"""Script to verify and display database schema status."""
 
 import asyncio
 import os
@@ -15,55 +15,50 @@ from sqlalchemy import text
 from app.database import engine  # noqa: E402
 
 
-async def migrate():
-    """Create all tables in the database."""
-    print("--- Schema Migration Start ---")
+async def check_schema():
+    """Verify database schema and report status."""
+    print("--- Schema Status Check ---")
     print("Connecting to database...")
+
     async with engine.begin() as conn:
         dialect = conn.dialect.name
-        print(f"Detected dialect: {dialect}")
+        print(f"Dialect: {dialect}")
 
-        exists = False
-        if dialect == "sqlite":
-            result = await conn.execute(text("PRAGMA table_info(studies)"))
-            columns = [row.name for row in result.fetchall()]
-            exists = "show_statement_codes" in columns
-            print(f"SQLite Columns found: {columns}")
-        else:
-            # PostgreSQL: information_schema
-            # Explicitly check for 'public' schema to avoid confusion
+        if dialect == "postgresql":
+            # List all tables in public schema
             result = await conn.execute(
                 text(
-                    "SELECT column_name FROM information_schema.columns "
-                    "WHERE table_name='studies' AND column_name='show_statement_codes' "
-                    "AND table_schema='public'"
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema = 'public' ORDER BY table_name"
                 )
             )
-            row = result.fetchone()
-            exists = row is not None
-            print(f"Postgres check result: {row}")
-
-        if exists:
-            print("Column 'show_statement_codes' already exists. Skipping.")
+            tables = [row[0] for row in result.fetchall()]
         else:
-            print("Column 'show_statement_codes' is missing. Attempting to add...")
-            if dialect == "sqlite":
-                await conn.execute(
-                    text(
-                        "ALTER TABLE studies ADD COLUMN show_statement_codes BOOLEAN DEFAULT 0"
-                    )
-                )
-            else:
-                # PostgreSQL
-                await conn.execute(
-                    text(
-                        "ALTER TABLE studies ADD COLUMN show_statement_codes BOOLEAN DEFAULT FALSE"
-                    )
-                )
+            # SQLite
+            result = await conn.execute(
+                text("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+            )
+            tables = [row[0] for row in result.fetchall()]
 
-            print("Column 'show_statement_codes' added successfully.")
-    print("--- Schema Migration End ---")
+        if tables:
+            print(f"Tables found ({len(tables)}): {', '.join(tables)}")
+        else:
+            print("No tables found. Database may need initialization.")
+            print("Run: python backend/init_db.py")
+            return
+
+        # Check key tables exist
+        required_tables = ["users", "studies", "workspaces", "participants"]
+        missing = [t for t in required_tables if t not in tables]
+
+        if missing:
+            print(f"⚠️  Missing tables: {', '.join(missing)}")
+            print("Run: python backend/init_db.py")
+        else:
+            print("✅ All required tables present.")
+
+    print("--- Schema Status Check Complete ---")
 
 
 if __name__ == "__main__":
-    asyncio.run(migrate())
+    asyncio.run(check_schema())

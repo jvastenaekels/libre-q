@@ -65,38 +65,44 @@ graph LR
 
 ### 🛰️ Post-Deployment Automation
 
-Open-Q uses a `scalingo.json` configuration to automate critical tasks after every successful build:
+Open-Q uses the `release` phase in `Procfile` to automate critical tasks after every successful build:
 
-- **Schema Verification**: Automatically adds missing columns (like `show_statement_codes`) to your production database without data loss.
+- **Schema Creation**: Ensures all database tables exist.
 - **Study Sync**: Updates your study configuration and statements based on `backend/data/example-study.json`.
 
 You can monitor these tasks in the deployment logs:
 
 ```bash
-scalingo --app open-q logs --n 100 --source build
+scalingo --app open-q logs --n 100
 ```
 
 ---
 
 ## Environment Variables
 
-| Variable          | Description                                  | Required |
-| ----------------- | -------------------------------------------- | -------- |
-| `DATABASE_URL`    | Connection string (PostgreSQL or SQLite)     | ✅       |
-| `SECRET_KEY`      | Application secret for session security      | ✅       |
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | ✅       |
+| Variable          | Description                                           | Required |
+| ----------------- | ----------------------------------------------------- | -------- |
+| `DATABASE_URL`    | Connection string (PostgreSQL or SQLite)              | ✅       |
+| `SECRET_KEY`      | Application secret for session security               | ✅       |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins          | ✅       |
+| `ADMIN_EMAIL`     | Initial admin user email (default: admin@example.com) | ❌       |
+| `ADMIN_PASSWORD`  | Initial admin user password (default: changeme123)    | ❌       |
 
 ---
 
 ## Manual Database Maintenance
 
-If you need to trigger tasks manually without a full redeploy:
+Use `--` to separate Scalingo CLI flags from the command arguments.
+
+### Check Schema Status
 
 ```bash
-# Force a schema check
 scalingo --app open-q run -- python backend/scripts/ensure_schema.py
+```
 
-# Force a study configuration update
+### Sync Study Configuration
+
+```bash
 scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
 ```
 
@@ -121,6 +127,13 @@ If you need to perform a full "factory reset" of the database (e.g., during init
    ```bash
    scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
    ```
+
+> [!TIP]
+> You can combine both steps:
+>
+> ```bash
+> scalingo --app open-q run -- bash -c "python backend/init_db.py --reset && python backend/seed.py backend/data/example-study.json"
+> ```
 
 ---
 
