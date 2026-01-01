@@ -77,3 +77,4 @@ export const StudyConfigSchema = z.object({
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;
 export type PreSortField = z.infer<typeof PreSortFieldSchema>;
+export type Statement = z.infer<typeof StatementSchema>;
