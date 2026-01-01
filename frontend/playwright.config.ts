@@ -51,29 +51,40 @@ export default defineConfig({
     },
 
     /* Configure projects for major browsers */
-    projects: [
-        {
-            name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
-        },
-        // Firefox doesn't support isMobile option well in Playwright
-        {
-            name: 'firefox',
-            use: { ...devices['Desktop Firefox'] },
-        },
-        {
-            name: 'webkit',
-            use: { ...devices['Desktop Safari'] },
-        },
-        {
-            name: 'mobile-chrome',
-            use: { ...devices['Pixel 5'] },
-        },
-        {
-            name: 'mobile-safari',
-            use: { ...devices['iPhone 13'] },
-        },
-    ],
+    /* On CI, only run Chromium and mobile-chrome to stay within timeout */
+    projects: process.env.CI
+        ? [
+              {
+                  name: 'chromium',
+                  use: { ...devices['Desktop Chrome'] },
+              },
+              {
+                  name: 'mobile-chrome',
+                  use: { ...devices['Pixel 5'] },
+              },
+          ]
+        : [
+              {
+                  name: 'chromium',
+                  use: { ...devices['Desktop Chrome'] },
+              },
+              {
+                  name: 'firefox',
+                  use: { ...devices['Desktop Firefox'] },
+              },
+              {
+                  name: 'webkit',
+                  use: { ...devices['Desktop Safari'] },
+              },
+              {
+                  name: 'mobile-chrome',
+                  use: { ...devices['Pixel 5'] },
+              },
+              {
+                  name: 'mobile-safari',
+                  use: { ...devices['iPhone 13'] },
+              },
+          ],
 
     /* Run local dev server before starting tests */
     webServer: {
