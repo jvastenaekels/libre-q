@@ -9,6 +9,7 @@ interface UseGridZoomProps {
     activePile: 'agree' | 'disagree' | 'neutral';
     activePileCount: number;
     hasPerformedZonalFocus: boolean;
+    setHasPerformedZonalFocus: (val: boolean) => void;
     onZoomChange?: (scale: number) => void;
     onTransformChange?: () => void;
 }
@@ -21,6 +22,7 @@ export const useGridZoom = ({
     activePile,
     activePileCount,
     hasPerformedZonalFocus,
+    setHasPerformedZonalFocus,
     onZoomChange,
     onTransformChange,
 }: UseGridZoomProps) => {
@@ -243,7 +245,8 @@ export const useGridZoom = ({
             // Apply zoom and pan with smooth easing
             transformRef.current.setTransform(clampedX, targetY, targetScale, 800, 'easeInOutQuad');
 
-            // (No dimming cue)
+            // Reset focus state to prevent redundant triggers
+            setHasPerformedZonalFocus(false);
         }, 500); // Reduced delay for smoother transition
 
         return () => clearTimeout(zoomTimer);
@@ -257,6 +260,7 @@ export const useGridZoom = ({
         performAutoFit,
         gridColumns,
         activePileCount,
+        setHasPerformedZonalFocus,
     ]);
 
     return {

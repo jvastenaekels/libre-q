@@ -87,9 +87,9 @@ const FineSortPage: React.FC = () => {
 
     // 3. Sensors (Always stable)
     const sensors = useSensors(
-        useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(MouseSensor, { activationConstraint: { distance: 3 } }),
         useSensor(TouchSensor, {
-            activationConstraint: { delay: 250, tolerance: 5 },
+            activationConstraint: { delay: 150, tolerance: 5 },
         }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,

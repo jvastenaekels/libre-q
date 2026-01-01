@@ -76,11 +76,17 @@ export const useFineSortDrag = ({
             setActiveId(event.active.id as number);
             onSelectionChange?.(null);
 
-            if (
-                event.activatorEvent instanceof MouseEvent ||
-                event.activatorEvent instanceof PointerEvent
-            ) {
-                initInteraction(event.activatorEvent.clientX, event.activatorEvent.clientY);
+            if (event.activatorEvent) {
+                // Try to get stable coordinates from the event
+                const anyEvent = event as any;
+                const clientX =
+                    anyEvent.pointerCoordinates?.x ?? (anyEvent.activatorEvent as any).clientX;
+                const clientY =
+                    anyEvent.pointerCoordinates?.y ?? (anyEvent.activatorEvent as any).clientY;
+
+                if (clientX !== undefined && clientY !== undefined) {
+                    initInteraction(clientX, clientY);
+                }
             }
         },
         [onSelectionChange, initInteraction]
@@ -88,10 +94,17 @@ export const useFineSortDrag = ({
 
     const handleDragMove = useCallback(
         (event: DragMoveEvent) => {
-            const activator = event.activatorEvent as MouseEvent | PointerEvent;
-            const x = activator.clientX + event.delta.x;
-            const y = activator.clientY + event.delta.y;
-            updateInteraction(x, y);
+            const anyEvent = event as any;
+            if (anyEvent.pointerCoordinates) {
+                updateInteraction(anyEvent.pointerCoordinates.x, anyEvent.pointerCoordinates.y);
+            } else {
+                const activator = anyEvent.activatorEvent as any;
+                if (activator && activator.clientX !== undefined) {
+                    const x = activator.clientX + event.delta.x;
+                    const y = activator.clientY + event.delta.y;
+                    updateInteraction(x, y);
+                }
+            }
         },
         [updateInteraction]
     );

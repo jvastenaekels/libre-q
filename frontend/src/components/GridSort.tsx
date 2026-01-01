@@ -113,6 +113,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             activePile,
             activePileCount: activeCards.length,
             hasPerformedZonalFocus,
+            setHasPerformedZonalFocus,
             onZoomChange,
             onTransformChange,
         });
