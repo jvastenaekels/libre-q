@@ -145,8 +145,7 @@
             "validate": "Vahvista lajittelu",
             "finish": "Lopeta lajittelu",
             "ready": "Tarkastele näkemystäni",
-            "not_ready": "Sijoita kaikki väitteet jatkaaksesi",
-            "review": "Tarkista yhteenveto"
+            "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
         },
         "workbench": {
             "active_card": "Aktiivinen väite",
