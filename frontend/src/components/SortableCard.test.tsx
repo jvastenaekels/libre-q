@@ -33,7 +33,16 @@ vi.mock('framer-motion', () => ({
             onMouseLeave,
             style,
             ...props
-        }: any) => (
+        }: {
+            children: React.ReactNode;
+            className: string;
+            onClick: () => void;
+            onMouseEnter: () => void;
+            onMouseLeave: () => void;
+            style: React.CSSProperties;
+            // biome-ignore lint/suspicious/noExplicitAny: simpler for mock
+            [key: string]: any;
+        }) => (
             <button
                 type="button"
                 className={className}

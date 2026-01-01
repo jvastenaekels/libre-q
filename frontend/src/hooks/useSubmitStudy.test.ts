@@ -121,7 +121,7 @@ describe('useSubmitStudy', () => {
 
     it('handles ApiError 400 (Bad Request)', async () => {
         const apiError = new Error('Bad Request');
-        (apiError as any).status = 400;
+        Object.assign(apiError, { status: 400 });
         mockCustomInstance.mockRejectedValueOnce(apiError);
 
         const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
@@ -134,7 +134,7 @@ describe('useSubmitStudy', () => {
     });
 
     it('handles missing config error', async () => {
-        useConfigStore.getState().setConfig(null as any);
+        useConfigStore.getState().setConfig(null as unknown as StudyConfig);
 
         const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
@@ -149,7 +149,7 @@ describe('useSubmitStudy', () => {
     });
 
     it('handles missing session token error', async () => {
-        useSessionStore.getState().setToken(null as any);
+        useSessionStore.getState().setToken(null as unknown as string);
 
         const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 

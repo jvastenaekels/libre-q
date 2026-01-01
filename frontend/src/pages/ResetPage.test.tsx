@@ -16,8 +16,11 @@ const mockResetSession = vi.fn();
 const mockResetConfig = vi.fn();
 const mockResetResponses = vi.fn();
 
+// biome-ignore lint/suspicious/noExplicitAny: mocking store internals
 vi.mocked(useSessionStore).getState = vi.fn(() => ({ resetSession: mockResetSession })) as any;
+// biome-ignore lint/suspicious/noExplicitAny: mocking store internals
 vi.mocked(useConfigStore).getState = vi.fn(() => ({ resetConfig: mockResetConfig })) as any;
+// biome-ignore lint/suspicious/noExplicitAny: mocking store internals
 vi.mocked(useResponseStore).getState = vi.fn(() => ({ resetResponses: mockResetResponses })) as any;
 
 describe('ResetPage', () => {

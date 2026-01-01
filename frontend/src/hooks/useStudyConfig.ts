@@ -70,7 +70,10 @@ export const useStudyConfig = () => {
                 if (error.status === 429) errorKey = 'common.errors.rate_limited';
             } else if (error instanceof ZodError) {
                 errorKey = 'common.errors.validation';
-            } else if (error instanceof TypeError || (error as any).name === 'TypeError') {
+            } else if (
+                error instanceof TypeError ||
+                (error instanceof Error && error.name === 'TypeError')
+            ) {
                 errorKey = 'common.errors.network';
             }
 

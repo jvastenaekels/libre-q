@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import FineSortPage from './FineSortPage';
 
@@ -20,29 +20,29 @@ vi.mock('react-i18next', () => ({
 const mockCategorizeCard = vi.fn();
 
 vi.mock('../store/useConfigStore', () => ({
-    useConfigStore: (selector: any) => selector({
-        config: {
-            statements: [
-                { id: 1, text: 'Card 1' },
-                { id: 2, text: 'Card 2' },
-                { id: 3, text: 'Card 3' }, // Missing from responses
-            ],
-            grid_config: [
-                { score: 0, capacity: 3 },
-            ],
-        },
-    }),
+    useConfigStore: (selector: (state: unknown) => unknown) =>
+        selector({
+            config: {
+                statements: [
+                    { id: 1, text: 'Card 1' },
+                    { id: 2, text: 'Card 2' },
+                    { id: 3, text: 'Card 3' }, // Missing from responses
+                ],
+                grid_config: [{ score: 0, capacity: 3 }],
+            },
+        }),
 }));
 
 vi.mock('../store/useResponseStore', () => ({
-    useResponseStore: (selector: any) => {
-        if (!selector) return {
-            categorizeCard: mockCategorizeCard,
-            placeCardInGrid: vi.fn(),
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-        };
+    useResponseStore: (selector: (state: unknown) => unknown) => {
+        if (!selector)
+            return {
+                categorizeCard: mockCategorizeCard,
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+            };
         return selector({
             rough: {
                 agree: [1],
@@ -55,15 +55,17 @@ vi.mock('../store/useResponseStore', () => ({
 }));
 
 vi.mock('../store/useSessionStore', () => ({
-    useSessionStore: (selector: any) => selector({
-        setStep: vi.fn(),
-    }),
+    useSessionStore: (selector: (state: unknown) => unknown) =>
+        selector({
+            setStep: vi.fn(),
+        }),
 }));
 
 vi.mock('../store/useUIStore', () => ({
-    useUIStore: (selector: any) => selector({
-        setSelectedCard: vi.fn(),
-    }),
+    useUIStore: (selector: (state: unknown) => unknown) =>
+        selector({
+            setSelectedCard: vi.fn(),
+        }),
 }));
 
 vi.mock('../hooks/useLayout', () => ({
@@ -97,7 +99,7 @@ describe('FineSortPage Reconciliation', () => {
         await waitFor(() => {
             expect(mockCategorizeCard).toHaveBeenCalledWith(3, 'neutral');
         });
-        
+
         // Ensure other cards are NOT reconciled
         expect(mockCategorizeCard).not.toHaveBeenCalledWith(1, expect.anything());
         expect(mockCategorizeCard).not.toHaveBeenCalledWith(2, expect.anything());

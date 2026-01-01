@@ -22,11 +22,14 @@ const queryClient = new QueryClient({
     },
 });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <App />
-            <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-    </React.StrictMode>
-);
+const rootContainer = document.getElementById('root');
+if (rootContainer) {
+    ReactDOM.createRoot(rootContainer).render(
+        <React.StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <App />
+                <ReactQueryDevtools initialIsOpen={false} />
+            </QueryClientProvider>
+        </React.StrictMode>
+    );
+}

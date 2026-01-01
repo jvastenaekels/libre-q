@@ -41,13 +41,13 @@ vi.mock('react', async () => {
     const actual = await vi.importActual('react');
     return {
         ...actual,
-        useRef: (initial: any) => {
+        useRef: (initial: unknown) => {
             // The first ref created in useGridZoom is transformRef
             if (initial === null) {
                 return { current: mockTransformRef };
             }
             // biome-ignore lint/correctness/useHookAtTopLevel: This is a mock
-            return (actual as any).useRef(initial);
+            return (actual as { useRef: (initial: unknown) => unknown }).useRef(initial);
         },
     };
 });
@@ -120,13 +120,16 @@ describe('useGridZoom', () => {
             top: 400,
             width: 100,
             height: 100,
-        } as any);
-        vi.spyOn(defaultProps.contentRef.current as any, 'getBoundingClientRect').mockReturnValue({
+        } as DOMRect);
+        vi.spyOn(
+            defaultProps.contentRef.current as Element,
+            'getBoundingClientRect'
+        ).mockReturnValue({
             left: 0,
             top: 0,
             width: 500,
             height: 400,
-        } as any);
+        } as DOMRect);
 
         renderHook(() => useGridZoom(props));
 

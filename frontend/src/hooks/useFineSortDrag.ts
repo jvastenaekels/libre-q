@@ -30,7 +30,7 @@ interface Actions {
     categorizeCard: (id: number, category: 'agree' | 'disagree' | 'neutral') => void;
 }
 
-interface UseFineSortDragProps {
+export interface UseFineSortDragProps {
     responses: {
         qsort: DragCard[];
     };

@@ -29,7 +29,19 @@ vi.mock('../store/useConfigStore', () => ({
     }),
 }));
 vi.mock('../store/useSessionStore', () => ({ useSessionStore: vi.fn() }));
-vi.mock('../store/useResponseStore', () => ({ useResponseStore: vi.fn() }));
+vi.mock('../store/useResponseStore', () => ({
+    useResponseStore: Object.assign(vi.fn(), {
+        getState: () => ({
+            categorizeCard: vi.fn(),
+            placeCardInGrid: vi.fn(),
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+            rough: { agree: [], disagree: [], neutral: [] },
+            qsort: [],
+        }),
+    }),
+}));
 vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mocks
@@ -74,6 +86,7 @@ describe('FineSortPage', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
+                categorizeCard: vi.fn(),
                 rough: { agree: [1, 2], disagree: [], neutral: [] },
                 qsort: [],
             },
@@ -109,6 +122,7 @@ describe('FineSortPage', () => {
         setupStoreMocks({
             useConfigStore: { config: singleCardConfig },
             useResponseStore: {
+                categorizeCard: vi.fn(),
                 rough: { agree: [1], disagree: [], neutral: [] },
                 qsort: [{ statementId: 1, col: 0, row: 0 }],
             },
@@ -143,6 +157,7 @@ describe('FineSortPage', () => {
         setupStoreMocks({
             useConfigStore: { config: configWithCodes },
             useResponseStore: {
+                categorizeCard: vi.fn(),
                 rough: { agree: [], disagree: [], neutral: [] },
                 qsort: [],
             },

@@ -77,7 +77,7 @@ describe('i18nOverrides utility', () => {
         vi.clearAllMocks();
 
         applyStudyOverrides('en', {});
-        applyStudyOverrides('en', undefined as any);
+        applyStudyOverrides('en', undefined);
 
         expect(i18n.addResourceBundle).not.toHaveBeenCalled();
     });

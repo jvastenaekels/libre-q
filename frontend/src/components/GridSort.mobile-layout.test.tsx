@@ -17,13 +17,26 @@ vi.mock('@dnd-kit/sortable', () => ({
 }));
 
 // Mock SortableCard to check props passed to it
-const MockSortableCard = vi.fn(({ aspectRatio }: { aspectRatio?: number }) => (
-    <div data-testid="mock-card" data-aspect={aspectRatio}>
+// Define the expected props for SortableCard
+interface SortableCardProps {
+    aspectRatio?: number;
+    children?: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
+    style?: React.CSSProperties;
+    'data-testid'?: string;
+    // Add any other props SortableCard might receive
+}
+
+const MockSortableCard = vi.fn(({ aspectRatio, ...rest }: SortableCardProps) => (
+    <div data-testid={rest['data-testid'] || 'mock-card'} data-aspect={aspectRatio} {...rest}>
         Card
     </div>
 ));
 vi.mock('./SortableCard', () => ({
-    default: (props: any) => <MockSortableCard {...props} />,
+    default: (props: SortableCardProps) => <MockSortableCard {...props} />,
 }));
 
 vi.mock('./DroppableSlot', () => ({

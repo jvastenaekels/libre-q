@@ -30,7 +30,9 @@ describe('PreSortPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Setup stores
-        useConfigStore.getState().setConfig(mockConfig as any);
+        useConfigStore
+            .getState()
+            .setConfig(mockConfig as unknown as import('../schemas/study').StudyConfig);
         useSessionStore.getState().resetSession();
         useSessionStore.getState().setConsent(true);
         useResponseStore.getState().resetResponses();

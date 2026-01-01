@@ -64,7 +64,7 @@ const renderWithProviders = (
  * Type-safe store mocking helper.
  */
 type MockableStore = {
-    mockImplementation: (fn: (selector: (state: any) => any) => any) => void;
+    mockImplementation: (fn: (selector: (state: unknown) => unknown) => unknown) => void;
 };
 
 export const setupStoreMocks = (mocks: {

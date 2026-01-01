@@ -19,7 +19,11 @@ global.ResizeObserver = class ResizeObserver {
 
 describe('CardStack', () => {
     // Wrapper to use hooks correctly
-    const CardStackWrapper = ({ statement }: { statement: any }) => {
+    const CardStackWrapper = ({
+        statement,
+    }: {
+        statement: import('../schemas/study').Statement;
+    }) => {
         const x = useMotionValue(0);
         const y = useMotionValue(0);
         return <CardStack statement={statement} onVote={() => {}} x={x} y={y} />;

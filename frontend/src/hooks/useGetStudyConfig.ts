@@ -3,7 +3,7 @@ import type { StudyConfig } from '../schemas/study';
 
 export const useGetStudyConfig = (slug?: string, language?: string) => {
     return useGetStudyApiStudySlugGet<StudyConfig>(
-        slug!,
+        slug || '',
         { lang: language },
         {
             query: {

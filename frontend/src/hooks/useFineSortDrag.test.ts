@@ -6,7 +6,7 @@
 
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useFineSortDrag } from './useFineSortDrag';
+import { type UseFineSortDragProps, useFineSortDrag } from './useFineSortDrag';
 
 vi.mock('../store/useUIStore', () => ({
     useUIStore: vi.fn((selector) => selector({ setActiveCard: vi.fn() })),
@@ -35,7 +35,9 @@ describe('useFineSortDrag', () => {
     };
 
     it('extracts stable coordinates in handleDragStart (pointerCoordinates)', async () => {
-        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+        const { result } = renderHook(() =>
+            useFineSortDrag(defaultProps as unknown as UseFineSortDragProps)
+        );
 
         // Manual override for hook's inner mock if possible, or just check that it uses the provided mock
         // Since we mocked useDragAutoInteraction globally, we check if handles are correctly wired
@@ -48,7 +50,9 @@ describe('useFineSortDrag', () => {
 
         const { act } = await import('react');
         await act(async () => {
-            result.current.handleDragStart(event as any);
+            result.current.handleDragStart(
+                event as unknown as import('@dnd-kit/core').DragStartEvent
+            );
         });
 
         // We verify that activeId is set
@@ -56,14 +60,16 @@ describe('useFineSortDrag', () => {
     });
 
     it('handles handleDragMove with pointerCoordinates', () => {
-        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+        const { result } = renderHook(() =>
+            useFineSortDrag(defaultProps as unknown as UseFineSortDragProps)
+        );
 
         const event = {
             delta: { x: 10, y: 10 },
             pointerCoordinates: { x: 160, y: 260 },
         };
 
-        result.current.handleDragMove(event as any);
+        result.current.handleDragMove(event as unknown as import('@dnd-kit/core').DragMoveEvent);
         // Logic check: anyEvent.pointerCoordinates is used preferentially
     });
 
@@ -74,7 +80,7 @@ describe('useFineSortDrag', () => {
                 ...defaultProps,
                 selectedId: 1,
                 onSelectionChange,
-            } as any)
+            } as unknown as UseFineSortDragProps)
         );
 
         result.current.handleSlotClick(0, 0);
@@ -84,28 +90,32 @@ describe('useFineSortDrag', () => {
     });
 
     it('handles Return to Pile (Deck Drop) correctly', () => {
-        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+        const { result } = renderHook(() =>
+            useFineSortDrag(defaultProps as unknown as UseFineSortDragProps)
+        );
 
         const event = {
             active: { id: 1 },
             over: { id: 'deck-agree' },
         };
 
-        result.current.handleDragEnd(event as any);
+        result.current.handleDragEnd(event as unknown as import('@dnd-kit/core').DragEndEvent);
 
         expect(defaultProps.actions.unplaceCard).toHaveBeenCalledWith(1);
         expect(defaultProps.actions.categorizeCard).toHaveBeenCalledWith(1, 'agree');
     });
 
     it('handles Return to Pile (Deck Disagree) correctly', () => {
-        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+        const { result } = renderHook(() =>
+            useFineSortDrag(defaultProps as unknown as UseFineSortDragProps)
+        );
 
         const event = {
             active: { id: 2 },
             over: { id: 'deck-disagree' },
         };
 
-        result.current.handleDragEnd(event as any);
+        result.current.handleDragEnd(event as unknown as import('@dnd-kit/core').DragEndEvent);
 
         expect(defaultProps.actions.unplaceCard).toHaveBeenCalledWith(2);
         expect(defaultProps.actions.categorizeCard).toHaveBeenCalledWith(2, 'disagree');

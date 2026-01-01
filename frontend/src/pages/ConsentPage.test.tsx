@@ -45,7 +45,9 @@ describe('ConsentPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Setup initial state
-        useConfigStore.getState().setConfig(mockConfig as any);
+        useConfigStore
+            .getState()
+            .setConfig(mockConfig as unknown as import('../schemas/study').StudyConfig);
         useSessionStore.getState().resetSession();
     });
 
@@ -126,7 +128,11 @@ describe('ConsentPage', () => {
         // Clear config consent
         const configWithoutConsent = { ...mockConfig, consent: null };
         act(() => {
-            useConfigStore.getState().setConfig(configWithoutConsent as any);
+            useConfigStore
+                .getState()
+                .setConfig(
+                    configWithoutConsent as unknown as import('../schemas/study').StudyConfig
+                );
         });
 
         renderWithProviders(<ConsentPage />);
