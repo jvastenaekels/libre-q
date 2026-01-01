@@ -342,7 +342,7 @@ const PostSortPage: React.FC = () => {
                     {/* Dropdown to add */}
                     <div className="flex gap-2">
                         <select
-                            className="flex-1 min-w-0 max-w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
+                            className="flex-1 min-w-0 max-w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white truncate pr-8"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);
@@ -383,7 +383,7 @@ const PostSortPage: React.FC = () => {
                                 .sort((a, b) => a.statementId - b.statementId)
                                 .map((s) => (
                                     <option key={s.statementId} value={s.statementId}>
-                                        {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 60)}...`}
+                                        {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 50)}...`}
                                     </option>
                                 ))}
                         </select>
@@ -468,7 +468,7 @@ const PostSortPage: React.FC = () => {
                 <hr className="border-slate-200 my-8" />
 
                 {/* 3. MISSING STATEMENTS */}
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label
                         htmlFor="missing_statement"
                         className="block text-lg font-bold text-slate-800 mb-2"
@@ -487,7 +487,7 @@ const PostSortPage: React.FC = () => {
                 </div>
 
                 {/* 4. GENERAL COMMENTS */}
-                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                     <label
                         htmlFor="general_comment"
                         className="block text-lg font-bold text-slate-800 mb-2"

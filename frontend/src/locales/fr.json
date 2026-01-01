@@ -116,8 +116,7 @@
     },
     "fine": {
         "header": {
-            "title": "Classez les affirmations sur la grille selon votre ressenti",
-            "mobile_title": "Classez les affirmations sur la grille selon votre ressenti"
+            "title": "Classez les affirmations sur la grille selon votre expérience unique et personnelle"
         },
         "deck": {
             "title": "Affirmations disponibles",
@@ -165,7 +164,7 @@
         "title": "Pour conclure",
         "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
         "extreme": {
-            "why": "En quoi cette affirmation est-elle particulièrement significative pour votre point de vue ?",
+            "why": "Pourquoi avez-vous choisi de placer cette affirmation ici ? En quoi est-elle significative pour vous ?",
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
             "label_agree": "Le plus en accord",
@@ -174,7 +173,7 @@
         "optional": {
             "title": "Commentaires additionnels (optionnel)",
             "description": "N'hésitez pas à commenter d'autres affirmations pour préciser vos choix.",
-            "select_placeholder": "Sélectionner une affirmation à commenter...",
+            "select_placeholder": "Choisir une affirmation...",
             "placeholder": "Votre commentaire ici..."
         },
         "missing": {
