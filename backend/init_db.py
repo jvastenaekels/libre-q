@@ -24,7 +24,18 @@ async def init_db(reset: bool = False):
     async with engine.begin() as conn:
         if reset:
             print("0. Dropping all existing tables (--reset flag)...")
-            await conn.run_sync(Base.metadata.drop_all)
+            # Use raw SQL with CASCADE for PostgreSQL compatibility
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                from sqlalchemy import text
+
+                # Drop all tables in public schema with CASCADE
+                await conn.execute(
+                    text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+                )
+            else:
+                # SQLite doesn't need CASCADE
+                await conn.run_sync(Base.metadata.drop_all)
             print("   Tables dropped.")
 
         # Create tables if they don't exist
