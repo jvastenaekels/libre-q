@@ -173,6 +173,12 @@
             "label_agree": "Le plus en accord",
             "label_disagree": "Le plus en désaccord"
         },
+        "optional": {
+            "title": "Commentaires additionnels (Optionnel)",
+            "description": "N'hésitez pas à commenter d'autres affirmations pour préciser vos choix.",
+            "select_placeholder": "Sélectionner une affirmation à commenter...",
+            "placeholder": "Votre commentaire ici..."
+        },
         "missing": {
             "label": "Y a-t-il quelque chose d'important dans votre point de vue qui n'a pas été capturé ?",
             "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",

@@ -342,7 +342,7 @@ const PostSortPage: React.FC = () => {
                     {/* Dropdown to add */}
                     <div className="flex gap-2">
                         <select
-                            className="flex-1 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
+                            className="flex-1 min-w-0 max-w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);

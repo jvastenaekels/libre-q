@@ -173,6 +173,12 @@
             "label_agree": "Strongest Agreement",
             "label_disagree": "Strongest Disagreement"
         },
+        "optional": {
+            "title": "Additional Comments (Optional)",
+            "description": "Feel free to add comments to any other statement if you wish to elaborate on your choices.",
+            "select_placeholder": "Select a statement to comment...",
+            "placeholder": "Your comment here..."
+        },
         "missing": {
             "label": "Is there something important about your view that wasn't captured?",
             "description": "If you feel an important aspect was left out, please describe it here.",
