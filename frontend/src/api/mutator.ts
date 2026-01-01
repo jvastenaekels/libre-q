@@ -8,11 +8,15 @@ export const customInstance = async <T>({
     method,
     params,
     data,
+    headers,
+    signal,
 }: {
     url: string;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
     params?: Record<string, string | number | boolean | undefined>;
     data?: unknown;
+    headers?: HeadersInit;
+    signal?: AbortSignal;
 }): Promise<T> => {
     // Filter undefined params
     const cleanParams = Object.fromEntries(
@@ -26,8 +30,10 @@ export const customInstance = async <T>({
         method,
         headers: {
             'Content-Type': 'application/json',
+            ...(headers as Record<string, string>),
         },
         body: data ? JSON.stringify(data) : undefined,
+        signal,
     });
 
     if (!response.ok) {
