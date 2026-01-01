@@ -72,11 +72,27 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             categorizeCard: (statementId, category) => {
                 set((state) => {
                     const { rough } = state;
+
+                    // Remove from other categories first
+                    const agree = rough.agree.filter((id) => id !== statementId);
+                    const disagree = rough.disagree.filter((id) => id !== statementId);
+                    const neutral = rough.neutral.filter((id) => id !== statementId);
+
+                    const newRough = {
+                        agree,
+                        disagree,
+                        neutral,
+                        history: [...rough.history, statementId],
+                    };
+
+                    // Add to new category
+                    // (But careful not to add if currently filtering, though this approach rebuilds them)
+                    // Actually, simpler: just filter all, then append to target.
+
                     return {
                         rough: {
-                            ...rough,
-                            [category]: [...rough[category], statementId],
-                            history: [...rough.history, statementId],
+                            ...newRough,
+                            [category]: [...newRough[category], statementId],
                         },
                         qsort: [], // Reset Fine Sort logic
                     };
