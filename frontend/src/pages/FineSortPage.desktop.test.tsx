@@ -33,10 +33,10 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="sort/fine" element={<FineSortPage />} />
+                    <Route path="fine-sort" element={<FineSortPage />} />
                 </Route>
             </Routes>,
-            { initialEntries: ['/study/demo/sort/fine'] }
+            { initialEntries: ['/study/demo/fine-sort'] }
         );
 
         // 2. Wait for cards to appear

@@ -146,9 +146,9 @@ describe('Layout Scroll Behavior', () => {
     it('Applies overflow-hidden on fine-sort page', () => {
         const { container } = renderWithProviders(
             <Routes>
-                <Route path="/study/:slug/sort" element={<StudyLayout />} />
+                <Route path="/study/:slug/fine-sort" element={<StudyLayout />} />
             </Routes>,
-            { initialEntries: ['/study/slug/sort'] }
+            { initialEntries: ['/study/slug/fine-sort'] }
         );
         const main = container.querySelector('main');
         expect(main).toHaveClass('overflow-hidden');

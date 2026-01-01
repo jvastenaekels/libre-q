@@ -287,7 +287,7 @@ const StudyLayoutContent: React.FC = () => {
 
             {/* Main Content */}
             <main
-                className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
+                className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/fine-sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
                 {/* Transition Overlay / Dimming */}
                 <div

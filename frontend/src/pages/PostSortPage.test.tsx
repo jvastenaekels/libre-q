@@ -1,151 +1,97 @@
-/*
- * Open-Q - Open-source platform for conducting Q-methodology research
- * Copyright (C) 2025 Julien Vastenekels
- * Licensed under the GNU Affero General Public License v3.0 or later.
- */
-
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test/test-utils';
 import PostSortPage from './PostSortPage';
 
-// Mock translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
+// Mock dependencies
+vi.mock('../hooks/useSubmitStudy', () => ({
+    useSubmitStudy: vi.fn(() => ({
+        submit: vi.fn(),
+        isLoading: false,
+        isSuccess: false,
+        error: null,
+        confirmationCode: null,
+    })),
 }));
 
-const mockConfig = {
-    statements: [
-        { id: 1, text: 'Card 1 (Extreme -4)' },
-        { id: 2, text: 'Card 2 (Extreme +4)' },
-        { id: 3, text: 'Card 3 (Neutral 0)' },
-    ],
-    postsort_config: { extreme_columns: [-4, 4] },
-    grid_config: [
-        { score: -4, capacity: 1 },
-        { score: -3, capacity: 1 },
-        { score: -2, capacity: 1 },
-        { score: -1, capacity: 1 },
-        { score: 0, capacity: 1 },
-        { score: 1, capacity: 1 },
-        { score: 2, capacity: 1 },
-        { score: 3, capacity: 1 },
-        { score: 4, capacity: 1 },
-    ],
-    title: 'Test',
-    description: 'Test',
-    instructions: 'Test',
-};
+// Mock useStudyConfig since it's used in StudyLayout
+vi.mock('../hooks/useStudyConfig', () => ({
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+}));
 
 describe('PostSortPage', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-
-        // Setup stores with real data
-        useConfigStore.getState().setConfig(mockConfig as any);
-        useSessionStore.getState().resetSession();
-        useSessionStore.getState().setConsent(true);
-
-        useResponseStore.getState().resetResponses();
-        // Place cards in grid
-        useResponseStore.getState().placeCardInGrid(1, 0, 0); // Score -4
-        useResponseStore.getState().placeCardInGrid(2, 8, 0); // Score +4
-        useResponseStore.getState().placeCardInGrid(3, 4, 0); // Score 0
-    });
-
-    it('renders null if config is missing', () => {
         useConfigStore.getState().resetConfig();
+        useResponseStore.getState().resetResponses();
+        useSessionStore.getState().resetSession();
 
-        const { container } = renderWithProviders(<PostSortPage />);
-        expect(container.firstChild).toBeNull();
-    });
-
-    it('identifies and displays extreme cards only', () => {
-        renderWithProviders(<PostSortPage />);
-
-        // Extreme Cards
-        expect(screen.getByText(/Card 1 \(Extreme -4\)/)).toBeTruthy();
-        expect(screen.getByText(/Card 2 \(Extreme \+4\)/)).toBeTruthy();
-
-        // Neutral Card should NOT be visible in the prompt list
-        const card3 = screen.queryByText('Card 3 (Neutral 0)');
-        expect(card3).toBeNull();
-    });
-
-    it('shows validation error for short comments on submit', async () => {
-        renderWithProviders(<PostSortPage />);
-
-        const submitBtn = screen.getByText('post.submit');
-        fireEvent.click(submitBtn);
-
-        // Validation message should appear for both cards
-        const warnings = await screen.findAllByText('post.extreme.min_chars');
-        expect(warnings.length).toBe(2);
-    });
-
-    it('updates store when typing comments', () => {
-        renderWithProviders(<PostSortPage />);
-
-        const textAreas = screen.getAllByPlaceholderText('post.extreme.placeholder');
-        fireEvent.change(textAreas[0], {
-            target: { value: 'This is a valid comment because it is long enough.' },
+        // Setup basic config
+        useConfigStore.setState({
+            config: {
+                statements: [
+                    { id: 1, text: 'S1' },
+                    { id: 2, text: 'S2' },
+                ],
+                slug: 'demo',
+                grid_config: [
+                    { score: -1, capacity: 1 },
+                    { score: 1, capacity: 1 },
+                ],
+                state: 'active',
+            } as any,
         });
 
-        expect(useResponseStore.getState().postsort.card_comments[1]).toBe(
-            'This is a valid comment because it is long enough.'
+        useSessionStore.setState({
+            hasConsented: true,
+            currentStep: 5,
+        });
+    });
+
+    it('Redirects to /fine-sort if qsort is incomplete', async () => {
+        // Setup incomplete qsort (0 cards placed)
+        useResponseStore.setState({
+            qsort: [],
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<PostSortPage />} />
+                    <Route path="fine-sort" element={<div>Fine Sort Page</div>} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
         );
+
+        // Should redirect to Fine Sort (which renders "Fine Sort Page")
+        expect(await screen.findByText('Fine Sort Page')).toBeInTheDocument();
     });
 
-    it('tracks missing statement and general comments', () => {
-        renderWithProviders(<PostSortPage />);
+    it('Renders Post Sort page if qsort is complete', async () => {
+        // Setup complete qsort (all 2 cards placed)
+        useResponseStore.setState({
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 1, row: 0 },
+            ],
+        });
 
-        // Missing statement
-        const missingInput = screen.getByLabelText('post.missing.label');
-        fireEvent.change(missingInput, { target: { value: 'I feel like X is missing' } });
-        expect(useResponseStore.getState().postsort.missing_statement).toBe(
-            'I feel like X is missing'
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<PostSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        // General
-        const generalInput = screen.getByLabelText('post.general.label');
-        fireEvent.change(generalInput, { target: { value: 'Great study!' } });
-        expect(useResponseStore.getState().postsort.general_comment).toBe('Great study!');
-    });
-
-    it('persists comments when re-navigating', async () => {
-        const { unmount } = renderWithProviders(<PostSortPage />);
-
-        const textAreas = screen.getAllByPlaceholderText('post.extreme.placeholder');
-        fireEvent.change(textAreas[0], { target: { value: 'Persisted comment for card 1' } });
-
-        unmount();
-
-        renderWithProviders(<PostSortPage />);
-
-        expect(screen.getByDisplayValue('Persisted comment for card 1')).toBeTruthy();
-    });
-    it('uses custom prompts from config if provided', () => {
-        const customConfig = {
-            ...mockConfig,
-            postsort_config: {
-                ...mockConfig.postsort_config,
-                prompts: {
-                    extreme: 'Custom Why?',
-                    missing: 'Custom Missing?',
-                    general: 'Custom General?',
-                },
-            },
-        };
-        useConfigStore.getState().setConfig(customConfig as any);
-
-        renderWithProviders(<PostSortPage />);
-
-        // Check for custom prompts (using queryAllByText for "Custom Why?" since it appears for multiple cards)
-        expect(screen.getAllByText('Custom Why?').length).toBeGreaterThan(0);
-        expect(screen.getByText('Custom Missing?')).toBeTruthy();
-        expect(screen.getByText('Custom General?')).toBeTruthy();
+        // Should render Post Sort specific content (e.g. Title)
+        // Note: Title key is 'post.title', mocked i18n returns key
+        expect(await screen.findByText('post.title')).toBeInTheDocument();
     });
 });

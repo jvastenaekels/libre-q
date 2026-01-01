@@ -69,7 +69,7 @@ const PostSortPage: React.FC = () => {
 
         if (config && responses.qsort.length !== config.statements.length) {
             // Incomplete sort, redirect back
-            navigate(`/study/${slug}/sort`, { replace: true });
+            navigate(`/study/${slug}/fine-sort`, { replace: true });
         } else {
             // Auto-save as incomplete draft
             const timer = setTimeout(() => {

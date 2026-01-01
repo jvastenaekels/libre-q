@@ -46,7 +46,7 @@ const MockPreSort = () => {
                 type="button"
                 onClick={() => {
                     setStep(3);
-                    navigate('/study/demo/sort/rough');
+                    navigate('/study/demo/rough-sort');
                 }}
             >
                 Next
@@ -99,7 +99,7 @@ describe('Navigation Integration', () => {
                 <Route path="/study/:slug" element={<StudyLayout />}>
                     <Route path="welcome" element={<MockWelcome />} />
                     <Route path="presort" element={<MockPreSort />} />
-                    <Route path="sort/rough" element={<MockRoughSort />} />
+                    <Route path="rough-sort" element={<MockRoughSort />} />
                 </Route>
             </Routes>,
             { initialEntries: ['/study/demo/welcome'] }
