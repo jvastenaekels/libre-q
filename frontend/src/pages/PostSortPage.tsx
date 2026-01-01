@@ -261,7 +261,7 @@ const PostSortPage: React.FC = () => {
                         return (
                             <div
                                 key={card.statementId}
-                                className={`p-6 rounded-xl border ${borderColor} shadow-sm transition-all`}
+                                className={`p-4 md:p-6 rounded-xl border ${borderColor} shadow-sm transition-all`}
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-2">
@@ -273,7 +273,7 @@ const PostSortPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic">
+                                <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic break-words">
                                     <ReactMarkdown
                                         components={{
                                             p: ({ children }) => <span>{children}</span>,
@@ -413,7 +413,7 @@ const PostSortPage: React.FC = () => {
                             return (
                                 <div
                                     key={id}
-                                    className="p-6 rounded-xl border border-slate-200 shadow-sm bg-white relative group"
+                                    className="p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm bg-white relative group"
                                 >
                                     <button
                                         type="button"
@@ -439,7 +439,7 @@ const PostSortPage: React.FC = () => {
                                         </span>
                                     </div>
 
-                                    <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic">
+                                    <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic break-words">
                                         <ReactMarkdown
                                             components={{
                                                 p: ({ children }) => <span>{children}</span>,
