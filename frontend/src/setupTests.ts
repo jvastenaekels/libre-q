@@ -73,6 +73,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Polyfill scrollTo
 window.scrollTo = vi.fn();
+window.confirm = vi.fn();
 
 // MSW Server Setup
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));

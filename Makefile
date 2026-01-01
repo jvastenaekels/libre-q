@@ -30,7 +30,7 @@ check:
 
 test:
 	cd backend && ./venv/bin/pytest -n auto tests/
-	cd frontend && npm run test -- --run
+	cd frontend && npm run test -- --run --coverage
 
 ci: lint check test
 	@echo "\n--- All CI checks passed locally! ---"
