@@ -41,6 +41,9 @@ vi.mock('framer-motion', () => ({
                 onMouseLeave={onMouseLeave}
                 style={style}
                 data-testid={props['data-testid']}
+                role="button"
+                tabIndex={0}
+                onKeyDown={() => {}}
             >
                 {children}
             </div>

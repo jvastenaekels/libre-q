@@ -68,6 +68,7 @@ const StudyStatusPage: React.FC<StudyStatusPageProps> = ({ type = 'not_found', o
 
                 {current.onClick ? (
                     <button
+                        type="button"
                         onClick={current.onClick}
                         className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-all duration-200 active:scale-95 shadow-lg shadow-blue-600/20"
                     >

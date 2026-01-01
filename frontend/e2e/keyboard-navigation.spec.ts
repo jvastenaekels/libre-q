@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -51,34 +51,36 @@ test.describe('Keyboard Navigation', () => {
         // 1. Setup - Fast forward to Rough Sort
         await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
         await page.getByRole('button', { name: /continue|continuer/i }).click(); // Welcome -> Consent
-        await page.getByRole('checkbox').check(); 
+        await page.getByRole('checkbox').check();
         await page.getByRole('button', { name: mockStudyConfig.ui_labels.start_button }).click(); // Consent -> Presort
-        
+
         // Fill Presort Inputs
         await page.getByLabel(/age/i).first().fill('30');
         await page.getByLabel(/gender|genre|sukupuoli/i).selectOption({ label: 'Male' });
-        await page.getByLabel(/education|études|koulutus/i).selectOption({ label: "Master's Degree" });
+        await page
+            .getByLabel(/education|études|koulutus/i)
+            .selectOption({ label: "Master's Degree" });
 
         await page.getByRole('button', { name: /continue|continuer/i }).click(); // Presort -> Rough Sort
 
         await expect(page).toHaveURL(/.*\/rough-sort/);
-        
+
         // Wait for animation/tip
-        await page.waitForTimeout(2000); 
+        await page.waitForTimeout(2000);
 
         // 2. Test Arrow Navigation
         const cardsTotal = mockStudyConfig.statements.length;
-        
+
         // Focus the page body to ensure key presses are caught
-        await page.locator('body').click(); 
+        await page.locator('body').click();
 
         // A. Arrow Right -> Agree
         await page.keyboard.press('ArrowRight');
         await page.waitForTimeout(600); // Wait for transition
-        // We can check if progress bar increased or check internal state if we had access, 
+        // We can check if progress bar increased or check internal state if we had access,
         // but checking the "Agree" pile count or simply that a new card appeared is easier.
         // Let's rely on the fact that the card stack changes.
-        
+
         // B. Arrow Left -> Disagree
         await page.keyboard.press('ArrowLeft');
         await page.waitForTimeout(600);
@@ -87,23 +89,23 @@ test.describe('Keyboard Navigation', () => {
         await page.keyboard.press('ArrowDown');
         await page.waitForTimeout(600);
 
-        // We moved 3 cards. 
+        // We moved 3 cards.
         // Verify Undo (Z key)
         await page.keyboard.press('z');
         await page.waitForTimeout(600);
-        
+
         // After undo, we should effectively "go back" one step.
-        // It's hard to verify visually without distinct card texts, 
+        // It's hard to verify visually without distinct card texts,
         // but ensuring the page doesn't crash and remains interactive is a baseline.
-        
+
         // Let's finish the sort to verify we can proceed.
-        // We moved 3, undid 1 -> 2 moved working. 
+        // We moved 3, undid 1 -> 2 moved working.
         // Need to move (Total - 2) more.
         for (let i = 0; i < cardsTotal - 2; i++) {
             await page.keyboard.press('ArrowRight');
             await page.waitForTimeout(300);
         }
-        
+
         // Verify completion
         await expect(page.getByRole('button', { name: /next|suivant/i }).first()).toBeVisible();
     });
@@ -111,17 +113,19 @@ test.describe('Keyboard Navigation', () => {
     test('Fine Sort: Keyboard Drag and Drop', async ({ page }) => {
         // 1. Setup - Fast forward to Fine Sort (requires completing Rough Sort)
         await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
-        await page.getByRole('button', { name: /continue|continuer/i }).click(); 
+        await page.getByRole('button', { name: /continue|continuer/i }).click();
         await page.getByRole('checkbox').check();
         await page.getByRole('button', { name: mockStudyConfig.ui_labels.start_button }).click();
-        
+
         // Fill Presort Inputs
         await page.getByLabel(/age/i).first().fill('30');
         await page.getByLabel(/gender|genre|sukupuoli/i).selectOption({ label: 'Male' });
-        await page.getByLabel(/education|études|koulutus/i).selectOption({ label: "Master's Degree" });
+        await page
+            .getByLabel(/education|études|koulutus/i)
+            .selectOption({ label: "Master's Degree" });
 
         await page.getByRole('button', { name: /continue|continuer/i }).click();
-        
+
         // Complete Rough Sort quickly
         const cardsTotal = mockStudyConfig.statements.length;
         // Wait for tip to appear/disappear or just click through
@@ -132,19 +136,22 @@ test.describe('Keyboard Navigation', () => {
             await page.waitForTimeout(200); // faster than keyboard
         }
         await page.waitForTimeout(500);
-        await page.getByRole('button', { name: /next|suivant/i }).first().click();
+        await page
+            .getByRole('button', { name: /next|suivant/i })
+            .first()
+            .click();
 
         await expect(page).toHaveURL(/.*\/fine-sort/);
         await expect(page.getByTestId('deck-cards-container')).toBeVisible();
 
         // 2. Keyboard Sort Interaction
-        // Dnd-kit keyboard sensor: 
+        // Dnd-kit keyboard sensor:
         // Tab to card -> Space to lift -> Arrows to move -> Space to drop.
-        
+
         // Find a card in the "Agree" column (since we agreed with everything)
         // They are likely in the right-side deck panel.
-        
-        // Tab until we focus a card. 
+
+        // Tab until we focus a card.
         // Or directly click to focus if tabbing is flaky in headless.
         // Let's try explicit focus first.
         const firstCard = page.locator('[data-testid^="card-"]').first();
@@ -155,22 +162,22 @@ test.describe('Keyboard Navigation', () => {
         await page.keyboard.press('Space');
         await expect(firstCard).toHaveAttribute('aria-pressed', 'true'); // dnd-kit adds this
 
-        // Move it. Logic: The grid is to the left of the deck usually? 
+        // Move it. Logic: The grid is to the left of the deck usually?
         // Or if it's already in a column, we move to another.
         // In this app, cards start in stacks (Agree/Disagree/Neutral) below or to the side?
         // Actually, the "Unplaced" cards are in the "Deck" (right side on desktop).
         // The Grid is on the left.
         // So ArrowLeft should move it towards the grid.
-        
-        // Drop it (attempt) 
+
+        // Drop it (attempt)
         // Note: In headless E2E, ensuring valid drop targets via blind arrow navigation is flaky.
         // Verifying that we could interact and LIFT the card proves the KeyboardSensor is active.
-        await page.keyboard.press('Escape'); 
-        
+        await page.keyboard.press('Escape');
+
         // We consider the test passed if we could successfully lift the card using keyboard.
         // Clean up or just end.
         await expect(firstCard).toBeVisible();
-        
+
         // If the sort worked, the number of unplaced cards should decrease?
         // Or we can check if it's inside a remote drop zone.
     });

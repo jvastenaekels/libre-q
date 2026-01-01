@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { mockStudyConfig } from './fixtures/study-config';
 
 test.describe('Error Handling Scenarios', () => {

@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { mockStudyConfig, mockStudyAPI } from './fixtures/study-config';
+import { expect, test } from '@playwright/test';
+import { mockStudyAPI, mockStudyConfig } from './fixtures/study-config';
 
 test.describe('Mobile UX (Focus Flow)', () => {
     test.use({

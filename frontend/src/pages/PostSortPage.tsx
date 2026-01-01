@@ -416,6 +416,7 @@ const PostSortPage: React.FC = () => {
                                     className="p-6 rounded-xl border border-slate-200 shadow-sm bg-white relative group"
                                 >
                                     <button
+                                        type="button"
                                         onClick={() => {
                                             // Remove comment: delete key from object
                                             const current = { ...responses.postsort.card_comments };
@@ -507,6 +508,7 @@ const PostSortPage: React.FC = () => {
                 {/* SUBMIT BUTTON */}
                 <div className="flex justify-center pt-8">
                     <button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={isLoading}
                         className="

@@ -15,6 +15,7 @@ const MockWelcome = () => {
         <div>
             <h1>Welcome Page</h1>
             <button
+                type="button"
                 onClick={() => {
                     setStep(2);
                     navigate('/study/demo/presort');
@@ -33,6 +34,7 @@ const MockPreSort = () => {
         <div>
             <h1>PreSort Page</h1>
             <button
+                type="button"
                 onClick={() => {
                     setStep(1);
                     navigate('/study/demo/welcome');
@@ -41,6 +43,7 @@ const MockPreSort = () => {
                 Back
             </button>
             <button
+                type="button"
                 onClick={() => {
                     setStep(3);
                     navigate('/study/demo/sort/rough');
@@ -59,6 +62,7 @@ const MockRoughSort = () => {
         <div>
             <h1>RoughSort Page</h1>
             <button
+                type="button"
                 onClick={() => {
                     setStep(2);
                     navigate('/study/demo/presort');

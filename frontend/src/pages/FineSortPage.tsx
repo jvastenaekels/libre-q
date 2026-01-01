@@ -17,6 +17,7 @@ import {
     closestCenter,
     DndContext,
     DragOverlay,
+    KeyboardSensor,
     MeasuringStrategy,
     type Modifier,
     MouseSensor,
@@ -24,7 +25,6 @@ import {
     TouchSensor,
     useSensor,
     useSensors,
-    KeyboardSensor,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import type React from 'react';
