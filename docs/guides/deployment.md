@@ -103,7 +103,7 @@ scalingo --app open-q run -- python backend/scripts/ensure_schema.py
 ### Sync Study Configuration
 
 ```bash
-scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
+scalingo --app open-q run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
 ```
 
 ---
@@ -123,16 +123,16 @@ If you need to perform a full "factory reset" of the database (e.g., during init
    ```
 
 2. **Repopulate Content**
-   Seed the default study data:
+   Seed the default study data using the internal API bypass:
    ```bash
-   scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
+   scalingo --app open-q run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
    ```
 
 > [!TIP]
 > You can combine both steps:
 >
 > ```bash
-> scalingo --app open-q run -- bash -c "python backend/init_db.py --reset && python backend/seed.py backend/data/example-study.json"
+> scalingo --app open-q run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
 > ```
 
 ---
