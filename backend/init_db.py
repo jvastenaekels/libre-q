@@ -29,10 +29,9 @@ async def init_db(reset: bool = False):
             if dialect == "postgresql":
                 from sqlalchemy import text
 
-                # Drop all tables in public schema with CASCADE
-                await conn.execute(
-                    text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
-                )
+                # Drop and recreate public schema (must be separate statements for asyncpg)
+                await conn.execute(text("DROP SCHEMA public CASCADE"))
+                await conn.execute(text("CREATE SCHEMA public"))
             else:
                 # SQLite doesn't need CASCADE
                 await conn.run_sync(Base.metadata.drop_all)
