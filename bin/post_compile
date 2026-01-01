@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+echo "--> Installing Frontend Dependencies"
+cd frontend
+npm ci
+
+echo "--> Building Frontend"
+npm run build
+cd ..
+
+echo "--> Frontend Build Complete"
