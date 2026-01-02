@@ -65,19 +65,19 @@ export const useGridZoom = ({
             // But ensure we don't push it *too* far down if it's small
             y = wrapperH - contentH * scale - 10;
         } else {
-            // Desktop: Fit both, with padding
-            const padding = 60; // Reduced padding
+            // Desktop: Fit both, with generous padding to encompass Spectrum Bar
+            const padding = 160; // Increased to 160px to guarantee bottom visibility
             const availableW = wrapperW - padding;
             const availableH = wrapperH - padding;
             const scaleX = availableW / contentW;
             const scaleY = availableH / contentH;
 
-            scale = Math.min(scaleX, scaleY, 1.1);
+            scale = Math.min(scaleX, scaleY, 0.95); // Slight cap to prevent edge-touching
 
             // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
 
-            // Center Vertically based on FULL CONTENT to ensure spectrum bar is visible
+            // Center Vertically
             y = (wrapperH - contentH * scale) / 2;
         }
 

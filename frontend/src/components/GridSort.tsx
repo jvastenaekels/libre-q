@@ -5,9 +5,8 @@
  */
 
 import { useDroppable } from '@dnd-kit/core';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
-// Imports
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
@@ -15,10 +14,14 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useGridZoom } from '../hooks/useGridZoom';
+import { useUIStore } from '../store/useUIStore';
 import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
+import MethodologyTips from './MethodologyTips';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+
+
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -276,12 +279,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         const renderDeckCards = useCallback(() => {
             return activeCards.length > 0 ? (
                 activeCards.map((card) => (
-                    <motion.div
+                    <div
                         key={card.id}
-                        layout
-                        initial={{ x: 20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -20, opacity: 0 }}
                         className="flex-none w-[130px] sm:w-[140px] lg:w-full lg:flex-none"
                     >
                         <SortableCard
@@ -291,24 +290,22 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             variant="compact"
                             isSelected={selectedCardId === card.id}
                             onClick={() => onCardClick?.(card.id)}
-                            aspectRatio={
-                                isMobile ? 1.5 : cardDimensions.width / cardDimensions.height
-                            }
+                            aspectRatio={1.5}
                             disableHoverZoom={disableHoverZoom || isMobile}
                         />
-                    </motion.div>
+                    </div>
                 ))
             ) : (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                <div
                     className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center"
                 >
-                    <div className="flex flex-col items-center gap-2">
-                        <Check size={24} className="text-green-400" />
-                        <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
+                            <Check size={32} className="text-green-500" strokeWidth={3} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">{t('fine.deck.all_placed')}</span>
                     </div>
-                </motion.div>
+                </div>
             );
         }, [
             activeCards,
@@ -322,7 +319,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         ]);
 
         return (
-            <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
+            <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
                 {/* PANEL: THE GRID (Canvas) */}
                 <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300">
                     {/* Condition of Instruction - Persistent Research Question */}
@@ -436,7 +433,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                                     width: cardDimensions.width,
                                                                     height: cardDimensions.height,
                                                                 }}
-                                                                className={`border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center ${getColumnTint(col.score)} bg-opacity-40 transition-all duration-300 shadow-sm ${selectedCardId ? 'animate-pulse ring-2 ring-blue-400/30 cursor-pointer hover:bg-blue-50' : ''}`}
+                                                                className={`border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center ${getColumnTint(col.score)} bg-opacity-40 transition-all duration-300 shadow-sm ${selectedCardId ? 'ring-2 ring-indigo-400/50 bg-indigo-50/30 cursor-pointer hover:bg-indigo-100/50 hover:ring-indigo-500 hover:scale-[1.02]' : ''}`}
                                                             >
                                                                 {renderSlotContent(
                                                                     colIndex,
@@ -508,10 +505,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md
           flex flex-col lg:h-full transition-all duration-300
-          overflow-hidden pb-safe lg:pb-0
+          overflow-hidden pb-24
         `}
                     style={{
-                        height: isMobile ? `${deckHeight}px` : '100%',
+                        height: isMobile ? `${Math.max(deckHeight, 180)}px` : '100%',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -558,21 +555,18 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         activeBar: 'bg-green-200',
                                     },
                                 };
-                                const style = pileStyles[pile];
+                                const style = pileStyles[pile as PileType];
 
                                 return (
                                     <DroppablePile
                                         key={pile}
                                         id={`deck-${pile}`}
-                                        className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
-                                      ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
-                                    `}
-                                        onClick={() => {
-                                            setActivePile(pile as PileType);
-                                            if (isMobile) {
-                                                setHasPerformedZonalFocus(true);
-                                            }
-                                        }}
+                                        className={`
+                                            relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200
+                                            ${isActive ? style.activeBg : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}
+                                            ${isActive ? 'shadow-sm scale-[1.02]' : ''}
+                                        `}
+                                        onClick={() => setActivePile(pile as PileType)}
                                         active={isActive}
                                         role="tab"
                                         aria-selected={isActive}
@@ -606,31 +600,21 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className="flex-1 min-h-0 flex flex-col overflow-hidden relative"
                     >
-                        <motion.div
+                        <div
                             key={activePile}
-                            initial={{
-                                backgroundColor:
-                                    activePile === 'disagree'
-                                        ? '#fee2e2'
-                                        : activePile === 'agree'
-                                          ? '#dcfce7'
-                                          : '#f1f5f9',
-                            }}
-                            animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }}
-                            transition={{ duration: 0.8 }}
                             className={`
                         flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-center justify-start custom-scrollbar
                         ${activeCards.length === 0 ? 'justify-center' : ''}
-                        lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:p-2
-                        ${activeCards.length === 0 ? 'lg:place-content-center' : 'lg:content-start'}
+                        lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3
+                        ${activeCards.length === 0 ? 'lg:place-content-center' : ''}
                     `}
                             data-testid="deck-cards-container"
                         >
                             {renderDeckCards()}
-                        </motion.div>
+                        </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                    <div className="fixed bottom-0 right-0 w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100]">
                         {isAllPlaced ? (
                             <button
                                 type="button"
@@ -640,7 +624,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
                             </button>
                         ) : (
-                            <div className="flex items-center justify-center min-h-[48px] bg-slate-50 border border-slate-100 rounded-xl px-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4">
                                 <div className="flex items-center gap-3 text-slate-500">
                                     {selectedCardId ? (
                                         <>

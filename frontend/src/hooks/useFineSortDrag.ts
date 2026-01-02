@@ -135,45 +135,51 @@ export const useFineSortDrag = ({
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
             const { active, over } = event;
-            setActiveId(null);
-            cleanupInteraction();
 
-            if (!over) return;
+            // Ensure we ALWAYS clean up drag state, even if placement fails
+            try {
+                if (!over) return;
 
-            const cardId = active.id as number;
-            let overIdString = String(over.id);
+                const cardId = active.id as number;
+                let overIdString = String(over.id);
 
-            // 1. Check for Deck Drop (Return to Pile)
-            if (overIdString.startsWith('deck-')) {
-                let categoryStr = overIdString.replace('deck-', '');
-                // Handle deck area drop
-                if (categoryStr.startsWith('area-')) {
-                    categoryStr = categoryStr.replace('area-', '');
+                // 1. Check for Deck Drop (Return to Pile)
+                if (overIdString.startsWith('deck-')) {
+                    let categoryStr = overIdString.replace('deck-', '');
+                    // Handle deck area drop
+                    if (categoryStr.startsWith('area-')) {
+                        categoryStr = categoryStr.replace('area-', '');
+                    }
+
+                    const category = categoryStr as 'agree' | 'neutral' | 'disagree';
+                    actions.unplaceCard(cardId);
+                    actions.categorizeCard(cardId, category);
+                    return;
                 }
 
-                const category = categoryStr as 'agree' | 'neutral' | 'disagree';
-                actions.unplaceCard(cardId);
-                actions.categorizeCard(cardId, category);
-                return;
-            }
-
-            // 2. If dropped on another card, resolve to its slot
-            if (!overIdString.startsWith('slot_')) {
-                const cardIdAtOver = over.id as number;
-                const placedCard = responses.qsort.find((c) => c.statementId === cardIdAtOver);
-                if (placedCard) {
-                    overIdString = `slot_${placedCard.col}_${placedCard.row}`;
+                // 2. If dropped on another card, resolve to its slot
+                if (!overIdString.startsWith('slot_')) {
+                    const cardIdAtOver = over.id as number;
+                    const placedCard = responses.qsort.find((c) => c.statementId === cardIdAtOver);
+                    if (placedCard) {
+                        overIdString = `slot_${placedCard.col}_${placedCard.row}`;
+                    }
                 }
-            }
 
-            // 3. Slot Placement
-            if (overIdString.startsWith('slot_')) {
-                const parts = overIdString.split('_');
-                if (parts.length === 3) {
-                    const col = parseInt(parts[1], 10);
-                    const row = parseInt(parts[2], 10);
-                    handlePlacement(cardId, col, row);
+                // 3. Slot Placement
+                if (overIdString.startsWith('slot_')) {
+                    const parts = overIdString.split('_');
+                    if (parts.length === 3) {
+                        const col = parseInt(parts[1], 10);
+                        const row = parseInt(parts[2], 10);
+                        handlePlacement(cardId, col, row);
+                    }
                 }
+            } catch (error) {
+                console.error('Drag end error:', error);
+            } finally {
+                setActiveId(null);
+                cleanupInteraction();
             }
         },
         [responses.qsort, handlePlacement, cleanupInteraction, actions]

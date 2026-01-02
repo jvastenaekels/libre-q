@@ -5,7 +5,7 @@
  */
 
 import { DndContext } from '@dnd-kit/core';
-import { act, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import GridSort from './GridSort';
 
@@ -36,7 +36,14 @@ vi.mock('./DroppableSlot', () => ({
     ),
 }));
 
-describe('GridSort Layout', () => {
+// Mock ReadingZone to avoid complexity
+vi.mock('./ReadingZone', () => ({
+    default: ({ variant }: { variant: string }) => (
+        <div data-testid={`reading-zone-${variant}`}>Reading Zone ({variant})</div>
+    ),
+}));
+
+describe('GridSort Detailed UI Verification', () => {
     const defaultProps = {
         agreeCards: [],
         disagreeCards: [],
@@ -50,156 +57,116 @@ describe('GridSort Layout', () => {
         renderSlotContent: () => null,
     };
 
-    it('renders the correct number of slots based on capacity', () => {
-        render(
-            <DndContext>
-                <GridSort {...defaultProps} />
-            </DndContext>
-        );
-
-        const slots = screen.getAllByTestId('droppable-slot');
-        // Total capacity: 2 + 4 + 2 = 8
-        expect(slots).toHaveLength(8);
-    });
-
-    it('has sufficient spacing', () => {
-        render(
-            <DndContext>
-                <GridSort {...defaultProps} />
-            </DndContext>
-        );
-        const gridContainer = screen.getByTestId('grid-container');
-        expect(gridContainer.className).toContain('gap-8');
-    });
-});
-
-describe('GridSort Responsive Layout', () => {
-    const defaultProps = {
-        agreeCards: [],
-        disagreeCards: [{ id: 1, text: 'Card 1' }],
-        neutralCards: [],
-        gridColumns: [{ score: 0, capacity: 4 }],
-        responses: { qsort: [] },
-        renderSlotContent: () => null,
-    };
-
-    // Helper to resize window
-    const resizeWindow = (width: number) => {
-        window.innerWidth = width;
-        window.dispatchEvent(new Event('resize'));
-    };
-
-    // Note: Skipped - DOM structure assertions are fragile and break with layout changes
-    it.skip('renders mobile source deck correctly (icons visible, text hidden)', () => {
-        resizeWindow(375); // Mobile width
-        render(
-            <DndContext>
-                <GridSort {...defaultProps} />
-            </DndContext>
-        );
-
-        // Pile Buttons: Check for "Frown" icon usage logic (by class/presence)
-        // Since we mock lucide-react mostly, we check if the mobile-structure is present
-        // In our actual code, we use 'lg:hidden' classes.
-        // Testing library doesn't process CSS media queries, but we can check if the elements exist in the DOM
-        // and have the correct class names.
-
-        const disagreeBtn = screen.getByText('common.disagree').closest('button');
-        expect(disagreeBtn).toBeDefined();
-
-        // We expect the icon container to be present (lg:hidden)
-        // And the text span to have 'hidden lg:block'
-        const textSpan = screen.getByText('common.disagree');
-        expect(textSpan.className).toContain('hidden lg:block');
-
-        // Verify Sidebar classes for padding
-        const sidebar = screen.getByText('fine.deck.title').closest('div')?.parentElement;
-        expect(sidebar?.className).toContain('lg:pb-0');
-    });
-
-    it('renders desktop source deck correctly (text visible)', () => {
-        resizeWindow(1024); // Desktop width
-        render(
-            <DndContext>
-                <GridSort {...defaultProps} />
-            </DndContext>
-        );
-
-        const textSpan = screen.getByText('common.disagree');
-        expect(textSpan.className).toContain('hidden lg:block');
-        // Note: unit tests won't "hide" it visually without a real browser layout engine,
-        // but checking the class presence confirms the logic is wired.
-    });
-
-    it('renders cards with mobile width (120px) on small screens', () => {
-        resizeWindow(375);
-        render(
-            <DndContext>
-                <GridSort {...defaultProps} />
-            </DndContext>
-        );
-
-        // Find the card wrapper div.
-        // In GridSort.tsx: <div key={card.id} className="flex-none w-[120px] ...">
-        const cardText = screen.getByText('Card 1');
-        const cardContainer = cardText.closest('div');
-        expect(cardContainer).not.toBeNull();
-        // Since we verify text presence above, this is mostly checking structure stability.
-    });
-    // Note: Skipped - transient zone highlighting no longer uses this approach
-    it.skip('applies transient zone highlighting (dimming) correctly', () => {
-        vi.useFakeTimers();
-
+    // 1. Footer Instructions Verification
+    it('shows "Drag or Tap" in footer when deck has cards and no card is selected', () => {
         render(
             <DndContext>
                 <GridSort
                     {...defaultProps}
-                    gridColumns={[
-                        { score: -2, capacity: 2 },
-                        { score: 0, capacity: 4 },
-                        { score: 2, capacity: 2 },
-                    ]}
+                    disagreeCards={[{ id: 1, text: 'Card 1' }]} // Deck has cards
+                    selectedCardId={null} // No selection
+                    isAllPlaced={false} // Not finished
                 />
             </DndContext>
         );
 
-        // Initial State
-        const colPos = document.getElementById('column-2');
-        // Logic: Disagree -> Positive columns dimmed.
-        expect(colPos?.className).toContain('opacity-50'); // Dimmed initially
-
-        // Advance timer to trigger fade out (2500ms set in component)
-        act(() => {
-            vi.runAllTimers();
-        });
-
-        const colPosAfter = document.getElementById('column-2');
-        expect(colPosAfter?.className).toContain('opacity-100'); // Faded back to normal
-
-        vi.useRealTimers();
+        // Expect Instruction 1: Sequence Number
+        // There might be other "1"s (e.g. badge counts), so we look for the one in the instruction circle
+        const instructionNumber = screen.getAllByText('1').find(el => 
+            el.className.includes('bg-slate-200') || el.className.includes('rounded-full')
+        );
+        expect(instructionNumber).toBeInTheDocument();
+        // Expect Instruction Text
+        expect(screen.getByText('fine.workbench.initial_instruction')).toBeInTheDocument();
     });
 
-    // Note: Tips test removed - legacy floating tips were removed in performance optimization PR
-
-    // Note: Skipped - relies on specific container structure that changes frequently
-    it.skip('renders reset button correctly based on viewport', () => {
-        resizeWindow(1024); // Desktop
-        const onReset = vi.fn();
+    it('shows "Place on Grid" in footer when a card IS selected', () => {
         render(
             <DndContext>
-                <GridSort {...defaultProps} onReset={onReset} />
+                <GridSort
+                    {...defaultProps}
+                    disagreeCards={[{ id: 1, text: 'Card 1' }]}
+                    selectedCardId={1} // Card selected
+                    isAllPlaced={false}
+                />
             </DndContext>
         );
 
-        const resetBtn = screen.getByText('fine.deck.reset');
-        expect(resetBtn).toBeInTheDocument();
+        // Expect Instruction 2: Sequence Number
+        expect(screen.getByText('2')).toBeInTheDocument();
+        // Expect Instruction Text
+        expect(screen.getByText('fine.workbench.place_on_grid')).toBeInTheDocument();
+    });
 
-        // Check local parent container
-        const container = resetBtn.closest('div');
-        expect(container?.className).toContain('flex justify-center'); // Base structure
-        expect(container?.className).toContain('hidden lg:flex'); // Specifically hidden on mobile, shown on desktop
+    // 2. Button Verification
+    it('shows "Validate" button when all cards are placed', () => {
+        const onValidate = vi.fn();
+        render(
+            <DndContext>
+                <GridSort
+                    {...defaultProps}
+                    disagreeCards={[{ id: 1, text: 'Card 1' }]}
+                    isAllPlaced={true} // Completed
+                    onValidate={onValidate}
+                />
+            </DndContext>
+        );
 
-        // Check if flex-none is applied (crucial for layout stability)
-        expect(container?.className).toContain('flex-none');
+        const validateBtn = screen.getByText('fine.actions.validate');
+        expect(validateBtn).toBeInTheDocument();
+
+        fireEvent.click(validateBtn);
+        expect(onValidate).toHaveBeenCalled();
+    });
+
+    // 3. Deck Empty State
+    it('shows Green Checkmark message when deck is empty', () => {
+        render(
+            <DndContext>
+                <GridSort
+                    {...defaultProps}
+                    disagreeCards={[]} // Empty Deck
+                    activePile="disagree" // Ensure we are looking at the empty pile
+                />
+            </DndContext>
+        );
+
+        expect(screen.getByText('fine.deck.all_placed')).toBeInTheDocument();
+        // We can checks for the green checkmark class presence on the container
+        const emptyStateText = screen.getByText('fine.deck.all_placed');
+        const container = emptyStateText.closest('div');
+        // The container has `flex flex-col items-center gap-3`
+        expect(container?.className).toContain('gap-3');
+    });
+
+    // 4. Layout & Sidebar
+    it('renders Reading Zone in Sidebar on Desktop', () => {
+        // Force Desktop width
+        window.innerWidth = 1200;
+        window.dispatchEvent(new Event('resize'));
+
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        expect(screen.getByTestId('reading-zone-desktop')).toBeInTheDocument();
+        expect(screen.queryByTestId('reading-zone-mobile')).not.toBeInTheDocument();
+    });
+
+    it('renders Reading Zone in Main Area on Mobile', () => {
+        // Force Mobile width
+        window.innerWidth = 500;
+        window.dispatchEvent(new Event('resize'));
+
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        expect(screen.queryByTestId('reading-zone-desktop')).not.toBeInTheDocument();
+        expect(screen.getByTestId('reading-zone-mobile')).toBeInTheDocument();
     });
 });

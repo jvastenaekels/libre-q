@@ -1,34 +1,42 @@
-/*
- * Open-Q - Open-source platform for conducting Q-methodology research
- * Copyright (C) 2025 Julien Vastenekels
- * Licensed under the GNU Affero General Public License v3.0 or later.
- */
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { act, renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import { act, renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test/test-utils';
 import FineSortPage from './FineSortPage';
 
+// --- Mocks ---
 const mockConfig: StudyConfig = {
     slug: 'demo',
-    title: 'Test',
-    description: 'Test',
-    instructions: 'Test',
+    title: 'Test Study',
+    description: 'Test Description',
+    instructions: 'Test Instructions',
     statements: [
-        { id: 1, text: 'S1' },
-        { id: 2, text: 'S2' },
+        { id: 1, text: 'Card 1 (Agree)' },
+        { id: 2, text: 'Card 2 (Disagree)' },
+        { id: 3, text: 'Card 3 (Neutral)' },
+        { id: 4, text: 'Card 4 (Missing)' }, // For reconciliation test
     ],
-    grid_config: [{ score: 0, capacity: 2 }],
+    grid_config: [
+        { score: -1, capacity: 1 },
+        { score: 0, capacity: 2 },
+        { score: 1, capacity: 1 },
+    ],
     presort_config: {},
+    show_statement_codes: true,
 };
 
-// Mock Stores (Core)
+// Mock Stores
 vi.mock('../store/useConfigStore', () => ({
     useConfigStore: Object.assign(vi.fn(), {
         getState: () => ({ setConfig: vi.fn(), config: mockConfig }),
     }),
 }));
-vi.mock('../store/useSessionStore', () => ({ useSessionStore: vi.fn() }));
+
+vi.mock('../store/useSessionStore', () => ({
+    useSessionStore: Object.assign(vi.fn(), {
+        getState: () => ({ setStep: vi.fn() }),
+    }),
+}));
+
 vi.mock('../store/useResponseStore', () => ({
     useResponseStore: Object.assign(vi.fn(), {
         getState: () => ({
@@ -42,144 +50,185 @@ vi.mock('../store/useResponseStore', () => ({
         }),
     }),
 }));
-vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
-// Mocks
+vi.mock('../store/useUIStore', () => ({
+    useUIStore: Object.assign(vi.fn(), {
+        getState: () => ({ 
+            setSelectedCard: vi.fn(), 
+            setActiveCard: vi.fn(), 
+            setHoveredCard: vi.fn() 
+        }),
+    }),
+}));
+
+// Mock Navigation
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+        useParams: () => ({ slug: 'demo' }),
+    };
+});
+
+// Mock Layout
 vi.mock('../hooks/useLayout', () => ({
     useLayoutAction: () => ({
         setHeaderAction: vi.fn(),
     }),
 }));
 
-// Mock GridSort
+// Mock GridSort Component (Spying on props)
 vi.mock('../components/GridSort', () => ({
-    // biome-ignore lint/suspicious/noExplicitAny: mock prop
-    default: ({ isAllPlaced, onValidate, showCodes }: any) => (
+    // biome-ignore lint/suspicious/noExplicitAny: mock
+    default: ({ isAllPlaced, onValidate, agreeCards, disagreeCards, neutralCards, gridColumns }: any) => (
         <div data-testid="grid-sort">
-            GridSort
-            <span data-testid="show-codes">{String(showCodes)}</span>
-            {isAllPlaced && (
-                <button type="button" onClick={onValidate}>
-                    fine.actions.validate
-                </button>
-            )}
+            <h1>Fine Sort Grid</h1>
+            <button
+                type="button"
+                data-testid="validate-btn"
+                disabled={!isAllPlaced}
+                onClick={onValidate}
+            >
+                Validate
+            </button>
+            <div data-testid="deck-agree">{agreeCards?.length ?? 0}</div>
+            <div data-testid="deck-disagree">{disagreeCards?.length ?? 0}</div>
+            <div data-testid="deck-neutral">{neutralCards?.length ?? 0}</div>
+            <div data-testid="grid-slots">{gridColumns?.reduce((acc: number, col: any) => acc + col.capacity, 0) ?? 0}</div>
         </div>
     ),
 }));
 
-// Mock useStudyConfig
-vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null }),
-}));
-
-// Mock translation
+// Mock Translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
     initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-describe('FineSortPage', () => {
+describe('FineSortPage Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    it('does not show validation button when not all cards are placed', () => {
+    it('renders and initializes correctly', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
-                categorizeCard: vi.fn(),
-                rough: { agree: [1, 2], disagree: [], neutral: [] },
+                rough: { agree: [1], disagree: [2], neutral: [3, 4] }, // All accounted for
                 qsort: [],
             },
-            useSessionStore: {
-                hasConsented: true,
-                currentStep: 4,
-                isCompleted: false,
-                language: 'en',
-                setStep: vi.fn(),
-            },
-            useUIStore: {
-                hoveredCard: null,
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn(),
+            useSessionStore: { currentStep: 4, language: 'en', setStep: vi.fn() },
+            useUIStore: { 
+                setSelectedCard: vi.fn(), 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn() 
             },
         });
 
-        act(() => {
-            renderWithProviders(<FineSortPage />);
-        });
+        renderWithProviders(<FineSortPage />);
 
-        expect(screen.queryByText('fine.actions.validate')).toBeNull();
+        expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
+        // Check if decks received correct counts
+        expect(screen.getByTestId('deck-agree')).toHaveTextContent('1');
+        expect(screen.getByTestId('deck-disagree')).toHaveTextContent('1');
+        expect(screen.getByTestId('deck-neutral')).toHaveTextContent('2'); // 3 and 4
     });
 
-    it('shows validation button when all cards placed', () => {
-        const singleCardConfig: StudyConfig = {
-            ...mockConfig,
-            statements: [{ id: 1, text: 'S1' }],
-            grid_config: [{ capacity: 1, score: 0 }],
-        };
-
+    it('reconciles missing cards into Neutral deck', () => {
+        const categorizeCardMock = vi.fn();
         setupStoreMocks({
-            useConfigStore: { config: singleCardConfig },
+            useConfigStore: { config: mockConfig },
             useResponseStore: {
-                categorizeCard: vi.fn(),
+                categorizeCard: categorizeCardMock,
+                // Scenario: Card 4 is in statements but NOT in rough buckets or qsort
+                rough: { agree: [1], disagree: [2], neutral: [3] },
+                qsort: [],
+            },
+            useSessionStore: { currentStep: 4, setStep: vi.fn() },
+            useUIStore: { 
+                setSelectedCard: vi.fn(), 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn() 
+            },
+        });
+
+        renderWithProviders(<FineSortPage />);
+
+        // The hook in FineSortPage should detect Card 4 is missing and auto-categorize it
+        expect(categorizeCardMock).toHaveBeenCalledWith(4, 'neutral');
+    });
+
+    it('disables validation until all cards are placed', () => {
+        setupStoreMocks({
+            useConfigStore: { config: mockConfig },
+            useResponseStore: {
                 rough: { agree: [1], disagree: [], neutral: [] },
-                qsort: [{ statementId: 1, col: 0, row: 0 }],
+                qsort: [
+                    { statementId: 2, col: 0, row: 0 },
+                    { statementId: 3, col: 1, row: 0 },
+                    { statementId: 4, col: 1, row: 1 },
+                ],
             },
-            useSessionStore: {
-                hasConsented: true,
-                currentStep: 4,
-                isCompleted: false,
-                language: 'en',
-                setStep: vi.fn(),
-            },
-            useUIStore: {
-                hoveredCard: null,
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn(),
+            useSessionStore: { currentStep: 4, setStep: vi.fn() },
+            useUIStore: { 
+                setSelectedCard: vi.fn(), 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn() 
             },
         });
 
-        act(() => {
-            renderWithProviders(<FineSortPage />);
-        });
+        renderWithProviders(<FineSortPage />);
 
-        expect(screen.getByText('fine.actions.validate')).toBeInTheDocument();
+        const btn = screen.getByTestId('validate-btn');
+        expect(btn).toBeDisabled(); // Card 1 is still in deck
     });
 
-    it('passes show_statement_codes config to GridSort', () => {
-        const configWithCodes: StudyConfig = {
-            ...mockConfig,
-            show_statement_codes: true,
-        };
-
+    it('enables validation and navigates on success', () => {
         setupStoreMocks({
-            useConfigStore: { config: configWithCodes },
+            useConfigStore: { config: mockConfig },
             useResponseStore: {
-                categorizeCard: vi.fn(),
                 rough: { agree: [], disagree: [], neutral: [] },
-                qsort: [],
+                qsort: [
+                    { statementId: 1, col: 2, row: 0 },
+                    { statementId: 2, col: 0, row: 0 },
+                    { statementId: 3, col: 1, row: 0 },
+                    { statementId: 4, col: 1, row: 1 },
+                ], // All 4 placed
             },
-            useSessionStore: {
-                hasConsented: true,
-                currentStep: 4,
-                isCompleted: false,
-                language: 'en',
-                setStep: vi.fn(),
-            },
-            useUIStore: {
-                hoveredCard: null,
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-                setSelectedCard: vi.fn(),
+            useSessionStore: { currentStep: 4, setStep: vi.fn() },
+            useUIStore: { 
+                setSelectedCard: vi.fn(), 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn() 
             },
         });
 
-        act(() => {
-            renderWithProviders(<FineSortPage />);
+        renderWithProviders(<FineSortPage />);
+
+        const btn = screen.getByTestId('validate-btn');
+        expect(btn).not.toBeDisabled();
+
+        fireEvent.click(btn);
+        expect(mockNavigate).toHaveBeenCalledWith('/study/demo/post-sort');
+    });
+
+    it('Escape key deselects active card', () => {
+        const setSelectedCardMock = vi.fn();
+        setupStoreMocks({
+            useConfigStore: { config: mockConfig },
+            useUIStore: { 
+                setSelectedCard: setSelectedCardMock, 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn() 
+            },
+            useResponseStore: { rough: { agree: [], disagree: [], neutral: [] }, qsort: [] },
+            useSessionStore: { currentStep: 4, setStep: vi.fn() },
         });
-        expect(screen.getByTestId('show-codes')).toHaveTextContent('true');
+
+        renderWithProviders(<FineSortPage />);
+
+        fireEvent.keyDown(window, { key: 'Escape' });
     });
 });

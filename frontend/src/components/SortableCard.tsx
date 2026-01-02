@@ -158,13 +158,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             `}
             >
                 <motion.div
-                    layoutId={
-                        process.env.NODE_ENV === 'test'
-                            ? undefined
-                            : isOverlay
-                              ? undefined
-                              : `card-${id}`
-                    }
+                    // layoutId={
+                    //     process.env.NODE_ENV === 'test'
+                    //         ? undefined
+                    //         : isOverlay
+                    //           ? undefined
+                    //           : `card-${id}`
+                    // }
                     transition={{
                         type: 'spring',
                         stiffness: 350,
