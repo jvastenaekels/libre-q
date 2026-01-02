@@ -10,6 +10,8 @@ import {
     CheckCircle2,
     RotateCcw,
     Loader2,
+    Smartphone,
+    Monitor,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +44,7 @@ const StudyDesignPage = () => {
     } = useStudyDesigner();
 
     const [isPreviewVisible, setIsPreviewVisible] = useState(true);
+    const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>('mobile');
     const setConfig = useConfigStore((state) => state.setConfig);
 
     const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(slug ?? '', {
@@ -225,16 +228,16 @@ import { LayoutProvider } from '@/contexts/LayoutContext';
                     >
                         <TabsList className="grid grid-cols-4 mb-8 w-full max-w-2xl mx-auto shadow-sm">
                             <TabsTrigger value="intro" className="gap-2">
-                                👋 Intro
+                                👋 Welcome
                             </TabsTrigger>
                             <TabsTrigger value="pre-sort" className="gap-2">
-                                📋 Pre-Sort
+                                📋 Questionnaire
                             </TabsTrigger>
                             <TabsTrigger value="q-sort" className="gap-2">
-                                🃏 Tri (Q-Sort)
+                                🃏 Q-Sort Task
                             </TabsTrigger>
                             <TabsTrigger value="post-sort" className="gap-2">
-                                📝 Post-Sort
+                                📝 Post-Interview
                             </TabsTrigger>
                         </TabsList>
 
@@ -260,39 +263,71 @@ import { LayoutProvider } from '@/contexts/LayoutContext';
 
                 {/* Right Pane: Preview */}
                 {isPreviewVisible && (
-                    <div className="w-[450px] border-l bg-muted/10 flex flex-col shrink-0">
+                    <div
+                        className={cn(
+                            'border-l bg-muted/10 flex flex-col shrink-0 transition-[width] duration-300 ease-in-out',
+                            viewMode === 'mobile' ? 'w-[450px]' : 'w-[50vw]'
+                        )}
+                    >
                         <div className="p-4 border-b bg-background/50 flex items-center justify-between shrink-0">
-                            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                <Eye className="h-3 w-3" /> Live Simulator
-                            </span>
+                            <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg">
+                                <Button
+                                    size="icon"
+                                    variant={viewMode === 'mobile' ? 'default' : 'ghost'}
+                                    className="h-6 w-6"
+                                    onClick={() => setViewMode('mobile')}
+                                    title="Mobile View"
+                                >
+                                    <Smartphone className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    variant={viewMode === 'desktop' ? 'default' : 'ghost'}
+                                    className="h-6 w-6"
+                                    onClick={() => setViewMode('desktop')}
+                                    title="Desktop View"
+                                >
+                                    <Monitor className="h-3 w-3" />
+                                </Button>
+                            </div>
                             <div className="text-[10px] text-muted-foreground px-2 py-0.5 bg-background rounded border font-mono">
                                 {activeLocale.toUpperCase()}
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-4 flex items-start justify-center">
-                            <div className="w-full bg-background rounded-2xl shadow-2xl border aspect-[10/16] overflow-hidden flex flex-col relative">
+                        <div className="flex-1 overflow-y-auto p-8 flex items-start justify-center bg-slate-100/50">
+                            <div
+                                className={cn(
+                                    'bg-background rounded-2xl shadow-2xl border overflow-hidden flex flex-col relative transition-all duration-300',
+                                    viewMode === 'mobile' ? 'w-[375px] aspect-[9/19.5]' : 'w-full h-full rounded-lg'
+                                )}
+                            >
                                 {/* Browser Chrome Mockup */}
-                                <div className="h-10 bg-muted/30 border-b flex items-center px-4 gap-2 shrink-0">
-                                    <div className="h-4 flex-1 bg-background rounded-full border px-2 flex items-center">
-                                        <span className="text-[10px] text-muted-foreground opacity-50 truncate">
-                                            open-q.sh/study/{draft.slug}
-                                        </span>
+                                <div className="h-8 bg-muted/30 border-b flex items-center px-4 gap-2 shrink-0">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2 h-2 rounded-full bg-red-400/50" />
+                                        <div className="w-2 h-2 rounded-full bg-amber-400/50" />
+                                        <div className="w-2 h-2 rounded-full bg-emerald-400/50" />
                                     </div>
-                                    <RefreshCw className="h-2 w-2 text-muted-foreground opacity-30" />
+                                    <div className="h-5 flex-1 bg-background rounded border px-2 flex items-center mx-2 text-[10px] text-muted-foreground opacity-50 font-mono">
+                                        open-q.sh/study/{draft.slug}
+                                    </div>
+                                    <RefreshCw className="h-3 w-3 text-muted-foreground opacity-30" />
                                 </div>
 
                                 {/* Simulation Content */}
-                                <div className="flex-1 overflow-y-auto bg-background">
-                                    <div className="scale-[0.85] origin-top h-[117%] w-[117%]">
-                                        {renderPreview()}
-                                    </div>
+                                <div className="flex-1 overflow-y-auto bg-background isolate">
+                                    {renderPreview()}
                                 </div>
 
-                                <div className="absolute bottom-4 left-4 right-4 bg-primary/90 text-primary-foreground text-[10px] py-1.5 px-3 rounded-lg backdrop-blur shadow-lg flex items-center gap-2">
-                                    <CheckCircle2 className="h-3 w-3" />
-                                    Live connection active
-                                </div>
+                                {viewMode === 'mobile' && (
+                                    <div className="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">
+                                        <div className="bg-primary/90 text-primary-foreground text-[10px] py-1 px-3 rounded-full backdrop-blur shadow-lg flex items-center gap-2">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            Preview Mode
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

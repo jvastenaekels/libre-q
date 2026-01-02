@@ -137,10 +137,10 @@ export const CommandMenu = () => {
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
                             >
                                 <LayoutDashboard className="h-4 w-4 text-indigo-500" />
-                                <span>Open Overview</span>
+                                <span>Open Dashboard</span>
                             </Command.Item>
                             <Command.Item
-                                value="design study"
+                                value="design study protocol"
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(`/admin/studies/${activeStudyId}/design`)
@@ -149,10 +149,10 @@ export const CommandMenu = () => {
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
                             >
                                 <PencilRuler className="h-4 w-4 text-emerald-500" />
-                                <span>Open Designer</span>
+                                <span>Protocol Design</span>
                             </Command.Item>
                             <Command.Item
-                                value="team management invite"
+                                value="team management collaborators"
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(`/admin/studies/${activeStudyId}/team`)
@@ -161,7 +161,7 @@ export const CommandMenu = () => {
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
                             >
                                 <Users className="h-4 w-4 text-amber-500" />
-                                <span>Team Management</span>
+                                <span>Collaborators</span>
                             </Command.Item>
                             <Command.Item
                                 value="copy share link"

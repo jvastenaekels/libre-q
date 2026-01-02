@@ -51,22 +51,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   isActive: true,
                   items: [
                       {
-                          title: 'Overview',
+                          title: 'Dashboard',
                           url: `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
                       },
                       {
-                          title: 'Designer',
+                          title: 'Protocol Design',
                           url: `/admin/studies/${activeStudyId}/design`,
                           icon: PencilRuler,
                       },
                       {
-                          title: 'Team Management',
+                          title: 'Collaborators',
                           url: `/admin/studies/${activeStudyId}/team`,
                           icon: Users,
                       },
                       {
-                          title: 'Fieldwork',
+                          title: 'Recruitment',
                           url: `#`,
                           icon: Send, // Placeholder
                       },
