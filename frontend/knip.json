@@ -8,7 +8,8 @@
         "src/contexts/LayoutContext.context.ts",
         "src/schemas/study.ts",
         "src/api/generated.ts",
-        "src/api/model/**"
+        "src/api/model/**",
+        "src/components/ui/**"
     ],
     "ignoreBinaries": ["jscpd", "python3"],
     "ignoreDependencies": [
@@ -22,6 +23,11 @@
         "@testing-library/dom",
         "@vitest/coverage-v8",
         "eslint-config-prettier",
-        "eslint-plugin-prettier"
+        "eslint-plugin-prettier",
+        "@radix-ui/react-accordion",
+        "@radix-ui/react-collapsible",
+        "next-themes",
+        "recharts",
+        "vaul"
     ]
 }
