@@ -5,6 +5,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Enum for study-specific roles.
+ */
 export type StudyRole = (typeof StudyRole)[keyof typeof StudyRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare

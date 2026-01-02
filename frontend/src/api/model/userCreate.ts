@@ -4,6 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { UserCreateInvitationToken } from './userCreateInvitationToken';
 
 /**
  * Schema for creating a new user.
@@ -13,4 +14,5 @@ export interface UserCreate {
     password: string;
     is_active?: boolean;
     is_superuser?: boolean;
+    invitation_token?: UserCreateInvitationToken;
 }
