@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import type { useResponseStore } from '../store/useResponseStore';
 
 interface GridColumn {
     capacity: number;
@@ -29,7 +28,9 @@ export const useGridSanity = ({
 
             // 1. Check Bounds
             if (!gridColumns[col] || row < 0 || row >= gridColumns[col].capacity) {
-                console.warn(`Sanity: Card ${statementId} out of bounds at ${col},${row}. Removing.`);
+                console.warn(
+                    `Sanity: Card ${statementId} out of bounds at ${col},${row}. Removing.`
+                );
                 cardsToRemove.push(statementId);
                 return;
             }

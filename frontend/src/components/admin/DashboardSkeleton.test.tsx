@@ -3,7 +3,7 @@
  *
  * Verifies skeleton variants render correctly.
  */
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { DashboardSkeleton, DesignerSkeleton, TableSkeleton } from './DashboardSkeleton';
 
