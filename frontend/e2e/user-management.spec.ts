@@ -43,18 +43,16 @@ test.describe('User Management (Phase 8)', () => {
         });
 
         // Mock Invitation Verification
-        await page.route(
-            /\/api\/admin\/invitations\/verify\/mock-token-newguy@example.com/,
-            async (route) => {
-                await route.fulfill({
-                    json: {
-                        email: 'newguy@example.com',
-                        study_id: 1,
-                        role: 'editor',
-                    },
-                });
-            }
-        );
+        await page.route('**/api/admin/invitations/verify*', async (route) => {
+            console.log('Fulfilling verify route:', route.request().url());
+            await route.fulfill({
+                json: {
+                    email: 'newguy@example.com',
+                    study_id: 1,
+                    role: 'editor',
+                },
+            });
+        });
 
         // Mock Registration
         await page.route(/\/api\/auth\/register/, async (route) => {
@@ -83,7 +81,12 @@ test.describe('User Management (Phase 8)', () => {
         expect(inviteUrl).toContain('token=mock-token-newguy@example.com');
 
         // 2. New user joins
+        const verifyResponsePromise = page.waitForResponse(
+            (resp) => resp.url().includes('/api/admin/invitations/verify') && resp.status() === 200
+        );
         await page.goto(inviteUrl);
+        await verifyResponsePromise;
+
         await expect(page.getByText(/create your account/i)).toBeVisible();
         await expect(page.locator('input[type="email"]')).toHaveValue('newguy@example.com');
 
