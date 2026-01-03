@@ -143,10 +143,12 @@ jobs:
           enable-cache: true
 
       - name: Setup Backend & Seed
+        env:
+          API_BASE_URL: http://internal
         run: |
           cd backend
           uv sync
-          uv run python init_db.py --reset --yes
+          uv run python init_db.py --reset
           uv run python seed.py data/example-study.json
 
       - name: Start Backend in Background
