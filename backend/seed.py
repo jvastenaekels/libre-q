@@ -17,4 +17,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     json_file = sys.argv[1]
+    print(f"DEBUG: Starting seeding from {json_file}")
     asyncio.run(sync_study_from_file(json_file))
+    print("DEBUG: Seeding completed successfully")

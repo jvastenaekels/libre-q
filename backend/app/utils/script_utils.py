@@ -38,9 +38,11 @@ class APIClient:
         email = email or os.getenv("ADMIN_EMAIL", "admin@example.com")
         password = password or os.getenv("ADMIN_PASSWORD", "admin123")
 
+        print(f"DEBUG: Attempting login for {email}...")
         response = await self.client.post(
             "/api/token", data={"username": email, "password": password}
         )
+        print(f"DEBUG: Login response status: {response.status_code}")
 
         if response.status_code != 200:
             raise Exception(f"Login failed: {response.text}")
@@ -124,7 +126,9 @@ async def sync_study_from_file(json_path: str):
 
     api = APIClient()
     try:
+        print("DEBUG: Calling api.login()...")
         await api.login()
+        print("DEBUG: api.login() successful")
 
         # 1. Transform data
         data = api.transform_study_data(raw_data)
