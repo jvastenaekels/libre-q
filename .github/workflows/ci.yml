@@ -146,15 +146,24 @@ jobs:
         run: |
           cd backend
           uv sync
-          uv run python init_db.py --reset
+          uv run python init_db.py --reset --yes
           uv run python seed.py data/example-study.json
 
       - name: Start Backend in Background
         run: |
           cd backend
           uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-          # Wait for backend to be ready
-          timeout 60 bash -c 'until curl -s http://127.0.0.1:8000/health; do sleep 2; echo "Waiting for backend..."; done'
+          # Wait for backend to be ready with a slightly more robust check
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8000/health > /dev/null; then
+              echo "Backend is ready!"
+              exit 0
+            fi
+            echo "Waiting for backend ($i/30)..."
+            sleep 2
+          done
+          echo "Backend failed to start"
+          exit 1
 
       - name: Install frontend dependencies
         run: cd frontend && npm ci
