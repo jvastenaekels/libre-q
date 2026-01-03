@@ -147,7 +147,6 @@ jobs:
       - name: Setup Backend
         run: |
           cd backend
-          uv sync
           uv run python init_db.py --reset
 
       - name: Start Backend
