@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { StudyRead, StudyUpdate } from '@/api/model';
+import type { StudyRead, StudyUpdate, StudyTranslationRead } from '@/api/model';
 import { produce } from 'immer';
 
 interface StudyDesignerState {
@@ -64,7 +64,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
             return { draft: produce(state.draft, fn) };
         }),
 
-    updateTranslation: (lang: string, fn: (t: StudyTranslationRead) => void) =>
+    // biome-ignore lint/suspicious/noExplicitAny: complex translation type
+    updateTranslation: (lang: string, fn: (t: any) => void) =>
         set((state: StudyDesignerState) => {
             if (!state.draft) return state;
             return {

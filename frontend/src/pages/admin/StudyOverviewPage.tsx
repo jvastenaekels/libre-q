@@ -75,16 +75,16 @@ const StudyOverviewPage = () => {
                                 role="status"
                                 className={cn(
                                     'ml-2 font-bold uppercase tracking-widest text-[10px]',
-                                    stats.status === 'active'
+                                    study?.state === 'active'
                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                        : stats.status === 'completed'
+                                        : study?.state === 'closed'
                                           ? 'bg-slate-50 text-slate-700 border-slate-100'
                                           : 'bg-amber-50 text-amber-700 border-amber-100'
                                 )}
                             >
-                                {stats.status === 'active'
+                                {study?.state === 'active'
                                     ? 'Live Fieldwork'
-                                    : stats.status === 'completed'
+                                    : study?.state === 'closed'
                                       ? 'Closed'
                                       : 'Draft Mode'}
                             </Badge>
@@ -143,7 +143,7 @@ const StudyOverviewPage = () => {
                 <div className="col-span-12 md:col-span-4 space-y-6">
                     <StudyStatusControl
                         slug={slug || ''}
-                        currentState={stats?.status || 'draft'}
+                        currentState={study?.state || 'draft'}
                         onStateChange={() => {
                             refetchParticipants();
                             refetchStats();

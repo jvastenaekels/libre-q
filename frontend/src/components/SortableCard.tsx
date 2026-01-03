@@ -197,9 +197,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     //           ? undefined
                     //           : `card-${id}`
                     // }
-                    transition={CARD_SPRING_TRANSITION}
+                    // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
+                    transition={CARD_SPRING_TRANSITION as any}
                     // Trigger a subtle pulse/flash when the card content (id) changes or on mount
-                    animate={process.env.NODE_ENV === 'test' ? undefined : CARD_PULSE_ANIMATION}
+                    // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
+                    animate={
+                        process.env.NODE_ENV === 'test' ? undefined : (CARD_PULSE_ANIMATION as any)
+                    }
                     key={id} // Ensure animation re-triggers if ID changes in this slot
                     className={`
                     w-full h-full

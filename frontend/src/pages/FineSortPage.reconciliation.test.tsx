@@ -34,6 +34,7 @@ vi.mock('../store/useConfigStore', () => ({
 }));
 
 vi.mock('../store/useResponseStore', () => ({
+    // biome-ignore lint/suspicious/noExplicitAny: mock type
     useResponseStore: (selector: (state: any) => any) => {
         const state = {
             rough: {

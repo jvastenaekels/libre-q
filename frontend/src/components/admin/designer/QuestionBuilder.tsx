@@ -37,6 +37,8 @@ import {
 } from '@/components/ui/accordion';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
+type QuestionType = 'text' | 'number' | 'select' | 'checkbox';
+
 interface QuestionConfig {
     type: QuestionType;
     label: string | Record<string, string>;
@@ -216,9 +218,10 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                         size="icon"
                                                         className="h-8 w-8 opacity-0 group-hover/opt:opacity-100"
                                                         onClick={() => {
-                                                            const newOpts = question.options.filter(
-                                                                (_, i: number) => i !== idx
-                                                            );
+                                                            const newOpts =
+                                                                question.options?.filter(
+                                                                    (_, i: number) => i !== idx
+                                                                );
                                                             onUpdate({
                                                                 ...question,
                                                                 options: newOpts,

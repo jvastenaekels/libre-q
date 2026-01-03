@@ -69,7 +69,8 @@ const TeamSettings = () => {
         );
     }
 
-    const members = study?.collaborators || [];
+    // biome-ignore lint/suspicious/noExplicitAny: missing type in generated client
+    const members = (study as any)?.collaborators || [];
 
     return (
         <div className="space-y-6">
@@ -247,7 +248,8 @@ const TeamSettings = () => {
                                     onAction={() => document.getElementById('email')?.focus()}
                                 />
                             ) : (
-                                members.map((m) => (
+                                // biome-ignore lint/suspicious/noExplicitAny: missing type
+                                members.map((m: any) => (
                                     <div
                                         key={m.user_id}
                                         className="grid grid-cols-12 p-3 items-center hover:bg-muted/30 transition-colors"

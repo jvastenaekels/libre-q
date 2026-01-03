@@ -17,7 +17,11 @@ import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
+
 // Define basic types for clarity
+type Statement = StatementRead;
+type Translation = StatementTranslationRead;
 
 const QSortEditor = () => {
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
@@ -27,7 +31,7 @@ const QSortEditor = () => {
     if (!draft) return null;
 
     // --- Statements Logic ---
-    const statements: Statement[] = draft.statements || [];
+    const statements: Statement[] = (draft.statements || []) as Statement[];
     const localizedStatements = statements
         .map((s: Statement) => {
             const t = (s.translations as Translation[])?.find(
@@ -63,7 +67,8 @@ const QSortEditor = () => {
                 if (tIdx > -1) {
                     newTranslations[tIdx] = { ...newTranslations[tIdx], text: line };
                 } else {
-                    newTranslations.push({ language_code: activeLocale, text: line });
+                    // biome-ignore lint/suspicious/noExplicitAny: draft creation
+                    newTranslations.push({ language_code: activeLocale, text: line } as any);
                 }
 
                 return {
@@ -75,9 +80,8 @@ const QSortEditor = () => {
         setBulkText('');
     };
 
-    const grid = (draft.grid_config || []) as Record<string, unknown>[];
-    // biome-ignore lint/suspicious/noExplicitAny: complex reduce
-    const totalSlots = grid.reduce((acc: number, col: any) => acc + (col.capacity || 0), 0);
+    const grid = (draft.grid_config || []) as GridColumn[];
+    const totalSlots = grid.reduce((acc: number, col: GridColumn) => acc + (col.capacity || 0), 0);
     const totalStatements = statements.length;
     const isValid = totalSlots === totalStatements;
 
@@ -93,7 +97,7 @@ const QSortEditor = () => {
         <div className="space-y-6">
             <Tabs
                 value={activeSubTab}
-                onValueChange={(v: 'statements' | 'grid') => setActiveSubTab(v)}
+                onValueChange={(v) => setActiveSubTab(v as 'statements' | 'grid')}
             >
                 <TabsList className="grid grid-cols-2 w-full max-w-[400px]">
                     <TabsTrigger value="statements" className="gap-2">

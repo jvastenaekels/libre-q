@@ -45,7 +45,7 @@ const RegistrationPage = () => {
             customInstance({
                 url: `/api/admin/invitations/verify`,
                 method: 'GET',
-                params: { token },
+                params: { token: token || undefined },
                 signal,
             }),
         enabled: !!token,

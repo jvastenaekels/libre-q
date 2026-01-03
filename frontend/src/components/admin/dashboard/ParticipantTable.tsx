@@ -127,10 +127,9 @@ const ParticipantTable: React.FC<ParticipantTableProps> = ({
                             {minutes}m {seconds % 60}s
                         </span>
                         {isSuspect && !row.original.is_discarded && (
-                            <AlertTriangle
-                                className="h-4 w-4 text-amber-500"
-                                title="Suspiciously fast completion"
-                            />
+                            <span title="Suspiciously fast completion">
+                                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            </span>
                         )}
                     </div>
                 );

@@ -29,16 +29,16 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 }) => {
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
 
-    const handleStateChange = async (action: 'activate' | 'close') => {
+    const handleStateChange = async (newState: 'active' | 'closed') => {
         try {
             await changeStateMutation.mutateAsync({
                 slug,
-                params: { action },
+                params: { new_state: newState },
             });
-            toast.success(`Study ${action === 'activate' ? 'launched' : 'closed'} successfully`);
+            toast.success(`Study ${newState === 'active' ? 'launched' : 'closed'} successfully`);
             onStateChange();
         } catch (error) {
-            toast.error(`Failed to ${action} study`);
+            toast.error(`Failed to change study state`);
             console.error(error);
         }
     };
@@ -102,7 +102,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Wait, let me check</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleStateChange('activate')}>
+                                <AlertDialogAction onClick={() => handleStateChange('active')}>
                                     Yes, Launch Now
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -138,7 +138,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                                 <AlertDialogCancel>Keep Active</AlertDialogCancel>
                                 <AlertDialogAction
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    onClick={() => handleStateChange('close')}
+                                    onClick={() => handleStateChange('closed')}
                                 >
                                     Close Study
                                 </AlertDialogAction>
