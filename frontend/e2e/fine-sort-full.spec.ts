@@ -1,15 +1,62 @@
 
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { mockSubmitAPI } from './fixtures/study-config';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load and Transform example-study.json
+const studyJsonPath = path.resolve(__dirname, '../../backend/data/example-study.json');
+const rawStudy = JSON.parse(fs.readFileSync(studyJsonPath, 'utf-8'));
+
+// Synthesize ID for statements
+const statements = rawStudy.statements.map((s: any, index: number) => ({
+    id: index + 1,
+    text: s.translations.en,
+    code: s.code,
+}));
+
+const mockStudyConfig = {
+    ...rawStudy,
+    title: rawStudy.translations.en.title,
+    subtitle: rawStudy.translations.en.subtitle,
+    description: rawStudy.translations.en.description || '',
+    objective: rawStudy.translations.en.objective,
+    instructions: rawStudy.translations.en.instructions,
+    ui_labels: rawStudy.translations.en.ui_labels,
+    statements: statements,
+    state: rawStudy.state || 'active',
+};
 
 test.describe('Fine Sort Comprehensive UX & Layout', () => {
-    // Increase timeout for this comprehensive test
     test.setTimeout(120_000);
+
+    test.beforeEach(async ({ page }) => {
+        // Mock Study API
+        await page.route(`**/api/study/${mockStudyConfig.slug}**`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify(mockStudyConfig),
+            });
+        });
+
+        // Mock Submission API
+        await mockSubmitAPI(page);
+
+        // Mock Logging
+        await page.route('**/api/logs', async (route) => {
+            await route.fulfill({ status: 200, body: '{}' });
+        });
+    });
 
     test('should verify all critical UI elements and interactions', async ({ page }) => {
         // --- SETUP ---
         await test.step('Navigate to Fine Sort', async () => {
-            // Use example-study which is seeded in CI backend
-            await page.goto('/study/example-study/welcome');
+            await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
 
             // Wait for loading to finish
             await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
