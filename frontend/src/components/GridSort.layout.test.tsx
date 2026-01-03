@@ -95,7 +95,7 @@ describe('GridSort Detailed UI Verification', () => {
             </DndContext>
         );
 
-        // Expect Instruction 2: Sequence Number
+        // Expect Instruction 2: Sequence Number9
         expect(screen.getByText('2')).toBeInTheDocument();
         // Expect Instruction Text
         expect(screen.getByText('fine.workbench.place_on_grid')).toBeInTheDocument();

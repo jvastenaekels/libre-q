@@ -24,7 +24,38 @@ export const mockStudyConfig = {
         { score: 0, capacity: 1 },
         { score: 1, capacity: 1 },
     ],
-    presort_config: {},
+    presort_config: {
+        age: {
+            type: 'number',
+            label: { en: 'Age', fr: 'Âge', fi: 'Ikä' },
+            required: true,
+            min: 18,
+            max: 99,
+        },
+        gender: {
+            type: 'select',
+            options: [
+                { value: 'Male', label: { en: 'Male', fr: 'Homme', fi: 'Mies' } },
+                { value: 'Female', label: { en: 'Female', fr: 'Femme', fi: 'Nainen' } },
+                { value: 'Non-binary', label: { en: 'Non-binary', fr: 'Non-binaire', fi: 'Muunsukupuolinen' } },
+                { value: 'Prefer not to say', label: { en: 'Prefer not to answer', fr: 'Je préfère ne pas répondre', fi: 'En halua vastata' } },
+            ],
+            label: { en: 'Gender', fr: 'Genre', fi: 'Sukupuoli' },
+            required: true,
+        },
+        education: {
+            type: 'select',
+            options: [
+                { value: 'High School', label: { en: 'High School / Secondary', fr: 'Études secondaires', fi: 'Toisen asteen koulutus' } },
+                { value: 'Bachelor', label: { en: "Bachelor's Degree", fr: 'Licence / Bachelor', fi: 'Kandidaatti (Bachelor)' } },
+                { value: 'Master', label: { en: "Master's Degree", fr: 'Master / Maîtrise', fi: 'Maisteri (Master)' } },
+                { value: 'PhD', label: { en: 'PhD / Doctorate', fr: 'Doctorat', fi: 'Tohtori' } },
+                { value: 'Other', label: { en: 'Other', fr: 'Autre', fi: 'Muu' } },
+            ],
+            label: { en: 'Education Level', fr: "Niveau d'études", fi: 'Koulutustaso' },
+            required: true,
+        },
+    },
     postsort_config: {},
 };
 
@@ -65,6 +96,11 @@ export async function mockStudyAPI(
     await page.route('**/api/logs', async (route) => {
         await route.fulfill({ status: 200, body: '{}' });
     });
+
+    // Mock Consent Recording
+    await page.route(`**/api/study/${config.slug}/consent`, async (route) => {
+         await route.fulfill({ status: 200, body: '{}' });
+    });
 }
 
 /**
@@ -80,5 +116,10 @@ export async function mockSubmitAPI(page: import('@playwright/test').Page) {
                 confirmation_code: 'TEST-123-ABC',
             }),
         });
+    });
+
+    // Valid for all tests using this fixture
+    await page.route('**/api/study/*/consent', async (route) => {
+        await route.fulfill({ status: 200, body: '{}' });
     });
 }

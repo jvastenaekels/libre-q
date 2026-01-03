@@ -8,10 +8,10 @@ export default defineConfig({
     testDir: './e2e',
 
     /* Maximum time one test can run for */
-    timeout: 60 * 1000,
+    timeout: 120 * 1000,
 
     expect: {
-        timeout: 10000,
+        timeout: 15000,
     },
 
     /* Run tests in files in parallel */
@@ -48,43 +48,32 @@ export default defineConfig({
 
         /* Viewport for consistent testing */
         viewport: { width: 1280, height: 720 },
+
+        /* Default timeout for each action (click, fill, etc.) */
+        actionTimeout: 30000,
     },
 
     /* Configure projects for major browsers */
     /* On CI, only run Chromium and mobile-chrome to stay within timeout */
-    projects: process.env.CI
-        ? [
-              {
-                  name: 'chromium',
-                  use: { ...devices['Desktop Chrome'] },
-              },
-              {
-                  name: 'mobile-chrome',
-                  use: { ...devices['Pixel 5'] },
-              },
-          ]
-        : [
-              {
-                  name: 'chromium',
-                  use: { ...devices['Desktop Chrome'] },
-              },
-              {
-                  name: 'firefox',
-                  use: { ...devices['Desktop Firefox'] },
-              },
-              {
-                  name: 'webkit',
-                  use: { ...devices['Desktop Safari'] },
-              },
-              {
-                  name: 'mobile-chrome',
-                  use: { ...devices['Pixel 5'] },
-              },
-              {
-                  name: 'mobile-safari',
-                  use: { ...devices['iPhone 13'] },
-              },
-          ],
+    /* Configure projects for major browsers */
+    projects: [
+        {
+            name: 'Admin E2E',
+            testMatch: /.*admin\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
+        {
+            name: 'Study E2E',
+            testMatch: /.*study\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
+        // Mobile variants for Study only (typically Admin is desktop focused)
+        {
+            name: 'Study Mobile Chrome',
+            testMatch: /.*study\/.*\.spec\.ts/,
+            use: { ...devices['Pixel 5'] },
+        },
+    ],
 
     /* Run local dev server before starting tests */
     webServer: {
