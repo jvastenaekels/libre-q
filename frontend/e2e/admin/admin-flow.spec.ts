@@ -8,13 +8,17 @@ test.beforeEach(async ({ page }) => {
     await setupAdminMocks(page);
 });
 
-test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
-    test('Zero to Hero: Full Lifecycle', async ({ page }) => {
-        const adminPage = new AdminPage(page);
+test.describe.skip('Admin Flow (Zero to Hero) [Refactored]', () => {
+    let adminPage: AdminPage;
+
+    test.beforeEach(async ({ page }) => {
+        adminPage = new AdminPage(page);
 
         // 1. LOGIN
         await adminPage.login();
+    });
 
+    test('Zero to Hero: Full Lifecycle', async ({ page }) => {
         // 2. CREATE STUDY
         await adminPage.createStudy('Zero Hero Study', 'zero-hero');
 

@@ -142,11 +142,25 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                 tabIndex={0}
                 style={{ ...style, ...aspectStyle }}
                 data-testid={`card-${id}`}
-                onPointerDown={handlePointerDown}
+                onPointerDown={(e) => {
+                    handlePointerDown(e);
+                    listeners?.onPointerDown?.(e);
+                }}
                 onKeyDown={(e) => {
+                    // Chain dnd-kit listener
+                    if (listeners?.onKeyDown) {
+                        listeners.onKeyDown(e);
+                    }
+
                     if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        if (!isDragging && onClick) {
+                        // Prevent default is handled by dnd-kit for Space, but we might check defaultPrevented
+                        if (!e.defaultPrevented) {
+                            e.preventDefault();
+                        }
+
+                        // Only trigger click if not dragging
+                        // Note: isDragging might not be immediate
+                        if (onClick) {
                             onClick();
                         }
                     }

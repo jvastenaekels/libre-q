@@ -163,9 +163,9 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Redirect study base URL to current/welcome step
-    // biome-ignore lint/style/useTemplate: clearer here
+    // Redirect study base URL to current/welcome step
     const isStudyBase =
-        location.pathname === '/study/' + slug || location.pathname === '/study/' + slug + '/';
+        location.pathname === `/study/${slug}` || location.pathname === `/study/${slug}/`;
     if (isStudyBase) {
         const stepRoutes: Record<number, string> = {
             1: 'welcome',

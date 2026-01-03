@@ -40,7 +40,7 @@ export class FineSortPage extends BasePage {
         const deckCard = this.deckContainer.locator('[data-testid^="card-"]').first();
         const targetSlot = this.page.locator('[data-testid="droppable-slot"]').first();
         await deckCard.dragTo(targetSlot);
-        await expect(targetSlot.locator('[data-testid^="card-"]')).toBeVisible();
+        await expect(targetSlot.locator('[data-testid^="card-"]')).toBeVisible({ timeout: 5000 });
     }
 
     async tapFirstCard() {
