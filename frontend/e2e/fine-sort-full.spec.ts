@@ -68,29 +68,50 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
             // Consent Page
             await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
-            const acceptBtn = page.getByRole('button', { name: /accept|accepter|agree|d'accord/i });
-            await expect(acceptBtn.first()).toBeVisible({ timeout: 30000 });
-            await acceptBtn.first().click();
+            
+            // Check consent
+            const checkbox = page.getByTestId('consent-checkbox');
+            await expect(checkbox).toBeVisible({ timeout: 15000 });
+            await checkbox.check();
 
-            // Fast-forward through Rough Sort if needed
-            // Try to jump to fine sort if URL manipulation works, otherwise speed-click
-            // Knowing the app, we might need to "Click Agree" on all rough sort cards
-            // Wait for redirect to rough sort
+            // Click Accept/Start
+            const acceptBtn = page.getByTestId('consent-accept-btn');
+            await expect(acceptBtn).toBeVisible({ timeout: 30000 });
+            await acceptBtn.click();
+
+            // Fast-forward through Pre-Sort
             try {
-                await page.waitForURL(/.*rough-sort/, { timeout: 3000 });
-                // Quick rough sort
-                const cards = page.locator('[data-testid^="card-stack-item-"]');
-                while (await cards.count() > 0 && await cards.first().isVisible()) {
-                    await page.getByRole('button', { name: /agree|d'accord/i }).click();
-                    await page.waitForTimeout(20); // minimal throttle
-                }
+                await page.waitForURL(/.*presort/, { timeout: 5000 });
+                await page.getByLabel(/age/i).first().fill('30');
+                await page.getByLabel(/gender/i).first().selectOption({ index: 1 });
+                await page.getByLabel(/education/i).first().selectOption({ index: 1 });
                 await page.getByRole('button', { name: /continue|continuer/i }).click();
             } catch (e) {
-                // Already at fine sort or skipped?
+                console.log('Skipped pre-sort or already passed');
+            }
+
+            // Fast-forward through Rough Sort
+            try {
+                await page.waitForURL(/.*rough-sort/, { timeout: 5000 });
+                const cardsTotal = mockStudyConfig.statements.length;
+                const agreeBtn = page.getByTestId('rough-agree-btn');
+                
+                // Sort all cards
+                for (let i = 0; i < cardsTotal; i++) {
+                    await agreeBtn.click();
+                    await page.waitForTimeout(100); // Wait for animation
+                }
+
+                // Proceed to Fine Sort
+                await page.waitForTimeout(500);
+                const nextBtn = page.getByRole('button', { name: /next|suivant|continue/i }).first();
+                await expect(nextBtn).toBeEnabled({ timeout: 10000 });
+                await nextBtn.click();
+            } catch (e) {
                 console.log('Skipped rough sort or already passed');
             }
 
-            await expect(page).toHaveURL(/.*fine-sort/);
+            await expect(page).toHaveURL(/.*fine-sort/, { timeout: 15000 });
         });
 
         // --- SECTION 1: VISIBILITY & LAYOUT CHECKS ---
