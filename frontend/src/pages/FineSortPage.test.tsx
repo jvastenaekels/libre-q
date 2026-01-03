@@ -81,7 +81,6 @@ vi.mock('../hooks/useLayout', () => ({
 
 // Mock GridSort Component (Spying on props)
 vi.mock('../components/GridSort', () => ({
-    // biome-ignore lint/suspicious/noExplicitAny: mock
     default: ({
         isAllPlaced,
         onValidate,
