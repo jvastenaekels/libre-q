@@ -38,16 +38,18 @@ const PostSortConfigEditor = () => {
     if (!draft) return null;
 
     // Extract postsort_config with proper typing
-    const config = draft.postsort_config as {
-        extreme_columns?: number[];
-        ask_missing?: boolean;
-        ask_general_comment?: boolean;
-        prompts?: {
-            extreme?: string | Record<string, string>;
-            missing?: string | Record<string, string>;
-            general?: string | Record<string, string>;
-        };
-    } | undefined;
+    const config = draft.postsort_config as
+        | {
+              extreme_columns?: number[];
+              ask_missing?: boolean;
+              ask_general_comment?: boolean;
+              prompts?: {
+                  extreme?: string | Record<string, string>;
+                  missing?: string | Record<string, string>;
+                  general?: string | Record<string, string>;
+              };
+          }
+        | undefined;
 
     const extremeColumns = config?.extreme_columns || [];
     const askMissing = config?.ask_missing ?? false;
@@ -232,7 +234,9 @@ const PostSortConfigEditor = () => {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => selectedScore !== null && addExtremeColumn(selectedScore)}
+                                onClick={() =>
+                                    selectedScore !== null && addExtremeColumn(selectedScore)
+                                }
                                 disabled={selectedScore === null}
                                 className="h-8"
                             >
@@ -269,7 +273,9 @@ const PostSortConfigEditor = () => {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base">Ask About Missing Statements</CardTitle>
+                            <CardTitle className="text-base">
+                                Ask About Missing Statements
+                            </CardTitle>
                             <CardDescription className="text-sm">
                                 Ask participants if there were statements they wish had been
                                 included in the study.

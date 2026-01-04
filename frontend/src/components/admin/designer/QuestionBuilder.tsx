@@ -42,7 +42,15 @@ import {
 } from '@/components/ui/accordion';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
-type QuestionType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'email' | 'textarea' | 'radio';
+type QuestionType =
+    | 'text'
+    | 'number'
+    | 'select'
+    | 'checkbox'
+    | 'date'
+    | 'email'
+    | 'textarea'
+    | 'radio';
 
 interface QuestionConfig {
     type: QuestionType;
@@ -116,12 +124,22 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     <div className="p-1.5 bg-muted rounded">
                                         {question.type === 'text' && <Type className="h-3 w-3" />}
                                         {question.type === 'number' && <Hash className="h-3 w-3" />}
-                                        {question.type === 'select' && <ListCircle className="h-3 w-3" />}
-                                        {question.type === 'checkbox' && <CheckSquare className="h-3 w-3" />}
-                                        {question.type === 'radio' && <Circle className="h-3 w-3" />}
-                                        {question.type === 'date' && <Calendar className="h-3 w-3" />}
+                                        {question.type === 'select' && (
+                                            <ListCircle className="h-3 w-3" />
+                                        )}
+                                        {question.type === 'checkbox' && (
+                                            <CheckSquare className="h-3 w-3" />
+                                        )}
+                                        {question.type === 'radio' && (
+                                            <Circle className="h-3 w-3" />
+                                        )}
+                                        {question.type === 'date' && (
+                                            <Calendar className="h-3 w-3" />
+                                        )}
                                         {question.type === 'email' && <Mail className="h-3 w-3" />}
-                                        {question.type === 'textarea' && <AlignLeft className="h-3 w-3" />}
+                                        {question.type === 'textarea' && (
+                                            <AlignLeft className="h-3 w-3" />
+                                        )}
                                     </div>
                                     <span className="text-sm font-medium truncate">
                                         {label || (
@@ -183,11 +201,14 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     </div>
                                 </div>
 
-                                {(question.type === 'select' || question.type === 'radio' || question.type === 'checkbox') && (
+                                {(question.type === 'select' ||
+                                    question.type === 'radio' ||
+                                    question.type === 'checkbox') && (
                                     <div className="space-y-3 pt-2 border-t border-dashed">
                                         <Label className="text-xs">
                                             Options
-                                            {question.type === 'checkbox' && ' (multiple selection allowed)'}
+                                            {question.type === 'checkbox' &&
+                                                ' (multiple selection allowed)'}
                                             {question.type === 'radio' && ' (single selection)'}
                                         </Label>
                                         <div className="space-y-2">
@@ -331,12 +352,14 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
             type: qType,
             label: { [activeLocale]: 'New Question' },
             required: false,
-            options: (qType === 'select' || qType === 'checkbox' || qType === 'radio')
-                ? ['Option 1', 'Option 2']
-                : undefined,
-            placeholder: qType === 'text' || qType === 'email' || qType === 'textarea'
-                ? { [activeLocale]: 'Enter your answer...' }
-                : undefined,
+            options:
+                qType === 'select' || qType === 'checkbox' || qType === 'radio'
+                    ? ['Option 1', 'Option 2']
+                    : undefined,
+            placeholder:
+                qType === 'text' || qType === 'email' || qType === 'textarea'
+                    ? { [activeLocale]: 'Enter your answer...' }
+                    : undefined,
             rows: qType === 'textarea' ? 4 : undefined,
         };
 

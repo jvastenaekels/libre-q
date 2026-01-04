@@ -125,13 +125,17 @@ const IntroductionEditor = () => {
                     <CardContent className="pt-6 space-y-4">
                         <div className="flex items-center justify-between py-2">
                             <div className="space-y-1">
-                                <Label htmlFor="randomize-statements" className="text-sm font-medium">
+                                <Label
+                                    htmlFor="randomize-statements"
+                                    className="text-sm font-medium"
+                                >
                                     Randomize Statement Order
                                 </Label>
                                 <p className="text-xs text-muted-foreground max-w-md">
-                                    Present statements in random order for each participant to prevent order
-                                    effects. This is a Q methodology best practice for scientific validity.
-                                    Each participant sees a unique but reproducible order.
+                                    Present statements in random order for each participant to
+                                    prevent order effects. This is a Q methodology best practice for
+                                    scientific validity. Each participant sees a unique but
+                                    reproducible order.
                                 </p>
                             </div>
                             <Switch
@@ -152,7 +156,8 @@ const IntroductionEditor = () => {
                                 </Label>
                                 <p className="text-xs text-muted-foreground max-w-md">
                                     Display statement codes (e.g., "S1", "S2") alongside the text.
-                                    Useful for referencing specific statements in follow-up interviews.
+                                    Useful for referencing specific statements in follow-up
+                                    interviews.
                                 </p>
                             </div>
                             <Switch
@@ -171,10 +176,11 @@ const IntroductionEditor = () => {
                                 <div className="flex gap-2">
                                     <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
                                     <p>
-                                        <strong>Q Methodology Best Practice:</strong> Randomization uses each
-                                        participant's unique session ID as a seed, ensuring they always see
-                                        the same order across page refreshes while preventing systematic
-                                        position biases in factor analysis.
+                                        <strong>Q Methodology Best Practice:</strong> Randomization
+                                        uses each participant's unique session ID as a seed,
+                                        ensuring they always see the same order across page
+                                        refreshes while preventing systematic position biases in
+                                        factor analysis.
                                     </p>
                                 </div>
                             </div>

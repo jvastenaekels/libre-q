@@ -74,7 +74,10 @@ const PreSortPage: React.FC = () => {
 
             if (field.required) {
                 if (field.type === 'checkbox') {
-                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(1, t('presort.error_required'));
+                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
+                        1,
+                        t('presort.error_required')
+                    );
                 } else if (field.type !== 'number') {
                     fieldSchema = (fieldSchema as z.ZodString).min(1, t('presort.error_required'));
                 }
@@ -159,14 +162,7 @@ const PreSortPage: React.FC = () => {
                     />
                 );
             case 'date':
-                return (
-                    <input
-                        id={key}
-                        type="date"
-                        {...register(key)}
-                        className={commonClasses}
-                    />
-                );
+                return <input id={key} type="date" {...register(key)} className={commonClasses} />;
             case 'textarea':
                 return (
                     <textarea
