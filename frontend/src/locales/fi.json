@@ -79,7 +79,7 @@
     "welcome": {
         "start": "Aloita",
         "consent": {
-            "label": "Olen lukenut ja hyväksyn yllä olevat ehdot.",
+            "label": "Olen lukenut yllä olevat tiedot ja suostun osallistumaan tähän tutkimukseen.",
             "error": "Hyväksy ehdot jatkaaksesi."
         },
         "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
@@ -92,7 +92,7 @@
     "consent": {
         "title": "Suostumus osallistumiseen",
         "subtitle": "Lue seuraavat tiedot huolellisesti.",
-        "default_text": "**Luottamuksellisuus ja anonymiteetti:**\nVastauksesi käsitellään täysin luottamuksellisesti, nimettöminä ja GDPR:n mukaisesti. Tulokset yhdistetään yleisten suuntausten (näkökulmatekijöiden) tunnistamiseksi, eikä sinua voida tunnistaa yksilöllisesti.\n\n**Tietojen käyttö:**\nKerättyjä tietoja käytetään yksinomaan tieteelliseen tutkimukseen.\n\n**Vapaaehtoinen osallistuminen:**\nOsallistumisesi on täysin vapaaehtoista. Olet vapaa kieltäytymään osallistumisesta tai keskeyttämään tutkimuksen milloin tahansa ilman perusteluja."
+        "default_text": "**Ymmärryksen vahvistaminen:** Rastittamalla alla olevan ruudun vahvistat lukeneesi tervetuloa-sivulla kuvatut tutkimuksen tavoitteet ja menettelyt. Ymmärrät, että tämä tehtävä sisältää väitteiden lajittelua henkilökohtaisen näkökulmasi mallintamiseksi ja että oikeita tai vääriä vastauksia ei ole.\n\n**Luottamuksellisuus ja tietosuoja:** Osallistumisesi on anonyymiä. Vastauksillesi annetaan koodi, eikä niitä yhdistetä henkilöllisyyteesi missään raporteissa tai julkaisuissa. Kerätyt tiedot analysoidaan yhdessä jaettujen näkökulmien (faktoreiden) tunnistamiseksi. Lajittelun jälkeisessä vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimettömästi näiden näkökantojen havainnollistamiseksi.\n\n**Vapaaehtoinen osallistuminen:** Osallistuminen on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ilman seuraamuksia. Jos keskeytät ennen lähettämistä, osittaisia tietojasi ei säilytetä."
     },
     "presort": {
         "title": "Tietoa sinusta",

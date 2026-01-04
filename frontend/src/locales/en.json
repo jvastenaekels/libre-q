@@ -79,7 +79,7 @@
     "welcome": {
         "start": "Get Started",
         "consent": {
-            "label": "I have read and agree to the terms above.",
+            "label": "I have read the above information and agree to participate in this study.",
             "error": "Please accept the terms to continue."
         },
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
@@ -92,7 +92,7 @@
     "consent": {
         "title": "Participation Consent",
         "subtitle": "Please read the following information carefully.",
-        "default_text": "**Confidentiality and Anonymity:**\nYour responses will be treated with strict confidentiality, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nThe data collected will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to decline to participate or to withdraw from the study at any time without providing a justification."
+        "default_text": "**Confirmation of understanding:** By checking the box below, you confirm that you have read the study objectives and procedure described on the welcome page. You understand that this task involves sorting statements to model your personal point of view and that there are no right or wrong answers.\n\n**Confidentiality and data protection:** Your participation is anonymous. Your responses will be assigned a code and will not be linked to your identity in any reports or publications. The data collected will be analyzed collectively to identify shared perspectives (factors). Any written comments provided during the post-sort phase may be quoted anonymously to illustrate these viewpoints.\n\n**Voluntary participation:** Participation is entirely voluntary. You reserve the right to stop the sorting process and close the browser at any time without penalty. If you withdraw before submission, your partial data will not be retained."
     },
     "presort": {
         "title": "About You",

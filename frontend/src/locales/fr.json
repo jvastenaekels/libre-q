@@ -79,7 +79,7 @@
     "welcome": {
         "start": "Commencer",
         "consent": {
-            "label": "J'ai lu et j'accepte les conditions ci-dessus.",
+            "label": "J'ai lu les informations ci-dessus et j'accepte de participer à cette étude.",
             "error": "Vous devez accepter les conditions pour continuer."
         },
         "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
@@ -92,7 +92,7 @@
     "consent": {
         "title": "Consentement à la participation",
         "subtitle": "Veuillez lire attentivement les informations suivantes.",
-        "default_text": "**Confidentialité et anonymat :**\nVos réponses seront traitées de manière strictement confidentielle, anonymisée et en conformité avec le RGPD. Les résultats seront agrégés pour dégager des tendances générales (facteurs de points de vue) et ne permettront jamais de vous identifier individuellement.\n\n**Utilisation des données :**\nLes données collectées serviront exclusivement à des fins de recherche scientifique.\n\n**Liberté de participation :**\nVotre participation est entièrement volontaire. Vous êtes libre de refuser de participer ou d'interrompre l'étude à tout moment sans avoir à vous justifier."
+        "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et le déroulement de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à classer des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-classement pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de classement et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
     },
     "presort": {
         "title": "À propos de vous",
