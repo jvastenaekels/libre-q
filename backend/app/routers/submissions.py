@@ -1,5 +1,8 @@
 """API router for study submissions."""
 
+import random
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,9 +37,15 @@ async def get_study(
     request: Request,
     slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
     lang: str = Query("en", pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
+    session_token: UUID | None = Query(None, description="Participant session token for deterministic randomization"),
     db: AsyncSession = Depends(get_db),
 ):
-    """Fetches study configuration for the frontend, including language resolution."""
+    """Fetches study configuration for the frontend, including language resolution.
+
+    If the study has randomize_statements=True and a session_token is provided,
+    statements will be shuffled deterministically using the token as seed.
+    This ensures the same participant always sees statements in the same order.
+    """
     study = await StudyService.get_study_by_slug(db, slug)
     if not study:
         raise HTTPException(status_code=404, detail="Study not found")
@@ -84,6 +93,17 @@ async def get_study(
         text = s_trans.text if s_trans else s.code
         statements_data.append({"id": s.id, "text": text, "code": s.code})
 
+    # Q Methodology: Randomize statement order if configured
+    # This prevents order effects from biasing participant responses
+    random_seed_str = None
+    if study.randomize_statements and session_token:
+        # Use session token as deterministic seed
+        random_seed_str = str(session_token)
+        random.seed(random_seed_str)
+        random.shuffle(statements_data)
+        # Reset random state to avoid affecting other code
+        random.seed()
+
     return {
         "slug": study.slug,
         "title": title,
@@ -92,6 +112,7 @@ async def get_study(
         "objective": objective,
         "instructions": instructions,
         "presort_config": study.presort_config,
+        "postsort_config": study.postsort_config,
         "grid_config": study.grid_config,
         "statements": statements_data,
         "consent": {
@@ -104,6 +125,7 @@ async def get_study(
         "language": resolved_lang,
         "default_language": study.default_language,
         "show_statement_codes": study.show_statement_codes,
+        "randomize_statements": study.randomize_statements,
         "ui_labels": getattr(translation, "ui_labels", {}),
         "state": study.state.value,
     }

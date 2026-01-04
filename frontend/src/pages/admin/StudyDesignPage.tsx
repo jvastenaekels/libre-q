@@ -24,6 +24,7 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
 import QSortEditor from '@/components/admin/designer/QSortEditor';
+import PostSortConfigEditor from '@/components/admin/designer/PostSortConfigEditor';
 import WelcomePage from '@/pages/WelcomePage';
 import PreSortPage from '@/pages/PreSortPage';
 import RoughSortPage from '@/pages/RoughSortPage';
@@ -255,7 +256,7 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">
-                                <QuestionBuilder type="post" />
+                                <PostSortConfigEditor />
                             </TabsContent>
                         </div>
                     </Tabs>

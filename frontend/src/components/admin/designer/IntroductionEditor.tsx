@@ -9,7 +9,7 @@ import { Info } from 'lucide-react';
 import type React from 'react';
 
 const IntroductionEditor = () => {
-    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
     if (!draft) return null;
 
@@ -111,6 +111,74 @@ const IntroductionEditor = () => {
                                 placeholder="# Instructions&#10;&#10;1. Phase 1...&#10;2. Phase 2..."
                             />
                         </div>
+                    </CardContent>
+                </Card>
+            </section>
+
+            <section className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
+                    <Info className="h-5 w-5" />
+                    Research Settings
+                </div>
+
+                <Card className="shadow-sm">
+                    <CardContent className="pt-6 space-y-4">
+                        <div className="flex items-center justify-between py-2">
+                            <div className="space-y-1">
+                                <Label htmlFor="randomize-statements" className="text-sm font-medium">
+                                    Randomize Statement Order
+                                </Label>
+                                <p className="text-xs text-muted-foreground max-w-md">
+                                    Present statements in random order for each participant to prevent order
+                                    effects. This is a Q methodology best practice for scientific validity.
+                                    Each participant sees a unique but reproducible order.
+                                </p>
+                            </div>
+                            <Switch
+                                id="randomize-statements"
+                                checked={draft.randomize_statements ?? false}
+                                onCheckedChange={(checked: boolean) => {
+                                    updateDraft((d) => {
+                                        d.randomize_statements = checked;
+                                    });
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between py-2 border-t">
+                            <div className="space-y-1">
+                                <Label htmlFor="show-codes" className="text-sm font-medium">
+                                    Show Statement Codes
+                                </Label>
+                                <p className="text-xs text-muted-foreground max-w-md">
+                                    Display statement codes (e.g., "S1", "S2") alongside the text.
+                                    Useful for referencing specific statements in follow-up interviews.
+                                </p>
+                            </div>
+                            <Switch
+                                id="show-codes"
+                                checked={draft.show_statement_codes ?? false}
+                                onCheckedChange={(checked: boolean) => {
+                                    updateDraft((d) => {
+                                        d.show_statement_codes = checked;
+                                    });
+                                }}
+                            />
+                        </div>
+
+                        {draft.randomize_statements && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 mt-4">
+                                <div className="flex gap-2">
+                                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                                    <p>
+                                        <strong>Q Methodology Best Practice:</strong> Randomization uses each
+                                        participant's unique session ID as a seed, ensuring they always see
+                                        the same order across page refreshes while preventing systematic
+                                        position biases in factor analysis.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </section>

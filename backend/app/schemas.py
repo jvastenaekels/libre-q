@@ -186,6 +186,7 @@ class StudyBase(BaseModel):
     postsort_config: dict[str, Any]
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
+    randomize_statements: bool = False
 
 
 class StudyCreate(StudyBase):
@@ -215,6 +216,7 @@ class StudyUpdate(BaseModel):
     postsort_config: dict[str, Any] | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None
+    randomize_statements: bool | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
 
