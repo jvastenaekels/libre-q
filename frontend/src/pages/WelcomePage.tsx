@@ -204,14 +204,14 @@ const WelcomePage: React.FC = () => {
 
                     {/* Visual Column */}
                     <div className="md:col-span-5 p-8 md:px-10 md:pt-6 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
-                        <div className="relative z-10 uppercase tracking-wider text-xs font-bold text-slate-600 mb-4 bg-slate-200 w-fit px-3 py-1.5 rounded-md border border-slate-300">
+                        <div className="absolute top-4 left-6 z-20 uppercase tracking-wider text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
 
                         <div
                             ref={containerRef}
                             data-testid="animation-container"
-                            className="w-full flex-1 flex items-center justify-center relative"
+                            className="w-full flex-1 flex flex-col items-center justify-center relative min-h-[300px]"
                         >
                             {/* Anchor Shape */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
