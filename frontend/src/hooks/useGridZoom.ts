@@ -66,7 +66,7 @@ export const useGridZoom = ({
             y = wrapperH - contentH * scale - 10;
         } else {
             // Desktop: Fit both, with generous padding to encompass Spectrum Bar
-            const padding = 160; // Increased to 160px to guarantee bottom visibility
+            const padding = 100; // Reduced to 100px to allow slightly more zoom
             const availableW = wrapperW - padding;
             const availableH = wrapperH - padding;
             const scaleX = availableW / contentW;
