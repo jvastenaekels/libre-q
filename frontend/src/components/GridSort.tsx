@@ -107,6 +107,17 @@ const GridSort: React.FC<GridSortProps> = React.memo(
     }) => {
         const { t } = useTranslation();
 
+        const [isMobile, setIsMobile] = useState(
+            typeof window !== 'undefined' ? window.innerWidth < 1024 : false
+        );
+
+        useEffect(() => {
+            const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            return () => window.removeEventListener('resize', checkMobile);
+        }, []);
+
         // Deck Management Hook
         const {
             activePile,
@@ -119,6 +130,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             agreeCards,
             disagreeCards,
             neutralCards,
+            isMobile,
         });
 
         const [autoFitEnabled, setAutoFitEnabled] = useState(true);
@@ -129,17 +141,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             selectedCardId,
             onDimensionsChange,
         });
-
-        const [isMobile, setIsMobile] = useState(
-            typeof window !== 'undefined' ? window.innerWidth < 1024 : false
-        );
-
-        useEffect(() => {
-            const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-            checkMobile();
-            window.addEventListener('resize', checkMobile);
-            return () => window.removeEventListener('resize', checkMobile);
-        }, []);
 
         // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
         const contentRef = useRef<HTMLDivElement>(null);
@@ -273,11 +274,17 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         }, [autoFitEnabled, performAutoFit]);
 
         const renderDeckCards = useCallback(() => {
+            const gridRatio =
+                cardDimensions && cardDimensions.height > 0
+                    ? cardDimensions.width / cardDimensions.height
+                    : 1.5;
+
             return activeCards.length > 0 ? (
                 activeCards.map((card) => (
                     <div
                         key={card.id}
-                        className="flex-none h-full w-[130px] sm:w-[140px] lg:w-full lg:flex-none lg:h-auto"
+                        className={`flex-none h-full lg:w-full lg:flex-none lg:h-auto ${!isMobile ? 'w-[130px] sm:w-[140px]' : ''}`}
+                        style={isMobile ? { aspectRatio: gridRatio } : undefined}
                     >
                         <SortableCard
                             id={card.id}
@@ -286,7 +293,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             variant="compact"
                             isSelected={selectedCardId === card.id}
                             onClick={() => onCardClick?.(card.id)}
-                            aspectRatio="auto"
+                            aspectRatio={isMobile ? gridRatio : 'auto'}
                             disableHoverZoom={disableHoverZoom || isMobile}
                         />
                     </div>
@@ -303,7 +310,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </div>
                 </div>
             );
-        }, [activeCards, selectedCardId, onCardClick, isMobile, disableHoverZoom, t, showCodes]);
+        }, [activeCards, selectedCardId, onCardClick, isMobile, disableHoverZoom, t, showCodes, cardDimensions]);
 
         return (
             <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">

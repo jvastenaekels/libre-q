@@ -12,12 +12,14 @@ interface UseDeckManagementProps<T extends { id: number; text: string }> {
     agreeCards: T[];
     disagreeCards: T[];
     neutralCards: T[];
+    isMobile?: boolean;
 }
 
 export const useDeckManagement = <T extends { id: number; text: string }>({
     agreeCards,
     disagreeCards,
     neutralCards,
+    isMobile = false,
 }: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
     const [isPending, startTransition] = useTransition();
@@ -44,6 +46,11 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
 
     // Calculate optimal deck height based on longest statement
     const deckHeight = useMemo(() => {
+        if (isMobile) {
+            // Mobile: Fixed compact height (Piles ~50px + Cards ~110px + Footer Buffer ~96px = ~256px)
+            return 260;
+        }
+
         const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
         if (allCards.length === 0) return 320;
 
@@ -52,7 +59,7 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
         const estimatedLines = Math.ceil(maxLength / 50);
         const calculatedHeight = 320 + estimatedLines * 25;
         return Math.min(Math.max(calculatedHeight, 320), 600);
-    }, [agreeCards, disagreeCards, neutralCards]);
+    }, [agreeCards, disagreeCards, neutralCards, isMobile]);
 
     return {
         activePile,
