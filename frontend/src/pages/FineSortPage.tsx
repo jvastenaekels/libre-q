@@ -73,7 +73,6 @@ const FineSortPage: React.FC = () => {
     );
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
-    const [panVersion, setPanVersion] = useState(0);
 
     const setSelectedCard = useUIStore((state) => state.setSelectedCard);
 
@@ -166,8 +165,6 @@ const FineSortPage: React.FC = () => {
         [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard]
     );
 
-    const handlePan = useCallback(() => setPanVersion((v) => v + 1), []);
-
     // DnD Hooks
     const {
         activeId,
@@ -182,7 +179,6 @@ const FineSortPage: React.FC = () => {
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,
-        onPan: handlePan,
         statements: config?.statements || [],
         actions,
     });
@@ -330,7 +326,10 @@ const FineSortPage: React.FC = () => {
         []
     );
 
-    const handleTransformChange = useCallback(() => setPanVersion((v) => v + 1), []);
+    const handleTransformChange = useCallback(() => {
+        // panVersion was removed as it's no longer used for measurement frequency
+    }, []);
+
     const handleReset = useCallback(() => {
         if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort();
     }, [resetFineSort, t]);
