@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Post-deployment orchestration script."""
 
 import os
@@ -9,14 +10,15 @@ def run_task(script_path, description, args=None):
     """Execute a task script."""
     print(f"\n[PostDeploy] Starting: {description} ({script_path})")
     if not os.path.exists(script_path):
-        print(f"[PostDeploy] Error: Script not found at {script_path}")
+        print(f"[PostDeploy] Error: Script not found at {os.getcwd()}/{script_path}")
         sys.exit(1)
 
     try:
         # Pass current environment variables + point to internal API
-        # this allows scripts to run correctly during Scalingo release phase
         env = os.environ.copy()
         env["API_BASE_URL"] = "http://internal"
+        # Ensure imports works by adding CWD to PYTHONPATH
+        env["PYTHONPATH"] = os.getcwd()
 
         cmd = [sys.executable, script_path]
         if args:
@@ -37,13 +39,17 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/scripts
     backend_dir = os.path.dirname(script_dir)  # .../backend
 
+    print(f"[PostDeploy] Script Dir: {script_dir}")
+    print(f"[PostDeploy] Backend Dir: {backend_dir}")
+
     # Change to backend directory so scripts find their modules
     os.chdir(backend_dir)
+    print(f"[PostDeploy] CWD set to: {os.getcwd()}")
 
-    # 1. Initialize Database (Idempotent: Creates tables and initial admin if missing)
+    # 1. Initialize Database
     run_task("init_db.py", "Infrastructure Initialization")
 
-    # 2. Sync Study Configuration (Idempotent: Create or Update)
+    # 2. Sync Study Configuration
     if os.path.exists("data/example-study.json"):
         run_task(
             "seed.py",
