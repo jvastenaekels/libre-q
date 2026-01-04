@@ -62,25 +62,41 @@ class StudyService:
         hashed_ip = hash_ip(ip_address or "unknown")
 
         # 2. Check if participant exists
-        stmt = select(Participant).where(Participant.session_token == session_token)
+        stmt = (
+            select(Participant)
+            .where(Participant.session_token == session_token)
+            .with_for_update()
+        )
         result = await db.execute(stmt)
         participant = result.scalar_one_or_none()
 
         if not participant:
-            # Create new participant record immediately upon consent
-            participant = Participant(
-                study_id=study.id,
-                session_token=session_token,
-                language_used=language_code,
-                consented_at=datetime.now(timezone.utc),
-                consent_hash=consent_hash,
-                ip_address=hashed_ip,
-                user_agent=user_agent,
-                status=ParticipantStatus.started,
-            )
-            db.add(participant)
-        else:
-            # Update existing (if somehow re-consenting or resuming)
+            try:
+                # Create new participant record immediately upon consent
+                participant = Participant(
+                    study_id=study.id,
+                    session_token=session_token,
+                    language_used=language_code,
+                    consented_at=datetime.now(timezone.utc),
+                    consent_hash=consent_hash,
+                    ip_address=hashed_ip,
+                    user_agent=user_agent,
+                    status=ParticipantStatus.started,
+                )
+                db.add(participant)
+                await db.flush()
+            except IntegrityError:
+                # Race condition: Participant created concurrently
+                await db.rollback()
+                result = await db.execute(stmt)
+                participant = result.scalar_one_or_none()
+                if not participant:
+                    raise HTTPException(
+                        status_code=500, detail="Concurrency error during consent."
+                    )
+
+        # If we fell through (update existing)
+        if participant and participant not in db.new:
             participant.consented_at = datetime.now(timezone.utc)
             participant.consent_hash = consent_hash
             participant.language_used = language_code
