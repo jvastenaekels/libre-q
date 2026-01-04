@@ -12,14 +12,12 @@ interface UseDeckManagementProps<T extends { id: number; text: string }> {
     agreeCards: T[];
     disagreeCards: T[];
     neutralCards: T[];
-    isMobile?: boolean;
 }
 
 export const useDeckManagement = <T extends { id: number; text: string }>({
     agreeCards,
     disagreeCards,
     neutralCards,
-    isMobile = false,
 }: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
     const [isPending, startTransition] = useTransition();
@@ -54,7 +52,7 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
         const estimatedLines = Math.ceil(maxLength / 50);
         const calculatedHeight = 320 + estimatedLines * 25;
         return Math.min(Math.max(calculatedHeight, 320), 600);
-    }, [agreeCards, disagreeCards, neutralCards, isMobile]);
+    }, [agreeCards, disagreeCards, neutralCards]);
 
     return {
         activePile,

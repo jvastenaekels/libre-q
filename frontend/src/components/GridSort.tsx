@@ -123,14 +123,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             activePile,
             setActivePile,
             activeCards,
-            deckHeight,
             hasPerformedZonalFocus,
             setHasPerformedZonalFocus,
         } = useDeckManagement({
             agreeCards,
             disagreeCards,
             neutralCards,
-            isMobile,
         });
 
         const [autoFitEnabled, setAutoFitEnabled] = useState(true);
