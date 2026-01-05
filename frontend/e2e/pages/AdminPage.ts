@@ -68,7 +68,11 @@ export class AdminPage extends BasePage {
         expect(download.suggestedFilename()).toContain('.csv');
     }
 
-    async closeStudy() {
+    async closeStudy(studyName?: string) {
+        if (studyName) {
+            await this.page.getByRole('link', { name: /dashboard/i }).click();
+            await this.page.getByText(studyName).click();
+        }
         await this.page.getByRole('button', { name: /closed/i }).first().click();
         await this.page.getByRole('button', { name: /close study/i }).click();
         await expect(this.page.getByRole('status')).toHaveText(/closed/i);
