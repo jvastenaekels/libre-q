@@ -611,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
+                            ${isMobile ? 'h-[110px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
                         `}
                     >
                         <div
@@ -628,7 +628,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[80px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
+                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[100px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
                         {isAllPlaced ? (
                             <button
                                 type="button"
