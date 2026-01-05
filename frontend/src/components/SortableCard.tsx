@@ -62,6 +62,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         variant = 'grid',
         isSelected,
         onClick,
+        onAction,
         dimensions,
         aspectRatio,
         disableHoverZoom = false,
