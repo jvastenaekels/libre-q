@@ -1,6 +1,7 @@
 """API router for study submissions."""
 
 import random
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
@@ -104,6 +105,10 @@ async def get_study(
         local_random = random.Random(random_seed_str)
         local_random.shuffle(statements_data)
 
+    # Helper for safe attribute access
+    def get_t_attr(attr: str, default: Any = None) -> Any:
+        return getattr(translation, attr, default) if translation else default
+
     return {
         "slug": study.slug,
         "title": title,
@@ -116,16 +121,16 @@ async def get_study(
         "grid_config": study.grid_config,
         "statements": statements_data,
         "consent": {
-            "title": getattr(translation, "consent_title", None),
-            "description": getattr(translation, "consent_description", None),
-            "accept": getattr(translation, "consent_accept", None),
-            "decline": getattr(translation, "consent_decline", None),
+            "title": get_t_attr("consent_title"),
+            "description": get_t_attr("consent_description"),
+            "accept": get_t_attr("consent_accept"),
+            "decline": get_t_attr("consent_decline"),
         },
         "available_languages": [t.language_code for t in study.translations],
         "language": resolved_lang,
         "default_language": study.default_language,
         "show_statement_codes": study.show_statement_codes,
         "randomize_statements": study.randomize_statements,
-        "ui_labels": getattr(translation, "ui_labels", {}),
+        "ui_labels": get_t_attr("ui_labels", {}) or {},
         "state": study.state.value,
     }

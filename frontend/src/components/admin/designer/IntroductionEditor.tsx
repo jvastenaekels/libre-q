@@ -1,4 +1,5 @@
 import type { StudyTranslationRead as StudyTranslation } from '@/api/model/studyTranslationRead';
+import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +10,7 @@ import { Info } from 'lucide-react';
 import type React from 'react';
 
 const IntroductionEditor = () => {
+    const { t } = useTranslation();
     const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
     if (!draft) return null;
@@ -26,19 +28,18 @@ const IntroductionEditor = () => {
 
     const toggleConsent = (checked: boolean) => {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
-        updateTranslation(activeLocale, (t: any) => {
+        updateTranslation(activeLocale, (t_trans: any) => {
             if (checked) {
-                t.consent_title = t.consent_title || 'Consent to participate';
-                t.consent_description =
-                    t.consent_description ||
-                    'By continuing, you agree to participate in this study. Your data will be anonymized.';
-                t.consent_accept = t.consent_accept || 'I agree';
-                t.consent_decline = t.consent_decline || 'I decline';
+                t_trans.consent_title = t_trans.consent_title || t('consent.title');
+                t_trans.consent_description =
+                    t_trans.consent_description || t('consent.default_text');
+                t_trans.consent_accept = t_trans.consent_accept || t('welcome.consent.label'); // Closest match or custom
+                t_trans.consent_decline = t_trans.consent_decline || t('common.close'); // Fallback
             } else {
-                t.consent_title = null;
-                t.consent_description = null;
-                t.consent_accept = null;
-                t.consent_decline = null;
+                t_trans.consent_title = null;
+                t_trans.consent_description = null;
+                t_trans.consent_accept = null;
+                t_trans.consent_decline = null;
             }
         });
     };
@@ -236,6 +237,30 @@ const IntroductionEditor = () => {
                                         handleChange('consent_description', e.target.value)
                                     }
                                 />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 pt-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="consent-accept">Accept Button</Label>
+                                    <Input
+                                        id="consent-accept"
+                                        placeholder={`Default: ${t('welcome.consent.label')}`}
+                                        value={translation?.consent_accept || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                            handleChange('consent_accept', e.target.value)
+                                        }
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="consent-decline">Decline Button</Label>
+                                    <Input
+                                        id="consent-decline"
+                                        placeholder={`Default: ${t('common.close')}`}
+                                        value={translation?.consent_decline || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                            handleChange('consent_decline', e.target.value)
+                                        }
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
