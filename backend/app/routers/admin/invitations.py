@@ -27,7 +27,7 @@ async def invite_collaborator(
     return InvitationLink(invite_url=invite_url, token=token)
 
 
-@router.get("/verify/{token}")
+@router.get("/verify")
 async def verify_invitation(token: str):
     """Verify an invitation token and return details."""
     try:
