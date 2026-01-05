@@ -48,14 +48,14 @@ const IntroductionEditor = () => {
                     <span className="bg-primary/10 p-1 rounded">
                         <Info className="h-5 w-5" />
                     </span>
-                    Welcome Message
+                    Welcome message
                 </div>
 
                 <Card className="shadow-sm">
                     <CardContent className="pt-6 space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="title" className="text-sm font-semibold">
-                                Study Title
+                                Study title
                             </Label>
                             <Input
                                 id="title"
@@ -72,7 +72,7 @@ const IntroductionEditor = () => {
                                 htmlFor="subtitle"
                                 className="text-sm font-semibold text-slate-500"
                             >
-                                Subtitle (Optional)
+                                Subtitle (optional)
                             </Label>
                             <Input
                                 id="subtitle"
@@ -86,7 +86,7 @@ const IntroductionEditor = () => {
                         <div className="grid gap-2">
                             <MarkdownEditor
                                 id="objective"
-                                label="Study Objective"
+                                label="Study objective"
                                 value={translation?.objective || ''}
                                 onChange={(val: string) => handleChange('objective', val)}
                                 placeholder="What is the research question or purpose of this study?"
@@ -102,10 +102,7 @@ const IntroductionEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5" />
                         </span>
-                        Process Explanation
-                        <span className="text-xs text-muted-foreground font-normal ml-2">
-                            (Optional)
-                        </span>
+                        Custom process explanation
                     </div>
                     <Switch
                         id="enable-instructions"
@@ -126,7 +123,7 @@ const IntroductionEditor = () => {
                             <div className="grid gap-2">
                                 <MarkdownEditor
                                     id="instructions"
-                                    label="Task Overview"
+                                    label="Task overview"
                                     value={translation?.instructions || ''}
                                     onChange={(val: string) => handleChange('instructions', val)}
                                     placeholder="Briefly explain the study process to participants (optional)..."
@@ -144,10 +141,7 @@ const IntroductionEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5" />
                         </span>
-                        Consent Form
-                        <span className="text-xs text-muted-foreground font-normal ml-2">
-                            (Enabled by default)
-                        </span>
+                        Custom consent form
                     </div>
                     <Switch
                         id="enable-consent"
@@ -173,14 +167,14 @@ const IntroductionEditor = () => {
                 {hasConsent && (
                     <Card className="shadow-sm border-primary/20 bg-primary/5">
                         <CardHeader>
-                            <CardTitle className="text-sm">Consent Form Details</CardTitle>
+                            <CardTitle className="text-sm">Consent form details</CardTitle>
                             <CardDescription>
                                 Participants must agree to these terms before starting.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="consent-title">Consent Title</Label>
+                                <Label htmlFor="consent-title">Consent title</Label>
                                 <Input
                                     id="consent-title"
                                     value={translation?.consent_title || ''}
@@ -192,7 +186,7 @@ const IntroductionEditor = () => {
                             <div className="grid gap-2">
                                 <MarkdownEditor
                                     id="consent-description"
-                                    label="Legal Text / Agreement"
+                                    label="Legal text / agreement"
                                     value={translation?.consent_description || ''}
                                     onChange={(val: string) =>
                                         handleChange('consent_description', val)

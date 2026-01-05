@@ -2,25 +2,28 @@ import { useParams } from 'react-router-dom';
 import {
     useGetStudyStatsApiAdminStudiesSlugStatsGet,
     useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
-    useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
     useGetStudyApiAdminStudiesSlugGet,
 } from '@/api/generated';
-import ParticipantTable from '@/components/admin/dashboard/ParticipantTable';
-import ParticipantDetailSheet from '@/components/admin/dashboard/ParticipantDetailSheet';
-import ExportCenter from '@/components/admin/dashboard/ExportCenter';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
 import { DashboardSkeleton } from '@/components/admin/DashboardSkeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Activity, Users, PencilRuler, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
-import { useState } from 'react';
+import {
+    Activity,
+    Users,
+    PencilRuler,
+    CheckCircle2,
+    Clock,
+    AlertTriangle,
+    ArrowRight,
+    Table as TableIcon,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { ParticipantRead as Participant } from '@/api/model';
-import { toast } from 'sonner';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 const StudyOverviewPage = () => {
     const { slug } = useParams();
@@ -34,36 +37,12 @@ const StudyOverviewPage = () => {
         refetch: refetchParticipants,
     } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug || '');
     const { refetch: refetchStats } = useGetStudyStatsApiAdminStudiesSlugStatsGet(slug || '');
-    const discardMutation =
-        useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
-
-    const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
-    const [detailOpen, setDetailOpen] = useState(false);
-
-    const handleViewDetail = (p: Participant) => {
-        setSelectedParticipantId(p.id);
-        setDetailOpen(true);
-    };
-
-    const handleToggleDiscard = async (id: number, isDiscarded: boolean) => {
-        try {
-            await discardMutation.mutateAsync({
-                participantId: id,
-                data: {
-                    is_discarded: isDiscarded,
-                    discard_reason: isDiscarded ? 'Manual review' : null,
-                },
-            });
-            toast.success(isDiscarded ? 'Participant flagged' : 'Participant restored');
-            refetchParticipants();
-        } catch (_err) {
-            toast.error('Failed to update participant status');
-        }
-    };
 
     if (statsLoading || participantsLoading) {
         return <DashboardSkeleton />;
     }
+
+    const recentParticipants = (participants || []).slice(0, 5);
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
@@ -79,16 +58,20 @@ const StudyOverviewPage = () => {
                                     'ml-2 font-bold uppercase tracking-widest text-[10px]',
                                     study?.state === 'active'
                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                        : study?.state === 'closed'
-                                          ? 'bg-slate-50 text-slate-700 border-slate-100'
-                                          : 'bg-amber-50 text-amber-700 border-amber-100'
+                                        : study?.state === 'paused'
+                                          ? 'bg-orange-50 text-orange-700 border-orange-100'
+                                          : study?.state === 'closed'
+                                            ? 'bg-slate-50 text-slate-700 border-slate-100'
+                                            : 'bg-amber-50 text-amber-700 border-amber-100'
                                 )}
                             >
                                 {study?.state === 'active'
                                     ? 'Active'
-                                    : study?.state === 'closed'
-                                      ? 'Closed'
-                                      : 'Draft'}
+                                    : study?.state === 'paused'
+                                      ? 'Paused'
+                                      : study?.state === 'closed'
+                                        ? 'Closed'
+                                        : 'Draft'}
                             </Badge>
                         )}
                         {study?.state === 'draft' && (
@@ -100,7 +83,7 @@ const StudyOverviewPage = () => {
                             >
                                 <Link to={`/admin/studies/${slug}/design`}>
                                     <PencilRuler className="h-4 w-4" />
-                                    Edit Study Design
+                                    Edit study design
                                 </Link>
                             </Button>
                         )}
@@ -125,7 +108,7 @@ const StudyOverviewPage = () => {
                                 </span>
                             </div>
                             <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                                Receiving Data
+                                Receiving data
                             </span>
                         </div>
                     )}
@@ -134,36 +117,33 @@ const StudyOverviewPage = () => {
 
             {/* Key Metrics Dashboard + Study Status */}
             {stats && (
-                <div className="-mx-4 md:-mx-6 lg:-mx-0 bg-gradient-to-br from-slate-50 to-white px-4 md:px-6 lg:px-6 py-4 rounded-xl border border-slate-100 shadow-sm">
-                    <div className="grid gap-3 md:grid-cols-4">
-                        {/* Study Status - Most Important (2 columns) */}
-                        <div className="md:col-span-1">
-                            <StudyStatusControl
-                                slug={slug || ''}
-                                currentState={study?.state || 'draft'}
-                                onStateChange={() => {
-                                    refetchStudy();
-                                    refetchParticipants();
-                                    refetchStats();
-                                }}
-                            />
-                        </div>
+                <>
+                    {/* Status Control - Full Width at Top */}
+                    <StudyStatusControl
+                        slug={slug || ''}
+                        currentState={study?.state || 'draft'}
+                        onStateChange={() => {
+                            refetchStudy();
+                            refetchParticipants();
+                            refetchStats();
+                        }}
+                    />
 
-                        {/* Key Metrics (3 columns) */}
-                        <div className="md:col-span-3 grid gap-3 md:grid-cols-3">
+                    <div className="bg-gradient-to-br from-slate-50 to-white px-4 py-4 rounded-xl border border-slate-100 shadow-sm mb-6">
+                        <div className="grid gap-3 md:grid-cols-3">
                             {/* Sample Size */}
-                            <Card className="overflow-hidden border-2 border-indigo-100 shadow-md bg-gradient-to-br from-indigo-50/50 to-white">
+                            <Card className="overflow-hidden border border-slate-200 shadow-sm bg-white">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Users className="h-4 w-4 text-indigo-600" />
-                                        <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
-                                            Sample Size (N)
+                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                            Sample size (N)
                                         </div>
                                     </div>
-                                    <div className="text-5xl font-black text-indigo-900 mb-1">
+                                    <div className="text-4xl font-bold text-slate-900 mb-1">
                                         {stats.started_count}
                                     </div>
-                                    <p className="text-xs text-indigo-600/70 font-medium">
+                                    <p className="text-xs text-slate-400 font-medium">
                                         {stats.completed_count} completed
                                     </p>
                                 </CardContent>
@@ -175,7 +155,7 @@ const StudyOverviewPage = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Completion Rate
+                                            Completion rate
                                         </div>
                                     </div>
                                     <div className="text-4xl font-bold text-emerald-600 mb-2">
@@ -215,7 +195,7 @@ const StudyOverviewPage = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                         <Clock className="h-4 w-4 text-amber-500" />
                                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Median Duration
+                                            Median duration
                                         </div>
                                     </div>
                                     <div className="flex items-baseline gap-2 mb-1">
@@ -236,43 +216,107 @@ const StudyOverviewPage = () => {
                             </Card>
                         </div>
                     </div>
-                </div>
+                </>
             )}
 
             <div className="grid gap-6 md:grid-cols-12 pb-12">
-                <Card className="col-span-12 md:col-span-8 shadow-md border-none bg-slate-50/30">
-                    <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 bg-white/50">
+                {/* Recent Activity / Analytics Promo */}
+                <Card className="col-span-12 md:col-span-8 shadow-sm border-slate-200 bg-white">
+                    <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
                         <div className="space-y-1">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Users className="h-5 w-5 text-indigo-500" />
-                                Collected Data Overview
+                                <Activity className="h-5 w-5 text-indigo-500" />
+                                Recent activity
                             </CardTitle>
                             <CardDescription>
-                                Showing {Math.min((participants || []).length, 10)} most recent
-                                responses
+                                Latest submissions (last 5 of {(participants || []).length})
                             </CardDescription>
                         </div>
+                        <Button
+                            asChild
+                            variant="default"
+                            size="sm"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                        >
+                            <Link to={`/admin/studies/${slug}/exports`}>
+                                Explore analytics
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
                     </CardHeader>
-                    <CardContent className="p-6">
-                        <ParticipantTable
-                            data={(participants || []).slice(0, 10)}
-                            onViewDetail={handleViewDetail}
-                            onToggleDiscard={handleToggleDiscard}
-                        />
+                    <CardContent className="p-0">
+                        {/* Simple List */}
+                        <div className="divide-y divide-slate-50">
+                            {recentParticipants.length === 0 ? (
+                                <div className="p-8 text-center text-slate-400 text-sm">
+                                    No participants yet.
+                                </div>
+                            ) : (
+                                recentParticipants.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold text-slate-500">
+                                                {p.language_used.substring(0, 2).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-medium text-slate-900 font-mono">
+                                                    {p.session_token.substring(0, 8)}...
+                                                </div>
+                                                <div className="text-xs text-slate-500 flex items-center gap-1">
+                                                    {p.submitted_at ? (
+                                                        <>
+                                                            Submitted{' '}
+                                                            {formatDistanceToNow(
+                                                                new Date(
+                                                                    p.submitted_at as unknown as string
+                                                                ),
+                                                                { addSuffix: true }
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        'In Progress'
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Badge
+                                                variant="outline"
+                                                className={cn(
+                                                    'capitalize',
+                                                    p.status === 'completed'
+                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                                        : p.status === 'discarded'
+                                                          ? 'bg-red-50 text-red-700 border-red-100'
+                                                          : 'bg-slate-50 text-slate-600 border-slate-100'
+                                                )}
+                                            >
+                                                {p.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
+                            <Link
+                                to={`/admin/studies/${slug}/exports`}
+                                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
+                            >
+                                <TableIcon className="w-3 h-3" />
+                                View all participants and data details
+                            </Link>
+                        </div>
                     </CardContent>
                 </Card>
 
                 <div className="col-span-12 md:col-span-4 space-y-6">
                     <RecruitmentModule slug={slug || ''} />
-                    <ExportCenter slug={slug || ''} />
                 </div>
             </div>
-
-            <ParticipantDetailSheet
-                participantId={selectedParticipantId}
-                open={detailOpen}
-                onOpenChange={setDetailOpen}
-            />
         </div>
     );
 };

@@ -34,7 +34,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
             <CardHeader className="border-b border-slate-50 bg-slate-50/30">
                 <div className="flex items-center gap-2 mb-1">
                     <Megaphone className="h-5 w-5 text-indigo-500" />
-                    <CardTitle className="text-lg">Participant Outreach</CardTitle>
+                    <CardTitle className="text-lg">Share study</CardTitle>
                 </div>
                 <CardDescription>Distribute your study URL to invite participants.</CardDescription>
             </CardHeader>

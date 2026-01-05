@@ -144,7 +144,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     <span className="text-sm font-medium truncate">
                                         {label || (
                                             <span className="text-muted-foreground italic">
-                                                Untitled Question
+                                                Untitled question
                                             </span>
                                         )}
                                     </span>
@@ -169,7 +169,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
 
                             <AccordionContent className="pt-2 pb-4 px-1 space-y-4">
                                 <div className="grid gap-2">
-                                    <Label className="text-xs">Question Label</Label>
+                                    <Label className="text-xs">Question label</Label>
                                     <Input
                                         value={label}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -283,7 +283,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                     onUpdate({ ...question, options: newOpts });
                                                 }}
                                             >
-                                                <PlusCircle className="h-3 w-3 mr-2" /> Add Option
+                                                <PlusCircle className="h-3 w-3 mr-2" /> Add option
                                             </Button>
                                         </div>
                                     </div>
@@ -313,13 +313,14 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
     if (!draft) return null;
 
-    const configKey = type === 'pre' ? 'presort_config' : 'postsort_config';
+    // For pre-sort, the config IS the question map. For post-sort, it's under .questions
+    const getQuestionsMap = () => {
+        if (type === 'pre') return (draft.presort_config as Record<string, QuestionConfig>) || {};
+        // biome-ignore lint/suspicious/noExplicitAny: postsort structure
+        return ((draft.postsort_config as any)?.questions as Record<string, QuestionConfig>) || {};
+    };
 
-    // We assume the keys in the config represent the order, or we can use a helper array
-    // Let's create an ordered array for the UI
-    const questions = Object.entries(
-        (draft[configKey] as Record<string, QuestionConfig>) || {}
-    ).map(([key, value]) => ({
+    const questions = Object.entries(getQuestionsMap()).map(([key, value]) => ({
         id: key,
         ...value,
     }));
@@ -333,15 +334,21 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
             // Reconstruct the dictionary based on the new array order
             // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-            const newConfig: Record<string, any> = {};
+            const newQuestionsMap: Record<string, any> = {};
             newArray.forEach((q) => {
                 const { id, ...rest } = q;
-                newConfig[id] = rest;
+                newQuestionsMap[id] = rest;
             });
 
             updateDraft((d) => {
-                const draftWithConfig = d as Record<string, unknown>;
-                draftWithConfig[configKey] = newConfig;
+                if (type === 'pre') {
+                    d.presort_config = newQuestionsMap;
+                } else {
+                    // biome-ignore lint/suspicious/noExplicitAny: postsort structure
+                    const ps = d.postsort_config as any;
+                    if (!ps) d.postsort_config = {};
+                    (d.postsort_config as any).questions = newQuestionsMap;
+                }
             });
         }
     };
@@ -350,7 +357,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
         const id = `q_${Date.now()}`;
         const newQuestion: QuestionConfig = {
             type: qType,
-            label: { [activeLocale]: 'New Question' },
+            label: { [activeLocale]: 'New question' },
             required: false,
             options:
                 qType === 'select' || qType === 'checkbox' || qType === 'radio'
@@ -365,10 +372,14 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
         updateDraft((d: any) => {
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic field check
-            if (!(d as any)[configKey]) (d as any)[configKey] = {};
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic field access
-            (d as any)[configKey][id] = newQuestion;
+            if (type === 'pre') {
+                if (!d.presort_config) d.presort_config = {};
+                d.presort_config[id] = newQuestion;
+            } else {
+                if (!d.postsort_config) d.postsort_config = {};
+                if (!d.postsort_config.questions) d.postsort_config.questions = {};
+                d.postsort_config.questions[id] = newQuestion;
+            }
         });
     };
 
@@ -379,7 +390,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
                 <div className="space-y-2">
                     <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Basic Fields
+                        Basic fields
                     </div>
                     <div className="flex flex-wrap gap-2">
                         <Button
@@ -396,7 +407,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                             onClick={() => addQuestion('textarea')}
                             className="bg-background"
                         >
-                            <AlignLeft className="h-3.5 w-3.5 mr-1.5" /> Long Text
+                            <AlignLeft className="h-3.5 w-3.5 mr-1.5" /> Long text
                         </Button>
                         <Button
                             variant="outline"
@@ -427,7 +438,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
                 <div className="space-y-2">
                     <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Choice Fields
+                        Choice fields
                     </div>
                     <div className="flex flex-wrap gap-2">
                         <Button
@@ -487,15 +498,21 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                     onUpdate={(data: any) => {
                                         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
                                         updateDraft((d: any) => {
-                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic field access
-                                            (d as any)[configKey][q.id] = data;
+                                            if (type === 'pre') {
+                                                d.presort_config[q.id] = data;
+                                            } else {
+                                                d.postsort_config.questions[q.id] = data;
+                                            }
                                         });
                                     }}
                                     onDelete={() => {
                                         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
                                         updateDraft((d: any) => {
-                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic field deletion
-                                            delete (d as any)[configKey][q.id];
+                                            if (type === 'pre') {
+                                                delete d.presort_config[q.id];
+                                            } else {
+                                                delete d.postsort_config.questions[q.id];
+                                            }
                                         });
                                     }}
                                 />

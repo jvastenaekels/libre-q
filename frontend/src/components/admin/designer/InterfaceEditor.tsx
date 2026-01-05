@@ -30,7 +30,7 @@ const InterfaceEditor = () => {
         <div className="space-y-6">
             <div className="flex items-center gap-2 text-primary font-semibold text-lg">
                 <MousePointerClick className="h-5 w-5" />
-                Interface Customization
+                Interface customization
             </div>
 
             <p className="text-sm text-muted-foreground">
@@ -42,21 +42,21 @@ const InterfaceEditor = () => {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                        <ArrowRight className="h-4 w-4" /> Navigation Buttons
+                        <ArrowRight className="h-4 w-4" /> Navigation buttons
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Start Button</Label>
+                            <Label>Start button</Label>
                             <Input
-                                placeholder="Default: Get Started"
+                                placeholder="Default: Get started"
                                 value={getLabel('welcome.start')}
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Next Step Button</Label>
+                            <Label>Next step button</Label>
                             <Input
                                 placeholder="Default: Next step"
                                 value={getLabel('common.next')}
@@ -64,7 +64,7 @@ const InterfaceEditor = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Submit Button</Label>
+                            <Label>Submit button</Label>
                             <Input
                                 placeholder="Default: Share my perspective"
                                 value={getLabel('common.submit')}
@@ -72,7 +72,7 @@ const InterfaceEditor = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Continue Button</Label>
+                            <Label>Continue button</Label>
                             <Input
                                 placeholder="Default: Continue"
                                 value={getLabel('common.continue')}
@@ -87,22 +87,22 @@ const InterfaceEditor = () => {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                        <RefreshCcw className="h-4 w-4" /> Sorting Terminology
+                        <RefreshCcw className="h-4 w-4" /> Sorting terminology
                     </CardTitle>
                     <CardDescription>
-                        Define the poles of your sorting scale (Reference for Rough Sort & Grid).
+                        Define the poles of your sorting scale (Reference for Rough sort & grid).
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* Positive Pole */}
+                    {/* Positive pole */}
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-emerald-600 flex items-center gap-2">
-                            <Check className="h-4 w-4" /> Positive Pole (Right)
+                            <Check className="h-4 w-4" /> Positive pole (right)
                         </h4>
                         <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-emerald-100">
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Rough Sort Label
+                                    Rough sort label
                                 </Label>
                                 <Input
                                     placeholder="Default: Somewhat agree"
@@ -112,10 +112,10 @@ const InterfaceEditor = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Fine Sort Legend
+                                    Fine sort legend
                                 </Label>
                                 <Input
-                                    placeholder="Default: Most Agree"
+                                    placeholder="Default: Most agree"
                                     value={getLabel('fine.legend.agree')}
                                     onChange={(e) =>
                                         updateLabel('fine.legend.agree', e.target.value)
@@ -127,15 +127,15 @@ const InterfaceEditor = () => {
 
                     <Separator />
 
-                    {/* Negative Pole */}
+                    {/* Negative pole */}
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-red-600 flex items-center gap-2">
-                            <Check className="h-4 w-4" /> Negative Pole (Left)
+                            <Check className="h-4 w-4" /> Negative pole (left)
                         </h4>
                         <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-red-100">
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Rough Sort Label
+                                    Rough sort label
                                 </Label>
                                 <Input
                                     placeholder="Default: Somewhat disagree"
@@ -145,10 +145,10 @@ const InterfaceEditor = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Fine Sort Legend
+                                    Fine sort legend
                                 </Label>
                                 <Input
-                                    placeholder="Default: Most Disagree"
+                                    placeholder="Default: Most disagree"
                                     value={getLabel('fine.legend.disagree')}
                                     onChange={(e) =>
                                         updateLabel('fine.legend.disagree', e.target.value)
@@ -162,11 +162,11 @@ const InterfaceEditor = () => {
 
                     {/* Neutral */}
                     <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-slate-600">Neutral / Middle</h4>
+                        <h4 className="text-sm font-medium text-slate-600">Neutral / middle</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Rough Sort Label
+                                    Rough sort label
                                 </Label>
                                 <Input
                                     placeholder="Default: Neutral"
@@ -176,7 +176,7 @@ const InterfaceEditor = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-xs text-muted-foreground">
-                                    Fine Sort Legend
+                                    Fine sort legend
                                 </Label>
                                 <Input
                                     placeholder="Default: Neutral"

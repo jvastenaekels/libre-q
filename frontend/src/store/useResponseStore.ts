@@ -16,6 +16,7 @@ interface Responses {
         card_comments: Record<number, string>;
         missing_statement: string;
         general_comment: string;
+        questions_answers: Record<string, string | number | boolean>;
     };
 }
 
@@ -46,7 +47,12 @@ const initialResponses: Responses = {
     presort: {},
     rough: { agree: [], disagree: [], neutral: [], history: [] },
     qsort: [],
-    postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
+    postsort: {
+        card_comments: {},
+        missing_statement: '',
+        general_comment: '',
+        questions_answers: {},
+    },
 };
 
 // Helper: Trigger Saving Indicator

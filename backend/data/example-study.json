@@ -126,7 +126,19 @@
             4
         ],
         "ask_missing": true,
-        "ask_general_comment": true
+        "ask_general_comment": true,
+        "allow_random_comments": true,
+        "questions": {
+            "pilot_feeback": {
+                "type": "textarea",
+                "label": {
+                    "en": "How clear were the instructions?",
+                    "fr": "Les instructions étaient-elles claires ?",
+                    "fi": "Olivatko ohjeet selkeät?"
+                },
+                "required": false
+            }
+        }
     },
     "translations": {
         "en": {

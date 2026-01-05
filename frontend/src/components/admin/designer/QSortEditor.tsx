@@ -28,9 +28,15 @@ type Statement = StatementRead;
 type Translation = StatementTranslationRead;
 
 const QSortEditor = () => {
-    const { draft, activeLocale, updateDraft } = useStudyDesigner();
+    const { draft, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
+        useStudyDesigner();
     const [bulkText, setBulkText] = useState('');
-    const [activeSubTab, setActiveSubTab] = useState<'statements' | 'grid'>('statements');
+    // Alias to keep existing logic working
+    const activeSubTab = (activeSubStep as 'statements' | 'grid') || 'statements';
+
+    // Helper to update store
+    const setActiveSubTab = (v: 'statements' | 'grid') => setActiveSubStep(v);
+
     const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingText, setEditingText] = useState('');
@@ -139,7 +145,7 @@ const QSortEditor = () => {
                 <TabsContent value="statements" className="space-y-6 pt-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm">Bulk Editor (Quick Paste)</CardTitle>
+                            <CardTitle className="text-sm">Bulk editor (quick paste)</CardTitle>
                             <CardDescription className="text-xs">
                                 One statement per line. Supports "Code: Text" format.
                             </CardDescription>
@@ -179,8 +185,8 @@ const QSortEditor = () => {
                                     disabled={!bulkText.trim()}
                                 >
                                     {importMode === 'replace'
-                                        ? 'Process & Replace Statements'
-                                        : 'Process & Append Statements'}
+                                        ? 'Process & replace statements'
+                                        : 'Process & append statements'}
                                 </Button>
                             </div>
                         </CardContent>
@@ -189,7 +195,7 @@ const QSortEditor = () => {
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold flex items-center gap-2">
                             <Quote className="h-4 w-4 text-muted-foreground" />
-                            Statement Set ({statements.length})
+                            Statement set ({statements.length})
                         </h3>
                         {statements.length > 0 && (
                             <Button
@@ -199,7 +205,7 @@ const QSortEditor = () => {
                                 className="text-destructive hover:bg-destructive/5 h-8 gap-2"
                             >
                                 <Trash2 className="h-4 w-4" />
-                                Clear All
+                                Clear all
                             </Button>
                         )}
                     </div>
@@ -332,7 +338,7 @@ const QSortEditor = () => {
                         <div className="flex items-center gap-4 p-4 bg-indigo-50/50 border border-indigo-100 rounded-lg">
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-indigo-900">
-                                    Forced Distribution Grid
+                                    Forced distribution grid
                                 </p>
                                 <p className="text-xs text-indigo-600 mt-1">
                                     The grid shape forces participants to discriminate between
@@ -422,14 +428,14 @@ const QSortEditor = () => {
                             <div className="flex items-center gap-2">
                                 <Quote className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-semibold">
-                                    {totalStatements} Statements
+                                    {totalStatements} statements
                                 </span>
                             </div>
                             <div className="w-px h-4 bg-border" />
                             <div className="flex items-center gap-2">
                                 <Grid3X3 className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-semibold">
-                                    {totalSlots} Grid Slots
+                                    {totalSlots} grid slots
                                 </span>
                             </div>
                             <div className="w-px h-4 bg-border" />
@@ -446,7 +452,7 @@ const QSortEditor = () => {
                                     )}
                                 >
                                     {isValid
-                                        ? 'Perfect Match!'
+                                        ? 'Perfect match!'
                                         : `${Math.abs(totalStatements - totalSlots)} ${totalStatements > totalSlots ? 'too many statements' : 'empty slots'}`}
                                 </span>
                             </div>
@@ -456,7 +462,7 @@ const QSortEditor = () => {
                     {/* Research Settings */}
                     <Card className="shadow-sm mt-8">
                         <CardHeader>
-                            <CardTitle className="text-base">Research Settings</CardTitle>
+                            <CardTitle className="text-base">Research settings</CardTitle>
                             <CardDescription>
                                 Configure how statements are presented to participants
                             </CardDescription>
@@ -468,7 +474,7 @@ const QSortEditor = () => {
                                         htmlFor="randomize-statements"
                                         className="text-sm font-medium"
                                     >
-                                        Randomize Statement Order
+                                        Randomize statement order
                                     </Label>
                                     <p className="text-xs text-muted-foreground max-w-md">
                                         Present statements in random order for each participant to
@@ -489,7 +495,7 @@ const QSortEditor = () => {
                             <div className="flex items-center justify-between py-2 border-t">
                                 <div className="space-y-1">
                                     <Label htmlFor="show-codes" className="text-sm font-medium">
-                                        Show Statement Codes
+                                        Show statement codes
                                     </Label>
                                     <p className="text-xs text-muted-foreground max-w-md">
                                         Display statement codes (e.g., "S1", "S2") alongside the

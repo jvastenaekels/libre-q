@@ -73,6 +73,8 @@ export const StudyConfigSchema = z.object({
                     general: z.union([z.string(), z.record(z.string())]).optional(),
                 })
                 .optional(),
+            questions: z.record(PreSortFieldSchema).optional(),
+            allow_random_comments: z.boolean().optional(),
         })
         .optional(),
     statements: z.array(StatementSchema),

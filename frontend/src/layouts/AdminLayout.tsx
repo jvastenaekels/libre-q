@@ -67,16 +67,15 @@ export default function AdminLayout() {
                                                 .split('/')
                                                 .filter(Boolean);
                                             const last = segments[segments.length - 1];
-                                            if (last === 'admin') return 'Dashboard';
-                                            if (last === activeStudyId) return 'Study Overview';
-
                                             // Map common segments to prettier names
                                             const mapping: Record<string, string> = {
-                                                design: 'Study Design',
+                                                design: 'Study design',
                                                 team: 'Collaborators',
                                                 recruitment: 'Recruitment',
-                                                exports: 'Analytics & Data',
+                                                exports: 'Data & analytics',
                                             };
+                                            if (last === 'admin') return 'Dashboard';
+                                            if (last === activeStudyId) return 'Study dashboard';
                                             return (
                                                 mapping[last] ||
                                                 last.charAt(0).toUpperCase() + last.slice(1)

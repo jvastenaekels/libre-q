@@ -62,6 +62,9 @@ export async function reportBug(error: Error | string, context?: ErrorContext) {
     }
 }
 
+import { useAuthStore } from '../store/useAuthStore';
+import { useSessionStore } from '../store/useSessionStore';
+
 // Default export for axios-like usage in some older components
 // Note: This is a shim to allow the project to build while we transition to Orval
 export default {
@@ -73,15 +76,32 @@ export default {
             url.startsWith('http') || url.startsWith('/api')
                 ? `${BASE_URL}${url}`
                 : `${BASE_URL}/api${url}`;
+
+        // Get token from either admin store or participant session store
+        const adminToken = useAuthStore.getState().token;
+        const sessionToken = useSessionStore.getState().token;
+        const token = adminToken || sessionToken;
+
         const response = await fetch(fullUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 ...options?.headers,
             },
             ...options,
         });
-        if (!response.ok) throw new Error(await response.text());
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Handle session expiry for manual fetches too
+                useAuthStore.getState().logout();
+                if (!window.location.pathname.includes('/login')) {
+                    window.location.href = '/login?reason=session_expired';
+                }
+            }
+            throw new Error(await response.text());
+        }
         return {
             data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
         };

@@ -6,6 +6,7 @@ interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
     activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface';
+    activeSubStep?: string;
     activeLocale: string;
 
     // Actions
@@ -14,6 +15,7 @@ interface StudyDesignerState {
     // biome-ignore lint/suspicious/noExplicitAny: complex translation type
     updateTranslation: (lang: string, fn: (t: any) => void) => void;
     setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface') => void;
+    setActiveSubStep: (step: string) => void;
     setActiveLocale: (locale: string) => void;
     resetDraft: () => void;
 }
@@ -22,6 +24,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     draft: null,
     original: null,
     activeStep: 'intro',
+    activeSubStep: 'statements',
     activeLocale: 'en',
 
     setStudy: (study: StudyRead) =>
@@ -89,6 +92,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
 
     setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface') =>
         set({ activeStep: step }),
+    setActiveSubStep: (step: string) => set({ activeSubStep: step }),
     setActiveLocale: (locale: string) => set({ activeLocale: locale }),
 
     resetDraft: () =>

@@ -100,6 +100,7 @@ describe('useSubmitStudy', () => {
                 card_comments: { 1: 'Why -4', 2: 'Why 4' },
                 missing_statement: 'Missed this',
                 general_comment: 'Good study',
+                questions_answers: {},
             },
         });
     });

@@ -161,15 +161,19 @@ async def update_study(
     await db.refresh(study, attribute_names=["translations", "statements"])
 
     # Structural changes only allowed in DRAFT
-    is_structural_edit = any(
-        f in study_update.model_dump(exclude_unset=True) for f in ["grid_config"]
-    )
+    # Check if grid_config is actually being modified relative to current DB state
+    if study_update.grid_config is not None:
+        new_grid = [col.model_dump() for col in study_update.grid_config]
+        # Compare with existing grid (ignoring potential tuple/list differences by strictly dumping)
+        # Existing in DB is a JSON list of dicts.
+        current_grid = study.grid_config
 
-    if is_structural_edit and study.state != StudyState.draft:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot modify grid structure of an active, paused, or closed study.",
-        )
+        # If they are different AND study is not draft, raise error
+        if new_grid != current_grid and study.state != StudyState.draft:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot modify grid structure of an active, paused, or closed study.",
+            )
 
     if study.state == StudyState.closed:
         raise HTTPException(

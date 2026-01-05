@@ -37,7 +37,7 @@ export class AdminPage extends BasePage {
     }
 
     async configureQSort(statements: string[]) {
-        await this.page.getByText('Study Design').first().click();
+        await this.page.getByText('Study design').first().click();
         await this.page.getByRole('tab', { name: /Q-Sort Task/i }).click();
 
         const textarea = this.page.getByPlaceholder(/paste your statements here/i);
@@ -48,9 +48,9 @@ export class AdminPage extends BasePage {
     }
 
     async launchStudy() {
-        await this.page.getByRole('link', { name: /overview/i }).click();
-        await this.page.getByRole('button', { name: /launch study/i }).click();
-        await this.page.getByRole('button', { name: /yes, launch now/i }).click();
+        await this.page.getByRole('link', { name: /dashboard/i }).click();
+        await this.page.getByRole('button', { name: /active/i }).first().click();
+        await this.page.getByRole('button', { name: /set to active/i }).click();
         await expect(this.page.getByText(/receiving data/i)).toBeVisible();
     }
 
@@ -63,9 +63,9 @@ export class AdminPage extends BasePage {
     }
 
     async closeStudy() {
-        await this.page.getByRole('button', { name: /close data collection/i }).click();
+        await this.page.getByRole('button', { name: /closed/i }).first().click();
         await this.page.getByRole('button', { name: /close study/i }).click();
-        await expect(this.page.getByTestId('study-status')).toHaveText(/completed/i);
+        await expect(this.page.getByRole('status')).toHaveText(/closed/i);
     }
 
     async verifyParticipant(text: string | RegExp) {

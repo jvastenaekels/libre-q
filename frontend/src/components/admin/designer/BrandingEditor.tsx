@@ -25,12 +25,12 @@ const BrandingEditor = () => {
                     <span className="bg-primary/10 p-1 rounded">
                         <Palette className="h-5 w-5" />
                     </span>
-                    Visual Branding
+                    Visual branding
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-sm font-semibold">Accent Color</CardTitle>
+                        <CardTitle className="text-sm font-semibold">Accent color</CardTitle>
                         <CardDescription>
                             This color will be used for buttons, links, and highlights throughout
                             the study.
@@ -98,7 +98,7 @@ const BrandingEditor = () => {
                     <CardHeader>
                         <CardTitle className="text-sm font-semibold flex items-center gap-2">
                             <ImageIcon className="h-4 w-4" />
-                            Study Logo
+                            Study logo
                         </CardTitle>
                         <CardDescription>
                             Upload a custom logo to replace the default Open-Q branding.
@@ -122,7 +122,7 @@ const BrandingEditor = () => {
                             <div className="p-4 bg-muted/20 border rounded-lg flex items-center justify-center">
                                 <img
                                     src={branding.logo_url}
-                                    alt="Logo Preview"
+                                    alt="Logo preview"
                                     className="max-h-12 object-contain"
                                     onError={(e) => {
                                         (e.target as HTMLImageElement).style.display = 'none';
@@ -138,7 +138,7 @@ const BrandingEditor = () => {
                 <div className="flex gap-2">
                     <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
                     <div>
-                        <p className="font-medium mb-1">Branding Tip</p>
+                        <p className="font-medium mb-1">Branding tip</p>
                         <p className="text-amber-800">
                             Ensuring high accessibility is key. When picking an accent color, make
                             sure it has enough contrast against white backgrounds for readability.

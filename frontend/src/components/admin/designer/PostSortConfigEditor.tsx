@@ -4,6 +4,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Info, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -13,7 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import MarkdownEditor from './MarkdownEditor';
+import QuestionBuilder from './QuestionBuilder';
 
 const PostSortConfigEditor = () => {
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
@@ -27,6 +29,7 @@ const PostSortConfigEditor = () => {
     const extremeColumns = config?.extreme_columns || [];
     const askMissing = config?.ask_missing ?? false;
     const askGeneralComment = config?.ask_general_comment ?? true;
+    const allowRandomComments = config?.allow_random_comments ?? true;
     const prompts = config?.prompts || {};
 
     const gridConfig = draft.grid_config as Array<{ score: number; capacity: number }> | undefined;
@@ -112,6 +115,15 @@ const PostSortConfigEditor = () => {
         });
     };
 
+    const toggleAllowRandomComments = (checked: boolean) => {
+        updateDraft((d) => {
+            if (!d.postsort_config) d.postsort_config = {};
+            // biome-ignore lint/suspicious/noExplicitAny: cast to any
+            const ps = d.postsort_config as any;
+            ps.allow_random_comments = checked;
+        });
+    };
+
     const unselectedScores = availableScores.filter((s) => !extremeColumns.includes(s));
 
     return (
@@ -122,7 +134,7 @@ const PostSortConfigEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5 text-primary" />
                         </span>
-                        Extreme Columns
+                        Extreme columns
                     </CardTitle>
                     <CardDescription>
                         Select columns that trigger follow-up questions.
@@ -189,13 +201,14 @@ const PostSortConfigEditor = () => {
                     )}
 
                     {extremeColumns.length > 0 && (
-                        <div className="pt-4 border-t">
-                            <MarkdownEditor
+                        <div className="pt-4 border-t space-y-2">
+                            <Label htmlFor="extreme-prompt">Prompt for extreme cards</Label>
+                            <Textarea
                                 id="extreme-prompt"
-                                label="Prompt for Extreme Cards"
                                 value={getPromptText('extreme')}
-                                onChange={(val) => setPromptText('extreme', val)}
+                                onChange={(e) => setPromptText('extreme', e.target.value)}
                                 placeholder="Why did you place this statement here?"
+                                className="min-h-[80px]"
                             />
                         </div>
                     )}
@@ -206,8 +219,39 @@ const PostSortConfigEditor = () => {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
+                            <CardTitle className="text-base">Allow random comments</CardTitle>
+                            <CardDescription className="text-sm">
+                                Allow participants to add comments to any statement in the grid.
+                            </CardDescription>
+                        </div>
+                        <Switch
+                            checked={allowRandomComments}
+                            onCheckedChange={toggleAllowRandomComments}
+                        />
+                    </div>
+                </CardHeader>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="space-y-1">
+                        <CardTitle className="text-base">Custom questions</CardTitle>
+                        <CardDescription className="text-sm">
+                            Add custom questions to the post-sort survey.
+                        </CardDescription>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <QuestionBuilder type="post" />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
                             <CardTitle className="text-base">
-                                Ask About Missing Statements
+                                Ask about missing statements
                             </CardTitle>
                             <CardDescription className="text-sm">
                                 Ask if there were missing topics.
@@ -218,11 +262,11 @@ const PostSortConfigEditor = () => {
                 </CardHeader>
                 {askMissing && (
                     <CardContent className="space-y-2">
-                        <MarkdownEditor
+                        <Label htmlFor="missing-prompt">Missing statements prompt</Label>
+                        <Input
                             id="missing-prompt"
-                            label="Missing Statements Prompt"
                             value={getPromptText('missing')}
-                            onChange={(val) => setPromptText('missing', val)}
+                            onChange={(e) => setPromptText('missing', e.target.value)}
                             placeholder="Were there any statements you wish had been included?"
                         />
                     </CardContent>
@@ -233,7 +277,7 @@ const PostSortConfigEditor = () => {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base">Ask for General Feedback</CardTitle>
+                            <CardTitle className="text-base">Ask for general feedback</CardTitle>
                             <CardDescription className="text-sm">
                                 General comments at the end.
                             </CardDescription>
@@ -246,12 +290,13 @@ const PostSortConfigEditor = () => {
                 </CardHeader>
                 {askGeneralComment && (
                     <CardContent className="space-y-2">
-                        <MarkdownEditor
+                        <Label htmlFor="general-prompt">General feedback prompt</Label>
+                        <Textarea
                             id="general-prompt"
-                            label="General Feedback Prompt"
                             value={getPromptText('general')}
-                            onChange={(val) => setPromptText('general', val)}
+                            onChange={(e) => setPromptText('general', e.target.value)}
                             placeholder="Do you have any additional comments or feedback?"
+                            className="min-h-[80px]"
                         />
                     </CardContent>
                 )}

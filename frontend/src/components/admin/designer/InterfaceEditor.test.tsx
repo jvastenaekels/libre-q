@@ -47,9 +47,9 @@ describe('InterfaceEditor', () => {
         render(<InterfaceEditor />);
 
         // Check for labels
-        expect(screen.getByText('Start Button')).toBeInTheDocument();
-        expect(screen.getByText('Next Step Button')).toBeInTheDocument();
-        expect(screen.getByText('Submit Button')).toBeInTheDocument();
+        expect(screen.getByText('Start button')).toBeInTheDocument();
+        expect(screen.getByText('Next step button')).toBeInTheDocument();
+        expect(screen.getByText('Submit button')).toBeInTheDocument();
 
         // Check for existing value from draft
         const startInput = screen.getByDisplayValue('Custom Start');
@@ -59,9 +59,9 @@ describe('InterfaceEditor', () => {
     it('renders sorting terminology configuration', () => {
         render(<InterfaceEditor />);
 
-        expect(screen.getByText('Positive Pole (Right)')).toBeInTheDocument();
-        expect(screen.getByText('Negative Pole (Left)')).toBeInTheDocument();
-        expect(screen.getByText('Neutral / Middle')).toBeInTheDocument();
+        expect(screen.getByText('Positive pole (right)')).toBeInTheDocument();
+        expect(screen.getByText('Negative pole (left)')).toBeInTheDocument();
+        expect(screen.getByText('Neutral / middle')).toBeInTheDocument();
     });
 
     it('updates labels via updateTranslation', () => {

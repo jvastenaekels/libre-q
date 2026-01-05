@@ -44,7 +44,7 @@ test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
             is_discarded: false,
             created_at: new Date().toISOString(),
             submitted_at: new Date().toISOString(),
-            language: 'en',
+            language_used: 'en',
         });
 
         // Reload to see data

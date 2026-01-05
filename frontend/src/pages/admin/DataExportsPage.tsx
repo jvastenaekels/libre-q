@@ -1,14 +1,16 @@
 import { useParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportCenter from '@/components/admin/dashboard/ExportCenter';
+import InteractiveDataView from '@/components/admin/dashboard/InteractiveDataView';
+import { Database, Download, Table as TableIcon } from 'lucide-react';
 
 const DataExportsPage = () => {
     const { slug } = useParams<{ slug: string }>();
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
+        <div className="flex flex-1 flex-col gap-6 p-6 pt-2 h-[calc(100vh-4rem)] overflow-hidden">
+            <header className="flex-none flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                         {slug}
@@ -16,50 +18,94 @@ const DataExportsPage = () => {
                             variant="outline"
                             className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase tracking-widest text-[10px]"
                         >
-                            Data & Exports
+                            Analytics & data
                         </Badge>
                     </h1>
                     <p className="text-slate-500 text-sm">
-                        Download raw participant data and analysis-ready files.
+                        Inspect participant data and export datasets.
                     </p>
                 </div>
             </header>
 
-            <div className="grid gap-6 md:grid-cols-12 pb-12">
-                <div className="col-span-12 md:col-span-8">
-                    <ExportCenter slug={slug || ''} />
+            <Tabs defaultValue="browse" className="flex-1 flex flex-col min-h-0">
+                <div className="flex-none pb-4">
+                    <TabsList className="bg-slate-100/50 border border-slate-200 p-1 rounded-xl w-full sm:w-auto grid grid-cols-2 sm:flex sm:inline-flex">
+                        <TabsTrigger
+                            value="browse"
+                            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
+                        >
+                            <TableIcon className="w-4 h-4" />
+                            Interactive view
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="export"
+                            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
+                        >
+                            <Download className="w-4 h-4" />
+                            File downloads
+                        </TabsTrigger>
+                    </TabsList>
                 </div>
 
-                <div className="col-span-12 md:col-span-4 space-y-6">
-                    <Card className="border-none shadow-md bg-indigo-50/50">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-bold text-indigo-900 uppercase tracking-tight">
-                                Format Guide
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-xs text-indigo-800/70 space-y-3 leading-relaxed">
-                            <p>
-                                <strong>CSV</strong>: Best for SPSS, Excel, or general spreadsheet
-                                analysis. Includes all metadata and scores.
-                            </p>
-                            <p>
-                                <strong>KenQ</strong>: The standard for modern Q-methodological
-                                factor analysis. Fully compatible with Web-KenQ.
-                            </p>
-                            <p>
-                                <strong>PQMethod</strong>: Compatibility format for legacy DOS-based
-                                analysis tools (.DAT, .STA, .ANS).
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <div className="p-4 rounded-xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-center gap-2 opacity-60">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            More formats coming soon
-                        </p>
+                <TabsContent
+                    value="browse"
+                    className="flex-1 min-h-0 overflow-hidden flex flex-col data-[state=inactive]:hidden"
+                >
+                    <div className="flex-1 relative">
+                        <div className="absolute inset-0 overflow-y-auto pr-2 pb-10">
+                            <InteractiveDataView slug={slug || ''} />
+                        </div>
                     </div>
-                </div>
-            </div>
+                </TabsContent>
+
+                <TabsContent
+                    value="export"
+                    className="flex-1 overflow-y-auto data-[state=inactive]:hidden"
+                >
+                    <div className="grid gap-6 md:grid-cols-12 max-w-6xl">
+                        <div className="col-span-12 md:col-span-8">
+                            <ExportCenter slug={slug || ''} />
+                        </div>
+
+                        <div className="col-span-12 md:col-span-4 space-y-6">
+                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-tight mb-4 flex items-center gap-2">
+                                    <Database className="w-4 h-4" /> Format guide
+                                </h3>
+                                <div className="space-y-4 text-xs text-slate-600 leading-relaxed">
+                                    <div className="space-y-1">
+                                        <div className="font-semibold text-indigo-700">
+                                            Universal CSV
+                                        </div>
+                                        <p>
+                                            Raw rectangular data. Best for R, Python, SPSS, or Excel
+                                            analysis. Includes all metadata.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="font-semibold text-indigo-700">
+                                            KenQ JSON
+                                        </div>
+                                        <p>
+                                            Optimized for the Web-KenQ analysis tool. Contains study
+                                            definition and sorts.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="font-semibold text-indigo-700">
+                                            PQMethod Bundle (ZIP)
+                                        </div>
+                                        <p>
+                                            Contains legacy .DAT and .STA files for DOS PQMethod
+                                            software.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };

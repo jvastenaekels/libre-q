@@ -51,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   isActive: true,
                   items: [
                       {
-                          title: 'Study Overview',
+                          title: 'Study dashboard',
                           url: `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
                       },
@@ -61,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           icon: Users,
                       },
                       {
-                          title: 'Study Design',
+                          title: 'Study design',
                           url: `/admin/studies/${activeStudyId}/design`,
                           icon: PencilRuler,
                       },
@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           badge: 'Coming Soon',
                       },
                       {
-                          title: 'Analytics & Data',
+                          title: 'Data & analytics',
                           url: `/admin/studies/${activeStudyId}/exports`,
                           icon: Database,
                       },

@@ -35,6 +35,7 @@ import WelcomePage from '@/pages/WelcomePage';
 import PreSortPage from '@/pages/PreSortPage';
 import RoughSortPage from '@/pages/RoughSortPage';
 import PostSortPage from '@/pages/PostSortPage';
+import FineSortPage from '@/pages/FineSortPage';
 import { useConfigStore } from '@/store/useConfigStore';
 import { LayoutProvider } from '@/contexts/LayoutContext';
 import { toast } from 'sonner';
@@ -45,6 +46,7 @@ const StudyDesignPage = () => {
     const {
         draft,
         activeStep,
+        activeSubStep,
         activeLocale,
         setStudy,
         setActiveStep,
@@ -263,7 +265,11 @@ const StudyDesignPage = () => {
                                 case 'pre-sort':
                                     return <PreSortPage />;
                                 case 'q-sort':
-                                    return <RoughSortPage />;
+                                    return activeSubStep === 'grid' ? (
+                                        <FineSortPage />
+                                    ) : (
+                                        <RoughSortPage />
+                                    );
                                 case 'post-sort':
                                     return <PostSortPage />;
                                 case 'branding':
@@ -287,36 +293,49 @@ const StudyDesignPage = () => {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-md border border-primary/10">
                         <Wand2 className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-semibold">Study Designer</span>
+                        <span className="text-sm font-semibold">Study design</span>
                     </div>
                     <div className="h-4 w-px bg-border" />
                     <h2 className="text-sm font-medium truncate max-w-[200px] font-mono">
                         {draft.slug}
                     </h2>
+                    {/* Status Badge */}
+                    <div
+                        className={cn(
+                            'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border',
+                            draft.state === 'active'
+                                ? 'bg-green-100 text-green-700 border-green-200'
+                                : draft.state === 'closed'
+                                  ? 'bg-red-100 text-red-700 border-red-200'
+                                  : 'bg-amber-100 text-amber-700 border-amber-200'
+                        )}
+                    >
+                        {draft.state}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 mr-4 bg-muted/50 rounded-lg p-1">
-                        {draft?.supported_languages?.map((lang: string) => (
-                            <Button
-                                key={lang}
-                                variant={activeLocale === lang ? 'secondary' : 'ghost'}
-                                size="sm"
-                                className="h-7 px-2 text-xs"
-                                onClick={() => setActiveLocale(lang)}
-                            >
-                                {lang.toUpperCase()}
-                            </Button>
-                        )) || (
-                            <Button
-                                variant={activeLocale === 'en' ? 'secondary' : 'ghost'}
-                                size="sm"
-                                className="h-7 px-2 text-xs"
-                                onClick={() => setActiveLocale('en')}
-                            >
-                                EN
-                            </Button>
-                        )}
+                        {/* Language Switcher Fix */}
+                        {(() => {
+                            // Derive supported languages from translations
+                            const supportedLangs = Array.from(
+                                new Set((draft.translations || []).map((t: any) => t.language_code))
+                            );
+                            // Ensure current active locale is included or default to en
+                            const langs = supportedLangs.length > 0 ? supportedLangs : ['en'];
+                            return langs.map((lang: string) => (
+                                <Button
+                                    key={lang}
+                                    variant={activeLocale === lang ? 'secondary' : 'ghost'}
+                                    size="sm"
+                                    className="h-7 px-2 text-xs"
+                                    onClick={() => setActiveLocale(lang)}
+                                >
+                                    {lang.toUpperCase()}
+                                </Button>
+                            ));
+                        })()}
                     </div>
 
                     <Button
@@ -330,7 +349,7 @@ const StudyDesignPage = () => {
                         ) : (
                             <Eye className="h-4 w-4 mr-2" />
                         )}
-                        {isPreviewVisible ? 'Hide Preview' : 'Show Preview'}
+                        {isPreviewVisible ? 'Hide preview' : 'Show preview'}
                     </Button>
 
                     <Button
@@ -338,22 +357,25 @@ const StudyDesignPage = () => {
                         size="sm"
                         onClick={resetDraft}
                         title="Discard unsaved changes"
+                        disabled={draft.state !== 'draft'} // Disable reset in read-only
                     >
                         <RotateCcw className="h-4 w-4" />
                     </Button>
 
                     <Button variant="secondary" size="sm" onClick={handleTestRun} className="gap-2">
                         <Eye className="h-4 w-4" />
-                        <span className="hidden sm:inline">Test Run</span>
+                        <span className="hidden sm:inline">Test run</span>
                     </Button>
 
                     <Button
                         size="sm"
                         onClick={handleSave}
-                        disabled={updateMutation.isPending}
+                        disabled={updateMutation.isPending || draft.state !== 'draft'}
                         className={cn(
                             'transition-all',
-                            isDirty && 'ring-2 ring-primary ring-offset-2 shadow-lg'
+                            isDirty &&
+                                draft.state === 'draft' &&
+                                'ring-2 ring-primary ring-offset-2 shadow-lg'
                         )}
                     >
                         {updateMutation.isPending ? (
@@ -362,14 +384,43 @@ const StudyDesignPage = () => {
                             <Save className="h-4 w-4 mr-2" />
                         )}
                         <span className="hidden sm:inline">
-                            {isDirty ? 'Save Design*' : 'Save Design'}
+                            {draft.state !== 'draft'
+                                ? 'Read only'
+                                : isDirty
+                                  ? 'Save design*'
+                                  : 'Save design'}
                         </span>
                     </Button>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
+                {/* Read-only Overlay */}
+                {draft.state !== 'draft' && (
+                    <div className="absolute inset-0 z-50 bg-background/50 backdrop-blur-[1px] flex items-center justify-center p-8 pointer-events-none">
+                        <div className="bg-background border shadow-lg rounded-xl p-6 max-w-md text-center pointer-events-auto">
+                            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <AlertTriangle className="h-6 w-6 text-amber-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold">Study is {draft.state}</h3>
+                            <p className="text-sm text-muted-foreground mt-2 mb-6">
+                                Editing is disabled while the study is active to preserve data
+                                integrity. To make changes, please revert the study to{' '}
+                                <strong>Draft</strong> status in the settings.
+                            </p>
+                            <div className="flex gap-3 justify-center">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => _navigate(`/admin/studies/${draft.slug}`)}
+                                >
+                                    Go to study dashboard
+                                </Button>
+                                {/* We could allow state change here if we had the mutation ready */}
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {/* Left Pane: Editor */}
                 <div className="flex-1 overflow-y-auto bg-muted/30 p-6">
                     <Tabs
@@ -395,13 +446,13 @@ const StudyDesignPage = () => {
                                 value="q-sort"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                🃏 Q-Sort Task
+                                🃏 Q-sort task
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                📝 Post-Interview
+                                📝 Post-sort
                             </TabsTrigger>
                             <TabsTrigger
                                 value="interface"
@@ -423,7 +474,7 @@ const StudyDesignPage = () => {
                                     <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                                     <div>
                                         <h4 className="text-sm font-semibold text-amber-900">
-                                            Grid Configuration Mismatch
+                                            Grid configuration mismatch
                                         </h4>
                                         <p className="text-sm text-amber-700 mt-1">
                                             You have <strong>{statementsCount}</strong> statements
@@ -485,7 +536,7 @@ const StudyDesignPage = () => {
                                     variant={viewMode === 'mobile' ? 'default' : 'ghost'}
                                     className="h-6 w-6"
                                     onClick={() => setViewMode('mobile')}
-                                    title="Mobile View"
+                                    title="Mobile view"
                                 >
                                     <Smartphone className="h-3 w-3" />
                                 </Button>
@@ -494,7 +545,7 @@ const StudyDesignPage = () => {
                                     variant={viewMode === 'desktop' ? 'default' : 'ghost'}
                                     className="h-6 w-6"
                                     onClick={() => setViewMode('desktop')}
-                                    title="Desktop View"
+                                    title="Desktop view"
                                 >
                                     <Monitor className="h-3 w-3" />
                                 </Button>
@@ -510,7 +561,7 @@ const StudyDesignPage = () => {
                                             'width=1200,height=800'
                                         )
                                     }
-                                    title="Pop out Preview"
+                                    title="Pop out preview"
                                 >
                                     <ExternalLink className="h-3 w-3" />
                                 </Button>
@@ -551,7 +602,7 @@ const StudyDesignPage = () => {
                                     <div className="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">
                                         <div className="bg-primary/90 text-primary-foreground text-[10px] py-1 px-3 rounded-full backdrop-blur shadow-lg flex items-center gap-2">
                                             <CheckCircle2 className="h-3 w-3" />
-                                            Preview Mode
+                                            Preview mode
                                         </div>
                                     </div>
                                 )}
