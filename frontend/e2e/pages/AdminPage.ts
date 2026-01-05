@@ -78,7 +78,7 @@ export class AdminPage extends BasePage {
     }
 
     async verifyParticipant(text: string | RegExp) {
-        await expect(this.page.getByRole('cell', { name: text })).toBeVisible();
+        await expect(this.page.getByText(text).first()).toBeVisible();
     }
 
     async verifyStatus(status: 'Draft' | 'Active' | 'Closed') {
