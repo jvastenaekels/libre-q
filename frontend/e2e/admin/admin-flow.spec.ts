@@ -27,6 +27,7 @@ test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
 
         // 4. ACTIVATE
         await adminPage.launchStudy();
+        await adminPage.verifyStatus('Active');
 
         // 5. DATA SIMULATION & MONITOR
         // Logic for checking participants involves mocking specific endpoints which are handled in setupAdminMocks

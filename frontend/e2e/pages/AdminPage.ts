@@ -74,11 +74,15 @@ export class AdminPage extends BasePage {
         }
         await this.page.getByRole('button', { name: /closed/i }).first().click();
         await this.page.getByRole('button', { name: /close study/i }).click();
-        await expect(this.page.getByRole('status')).toHaveText(/closed/i);
+        await expect(this.page.getByRole('status')).toHaveText(/Closed/i);
     }
 
     async verifyParticipant(text: string | RegExp) {
-        await expect(this.page.getByText(text)).toBeVisible();
+        await expect(this.page.getByRole('cell', { name: text })).toBeVisible();
+    }
+
+    async verifyStatus(status: 'Draft' | 'Active' | 'Closed') {
+        await expect(this.page.getByRole('status')).toHaveText(status);
     }
 
     async logout() {
