@@ -65,14 +65,14 @@ export const useGridZoom = ({
             // But ensure we don't push it *too* far down if it's small
             y = wrapperH - contentH * scale - 10;
         } else {
-            // Desktop: Fit both, with generous padding to encompass Spectrum Bar
-            const padding = 100; // Reduced to 100px to allow slightly more zoom
+            // Desktop: Fit both, with padding to encompass Spectrum Bar
+            const padding = 70; // Reduced to 70px to increase default zoom for better readability
             const availableW = wrapperW - padding;
             const availableH = wrapperH - padding;
             const scaleX = availableW / contentW;
             const scaleY = availableH / contentH;
 
-            scale = Math.min(scaleX, scaleY, 0.95); // Slight cap to prevent edge-touching
+            scale = Math.min(scaleX, scaleY, 1.0); // Slight cap to prevent edge-touching
 
             // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
