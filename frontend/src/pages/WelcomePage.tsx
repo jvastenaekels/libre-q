@@ -127,9 +127,12 @@ const WelcomePage: React.FC = () => {
                 {/* Objective Frame */}
                 {study.objective && (
                     <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-2xl mx-auto mt-8 text-left shadow-md relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                        <div
+                            className="absolute top-0 left-0 w-1 h-full"
+                            style={{ backgroundColor: 'var(--brand-accent)' }}
+                        ></div>
                         <h4 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
-                            <Target size={16} className="text-blue-500" />
+                            <Target size={16} style={{ color: 'var(--brand-accent)' }} />
                             {t('welcome.objective_label', 'Objective of the study')}
                         </h4>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
@@ -143,8 +146,23 @@ const WelcomePage: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden mb-8">
                 <div className="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                     {/* Instructions Column */}
-                    <div className="md:col-span-7 p-8 md:px-10 md:pt-10 md:pb-6 bg-blue-50 flex flex-col justify-start">
-                        <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
+                    <div
+                        className="md:col-span-7 p-8 md:px-10 md:pt-10 md:pb-6 flex flex-col justify-start"
+                        style={{
+                            backgroundColor:
+                                'color-mix(in srgb, var(--brand-accent), transparent 95%)',
+                        }}
+                    >
+                        <div
+                            className="uppercase tracking-wider text-xs font-bold mb-4 w-fit px-3 py-1.5 rounded-md border"
+                            style={{
+                                color: 'var(--brand-accent)',
+                                backgroundColor:
+                                    'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                                borderColor:
+                                    'color-mix(in srgb, var(--brand-accent), transparent 80%)',
+                            }}
+                        >
                             {t('welcome.instructions_label', 'Instructions')}
                         </div>
 
@@ -157,7 +175,19 @@ const WelcomePage: React.FC = () => {
                                         ),
                                         li: ({ node: _node, ...props }) => (
                                             <li className="flex gap-4 items-start group">
-                                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-200 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm mt-0.5 step-badge">
+                                                <span
+                                                    className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm border transition-all duration-300 shadow-sm mt-0.5 step-badge group-hover:text-white"
+                                                    style={
+                                                        {
+                                                            backgroundColor:
+                                                                'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                                                            color: 'var(--brand-accent)',
+                                                            borderColor:
+                                                                'color-mix(in srgb, var(--brand-accent), transparent 80%)',
+                                                            '--hover-bg': 'var(--brand-accent)',
+                                                        } as any
+                                                    }
+                                                >
                                                     {/* Number injected via CSS */}
                                                 </span>
                                                 <div className="pt-1 text-slate-600 group-hover:text-slate-900 transition-colors leading-relaxed">
@@ -231,7 +261,8 @@ const WelcomePage: React.FC = () => {
                     type="button"
                     data-testid="start-btn"
                     onClick={handleContinue}
-                    className="group w-full sm:w-auto px-10 py-4 bg-blue-600 text-white rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
+                    style={{ backgroundColor: 'var(--brand-accent)' }}
+                    className="group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
                 >
                     {t('common.continue', 'Continue')}
                     <ArrowRight

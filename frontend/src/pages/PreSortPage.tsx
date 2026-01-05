@@ -132,7 +132,7 @@ const PreSortPage: React.FC = () => {
 
     const renderField = (key: string, fieldConfig: PreSortField) => {
         const commonClasses =
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[44px] text-base';
+            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
         const labelText = getLocalizedText(fieldConfig.label);
         const placeholderText = fieldConfig.placeholder
             ? getLocalizedText(fieldConfig.placeholder)
@@ -205,7 +205,8 @@ const PreSortPage: React.FC = () => {
                                         type="radio"
                                         {...register(key)}
                                         value={optValue}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                        style={{ accentColor: 'var(--brand-accent)' } as any}
+                                        className="h-4 w-4"
                                     />
                                     <span className="text-base">{optLabel}</span>
                                 </label>
@@ -229,7 +230,8 @@ const PreSortPage: React.FC = () => {
                                         type="checkbox"
                                         {...register(key)}
                                         value={optValue}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                                        style={{ accentColor: 'var(--brand-accent)' } as any}
+                                        className="h-4 w-4 rounded"
                                     />
                                     <span className="text-base">{optLabel}</span>
                                 </label>
@@ -290,7 +292,8 @@ const PreSortPage: React.FC = () => {
                                 !isValid) ||
                             false
                         }
-                        className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md font-bold text-sm hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className="w-full sm:w-auto px-6 py-2 text-white rounded-md font-bold text-sm hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
                     >
                         {t('presort.submit')} <ArrowRight size={16} />
                     </button>

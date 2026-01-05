@@ -94,7 +94,7 @@ export const CommandMenu = () => {
                         heading="Switch Workspace"
                         className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
                     >
-                        {workspaces?.map((ws) => (
+                        {(Array.isArray(workspaces) ? workspaces : []).map((ws) => (
                             <Command.Item
                                 key={ws.id}
                                 value={`workspace ${ws.title}`}
@@ -163,7 +163,7 @@ export const CommandMenu = () => {
                                 <span>Open Dashboard</span>
                             </Command.Item>
                             <Command.Item
-                                value="design study protocol"
+                                value="design study"
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(`/admin/studies/${activeStudyId}/design`)
@@ -172,7 +172,7 @@ export const CommandMenu = () => {
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
                             >
                                 <PencilRuler className="h-4 w-4 text-emerald-500" />
-                                <span>Protocol Design</span>
+                                <span>Study Design</span>
                             </Command.Item>
                             <Command.Item
                                 value="team management collaborators"

@@ -187,6 +187,37 @@ const ParticipantDetailSheet: React.FC<ParticipantDetailSheetProps> = ({
                             </div>
                         </section>
 
+                        {/* Post-Sort Responses */}
+                        <section className="space-y-4">
+                            <h3 className="text-sm font-bold text-slate-900 border-l-2 border-violet-500 pl-3">
+                                Post-Interview Responses
+                            </h3>
+                            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                <div className="p-4 space-y-4">
+                                    {Object.entries(p.postsort_answers || {}).length > 0 ? (
+                                        Object.entries(p.postsort_answers).map(([key, value]) => (
+                                            <div key={key} className="space-y-1">
+                                                <div className="text-[10px] font-bold text-violet-400 uppercase tracking-tight">
+                                                    {key.replace(/_/g, ' ')}
+                                                </div>
+                                                <div className="text-sm text-slate-700 font-medium">
+                                                    {typeof value === 'boolean'
+                                                        ? value
+                                                            ? 'Yes'
+                                                            : 'No'
+                                                        : String(value)}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-sm text-slate-400 italic">
+                                            No post-interview data.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </section>
+
                         {/* System Info */}
                         <section className="bg-slate-200/30 p-4 rounded-xl border border-slate-200">
                             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase mb-3 px-1">

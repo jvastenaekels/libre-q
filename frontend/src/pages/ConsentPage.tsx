@@ -130,14 +130,22 @@ const ConsentPage: React.FC = () => {
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">
-                    <div className="flex items-start gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                    <div
+                        className="flex items-start gap-4 p-4 rounded-lg border"
+                        style={{
+                            backgroundColor:
+                                'color-mix(in srgb, var(--brand-accent), transparent 95%)',
+                            borderColor: 'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                        }}
+                    >
                         <div className="flex h-6 items-center">
                             <input
                                 id="consent"
                                 type="checkbox"
                                 data-testid="consent-checkbox"
                                 {...register('consent')}
-                                className="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                                style={{ accentColor: 'var(--brand-accent)' } as any}
+                                className="h-6 w-6 rounded border-gray-300 cursor-pointer"
                             />
                         </div>
                         <div className="text-base">
@@ -161,7 +169,8 @@ const ConsentPage: React.FC = () => {
                         type="submit"
                         data-testid="consent-accept-btn"
                         disabled={!isValid && !session.hasConsented}
-                        className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
+                        className="w-full sm:w-auto px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {config.ui_labels?.start_button || t('welcome.start')}{' '}
                         <ArrowRight size={18} />

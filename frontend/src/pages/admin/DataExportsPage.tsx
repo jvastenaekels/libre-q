@@ -1,8 +1,7 @@
 import { useParams } from 'react-router-dom';
-import { Database, Download, FileSpreadsheet } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ExportCenter from '@/components/admin/dashboard/ExportCenter';
 
 const DataExportsPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -26,40 +25,40 @@ const DataExportsPage = () => {
                 </div>
             </header>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                        <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">
-                                Raw JSON Exporter
-                            </CardTitle>
-                            <CardDescription>Full participant response dump</CardDescription>
-                        </div>
-                        <Database className="h-4 w-4 text-slate-400" />
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                        <Button variant="outline" className="w-full" disabled>
-                            <Download className="mr-2 h-4 w-4" /> Export JSON
-                        </Button>
-                    </CardContent>
-                </Card>
+            <div className="grid gap-6 md:grid-cols-12 pb-12">
+                <div className="col-span-12 md:col-span-8">
+                    <ExportCenter slug={slug || ''} />
+                </div>
 
-                <Card>
-                    <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                        <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">
-                                CSV Analysis Format
+                <div className="col-span-12 md:col-span-4 space-y-6">
+                    <Card className="border-none shadow-md bg-indigo-50/50">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-bold text-indigo-900 uppercase tracking-tight">
+                                Format Guide
                             </CardTitle>
-                            <CardDescription>Ready for PQMethod/R</CardDescription>
-                        </div>
-                        <FileSpreadsheet className="h-4 w-4 text-slate-400" />
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                        <Button variant="outline" className="w-full" disabled>
-                            <Download className="mr-2 h-4 w-4" /> Export CSV
-                        </Button>
-                    </CardContent>
-                </Card>
+                        </CardHeader>
+                        <CardContent className="text-xs text-indigo-800/70 space-y-3 leading-relaxed">
+                            <p>
+                                <strong>CSV</strong>: Best for SPSS, Excel, or general spreadsheet
+                                analysis. Includes all metadata and scores.
+                            </p>
+                            <p>
+                                <strong>KenQ</strong>: The standard for modern Q-methodological
+                                factor analysis. Fully compatible with Web-KenQ.
+                            </p>
+                            <p>
+                                <strong>PQMethod</strong>: Compatibility format for legacy DOS-based
+                                analysis tools (.DAT, .STA, .ANS).
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <div className="p-4 rounded-xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-center gap-2 opacity-60">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            More formats coming soon
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );

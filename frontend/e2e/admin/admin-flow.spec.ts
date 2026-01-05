@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
     await setupAdminMocks(page);
 });
 
-test.describe.skip('Admin Flow (Zero to Hero) [Refactored]', () => {
+test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
     let adminPage: AdminPage;
 
     test.beforeEach(async ({ page }) => {

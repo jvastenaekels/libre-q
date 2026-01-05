@@ -29,13 +29,18 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 }) => {
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
 
-    const handleStateChange = async (newState: 'active' | 'closed') => {
+    const handleStateChange = async (newState: 'draft' | 'active' | 'closed') => {
         try {
             await changeStateMutation.mutateAsync({
                 slug,
                 params: { new_state: newState },
             });
-            toast.success(`Study ${newState === 'active' ? 'launched' : 'closed'} successfully`);
+            const stateLabels = {
+                draft: 'reverted to draft',
+                active: 'launched',
+                closed: 'closed',
+            };
+            toast.success(`Study ${stateLabels[newState]} successfully`);
             onStateChange();
         } catch (error) {
             toast.error(`Failed to change study state`);
@@ -50,9 +55,9 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
             <CardHeader className="border-b border-slate-50 bg-slate-50/30">
                 <div className="flex items-center gap-2 mb-1">
                     <Rocket className="h-5 w-5 text-indigo-500" />
-                    <CardTitle className="text-lg">Study Lifecycle</CardTitle>
+                    <CardTitle className="text-lg">Study Status</CardTitle>
                 </div>
-                <CardDescription>Control the current state of your fieldwork.</CardDescription>
+                <CardDescription>Control the current state of your study.</CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
@@ -70,7 +75,10 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                                           : 'bg-amber-500'
                                 }`}
                             />
-                            <span className="font-bold text-slate-700 uppercase tracking-tight">
+                            <span
+                                data-testid="study-status"
+                                className="font-bold text-slate-700 uppercase tracking-tight"
+                            >
                                 {currentState}
                             </span>
                         </div>
@@ -123,7 +131,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                                 ) : (
                                     <PowerOff className="h-4 w-4" />
                                 )}
-                                Close Fieldwork
+                                Close Data Collection
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -148,12 +156,44 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                 )}
 
                 {currentState === 'completed' && (
-                    <div className="p-3 bg-slate-50 rounded-lg flex gap-3 items-start border border-slate-100">
-                        <AlertCircle className="h-4 w-4 text-slate-400 mt-0.5" />
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
-                            This study is closed. Data is preserved for export and archival. To
-                            restart, contact the system administrator.
-                        </p>
+                    <div className="space-y-3">
+                        <div className="p-3 bg-slate-50 rounded-lg flex gap-3 items-start border border-slate-100">
+                            <AlertCircle className="h-4 w-4 text-slate-400 mt-0.5" />
+                            <p className="text-[11px] text-slate-500 leading-relaxed">
+                                This study is closed. Data is preserved for export.
+                            </p>
+                        </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="w-full gap-2 border-amber-200 text-amber-700 hover:bg-amber-50 font-bold"
+                                    disabled={isPending}
+                                >
+                                    {isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Rocket className="h-4 w-4" />
+                                    )}
+                                    Revert to Draft
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Revert to draft mode?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will reopen the study for configuration changes.
+                                        Existing data will be preserved.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleStateChange('draft')}>
+                                        Revert to Draft
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 )}
             </CardContent>

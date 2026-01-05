@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
 
 import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
 
@@ -30,6 +32,8 @@ const QSortEditor = () => {
     const [bulkText, setBulkText] = useState('');
     const [activeSubTab, setActiveSubTab] = useState<'statements' | 'grid'>('statements');
     const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingText, setEditingText] = useState('');
 
     if (!draft) return null;
 
@@ -40,9 +44,9 @@ const QSortEditor = () => {
             const t = (s.translations as Translation[])?.find(
                 (st: Translation) => st.language_code === activeLocale
             );
-            return t?.text || '';
+            return { code: s.code, text: t?.text || '' };
         })
-        .filter((text: string) => text.trim() !== '');
+        .filter((item) => item.text.trim() !== '');
 
     const handleBulkSave = () => {
         const lines = bulkText
@@ -51,19 +55,31 @@ const QSortEditor = () => {
             .filter((l: string) => l !== '');
 
         const parsedItems = lines.map((line: string) => {
-            // Regex to match "Code: Text" or "Code, Text" or "Code - Text"
-            // We assume codes are alphanumeric, reasonably short (up to 10 chars)
-            const match = line.match(/^([a-zA-Z0-9_-]{1,10})\s*[:,\-]\s+(.+)$/);
+            // Check for TSV (Tab separated): "Code\tText"
+            if (line.includes('\t')) {
+                const parts = line.split('\t');
+                return { code: parts[0].trim(), text: parts.slice(1).join('\t').trim() };
+            }
+
+            // Check for CSV-like with quotes: "Code","Text"
+            const csvMatch = line.match(/^"([^"]+)"\s*,\s*"(.+)"$/);
+            if (csvMatch) {
+                return { code: csvMatch[1], text: csvMatch[2] };
+            }
+
+            // Regex for common separators: "Code: Text" or "Code, Text" or "Code - Text"
+            const match = line.match(/^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+(.+)$/);
             if (match) {
                 return { code: match[1], text: match[2].trim() };
             }
+
             // Fallback: remove leading numbering "1. ", "1) "
             return { code: null, text: line.replace(/^\d+[.)\-\s]+/, '').trim() };
         });
 
         // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateDraft((d: any) => {
-            const currentStatements = importMode === 'append' ? (d.statements || []) : [];
+            const currentStatements = importMode === 'append' ? d.statements || [] : [];
             const startingIndex = currentStatements.length;
 
             const newStatements = parsedItems.map((item, idx) => {
@@ -71,15 +87,25 @@ const QSortEditor = () => {
 
                 return {
                     code,
-                    translations: [
-                        { language_code: activeLocale, text: item.text }
-                    ]
+                    translations: [{ language_code: activeLocale, text: item.text }],
                 };
             });
 
             d.statements = [...currentStatements, ...newStatements];
         });
         setBulkText('');
+        toast.success(
+            `Successfully ${importMode === 'append' ? 'appended' : 'imported'} ${parsedItems.length} statements`
+        );
+    };
+
+    const handleClearAll = () => {
+        if (confirm('Are you sure you want to delete ALL statements? This cannot be undone.')) {
+            updateDraft((d: any) => {
+                d.statements = [];
+            });
+            toast.info('All statements cleared');
+        }
     };
 
     const grid = (draft.grid_config || []) as GridColumn[];
@@ -119,7 +145,7 @@ const QSortEditor = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                             <RadioGroup
+                            <RadioGroup
                                 defaultValue="replace"
                                 value={importMode}
                                 onValueChange={(v) => setImportMode(v as 'replace' | 'append')}
@@ -152,31 +178,151 @@ const QSortEditor = () => {
                                     onClick={handleBulkSave}
                                     disabled={!bulkText.trim()}
                                 >
-                                    Process & Replace Statements
+                                    {importMode === 'replace'
+                                        ? 'Process & Replace Statements'
+                                        : 'Process & Append Statements'}
                                 </Button>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <div className="grid grid-cols-1 gap-2">
-                        {localizedStatements.map((text, idx) => (
-                            <div
-                                key={idx}
-                                className="flex items-center gap-3 p-3 bg-background border rounded-lg text-sm group"
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold flex items-center gap-2">
+                            <Quote className="h-4 w-4 text-muted-foreground" />
+                            Statement Set ({statements.length})
+                        </h3>
+                        {statements.length > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleClearAll}
+                                className="text-destructive hover:bg-destructive/5 h-8 gap-2"
                             >
-                                <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded min-w-[24px] text-center">
-                                    {idx + 1}
-                                </span>
-                                <span className="flex-1 truncate">{text}</span>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                <Trash2 className="h-4 w-4" />
+                                Clear All
+                            </Button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2">
+                        {localizedStatements.map((item, idx) => {
+                            const isEditing = editingIndex === idx;
+
+                            return (
+                                <div
+                                    key={idx}
+                                    className="flex items-center gap-3 p-3 bg-background border rounded-lg text-sm group"
                                 >
-                                    <Trash2 className="h-3 w-3" />
-                                </Button>
-                            </div>
-                        ))}
+                                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded min-w-[32px] text-center font-mono">
+                                        {item.code}
+                                    </span>
+
+                                    {isEditing ? (
+                                        <>
+                                            <Input
+                                                value={editingText}
+                                                onChange={(e) => setEditingText(e.target.value)}
+                                                className="flex-1"
+                                                autoFocus
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        // Save on Enter
+                                                        updateDraft((d: any) => {
+                                                            if (d.statements?.[idx]) {
+                                                                const statement = d.statements[idx];
+                                                                const translation =
+                                                                    statement.translations?.find(
+                                                                        (t: any) =>
+                                                                            t.language_code ===
+                                                                            activeLocale
+                                                                    );
+                                                                if (translation) {
+                                                                    translation.text = editingText;
+                                                                }
+                                                            }
+                                                        });
+                                                        setEditingIndex(null);
+                                                        toast.success('Statement updated');
+                                                    } else if (e.key === 'Escape') {
+                                                        // Cancel on Escape
+                                                        setEditingIndex(null);
+                                                    }
+                                                }}
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    updateDraft((d: any) => {
+                                                        if (d.statements?.[idx]) {
+                                                            const statement = d.statements[idx];
+                                                            const translation =
+                                                                statement.translations?.find(
+                                                                    (t: any) =>
+                                                                        t.language_code ===
+                                                                        activeLocale
+                                                                );
+                                                            if (translation) {
+                                                                translation.text = editingText;
+                                                            }
+                                                        }
+                                                    });
+                                                    setEditingIndex(null);
+                                                    toast.success('Statement updated');
+                                                }}
+                                                className="h-6 w-6 text-green-600 hover:bg-green-50"
+                                            >
+                                                <CheckCircle2 className="h-3 w-3" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setEditingIndex(null)}
+                                                className="h-6 w-6"
+                                            >
+                                                <AlertCircle className="h-3 w-3" />
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div
+                                                role="button"
+                                                tabIndex={0}
+                                                className="flex-1 cursor-text hover:bg-muted/50 px-2 py-1 rounded transition-colors"
+                                                onClick={() => {
+                                                    setEditingIndex(idx);
+                                                    setEditingText(item.text);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        setEditingIndex(idx);
+                                                        setEditingText(item.text);
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                title="Click to edit"
+                                            >
+                                                {item.text}
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    updateDraft((d: any) => {
+                                                        if (d.statements) {
+                                                            d.statements.splice(idx, 1);
+                                                        }
+                                                    });
+                                                }}
+                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </TabsContent>
 
@@ -306,6 +452,62 @@ const QSortEditor = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Research Settings */}
+                    <Card className="shadow-sm mt-8">
+                        <CardHeader>
+                            <CardTitle className="text-base">Research Settings</CardTitle>
+                            <CardDescription>
+                                Configure how statements are presented to participants
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between py-2">
+                                <div className="space-y-1">
+                                    <Label
+                                        htmlFor="randomize-statements"
+                                        className="text-sm font-medium"
+                                    >
+                                        Randomize Statement Order
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground max-w-md">
+                                        Present statements in random order for each participant to
+                                        prevent order effects.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="randomize-statements"
+                                    checked={draft.randomize_statements ?? false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        updateDraft((d) => {
+                                            d.randomize_statements = checked;
+                                        });
+                                    }}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between py-2 border-t">
+                                <div className="space-y-1">
+                                    <Label htmlFor="show-codes" className="text-sm font-medium">
+                                        Show Statement Codes
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground max-w-md">
+                                        Display statement codes (e.g., "S1", "S2") alongside the
+                                        text.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="show-codes"
+                                    checked={draft.show_statement_codes ?? false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        updateDraft((d) => {
+                                            d.show_statement_codes = checked;
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>

@@ -24,20 +24,47 @@ const RecruitmentPage = () => {
                 </div>
             </header>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="col-span-1 rounded-xl border bg-slate-50/50 p-6 flex flex-col items-center justify-center text-center gap-4 text-slate-400 dashed border-slate-200">
-                    <Mail className="h-10 w-10 text-slate-300" />
-                    <div>
-                        <h3 className="font-semibold text-slate-900">Email Invitations</h3>
-                        <p className="text-sm">Not implemented yet.</p>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl">
+                <div className="col-span-1 border rounded-xl p-8 bg-white shadow-sm flex flex-col items-center justify-center text-center gap-4 border-slate-200">
+                    <div className="p-4 rounded-full bg-slate-50 text-slate-400">
+                        <Mail className="h-10 w-10 text-slate-300" />
                     </div>
+                    <div>
+                        <h3 className="font-bold text-slate-900 text-lg">Email Campaigns</h3>
+                        <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                            Automate invitations and follow-ups with customizable templates.
+                        </p>
+                    </div>
+                    <Badge
+                        variant="secondary"
+                        className="bg-slate-100 text-slate-500 uppercase font-bold tracking-tighter text-[9px]"
+                    >
+                        Feature in development
+                    </Badge>
                 </div>
-                <div className="col-span-1 rounded-xl border bg-slate-50/50 p-6 flex flex-col items-center justify-center text-center gap-4 text-slate-400 dashed border-slate-200">
-                    <QrCode className="h-10 w-10 text-slate-300" />
-                    <div>
-                        <h3 className="font-semibold text-slate-900">QR Codes</h3>
-                        <p className="text-sm">Not implemented yet.</p>
+
+                <div className="col-span-1 border rounded-xl p-8 bg-white shadow-sm flex flex-col items-center justify-center text-center gap-4 border-slate-200">
+                    <div className="p-4 rounded-full bg-slate-50 text-slate-400">
+                        <QrCode className="h-10 w-10 text-slate-300" />
                     </div>
+                    <div>
+                        <h3 className="font-bold text-slate-900 text-lg">Smart QR Access</h3>
+                        <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                            Generate unique codes for offline recruitment or physical events.
+                        </p>
+                    </div>
+                    <Badge
+                        variant="secondary"
+                        className="bg-slate-100 text-slate-500 uppercase font-bold tracking-tighter text-[9px]"
+                    >
+                        Feature in development
+                    </Badge>
+                </div>
+
+                <div className="col-span-1 border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center gap-4 border-slate-100 opacity-60">
+                    <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                        More channels coming soon
+                    </p>
                 </div>
             </div>
         </div>

@@ -30,6 +30,11 @@ export async function setupAdminMocks(page: Page) {
             console.log(`[Browser]: ${text}`);
         }
     });
+    page.on('response', (resp) => {
+        if (resp.status() === 404) {
+            console.log(`[404] ${resp.url()}`);
+        }
+    });
     page.on('pageerror', (err) => console.error(`[Browser Error]: ${err.message}`));
 
 
@@ -37,8 +42,8 @@ export async function setupAdminMocks(page: Page) {
 
     // Catch-all for any other API requests (Strict check to avoid matching source files like /src/api/...)
     await page.route((url) => url.pathname.startsWith('/api/'), async (route) => {
-        console.log(`[Mock Catch-All] Intercepting unmocked request: ${route.request().url()}`);
-        await route.fulfill({ status: 200, json: {} });
+        console.log(`[Mock Catch-All] ${route.request().method()} ${route.request().url()}`);
+        await route.fulfill({ status: 200, json: [] });
     });
 
     // Valid for all tests using this fixture
@@ -55,7 +60,8 @@ export async function setupAdminMocks(page: Page) {
     });
 
     // STUDIES
-    await page.route('**/api/admin/studies', async (route) => {
+    await page.route(/\/api\/admin\/studies(\/|\?|$)/, async (route) => {
+        console.log(`[Mock] ${route.request().method()} ${route.request().url()}`);
         if (route.request().method() === 'POST') {
             const body = route.request().postDataJSON();
             const newStudy = {
@@ -78,18 +84,19 @@ export async function setupAdminMocks(page: Page) {
         }
     });
 
-    await page.route('**/api/admin/studies/*', async (route) => {
+    await page.route(/\/api\/admin\/studies\/[a-zA-Z0-9_\-]+/, async (route) => {
         const url = route.request().url();
+        console.log(`[Mock Single] ${route.request().method()} ${url}`);
         // Handle sub-resources manually since glob is broad
             if (url.includes('/state')) {
             const slug = url.match(/studies\/([\w-]+)\/state/)?.[1];
             const study = studiesStore.find((s) => s.slug === slug);
             if (!study) return route.fulfill({ status: 404 });
 
-            const action = new URL(url).searchParams.get('action');
-            if (action === 'activate') study.status = 'active';
-            if (action === 'close') study.status = 'completed';
-            return route.fulfill({ json: { ...study, state: study.status } });
+            const newState = new URL(url).searchParams.get('new_state');
+            if (newState === 'active') study.state = 'active';
+            if (newState === 'closed') study.state = 'completed';
+            return route.fulfill({ json: study });
         }
 
         if (url.includes('/stats')) {

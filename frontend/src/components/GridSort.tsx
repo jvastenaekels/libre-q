@@ -438,7 +438,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                                     width: cardDimensions.width,
                                                                     height: cardDimensions.height,
                                                                 }}
-                                                                className={`border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center ${getColumnTint(col.score)} bg-opacity-40 transition-all duration-300 shadow-sm ${selectedCardId ? 'ring-2 ring-indigo-400/50 bg-indigo-50/30 cursor-pointer hover:bg-indigo-100/50 hover:ring-indigo-500 hover:scale-[1.02]' : ''}`}
+                                                                className={`border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center ${getColumnTint(col.score)} bg-opacity-40 transition-all duration-300 shadow-sm ${selectedCardId ? 'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]' : ''}`}
                                                             >
                                                                 {renderSlotContent(
                                                                     colIndex,
@@ -474,6 +474,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 return (
                                                     <>
                                                         <span
+                                                            data-testid="legend-disagree"
                                                             className={`text-red-600 flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
                                                         >
                                                             {l1}
@@ -484,6 +485,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                             {l2}
                                                         </span>
                                                         <span
+                                                            data-testid="legend-agree"
                                                             className={`text-green-600 flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
                                                         >
                                                             {l3}
@@ -641,10 +643,16 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 <div className="flex items-center gap-3 text-slate-500">
                                     {selectedCardId ? (
                                         <>
-                                            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-indigo-500 text-[10px] text-white font-black">
+                                            <span
+                                                className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] text-white font-black"
+                                                style={{ backgroundColor: 'var(--brand-accent)' }}
+                                            >
                                                 2
                                             </span>
-                                            <span className="text-xs font-bold uppercase tracking-wide animate-pulse">
+                                            <span
+                                                className="text-xs font-bold uppercase tracking-wide animate-pulse"
+                                                style={{ color: 'var(--brand-accent)' }}
+                                            >
                                                 {t('fine.workbench.place_on_grid')}
                                             </span>
                                         </>

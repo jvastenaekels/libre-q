@@ -3,6 +3,7 @@
 import pytest
 from httpx import AsyncClient
 
+
 @pytest.mark.asyncio
 async def test_get_study_config_consent_fields(client: AsyncClient, seed_study, db):
     """Test that the study config endpoint returns the correct consent fields."""
@@ -25,6 +26,7 @@ async def test_get_study_config_consent_fields(client: AsyncClient, seed_study, 
     assert "accept" in consent
     assert "decline" in consent
 
+
 @pytest.mark.asyncio
 async def test_record_consent_integration(client: AsyncClient, seed_study):
     """Verify full consent flow: POST to endpoint."""
@@ -35,7 +37,7 @@ async def test_record_consent_integration(client: AsyncClient, seed_study):
         "study_slug": study.slug,
         "session_token": token,
         "language_code": "en",
-        "consent_hash": "test_hash_123"
+        "consent_hash": "test_hash_123",
     }
 
     response = await client.post(f"/api/study/{study.slug}/consent", json=payload)

@@ -23,7 +23,7 @@ export class AdminPage extends BasePage {
              await sidebarTrigger.click().catch(() => {});
         }
 
-        await this.page.getByRole('button', { name: /no study selected|select study/i }).click();
+        await this.page.getByTestId('study-switcher').click();
         await this.page.getByRole('menuitem', { name: /add study/i }).click();
         await this.page.getByLabel(/study title/i).fill(title);
         await this.page.getByLabel(/url slug/i).fill(slug);
@@ -37,8 +37,8 @@ export class AdminPage extends BasePage {
     }
 
     async configureQSort(statements: string[]) {
-        await this.page.getByRole('link', { name: /designer/i }).click();
-        await this.page.getByRole('tab', { name: /tri \(q-sort\)/i }).click();
+        await this.page.getByText('Study Design').first().click();
+        await this.page.getByRole('tab', { name: /Q-Sort Task/i }).click();
 
         const textarea = this.page.getByPlaceholder(/paste your statements here/i);
         await textarea.fill(statements.join('\n'));
@@ -51,7 +51,7 @@ export class AdminPage extends BasePage {
         await this.page.getByRole('link', { name: /overview/i }).click();
         await this.page.getByRole('button', { name: /launch study/i }).click();
         await this.page.getByRole('button', { name: /yes, launch now/i }).click();
-        await expect(this.page.getByText('LIVE FIELDWORK')).toBeVisible();
+        await expect(this.page.getByText(/receiving data/i)).toBeVisible();
     }
 
     async exportCSV() {
@@ -63,9 +63,9 @@ export class AdminPage extends BasePage {
     }
 
     async closeStudy() {
-        await this.page.getByRole('button', { name: /close fieldwork/i }).click();
+        await this.page.getByRole('button', { name: /close data collection/i }).click();
         await this.page.getByRole('button', { name: /close study/i }).click();
-        await expect(this.page.getByRole('status').getByText('Closed', { exact: true })).toBeVisible();
+        await expect(this.page.getByTestId('study-status')).toHaveText(/completed/i);
     }
 
     async verifyParticipant(text: string | RegExp) {

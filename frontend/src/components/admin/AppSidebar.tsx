@@ -51,14 +51,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   isActive: true,
                   items: [
                       {
-                          title: 'Dashboard',
+                          title: 'Study Overview',
                           url: `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
-                      },
-                      {
-                          title: 'Protocol Design',
-                          url: `/admin/studies/${activeStudyId}/design`,
-                          icon: PencilRuler,
                       },
                       {
                           title: 'Collaborators',
@@ -66,12 +61,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           icon: Users,
                       },
                       {
+                          title: 'Study Design',
+                          url: `/admin/studies/${activeStudyId}/design`,
+                          icon: PencilRuler,
+                      },
+                      {
                           title: 'Recruitment',
                           url: `/admin/studies/${activeStudyId}/recruitment`,
                           icon: Send, // Placeholder
+                          badge: 'Coming Soon',
                       },
                       {
-                          title: 'Data & Exports',
+                          title: 'Analytics & Data',
                           url: `/admin/studies/${activeStudyId}/exports`,
                           icon: Database,
                       },
@@ -100,6 +101,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         <Link to={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
+                                            {item.badge && (
+                                                <span className="ml-auto text-[9px] font-bold uppercase py-0.5 px-1.5 rounded-full bg-slate-100 text-slate-500 ring-1 ring-slate-200">
+                                                    {item.badge}
+                                                </span>
+                                            )}
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

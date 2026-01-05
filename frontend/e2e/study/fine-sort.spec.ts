@@ -37,7 +37,7 @@ const mockStudyConfig = {
     state: rawStudy.state || 'active',
 };
 
-test.describe.skip('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
+test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
     test.setTimeout(120_000);
 
     test.beforeEach(async ({ page }) => {

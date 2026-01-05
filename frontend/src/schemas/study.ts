@@ -13,6 +13,11 @@ export const ConsentSchema = z.object({
     decline: z.string().optional().nullable(),
 });
 
+export const BrandingSchema = z.object({
+    logo_url: z.string().optional().nullable(),
+    accent_color: z.string().optional().nullable(),
+});
+
 export const GridConfigSchema = z.object({
     score: z.number(),
     capacity: z.number(),
@@ -77,6 +82,7 @@ export const StudyConfigSchema = z.object({
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
+    branding: BrandingSchema.optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

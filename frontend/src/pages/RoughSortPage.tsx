@@ -199,7 +199,8 @@ const RoughSortPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => navigate(`/study/${slug}/fine-sort`)}
-                        className="px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
+                        className="px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
                     >
                         {t('common.next')} <ArrowRight size={18} />
                     </button>
@@ -222,8 +223,8 @@ const RoughSortPage: React.FC = () => {
             {/* 1. Slim Progress Bar (Top) */}
             <div className="w-full h-1 bg-gray-100 flex-none z-30">
                 <div
-                    className="h-full bg-indigo-500 transition-all duration-300 ease-out"
-                    style={{ width: `${progress}%` }}
+                    className="h-full transition-all duration-300 ease-out"
+                    style={{ width: `${progress}%`, backgroundColor: 'var(--brand-accent)' }}
                 />
             </div>
 

@@ -59,9 +59,6 @@ export function WorkspaceSwitcher() {
                                 <span className="truncate font-semibold">
                                     {activeWorkspace ? activeWorkspace.title : 'Select Workspace'}
                                 </span>
-                                <span className="truncate text-xs">
-                                    {activeWorkspace ? 'Free Plan' : 'No workspace'}
-                                </span>
                             </div>
                             <ChevronsUpDown className="ml-auto" />
                         </SidebarMenuButton>
@@ -95,8 +92,11 @@ export function WorkspaceSwitcher() {
                             <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                                 <Plus className="size-4" />
                             </div>
-                            <div className="font-medium text-muted-foreground">
+                            <div className="font-medium text-muted-foreground flex items-center justify-between w-full">
                                 Create Workspace
+                                <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                    Coming Soon
+                                </span>
                             </div>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -14,8 +14,8 @@ export class FineSortPage extends BasePage {
     }
 
     async verifyLayout() {
-        await expect(this.page.getByText(/DISAGREE|DÉSACCORD/i).first()).toBeVisible();
-        await expect(this.page.getByText(/AGREE|ACCORD/i).last()).toBeVisible();
+        await expect(this.page.getByTestId('legend-disagree')).toBeVisible();
+        await expect(this.page.getByTestId('legend-agree')).toBeVisible();
         await expect(this.page.getByRole('button', { name: /zoom/i })).toHaveCount(2);
         await expect(this.page.getByRole('tab')).toHaveCount(3);
     }

@@ -1,6 +1,6 @@
-import { useNavigate, useParams, MemoryRouter } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
     Wand2,
@@ -14,10 +14,11 @@ import {
     Smartphone,
     Monitor,
     AlertTriangle,
+    ExternalLink,
+    Palette,
 } from 'lucide-react';
 import Frame from 'react-frame-component';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
     useGetStudyApiAdminStudiesSlugGet,
     useUpdateStudyApiAdminStudiesSlugPatch,
@@ -28,6 +29,7 @@ import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
 import QSortEditor from '@/components/admin/designer/QSortEditor';
 import PostSortConfigEditor from '@/components/admin/designer/PostSortConfigEditor';
+import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import WelcomePage from '@/pages/WelcomePage';
 import PreSortPage from '@/pages/PreSortPage';
@@ -105,15 +107,50 @@ const StudyDesignPage = () => {
             });
 
             setConfig(syntheticStudy);
-        }
-    }, [draft, activeLocale, setConfig]);
 
-    // TODO: Implement proper dirty state tracking
-    // const isDirty = JSON.stringify(draft) !== JSON.stringify(original);
+            // Broadcast to detachable preview windows
+            if (slug) {
+                const bc = new BroadcastChannel(`open-q-designer-${slug}`);
+                bc.postMessage({
+                    type: 'SYNC_DRAFT',
+                    payload: {
+                        config: syntheticStudy,
+                        activeStep,
+                    },
+                });
+                // Persist for initial load of new popups
+                localStorage.setItem(
+                    `open-q-designer-sync-${slug}`,
+                    JSON.stringify({
+                        config: syntheticStudy,
+                        activeStep,
+                    })
+                );
+                bc.close();
+            }
+        }
+    }, [draft, activeLocale, activeStep, setConfig, slug]);
+
+    // Dirty State Detection
+    const isDirty = JSON.stringify(draft) !== JSON.stringify(study);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty]);
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;
-    const gridCapacity = (draft?.grid_config || []).reduce((acc, col) => acc + (col.capacity || 0), 0);
+    const gridCapacity = (draft?.grid_config || []).reduce(
+        (acc, col) => acc + (col.capacity || 0),
+        0
+    );
     const isGridValid = statementsCount === gridCapacity;
 
     const handleSave = async () => {
@@ -125,11 +162,52 @@ const StudyDesignPage = () => {
                 // biome-ignore lint/suspicious/noExplicitAny: schema cast
                 data: draft as any,
             });
-            toast.success('Study configuration saved successfully');
+            toast.success('Study design saved successfully');
         } catch (error) {
-            toast.error('Failed to save study configuration');
+            toast.error('Failed to save study design');
             console.error(error);
         }
+    };
+
+    const handleTestRun = () => {
+        if (!draft || !slug) return;
+
+        // 1. Build synthetic config (same logic as side-preview)
+        const translation = (draft.translations as any[])?.find(
+            (t: any) => t.language_code === activeLocale
+        );
+
+        const syntheticConfig = {
+            ...draft,
+            title: translation?.title || 'No Title',
+            subtitle: translation?.subtitle,
+            description: translation?.description,
+            objective: translation?.objective,
+            instructions: translation?.instructions,
+            consent: {
+                title: translation?.consent_title,
+                description: translation?.consent_description,
+                accept: translation?.consent_accept,
+                decline: translation?.consent_decline,
+            },
+            ui_labels: translation?.ui_labels || {},
+            language: activeLocale,
+            statements: (draft.statements || []).map((s: any) => {
+                const st = s.translations?.find((t: any) => t.language_code === activeLocale);
+                return {
+                    id: Math.floor(Math.random() * 1000000), // Mock numerical ID
+                    code: s.code,
+                    text: st?.text || '',
+                };
+            }),
+        };
+
+        // 2. Persist to localStorage
+        localStorage.setItem(`open-q-test-config-${slug}`, JSON.stringify(syntheticConfig));
+
+        // 3. Open in new tab with mode=test
+        window.open(`/study/${slug}?mode=test`, '_blank');
+        toast.info('Opening study in pilot mode...');
     };
 
     if (isLoading) {
@@ -147,12 +225,20 @@ const StudyDesignPage = () => {
                 {/* Capture all style tags (Vite dev & some prod) */}
                 {Array.from(document.querySelectorAll('style')).map((style, i) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: stable enough for dev preview
-                    <style key={`style-${i}`} dangerouslySetInnerHTML={{ __html: style.innerHTML }} />
+                    <style
+                        key={`style-${i}`}
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: injecting styles to preview
+                        dangerouslySetInnerHTML={{ __html: style.innerHTML }}
+                    />
                 ))}
                 {/* Capture all linked stylesheets (Prod bundles) */}
                 {Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link, i) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: stable
-                    <link key={`link-${i}`} rel="stylesheet" href={(link as HTMLLinkElement).href} />
+                    <link
+                        key={`link-${i}`}
+                        rel="stylesheet"
+                        href={(link as HTMLLinkElement).href}
+                    />
                 ))}
             </>
         );
@@ -168,10 +254,9 @@ const StudyDesignPage = () => {
                     backgroundColor: 'white',
                 }}
             >
-                <MemoryRouter>
-                    <LayoutProvider>
-                        <div className="h-full w-full bg-background text-foreground">
-                            {(() => {
+                <LayoutProvider>
+                    <div className="h-full w-full bg-background text-foreground">
+                        {(() => {
                             switch (activeStep) {
                                 case 'intro':
                                     return <WelcomePage />;
@@ -181,15 +266,16 @@ const StudyDesignPage = () => {
                                     return <RoughSortPage />;
                                 case 'post-sort':
                                     return <PostSortPage />;
+                                case 'branding':
+                                    return <BrandingEditor />;
                                 case 'interface': // Show Welcome page for interface edits
                                     return <WelcomePage />;
                                 default:
                                     return <WelcomePage />;
                             }
                         })()}
-                        </div>
-                    </LayoutProvider>
-                </MemoryRouter>
+                    </div>
+                </LayoutProvider>
             </Frame>
         );
     };
@@ -201,7 +287,7 @@ const StudyDesignPage = () => {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-md border border-primary/10">
                         <Wand2 className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-semibold">Flow Designer</span>
+                        <span className="text-sm font-semibold">Study Designer</span>
                     </div>
                     <div className="h-4 w-px bg-border" />
                     <h2 className="text-sm font-medium truncate max-w-[200px] font-mono">
@@ -211,22 +297,26 @@ const StudyDesignPage = () => {
 
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 mr-4 bg-muted/50 rounded-lg p-1">
-                        <Button
-                            variant={activeLocale === 'en' ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className="h-7 px-2 text-xs"
-                            onClick={() => setActiveLocale('en')}
-                        >
-                            EN
-                        </Button>
-                        <Button
-                            variant={activeLocale === 'fr' ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className="h-7 px-2 text-xs"
-                            onClick={() => setActiveLocale('fr')}
-                        >
-                            FR
-                        </Button>
+                        {draft?.supported_languages?.map((lang: string) => (
+                            <Button
+                                key={lang}
+                                variant={activeLocale === lang ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="h-7 px-2 text-xs"
+                                onClick={() => setActiveLocale(lang)}
+                            >
+                                {lang.toUpperCase()}
+                            </Button>
+                        )) || (
+                            <Button
+                                variant={activeLocale === 'en' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="h-7 px-2 text-xs"
+                                onClick={() => setActiveLocale('en')}
+                            >
+                                EN
+                            </Button>
+                        )}
                     </div>
 
                     <Button
@@ -251,13 +341,26 @@ const StudyDesignPage = () => {
                         <RotateCcw className="h-4 w-4" />
                     </Button>
 
-                    <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                    <Button variant="secondary" size="sm" onClick={handleTestRun} className="gap-2">
+                        <Eye className="h-4 w-4" />
+                        Test Run
+                    </Button>
+
+                    <Button
+                        size="sm"
+                        onClick={handleSave}
+                        disabled={updateMutation.isPending}
+                        className={cn(
+                            'transition-all',
+                            isDirty && 'ring-2 ring-primary ring-offset-2 shadow-lg'
+                        )}
+                    >
                         {updateMutation.isPending ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (
                             <Save className="h-4 w-4 mr-2" />
                         )}
-                        Save Changes
+                        {isDirty ? 'Save Design*' : 'Save Design'}
                     </Button>
                 </div>
             </div>
@@ -272,7 +375,7 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="grid grid-cols-5 mb-8 w-full max-w-3xl mx-auto shadow-sm">
+                        <TabsList className="grid grid-cols-6 mb-8 w-full max-w-4xl mx-auto shadow-sm">
                             <TabsTrigger value="intro" className="gap-2">
                                 👋 Welcome
                             </TabsTrigger>
@@ -288,6 +391,9 @@ const StudyDesignPage = () => {
                             <TabsTrigger value="interface" className="gap-2">
                                 🎨 Interface
                             </TabsTrigger>
+                            <TabsTrigger value="branding" className="gap-2">
+                                <Palette className="h-4 w-4" /> Theme
+                            </TabsTrigger>
                         </TabsList>
 
                         <div className="max-w-3xl mx-auto pb-20">
@@ -299,9 +405,10 @@ const StudyDesignPage = () => {
                                             Grid Configuration Mismatch
                                         </h4>
                                         <p className="text-sm text-amber-700 mt-1">
-                                            You have <strong>{statementsCount}</strong> statements but the
-                                            grid only has slots for <strong>{gridCapacity}</strong> items.
-                                            Please adjust the columns in the "Q-Sort Task" tab.
+                                            You have <strong>{statementsCount}</strong> statements
+                                            but the grid only has slots for{' '}
+                                            <strong>{gridCapacity}</strong> items. Please adjust the
+                                            columns in the "Q-Sort Task" tab.
                                         </p>
                                     </div>
                                     <Button
@@ -334,6 +441,10 @@ const StudyDesignPage = () => {
                             <TabsContent value="interface" className="mt-0 outline-none">
                                 <InterfaceEditor />
                             </TabsContent>
+
+                            <TabsContent value="branding" className="mt-0 outline-none">
+                                <BrandingEditor />
+                            </TabsContent>
                         </div>
                     </Tabs>
                 </div>
@@ -365,6 +476,22 @@ const StudyDesignPage = () => {
                                     title="Desktop View"
                                 >
                                     <Monitor className="h-3 w-3" />
+                                </Button>
+                                <div className="w-px h-3 bg-border mx-1" />
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-6 w-6"
+                                    onClick={() =>
+                                        window.open(
+                                            `/admin/studies/${slug}/design/preview`,
+                                            '_blank',
+                                            'width=1200,height=800'
+                                        )
+                                    }
+                                    title="Pop out Preview"
+                                >
+                                    <ExternalLink className="h-3 w-3" />
                                 </Button>
                             </div>
                             <div className="text-[10px] text-muted-foreground px-2 py-0.5 bg-background rounded border font-mono">

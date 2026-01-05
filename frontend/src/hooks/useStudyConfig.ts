@@ -26,7 +26,55 @@ export const useStudyConfig = () => {
     const langToRequest = session.language ?? window.navigator.language.substring(0, 2);
 
     // --- Query Hook ---
-    const { data, isLoading, error, refetch } = useGetStudyConfig(slug, langToRequest);
+    const searchParams = new URLSearchParams(window.location.search);
+    const isTestMode = searchParams.get('mode') === 'test';
+
+    const { data, isLoading, error, refetch } = useGetStudyConfig(
+        slug,
+        langToRequest,
+        // Disable query if we're in test mode and have local data
+        { enabled: !!slug && !isTestMode }
+    );
+
+    // --- Effect: Handle Test Mode Loading ---
+    useEffect(() => {
+        if (isTestMode && slug) {
+            const draftKey = `open-q-test-config-${slug}`;
+            const draftJson = localStorage.getItem(draftKey);
+            if (draftJson) {
+                try {
+                    const draft = JSON.parse(draftJson);
+                    setConfig(draft);
+                    if (draft.ui_labels) {
+                        applyStudyOverrides(draft.language || 'en', draft.ui_labels);
+                    }
+                    if (
+                        !session.language ||
+                        (draft.language && session.language !== draft.language)
+                    ) {
+                        setLanguage(draft.language || 'en');
+                    }
+                    setConfigError(null);
+                    setConfigLoading(false);
+                    console.log('Loaded study config from localStorage (Test Mode)');
+                } catch (e) {
+                    console.error('Failed to parse test config from localStorage', e);
+                    setConfigError('common.errors.validation');
+                }
+            } else {
+                // If no local data, we could fallback to API or show error
+                // For now, let's just trigger the normal loading if its enabled
+            }
+        }
+    }, [
+        isTestMode,
+        slug,
+        setConfig,
+        setLanguage,
+        session.language,
+        setConfigError,
+        setConfigLoading,
+    ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---
     useEffect(() => {
@@ -38,12 +86,14 @@ export const useStudyConfig = () => {
 
     // --- Effect: Sync Loading State ---
     useEffect(() => {
-        setConfigLoading(isLoading);
-    }, [isLoading, setConfigLoading]);
+        if (!isTestMode) {
+            setConfigLoading(isLoading);
+        }
+    }, [isLoading, setConfigLoading, isTestMode]);
 
     // --- Effect: Sync Data on Success ---
     useEffect(() => {
-        if (data) {
+        if (data && !isTestMode) {
             setConfig(data);
 
             if (data.ui_labels) {
@@ -56,7 +106,7 @@ export const useStudyConfig = () => {
             // Clear error on success
             setConfigError(null);
         }
-    }, [data, setConfig, setLanguage, session.language, setConfigError]);
+    }, [data, setConfig, setLanguage, session.language, setConfigError, isTestMode]);
 
     // --- Effect: Sync Error ---
     useEffect(() => {

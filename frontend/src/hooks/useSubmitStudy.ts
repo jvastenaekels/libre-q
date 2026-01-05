@@ -61,6 +61,20 @@ export const useSubmitStudy = () => {
                     },
                 };
 
+                const searchParams = new URLSearchParams(window.location.search);
+                const isTestMode = searchParams.get('mode') === 'test';
+
+                if (isTestMode) {
+                    console.log('PILOT SUBMISSION (Simulated):', payload);
+                    if (status === 'completed') {
+                        setIsSuccess(true);
+                        const code = `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                        setConfirmationCode(code);
+                        session.completeSession(code);
+                    }
+                    return;
+                }
+
                 const data = await submitStudyMutation({ data: payload });
 
                 if (status === 'completed') {
@@ -86,6 +100,7 @@ export const useSubmitStudy = () => {
             responses.postsort,
             responses.presort,
             submitStudyMutation,
+            session.completeSession,
         ]
     );
 

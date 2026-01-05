@@ -170,7 +170,13 @@ const PostSortPage: React.FC = () => {
     if (isSuccess) {
         return (
             <div className="max-w-xl mx-auto px-4 py-24 text-center">
-                <div className="bg-green-100 text-green-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                    style={{
+                        backgroundColor: 'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                        color: 'var(--brand-accent)',
+                    }}
+                >
                     <Check size={40} strokeWidth={3} />
                 </div>
                 <h1 className="text-3xl font-bold text-slate-800 mb-4">
@@ -198,7 +204,7 @@ const PostSortPage: React.FC = () => {
             {/* Loading Overlay */}
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[50vh]">
-                    <div className="animate-spin text-blue-600 mb-4">
+                    <div className="animate-spin mb-4" style={{ color: 'var(--brand-accent)' }}>
                         <Loader2 size={48} />
                     </div>
                     <p className="text-xl font-semibold text-slate-700">
@@ -302,7 +308,7 @@ const PostSortPage: React.FC = () => {
                                         }
                                         className={`
                                             w-full p-3 rounded-lg border focus:ring-2 focus:outline-none min-h-[100px]
-                                            ${!isValid && isTouched ? 'border-red-300 focus:ring-red-200 bg-red-50' : 'border-slate-300 focus:ring-indigo-200 focus:border-indigo-400'}
+                                            ${!isValid && isTouched ? 'border-red-300 focus:ring-red-200 bg-red-50' : 'border-slate-300 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)] focus:ring-opacity-20'}
                                         `}
                                         placeholder={t('post.extreme.placeholder')}
                                         disabled={isLoading}
@@ -337,7 +343,7 @@ const PostSortPage: React.FC = () => {
                     {/* Dropdown to add - Ensure it's fully responsive */}
                     <div className="w-full overflow-hidden">
                         <select
-                            className="w-full min-w-0 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white truncate pr-10"
+                            className="w-full min-w-0 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] bg-white truncate pr-10"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);
@@ -441,7 +447,7 @@ const PostSortPage: React.FC = () => {
                                     <textarea
                                         value={responses.postsort.card_comments[id] || ''}
                                         onChange={(e) => handleCommentChange(id, e.target.value)}
-                                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 min-h-[100px]"
+                                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] min-h-[100px]"
                                         placeholder={t(
                                             'post.optional.placeholder',
                                             'Your comment here...'
@@ -469,7 +475,7 @@ const PostSortPage: React.FC = () => {
                         id="missing_statement"
                         value={responses.postsort?.missing_statement || ''}
                         onChange={(e) => setPostSortResponse('missing_statement', e.target.value)}
-                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 min-h-[80px]"
+                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] min-h-[80px]"
                         placeholder={t('post.missing.placeholder')}
                         disabled={isLoading}
                     />
@@ -488,7 +494,7 @@ const PostSortPage: React.FC = () => {
                         id="general_comment"
                         value={responses.postsort?.general_comment || ''}
                         onChange={(e) => setPostSortResponse('general_comment', e.target.value)}
-                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 min-h-[80px]"
+                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] min-h-[80px]"
                         placeholder={t('post.general.placeholder')}
                         disabled={isLoading}
                     />
@@ -499,9 +505,10 @@ const PostSortPage: React.FC = () => {
                         type="button"
                         onClick={handleSubmit}
                         disabled={isLoading}
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="
-                            bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg
-                            hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300
+                            text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg
+                            hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-300
                             flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed
                         "
                     >

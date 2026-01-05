@@ -2,16 +2,16 @@ import type { StudyTranslationRead as StudyTranslation } from '@/api/model/study
 import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Info } from 'lucide-react';
 import type React from 'react';
+import MarkdownEditor from './MarkdownEditor';
 
 const IntroductionEditor = () => {
     const { t } = useTranslation();
-    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
 
     if (!draft) return null;
 
@@ -19,22 +19,19 @@ const IntroductionEditor = () => {
     const hasConsent = !!translation?.consent_title;
 
     const handleChange = (field: keyof StudyTranslation, value: string) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
-        updateTranslation(activeLocale, (t: any) => {
-            // biome-ignore lint/suspicious/noExplicitAny: complex state update
-            (t as any)[field] = value;
+        updateTranslation(activeLocale, (t_trans: any) => {
+            (t_trans as any)[field] = value;
         });
     };
 
-    const toggleConsent = (checked: boolean) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
+    const _toggleConsent = (checked: boolean) => {
         updateTranslation(activeLocale, (t_trans: any) => {
             if (checked) {
                 t_trans.consent_title = t_trans.consent_title || t('consent.title');
                 t_trans.consent_description =
                     t_trans.consent_description || t('consent.default_text');
-                t_trans.consent_accept = t_trans.consent_accept || t('welcome.consent.label'); // Closest match or custom
-                t_trans.consent_decline = t_trans.consent_decline || t('common.close'); // Fallback
+                t_trans.consent_accept = t_trans.consent_accept || t('welcome.consent.label');
+                t_trans.consent_decline = t_trans.consent_decline || t('common.close');
             } else {
                 t_trans.consent_title = null;
                 t_trans.consent_description = null;
@@ -48,14 +45,18 @@ const IntroductionEditor = () => {
         <div className="space-y-8">
             <section className="space-y-4">
                 <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <Info className="h-5 w-5" />
+                    <span className="bg-primary/10 p-1 rounded">
+                        <Info className="h-5 w-5" />
+                    </span>
                     Welcome Message
                 </div>
 
                 <Card className="shadow-sm">
                     <CardContent className="pt-6 space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="title">Study Title</Label>
+                            <Label htmlFor="title" className="text-sm font-semibold">
+                                Study Title
+                            </Label>
                             <Input
                                 id="title"
                                 value={translation?.title || ''}
@@ -63,10 +64,16 @@ const IntroductionEditor = () => {
                                     handleChange('title', e.target.value)
                                 }
                                 placeholder="Enter public title..."
+                                className="font-semibold text-lg"
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="subtitle">Subtitle (Optional)</Label>
+                            <Label
+                                htmlFor="subtitle"
+                                className="text-sm font-semibold text-slate-500"
+                            >
+                                Subtitle (Optional)
+                            </Label>
                             <Input
                                 id="subtitle"
                                 value={translation?.subtitle || ''}
@@ -77,14 +84,12 @@ const IntroductionEditor = () => {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="description">Short Description</Label>
-                            <Textarea
-                                id="description"
-                                value={translation?.description || ''}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    handleChange('description', e.target.value)
-                                }
-                                placeholder="What is this study about?"
+                            <MarkdownEditor
+                                id="objective"
+                                label="Study Objective"
+                                value={translation?.objective || ''}
+                                onChange={(val: string) => handleChange('objective', val)}
+                                placeholder="What is the research question or purpose of this study?"
                             />
                         </div>
                     </CardContent>
@@ -92,120 +97,77 @@ const IntroductionEditor = () => {
             </section>
 
             <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <Info className="h-5 w-5" />
-                    Instructions
-                </div>
-                <Card className="shadow-sm">
-                    <CardContent className="pt-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="instructions">
-                                Task Instructions (Markdown supported)
-                            </Label>
-                            <Textarea
-                                id="instructions"
-                                className="min-h-[200px] font-serif"
-                                value={translation?.instructions || ''}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    handleChange('instructions', e.target.value)
-                                }
-                                placeholder="# Instructions&#10;&#10;1. Phase 1...&#10;2. Phase 2..."
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
-            </section>
-
-            <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <Info className="h-5 w-5" />
-                    Research Settings
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-lg">
+                        <span className="bg-primary/10 p-1 rounded">
+                            <Info className="h-5 w-5" />
+                        </span>
+                        Process Explanation
+                        <span className="text-xs text-muted-foreground font-normal ml-2">
+                            (Optional)
+                        </span>
+                    </div>
+                    <Switch
+                        id="enable-instructions"
+                        checked={!!translation?.instructions && translation?.instructions !== null}
+                        onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                                handleChange('instructions', '');
+                            } else {
+                                handleChange('instructions', null as any);
+                            }
+                        }}
+                    />
                 </div>
 
-                <Card className="shadow-sm">
-                    <CardContent className="pt-6 space-y-4">
-                        <div className="flex items-center justify-between py-2">
-                            <div className="space-y-1">
-                                <Label
-                                    htmlFor="randomize-statements"
-                                    className="text-sm font-medium"
-                                >
-                                    Randomize Statement Order
-                                </Label>
-                                <p className="text-xs text-muted-foreground max-w-md">
-                                    Present statements in random order for each participant to
-                                    prevent order effects. This is a Q methodology best practice for
-                                    scientific validity. Each participant sees a unique but
-                                    reproducible order.
-                                </p>
+                {translation?.instructions !== undefined && translation?.instructions !== null && (
+                    <Card className="shadow-sm">
+                        <CardContent className="pt-6">
+                            <div className="grid gap-2">
+                                <MarkdownEditor
+                                    id="instructions"
+                                    label="Task Overview"
+                                    value={translation?.instructions || ''}
+                                    onChange={(val: string) => handleChange('instructions', val)}
+                                    placeholder="Briefly explain the study process to participants (optional)..."
+                                    className="min-h-[200px]"
+                                />
                             </div>
-                            <Switch
-                                id="randomize-statements"
-                                checked={draft.randomize_statements ?? false}
-                                onCheckedChange={(checked: boolean) => {
-                                    updateDraft((d) => {
-                                        d.randomize_statements = checked;
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-between py-2 border-t">
-                            <div className="space-y-1">
-                                <Label htmlFor="show-codes" className="text-sm font-medium">
-                                    Show Statement Codes
-                                </Label>
-                                <p className="text-xs text-muted-foreground max-w-md">
-                                    Display statement codes (e.g., "S1", "S2") alongside the text.
-                                    Useful for referencing specific statements in follow-up
-                                    interviews.
-                                </p>
-                            </div>
-                            <Switch
-                                id="show-codes"
-                                checked={draft.show_statement_codes ?? false}
-                                onCheckedChange={(checked: boolean) => {
-                                    updateDraft((d) => {
-                                        d.show_statement_codes = checked;
-                                    });
-                                }}
-                            />
-                        </div>
-
-                        {draft.randomize_statements && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 mt-4">
-                                <div className="flex gap-2">
-                                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                                    <p>
-                                        <strong>Q Methodology Best Practice:</strong> Randomization
-                                        uses each participant's unique session ID as a seed,
-                                        ensuring they always see the same order across page
-                                        refreshes while preventing systematic position biases in
-                                        factor analysis.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                )}
             </section>
 
             <section className="space-y-4 pb-12">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                        <Info className="h-5 w-5" />
-                        Consent Builder
+                        <span className="bg-primary/10 p-1 rounded">
+                            <Info className="h-5 w-5" />
+                        </span>
+                        Consent Form
+                        <span className="text-xs text-muted-foreground font-normal ml-2">
+                            (Enabled by default)
+                        </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Switch
-                            id="require-consent"
-                            checked={hasConsent}
-                            onCheckedChange={toggleConsent}
-                        />
-                        <Label htmlFor="require-consent" className="cursor-pointer">
-                            Enable Consent Step
-                        </Label>
-                    </div>
+                    <Switch
+                        id="enable-consent"
+                        checked={hasConsent}
+                        onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                                updateTranslation(activeLocale, (t_trans: any) => {
+                                    t_trans.consent_title =
+                                        t_trans.consent_title || t('consent.title');
+                                    t_trans.consent_description =
+                                        t_trans.consent_description || t('consent.default_text');
+                                });
+                            } else {
+                                updateTranslation(activeLocale, (t_trans: any) => {
+                                    t_trans.consent_title = null;
+                                    t_trans.consent_description = null;
+                                });
+                            }
+                        }}
+                    />
                 </div>
 
                 {hasConsent && (
@@ -228,39 +190,15 @@ const IntroductionEditor = () => {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="consent-description">Legal Text / Agreement</Label>
-                                <Textarea
+                                <MarkdownEditor
                                     id="consent-description"
-                                    className="min-h-[150px]"
+                                    label="Legal Text / Agreement"
                                     value={translation?.consent_description || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        handleChange('consent_description', e.target.value)
+                                    onChange={(val: string) =>
+                                        handleChange('consent_description', val)
                                     }
+                                    placeholder="Enter the full legal agreement text..."
                                 />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 pt-2">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="consent-accept">Accept Button</Label>
-                                    <Input
-                                        id="consent-accept"
-                                        placeholder={`Default: ${t('welcome.consent.label')}`}
-                                        value={translation?.consent_accept || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                            handleChange('consent_accept', e.target.value)
-                                        }
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="consent-decline">Decline Button</Label>
-                                    <Input
-                                        id="consent-decline"
-                                        placeholder={`Default: ${t('common.close')}`}
-                                        value={translation?.consent_decline || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                            handleChange('consent_decline', e.target.value)
-                                        }
-                                    />
-                                </div>
                             </div>
                         </CardContent>
                     </Card>

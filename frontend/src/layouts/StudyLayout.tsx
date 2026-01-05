@@ -135,7 +135,8 @@ const StudyLayoutContent: React.FC = () => {
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
                 <div
                     data-testid="loading-spinner"
-                    className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+                    className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin"
+                    style={{ borderColor: 'var(--brand-accent)', borderTopColor: 'transparent' }}
                 ></div>
                 <div className="space-y-2 text-center animate-pulse">
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
@@ -188,8 +189,22 @@ const StudyLayoutContent: React.FC = () => {
     // This effectively acts as the bottom bar for mobile when an action is present
     const showMobileFooter = !!headerAction;
 
+    const isTestMode = new URLSearchParams(location.search).get('mode') === 'test';
+    const branding = config?.branding;
+    const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
+
     return (
-        <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
+        <div
+            className="h-dvh bg-gray-50 flex flex-col overflow-hidden"
+            style={{ '--brand-accent': accentColor } as React.CSSProperties}
+        >
+            {/* Pilot Mode Banner */}
+            {isTestMode && (
+                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-[11px] font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
+                    <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                    Pilot Mode: Changes are temporary & data will not be saved
+                </div>
+            )}
             {/* Header */}
             <header
                 data-testid="layout-header"
@@ -197,15 +212,15 @@ const StudyLayoutContent: React.FC = () => {
             >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/20 overflow-hidden">
-                        <div className="h-full bg-blue-600 w-1/3 animate-loading-line" />
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-[var(--brand-accent)]/20 overflow-hidden">
+                        <div className="h-full bg-[var(--brand-accent)] w-1/3 animate-loading-line" />
                     </div>
                 )}
 
                 {/* Mobile Progress Bar (Top Edge) */}
                 <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
-                        className="h-full bg-blue-600 transition-all duration-300 ease-in-out"
+                        className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
                         style={{ width: `${(session.currentStep / steps.length) * 100}%` }}
                     />
                 </div>
@@ -213,8 +228,14 @@ const StudyLayoutContent: React.FC = () => {
                 {/* LEFT: Branding / Context */}
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
-                        {/* Use logo if on step 1, else config title */}
-                        {session.currentStep === 1 ? (
+                        {/* Use custom logo if available, or logo if on step 1, else config title */}
+                        {branding?.logo_url ? (
+                            <img
+                                src={branding.logo_url}
+                                alt={config?.title || 'Study Logo'}
+                                className="h-8 w-auto object-contain"
+                            />
+                        ) : session.currentStep === 1 ? (
                             <img
                                 src="/open-q-logo.svg"
                                 alt="Open-Q"
@@ -230,9 +251,13 @@ const StudyLayoutContent: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
+                            style={{
+                                backgroundColor: isStepMenuOpen ? 'var(--brand-accent)' : undefined,
+                                color: isStepMenuOpen ? 'white' : undefined,
+                            }}
                             className={`
                                 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5
-                                ${isStepMenuOpen ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-500 bg-slate-100 hover:bg-slate-200'}
+                                ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
                             {t('layout.mobile_step')} {session.currentStep}/{steps.length}
@@ -261,11 +286,19 @@ const StudyLayoutContent: React.FC = () => {
                                                 handleStepClick(step.id);
                                                 setIsStepMenuOpen(false);
                                             }}
+                                            style={{
+                                                backgroundColor: isCurrent
+                                                    ? 'color-mix(in srgb, var(--brand-accent), transparent 90%)'
+                                                    : undefined,
+                                                color: isCurrent
+                                                    ? 'var(--brand-accent)'
+                                                    : undefined,
+                                            }}
                                             className={`
                                                 w-full px-3 py-2.5 flex items-center justify-between text-left transition-colors
                                                 ${
                                                     isCurrent
-                                                        ? 'bg-blue-50 text-blue-700 font-semibold'
+                                                        ? 'font-semibold'
                                                         : isReached
                                                           ? 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
                                                           : 'text-slate-400 cursor-not-allowed pointer-events-none opacity-60'
@@ -278,7 +311,10 @@ const StudyLayoutContent: React.FC = () => {
                                             {isReached &&
                                                 !isCurrent &&
                                                 session.currentStep > step.id && (
-                                                    <Check size={14} className="text-blue-500" />
+                                                    <Check
+                                                        size={14}
+                                                        style={{ color: 'var(--brand-accent)' }}
+                                                    />
                                                 )}
                                         </button>
                                     );
@@ -306,7 +342,13 @@ const StudyLayoutContent: React.FC = () => {
                                     {/* Connection Line */}
                                     {index > 0 && (
                                         <div
-                                            className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${status === 'upcoming' ? 'bg-slate-200' : 'bg-blue-600'}`}
+                                            className="w-8 h-0.5 mx-2 transition-colors duration-300"
+                                            style={{
+                                                backgroundColor:
+                                                    status === 'upcoming'
+                                                        ? '#e2e8f0'
+                                                        : 'var(--brand-accent)',
+                                            }}
                                         />
                                     )}
 
@@ -315,25 +357,48 @@ const StudyLayoutContent: React.FC = () => {
                                         type="button"
                                         onClick={() => handleStepClick(step.id)}
                                         disabled={!isReachable}
+                                        style={{
+                                            borderColor:
+                                                status === 'upcoming'
+                                                    ? '#e2e8f0'
+                                                    : 'var(--brand-accent)',
+                                            backgroundColor:
+                                                status === 'completed'
+                                                    ? 'var(--brand-accent)'
+                                                    : 'white',
+                                            color:
+                                                status === 'completed'
+                                                    ? 'white'
+                                                    : 'var(--brand-accent)',
+                                            boxShadow:
+                                                status === 'current'
+                                                    ? '0 0 0 4px color-mix(in srgb, var(--brand-accent), transparent 90%)'
+                                                    : undefined,
+                                        }}
                                         className={`
-                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                           ${
-                               status === 'current'
-                                   ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
-                                   : status === 'completed'
-                                     ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer shadow-sm'
-                                     : isReachable
-                                       ? 'border-blue-400 text-blue-600 bg-white hover:bg-blue-50 hover:border-blue-600 cursor-pointer shadow-sm ring-2 ring-blue-50'
-                                       : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
-                           }
-                       `}
+                                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                           ${
+                                               status === 'upcoming' && !isReachable
+                                                   ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
+                                                   : 'cursor-pointer shadow-sm'
+                                           }
+                                       `}
                                     >
                                         {status === 'completed' ? (
                                             <Check size={16} strokeWidth={3} />
                                         ) : status === 'current' ? (
-                                            <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
+                                            <div
+                                                className="w-2.5 h-2.5 rounded-full"
+                                                style={{ backgroundColor: 'var(--brand-accent)' }}
+                                            />
                                         ) : isReachable ? (
-                                            <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                                            <div
+                                                className="w-2 h-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        'color-mix(in srgb, var(--brand-accent), transparent 40%)',
+                                                }}
+                                            />
                                         ) : (
                                             <div className="w-2 h-2 bg-slate-200 rounded-full" />
                                         )}
@@ -378,10 +443,20 @@ const StudyLayoutContent: React.FC = () => {
                                             key={lang}
                                             type="button"
                                             onClick={() => changeLanguage(lang)}
-                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'text-blue-600 font-semibold' : 'text-slate-700'}`}
+                                            style={{
+                                                color: i18n.language.startsWith(lang)
+                                                    ? 'var(--brand-accent)'
+                                                    : undefined,
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'font-semibold' : 'text-slate-700'}`}
                                         >
                                             <span className="uppercase">{lang}</span>
-                                            {i18n.language.startsWith(lang) && <Check size={14} />}
+                                            {i18n.language.startsWith(lang) && (
+                                                <Check
+                                                    size={14}
+                                                    style={{ color: 'var(--brand-accent)' }}
+                                                />
+                                            )}
                                         </button>
                                     ))}
                             </div>

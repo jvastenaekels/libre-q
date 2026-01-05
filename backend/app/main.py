@@ -31,6 +31,17 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage the application lifespan (startup/shutdown)."""
+    # Schema Validation
+    try:
+        from app.schema_validation import validate_schema
+
+        await validate_schema()
+    except Exception as e:
+        logger.error(f"Schema validation failed: {e}")
+        logger.error("Database schema is out of sync with application models.")
+        logger.error("Run: uv run python backend/scripts/migrate.py")
+        raise
+
     # Production Readiness Checks
     if os.getenv("DATABASE_URL", "").startswith("postgre"):
         salt = os.getenv("IP_HASH_SALT")

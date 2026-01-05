@@ -142,7 +142,7 @@ describe('CommandMenu', () => {
 
             await waitFor(() => {
                 expect(screen.getByText('Open Dashboard')).toBeInTheDocument();
-                expect(screen.getByText('Protocol Design')).toBeInTheDocument();
+                expect(screen.getByText('Study Design')).toBeInTheDocument();
                 expect(screen.getByText('Collaborators')).toBeInTheDocument();
                 expect(screen.getByText('Copy Public Link')).toBeInTheDocument();
             });

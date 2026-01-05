@@ -37,27 +37,38 @@ export function AdminDashboard() {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-10 p-8 max-w-[1600px] mx-auto animate-in fade-in-50 duration-500">
+        <div className="flex flex-1 flex-col gap-6 md:gap-10 p-4 md:p-8 max-w-[1600px] mx-auto animate-in fade-in-50 duration-500">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground mt-2">
-                        Welcome back, {user?.email}. Here's what's happening in your workspace.
+                    <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 via-slate-800 to-slate-500 bg-clip-text text-transparent">
+                        Workspace Dashboard
+                    </h1>
+                    <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">
+                        Welcome back,{' '}
+                        <span className="text-slate-900 font-semibold">
+                            {user?.email.split('@')[0]}
+                        </span>
+                        . Here's a snapshot of your research activity.
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => setShowCreateDialog(true)}>
+                    <Button
+                        onClick={() => setShowCreateDialog(true)}
+                        className="w-full md:w-auto shadow-md hover:shadow-lg transition-all"
+                    >
                         <Plus className="mr-2 h-4 w-4" /> Create Study
                     </Button>
                 </div>
             </div>
 
             {/* Stats Overview */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                <Card className="hover:shadow-md transition-shadow border-none shadow-sm bg-white/50 backdrop-blur-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Studies</CardTitle>
+                        <CardTitle className="text-[10px] font-bold uppercase text-slate-500 tracking-widest">
+                            Total Studies
+                        </CardTitle>
                         <Layout className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -65,15 +76,19 @@ export function AdminDashboard() {
                         <p className="text-xs text-muted-foreground">Across all statuses</p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Fieldwork</CardTitle>
-                        <Activity className="h-4 w-4 text-muted-foreground" />
+                <Card className="hover:shadow-lg transition-shadow border-none shadow-md">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-slate-50/50">
+                        <CardTitle className="text-xs font-bold uppercase text-slate-500 tracking-wider">
+                            Active Data Collection
+                        </CardTitle>
+                        <Activity className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{activeStudiesCount}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Studies currently collecting data
+                    <CardContent className="pt-4">
+                        <div className="text-2xl font-bold text-slate-900">
+                            {activeStudiesCount}
+                        </div>
+                        <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase">
+                            Studies receiving responses
                         </p>
                     </CardContent>
                 </Card>
