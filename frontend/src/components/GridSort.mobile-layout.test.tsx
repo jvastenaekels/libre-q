@@ -120,8 +120,8 @@ describe('GridSort Mobile Layout Refinements', () => {
         // Find the specific instruction text
         const instruction = screen.getByText('fine.workbench.initial_instruction');
 
-        // Traverse up to find the footer container (min-h-[100px])
-        const footer = instruction.closest('.min-h-\\\\[100px\\\\]');
+        // Traverse up to find the footer container (min-h-[120px])
+        const footer = instruction.closest('.min-h-\\\\[120px\\\\]');
 
         expect(footer).toBeInTheDocument();
         expect(footer?.className).toContain('flex-none');
