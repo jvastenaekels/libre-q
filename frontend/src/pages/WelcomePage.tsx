@@ -185,6 +185,7 @@ const WelcomePage: React.FC = () => {
                                                             borderColor:
                                                                 'color-mix(in srgb, var(--brand-accent), transparent 80%)',
                                                             '--hover-bg': 'var(--brand-accent)',
+                                                            // biome-ignore lint/suspicious/noExplicitAny: style override
                                                         } as any
                                                     }
                                                 >

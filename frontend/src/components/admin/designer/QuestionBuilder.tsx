@@ -347,6 +347,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                     // biome-ignore lint/suspicious/noExplicitAny: postsort structure
                     const ps = d.postsort_config as any;
                     if (!ps) d.postsort_config = {};
+                    // biome-ignore lint/suspicious/noExplicitAny: complex nested type
                     (d.postsort_config as any).questions = newQuestionsMap;
                 }
             });

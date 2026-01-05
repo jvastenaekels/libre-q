@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
+import { SurveyField } from '../components/survey/SurveyField';
 
 const PostSortPage: React.FC = () => {
     const config = useConfigStore((state) => state.config);
@@ -209,6 +210,7 @@ const PostSortPage: React.FC = () => {
 
     const defaultExtremes = [-4, 4];
     const extremeCols = config?.postsort_config?.extreme_columns || defaultExtremes;
+    // biome-ignore lint/suspicious/noExplicitAny: config structure
     const allowRandomComments = (config?.postsort_config as any)?.allow_random_comments ?? true;
 
     const extremeCards = responses.qsort.filter((p) => {
@@ -294,132 +296,6 @@ const PostSortPage: React.FC = () => {
             </div>
         );
     }
-
-    const renderField = (key: string, fieldConfig: PreSortField) => {
-        const commonClasses =
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
-        const labelText = getLocalizedText(fieldConfig.label);
-        const placeholderText = fieldConfig.placeholder
-            ? getLocalizedText(fieldConfig.placeholder)
-            : labelText;
-
-        switch (fieldConfig.type) {
-            case 'number':
-                return (
-                    <input
-                        id={key}
-                        type="number"
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={placeholderText}
-                        min={fieldConfig.min}
-                        max={fieldConfig.max}
-                    />
-                );
-            case 'email':
-                return (
-                    <input
-                        id={key}
-                        type="email"
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={placeholderText}
-                    />
-                );
-            case 'date':
-                return <input id={key} type="date" {...register(key)} className={commonClasses} />;
-            case 'textarea':
-                return (
-                    <textarea
-                        id={key}
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={placeholderText}
-                        rows={fieldConfig.rows || 4}
-                    />
-                );
-            case 'select':
-                return (
-                    <select id={key} {...register(key)} className={commonClasses}>
-                        <option value="">
-                            {t('presort.select_placeholder', 'Select an option')}
-                        </option>
-                        {fieldConfig.options?.map((opt) => {
-                            const optValue = typeof opt === 'object' ? opt.value : opt;
-                            const optLabel =
-                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
-                            return (
-                                <option key={optValue} value={optValue}>
-                                    {optLabel}
-                                </option>
-                            );
-                        })}
-                    </select>
-                );
-            case 'radio':
-                return (
-                    <div className="space-y-2 mt-2">
-                        {fieldConfig.options?.map((opt) => {
-                            const optValue = typeof opt === 'object' ? opt.value : opt;
-                            const optLabel =
-                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
-                            return (
-                                <label
-                                    key={optValue}
-                                    className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-                                >
-                                    <input
-                                        type="radio"
-                                        {...register(key)}
-                                        value={optValue}
-                                        style={{ accentColor: 'var(--brand-accent)' } as any}
-                                        className="h-4 w-4"
-                                    />
-                                    <span className="text-base">{optLabel}</span>
-                                </label>
-                            );
-                        })}
-                    </div>
-                );
-            case 'checkbox':
-                return (
-                    <div className="space-y-2 mt-2">
-                        {fieldConfig.options?.map((opt) => {
-                            const optValue = typeof opt === 'object' ? opt.value : opt;
-                            const optLabel =
-                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
-                            return (
-                                <label
-                                    key={optValue}
-                                    className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        {...register(key)}
-                                        value={optValue}
-                                        style={{ accentColor: 'var(--brand-accent)' } as any}
-                                        className="h-4 w-4 rounded"
-                                    />
-                                    <span className="text-base">{optLabel}</span>
-                                </label>
-                            );
-                        })}
-                    </div>
-                );
-            default: // text
-                return (
-                    <input
-                        id={key}
-                        type="text"
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={placeholderText}
-                        minLength={fieldConfig.minLength}
-                        maxLength={fieldConfig.maxLength}
-                    />
-                );
-        }
-    };
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-8 pb-24 relative">
@@ -701,7 +577,11 @@ const PostSortPage: React.FC = () => {
                                         <span className="text-red-500 ml-1">*</span>
                                     )}
                                 </label>
-                                {renderField(key, fieldConfig)}
+                                <SurveyField
+                                    id={key}
+                                    fieldConfig={fieldConfig}
+                                    register={register}
+                                />
                                 {formErrors[key] && (
                                     <p className="text-red-500 text-sm mt-1">
                                         {(formErrors[key]?.message as string) ||

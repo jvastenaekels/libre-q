@@ -144,6 +144,7 @@ const ConsentPage: React.FC = () => {
                                 type="checkbox"
                                 data-testid="consent-checkbox"
                                 {...register('consent')}
+                                // biome-ignore lint/suspicious/noExplicitAny: style override
                                 style={{ accentColor: 'var(--brand-accent)' } as any}
                                 className="h-6 w-6 rounded border-gray-300 cursor-pointer"
                             />

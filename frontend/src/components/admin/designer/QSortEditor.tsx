@@ -127,6 +127,24 @@ const QSortEditor = () => {
         });
     };
 
+    const handleSaveStatement = () => {
+        // biome-ignore lint/suspicious/noExplicitAny: complex state update
+        updateDraft((d: any) => {
+            if (d.statements?.[editingIndex as number]) {
+                const statement = d.statements[editingIndex as number];
+                // biome-ignore lint/suspicious/noExplicitAny: complex types
+                const translation = statement.translations?.find(
+                    (t: any) => t.language_code === activeLocale
+                );
+                if (translation) {
+                    translation.text = editingText;
+                }
+            }
+        });
+        setEditingIndex(null);
+        toast.success('Statement updated');
+    };
+
     return (
         <div className="space-y-6">
             <Tabs
@@ -232,23 +250,7 @@ const QSortEditor = () => {
                                                 autoFocus
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
-                                                        // Save on Enter
-                                                        updateDraft((d: any) => {
-                                                            if (d.statements?.[idx]) {
-                                                                const statement = d.statements[idx];
-                                                                const translation =
-                                                                    statement.translations?.find(
-                                                                        (t: any) =>
-                                                                            t.language_code ===
-                                                                            activeLocale
-                                                                    );
-                                                                if (translation) {
-                                                                    translation.text = editingText;
-                                                                }
-                                                            }
-                                                        });
-                                                        setEditingIndex(null);
-                                                        toast.success('Statement updated');
+                                                        handleSaveStatement();
                                                     } else if (e.key === 'Escape') {
                                                         // Cancel on Escape
                                                         setEditingIndex(null);
@@ -258,24 +260,7 @@ const QSortEditor = () => {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => {
-                                                    updateDraft((d: any) => {
-                                                        if (d.statements?.[idx]) {
-                                                            const statement = d.statements[idx];
-                                                            const translation =
-                                                                statement.translations?.find(
-                                                                    (t: any) =>
-                                                                        t.language_code ===
-                                                                        activeLocale
-                                                                );
-                                                            if (translation) {
-                                                                translation.text = editingText;
-                                                            }
-                                                        }
-                                                    });
-                                                    setEditingIndex(null);
-                                                    toast.success('Statement updated');
-                                                }}
+                                                onClick={handleSaveStatement}
                                                 className="h-6 w-6 text-green-600 hover:bg-green-50"
                                             >
                                                 <CheckCircle2 className="h-3 w-3" />
