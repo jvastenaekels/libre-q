@@ -164,6 +164,9 @@ class Study(Base):
         String(5), nullable=True
     )  # e.g. "en"
     show_statement_codes: Mapped[bool] = mapped_column(Boolean, default=False)
+    randomize_statements: Mapped[bool] = mapped_column(
+        Boolean, default=False
+    )  # Randomize statement order per participant (Q methodology best practice)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -275,6 +278,9 @@ class Participant(Base):
     )
     session_token: Mapped[UUID] = mapped_column(unique=True, index=True, default=uuid4)
     language_used: Mapped[str] = mapped_column(String(5))
+    random_seed: Mapped[str | None] = mapped_column(
+        String(32), nullable=True
+    )  # Seed for reproducible statement randomization
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

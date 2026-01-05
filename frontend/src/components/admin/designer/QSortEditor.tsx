@@ -16,6 +16,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
 
@@ -27,6 +29,7 @@ const QSortEditor = () => {
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [bulkText, setBulkText] = useState('');
     const [activeSubTab, setActiveSubTab] = useState<'statements' | 'grid'>('statements');
+    const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
 
     if (!draft) return null;
 
@@ -47,35 +50,34 @@ const QSortEditor = () => {
             .map((l: string) => l.trim())
             .filter((l: string) => l !== '');
 
-        // Auto-cleanup: remove leading numbers like "1.", "1)", etc.
-        const cleanedLines = lines.map((line: string) => line.replace(/^\d+[.)\-\s]+/, '').trim());
+        const parsedItems = lines.map((line: string) => {
+            // Regex to match "Code: Text" or "Code, Text" or "Code - Text"
+            // We assume codes are alphanumeric, reasonably short (up to 10 chars)
+            const match = line.match(/^([a-zA-Z0-9_-]{1,10})\s*[:,\-]\s+(.+)$/);
+            if (match) {
+                return { code: match[1], text: match[2].trim() };
+            }
+            // Fallback: remove leading numbering "1. ", "1) "
+            return { code: null, text: line.replace(/^\d+[.)\-\s]+/, '').trim() };
+        });
 
         // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateDraft((d: any) => {
-            // Keep existing codes if possible, or generate new ones
-            d.statements = cleanedLines.map((line: string, idx: number) => {
-                const existing = d.statements?.[idx];
-                const translations = (existing?.translations || []) as Translation[];
-                // The user's provided diff included this line, but it seems unused in the context of this function.
-                // const translation = (draft.translations as Translation[])?.find((t: Translation) => t.language_code === activeLocale);
+            const currentStatements = importMode === 'append' ? (d.statements || []) : [];
+            const startingIndex = currentStatements.length;
 
-                const tIdx = translations.findIndex(
-                    (t: Translation) => t.language_code === activeLocale
-                );
-
-                const newTranslations = [...translations];
-                if (tIdx > -1) {
-                    newTranslations[tIdx] = { ...newTranslations[tIdx], text: line };
-                } else {
-                    // biome-ignore lint/suspicious/noExplicitAny: draft creation
-                    newTranslations.push({ language_code: activeLocale, text: line } as any);
-                }
+            const newStatements = parsedItems.map((item, idx) => {
+                const code = item.code || `s${startingIndex + idx + 1}`;
 
                 return {
-                    code: existing?.code || `s${idx + 1}`,
-                    translations: newTranslations,
+                    code,
+                    translations: [
+                        { language_code: activeLocale, text: item.text }
+                    ]
                 };
             });
+
+            d.statements = [...currentStatements, ...newStatements];
         });
         setBulkText('');
     };
@@ -113,10 +115,25 @@ const QSortEditor = () => {
                         <CardHeader>
                             <CardTitle className="text-sm">Bulk Editor (Quick Paste)</CardTitle>
                             <CardDescription className="text-xs">
-                                One statement per line. Numbers will be cleaned automatically.
+                                One statement per line. Supports "Code: Text" format.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                             <RadioGroup
+                                defaultValue="replace"
+                                value={importMode}
+                                onValueChange={(v) => setImportMode(v as 'replace' | 'append')}
+                                className="flex gap-4"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="replace" id="r1" />
+                                    <Label htmlFor="r1">Replace all</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="append" id="r2" />
+                                    <Label htmlFor="r2">Append to list</Label>
+                                </div>
+                            </RadioGroup>
                             <Textarea
                                 placeholder="Paste your statements here...&#10;1. First statement&#10;2. Second statement"
                                 className="min-h-[200px] font-serif text-base leading-relaxed"

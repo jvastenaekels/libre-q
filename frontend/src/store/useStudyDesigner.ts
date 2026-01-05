@@ -5,7 +5,7 @@ import { produce } from 'immer';
 interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
-    activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort';
+    activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface';
     activeLocale: string;
 
     // Actions
@@ -13,7 +13,7 @@ interface StudyDesignerState {
     updateDraft: (fn: (draft: StudyUpdate) => void) => void;
     // biome-ignore lint/suspicious/noExplicitAny: complex translation type
     updateTranslation: (lang: string, fn: (t: any) => void) => void;
-    setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort') => void;
+    setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface') => void;
     setActiveLocale: (locale: string) => void;
     resetDraft: () => void;
 }
@@ -35,6 +35,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                 postsort_config: study.postsort_config,
                 default_language: study.default_language,
                 show_statement_codes: study.show_statement_codes,
+                randomize_statements: study.randomize_statements,
                 translations: (study.translations || []).map((t) => ({
                     language_code: t.language_code,
                     title: t.title,
@@ -86,7 +87,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
             };
         }),
 
-    setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort') =>
+    setActiveStep: (step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface') =>
         set({ activeStep: step }),
     setActiveLocale: (locale: string) => set({ activeLocale: locale }),
 

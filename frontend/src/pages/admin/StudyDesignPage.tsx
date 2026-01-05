@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, MemoryRouter } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
     Wand2,
@@ -13,8 +13,11 @@ import {
     Loader2,
     Smartphone,
     Monitor,
+    AlertTriangle,
 } from 'lucide-react';
+import Frame from 'react-frame-component';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
     useGetStudyApiAdminStudiesSlugGet,
     useUpdateStudyApiAdminStudiesSlugPatch,
@@ -24,6 +27,8 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
 import QSortEditor from '@/components/admin/designer/QSortEditor';
+import PostSortConfigEditor from '@/components/admin/designer/PostSortConfigEditor';
+import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import WelcomePage from '@/pages/WelcomePage';
 import PreSortPage from '@/pages/PreSortPage';
 import RoughSortPage from '@/pages/RoughSortPage';
@@ -103,6 +108,14 @@ const StudyDesignPage = () => {
         }
     }, [draft, activeLocale, setConfig]);
 
+    // TODO: Implement proper dirty state tracking
+    // const isDirty = JSON.stringify(draft) !== JSON.stringify(original);
+
+    // Grid Validation
+    const statementsCount = draft?.statements?.length || 0;
+    const gridCapacity = (draft?.grid_config || []).reduce((acc, col) => acc + (col.capacity || 0), 0);
+    const isGridValid = statementsCount === gridCapacity;
+
     const handleSave = async () => {
         if (!slug || !draft) return;
 
@@ -126,25 +139,58 @@ const StudyDesignPage = () => {
     if (!draft) return <div>Study not found</div>;
 
     const renderPreview = () => {
+        // Collect styles for the iframe
+        const head = (
+            <>
+                {/* Dev mode fallback */}
+                <link href="/src/index.css" rel="stylesheet" />
+                {/* Capture all style tags (Vite dev & some prod) */}
+                {Array.from(document.querySelectorAll('style')).map((style, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: stable enough for dev preview
+                    <style key={`style-${i}`} dangerouslySetInnerHTML={{ __html: style.innerHTML }} />
+                ))}
+                {/* Capture all linked stylesheets (Prod bundles) */}
+                {Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: stable
+                    <link key={`link-${i}`} rel="stylesheet" href={(link as HTMLLinkElement).href} />
+                ))}
+            </>
+        );
+
         return (
-            <LayoutProvider>
-                <div className="h-full w-full">
-                    {(() => {
-                        switch (activeStep) {
-                            case 'intro':
-                                return <WelcomePage />;
-                            case 'pre-sort':
-                                return <PreSortPage />;
-                            case 'q-sort':
-                                return <RoughSortPage />;
-                            case 'post-sort':
-                                return <PostSortPage />;
-                            default:
-                                return <WelcomePage />;
-                        }
-                    })()}
-                </div>
-            </LayoutProvider>
+            <Frame
+                initialContent='<!DOCTYPE html><html><head></head><body><div id="mount"></div></body></html>'
+                head={head}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    backgroundColor: 'white',
+                }}
+            >
+                <MemoryRouter>
+                    <LayoutProvider>
+                        <div className="h-full w-full bg-background text-foreground">
+                            {(() => {
+                            switch (activeStep) {
+                                case 'intro':
+                                    return <WelcomePage />;
+                                case 'pre-sort':
+                                    return <PreSortPage />;
+                                case 'q-sort':
+                                    return <RoughSortPage />;
+                                case 'post-sort':
+                                    return <PostSortPage />;
+                                case 'interface': // Show Welcome page for interface edits
+                                    return <WelcomePage />;
+                                default:
+                                    return <WelcomePage />;
+                            }
+                        })()}
+                        </div>
+                    </LayoutProvider>
+                </MemoryRouter>
+            </Frame>
         );
     };
 
@@ -226,7 +272,7 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="grid grid-cols-4 mb-8 w-full max-w-2xl mx-auto shadow-sm">
+                        <TabsList className="grid grid-cols-5 mb-8 w-full max-w-3xl mx-auto shadow-sm">
                             <TabsTrigger value="intro" className="gap-2">
                                 👋 Welcome
                             </TabsTrigger>
@@ -239,9 +285,36 @@ const StudyDesignPage = () => {
                             <TabsTrigger value="post-sort" className="gap-2">
                                 📝 Post-Interview
                             </TabsTrigger>
+                            <TabsTrigger value="interface" className="gap-2">
+                                🎨 Interface
+                            </TabsTrigger>
                         </TabsList>
 
                         <div className="max-w-3xl mx-auto pb-20">
+                            {!isGridValid && (
+                                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+                                    <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                                    <div>
+                                        <h4 className="text-sm font-semibold text-amber-900">
+                                            Grid Configuration Mismatch
+                                        </h4>
+                                        <p className="text-sm text-amber-700 mt-1">
+                                            You have <strong>{statementsCount}</strong> statements but the
+                                            grid only has slots for <strong>{gridCapacity}</strong> items.
+                                            Please adjust the columns in the "Q-Sort Task" tab.
+                                        </p>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="ml-auto bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-900"
+                                        onClick={() => setActiveStep('q-sort')}
+                                    >
+                                        Fix
+                                    </Button>
+                                </div>
+                            )}
+
                             <TabsContent value="intro" className="mt-0 outline-none">
                                 <IntroductionEditor />
                             </TabsContent>
@@ -255,7 +328,11 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">
-                                <QuestionBuilder type="post" />
+                                <PostSortConfigEditor />
+                            </TabsContent>
+
+                            <TabsContent value="interface" className="mt-0 outline-none">
+                                <InterfaceEditor />
                             </TabsContent>
                         </div>
                     </Tabs>

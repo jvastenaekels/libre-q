@@ -1,4 +1,5 @@
 import type { StudyTranslationRead as StudyTranslation } from '@/api/model/studyTranslationRead';
+import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +10,8 @@ import { Info } from 'lucide-react';
 import type React from 'react';
 
 const IntroductionEditor = () => {
-    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+    const { t } = useTranslation();
+    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
     if (!draft) return null;
 
@@ -26,19 +28,18 @@ const IntroductionEditor = () => {
 
     const toggleConsent = (checked: boolean) => {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
-        updateTranslation(activeLocale, (t: any) => {
+        updateTranslation(activeLocale, (t_trans: any) => {
             if (checked) {
-                t.consent_title = t.consent_title || 'Consent to participate';
-                t.consent_description =
-                    t.consent_description ||
-                    'By continuing, you agree to participate in this study. Your data will be anonymized.';
-                t.consent_accept = t.consent_accept || 'I agree';
-                t.consent_decline = t.consent_decline || 'I decline';
+                t_trans.consent_title = t_trans.consent_title || t('consent.title');
+                t_trans.consent_description =
+                    t_trans.consent_description || t('consent.default_text');
+                t_trans.consent_accept = t_trans.consent_accept || t('welcome.consent.label'); // Closest match or custom
+                t_trans.consent_decline = t_trans.consent_decline || t('common.close'); // Fallback
             } else {
-                t.consent_title = null;
-                t.consent_description = null;
-                t.consent_accept = null;
-                t.consent_decline = null;
+                t_trans.consent_title = null;
+                t_trans.consent_description = null;
+                t_trans.consent_accept = null;
+                t_trans.consent_decline = null;
             }
         });
     };
@@ -115,6 +116,80 @@ const IntroductionEditor = () => {
                 </Card>
             </section>
 
+            <section className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
+                    <Info className="h-5 w-5" />
+                    Research Settings
+                </div>
+
+                <Card className="shadow-sm">
+                    <CardContent className="pt-6 space-y-4">
+                        <div className="flex items-center justify-between py-2">
+                            <div className="space-y-1">
+                                <Label
+                                    htmlFor="randomize-statements"
+                                    className="text-sm font-medium"
+                                >
+                                    Randomize Statement Order
+                                </Label>
+                                <p className="text-xs text-muted-foreground max-w-md">
+                                    Present statements in random order for each participant to
+                                    prevent order effects. This is a Q methodology best practice for
+                                    scientific validity. Each participant sees a unique but
+                                    reproducible order.
+                                </p>
+                            </div>
+                            <Switch
+                                id="randomize-statements"
+                                checked={draft.randomize_statements ?? false}
+                                onCheckedChange={(checked: boolean) => {
+                                    updateDraft((d) => {
+                                        d.randomize_statements = checked;
+                                    });
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between py-2 border-t">
+                            <div className="space-y-1">
+                                <Label htmlFor="show-codes" className="text-sm font-medium">
+                                    Show Statement Codes
+                                </Label>
+                                <p className="text-xs text-muted-foreground max-w-md">
+                                    Display statement codes (e.g., "S1", "S2") alongside the text.
+                                    Useful for referencing specific statements in follow-up
+                                    interviews.
+                                </p>
+                            </div>
+                            <Switch
+                                id="show-codes"
+                                checked={draft.show_statement_codes ?? false}
+                                onCheckedChange={(checked: boolean) => {
+                                    updateDraft((d) => {
+                                        d.show_statement_codes = checked;
+                                    });
+                                }}
+                            />
+                        </div>
+
+                        {draft.randomize_statements && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 mt-4">
+                                <div className="flex gap-2">
+                                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                                    <p>
+                                        <strong>Q Methodology Best Practice:</strong> Randomization
+                                        uses each participant's unique session ID as a seed,
+                                        ensuring they always see the same order across page
+                                        refreshes while preventing systematic position biases in
+                                        factor analysis.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </section>
+
             <section className="space-y-4 pb-12">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-primary font-semibold text-lg">
@@ -162,6 +237,30 @@ const IntroductionEditor = () => {
                                         handleChange('consent_description', e.target.value)
                                     }
                                 />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 pt-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="consent-accept">Accept Button</Label>
+                                    <Input
+                                        id="consent-accept"
+                                        placeholder={`Default: ${t('welcome.consent.label')}`}
+                                        value={translation?.consent_accept || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                            handleChange('consent_accept', e.target.value)
+                                        }
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="consent-decline">Decline Button</Label>
+                                    <Input
+                                        id="consent-decline"
+                                        placeholder={`Default: ${t('common.close')}`}
+                                        value={translation?.consent_decline || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                            handleChange('consent_decline', e.target.value)
+                                        }
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
