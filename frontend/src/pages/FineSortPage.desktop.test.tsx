@@ -5,7 +5,7 @@ import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
 describe('FineSortPage Desktop Layout (Integration)', () => {

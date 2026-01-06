@@ -27,7 +27,7 @@ export default defineConfig({
                 'src/main.tsx',
                 'e2e/**',
                 'src/**/*.d.ts',
-                'src/test/**',
+                'src/test-utils/**',
                 '**/*.json',
                 'postcss.config.js',
                 'tailwind.config.js',

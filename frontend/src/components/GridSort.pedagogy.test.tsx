@@ -6,7 +6,7 @@
 
 import { DndContext } from '@dnd-kit/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks } from '../test-utils/test-utils';
 import GridSort from './GridSort';
 
 // Mock dependencies

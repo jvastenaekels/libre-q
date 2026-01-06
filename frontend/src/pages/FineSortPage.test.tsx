@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
 // --- Mocks ---

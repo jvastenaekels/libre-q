@@ -5,7 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '../test/test-utils';
+import { act, render, screen } from '../test-utils/test-utils';
 import MethodologyTips from './MethodologyTips';
 
 vi.mock('react-i18next', () => ({

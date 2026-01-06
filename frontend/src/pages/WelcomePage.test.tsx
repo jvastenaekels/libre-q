@@ -11,7 +11,7 @@ import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import WelcomePage from './WelcomePage';
 
 // Mocks

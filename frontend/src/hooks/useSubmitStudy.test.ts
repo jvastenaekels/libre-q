@@ -10,7 +10,7 @@ import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { AllTheProviders } from '../test/test-utils';
+import { AllTheProviders } from '../test-utils/test-utils';
 import { useSubmitStudy } from './useSubmitStudy';
 
 // Mock the mutator

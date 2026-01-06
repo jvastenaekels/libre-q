@@ -11,7 +11,7 @@ import StudyLayout from './layouts/StudyLayout';
 import type { StudyConfig } from './schemas/study';
 import { useConfigStore } from './store/useConfigStore';
 import { useSessionStore } from './store/useSessionStore';
-import { renderWithProviders } from './test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 
 vi.mock('./pages/PreSortPage', () => ({
     default: () => <div data-testid="presort-page">PreSortPage</div>,
