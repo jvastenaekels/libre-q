@@ -90,6 +90,14 @@ async def migrate_studies_table():
                 )
             migrations_applied = True
 
+        # access_password
+        if not await check_column_exists(conn, "studies", "access_password"):
+            logger.info("  Adding 'access_password' column...")
+            await conn.execute(
+                text("ALTER TABLE studies ADD COLUMN access_password VARCHAR")
+            )
+            migrations_applied = True
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Studies table updated")
@@ -179,13 +187,112 @@ async def migrate_users_table():
             logger.warning("Users table doesn't exist - skipping migration")
             return
 
+        migrations_applied = False
+
         if not await check_column_exists(conn, "users", "full_name"):
             logger.info("  Adding 'full_name' column...")
             await conn.execute(text("ALTER TABLE users ADD COLUMN full_name VARCHAR"))
+            migrations_applied = True
+
+        # totp_secret
+        if not await check_column_exists(conn, "users", "totp_secret"):
+            logger.info("  Adding 'totp_secret' column...")
+            await conn.execute(text("ALTER TABLE users ADD COLUMN totp_secret VARCHAR"))
+            migrations_applied = True
+
+        # is_totp_enabled
+        if not await check_column_exists(conn, "users", "is_totp_enabled"):
+            logger.info("  Adding 'is_totp_enabled' column...")
+            await conn.execute(
+                text("ALTER TABLE users ADD COLUMN is_totp_enabled BOOLEAN DEFAULT 0")
+            )
+            migrations_applied = True
+
+        if migrations_applied:
             await conn.commit()
             logger.info("✓ Users table updated")
         else:
             logger.info("✓ Users table up to date")
+
+
+async def migrate_recruitment_invitation_tables():
+    """Create recruitment_links and invitations tables."""
+    logger.info("Checking Phase 2 tables...")
+
+    async with engine.connect() as conn:
+        # recruitment_links
+        if not await check_table_exists(conn, "recruitment_links"):
+            logger.info("  Creating 'recruitment_links' table...")
+            await conn.execute(
+                text(
+                    """
+                CREATE TABLE recruitment_links (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    study_id INTEGER NOT NULL,
+                    type VARCHAR(20) NOT NULL,
+                    token VARCHAR NOT NULL UNIQUE,
+                    name VARCHAR,
+                    capacity INTEGER,
+                    usage_count INTEGER DEFAULT 0,
+                    start_count INTEGER DEFAULT 0,
+                    is_active BOOLEAN DEFAULT 1,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP,
+                    FOREIGN KEY(study_id) REFERENCES studies(id) ON DELETE CASCADE
+                )
+            """
+                )
+            )
+            await conn.execute(
+                text(
+                    "CREATE INDEX ix_recruitment_links_token ON recruitment_links (token)"
+                )
+            )
+            await conn.execute(
+                text(
+                    "CREATE INDEX ix_recruitment_links_study_id ON recruitment_links (study_id)"
+                )
+            )
+        else:
+            # Add start_count if table exists but column doesn't
+            if not await check_column_exists(conn, "recruitment_links", "start_count"):
+                logger.info("  Adding 'start_count' column to recruitment_links...")
+                await conn.execute(
+                    text(
+                        "ALTER TABLE recruitment_links ADD COLUMN start_count INTEGER DEFAULT 0"
+                    )
+                )
+                await conn.commit()
+
+        # invitations
+        if not await check_table_exists(conn, "invitations"):
+            logger.info("  Creating 'invitations' table...")
+            await conn.execute(
+                text(
+                    """
+                CREATE TABLE invitations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email VARCHAR NOT NULL,
+                    study_id INTEGER NOT NULL,
+                    role VARCHAR(20) NOT NULL,
+                    token VARCHAR NOT NULL UNIQUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP NOT NULL,
+                    accepted_at TIMESTAMP,
+                    FOREIGN KEY(study_id) REFERENCES studies(id) ON DELETE CASCADE
+                )
+            """
+                )
+            )
+            await conn.execute(
+                text("CREATE INDEX ix_invitations_token ON invitations (token)")
+            )
+            await conn.execute(
+                text("CREATE INDEX ix_invitations_email ON invitations (email)")
+            )
+
+        await conn.commit()
+        logger.info("✓ Phase 2 tables verified")
 
 
 async def verify_workspace_tables():
@@ -279,6 +386,7 @@ async def run_all_migrations():
         await migrate_translations_table()
         await migrate_participants_table()
         await migrate_users_table()
+        await migrate_recruitment_invitation_tables()
 
         # Then run data migrations
         await migrate_data_collaborators()

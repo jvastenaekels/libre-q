@@ -4,13 +4,15 @@ import random
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.limiter import limiter
 from app.schemas import SubmissionInput
 from app.services.study_service import StudyService
+from app.services.recruitment_service import RecruitmentService
+from app.utils.security import verify_password
 
 router = APIRouter()
 
@@ -56,6 +58,8 @@ async def get_study(
     session_token: UUID | None = Query(
         None, description="Participant session token for deterministic randomization"
     ),
+    link_token: str | None = Query(None, description="Recruitment link token"),
+    password: str | None = Query(None, description="Study access password"),
     db: AsyncSession = Depends(get_db),
 ):
     """Fetches study configuration for the frontend, including language resolution.
@@ -67,6 +71,31 @@ async def get_study(
     study = await StudyService.get_study_by_slug(db, slug)
     if not study:
         raise HTTPException(status_code=404, detail="Study not found")
+
+    # 3. Recruitment Link Validation
+    if link_token:
+        link = await RecruitmentService.validate_link_token(db, study.id, link_token)
+        if not link:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid, expired, or full recruitment link",
+            )
+        # Record start (participant accessed the study layout)
+        await RecruitmentService.record_start(db, link.id)
+
+    # 4. Password Protection
+    if study.access_password and not verify_password(
+        password or "", study.access_password
+    ):
+        # Return only basic metadata if password is not provided or incorrect
+        resolved_lang, translation = StudyService.resolve_translation(study, lang)
+        return {
+            "slug": study.slug,
+            "title": translation.title if translation else study.slug,
+            "description": translation.description if translation else "",
+            "requires_password": True,
+            "language": resolved_lang,
+        }
 
     resolved_lang, translation = StudyService.resolve_translation(study, lang)
 
@@ -148,4 +177,25 @@ async def get_study(
         "randomize_statements": study.randomize_statements,
         "ui_labels": get_t_attr("ui_labels", {}) or {},
         "state": study.state.value,
+        "requires_password": False,
     }
+
+
+@router.post("/study/{slug}/unlock")
+async def unlock_study(
+    password: str = Query(...),
+    slug: str = Path(..., pattern="^[a-z0-9-]+$"),
+    db: AsyncSession = Depends(get_db),
+):
+    """Validate study access password."""
+    study = await StudyService.get_study_by_slug(db, slug)
+    if not study:
+        raise HTTPException(status_code=404, detail="Study not found")
+
+    if not study.access_password:
+        return {"status": "unlocked", "details": "No password required"}
+
+    if verify_password(password, study.access_password):
+        return {"status": "unlocked"}
+
+    raise HTTPException(status_code=401, detail="Incorrect password")

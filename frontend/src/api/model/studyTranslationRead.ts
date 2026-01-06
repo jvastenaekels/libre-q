@@ -4,6 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { StudyTranslationReadInstructions } from './studyTranslationReadInstructions';
 import type { StudyTranslationReadSubtitle } from './studyTranslationReadSubtitle';
 import type { StudyTranslationReadObjective } from './studyTranslationReadObjective';
 import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
@@ -27,7 +28,7 @@ export interface StudyTranslationRead {
      */
     title: string;
     description?: string;
-    instructions?: string;
+    instructions?: StudyTranslationReadInstructions;
     subtitle?: StudyTranslationReadSubtitle;
     objective?: StudyTranslationReadObjective;
     consent_title?: StudyTranslationReadConsentTitle;

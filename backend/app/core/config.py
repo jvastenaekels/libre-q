@@ -24,6 +24,17 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
+    # Mail
+    SMTP_TLS: bool = os.getenv("SMTP_TLS", "True") == "True"
+    SMTP_PORT: int | None = (
+        int(os.getenv("SMTP_PORT", "587")) if os.getenv("SMTP_PORT") else None
+    )
+    SMTP_HOST: str | None = os.getenv("SMTP_HOST")
+    SMTP_USER: str | None = os.getenv("SMTP_USER")
+    SMTP_PASSWORD: str | None = os.getenv("SMTP_PASSWORD")
+    EMAILS_FROM_EMAIL: str | None = os.getenv("EMAILS_FROM_EMAIL")
+    EMAILS_FROM_NAME: str = os.getenv("EMAILS_FROM_NAME", PROJECT_NAME)
+
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=True, extra="ignore"
     )

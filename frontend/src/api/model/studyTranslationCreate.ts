@@ -4,6 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { StudyTranslationCreateInstructions } from './studyTranslationCreateInstructions';
 import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
 import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
 import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
@@ -27,7 +28,7 @@ export interface StudyTranslationCreate {
      */
     title: string;
     description?: string;
-    instructions?: string;
+    instructions?: StudyTranslationCreateInstructions;
     subtitle?: StudyTranslationCreateSubtitle;
     objective?: StudyTranslationCreateObjective;
     consent_title?: StudyTranslationCreateConsentTitle;

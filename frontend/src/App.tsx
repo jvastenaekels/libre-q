@@ -11,7 +11,7 @@
  */
 
 import { lazy, Suspense } from 'react';
-import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useAdminStore } from './store/useAdminStore';
@@ -41,6 +41,11 @@ const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
+import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
+import { studyLayoutLoader } from './layouts/StudyLayout.loader';
+import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
+import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loader';
+import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
@@ -53,62 +58,100 @@ const AdminIndex = () => {
     return <AdminDashboard />;
 };
 
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <LandingPage />,
+    },
+    {
+        path: '/login',
+        element: <LoginPage />,
+    },
+    {
+        path: '/register',
+        element: <RegistrationPage />,
+    },
+    {
+        path: '/admin',
+        element: <RequireAdmin />,
+        children: [
+            {
+                element: <AdminLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <AdminIndex />,
+                    },
+                    {
+                        path: 'studies/:slug',
+                        element: <StudyOverviewPage />,
+                        loader: studyOverviewPageLoader,
+                    },
+                    {
+                        path: 'studies/:slug/design',
+                        element: <StudyDesignPage />,
+                    },
+                    {
+                        path: 'studies/:slug/team',
+                        element: <TeamManagementPage />,
+                        loader: teamManagementPageLoader,
+                    },
+                    {
+                        path: 'studies/:slug/recruitment',
+                        element: <RecruitmentPage />,
+                        loader: recruitmentPageLoader,
+                    },
+                    {
+                        path: 'studies/:slug/exports',
+                        element: <DataExportsPage />,
+                        loader: dataExportsPageLoader,
+                    },
+                    {
+                        path: 'profile',
+                        element: <ProfilePage />,
+                    },
+                ],
+            },
+            {
+                path: 'studies/:slug/design/preview',
+                element: <DesignerPreviewPage />,
+            },
+        ],
+    },
+    {
+        path: '/study/:slug',
+        element: <StudyLayout />,
+        loader: studyLayoutLoader,
+        children: [
+            { path: 'welcome', element: <WelcomePage /> },
+            { path: 'consent', element: <ConsentPage /> },
+            { path: 'presort', element: <PreSortPage /> },
+            { path: 'rough-sort', element: <RoughSortPage /> },
+            { path: 'fine-sort', element: <FineSortPage /> },
+            { path: 'post-sort', element: <PostSortPage /> },
+            { path: 'reset', element: <ResetPage /> },
+            {
+                path: '*',
+                element: <ErrorPage error={new ApiError(404, 'Page not found')} />,
+            },
+        ],
+    },
+]);
+
 const App = () => {
     return (
-        <Router>
-            <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
-                            Loading session...
-                        </div>
-                    }
-                >
-                    <Routes>
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegistrationPage />} />
-
-                        {/* Admin Routes */}
-                        <Route path="/admin" element={<RequireAdmin />}>
-                            <Route element={<AdminLayout />}>
-                                <Route index element={<AdminIndex />} />
-                                <Route path="studies/:slug" element={<StudyOverviewPage />} />
-                                <Route path="studies/:slug/design" element={<StudyDesignPage />} />
-                                <Route path="studies/:slug/team" element={<TeamManagementPage />} />
-                                <Route
-                                    path="studies/:slug/recruitment"
-                                    element={<RecruitmentPage />}
-                                />
-                                <Route path="studies/:slug/exports" element={<DataExportsPage />} />
-                                <Route path="profile" element={<ProfilePage />} />
-                            </Route>
-                            <Route
-                                path="studies/:slug/design/preview"
-                                element={<DesignerPreviewPage />}
-                            />
-                        </Route>
-
-                        {/* Study Routes */}
-                        <Route path="/study/:slug" element={<StudyLayout />}>
-                            <Route path="welcome" element={<WelcomePage />} />
-                            <Route path="consent" element={<ConsentPage />} />
-                            <Route path="presort" element={<PreSortPage />} />
-                            <Route path="rough-sort" element={<RoughSortPage />} />
-                            <Route path="fine-sort" element={<FineSortPage />} />
-                            <Route path="post-sort" element={<PostSortPage />} />
-                            <Route path="reset" element={<ResetPage />} />
-
-                            <Route
-                                path="*"
-                                element={<ErrorPage error={new ApiError(404, 'Page not found')} />}
-                            />
-                        </Route>
-                    </Routes>
-                </Suspense>
-            </ErrorBoundary>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
+                        Loading session...
+                    </div>
+                }
+            >
+                <RouterProvider router={router} />
+            </Suspense>
             <Toaster richColors position="top-center" closeButton />
-        </Router>
+        </ErrorBoundary>
     );
 };
 

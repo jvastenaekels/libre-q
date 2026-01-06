@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Rocket, PowerOff, Sparkles, Loader2, Lock } from 'lucide-react';
 import { useChangeStudyStateApiAdminStudiesSlugStatePost } from '@/api/generated';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
@@ -28,6 +29,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     onStateChange,
 }) => {
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
+    const queryClient = useQueryClient();
 
     const handleStateChange = async (newState: 'draft' | 'active' | 'closed' | 'paused') => {
         try {
@@ -42,6 +44,18 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                 paused: 'paused',
             };
             toast.success(`Study ${stateLabels[newState]} successfully`);
+
+            // Invalidate all queries related to this study
+            await queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const key = query.queryKey;
+                    return (
+                        Array.isArray(key) &&
+                        key.some((k) => typeof k === 'string' && k.includes(slug))
+                    );
+                },
+            });
+
             onStateChange();
         } catch (error) {
             toast.error(`Failed to change study state`);
@@ -240,6 +254,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                             return (
                                 <React.Fragment key={step.id}>
                                     {renderActionDialog(
+                                        // biome-ignore lint/suspicious/noExplicitAny: generic ID
                                         step.id as any,
                                         <div role="button" tabIndex={0} className="outline-none">
                                             {content}

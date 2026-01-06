@@ -16,6 +16,7 @@ const InterfaceEditor = () => {
     const uiLabels = translation?.ui_labels || {};
 
     const updateLabel = (key: string, value: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
         updateTranslation(activeLocale, (t: any) => {
             if (!t.ui_labels) t.ui_labels = {};
             if (!value) {

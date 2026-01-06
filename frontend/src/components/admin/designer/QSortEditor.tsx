@@ -108,6 +108,7 @@ const QSortEditor = () => {
 
     const handleClearAll = () => {
         if (confirm('Are you sure you want to delete ALL statements? This cannot be undone.')) {
+            // biome-ignore lint/suspicious/noExplicitAny: complex types
             updateDraft((d: any) => {
                 d.statements = [];
             });
@@ -133,8 +134,9 @@ const QSortEditor = () => {
         updateDraft((d: any) => {
             if (d.statements?.[editingIndex as number]) {
                 const statement = d.statements[editingIndex as number];
-                // biome-ignore lint/suspicious/noExplicitAny: complex types
+
                 const translation = statement.translations?.find(
+                    // biome-ignore lint/suspicious/noExplicitAny: complex types
                     (t: any) => t.language_code === activeLocale
                 );
                 if (translation) {
@@ -300,6 +302,7 @@ const QSortEditor = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => {
+                                                    // biome-ignore lint/suspicious/noExplicitAny: complex types
                                                     updateDraft((d: any) => {
                                                         if (d.statements) {
                                                             d.statements.splice(idx, 1);

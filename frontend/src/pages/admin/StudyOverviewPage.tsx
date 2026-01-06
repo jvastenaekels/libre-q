@@ -1,11 +1,7 @@
-import { useParams } from 'react-router-dom';
-import {
-    useGetStudyStatsApiAdminStudiesSlugStatsGet,
-    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
-    useGetStudyApiAdminStudiesSlugGet,
-} from '@/api/generated';
+import { useLoaderData, useRevalidator } from 'react-router-dom';
+import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
-import { DashboardSkeleton } from '@/components/admin/DashboardSkeleton';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -25,31 +21,25 @@ import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl'
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
-const StudyOverviewPage = () => {
-    const { slug } = useParams();
-    const { data: stats, isLoading: statsLoading } = useGetStudyStatsApiAdminStudiesSlugStatsGet(
-        slug || ''
-    );
-    const { data: study, refetch: refetchStudy } = useGetStudyApiAdminStudiesSlugGet(slug || '');
-    const {
-        data: participants,
-        isLoading: participantsLoading,
-        refetch: refetchParticipants,
-    } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug || '');
-    const { refetch: refetchStats } = useGetStudyStatsApiAdminStudiesSlugStatsGet(slug || '');
+interface LoaderData {
+    stats: StudyStatsRead;
+    participants: ParticipantRead[];
+    study: StudyRead;
+    slug: string;
+}
 
-    if (statsLoading || participantsLoading) {
-        return <DashboardSkeleton />;
-    }
+const StudyOverviewPage = () => {
+    const { stats, participants, study, slug } = useLoaderData() as LoaderData;
+    const revalidator = useRevalidator();
 
     const recentParticipants = (participants || []).slice(0, 5);
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        {slug}
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <header className="flex flex-col gap-4 py-4 border-b border-slate-100">
+                <div className="space-y-1 min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="truncate">{slug}</span>
                         {stats && (
                             <Badge
                                 variant="outline"
@@ -120,12 +110,10 @@ const StudyOverviewPage = () => {
                 <>
                     {/* Status Control - Full Width at Top */}
                     <StudyStatusControl
-                        slug={slug || ''}
+                        slug={slug}
                         currentState={study?.state || 'draft'}
                         onStateChange={() => {
-                            refetchStudy();
-                            refetchParticipants();
-                            refetchStats();
+                            revalidator.revalidate();
                         }}
                     />
 

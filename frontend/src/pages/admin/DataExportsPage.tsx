@@ -1,19 +1,25 @@
-import { useParams } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
+import type { ParticipantRead } from '@/api/model';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportCenter from '@/components/admin/dashboard/ExportCenter';
 import InteractiveDataView from '@/components/admin/dashboard/InteractiveDataView';
 import { Database, Download, Table as TableIcon } from 'lucide-react';
 
+interface LoaderData {
+    participants: ParticipantRead[];
+    slug: string;
+}
+
 const DataExportsPage = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const { participants, slug } = useLoaderData() as LoaderData;
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2 h-[calc(100vh-4rem)] overflow-hidden">
-            <header className="flex-none flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <header className="flex-none flex flex-col gap-4 py-4 border-b border-slate-100">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        {slug}
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="truncate">{slug}</span>
                         <Badge
                             variant="outline"
                             className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase tracking-widest text-[10px]"
@@ -27,7 +33,7 @@ const DataExportsPage = () => {
                 </div>
             </header>
 
-            <Tabs defaultValue="browse" className="flex-1 flex flex-col min-h-0">
+            <Tabs defaultValue="browse" className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <div className="flex-none pb-4">
                     <TabsList className="bg-slate-100/50 border border-slate-200 p-1 rounded-xl w-full sm:w-auto grid grid-cols-2 sm:flex sm:inline-flex">
                         <TabsTrigger
@@ -53,7 +59,7 @@ const DataExportsPage = () => {
                 >
                     <div className="flex-1 relative">
                         <div className="absolute inset-0 overflow-y-auto pr-2 pb-10">
-                            <InteractiveDataView slug={slug || ''} />
+                            <InteractiveDataView slug={slug} participants={participants} />
                         </div>
                     </div>
                 </TabsContent>

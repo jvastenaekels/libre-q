@@ -1,11 +1,23 @@
 import { useGetStudyApiStudySlugGet } from '../api/generated';
 import type { StudyConfig } from '../schemas/study';
 
-// biome-ignore lint/suspicious/noExplicitAny: query options
-export const useGetStudyConfig = (slug?: string, language?: string, options: any = {}) => {
+export const useGetStudyConfig = (
+    slug?: string,
+    language?: string,
+    // biome-ignore lint/suspicious/noExplicitAny: generic options
+    options: any = {},
+    password?: string
+) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const linkToken = searchParams.get('token') || undefined;
+
     return useGetStudyApiStudySlugGet<StudyConfig>(
         slug || '',
-        { lang: language },
+        {
+            lang: language,
+            link_token: linkToken,
+            password: password,
+        },
         {
             query: {
                 enabled: !!slug,

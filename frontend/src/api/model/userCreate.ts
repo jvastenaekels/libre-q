@@ -4,6 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { UserCreateFullName } from './userCreateFullName';
 import type { UserCreateInvitationToken } from './userCreateInvitationToken';
 
 /**
@@ -11,6 +12,7 @@ import type { UserCreateInvitationToken } from './userCreateInvitationToken';
  */
 export interface UserCreate {
     email: string;
+    full_name?: UserCreateFullName;
     password: string;
     is_active?: boolean;
     is_superuser?: boolean;

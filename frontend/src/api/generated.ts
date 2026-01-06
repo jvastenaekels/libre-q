@@ -24,6 +24,7 @@ import type {
     BodyLoginForAccessTokenApiTokenPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
     ConsentInput,
+    CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
     InvitationCreate,
@@ -32,14 +33,22 @@ import type {
     ParticipantDetailRead,
     ParticipantDiscardUpdate,
     ParticipantRead,
+    PasswordChange,
+    RecruitmentLinkCreate,
+    RecruitmentLinkRead,
     StudyCreate,
     StudyRead,
     StudyStatsRead,
     StudyUpdate,
     SubmissionInput,
+    TOTPSetup,
+    TOTPVerify,
     Token,
+    UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
     UserRead,
+    UserUpdate,
+    VerifyInvitationApiAdminInvitationsVerifyGetParams,
     WorkspaceCreate,
     WorkspaceRead,
 } from './model';
@@ -158,6 +167,84 @@ export function useReadUsersMeApiMeGet<
 
     return query;
 }
+
+/**
+ * Update current user profile.
+ * @summary Update User Me
+ */
+export const updateUserMeApiMePatch = (userUpdate: UserUpdate) => {
+    return customInstance<UserRead>({
+        url: `/api/me`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: userUpdate,
+    });
+};
+
+export const getUpdateUserMeApiMePatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+        TError,
+        { data: UserUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+    TError,
+    { data: UserUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateUserMeApiMePatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+        { data: UserUpdate }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return updateUserMeApiMePatch(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateUserMeApiMePatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>
+>;
+export type UpdateUserMeApiMePatchMutationBody = UserUpdate;
+export type UpdateUserMeApiMePatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update User Me
+ */
+export const useUpdateUserMeApiMePatch = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+            TError,
+            { data: UserUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+    TError,
+    { data: UserUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateUserMeApiMePatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * OAuth2 compatible token login, get an access token for future requests.
@@ -344,6 +431,367 @@ export const useRegisterUserApiRegisterPost = <TError = HTTPValidationError, TCo
     TContext
 > => {
     const mutationOptions = getRegisterUserApiRegisterPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Change current user password.
+ * @summary Change Password
+ */
+export const changePasswordApiMePasswordPost = (
+    passwordChange: PasswordChange,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/me/password`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: passwordChange,
+        signal,
+    });
+};
+
+export const getChangePasswordApiMePasswordPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+        TError,
+        { data: PasswordChange },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationKey = ['changePasswordApiMePasswordPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+        { data: PasswordChange }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return changePasswordApiMePasswordPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ChangePasswordApiMePasswordPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>
+>;
+export type ChangePasswordApiMePasswordPostMutationBody = PasswordChange;
+export type ChangePasswordApiMePasswordPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Change Password
+ */
+export const useChangePasswordApiMePasswordPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+            TError,
+            { data: PasswordChange },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationOptions = getChangePasswordApiMePasswordPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Start 2FA setup by generating a secret and QR code URI.
+ * @summary Setup Totp
+ */
+export const setupTotpApiMe2faSetupGet = (signal?: AbortSignal) => {
+    return customInstance<TOTPSetup>({ url: `/api/me/2fa/setup`, method: 'GET', signal });
+};
+
+export const getSetupTotpApiMe2faSetupGetQueryKey = () => {
+    return [`/api/me/2fa/setup`] as const;
+};
+
+export const getSetupTotpApiMe2faSetupGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getSetupTotpApiMe2faSetupGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>> = ({
+        signal,
+    }) => setupTotpApiMe2faSetupGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type SetupTotpApiMe2faSetupGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
+>;
+export type SetupTotpApiMe2faSetupGetQueryError = unknown;
+
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Setup Totp
+ */
+
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getSetupTotpApiMe2faSetupGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Enable 2FA after verifying a token.
+ * @summary Enable Totp
+ */
+export const enableTotpApiMe2faEnablePost = (tOTPVerify: TOTPVerify, signal?: AbortSignal) => {
+    return customInstance<unknown>({
+        url: `/api/me/2fa/enable`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: tOTPVerify,
+        signal,
+    });
+};
+
+export const getEnableTotpApiMe2faEnablePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+        TError,
+        { data: TOTPVerify },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+    TError,
+    { data: TOTPVerify },
+    TContext
+> => {
+    const mutationKey = ['enableTotpApiMe2faEnablePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+        { data: TOTPVerify }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return enableTotpApiMe2faEnablePost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type EnableTotpApiMe2faEnablePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>
+>;
+export type EnableTotpApiMe2faEnablePostMutationBody = TOTPVerify;
+export type EnableTotpApiMe2faEnablePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Enable Totp
+ */
+export const useEnableTotpApiMe2faEnablePost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+            TError,
+            { data: TOTPVerify },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+    TError,
+    { data: TOTPVerify },
+    TContext
+> => {
+    const mutationOptions = getEnableTotpApiMe2faEnablePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Disable 2FA after verifying current password.
+ * @summary Disable Totp
+ */
+export const disableTotpApiMe2faDisablePost = (
+    passwordChange: PasswordChange,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/me/2fa/disable`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: passwordChange,
+        signal,
+    });
+};
+
+export const getDisableTotpApiMe2faDisablePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+        TError,
+        { data: PasswordChange },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationKey = ['disableTotpApiMe2faDisablePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+        { data: PasswordChange }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return disableTotpApiMe2faDisablePost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DisableTotpApiMe2faDisablePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>
+>;
+export type DisableTotpApiMe2faDisablePostMutationBody = PasswordChange;
+export type DisableTotpApiMe2faDisablePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Disable Totp
+ */
+export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+            TError,
+            { data: PasswordChange },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationOptions = getDisableTotpApiMe2faDisablePostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -2230,30 +2678,33 @@ export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = <
  * Verify an invitation token and return details.
  * @summary Verify Invitation
  */
-export const verifyInvitationApiAdminInvitationsVerifyTokenGet = (
-    token: string,
+export const verifyInvitationApiAdminInvitationsVerifyGet = (
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     signal?: AbortSignal
 ) => {
     return customInstance<unknown>({
-        url: `/api/admin/invitations/verify/${token}`,
+        url: `/api/admin/invitations/verify`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey = (token?: string) => {
-    return [`/api/admin/invitations/verify/${token}`] as const;
+export const getVerifyInvitationApiAdminInvitationsVerifyGetQueryKey = (
+    params?: VerifyInvitationApiAdminInvitationsVerifyGetParams
+) => {
+    return [`/api/admin/invitations/verify`, ...(params ? [params] : [])] as const;
 };
 
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export const getVerifyInvitationApiAdminInvitationsVerifyGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
@@ -2263,82 +2714,81 @@ export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = 
     const { query: queryOptions } = options ?? {};
 
     const queryKey =
-        queryOptions?.queryKey ??
-        getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey(token);
+        queryOptions?.queryKey ?? getVerifyInvitationApiAdminInvitationsVerifyGetQueryKey(params);
 
     const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
-    > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyTokenGet(token, signal);
+        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
+    > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyGet(params, signal);
 
-    return { queryKey, queryFn, enabled: !!token, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+export type VerifyInvitationApiAdminInvitationsVerifyGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
 >;
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryError = HTTPValidationError;
+export type VerifyInvitationApiAdminInvitationsVerifyGetQueryError = HTTPValidationError;
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                     TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                     TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
@@ -2350,15 +2800,15 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
  * @summary Verify Invitation
  */
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
@@ -2366,8 +2816,8 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions(
-        token,
+    const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyGetQueryOptions(
+        params,
         options
     );
 
@@ -2646,6 +3096,351 @@ export const useDeleteUserApiAdminUsersUserIdDelete = <
     TContext
 > => {
     const mutationOptions = getDeleteUserApiAdminUsersUserIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all recruitment links for a specific study.
+ * @summary List Study Links
+ */
+export const listStudyLinksApiAdminRecruitmentSlugLinksGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<RecruitmentLinkRead[]>({
+        url: `/api/admin/recruitment/${slug}/links`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey = (slug?: string) => {
+    return [`/api/admin/recruitment/${slug}/links`] as const;
+};
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+    > = ({ signal }) => listStudyLinksApiAdminRecruitmentSlugLinksGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudyLinksApiAdminRecruitmentSlugLinksGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+>;
+export type ListStudyLinksApiAdminRecruitmentSlugLinksGetQueryError = HTTPValidationError;
+
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Study Links
+ */
+
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Create one or more recruitment links.
+ * @summary Create Recruitment Links
+ */
+export const createRecruitmentLinksApiAdminRecruitmentSlugLinksPost = (
+    slug: string,
+    recruitmentLinkCreate: RecruitmentLinkCreate,
+    params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<RecruitmentLinkRead[]>({
+        url: `/api/admin/recruitment/${slug}/links`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: recruitmentLinkCreate,
+        params,
+        signal,
+    });
+};
+
+export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+        TError,
+        {
+            slug: string;
+            data: RecruitmentLinkCreate;
+            params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+        },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+    TError,
+    {
+        slug: string;
+        data: RecruitmentLinkCreate;
+        params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+    },
+    TContext
+> => {
+    const mutationKey = ['createRecruitmentLinksApiAdminRecruitmentSlugLinksPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+        {
+            slug: string;
+            data: RecruitmentLinkCreate;
+            params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+        }
+    > = (props) => {
+        const { slug, data, params } = props ?? {};
+
+        return createRecruitmentLinksApiAdminRecruitmentSlugLinksPost(slug, data, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>
+>;
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationBody =
+    RecruitmentLinkCreate;
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Recruitment Links
+ */
+export const useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+            TError,
+            {
+                slug: string;
+                data: RecruitmentLinkCreate;
+                params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+            },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+    TError,
+    {
+        slug: string;
+        data: RecruitmentLinkCreate;
+        params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+    },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Revoke a recruitment link.
+ * @summary Revoke Recruitment Link
+ */
+export const revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = (linkId: number) => {
+    return customInstance<unknown>({
+        url: `/api/admin/recruitment/links/${linkId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+        TError,
+        { linkId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+    TError,
+    { linkId: number },
+    TContext
+> => {
+    const mutationKey = ['revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+        { linkId: number }
+    > = (props) => {
+        const { linkId } = props ?? {};
+
+        return revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete(linkId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>
+>;
+
+export type RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Revoke Recruitment Link
+ */
+export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+            TError,
+            { linkId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+    TError,
+    { linkId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -2960,6 +3755,10 @@ export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError, TConte
 
 /**
  * Fetches study configuration for the frontend, including language resolution.
+
+If the study has randomize_statements=True and a session_token is provided,
+statements will be shuffled deterministically using the token as seed.
+This ensures the same participant always sees statements in the same order.
  * @summary Get Study
  */
 export const getStudyApiStudySlugGet = (
@@ -3091,6 +3890,91 @@ export function useGetStudyApiStudySlugGet<
 
     return query;
 }
+
+/**
+ * Validate study access password.
+ * @summary Unlock Study
+ */
+export const unlockStudyApiStudySlugUnlockPost = (
+    slug: string,
+    params: UnlockStudyApiStudySlugUnlockPostParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/study/${slug}/unlock`,
+        method: 'POST',
+        params,
+        signal,
+    });
+};
+
+export const getUnlockStudyApiStudySlugUnlockPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+        TError,
+        { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+    TError,
+    { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+    TContext
+> => {
+    const mutationKey = ['unlockStudyApiStudySlugUnlockPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+        { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams }
+    > = (props) => {
+        const { slug, params } = props ?? {};
+
+        return unlockStudyApiStudySlugUnlockPost(slug, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnlockStudyApiStudySlugUnlockPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>
+>;
+
+export type UnlockStudyApiStudySlugUnlockPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Unlock Study
+ */
+export const useUnlockStudyApiStudySlugUnlockPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+            TError,
+            { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+    TError,
+    { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+    TContext
+> => {
+    const mutationOptions = getUnlockStudyApiStudySlugUnlockPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Records participant consent with timestamp and version.

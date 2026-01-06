@@ -8,9 +8,11 @@ import type { StudyState } from './studyState';
 import type { GridColumn } from './gridColumn';
 import type { StudyReadPresortConfig } from './studyReadPresortConfig';
 import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
+import type { StudyReadBranding } from './studyReadBranding';
 import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
 import type { StudyTranslationRead } from './studyTranslationRead';
 import type { StatementRead } from './statementRead';
+import type { RecruitmentLinkRead } from './recruitmentLinkRead';
 
 /**
  * Schema for reading a study.
@@ -26,11 +28,14 @@ export interface StudyRead {
     grid_config: GridColumn[];
     presort_config: StudyReadPresortConfig;
     postsort_config: StudyReadPostsortConfig;
+    branding?: StudyReadBranding;
     default_language?: StudyReadDefaultLanguage;
     show_statement_codes?: boolean;
+    randomize_statements?: boolean;
     id: number;
     workspace_id: number;
     created_at: string;
     translations?: StudyTranslationRead[];
     statements?: StatementRead[];
+    recruitment_links?: RecruitmentLinkRead[];
 }

@@ -16,6 +16,7 @@ const BrandingEditor = () => {
         updateDraft((d) => {
             // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
             if (!(d as any).branding) (d as any).branding = { logo_url: null, accent_color: null };
+            // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
             (d as any).branding[field] = value;
         });
     };

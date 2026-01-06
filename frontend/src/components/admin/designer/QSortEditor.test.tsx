@@ -30,6 +30,7 @@ describe('QSortEditor', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // biome-ignore lint/suspicious/noExplicitAny: mock
         (useStudyDesigner as any).mockReturnValue({
             draft: mockDraft,
             activeLocale: 'en',
@@ -154,6 +155,7 @@ describe('QSortEditor', () => {
 
         // There are two buttons: the text itself (for edit) and the delete button
         // We want the delete button (the second one)
+        // biome-ignore lint/style/noNonNullAssertion: test setup requires element existence
         const deleteButton = within(statementItem!).getAllByRole('button')[1];
         fireEvent.click(deleteButton);
 

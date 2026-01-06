@@ -20,12 +20,15 @@ const IntroductionEditor = () => {
         translation?.consent_title !== null && translation?.consent_title !== undefined;
 
     const handleChange = (field: keyof StudyTranslation, value: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateTranslation(activeLocale, (t_trans: any) => {
+            // biome-ignore lint/suspicious/noExplicitAny: complex state update
             (t_trans as any)[field] = value;
         });
     };
 
     const _toggleConsent = (checked: boolean) => {
+        // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateTranslation(activeLocale, (t_trans: any) => {
             if (checked) {
                 t_trans.consent_title = t_trans.consent_title || t('consent.title');
@@ -115,6 +118,7 @@ const IntroductionEditor = () => {
                             if (checked) {
                                 handleChange('instructions', '');
                             } else {
+                                // biome-ignore lint/suspicious/noExplicitAny: nulling field
                                 handleChange('instructions', null as any);
                             }
                         }}
@@ -152,6 +156,7 @@ const IntroductionEditor = () => {
                         checked={hasConsent}
                         onCheckedChange={(checked: boolean) => {
                             if (checked) {
+                                // biome-ignore lint/suspicious/noExplicitAny: complex state update
                                 updateTranslation(activeLocale, (t_trans: any) => {
                                     t_trans.consent_title =
                                         t_trans.consent_title || t('consent.title');
@@ -159,6 +164,7 @@ const IntroductionEditor = () => {
                                         t_trans.consent_description || t('consent.default_text');
                                 });
                             } else {
+                                // biome-ignore lint/suspicious/noExplicitAny: complex state update
                                 updateTranslation(activeLocale, (t_trans: any) => {
                                     t_trans.consent_title = null;
                                     t_trans.consent_description = null;

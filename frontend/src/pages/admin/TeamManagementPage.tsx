@@ -1,17 +1,23 @@
-import { useParams } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
+import type { StudyRead } from '@/api/model';
 import { Users, Shield } from 'lucide-react';
 import TeamSettings from '@/components/admin/team/TeamSettings';
 import { Badge } from '@/components/ui/badge';
 
+interface LoaderData {
+    study: StudyRead;
+    slug: string;
+}
+
 const TeamManagementPage = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const { slug } = useLoaderData() as LoaderData;
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        {slug}
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <header className="flex flex-col gap-4 py-4 border-b border-slate-100">
+                <div className="space-y-1 min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="truncate">{slug}</span>
                         <Badge
                             variant="outline"
                             className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase tracking-widest text-[10px]"

@@ -1,3 +1,4 @@
+import type { ParticipantRead } from '@/api/model';
 import { useState, useMemo } from 'react';
 import {
     useReactTable,
@@ -59,9 +60,13 @@ interface DumpResponse {
 
 interface InteractiveDataViewProps {
     slug: string;
+    participants?: ParticipantRead[]; // Optional: can be provided from loader
 }
 
-export default function InteractiveDataView({ slug }: InteractiveDataViewProps) {
+export default function InteractiveDataView({
+    slug,
+    participants: _providedParticipants,
+}: InteractiveDataViewProps) {
     // Determine type usage for useGetStudyDumpApiAdminStudiesSlugDumpGet
     // Casting broadly as we validated the structure manually
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);

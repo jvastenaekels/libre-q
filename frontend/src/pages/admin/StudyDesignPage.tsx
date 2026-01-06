@@ -16,6 +16,7 @@ import {
     AlertTriangle,
     ExternalLink,
     Palette,
+    Lock,
 } from 'lucide-react';
 import Frame from 'react-frame-component';
 import { Button } from '@/components/ui/button';
@@ -144,6 +145,10 @@ const StudyDesignPage = () => {
     // Dirty State Detection
     const isDirty = JSON.stringify(draft) !== JSON.stringify(study);
 
+    // Permission States
+    const isFullyReadOnly = draft?.state === 'closed';
+    const isStructureLocked = draft?.state !== 'draft'; // active, paused, closed
+
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             // biome-ignore lint/suspicious/noExplicitAny: window hack
@@ -185,7 +190,9 @@ const StudyDesignPage = () => {
         if (!draft || !slug) return;
 
         // 1. Build synthetic config (same logic as side-preview)
+        // biome-ignore lint/suspicious/noExplicitAny: complex draft type
         const translation = (draft.translations as any[])?.find(
+            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
             (t: any) => t.language_code === activeLocale
         );
 
@@ -204,7 +211,9 @@ const StudyDesignPage = () => {
             },
             ui_labels: translation?.ui_labels || {},
             language: activeLocale,
+            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
             statements: (draft.statements || []).map((s: any, index: number) => {
+                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
                 const st = s.translations?.find((t: any) => t.language_code === activeLocale);
                 return {
                     id: index + 1, // Stable numerical ID
@@ -237,7 +246,6 @@ const StudyDesignPage = () => {
                 <link href="/src/index.css" rel="stylesheet" />
                 {/* Capture all style tags (Vite dev & some prod) */}
                 {Array.from(document.querySelectorAll('style')).map((style, i) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: stable enough for dev preview
                     <style
                         key={`style-${i}`}
                         // biome-ignore lint/security/noDangerouslySetInnerHtml: injecting styles to preview
@@ -246,7 +254,6 @@ const StudyDesignPage = () => {
                 ))}
                 {/* Capture all linked stylesheets (Prod bundles) */}
                 {Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link, i) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: stable
                     <link
                         key={`link-${i}`}
                         rel="stylesheet"
@@ -368,22 +375,27 @@ const StudyDesignPage = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-theme(spacing.16))]">
+        <div
+            className="flex flex-col h-[calc(100vh-theme(spacing.16))] opacity-0 animate-in fade-in duration-500"
+            style={{ animationFillMode: 'forwards' }}
+        >
             {/* Toolbar */}
-            <div className="border-b bg-background px-6 py-2 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-md border border-primary/10">
+            <div className="border-b bg-background px-4 sm:px-6 py-2 flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center justify-between shrink-0">
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 px-2 sm:px-3 py-1 bg-primary/5 rounded-md border border-primary/10 shrink-0">
                         <Wand2 className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-semibold">Study design</span>
+                        <span className="text-xs sm:text-sm font-semibold hidden sm:inline">
+                            Study design
+                        </span>
                     </div>
-                    <div className="h-4 w-px bg-border" />
-                    <h2 className="text-sm font-medium truncate max-w-[200px] font-mono">
+                    <div className="h-4 w-px bg-border hidden sm:block" />
+                    <h2 className="text-xs sm:text-sm font-medium truncate font-mono min-w-0">
                         {draft.slug}
                     </h2>
                     {/* Status Badge */}
                     <div
                         className={cn(
-                            'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border',
+                            'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shrink-0',
                             draft.state === 'active'
                                 ? 'bg-green-100 text-green-700 border-green-200'
                                 : draft.state === 'closed'
@@ -395,22 +407,21 @@ const StudyDesignPage = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 mr-4 bg-muted/50 rounded-lg p-1">
-                        {/* Language Switcher Fix */}
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-0.5 sm:p-1">
+                        {/* Language Switcher */}
                         {(() => {
-                            // Derive supported languages from translations
                             const supportedLangs = Array.from(
+                                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
                                 new Set((draft.translations || []).map((t: any) => t.language_code))
                             );
-                            // Ensure current active locale is included or default to en
                             const langs = supportedLangs.length > 0 ? supportedLangs : ['en'];
                             return langs.map((lang: string) => (
                                 <Button
                                     key={lang}
                                     variant={activeLocale === lang ? 'secondary' : 'ghost'}
                                     size="sm"
-                                    className="h-7 px-2 text-xs"
+                                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
                                     onClick={() => setActiveLocale(lang)}
                                 >
                                     {lang.toUpperCase()}
@@ -423,14 +434,16 @@ const StudyDesignPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setIsPreviewVisible(!isPreviewVisible)}
-                        className="hidden lg:flex"
+                        className="hidden lg:flex h-8"
                     >
                         {isPreviewVisible ? (
-                            <EyeOff className="h-4 w-4 mr-2" />
+                            <EyeOff className="h-4 w-4 sm:mr-2" />
                         ) : (
-                            <Eye className="h-4 w-4 mr-2" />
+                            <Eye className="h-4 w-4 sm:mr-2" />
                         )}
-                        {isPreviewVisible ? 'Hide preview' : 'Show preview'}
+                        <span className="hidden xl:inline">
+                            {isPreviewVisible ? 'Hide preview' : 'Show preview'}
+                        </span>
                     </Button>
 
                     <Button
@@ -438,12 +451,18 @@ const StudyDesignPage = () => {
                         size="sm"
                         onClick={resetDraft}
                         title="Discard unsaved changes"
-                        disabled={draft.state !== 'draft'} // Disable reset in read-only
+                        disabled={draft.state !== 'draft'}
+                        className="h-8"
                     >
                         <RotateCcw className="h-4 w-4" />
                     </Button>
 
-                    <Button variant="secondary" size="sm" onClick={handleTestRun} className="gap-2">
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleTestRun}
+                        className="gap-1 sm:gap-2 h-8"
+                    >
                         <Eye className="h-4 w-4" />
                         <span className="hidden sm:inline">Test run</span>
                     </Button>
@@ -451,25 +470,21 @@ const StudyDesignPage = () => {
                     <Button
                         size="sm"
                         onClick={handleSave}
-                        disabled={updateMutation.isPending || draft.state !== 'draft'}
+                        disabled={updateMutation.isPending || isFullyReadOnly}
                         className={cn(
-                            'transition-all',
+                            'transition-all h-8',
                             isDirty &&
-                                draft.state === 'draft' &&
-                                'ring-2 ring-primary ring-offset-2 shadow-lg'
+                                !isFullyReadOnly &&
+                                'ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse'
                         )}
                     >
                         {updateMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
                         ) : (
-                            <Save className="h-4 w-4 mr-2" />
+                            <Save className="h-4 w-4 sm:mr-2" />
                         )}
                         <span className="hidden sm:inline">
-                            {draft.state !== 'draft'
-                                ? 'Read only'
-                                : isDirty
-                                  ? 'Save design*'
-                                  : 'Save design'}
+                            {isFullyReadOnly ? 'Closed' : isDirty ? 'Save*' : 'Save'}
                         </span>
                     </Button>
                 </div>
@@ -477,18 +492,18 @@ const StudyDesignPage = () => {
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative">
-                {/* Read-only Overlay */}
-                {draft.state !== 'draft' && (
-                    <div className="absolute inset-0 z-50 bg-background/50 backdrop-blur-[1px] flex items-center justify-center p-8 pointer-events-none">
+                {/* Read-only Overlay - Only for CLOSED studies */}
+                {isFullyReadOnly && (
+                    <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 pointer-events-none">
                         <div className="bg-background border shadow-lg rounded-xl p-6 max-w-md text-center pointer-events-auto">
-                            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertTriangle className="h-6 w-6 text-amber-600" />
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Lock className="h-6 w-6 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-semibold">Study is {draft.state}</h3>
+                            <h3 className="text-lg font-semibold">Study is closed</h3>
                             <p className="text-sm text-muted-foreground mt-2 mb-6">
-                                Editing is disabled while the study is active to preserve data
-                                integrity. To make changes, please revert the study to{' '}
-                                <strong>Draft</strong> status in the settings.
+                                This study is permanently closed and cannot be edited. All data
+                                remains accessible for analysis, but no changes to configuration are
+                                allowed.
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <Button
@@ -497,7 +512,6 @@ const StudyDesignPage = () => {
                                 >
                                     Go to study dashboard
                                 </Button>
-                                {/* We could allow state change here if we had the mutation ready */}
                             </div>
                         </div>
                     </div>
@@ -510,7 +524,7 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-8 scrollbar-hide snap-x">
+                        <TabsList className="flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent snap-x snap-mandatory">
                             <TabsTrigger
                                 value="intro"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
@@ -528,6 +542,9 @@ const StudyDesignPage = () => {
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
                                 🃏 Q-sort task
+                                {isStructureLocked && (
+                                    <Lock className="h-3 w-3 ml-1 text-muted-foreground" />
+                                )}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
@@ -550,31 +567,6 @@ const StudyDesignPage = () => {
                         </TabsList>
 
                         <div className="max-w-3xl mx-auto pb-20">
-                            {!isGridValid && (
-                                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
-                                    <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-amber-900">
-                                            Grid configuration mismatch
-                                        </h4>
-                                        <p className="text-sm text-amber-700 mt-1">
-                                            You have <strong>{statementsCount}</strong> statements
-                                            but the grid only has slots for{' '}
-                                            <strong>{gridCapacity}</strong> items. Please adjust the
-                                            columns in the "Q-Sort Task" tab.
-                                        </p>
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="ml-auto bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-900"
-                                        onClick={() => setActiveStep('q-sort')}
-                                    >
-                                        Fix
-                                    </Button>
-                                </div>
-                            )}
-
                             <TabsContent value="intro" className="mt-0 outline-none">
                                 <IntroductionEditor />
                             </TabsContent>
@@ -583,7 +575,40 @@ const StudyDesignPage = () => {
                                 <QuestionBuilder type="pre" />
                             </TabsContent>
 
-                            <TabsContent value="q-sort" className="mt-0 outline-none">
+                            <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
+                                {isStructureLocked && (
+                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+                                        <div className="flex-1">
+                                            <h4 className="text-sm font-semibold text-blue-900">
+                                                Grid structure is locked
+                                            </h4>
+                                            <p className="text-sm text-blue-700 mt-1">
+                                                The grid and statements cannot be modified while the
+                                                study is <strong>{draft.state}</strong>. This
+                                                protects data integrity for existing submissions.
+                                                You can still edit translations, branding, and other
+                                                study details.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                {!isGridValid && (
+                                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+                                        <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                                        <div className="flex-1">
+                                            <h4 className="text-sm font-semibold text-amber-900">
+                                                Grid configuration mismatch
+                                            </h4>
+                                            <p className="text-sm text-amber-700 mt-1">
+                                                You have <strong>{statementsCount}</strong>{' '}
+                                                statements but the grid only has slots for{' '}
+                                                <strong>{gridCapacity}</strong> items. Please adjust
+                                                the columns below to match.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                                 <QSortEditor />
                             </TabsContent>
 
@@ -606,8 +631,8 @@ const StudyDesignPage = () => {
                 {isPreviewVisible && (
                     <div
                         className={cn(
-                            'border-l bg-muted/10 flex-col shrink-0 transition-[width] duration-300 ease-in-out hidden lg:flex',
-                            viewMode === 'mobile' ? 'w-[450px]' : 'w-[50vw]'
+                            'border-l bg-muted/10 flex-col shrink-0 transition-all duration-300 ease-in-out hidden lg:flex',
+                            viewMode === 'mobile' ? 'w-[min(450px,35vw)]' : 'w-[min(60vw,1200px)]'
                         )}
                     >
                         <div className="p-4 border-b bg-background/50 flex items-center justify-between shrink-0">

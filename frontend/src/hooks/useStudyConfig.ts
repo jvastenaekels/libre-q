@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
@@ -10,6 +10,8 @@ import { useGetStudyConfig } from './useGetStudyConfig';
 
 export const useStudyConfig = () => {
     const { slug } = useParams();
+    const [password, setPasswordState] = useState<string | undefined>();
+    const [passwordError, setPasswordError] = useState<boolean>(false);
 
     // Store Actions
     const setConfig = useConfigStore((state) => state.setConfig);
@@ -37,7 +39,8 @@ export const useStudyConfig = () => {
         slug,
         langToRequest,
         // Disable query if we're in pilot mode (using local draft)
-        { enabled: !!slug && !isPilotMode && !isTestMode }
+        { enabled: !!slug && !isPilotMode && !isTestMode },
+        password
     );
 
     // --- Effect: Handle Test Mode Loading ---
@@ -127,8 +130,15 @@ export const useStudyConfig = () => {
             }
             // Clear error on success
             setConfigError(null);
+
+            // Handle password error
+            if (data.requires_password && password) {
+                setPasswordError(true);
+            } else {
+                setPasswordError(false);
+            }
         }
-    }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode]);
+    }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode, password]);
 
     // --- Effect: Sync Error ---
     useEffect(() => {
@@ -155,5 +165,9 @@ export const useStudyConfig = () => {
 
     return {
         retry: refetch,
+        unlock: (pw: string) => {
+            setPasswordState(pw);
+        },
+        passwordError,
     };
 };

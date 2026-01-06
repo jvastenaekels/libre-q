@@ -6,16 +6,24 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.models import ParticipantStatus, StudyRole, StudyState, WorkspaceRole
+from app.models import (
+    ParticipantStatus,
+    RecruitmentLinkType,
+    StudyRole,
+    StudyState,
+    WorkspaceRole,
+)
 
 # Auth Schemas
 
 
 class Token(BaseModel):
-    """Schema for returning an access token."""
+    """Schema for returning an access token or 2FA requirement."""
 
-    access_token: str
-    token_type: str
+    access_token: str | None = None
+    token_type: str | None = None
+    requires_2fa: bool = False
+    temp_token: str | None = None
 
 
 class TokenData(BaseModel):
@@ -49,6 +57,7 @@ class UserRead(UserBase):
     id: int
     is_active: bool
     is_superuser: bool
+    is_totp_enabled: bool
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -243,6 +252,7 @@ class StudyUpdate(BaseModel):
     randomize_statements: bool | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
+    access_password: str | None = None
 
     @model_validator(mode="after")
     def check_grid_symmetry(self) -> "StudyUpdate":
@@ -267,6 +277,7 @@ class StudyRead(StudyBase):
     created_at: datetime
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
+    recruitment_links: list["RecruitmentLinkRead"] = []
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -312,6 +323,7 @@ class SubmissionInput(BaseModel):
     presort_answers: dict[str, Any] | None = {}
     qsort: list[QSortEntryInput]
     postsort_answers: dict[str, Any] | None = {}
+    link_token: str | None = None
 
     @field_validator("qsort")
     @classmethod
@@ -414,4 +426,51 @@ class InvitationLink(BaseModel):
     """Schema for returning a generated invitation link."""
 
     invite_url: str
+    token: str
+
+
+# Recruitment Link Schemas
+
+
+class RecruitmentLinkBase(BaseModel):
+    """Base schema for recruitment links."""
+
+    name: str | None = None
+    type: RecruitmentLinkType = RecruitmentLinkType.public
+    capacity: int | None = None
+    expires_at: datetime | None = None
+    is_active: bool = True
+
+
+class RecruitmentLinkCreate(RecruitmentLinkBase):
+    """Schema for creating a recruitment link."""
+
+    pass
+
+
+class RecruitmentLinkRead(RecruitmentLinkBase):
+    """Schema for reading a recruitment link."""
+
+    id: int
+    study_id: int
+    token: str
+    usage_count: int
+    start_count: int
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+# TOTP Schemas
+
+
+class TOTPSetup(BaseModel):
+    """Schema for TOTP setup response."""
+
+    secret: str
+    qr_code_uri: str
+
+
+class TOTPVerify(BaseModel):
+    """Schema for TOTP verification."""
+
     token: str

@@ -93,3 +93,19 @@ accent_color
 update_user_me  # unused function (backend/app/routers/auth.py)
 change_password  # unused function (backend/app/routers/auth.py)
 full_name  # unused variable
+individual
+limited
+recruitment_links
+start_count
+Invitation
+accepted_at
+list_study_links
+create_recruitment_links
+revoke_recruitment_link
+setup_totp
+enable_totp
+disable_totp
+unlock_study
+requires_2fa
+temp_token
+qr_code_uri

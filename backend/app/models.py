@@ -59,6 +59,14 @@ class StudyRole(str, Enum):
     viewer = "viewer"
 
 
+class RecruitmentLinkType(str, Enum):
+    """Enum for types of recruitment links."""
+
+    public = "public"
+    individual = "individual"
+    limited = "limited"
+
+
 # Workspace Models
 class Workspace(Base):
     """SQLAlchemy model for workspaces."""
@@ -136,6 +144,10 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    # 2FA / TOTP
+    totp_secret: Mapped[str | None] = mapped_column(String, nullable=True)
+    is_totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+
     # Relationships
     memberships: Mapped[list["WorkspaceMember"]] = relationship(
         back_populates="user",
@@ -185,6 +197,7 @@ class Study(Base):
     branding: Mapped[dict[str, Any] | None] = mapped_column(
         JSON, nullable=True
     )  # e.g. {"logo_url": "...", "accent_color": "..."}
+    access_password: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Relationships
     workspace: Mapped["Workspace"] = relationship(back_populates="studies")
@@ -198,6 +211,9 @@ class Study(Base):
         back_populates="study", cascade="all, delete-orphan"
     )
     collaborators: Mapped[list["StudyCollaborator"]] = relationship(
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
+    )
+    recruitment_links: Mapped[list["RecruitmentLink"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
 
@@ -342,3 +358,56 @@ class QSortEntry(Base):
             "participant_id", "statement_id", name="uq_participant_statement"
         ),
     )
+
+
+class RecruitmentLink(Base):
+    """SQLAlchemy model for recruitment links."""
+
+    __tablename__ = "recruitment_links"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    study_id: Mapped[int] = mapped_column(
+        ForeignKey("studies.id", ondelete="CASCADE"), index=True
+    )
+    type: Mapped[RecruitmentLinkType] = mapped_column(
+        SAEnum(RecruitmentLinkType), default=RecruitmentLinkType.public
+    )
+    token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(
+        String, nullable=True
+    )  # Name for this link/lot
+    capacity: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    usage_count: Mapped[int] = mapped_column(Integer, default=0)
+    start_count: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    study: Mapped["Study"] = relationship(back_populates="recruitment_links")
+
+
+class Invitation(Base):
+    """SQLAlchemy model for researcher/collaborator invitations."""
+
+    __tablename__ = "invitations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String, index=True)
+    study_id: Mapped[int] = mapped_column(
+        ForeignKey("studies.id", ondelete="CASCADE"), index=True
+    )
+    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
+    token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    study: Mapped["Study"] = relationship()

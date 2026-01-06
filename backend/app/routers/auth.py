@@ -3,7 +3,7 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,12 +12,23 @@ from app.core.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import User, StudyCollaborator, StudyRole
-from app.schemas import Token, UserRead, UserCreate, UserUpdate, PasswordChange
 from app.utils.security import (
     create_access_token,
     verify_password,
     get_password_hash,
     decode_invitation_token,
+    generate_totp_secret,
+    get_totp_uri,
+    verify_totp_token,
+)
+from app.schemas import (
+    Token,
+    UserRead,
+    UserCreate,
+    UserUpdate,
+    PasswordChange,
+    TOTPSetup,
+    TOTPVerify,
 )
 from app.limiter import limiter
 from fastapi import Request
@@ -38,6 +49,7 @@ async def read_users_me(
 async def login_for_access_token(
     request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    x_totp_token: Annotated[str | None, Header()] = None,
     db: AsyncSession = Depends(get_db),
 ):
     """OAuth2 compatible token login, get an access token for future requests."""
@@ -53,6 +65,19 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # 2.5 Check 2FA
+    if user.is_totp_enabled:
+        if not x_totp_token:
+            return Token(requires_2fa=True)
+
+        if not user.totp_secret or not verify_totp_token(
+            user.totp_secret, x_totp_token
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid 2FA token",
+            )
 
     # 3. Create Token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -163,3 +188,58 @@ async def change_password(
     current_user.hashed_password = get_password_hash(password_data.new_password)
     await db.commit()
     return {"message": "Password updated successfully"}
+
+
+@router.get("/me/2fa/setup", response_model=TOTPSetup)
+async def setup_totp(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_db),
+):
+    """Start 2FA setup by generating a secret and QR code URI."""
+    if current_user.is_totp_enabled:
+        raise HTTPException(status_code=400, detail="2FA already enabled")
+
+    # Generate or reuse secret (re-generating for fresh setup)
+    secret = generate_totp_secret()
+    current_user.totp_secret = secret
+    await db.commit()
+
+    return TOTPSetup(
+        secret=secret, qr_code_uri=get_totp_uri(current_user.email, secret)
+    )
+
+
+@router.post("/me/2fa/enable")
+async def enable_totp(
+    verify_data: TOTPVerify,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_db),
+):
+    """Enable 2FA after verifying a token."""
+    if not current_user.totp_secret:
+        raise HTTPException(status_code=400, detail="TOTP not set up")
+
+    if verify_totp_token(current_user.totp_secret, verify_data.token):
+        current_user.is_totp_enabled = True
+        await db.commit()
+        return {"status": "enabled"}
+
+    raise HTTPException(status_code=400, detail="Invalid token")
+
+
+@router.post("/me/2fa/disable")
+async def disable_totp(
+    password_data: PasswordChange,  # Reuse for current password check
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_db),
+):
+    """Disable 2FA after verifying current password."""
+    if not verify_password(
+        password_data.current_password, current_user.hashed_password
+    ):
+        raise HTTPException(status_code=400, detail="Incorrect password")
+
+    current_user.is_totp_enabled = False
+    current_user.totp_secret = None
+    await db.commit()
+    return {"status": "disabled"}

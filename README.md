@@ -14,6 +14,7 @@ The documentation is organized using the **Diátaxis** framework:
 - **[Tutorials](docs/tutorials/)**: Learning-oriented lessons.
   - [Production Deployment](docs/guides/deployment.md) (Scalingo, Docker)
 - **[Guides](docs/guides/)**: Task-oriented how-to guides.
+  - [Admin Dashboard Features](docs/guides/admin-features.md)
   - [Admin & Team Management](docs/guides/admin-management.md)
   - [Conducting Studies](docs/guides/conducting-studies.md)
   - [Exporting Data](docs/guides/data-export.md)
@@ -31,11 +32,14 @@ The documentation is organized using the **Diátaxis** framework:
 ## ✨ Features
 
 - **Modern Q-Sort Interface** — Drag-and-drop with fluid animations (Framer Motion).
-- **Advanced RBAC** — Multi-user collaboration with Owner, Editor, and Viewer roles.
-- **Administrative API** — Management of users, studies, and data exports.
-- **Multi-language Support** — Fully internationalized (i18n).
+- **Two-Factor Authentication (TOTP)** — Enhanced security for researcher accounts.
+- **Recruitment Analytics** — Track participant conversion (Starts vs. Submissions) and success rates.
+- **Advanced RBAC** — Multi-user collaboration with Owner, Editor, and Viewer roles in Workspace isolation.
+- **Administrative API** — Full management of users, studies, and cross-format data exports.
+- **Modern Stack** — Built with **React 19**, **React Router v7** (Data APIs), and **FastAPI**.
+- **Multi-language Support** — Fully internationalized (i18n) for global research.
 - **Responsive Design** — "Focus Flow" UX optimized for mobile devices.
-- **Flexible Configuration** — Define grid shapes and logic via JSON.
+- **Flexible Configuration** — Define grid shapes, recruitment logic, and access passwords via API.
 - **Gunicorn**: Robust WSGI server for production concurrency.
 - **Local CI Wrapper**: A unified `make ci` command to verify code quality before pushing.
 

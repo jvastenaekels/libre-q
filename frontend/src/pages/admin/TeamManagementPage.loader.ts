@@ -1,0 +1,23 @@
+import {
+    getStudyApiAdminStudiesSlugGet,
+    getGetStudyApiAdminStudiesSlugGetQueryKey,
+} from '@/api/generated';
+import { queryClient } from '@/lib/queryClient';
+import type { LoaderFunctionArgs } from 'react-router-dom';
+
+export const teamManagementPageLoader = async ({ params }: LoaderFunctionArgs) => {
+    const { slug } = params;
+    if (!slug) throw new Error('Slug is required');
+
+    try {
+        const study = await queryClient.fetchQuery({
+            queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            queryFn: () => getStudyApiAdminStudiesSlugGet(slug),
+        });
+
+        return { study, slug };
+    } catch (error) {
+        console.error('Failed to load team management data:', error);
+        throw error;
+    }
+};

@@ -23,6 +23,7 @@ from ..models import (
     StudyTranslation,
 )
 from ..schemas import SubmissionInput
+from .recruitment_service import RecruitmentService
 from ..utils.crypto import hash_ip
 
 
@@ -258,6 +259,18 @@ class StudyService:
                 detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
             )
 
+        # 2.6 Validation: Recruitment Link
+        link = None
+        if data.link_token:
+            link = await RecruitmentService.validate_link_token(
+                db, study.id, data.link_token
+            )
+            if not link:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Invalid, expired, or full recruitment link",
+                )
+
         # Edge case: Ensure qsort is not None
         if data.qsort is None:
             raise HTTPException(
@@ -322,6 +335,10 @@ class StudyService:
                 )
                 db.add(participant)
                 await db.flush()
+
+                # Increment link usage if link was used
+                if link:
+                    await RecruitmentService.increment_usage(db, link.id)
             except IntegrityError:
                 # Race condition: Participant was created by another request in the meantime.
                 # Rollback the failed insert and fetch the existing participant.

@@ -86,3 +86,12 @@ afterEach(() => {
     useUIStore.getState().setHoveredCard(null);
 });
 afterAll(() => server.close());
+
+// Mock react-router-dom's useLoaderData globally
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useLoaderData: vi.fn().mockReturnValue({}),
+    };
+});

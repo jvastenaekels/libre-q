@@ -13,10 +13,18 @@
  */
 
 import { Check, ChevronDown, Globe } from 'lucide-react';
+import type { StudyRead } from '@/api/model';
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+    Navigate,
+    Outlet,
+    useLocation,
+    useNavigate,
+    useParams,
+    useLoaderData,
+} from 'react-router-dom';
 import { ApiError } from '../api/client';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
@@ -28,6 +36,7 @@ import type { StudyStatusType } from '../pages/StudyStatusPage';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { StudyAccessGate } from '../components/study/StudyAccessGate';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -45,6 +54,7 @@ const StudyLayoutContent: React.FC = () => {
     const config = useConfigStore((state) => state.config);
     const configLoading = useConfigStore((state) => state.isLoading);
     const configError = useConfigStore((state) => state.error);
+    const setConfig = useConfigStore((state) => state.setConfig);
 
     // session selectors
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
@@ -79,7 +89,7 @@ const StudyLayoutContent: React.FC = () => {
     };
 
     // Trigger config fetch/re-fetch on slug or language change
-    const { retry } = useStudyConfig();
+    const { retry, unlock, passwordError } = useStudyConfig();
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -109,6 +119,16 @@ const StudyLayoutContent: React.FC = () => {
         useSessionStore.getState().setLanguage(lng);
         setIsLangMenuOpen(false);
     };
+
+    // --- RR7 Loader Data ---
+    const { study } = useLoaderData() as { study: StudyRead };
+
+    // Sync loader data to config store
+    useEffect(() => {
+        if (study) {
+            setConfig(study);
+        }
+    }, [study, setConfig]);
 
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
@@ -166,6 +186,19 @@ const StudyLayoutContent: React.FC = () => {
 
     if (!isPilotModePersistent && config?.state && config.state !== 'active') {
         return <StudyStatusPage type={config.state as StudyStatusType} onRetry={retry} />;
+    }
+
+    // Password Protection Gate
+    if (config?.requires_password) {
+        return (
+            <StudyAccessGate
+                title={config.title}
+                description={config.description || ''}
+                onUnlock={unlock}
+                isLoading={configLoading}
+                error={passwordError ? 'Incorrect password' : null}
+            />
+        );
     }
 
     // Basic Protection Check
@@ -487,7 +520,18 @@ const StudyLayoutContent: React.FC = () => {
                     className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
                 >
                     <ErrorBoundary>
-                        <Outlet />
+                        <Suspense
+                            fallback={
+                                <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+                                    <div className="w-12 h-12 border-4 border-t-transparent border-indigo-600 rounded-full animate-spin" />
+                                    <p className="text-slate-500 font-medium">
+                                        Loading study content...
+                                    </p>
+                                </div>
+                            }
+                        >
+                            <Outlet />
+                        </Suspense>
                     </ErrorBoundary>
                 </div>
             </main>
