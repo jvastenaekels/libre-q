@@ -121,6 +121,8 @@ const StudyLayoutContent: React.FC = () => {
     };
 
     // --- RR7 Loader Data ---
+    // This component uses `useLoaderData` to hydrate the config store.
+    // In tests, we mock `useLoaderData` (see setupTests.ts) to avoid "Data Router" errors.
     const { study } = useLoaderData() as { study: StudyRead };
 
     // Sync loader data to config store

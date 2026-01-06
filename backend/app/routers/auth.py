@@ -52,7 +52,17 @@ async def login_for_access_token(
     x_totp_token: Annotated[str | None, Header()] = None,
     db: AsyncSession = Depends(get_db),
 ):
-    """OAuth2 compatible token login, get an access token for future requests."""
+    """
+    OAuth2 compatible token login, getting an access token for future requests.
+
+    Validation Flow:
+    1. Verify username (email) and password.
+    2. If the user has 2FA enabled:
+       - Check for `x-totp-token` header.
+       - If missing, return a special Token response indicating `requires_2fa=True`.
+       - If present, verify the TOTP token.
+    3. If all checks pass, issue a Bearer access token.
+    """
     # 1. Fetch user
     query = select(User).where(User.email == form_data.username)
     result = await db.execute(query)
@@ -93,7 +103,14 @@ async def register_user(
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    """Register a new user, optionally via an invitation token."""
+    """
+    Register a new user, optionally via an invitation token.
+
+    If an `invitation_token` is provided:
+    1. Decodes and verifies the token.
+    2. Ensures the token's subject matches the provided email.
+    3. Automatically adds the new user as a collaborator to the study specified in the token.
+    """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
     result = await db.execute(query)

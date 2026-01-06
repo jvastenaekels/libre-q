@@ -11,7 +11,17 @@ logger = logging.getLogger(__name__)
 def send_invitation_email(email_to: str, study_title: str, invite_url: str):
     """
     Send an invitation email to a collaborator.
-    If SMTP settings are missing, log the email content instead (for development).
+
+    Args:
+        email_to: The recipient's email address.
+        study_title: The title of the study they are being invited to.
+        invite_url: The unique URL for accepting the invitation.
+
+    Raises:
+        Exception: Re-raises any exception encountered during the SMTP process after logging it.
+
+    Note:
+        If SMTP settings are not configured, the email content is logged to the console/logger for development purposes.
     """
     subject = f"Invitation to collaborate on '{study_title}'"
 
