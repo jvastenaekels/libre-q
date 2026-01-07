@@ -249,7 +249,7 @@
         },
         "sidebar": {
             "dashboard": "Tableau de bord",
-            "design": "Design",
+            "design": "Conception",
             "recruit": "Recrutement",
             "data": "Données",
             "team": "Équipe",
@@ -355,7 +355,7 @@
             "admin": "Admin",
             "dashboard": "Tableau de bord",
             "study_dashboard": "Vue d'ensemble",
-            "design": "Design",
+            "design": "Conception",
             "participants": "Participants",
             "team": "Équipe",
             "recruitment": "Recrutement",
@@ -372,7 +372,7 @@
             "system": "Système",
             "no_studies": "Aucune étude dans cet espace.",
             "open_dashboard": "Ouvrir le tableau de bord",
-            "design_study": "Conception de l'étude",
+            "design_study": "Conception",
             "collaborators": "Collaborateurs",
             "copy_link": "Copier le lien public",
             "toggle_theme": "Changer de thème",
@@ -527,7 +527,7 @@
                 "qsort_desc": "Assurez-vous que la capacité de votre grille correspond exactement au nombre d'énoncés. Un Q-set équilibré compte généralement entre 30 et 60 items pour une analyse factorielle robuste."
             },
             "toolbar": {
-                "title": "Conception de l'étude",
+                "title": "Conception",
                 "preview": "Afficher l'aperçu",
                 "hide_preview": "Masquer l'aperçu",
                 "popout": "Aperçu détaché",

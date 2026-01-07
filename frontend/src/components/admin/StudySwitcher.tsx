@@ -94,7 +94,7 @@ export function StudySwitcher() {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight ml-1">
                                     <span className="truncate font-bold tracking-tight text-slate-900 leading-none">
-                                        {activeStudy ? activeStudy.slug : 'Select Study'}
+                                        {activeStudy ? (activeStudy.translations?.[0]?.title || activeStudy.slug) : 'Select Study'}
                                     </span>
                                 </div>
                                 <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
@@ -107,7 +107,7 @@ export function StudySwitcher() {
                             sideOffset={4}
                         >
                             <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
-                                Studies
+                                {t('admin.sidebar.studies')}
                             </DropdownMenuLabel>
                             <div className="space-y-1 my-1">
                                 {filteredStudies?.map((study) => {
@@ -134,7 +134,7 @@ export function StudySwitcher() {
                                             </div>
                                             <div className="flex flex-col flex-1 min-w-0">
                                                 <span className="text-sm font-bold truncate">
-                                                    {study.slug}
+                                                    {study.translations?.[0]?.title || study.slug}
                                                 </span>
                                             </div>
                                         </DropdownMenuItem>
