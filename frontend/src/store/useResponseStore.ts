@@ -17,6 +17,9 @@ interface Responses {
         missing_statement: string;
         general_comment: string;
         questions_answers: Record<string, string | number | boolean>;
+        email?: string;
+        interview_consent?: boolean;
+        newsletter_consent?: boolean;
     };
 }
 
@@ -37,7 +40,7 @@ interface ResponseActions {
     // Post Sort
     setPostSortResponse: (
         field: keyof Responses['postsort'],
-        value: string | Record<number, string>
+        value: string | Record<number, string> | boolean | number
     ) => void;
 
     resetResponses: () => void;

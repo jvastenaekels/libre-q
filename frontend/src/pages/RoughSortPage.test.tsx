@@ -59,6 +59,7 @@ const mockConfig = {
         { id: 2, text: 'Card 2' },
         { id: 3, text: 'Card 3' },
     ],
+    condition_of_instruction: 'Test Instruction',
 };
 
 describe('RoughSortPage', () => {
@@ -107,8 +108,8 @@ describe('RoughSortPage', () => {
 
         // Check for Hint (now at bottom)
         expect(screen.getByText('rough.header.hint')).toBeTruthy();
-        // Check for Title
-        expect(screen.getByText('rough.header.title')).toBeTruthy();
+        // Check for Instruction
+        expect(screen.getByText('Test Instruction')).toBeTruthy();
 
         vi.useRealTimers();
     });

@@ -6,8 +6,7 @@
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
-import type React from 'react';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,19 +31,22 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const config = useConfigStore((state) => state.config);
     const showCodes = config?.show_statement_codes ?? false;
 
-    // Response Store
-    const responses = useResponseStore((state) => ({ rough: state.rough }));
-    const categorizeCard = useResponseStore((state) => state.categorizeCard);
+    // --- Selectors (Stable) ---
+    const roughHistory = useResponseStore((state) => state.rough?.history ?? []);
+    const agreeCount = useResponseStore((state) => state.rough?.agree?.length ?? 0);
+    const disagreeCount = useResponseStore((state) => state.rough?.disagree?.length ?? 0);
+    const neutralCount = useResponseStore((state) => state.rough?.neutral?.length ?? 0);
     const undoRoughSort = useResponseStore((state) => state.undoRoughSort);
+    const categorizeCard = useResponseStore((state) => state.categorizeCard);
 
-    // Session Store
+    // Other Stores
     const setStep = useSessionStore((state) => state.setStep);
-
-    const cardStackRef = useRef<CardStackHandle>(null);
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
     const { setHeaderAction } = useLayoutAction();
     const { t } = useTranslation();
+
+    const cardStackRef = useRef<CardStackHandle>(null);
 
     // 2. State & Hooks - Continuous
     const [isReadingInstructions, setIsReadingInstructions] = useState(false);
@@ -53,6 +55,17 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     // Motion Values lifted from CardStack
     const x = useMotionValue(0);
     const y = useMotionValue(0);
+
+    // --- Handlers ---
+    const handleUndo = useCallback(
+        (e?: React.MouseEvent) => {
+            e?.stopPropagation();
+            if (roughHistory.length > 0) {
+                undoRoughSort();
+            }
+        },
+        [undoRoughSort, roughHistory.length]
+    );
 
     // Set Step 3 on mount
     useEffect(() => {
@@ -83,49 +96,28 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Auto-dismiss tip after 5 cards sorted (all devices)
     useEffect(() => {
-        if (config?.pre_instruction && responses.rough.history.length === 0) {
+        if (config?.pre_instruction && roughHistory.length === 0) {
             setIsReadingInstructions(true);
         }
-    }, [config, responses.rough.history.length]);
+    }, [config, roughHistory.length]);
 
     useEffect(() => {
-        if (!config) return;
-
-        // Set header action for undo
-        setHeaderAction(
-            <button
-                type="button"
-                onClick={() => {
-                    startTransition(() => {
-                        undoRoughSort();
-                    });
-                }}
-                className={cn(
-                    'flex items-center gap-2 px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest',
-                    responses.rough.history.length === 0 && 'opacity-0 pointer-events-none'
-                )}
-                disabled={responses.rough.history.length === 0}
-            >
-                <RotateCcw size={14} />
-                {t('common.undo')}
-            </button>
-        );
-
-        // Cleanup function to clear the header action when component unmounts or config changes
+        // Cleanup function to clear the header action when component unmounts
         return () => setHeaderAction(null);
-    }, [responses.rough.history.length, undoRoughSort, setHeaderAction, config, t]);
+    }, [setHeaderAction]);
 
     useEffect(() => {
-        if (showTip && responses.rough.history.length >= 5) {
+        if (showTip && roughHistory.length >= 5) {
             setShowTip(false);
         }
-    }, [responses.rough.history.length, showTip]);
+    }, [roughHistory.length, showTip]);
 
-    // React 19: Removed useMemo, React Compiler handles this automatically
-    const sortedIds = new Set(responses.rough.history);
-    const unsortedCards = config?.statements
-        ? config.statements.filter((s) => !sortedIds.has(s.id))
-        : [];
+    // Memoize sorted cards set to avoid re-calculating on every render
+    const sortedIds = React.useMemo(() => new Set(roughHistory), [roughHistory]);
+    const unsortedCards = React.useMemo(
+        () => (config?.statements ? config.statements.filter((s) => !sortedIds.has(s.id)) : []),
+        [config, sortedIds]
+    );
 
     const currentCard = unsortedCards[0];
     const progress = config?.statements?.length
@@ -195,10 +187,8 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     cardStackRef.current.swipe('neutral');
                     break;
                 case 'z':
-                    if (responses.rough.history.length > 0) {
-                        startTransition(() => {
-                            undoRoughSort();
-                        });
+                    if (roughHistory.length > 0) {
+                        handleUndo();
                     }
                     break;
                 case 'Escape':
@@ -209,10 +199,10 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentCard, responses.rough.history.length, undoRoughSort, setHoveredCard]);
+    }, [currentCard, roughHistory.length, handleUndo, setHoveredCard]);
 
-    // React 19: Removed useMemo, React Compiler handles this automatically
-    const getSharedFontSize = () => {
+    // Memoized font scale advisor
+    const sharedFontSize = React.useMemo(() => {
         if (typeof window === 'undefined' || window.innerWidth >= 1024) return 'text-sm';
 
         const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
@@ -222,8 +212,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
         if (maxWordLength > 10) return 'text-[10px]';
         if (maxWordLength > 8) return 'text-xs';
         return 'text-sm';
-    };
-    const sharedFontSize = getSharedFontSize();
+    }, [t]);
 
     if (!config) return null;
 
@@ -265,7 +254,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     // Completed State
     if (!currentCard) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in zoom-in duration-300 px-4">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in zoom-in duration-300 px-4 relative z-[60] pointer-events-auto">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4">
                     <Check size={40} />
                 </div>
@@ -275,7 +264,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
                         type="button"
-                        onClick={() => navigate(`/study/${slug}/fine-sort`)}
+                        onClick={() => startTransition(() => navigate(`/study/${slug}/fine-sort`))}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"
                     >
@@ -284,14 +273,10 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
                     <button
                         type="button"
-                        onClick={() => {
-                            startTransition(() => {
-                                undoRoughSort();
-                            });
-                        }}
-                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest"
+                        onClick={handleUndo}
+                        className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 transition-all text-sm font-bold uppercase tracking-wider active:scale-95 touch-manipulation"
                     >
-                        <RotateCcw size={14} />
+                        <RotateCcw size={16} />
                         {t('common.undo')}
                     </button>
                 </div>
@@ -318,7 +303,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             p: ({ children }) => <span>{children}</span>,
                         }}
                     >
-                        {config.condition_of_instruction || t('rough.header.title')}
+                        {config.condition_of_instruction}
                     </ReactMarkdown>
                     <span className="text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
                         {config &&
@@ -370,7 +355,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     {/* Left Button (Disagree) */}
                     <DeckButton
                         type="disagree"
-                        count={responses.rough.disagree.length}
+                        count={disagreeCount}
                         onClick={() => handleVote('disagree')}
                         scale={scaleDisagree}
                         opacity={opacityDisagree}
@@ -419,7 +404,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     {/* Right Button (Agree) */}
                     <DeckButton
                         type="agree"
-                        count={responses.rough.agree.length}
+                        count={agreeCount}
                         onClick={() => handleVote('agree')}
                         scale={scaleAgree}
                         opacity={opacityAgree}
@@ -433,7 +418,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 <div className="flex flex-col items-center gap-8 w-full px-2">
                     <DeckButton
                         type="neutral"
-                        count={responses.rough.neutral.length}
+                        count={neutralCount}
                         onClick={() => handleVote('neutral')}
                         scale={scaleNeutral}
                         opacity={opacityNeutral}
@@ -445,13 +430,9 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
                     <button
                         type="button"
-                        onClick={() => {
-                            startTransition(() => {
-                                undoRoughSort();
-                            });
-                        }}
-                        disabled={responses.rough.history.length === 0}
-                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest"
+                        onClick={handleUndo}
+                        disabled={roughHistory.length === 0}
+                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
                         aria-keyshortcuts="z"
                     >
                         <RotateCcw size={14} />
@@ -536,8 +517,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     t,
     sharedFontSize,
 }) => {
-    // React 19: Removed useMemo, React Compiler handles this automatically
-    const getConfig = () => {
+    const config = React.useMemo(() => {
         const base =
             'flex flex-col items-center justify-center rounded-2xl border-2 shadow-sm transition-all duration-200 gap-0.5 sm:gap-1 px-1.5 w-full h-full';
         switch (type) {
@@ -579,8 +559,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                     testid: 'rough-neutral-btn',
                 };
         }
-    };
-    const config = getConfig();
+    }, [type]);
 
     // Adaptive stack effect values
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
@@ -670,7 +649,10 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                     {config.icon}
                     <span
                         lang={t('common.lang_code', { defaultValue: 'en' })}
-                        className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-[10px] sm:text-xs px-0.5`}
+                        className={cn(
+                            sharedFontSize,
+                            'font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-[10px] sm:text-xs px-0.5'
+                        )}
                     >
                         {t(`common.${type}`)}
                     </span>

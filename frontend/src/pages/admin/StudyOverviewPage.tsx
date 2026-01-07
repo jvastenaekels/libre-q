@@ -149,12 +149,9 @@ const StudyOverviewPage = () => {
                                         </div>
                                     </div>
                                     <div className="text-4xl font-bold text-slate-900 mb-1">
-                                        {stats.started_count}
+                                        {stats.completed_count}
                                     </div>
-                                    <p className="text-xs text-slate-400 font-medium">
-                                        {stats.completed_count}{' '}
-                                        {t('admin.study_overview.completed', 'completed')}
-                                    </p>
+                                    <p className="text-xs text-slate-400 font-medium">&nbsp;</p>
                                 </CardContent>
                             </Card>
 
@@ -184,24 +181,7 @@ const StudyOverviewPage = () => {
                                         }
                                         className="h-1.5 bg-emerald-50 mb-1.5"
                                     />
-                                    <div className="flex justify-between text-[10px] text-slate-400">
-                                        <span>
-                                            {stats.started_count - stats.completed_count}{' '}
-                                            {t(
-                                                'admin.study_overview.active_participants',
-                                                'active'
-                                            )}
-                                        </span>
-                                        <span>
-                                            {Math.round(
-                                                ((stats.device_breakdown?.mobile || 0) /
-                                                    ((stats.device_breakdown?.mobile || 0) +
-                                                        (stats.device_breakdown?.desktop || 0))) *
-                                                    100
-                                            ) || 0}
-                                            % {t('admin.study_overview.mobile_users', 'mobile')}
-                                        </span>
-                                    </div>
+                                    <p className="text-[10px] text-slate-400">&nbsp;</p>
                                 </CardContent>
                             </Card>
 
@@ -413,21 +393,27 @@ const StudyOverviewPage = () => {
                                 )}
 
                                 {/* In Progress Section */}
-                                {recentParticipants.filter((p) => !p.completed && !p.is_discarded)
-                                    .length > 0 && (
+                                {recentParticipants.filter(
+                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                    (p: any) => !p.completed && !p.is_discarded
+                                ).length > 0 && (
                                     <div className="p-3">
                                         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 px-1">
                                             {t('admin.study_overview.in_progress', 'In Progress')} (
                                             {
                                                 recentParticipants.filter(
-                                                    (p) => !p.completed && !p.is_discarded
+                                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                    (p: any) => !p.completed && !p.is_discarded
                                                 ).length
                                             }
                                             )
                                         </div>
                                         <div className="space-y-2">
                                             {recentParticipants
-                                                .filter((p) => !p.completed && !p.is_discarded)
+                                                .filter(
+                                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                    (p: any) => !p.completed && !p.is_discarded
+                                                )
                                                 .map((p) => (
                                                     <div
                                                         key={p.id}

@@ -83,6 +83,9 @@ export const StudyConfigSchema = z.object({
                 .optional(),
             questions: z.record(PreSortFieldSchema).optional(),
             allow_random_comments: z.boolean().optional(),
+            email_collection_enabled: z.boolean().optional(),
+            interview_consent_enabled: z.boolean().optional(),
+            newsletter_consent_enabled: z.boolean().optional(),
         })
         .optional(),
     statements: z.array(StatementSchema),
@@ -93,6 +96,7 @@ export const StudyConfigSchema = z.object({
     show_statement_codes: z.boolean().optional(),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
     branding: BrandingSchema.optional(),
+    requires_password: z.boolean().optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

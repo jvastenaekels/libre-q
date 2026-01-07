@@ -38,4 +38,5 @@ export interface StudyRead {
     translations?: StudyTranslationRead[];
     statements?: StatementRead[];
     recruitment_links?: RecruitmentLinkRead[];
+    requires_password?: boolean;
 }

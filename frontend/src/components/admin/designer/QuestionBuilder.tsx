@@ -387,7 +387,10 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                     // Maintain enabled state if present
                     const currentConfig = d.presort_config || {};
                     if ('enabled' in currentConfig) {
-                        d.presort_config.fields = newQuestionsMap;
+                        d.presort_config = {
+                            ...currentConfig,
+                            fields: newQuestionsMap,
+                        };
                     } else {
                         // Legacy
                         d.presort_config = newQuestionsMap;
@@ -461,7 +464,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                             {t('admin.design.questions.enable_presort_desc')}
                         </p>
                     </div>
-                    <Switch checked={isPresortEnabled} onCheckedChange={handlePresortToggle} />
+                    <Switch checked={!!isPresortEnabled} onCheckedChange={handlePresortToggle} />
                 </div>
             )}
 
@@ -594,7 +597,18 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
                                         updateDraft((d: any) => {
                                             if (type === 'pre') {
-                                                d.presort_config[q.id] = data;
+                                                // Handle both legacy and new structure
+                                                if (
+                                                    d.presort_config &&
+                                                    'enabled' in d.presort_config
+                                                ) {
+                                                    if (!d.presort_config.fields)
+                                                        d.presort_config.fields = {};
+                                                    d.presort_config.fields[q.id] = data;
+                                                } else {
+                                                    // Legacy structure
+                                                    d.presort_config[q.id] = data;
+                                                }
                                             } else {
                                                 d.postsort_config.questions[q.id] = data;
                                             }
@@ -604,7 +618,18 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
                                         updateDraft((d: any) => {
                                             if (type === 'pre') {
-                                                delete d.presort_config[q.id];
+                                                // Handle both legacy and new structure
+                                                if (
+                                                    d.presort_config &&
+                                                    'enabled' in d.presort_config
+                                                ) {
+                                                    if (d.presort_config.fields) {
+                                                        delete d.presort_config.fields[q.id];
+                                                    }
+                                                } else {
+                                                    // Legacy structure
+                                                    delete d.presort_config[q.id];
+                                                }
                                             } else {
                                                 delete d.postsort_config.questions[q.id];
                                             }

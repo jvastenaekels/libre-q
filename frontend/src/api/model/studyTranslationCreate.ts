@@ -36,4 +36,6 @@ export interface StudyTranslationCreate {
     consent_accept?: StudyTranslationCreateConsentAccept;
     consent_decline?: StudyTranslationCreateConsentDecline;
     ui_labels?: StudyTranslationCreateUiLabels;
+    condition_of_instruction?: string;
+    pre_instruction?: string;
 }

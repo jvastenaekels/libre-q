@@ -138,7 +138,8 @@ const StudyLayoutContent: React.FC = () => {
     // Sync loader data to config store
     useEffect(() => {
         if (study) {
-            setConfig(study);
+            // biome-ignore lint/suspicious/noExplicitAny: API type definition mismatch
+            setConfig(study as any);
         }
     }, [study, setConfig]);
 
@@ -286,7 +287,20 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
-                        {branding?.logo_url ? (
+                        {/* Use custom logo if available, or logo if on step 1, else config title */}
+                        {branding?.partners && branding.partners.length > 0 ? (
+                            <div className="flex items-center gap-4">
+                                {branding.partners.map((partner: any) => (
+                                    <img
+                                        key={partner.id || partner.logo_url}
+                                        src={partner.logo_url}
+                                        alt={partner.name}
+                                        title={partner.name}
+                                        className="h-8 w-auto object-contain"
+                                    />
+                                ))}
+                            </div>
+                        ) : branding?.logo_url ? (
                             <img
                                 src={branding.logo_url}
                                 alt={config?.title || t('layout.default_study_title')}

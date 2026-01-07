@@ -116,6 +116,14 @@
             "post": {
                 "title": "Miksi",
                 "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
+            },
+            "contact": {
+                "title": "Tulokset ja yhteystiedot",
+                "email_label": "Sähköpostiosoitteesi (valinnainen)",
+                "email_placeholder": "esimerkki@email.com",
+                "interview_consent": "Suostun siihen, että minuun otetaan tarvittaessa yhteyttä jatkohaastattelua varten.",
+                "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
+                "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
             }
         }
     },
@@ -145,7 +153,6 @@
         }
     },
     "fine": {
-        "header": {},
         "deck": {
             "title": "Vapaat väitteet",
             "all_placed": "Kaikki väitteet on lajiteltu"
@@ -175,6 +182,9 @@
             "ready": "Tarkastele näkemystäni",
             "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
         },
+        "header": {
+            "title": "Sijoita väitteet ruudukkoon"
+        },
         "workbench": {
             "active_card": "Aktiivinen väite",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
@@ -184,7 +194,10 @@
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
                 "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
-                "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida."
+                "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
+                "relative": "Muistutus: väitteet lajitellaan suhteessa toisiinsa.",
+                "zoom": "Voit zoomata ruudukon eri osiin nähdäksesi paremmin.",
+                "flexibility": "Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa."
             }
         }
     },
@@ -260,49 +273,59 @@
         },
         "recruitment": {
             "title": "Rekrytointi",
-            "description": "Luo turvalliset linkit osallistujille ja seuraa rekrytoinnin tehokkuutta reaaliajassa.",
-            "new_link": "Uusi pääsylinkki",
-            "create_title": "Luo pääsylinkkejä",
-            "create_description": "Kohdista tiettyihin ryhmiin tai luo yleinen pääsy. Jokaisella linkkityypillä on erilaiset turvallisuus- ja käyttöominaisuudet.",
+            "description": "Luo turvallisia linkkejä osallistujille ja seuraa rekrytoinnin tehokkuutta reaaliajassa.",
+            "new_link": "Uusi pääsulinkki",
+            "create_title": "Luo pääsulinkejä",
+            "create_description": "Kohdista linkit erityisryhmille tai yleiseen jakeluun. Jokaisella linkillä on eri tietoturva- ja käyttöominaisuudet.",
             "link_type": "Pääsystrategia",
             "select_type": "Valitse rekrytointityyppi...",
             "campaign_name": "Kanava / Kampanjan nimi",
             "name_placeholder": "esim. LinkedIn, Sähköpostierä A, Opiskelijalista...",
             "link_count": "Erän koko",
-            "capacity_label": "Enimmäislähetykset",
+            "capacity_label": "Maksimilähetykset",
             "generate_links": "Luo linkit",
             "no_links": "Ei vielä luotuja rekrytointilinkkejä.",
             "unnamed": "Nimetön kanava",
             "revoked": "Pääsy peruutettu",
             "qr_title": "Jaa pääsykoodi",
-            "qr_desc": "Osallistujat voivat skannata tämän koodin päästäkseen suoraan tutkimukseen.",
+            "qr_desc": "Osallistujat voivat skannata tämän koodin siirtyäkseen suoraan tutkimukseen.",
             "copy_link": "Kopioi turvallinen URL",
-            "table_title": "Pääsynhallinta",
+            "table_title": "Pääsynhallintapaneeli",
             "table_description": "Aktiiviset kanavat ja linkkien elinkaaren hallinta.",
+            "share_title": "Jaa tutkimus",
+            "share_desc": "Levitä tutkimuslinkkiä kutsuaksesi osallistujia.",
+            "public_url_label": "Julkinen osallistumislinkki",
+            "hide_qr": "Piilota QR",
+            "show_qr": "Näytä QR",
+            "live_study": "Tutkimus käynnissä",
+            "qr_print_hint": "Skannaa tai tulosta tämä koodi fyysisiä materiaaleja varten (esitteet, julisteet).",
+            "analytics_title": "Kampanja-analytiikka",
+            "analytics_desc": "Suorat linkit ja QR-skannaukset seurataan automaattisesti kojelaudalla yläpuolella.",
+            "copy_success": "Linkki kopioitu leikepöydälle",
             "types": {
                 "public": "Avoin pääsy (Julkinen)",
-                "individual": "Kertakäyttökoodi",
+                "individual": "Kertakäyttöinen koodi",
                 "limited": "Rajoitettu osallistuminen"
             },
             "guidance": {
-                "public": "Paras suureen määrään rekrytointia. Yksi URL kaikille osallistujille.",
-                "individual": "Maksimaalinen turvallisuus. Luo ainutlaatuiset linkit, jotka vanhenevat yhden onnistuneen suorituksen jälkeen.",
-                "limited": "Kontrolloitu pääsy. Yksi linkki, joka lakkaa toimimasta kiinteän määrän lähetysten jälkeen."
+                "public": "Paras suurten määrien rekrytointiin. Yksi URL kaikille osallistujille.",
+                "individual": "Maksimaalinen turvallisuus. Luo yksilöllisiä linkkejä, jotka vanhenevat yhden onnistuneen suorituksen jälkeen.",
+                "limited": "Hallittu pääsy. Yksi linkki, joka lakkaa toimimasta tietyn lähetysmäärän jälkeen."
             },
             "stats": {
-                "total_links": "Kanavat yhteensä",
-                "active_channels": "Aktiiviset rekrytointierät",
-                "started": "Istunnot yhteensä",
-                "engagements": "Aloittaneet osallistujat",
-                "submitted": "Kelvollinen data",
-                "completions": "Valmiit lähetykset",
-                "conversion": "Konversioprosentti",
+                "total_links": "Kanavat",
+                "active_channels": "Aktiiviset erät",
+                "started": "Istunnot",
+                "engagements": "Osallistujat",
+                "submitted": "Tiedot",
+                "completions": "Valmiit",
+                "conversion": "Konversio",
                 "efficiency": "Tehokkuus"
             },
             "table": {
-                "name": "Kampanja / Erä",
-                "type": "Pääsytyyppi",
-                "token": "Turvamerkki",
+                "name": "Kampanja",
+                "type": "Tyyppi",
+                "token": "Tunniste",
                 "usage": "Kapasiteetti",
                 "status": "Tila",
                 "actions": "Hallitse"

@@ -115,6 +115,14 @@
             "post": {
                 "title": "Pourquoi",
                 "description": "Quelques mots pour expliquer vos choix les plus significatifs."
+            },
+            "contact": {
+                "title": "Restitutions & Contact",
+                "email_label": "Votre adresse email (optionnel)",
+                "email_placeholder": "exemple@email.com",
+                "interview_consent": "J'accepte d'être potentiellement contacté(e) pour un entretien de suivi.",
+                "newsletter_consent": "Je souhaite être tenu(e) au courant des résultats de l'étude.",
+                "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Il est stocké uniquement pour les finalités cochées ci-dessus."
             }
         }
     },
@@ -144,7 +152,6 @@
         }
     },
     "fine": {
-        "header": {},
         "deck": {
             "title": "Énoncés disponibles",
             "all_placed": "Tous les énoncés de cette pile sont classés"
@@ -174,6 +181,9 @@
             "ready": "Voir la vue d'ensemble",
             "not_ready": "Veuillez placer tous les énoncés pour continuer"
         },
+        "header": {
+            "title": "Placez les énoncés sur la grille"
+        },
         "workbench": {
             "active_card": "Énoncé actif",
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'énoncé",
@@ -183,7 +193,10 @@
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
                 "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance.",
-                "constraint": "Vous devez tout caser ! C'est parfois un casse-tête, mais c'est ainsi qu'on force la priorisation."
+                "constraint": "Vous devez tout caser ! C'est parfois un casse-tête, mais c'est ainsi qu'on force la priorisation.",
+                "relative": "Rappel : les énoncés sont classés les uns par rapport aux autres (accord relatif).",
+                "zoom": "N'hésitez pas à zoomer sur différents coins de la grille pour plus de confort (surtout sur mobile).",
+                "flexibility": "Rien n'est définitif : vous pouvez déplacer les cartes ou les remettre dans la pile à tout moment."
             }
         }
     },
@@ -259,25 +272,35 @@
         },
         "recruitment": {
             "title": "Recrutement",
-            "description": "Gérez l'accès des participants, les canaux de recrutement et suivez les taux de conversion.",
+            "description": "Générez des liens sécurisés pour vos participants et surveillez l'efficacité du recrutement en temps réel.",
             "new_link": "Nouveau lien d'accès",
             "create_title": "Créer des liens d'accès",
             "create_description": "Ciblez des cohortes spécifiques ou créez un accès général. Chaque type de lien a des propriétés de sécurité différentes.",
             "link_type": "Stratégie d'accès",
-            "select_type": "Choisir un type de recrutement...",
+            "select_type": "Choisir le type de recrutement...",
             "campaign_name": "Nom du canal / de la campagne",
             "name_placeholder": "ex: LinkedIn, Email Lot A, Liste étudiants...",
             "link_count": "Taille du lot",
-            "capacity_label": "Capacité maximale",
-            "generate_links": "Générer les liens",
+            "capacity_label": "Soumissions max",
+            "generate_links": "Provisionner les liens",
             "no_links": "Aucun lien de recrutement généré pour le moment.",
             "unnamed": "Canal sans nom",
             "revoked": "Accès révoqué",
             "qr_title": "Partager le code d'accès",
-            "qr_desc": "Les participants peuvent scanner ce code pour accéder instantanément à l'étude.",
+            "qr_desc": "Les participants peuvent scanner ce code pour accéder directement à l'étude.",
             "copy_link": "Copier l'URL sécurisée",
-            "table_title": "Contrôle des accès",
-            "table_description": "Gestion des canaux actifs et du cycle de vie des liens.",
+            "table_title": "Panneau de contrôle d'accès",
+            "table_description": "Canaux actifs et gestion du cycle de vie des liens.",
+            "share_title": "Partager l'étude",
+            "share_desc": "Distribuez l'URL de votre étude pour inviter des participants.",
+            "public_url_label": "URL publique de participation",
+            "hide_qr": "Masquer le QR",
+            "show_qr": "Afficher le QR",
+            "live_study": "Étude en direct",
+            "qr_print_hint": "Scannez ou imprimez ce code pour vos supports physiques (flyers, affiches).",
+            "analytics_title": "Analytique des campagnes",
+            "analytics_desc": "Les liens directs et les scans QR sont suivis automatiquement dans le tableau de bord ci-dessus.",
+            "copy_success": "Lien de l'étude copié dans le presse-papiers",
             "types": {
                 "public": "Accès ouvert (Public)",
                 "individual": "Usage unique",
@@ -396,9 +419,9 @@
             "no_participants": "Aucun participant pour le moment.",
             "recently_completed": "Récemment complété",
             "in_progress": "En cours",
-            "submitted": "Soumis il y a",
+            "submitted": "Soumis",
             "view_data": "Voir",
-            "started": "Commencé il y a",
+            "started": "Commencé",
             "discarded": "Rejeté",
             "steps": {
                 "welcome": "Bienvenue",

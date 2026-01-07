@@ -146,6 +146,9 @@ async def migrate_translations_table():
             logger.warning("Translations table doesn't exist - skipping migration")
             return
 
+        migrations_applied = False
+
+        # ui_labels
         if not await check_column_exists(conn, "study_translations", "ui_labels"):
             logger.info("  Adding 'ui_labels' column...")
             dialect = conn.dialect.name
@@ -161,6 +164,77 @@ async def migrate_translations_table():
                         "ALTER TABLE study_translations ADD COLUMN ui_labels JSON DEFAULT '{}'"
                     )
                 )
+            migrations_applied = True
+
+        # condition_of_instruction
+        if not await check_column_exists(
+            conn, "study_translations", "condition_of_instruction"
+        ):
+            logger.info("  Adding 'condition_of_instruction' column...")
+            await conn.execute(
+                text(
+                    "ALTER TABLE study_translations ADD COLUMN condition_of_instruction VARCHAR"
+                )
+            )
+            migrations_applied = True
+
+        # pre_instruction
+        if not await check_column_exists(conn, "study_translations", "pre_instruction"):
+            logger.info("  Adding 'pre_instruction' column...")
+            await conn.execute(
+                text(
+                    "ALTER TABLE study_translations ADD COLUMN pre_instruction VARCHAR"
+                )
+            )
+            migrations_applied = True
+
+        # instructions
+        if not await check_column_exists(conn, "study_translations", "instructions"):
+            logger.info("  Adding 'instructions' column...")
+            await conn.execute(
+                text("ALTER TABLE study_translations ADD COLUMN instructions VARCHAR")
+            )
+            migrations_applied = True
+
+        # consent_title
+        if not await check_column_exists(conn, "study_translations", "consent_title"):
+            logger.info("  Adding 'consent_title' column...")
+            await conn.execute(
+                text("ALTER TABLE study_translations ADD COLUMN consent_title VARCHAR")
+            )
+            migrations_applied = True
+
+        # consent_description
+        if not await check_column_exists(
+            conn, "study_translations", "consent_description"
+        ):
+            logger.info("  Adding 'consent_description' column...")
+            await conn.execute(
+                text(
+                    "ALTER TABLE study_translations ADD COLUMN consent_description VARCHAR"
+                )
+            )
+            migrations_applied = True
+
+        # consent_accept
+        if not await check_column_exists(conn, "study_translations", "consent_accept"):
+            logger.info("  Adding 'consent_accept' column...")
+            await conn.execute(
+                text("ALTER TABLE study_translations ADD COLUMN consent_accept VARCHAR")
+            )
+            migrations_applied = True
+
+        # consent_decline
+        if not await check_column_exists(conn, "study_translations", "consent_decline"):
+            logger.info("  Adding 'consent_decline' column...")
+            await conn.execute(
+                text(
+                    "ALTER TABLE study_translations ADD COLUMN consent_decline VARCHAR"
+                )
+            )
+            migrations_applied = True
+
+        if migrations_applied:
             await conn.commit()
             logger.info("✓ Translations table updated")
         else:

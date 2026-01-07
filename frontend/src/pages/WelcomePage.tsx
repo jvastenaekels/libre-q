@@ -155,6 +155,36 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                             <Markdown>{study.objective}</Markdown>
                         </div>
+
+                        {/* Institutional Signature */}
+                        {study.branding?.partners && study.branding.partners.length > 0 && (
+                            <div className="mt-8 pt-6 border-t border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                                    {t('welcome.conducted_by', 'Conducted by')}
+                                </p>
+                                <div className="flex flex-wrap gap-6 items-center">
+                                    {study.branding.partners.map((partner: any) => (
+                                        <a
+                                            key={partner.id || partner.logo_url}
+                                            href={partner.url || undefined}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={cn(
+                                                'block transition-opacity hover:opacity-80',
+                                                !partner.url && 'pointer-events-none'
+                                            )}
+                                        >
+                                            <img
+                                                src={partner.logo_url}
+                                                alt={partner.name}
+                                                title={partner.name}
+                                                className="h-8 md:h-10 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

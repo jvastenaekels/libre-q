@@ -223,6 +223,10 @@ class Study(Base):
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
 
+    @property
+    def requires_password(self) -> bool:
+        return bool(self.access_password)
+
 
 class StudyTranslation(Base):
     """SQLAlchemy model for study translations."""

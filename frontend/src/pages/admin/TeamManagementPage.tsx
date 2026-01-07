@@ -1,6 +1,9 @@
 import TeamSettings from '@/components/admin/team/TeamSettings';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
+import { Users } from 'lucide-react';
+import { useLoaderData } from 'react-router-dom';
+import type { StudyRead } from '@/api/model';
 
 interface LoaderData {
     study: StudyRead;

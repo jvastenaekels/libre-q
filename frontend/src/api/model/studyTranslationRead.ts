@@ -36,6 +36,8 @@ export interface StudyTranslationRead {
     consent_accept?: StudyTranslationReadConsentAccept;
     consent_decline?: StudyTranslationReadConsentDecline;
     ui_labels?: StudyTranslationReadUiLabels;
+    condition_of_instruction?: string;
+    pre_instruction?: string;
     id: number;
     study_id: number;
 }

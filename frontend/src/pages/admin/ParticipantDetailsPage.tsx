@@ -37,7 +37,7 @@ export default function ParticipantDetailsPage() {
         try {
             await discardMutation.mutateAsync({
                 participantId: Number(participantId) || Number(participant.id), // Try params first, then data
-                data: { isDiscarded },
+                data: { is_discarded: isDiscarded },
             });
             await refetch();
             toast.success(

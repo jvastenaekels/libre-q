@@ -5,6 +5,11 @@
  */
 
 import { AlertCircle, Check, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
@@ -18,7 +23,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
-import { cn } from '@/lib/utils';
 import { SurveyField } from '../components/survey/SurveyField';
 
 interface PostSortPageProps {
@@ -638,17 +642,99 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
                     />
                 </div>
 
-                <div className="flex justify-center pt-8">
-                    <button
-                        type="button"
+                {/* Email / Contact Section */}
+                {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
+                {(config as any)?.email_collection_enabled && (
+                    <Card className="border-blue-100 bg-blue-50/50 shadow-sm">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
+                                ✉️ {t('post.contact.title')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="contact-email"
+                                    className="text-blue-900 font-medium"
+                                >
+                                    {t('post.contact.email_label')}
+                                </Label>
+                                <Input
+                                    id="contact-email"
+                                    type="email"
+                                    placeholder={t('post.contact.email_placeholder')}
+                                    value={responses.postsort.email || ''}
+                                    onChange={(e) => setPostSortResponse('email', e.target.value)}
+                                    className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                            </div>
+
+                            {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
+                            {((config as any)?.interview_consent_enabled ?? true) && (
+                                <div className="flex items-start space-x-3 pt-2">
+                                    <Checkbox
+                                        id="contact-consent-interview"
+                                        checked={responses.postsort.interview_consent || false}
+                                        onCheckedChange={(checked) =>
+                                            setPostSortResponse(
+                                                'interview_consent',
+                                                checked === true
+                                            )
+                                        }
+                                        className="mt-1 border-blue-400 data-[state=checked]:bg-blue-600"
+                                    />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <Label
+                                            htmlFor="contact-consent-interview"
+                                            className="text-sm font-medium leading-normal cursor-pointer text-slate-700"
+                                        >
+                                            {t('post.contact.interview_consent')}
+                                        </Label>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
+                            {((config as any)?.newsletter_consent_enabled ?? true) && (
+                                <div className="flex items-start space-x-3 pt-2">
+                                    <Checkbox
+                                        id="contact-consent-newsletter"
+                                        checked={responses.postsort.newsletter_consent || false}
+                                        onCheckedChange={(checked) =>
+                                            setPostSortResponse(
+                                                'newsletter_consent',
+                                                checked === true
+                                            )
+                                        }
+                                        className="mt-1 border-blue-400 data-[state=checked]:bg-blue-600"
+                                    />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <Label
+                                            htmlFor="contact-consent-newsletter"
+                                            className="text-sm font-medium leading-normal cursor-pointer text-slate-700"
+                                        >
+                                            {t('post.contact.newsletter_consent')}
+                                        </Label>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="pt-2 border-t border-blue-100/50">
+                                <p className="text-xs text-slate-500 italic">
+                                    ℹ️ {t('post.contact.gdpr_note')}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                <div className="flex justify-end gap-4">
+                    <Button variant="outline" onClick={() => navigate('../fine-sort')}>
+                        ← {t('post.back', 'Back to sort')}
+                    </Button>
+                    <Button
                         onClick={handleSubmit}
-                        disabled={isLoading}
-                        style={{ backgroundColor: 'var(--brand-accent)' }}
-                        className={cn(
-                            'group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed',
-                            highlightKey === 'post.submit' &&
-                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
-                        )}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[200px]"
                     >
                         {isLoading ? (
                             <Loader2 className="w-6 h-6 animate-spin" />
@@ -658,7 +744,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
                                 <Check size={20} strokeWidth={3} />
                             </>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

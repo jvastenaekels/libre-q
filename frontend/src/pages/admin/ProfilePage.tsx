@@ -287,7 +287,8 @@ const ProfilePage = () => {
                                             </div>
                                         ) : (
                                             <QRCodeSVG
-                                                value={totpSetup?.otpauth_uri || ''}
+                                                // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                value={(totpSetup as any)?.otpauth_uri || ''}
                                                 size={160}
                                             />
                                         )}
@@ -371,7 +372,8 @@ const ProfilePage = () => {
                                                 }
                                                 onClick={() =>
                                                     disableMutation.mutate({
-                                                        data: { password: confirmPassword },
+                                                        // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                        data: { password: confirmPassword } as any,
                                                     })
                                                 }
                                             >

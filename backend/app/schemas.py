@@ -219,11 +219,21 @@ class GridColumn(BaseModel):
     capacity: int
 
 
+class PartnerLogo(BaseModel):
+    """Schema for a partner institution logo."""
+
+    id: str
+    name: str
+    logo_url: str
+    url: str | None = None
+
+
 class BrandingBase(BaseModel):
     """Schema for study branding."""
 
     logo_url: str | None = None
     accent_color: str | None = None
+    partners: list[PartnerLogo] = []
 
 
 # Study Schemas
@@ -306,6 +316,7 @@ class StudyRead(StudyBase):
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
     recruitment_links: list["RecruitmentLinkRead"] = []
+    requires_password: bool = False
     model_config = ConfigDict(from_attributes=True)
 
 

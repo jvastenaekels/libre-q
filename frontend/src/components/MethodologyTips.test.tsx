@@ -58,11 +58,42 @@ describe('MethodologyTips', () => {
     it('loops back to first tip after reaching the end', () => {
         render(<MethodologyTips variant="desktop" />);
 
-        // Step 1 -> 2 -> 3 -> 1
+        // Step 1 -> ... -> 6 -> 1
         act(() => {
-            vi.advanceTimersByTime(6100 * 3);
+            vi.advanceTimersByTime(6100 * 6);
         });
 
         expect(screen.getByText(/fine.workbench.methodology.extremes/i)).toBeInTheDocument();
+    });
+
+    it('navigates to next tip on click', () => {
+        render(<MethodologyTips variant="desktop" />);
+        const nextButton = screen.getByLabelText(/next tip/i);
+
+        act(() => {
+            nextButton.click();
+        });
+
+        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
+    });
+
+    it('pauses rotation on interaction', () => {
+        render(<MethodologyTips variant="desktop" />);
+        const nextButton = screen.getByLabelText(/next tip/i);
+
+        act(() => {
+            nextButton.click();
+        });
+
+        // Should be at tip 2 now.
+        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
+
+        // Advance time by normal interval (should NOT move because paused)
+        act(() => {
+            vi.advanceTimersByTime(6100);
+        });
+
+        // Should still be at tip 2 (rotation paused)
+        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
     });
 });

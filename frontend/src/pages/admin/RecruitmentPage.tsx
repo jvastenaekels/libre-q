@@ -11,6 +11,7 @@ import {
     Lock,
     UserPlus,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
@@ -108,7 +109,7 @@ const RecruitmentPage = () => {
         toast.success('Copied to clipboard');
     };
 
-    const getFullUrl = (token: str) => {
+    const getFullUrl = (token: string) => {
         return `${window.location.origin}/study/${slug}?token=${token}`;
     };
 
@@ -331,7 +332,8 @@ const RecruitmentPage = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-black text-amber-600">
-                            {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}
+                            {/* biome-ignore lint/suspicious/noExplicitAny: API type inference issue */}
+                            {links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) || 0}
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1 font-medium">
                             {t('admin.recruitment.stats.engagements', 'Initial engagements')}
@@ -368,7 +370,9 @@ const RecruitmentPage = () => {
                         <div className="text-3xl font-black text-slate-600">
                             {(() => {
                                 const started =
-                                    links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0;
+                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                    links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) ||
+                                    0;
                                 const submitted =
                                     links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0;
                                 return started > 0
@@ -459,7 +463,7 @@ const RecruitmentPage = () => {
                                                 <span className="capitalize text-[10px] font-bold text-slate-600">
                                                     {t(
                                                         `admin.recruitment.status.${link.type}`,
-                                                        link.type
+                                                        link.type || 'Unknown'
                                                     )}
                                                 </span>
                                             </div>

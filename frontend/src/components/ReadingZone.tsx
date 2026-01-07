@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfigStore } from '../store/useConfigStore';
 import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
+import { cn } from '@/lib/utils';
 
 interface ReadingZoneProps {
     variant: 'mobile' | 'desktop';
@@ -80,7 +81,10 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         iconSize: number;
     }) => (
         <div
-            className={`font-bold text-indigo-400 uppercase tracking-wider flex items-center ${className}`}
+            className={cn(
+                'font-bold text-indigo-400 uppercase tracking-wider flex items-center',
+                className
+            )}
         >
             <Eye size={iconSize} strokeWidth={2.5} />
             {label}

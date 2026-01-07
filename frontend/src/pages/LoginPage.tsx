@@ -49,7 +49,7 @@ const LoginPage = () => {
             const { data: user } = await fetchMe();
 
             if (user) {
-                setAuth(tokenResponse.access_token, {
+                setAuth(tokenResponse.access_token as string, {
                     id: user.id,
                     email: user.email,
                     is_superuser: user.is_superuser,

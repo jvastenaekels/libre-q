@@ -76,6 +76,8 @@ const ConditionOfInstructionEditor = () => {
                         id="enable-pre-instruction"
                         checked={hasPreInstruction}
                         onCheckedChange={(checked: boolean) => {
+                            // Defensive check to prevent infinite loops
+                            if (checked === hasPreInstruction) return;
                             if (checked) {
                                 handleChange('pre_instruction', '');
                             } else {

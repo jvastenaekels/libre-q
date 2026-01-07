@@ -7,6 +7,7 @@
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy import delete, select
@@ -20,6 +21,7 @@ from ..models import (
     QSortEntry,
     Statement,
     Study,
+    StudyState,
     StudyTranslation,
 )
 from ..schemas import SubmissionInput
@@ -143,6 +145,111 @@ class StudyService:
 
         resolved_lang = translation.language_code if translation else "en"
         return resolved_lang, translation
+
+    @staticmethod
+    async def get_resolved_study_config(
+        study: Study,
+        lang: str = "en",
+        session_token: UUID | None = None,
+    ) -> dict[str, Any]:
+        """Resolves study configuration including translations, randomization, and state."""
+        resolved_lang, translation = StudyService.resolve_translation(study, lang)
+
+        # Transform to Frontend Format
+        title = getattr(translation, "title", study.slug)
+        description = getattr(translation, "description", "")
+        instructions = getattr(translation, "instructions", "")
+        condition_of_instruction = getattr(
+            translation, "condition_of_instruction", None
+        )
+        if not condition_of_instruction:
+            condition_of_instruction = "What is your stance on this statement?"
+
+        pre_instruction = getattr(translation, "pre_instruction", None)
+
+        subtitle = getattr(translation, "subtitle", None)
+        objective = getattr(translation, "objective", None)
+
+        statements_data = []
+        for s in study.statements:
+            # Resolve statement translation
+            s_trans = next(
+                (t for t in s.translations if t.language_code == resolved_lang), None
+            )
+            if not s_trans:
+                s_trans = next(
+                    (t for t in s.translations if t.language_code == "en"), None
+                )
+            if not s_trans and s.translations:
+                s_trans = s.translations[0]
+
+            text = s_trans.text if s_trans else s.code
+            statements_data.append({"id": s.id, "text": text, "code": s.code})
+
+        # Q Methodology: Randomize statement order if configured
+        if study.randomize_statements and session_token:
+            import random
+
+            local_random = random.Random(str(session_token))
+            local_random.shuffle(statements_data)
+
+        # Helper for translation attributes
+        def get_t_attr(attr: str, default: Any = None) -> Any:
+            return getattr(translation, attr, default) if translation else default
+
+        # Calculate effective state based on dates
+        from datetime import datetime, timezone
+
+        now = datetime.now(timezone.utc)
+        effective_state = study.state.value
+
+        if study.state == StudyState.active:
+
+            def is_now_before(target_dt: datetime) -> bool:
+                if target_dt.tzinfo is None:
+                    return now.replace(tzinfo=None) < target_dt
+                return now < target_dt
+
+            def is_now_after(target_dt: datetime) -> bool:
+                if target_dt.tzinfo is None:
+                    return now.replace(tzinfo=None) > target_dt
+                return now > target_dt
+
+            if study.start_date and is_now_before(study.start_date):
+                effective_state = StudyState.paused.value
+            elif study.end_date and is_now_after(study.end_date):
+                effective_state = StudyState.closed.value
+
+        return {
+            "slug": study.slug,
+            "title": title,
+            "subtitle": subtitle,
+            "description": description,
+            "objective": objective,
+            "instructions": instructions,
+            "presort_config": study.presort_config,
+            "postsort_config": study.postsort_config,
+            "grid_config": study.grid_config,
+            "statements": statements_data,
+            "consent": {
+                "title": get_t_attr("consent_title"),
+                "description": get_t_attr("consent_description"),
+                "accept": get_t_attr("consent_accept"),
+                "decline": get_t_attr("consent_decline"),
+            },
+            "condition_of_instruction": condition_of_instruction,
+            "pre_instruction": pre_instruction,
+            "available_languages": [t.language_code for t in study.translations],
+            "language": resolved_lang,
+            "default_language": study.default_language,
+            "show_statement_codes": study.show_statement_codes,
+            "randomize_statements": study.randomize_statements,
+            "ui_labels": get_t_attr("ui_labels", {}) or {},
+            "state": effective_state,
+            "requires_password": False,
+            "start_date": study.start_date,
+            "end_date": study.end_date,
+        }
 
     @staticmethod
     def validate_distribution(study: Study, qsort: list[Any]):

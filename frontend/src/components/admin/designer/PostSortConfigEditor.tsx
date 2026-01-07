@@ -238,7 +238,10 @@ const PostSortConfigEditor = () => {
                         </div>
                         <Switch
                             checked={allowRandomComments}
-                            onCheckedChange={toggleAllowRandomComments}
+                            onCheckedChange={(checked: boolean) => {
+                                if (checked === allowRandomComments) return;
+                                toggleAllowRandomComments(checked);
+                            }}
                         />
                     </div>
                 </CardHeader>
@@ -271,7 +274,13 @@ const PostSortConfigEditor = () => {
                                 {t('admin.design.postsort.missing.desc')}
                             </CardDescription>
                         </div>
-                        <Switch checked={askMissing} onCheckedChange={toggleAskMissing} />
+                        <Switch
+                            checked={askMissing}
+                            onCheckedChange={(checked: boolean) => {
+                                if (checked === askMissing) return;
+                                toggleAskMissing(checked);
+                            }}
+                        />
                     </div>
                 </CardHeader>
                 {askMissing && (
@@ -302,7 +311,10 @@ const PostSortConfigEditor = () => {
                         </div>
                         <Switch
                             checked={askGeneralComment}
-                            onCheckedChange={toggleAskGeneralComment}
+                            onCheckedChange={(checked: boolean) => {
+                                if (checked === askGeneralComment) return;
+                                toggleAskGeneralComment(checked);
+                            }}
                         />
                     </div>
                 </CardHeader>
@@ -321,6 +333,65 @@ const PostSortConfigEditor = () => {
                     </CardContent>
                 )}
             </Card>
+
+            <div className="flex items-center justify-between rounded-lg border p-4 bg-slate-50 mt-4">
+                <div className="space-y-0.5">
+                    <Label className="text-base flex items-center gap-2">
+                        Collecte d'Email
+                        <Badge variant="outline" className="text-xs font-normal">
+                            Optionnel
+                        </Badge>
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                        Demander l'email du participant à la fin pour un entretien ou l'envoi des
+                        résultats.
+                    </p>
+                </div>
+                <Switch
+                    checked={config?.email_collection_enabled || false}
+                    onCheckedChange={(checked: boolean) => {
+                        const currentValue = config?.email_collection_enabled || false;
+                        if (checked === currentValue) return;
+                        updateDraft((d) => {
+                            if (!d.postsort_config) d.postsort_config = {};
+                            // biome-ignore lint/suspicious/noExplicitAny: complex config
+                            (d.postsort_config as any).email_collection_enabled = checked;
+                        });
+                    }}
+                />
+            </div>
+            {config?.email_collection_enabled && (
+                <div className="ml-8 mt-2 space-y-2 border-l-2 border-slate-200 pl-4">
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm">Demander accord entretien</Label>
+                        <Switch
+                            checked={config?.interview_consent_enabled ?? true}
+                            onCheckedChange={(checked: boolean) => {
+                                const currentValue = config?.interview_consent_enabled ?? true;
+                                if (checked === currentValue) return;
+                                updateDraft((d) => {
+                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                    (d.postsort_config as any).interview_consent_enabled = checked;
+                                });
+                            }}
+                        />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm">Demander accord résultats (Newsletter)</Label>
+                        <Switch
+                            checked={config?.newsletter_consent_enabled ?? true}
+                            onCheckedChange={(checked: boolean) => {
+                                const currentValue = config?.newsletter_consent_enabled ?? true;
+                                if (checked === currentValue) return;
+                                updateDraft((d) => {
+                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                    (d.postsort_config as any).newsletter_consent_enabled = checked;
+                                });
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

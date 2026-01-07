@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Palette, Image as ImageIcon, Info, RotateCcw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +17,7 @@ const BrandingEditor = () => {
     // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
     const branding = (draft as any).branding || { logo_url: null, accent_color: null };
 
-    const updateBranding = (field: 'logo_url' | 'accent_color', value: string | null) => {
+    const updateBranding = (field: 'logo_url' | 'accent_color' | 'partners', value: any) => {
         updateDraft((d) => {
             // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
             if (!(d as any).branding) (d as any).branding = { logo_url: null, accent_color: null };
@@ -177,6 +178,155 @@ const BrandingEditor = () => {
                                 />
                             </div>
                         )}
+                    </CardContent>
+                </Card>
+
+                {/* Institutional Partners Section */}
+                <Card className="border-none shadow-none bg-transparent">
+                    <CardHeader className="px-0">
+                        <div className="flex items-center gap-2">
+                            <CardTitle className="text-sm font-bold flex items-center gap-2">
+                                <ImageIcon className="h-4 w-4 text-indigo-500" />
+                                {t('admin.design.theme.partners.title', 'Institutional Partners')}
+                            </CardTitle>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Info className="h-3.5 w-3.5 text-slate-400" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                        <p className="text-xs">
+                                            {t(
+                                                'admin.design.theme.partners.desc',
+                                                'Add logos of universities, labs, or funders supporting this study. They will appear in the header and objective section.'
+                                            )}
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="px-0 space-y-4">
+                        <div className="space-y-3">
+                            {/* List of existing partners */}
+                            {(branding.partners || []).map((partner: any, index: number) => (
+                                <div
+                                    key={partner.id || index}
+                                    className="flex gap-3 items-start p-3 bg-white rounded-xl border border-slate-200 shadow-sm group"
+                                >
+                                    <div className="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center p-1 border border-slate-100 shrink-0">
+                                        {partner.logo_url ? (
+                                            <img
+                                                src={partner.logo_url}
+                                                alt={partner.name}
+                                                className="max-w-full max-h-full object-contain"
+                                            />
+                                        ) : (
+                                            <ImageIcon className="text-slate-300 w-6 h-6" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <Input
+                                            value={partner.name}
+                                            onChange={(e) => {
+                                                const newPartners = [...(branding.partners || [])];
+                                                newPartners[index] = {
+                                                    ...partner,
+                                                    name: e.target.value,
+                                                };
+                                                updateBranding('partners', newPartners as any);
+                                            }}
+                                            placeholder={t(
+                                                'admin.design.theme.partners.name_placeholder',
+                                                'Institution Name'
+                                            )}
+                                            className="h-8 text-xs font-medium"
+                                        />
+                                        <Input
+                                            value={partner.logo_url}
+                                            onChange={(e) => {
+                                                const newPartners = [...(branding.partners || [])];
+                                                newPartners[index] = {
+                                                    ...partner,
+                                                    logo_url: e.target.value,
+                                                };
+                                                updateBranding('partners', newPartners as any);
+                                            }}
+                                            placeholder={t(
+                                                'admin.design.theme.partners.url_placeholder',
+                                                'Logo URL (https://...)'
+                                            )}
+                                            className="h-8 text-xs text-slate-500 font-mono"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newPartners = (branding.partners || []).filter(
+                                                (_: any, i: number) => i !== index
+                                            );
+                                            updateBranding('partners', newPartners as any);
+                                        }}
+                                        className="text-slate-400 hover:text-red-500 p-1 transition-colors"
+                                    >
+                                        <span className="sr-only">{t('common.remove')}</span>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path d="M3 6h18" />
+                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                            <line x1="10" x2="10" y1="11" y2="17" />
+                                            <line x1="14" x2="14" y1="11" y2="17" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Add Button */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const newPartners = [
+                                        ...(branding.partners || []),
+                                        {
+                                            id: crypto.randomUUID(),
+                                            name: '',
+                                            logo_url: '',
+                                            url: '',
+                                        },
+                                    ];
+                                    updateBranding('partners', newPartners as any);
+                                }}
+                                className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-medium text-sm"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M5 12h14" />
+                                    <path d="M12 5v14" />
+                                </svg>
+                                {t('admin.design.theme.partners.add', 'Add Partner')}
+                            </button>
+                        </div>
                     </CardContent>
                 </Card>
             </section>

@@ -1,8 +1,9 @@
 import { Calendar } from '@/components/ui/calendar';
-import { Settings } from 'lucide-react';
+import { Calendar as CalendarIcon, Settings, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import {
     Card,
     CardContent,
@@ -63,10 +64,13 @@ export default function GeneralSettingsPage() {
     const form = useForm<StudyFormValues>({
         resolver: zodResolver(studyFormSchema),
         defaultValues: {
-            title: study?.title || '',
+            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+            title: (study as any)?.title || '',
             slug: study?.slug || '',
-            start_date: study?.start_date ? new Date(study.start_date) : null,
-            end_date: study?.end_date ? new Date(study.end_date) : null,
+            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+            start_date: (study as any).start_date ? new Date((study as any).start_date) : null,
+            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+            end_date: (study as any).end_date ? new Date((study as any).end_date) : null,
         },
     });
 
@@ -75,10 +79,13 @@ export default function GeneralSettingsPage() {
     useEffect(() => {
         if (study) {
             form.reset({
-                title: study.title || '',
+                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+                title: (study as any).title || '',
                 slug: study.slug || '',
-                start_date: study.start_date ? new Date(study.start_date) : null,
-                end_date: study.end_date ? new Date(study.end_date) : null,
+                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+                start_date: (study as any).start_date ? new Date((study as any).start_date) : null,
+                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
+                end_date: (study as any).end_date ? new Date((study as any).end_date) : null,
             });
         }
     }, [study, form]);

@@ -225,7 +225,7 @@ export default function InteractiveDataView({
                 ),
             }),
         ],
-        [columnHelper]
+        [columnHelper, t]
     );
 
     const table = useReactTable({

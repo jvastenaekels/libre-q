@@ -71,7 +71,7 @@ export function ParticipantDetailContent({
     // Functional check: logic in `StudyService` saves it to `presort_answers`.
     // `DumpParticipant` has `presort` which comes from that.
     // So `participant.presort['_recruitment_token']` should exist if it was saved.
-    const recruitmentToken = participant.presort?.['_recruitment_token'];
+    const recruitmentToken = participant.presort?._recruitment_token;
 
     return (
         <div className="flex-1 p-4 sm:p-8 pt-6 space-y-8 text-slate-900 overflow-y-auto">

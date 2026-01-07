@@ -115,6 +115,11 @@ const IntroductionEditor = () => {
                             translation?.instructions !== undefined
                         }
                         onCheckedChange={(checked: boolean) => {
+                            const currentlyEnabled =
+                                translation?.instructions !== null &&
+                                translation?.instructions !== undefined;
+                            // Defensive check to prevent infinite loops
+                            if (checked === currentlyEnabled) return;
                             if (checked) {
                                 handleChange('instructions', '');
                             } else {
@@ -155,6 +160,8 @@ const IntroductionEditor = () => {
                         id="enable-consent"
                         checked={hasConsent}
                         onCheckedChange={(checked: boolean) => {
+                            // Defensive check to prevent infinite loops
+                            if (checked === hasConsent) return;
                             if (checked) {
                                 // biome-ignore lint/suspicious/noExplicitAny: complex state update
                                 updateTranslation(activeLocale, (t_trans: any) => {

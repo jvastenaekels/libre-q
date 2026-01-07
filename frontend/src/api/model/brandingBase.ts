@@ -10,7 +10,13 @@ import type { BrandingBaseAccentColor } from './brandingBaseAccentColor';
 /**
  * Schema for study branding.
  */
+import type { PartnerLogo } from './partnerLogo';
+
+/**
+ * Schema for study branding.
+ */
 export interface BrandingBase {
     logo_url?: BrandingBaseLogoUrl;
     accent_color?: BrandingBaseAccentColor;
+    partners?: PartnerLogo[];
 }

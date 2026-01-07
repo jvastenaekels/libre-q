@@ -20,8 +20,10 @@ import {
 } from '@/api/generated';
 import { StudyRole } from '@/api/model';
 import { EmptyState } from '@/components/admin/EmptyState';
+import { useTranslation } from 'react-i18next';
 
 const TeamSettings = () => {
+    const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const { data: study, isLoading, refetch } = useGetStudyApiAdminStudiesSlugGet(slug || '');
     const inviteMutation = useInviteCollaboratorApiAdminInvitationsSlugInvitePost();
@@ -43,11 +45,11 @@ const TeamSettings = () => {
                 },
             });
             setInviteLink(result.invite_url);
-            toast.success('Invitation link generated!');
+            toast.success(t('admin.team.invite_success', 'Invitation link generated!'));
             setInviteEmail('');
             refetch(); // Refresh member list (though it might only show on registration)
         } catch (error) {
-            toast.error('Failed to generate invitation');
+            toast.error(t('admin.team.invite_error', 'Failed to generate invitation'));
             console.error(error);
         }
     };
@@ -56,7 +58,7 @@ const TeamSettings = () => {
         if (inviteLink) {
             navigator.clipboard.writeText(inviteLink);
             setCopied(true);
-            toast.success('Link copied to clipboard');
+            toast.success(t('admin.team.copy_success', 'Link copied to clipboard'));
             setTimeout(() => setCopied(false), 2000);
         }
     };
@@ -80,15 +82,20 @@ const TeamSettings = () => {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <UserPlus className="h-5 w-5 text-primary" />
-                            Invite Collaborator
+                            {t('admin.team.invite_title', 'Invite Collaborator')}
                         </CardTitle>
                         <CardDescription>
-                            Generate a secure link to invite a new member to this study.
+                            {t(
+                                'admin.team.invite_description',
+                                'Generate a secure link to invite a new member to this study.'
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
+                            <Label htmlFor="email">
+                                {t('admin.team.email_label', 'Email Address')}
+                            </Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -98,23 +105,25 @@ const TeamSettings = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
+                            <Label htmlFor="role">{t('admin.team.role_label', 'Role')}</Label>
                             <Select
                                 value={inviteRole}
                                 onValueChange={(v) => setInviteRole(v as StudyRole)}
                             >
                                 <SelectTrigger id="role">
-                                    <SelectValue placeholder="Select a role" />
+                                    <SelectValue
+                                        placeholder={t('admin.team.select_role', 'Select a role')}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={StudyRole.owner}>
-                                        Owner (Full Control)
+                                        {t('admin.team.roles.owner', 'Owner (Full Control)')}
                                     </SelectItem>
                                     <SelectItem value={StudyRole.editor}>
-                                        Editor (Design & Analysis)
+                                        {t('admin.team.roles.editor', 'Editor (Design & Analysis)')}
                                     </SelectItem>
                                     <SelectItem value={StudyRole.viewer}>
-                                        Viewer (Read-only)
+                                        {t('admin.team.roles.viewer', 'Viewer (Read-only)')}
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
@@ -127,14 +136,17 @@ const TeamSettings = () => {
                             {inviteMutation.isPending ? (
                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
-                                'Generate Link'
+                                t('admin.team.generate_link', 'Generate Link')
                             )}
                         </Button>
 
                         {inviteLink && (
                             <div className="mt-4 p-3 bg-muted rounded-lg border flex flex-col gap-2">
                                 <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                                    Share this link with the invitee:
+                                    {t(
+                                        'admin.team.share_label',
+                                        'Share this link with the invitee:'
+                                    )}
                                 </Label>
                                 <div className="flex gap-2">
                                     <Input
@@ -164,7 +176,7 @@ const TeamSettings = () => {
                 <Card className="bg-primary/5 border-primary/10">
                     <CardHeader>
                         <CardTitle className="text-sm uppercase tracking-widest text-primary font-bold">
-                            Collaboration Overview
+                            {t('admin.team.collab_overview', 'Collaboration Overview')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-2">
@@ -176,14 +188,14 @@ const TeamSettings = () => {
                                 <div>
                                     <p className="text-2xl font-bold">{members.length}</p>
                                     <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                                        Active Members
+                                        {t('admin.team.active_members', 'Active Members')}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-3">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                                Permissions Info
+                                {t('admin.team.permissions_info', 'Permissions Info')}
                             </p>
                             <div className="grid grid-cols-1 gap-2">
                                 <div className="flex items-center gap-2 text-xs">
@@ -194,7 +206,10 @@ const TeamSettings = () => {
                                         OWNER
                                     </Badge>
                                     <span className="text-muted-foreground">
-                                        Can delete the study and manage team.
+                                        {t(
+                                            'admin.team.permissions.owner',
+                                            'Can delete the study and manage team.'
+                                        )}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-xs">
@@ -205,7 +220,10 @@ const TeamSettings = () => {
                                         EDITOR
                                     </Badge>
                                     <span className="text-muted-foreground">
-                                        Can modify design and view results.
+                                        {t(
+                                            'admin.team.permissions.editor',
+                                            'Can modify design and view results.'
+                                        )}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-xs">
@@ -216,7 +234,10 @@ const TeamSettings = () => {
                                         VIEWER
                                     </Badge>
                                     <span className="text-muted-foreground">
-                                        Read-only access to all modules.
+                                        {t(
+                                            'admin.team.permissions.viewer',
+                                            'Read-only access to all modules.'
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -230,16 +251,25 @@ const TeamSettings = () => {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-indigo-500" />
-                        Research Team
+                        {t('admin.team.list_title', 'Research Team')}
                     </CardTitle>
-                    <CardDescription>Manage access for existing collaborators.</CardDescription>
+                    <CardDescription>
+                        {t(
+                            'admin.team.list_description',
+                            'Manage access for existing collaborators.'
+                        )}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="rounded-md border">
                         <div className="grid grid-cols-12 bg-muted/50 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
-                            <div className="col-span-6">Collaborator</div>
-                            <div className="col-span-4">Role</div>
-                            <div className="col-span-2 text-right">Actions</div>
+                            <div className="col-span-6">
+                                {t('admin.team.headers.collaborator', 'Collaborator')}
+                            </div>
+                            <div className="col-span-4">{t('admin.team.headers.role', 'Role')}</div>
+                            <div className="col-span-2 text-right">
+                                {t('admin.team.headers.actions', 'Actions')}
+                            </div>
                         </div>
                         <div className="divide-y">
                             {members.length === 0 ? (
@@ -260,10 +290,11 @@ const TeamSettings = () => {
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium">
-                                                    {m.user?.email || 'Unknown User'}
+                                                    {m.user?.email ||
+                                                        t('common.unknown_user', 'Unknown User')}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground">
-                                                    Added on{' '}
+                                                    {t('admin.team.added_on', 'Added on')}{' '}
                                                     {new Date(m.added_at).toLocaleDateString()}
                                                 </span>
                                             </div>

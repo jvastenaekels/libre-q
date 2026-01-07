@@ -115,6 +115,14 @@
             "post": {
                 "title": "Why",
                 "description": "A few words to explain your most significant choices."
+            },
+            "contact": {
+                "title": "Results & Contact",
+                "email_label": "Your email address (Optional)",
+                "email_placeholder": "example@email.com",
+                "interview_consent": "I agree to be potentially contacted for a follow-up interview.",
+                "newsletter_consent": "I wish to be informed about the study results.",
+                "gdpr_note": "Your email will never be publicly shared. It is stored solely for the purposes selected above."
             }
         }
     },
@@ -144,7 +152,6 @@
         }
     },
     "fine": {
-        "header": {},
         "deck": {
             "title": "Available Statements",
             "all_placed": "All statements in this pile are sorted"
@@ -174,6 +181,9 @@
             "ready": "Review overview",
             "not_ready": "Place all statements to continue"
         },
+        "header": {
+            "title": "Place statements on the grid"
+        },
         "workbench": {
             "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
@@ -183,7 +193,10 @@
             "methodology": {
                 "extremes": "Tip: Start with what is most obvious to you (the extremes).",
                 "vertical": "In the same column, the order from top to bottom doesn't matter.",
-                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices."
+                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
+                "relative": "Reminder: items are sorted relative to each other (relative agreement).",
+                "zoom": "Feel free to zoom in on different parts of the grid for better visibility.",
+                "flexibility": "Nothing is final: you can move cards or put them back in the deck at any time."
             }
         }
     },
@@ -278,6 +291,16 @@
             "copy_link": "Copy Secure URL",
             "table_title": "Access Control Panel",
             "table_description": "Active channels and link lifecycle management.",
+            "share_title": "Share study",
+            "share_desc": "Distribute your study URL to invite participants.",
+            "public_url_label": "Public Participation URL",
+            "hide_qr": "Hide QR",
+            "show_qr": "Show QR",
+            "live_study": "Live Study",
+            "qr_print_hint": "Scan or print this code for physical recruitment materials (flyers, posters).",
+            "analytics_title": "Campaign Analytics",
+            "analytics_desc": "Direct links and QR scans are automatically tracked in the Health Dashboard above.",
+            "copy_success": "Study link copied to clipboard",
             "types": {
                 "public": "Open Access (Public)",
                 "individual": "Single-Use Passcode",
