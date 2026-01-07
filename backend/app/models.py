@@ -46,6 +46,7 @@ class ParticipantStatus(str, Enum):
 class WorkspaceRole(str, Enum):
     """Enum for workspace roles."""
 
+    owner = "owner"
     admin = "admin"
     researcher = "researcher"
     viewer = "viewer"
@@ -79,6 +80,7 @@ class Workspace(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    config: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
     # Relationships
     studies: Mapped[list["Study"]] = relationship(
