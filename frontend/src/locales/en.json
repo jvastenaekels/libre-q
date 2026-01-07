@@ -596,7 +596,7 @@
                     "objective": "Study objective",
                     "objective_placeholder": "What is the research question or purpose of this study?",
                     "task_overview": "Introduction",
-                    "task_placeholder": "Briefly explain the study process to participants (optional)...",
+                    "task_placeholder": "Describe the study process here (number of steps, estimated duration, etc.). This field is optional if you use the custom steps above.",
                     "consent_title_label": "Consent title",
                     "legal_text": "Legal text / agreement",
                     "legal_placeholder": "Enter the full legal agreement text..."

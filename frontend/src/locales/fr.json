@@ -597,7 +597,7 @@
                     "objective": "Question de tri",
                     "objective_placeholder": "Quelle est la question de recherche ou le but de cette étude ?",
                     "task_overview": "Introduction",
-                    "task_placeholder": "Expliquez brièvement le processus aux participants (optionnel)...",
+                    "task_placeholder": "Décrivez ici comment se déroule l'étude (nombre d'étapes, durée estimée, etc.). Ce champ est optionnel si vous utilisez les étapes personnalisées ci-dessus.",
                     "consent_title_label": "Titre du consentement",
                     "legal_text": "Texte légal / accord",
                     "legal_placeholder": "Entrez le texte complet de l'accord..."

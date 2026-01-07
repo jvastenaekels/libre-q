@@ -597,7 +597,7 @@
                     "objective": "Tutkimuksen tavoite",
                     "objective_placeholder": "Mikä on tutkimuskysymys tai tarkoitus?",
                     "task_overview": "Johdanto",
-                    "task_placeholder": "Selitä prosessi lyhyesti osallistujille (valinnainen)...",
+                    "task_placeholder": "Kuvaile tutkimuksen kulku tähän (vaiheiden määrä, arvioitu kesto, jne.). Tämä kenttä on valinnainen, jos käytät mukautettuja vaiheita yllä.",
                     "consent_title_label": "Suostumuksen otsikko",
                     "legal_text": "Lakiteksti / sopimus",
                     "legal_placeholder": "Syötä sopimuksen koko teksti..."
