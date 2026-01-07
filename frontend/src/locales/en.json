@@ -566,9 +566,9 @@
             },
             "intro": {
                 "welcome_title": "Welcome message",
-                "process_title": "Study Steps",
+                "process_title": "Study Steps Overview",
                 "process_steps": {
-                    "title": "Study Steps",
+                    "title": "Study Steps Overview",
                     "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
                     "add_step": "Add step",
                     "empty": {
@@ -594,7 +594,7 @@
                     "subtitle_placeholder": "A brief catchphrase...",
                     "objective": "Study objective",
                     "objective_placeholder": "What is the research question or purpose of this study?",
-                    "task_overview": "Task overview",
+                    "task_overview": "Introduction",
                     "task_placeholder": "Briefly explain the study process to participants (optional)...",
                     "consent_title_label": "Consent title",
                     "legal_text": "Legal text / agreement",

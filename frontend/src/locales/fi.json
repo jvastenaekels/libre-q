@@ -567,9 +567,9 @@
             },
             "intro": {
                 "welcome_title": "Tervetuloviesti",
-                "process_title": "Study Steps",
+                "process_title": "Vaiheiden yleiskatsaus",
                 "process_steps": {
-                    "title": "Study Steps",
+                    "title": "Vaiheiden yleiskatsaus",
                     "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
                     "add_step": "Add step",
                     "empty": {
@@ -595,7 +595,7 @@
                     "subtitle_placeholder": "Lyhyt iskulause...",
                     "objective": "Tutkimuksen tavoite",
                     "objective_placeholder": "Mikä on tutkimuskysymys tai tarkoitus?",
-                    "task_overview": "Tehtävän yleiskatsaus",
+                    "task_overview": "Johdanto",
                     "task_placeholder": "Selitä prosessi lyhyesti osallistujille (valinnainen)...",
                     "consent_title_label": "Suostumuksen otsikko",
                     "legal_text": "Lakiteksti / sopimus",
