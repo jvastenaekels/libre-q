@@ -142,7 +142,9 @@ export const CommandMenu = () => {
                                         className="flex items-center gap-3 px-9 py-1.5 rounded-lg cursor-pointer transition-colors aria-selected:bg-slate-50 aria-selected:text-slate-900 text-slate-500"
                                     >
                                         <Settings className="h-3 w-3" />
-                                        <span className="text-xs font-bold">Manage Workspace</span>
+                                        <span className="text-xs font-bold">
+                                            {t('admin.workspace.switcher.settings')}
+                                        </span>
                                     </Command.Item>
                                 )}
                             </div>

@@ -32,7 +32,7 @@ export function StudySwitcher() {
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
     const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
 
-    const getStatusColor = (state: string) => {
+    const _getStatusColor = (state: string) => {
         switch (state) {
             case 'active':
                 return 'bg-emerald-500';
@@ -96,22 +96,6 @@ export function StudySwitcher() {
                                     <span className="truncate font-bold tracking-tight text-slate-900 leading-none">
                                         {activeStudy ? activeStudy.slug : 'Select Study'}
                                     </span>
-                                    {activeStudy && (
-                                        <div className="flex items-center gap-1.5 mt-1">
-                                            <div
-                                                className={cn(
-                                                    'size-1.5 rounded-full',
-                                                    getStatusColor(activeStudy.state)
-                                                )}
-                                            />
-                                            <span className="truncate text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                {t(
-                                                    `admin.status.${activeStudy.state}`,
-                                                    activeStudy.state
-                                                )}
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
                                 <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
                             </SidebarMenuButton>
@@ -152,20 +136,6 @@ export function StudySwitcher() {
                                                 <span className="text-sm font-bold truncate">
                                                     {study.slug}
                                                 </span>
-                                                <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <div
-                                                        className={cn(
-                                                            'size-1.5 rounded-full',
-                                                            getStatusColor(study.state)
-                                                        )}
-                                                    />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                                                        {t(
-                                                            `admin.status.${study.state}`,
-                                                            study.state
-                                                        )}
-                                                    </span>
-                                                </div>
                                             </div>
                                         </DropdownMenuItem>
                                     );
