@@ -30,8 +30,9 @@ async def invite_collaborator(
     background_tasks.add_task(
         send_invitation_email,
         email_to=invite.email,
-        study_title=study.slug,  # Study model has slug, title is in translations
+        context_name=study.slug,
         invite_url=invite_url,
+        context_type="study",
     )
 
     return InvitationLink(invite_url=invite_url, token=token)

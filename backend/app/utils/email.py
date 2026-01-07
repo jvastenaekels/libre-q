@@ -8,31 +8,28 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
-def send_invitation_email(email_to: str, study_title: str, invite_url: str):
+def send_invitation_email(
+    email_to: str, context_name: str, invite_url: str, context_type: str = "study"
+):
     """
     Send an invitation email to a collaborator.
 
     Args:
         email_to: The recipient's email address.
-        study_title: The title of the study they are being invited to.
+        context_name: The title of the study or workspace.
         invite_url: The unique URL for accepting the invitation.
-
-    Raises:
-        Exception: Re-raises any exception encountered during the SMTP process after logging it.
-
-    Note:
-        If SMTP settings are not configured, the email content is logged to the console/logger for development purposes.
+        context_type: "study" or "workspace".
     """
-    subject = f"Invitation to collaborate on '{study_title}'"
+    subject = f"Invitation to collaborate on {context_type} '{context_name}'"
 
     html_content = f"""
     <html>
         <body>
             <h2>Hello!</h2>
-            <p>You have been invited to collaborate on the study <strong>{study_title}</strong> on Open-Q.</p>
+            <p>You have been invited to collaborate on the {context_type} <strong>{context_name}</strong> on Open-Q.</p>
             <p>To accept the invitation and register your account, please click the link below:</p>
             <p><a href="{invite_url}">{invite_url}</a></p>
-            <p>If you already have an account, the link will associate your account with this study.</p>
+            <p>If you already have an account, the link will associate your account with this {context_type}.</p>
             <br>
             <p>L'équipe Open-Q</p>
         </body>
