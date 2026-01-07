@@ -41,7 +41,10 @@ export class AdminPage extends BasePage {
     }
 
     async configureQSort(statements: string[]) {
-        await this.page.getByRole('link', { name: /design/i }).first().click();
+        await this.page
+            .getByRole('link', { name: /design/i })
+            .first()
+            .click();
         await this.page.getByTestId('tab-q-sort').click();
 
         const textarea = this.page.getByPlaceholder(/paste your statements here/i);
