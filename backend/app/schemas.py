@@ -99,6 +99,12 @@ class WorkspaceRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class WorkspaceWithRole(WorkspaceRead):
+    """Schema for reading a workspace with the current user's role."""
+
+    user_role: WorkspaceRole
+
+
 class WorkspaceCreate(BaseModel):
     """Schema for creating a workspace."""
 

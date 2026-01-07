@@ -16,6 +16,7 @@ from app.schemas import (
     WorkspaceUpdate,
     WorkspaceInvitationCreate,
     InvitationLink,
+    WorkspaceWithRole,
 )
 from app.utils.security import create_invitation_token
 from app.utils.email import send_invitation_email
@@ -25,23 +26,28 @@ from fastapi import BackgroundTasks
 router = APIRouter()
 
 
-@router.get("/", response_model=list[WorkspaceRead])
+@router.get("/", response_model=list[WorkspaceWithRole])
 async def list_workspaces(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-) -> list[Workspace]:
+) -> list[WorkspaceWithRole]:
     """
-    List all workspaces the current user is a member of.
+    List all workspaces the current user is a member of, with their role.
     """
-    # Select workspaces where the user is a member
+    # Select workspaces where the user is a member, inclusive of role
     query = (
-        select(Workspace)
-        .join(WorkspaceMember)
+        select(Workspace, WorkspaceMember.role)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(WorkspaceMember.user_id == current_user.id)
     )
     result = await db.execute(query)
-    workspaces = result.scalars().all()
-    return list(workspaces)
+    rows = result.all()
+
+    # Map to schema
+    return [
+        WorkspaceWithRole(**workspace.__dict__, user_role=role)
+        for workspace, role in rows
+    ]
 
 
 @router.post("/", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
