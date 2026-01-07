@@ -367,25 +367,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     {/* Card Zone */}
                     <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md min-w-[6rem] min-h-[8rem] sm:min-w-[12rem] sm:min-h-[9rem]">
                         <div className="w-full h-full relative">
-                            {/* Desktop/Tablet Hover Tip (Keep absolute for large screens, hidden on mobile) */}
-                            <AnimatePresence>
-                                {showTip && window.innerWidth >= 1024 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{
-                                            opacity: 0,
-                                            scale: 0.9,
-                                            transition: { duration: 0.2 },
-                                        }}
-                                        className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
-                                    >
-                                        <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-80">
-                                            {t('rough.instructions.desktop_tip')}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
 
                             <CardStack
                                 ref={cardStackRef}
@@ -428,16 +409,24 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         isNeutral
                     />
 
-                    <button
-                        type="button"
-                        onClick={handleUndo}
-                        disabled={roughHistory.length === 0}
-                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
-                        aria-keyshortcuts="z"
-                    >
-                        <RotateCcw size={14} />
-                        {t('common.undo')}
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            onClick={handleUndo}
+                            disabled={roughHistory.length === 0}
+                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
+                            aria-keyshortcuts="z"
+                        >
+                            <RotateCcw size={14} />
+                            {t('common.undo')}
+                        </button>
+                        {/* Desktop Keyboard Shortcuts Hint */}
+                        <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">←</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">↓</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">→</kbd>
+                        </div>
+                    </div>
                 </div>
             </div>
 
