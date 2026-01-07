@@ -14,6 +14,7 @@
         "submitting": "Lähetetään...",
         "cards": "väitettä",
         "close": "Sulje",
+        "optional": "Valinnainen",
         "statement": "Väite",
         "errors": {
             "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
@@ -723,7 +724,7 @@
                     "title": "Osallistujan seuranta",
                     "desc": "Kerää sähköpostiosoitteita seurantaa tai tuloksia varten.",
                     "interview": "Tarjoa seurantahaastattelua",
-                    "results": "Tarjoa tulosten lähetystä (Uutiskirje)",
+                    "results": "Tarjoa mahdollisuutta liittyä postituslistalle tutkimuksen tuloksista",
                     "interview_warning": "Huom: Suostumus haastatteluun poistaa anonymiteetin tutkijalta.",
                     "results_hint": "Sähköpostia käytetään vain tulosten lähettämiseen, anonymiteetti säilyy."
                 }

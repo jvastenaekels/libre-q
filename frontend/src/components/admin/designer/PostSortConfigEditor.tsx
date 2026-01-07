@@ -236,7 +236,7 @@ const PostSortConfigEditor = () => {
                             variant="outline"
                             className="text-[10px] font-bold uppercase tracking-wider bg-white/50"
                         >
-                            {t('common.optional', 'Optional')}
+                            {t('common.optional')}
                         </Badge>
                     </Label>
                     <p className="text-sm text-blue-800/60">

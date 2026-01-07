@@ -14,6 +14,7 @@
         "submitting": "Envoi en cours...",
         "cards": "énoncés",
         "close": "Fermer",
+        "optional": "Optionnel",
         "statement": "Énoncé",
         "errors": {
             "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
@@ -724,7 +725,7 @@
                     "title": "Suivi des participants",
                     "desc": "Collecter les adresses email pour un recontact ou l'envoi des résultats.",
                     "interview": "Proposer un entretien de suivi",
-                    "results": "Proposer l'envoi des résultats (Newsletter)",
+                    "results": "Proposer l'inscription à une liste de diffusion concernant les suites de l'étude",
                     "interview_warning": "Note : L'accord pour un entretien lève l'anonymat vis-à-vis du chercheur.",
                     "results_hint": "L'e-mail ne sera utilisé que pour l'envoi des résultats, préservant l'anonymat."
                 }

@@ -14,6 +14,7 @@
         "submitting": "Submitting...",
         "cards": "statements",
         "close": "Close",
+        "optional": "Optional",
         "statement": "Statement",
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
@@ -723,7 +724,7 @@
                     "title": "Participant Follow-up",
                     "desc": "Collect email addresses for follow-up or research results.",
                     "interview": "Offer follow-up interview",
-                    "results": "Offer study results (Newsletter)",
+                    "results": "Offer to subscribe to a mailing list about study outcomes",
                     "interview_warning": "Note: agreeing to be contacted lifts anonymity for the researcher.",
                     "results_hint": "Email solely for results, anonymity preserved."
                 }
