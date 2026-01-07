@@ -98,8 +98,21 @@ const ConsentPage: React.FC = () => {
                 reportBug(err as Error, { context: 'ConsentPage' });
             }
 
-            setStep(2); // Move to Pre-Sort
-            navigate(`/study/${slug}/presort`);
+            // Determine next step
+            let nextStep = 2; // Default to Pre-Sort
+            let nextPath = 'presort';
+
+            if (
+                config.presort_config &&
+                'enabled' in config.presort_config &&
+                !config.presort_config.enabled
+            ) {
+                nextStep = 3;
+                nextPath = 'rough-sort';
+            }
+
+            setStep(nextStep);
+            navigate(`/study/${slug}/${nextPath}`);
         }
     };
 

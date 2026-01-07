@@ -33,13 +33,21 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
     const { t, i18n } = useTranslation();
 
+    // Normalize config to get fields
+    const presortFields = useMemo(() => {
+        if (!config?.presort_config) return {};
+        if ('fields' in config.presort_config) {
+            return config.presort_config.fields;
+        }
+        // Legacy support
+        return config.presort_config as Record<string, PreSortField>;
+    }, [config?.presort_config]);
+
     // Generate Dynamic Zod Schema based on config
     const dynamicSchema = useMemo(() => {
-        if (!config?.presort_config) return z.object({});
-
         const shape: Record<string, z.ZodTypeAny> = {};
 
-        Object.entries(config.presort_config).forEach(([key, field]) => {
+        Object.entries(presortFields).forEach(([key, field]) => {
             let fieldSchema: z.ZodTypeAny;
 
             if (field.type === 'number') {
@@ -95,7 +103,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         });
 
         return z.object(shape);
-    }, [config?.presort_config, t]);
+    }, [presortFields, t]);
 
     const {
         register,
@@ -148,7 +156,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
             >
-                {Object.entries(config.presort_config || {}).map(([key, fieldConfig]) => (
+                {Object.entries(presortFields).map(([key, fieldConfig]) => (
                     <div key={key}>
                         <label htmlFor={key} className="block text-sm font-medium text-gray-700">
                             {getLocalizedText(fieldConfig.label)}
@@ -173,9 +181,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                         data-testid="presort-submit-btn"
                         // If no config, always valid. Otherwise respect form validation.
                         disabled={
-                            (config?.presort_config &&
-                                Object.keys(config.presort_config).length > 0 &&
-                                !isValid) ||
+                            (presortFields && Object.keys(presortFields).length > 0 && !isValid) ||
                             false
                         }
                         className={cn(

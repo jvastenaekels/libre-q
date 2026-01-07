@@ -1,10 +1,12 @@
 import { useLoaderData } from 'react-router-dom';
 import type { ParticipantRead } from '@/api/model';
-import { Badge } from '@/components/ui/badge';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExportCenter from '@/components/admin/dashboard/ExportCenter';
+import { Database, Download, Table as TableIcon, ChartBar } from 'lucide-react';
+import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
+import { useTranslation } from 'react-i18next';
 import InteractiveDataView from '@/components/admin/dashboard/InteractiveDataView';
-import { Database, Download, Table as TableIcon } from 'lucide-react';
 
 interface LoaderData {
     participants: ParticipantRead[];
@@ -13,25 +15,18 @@ interface LoaderData {
 
 const DataExportsPage = () => {
     const { participants, slug } = useLoaderData() as LoaderData;
+    const { t } = useTranslation();
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
-            <header className="flex-none flex flex-col gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1">
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
-                        <span className="truncate">{slug}</span>
-                        <Badge
-                            variant="outline"
-                            className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase tracking-widest text-[10px]"
-                        >
-                            Analytics & data
-                        </Badge>
-                    </h1>
-                    <p className="text-slate-500 text-sm">
-                        Inspect participant data and export datasets.
-                    </p>
-                </div>
-            </header>
+            <StudyPageHeader
+                title={t('admin.data.title', 'Analytics & Data')}
+                description={t(
+                    'admin.data.description',
+                    'Inspect participant performance, qualitative feedback, and export datasets.'
+                )}
+                icon={ChartBar}
+            />
 
             <Tabs defaultValue="browse" className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <div className="flex-none pb-4">

@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Bold, Italic, List, Link, Eye, Edit3, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     placeholder,
     className,
 }) => {
+    const { t } = useTranslation();
     const [view, setView] = useState<'edit' | 'preview'>('edit');
 
     const insertText = (before: string, after = '') => {
@@ -54,10 +56,10 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                     </label>
                     <div
                         className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded cursor-help"
-                        title="Supports Markdown for rich formatting"
+                        title={t('admin.components.markdown.tooltip')}
                     >
                         <Info className="h-3 w-3" />
-                        Markdown
+                        {t('admin.components.markdown.label')}
                     </div>
                 </div>
             )}
@@ -71,7 +73,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             size="icon"
                             className="h-7 w-7"
                             onClick={() => insertText('**', '**')}
-                            title="Bold"
+                            title={t('admin.components.markdown.bold')}
                             disabled={view === 'preview'}
                         >
                             <Bold className="h-3.5 w-3.5" />
@@ -81,7 +83,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             size="icon"
                             className="h-7 w-7"
                             onClick={() => insertText('_', '_')}
-                            title="Italic"
+                            title={t('admin.components.markdown.italic')}
                             disabled={view === 'preview'}
                         >
                             <Italic className="h-3.5 w-3.5" />
@@ -91,7 +93,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             size="icon"
                             className="h-7 w-7"
                             onClick={() => insertText('\n- ')}
-                            title="List"
+                            title={t('admin.components.markdown.list')}
                             disabled={view === 'preview'}
                         >
                             <List className="h-3.5 w-3.5" />
@@ -101,7 +103,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             size="icon"
                             className="h-7 w-7"
                             onClick={() => insertText('[', '](url)')}
-                            title="Link"
+                            title={t('admin.components.markdown.link')}
                             disabled={view === 'preview'}
                         >
                             <Link className="h-3.5 w-3.5" />
@@ -116,7 +118,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             onClick={() => setView('edit')}
                         >
                             <Edit3 className="h-3 w-3" />
-                            Edit
+                            {t('admin.components.markdown.edit')}
                         </Button>
                         <Button
                             variant={view === 'preview' ? 'secondary' : 'ghost'}
@@ -125,7 +127,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             onClick={() => setView('preview')}
                         >
                             <Eye className="h-3 w-3" />
-                            Preview
+                            {t('admin.components.markdown.preview')}
                         </Button>
                     </div>
                 </div>
@@ -146,7 +148,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                 <ReactMarkdown>{value}</ReactMarkdown>
                             ) : (
                                 <span className="text-muted-foreground italic text-xs">
-                                    Nothing to preview
+                                    {t('admin.components.markdown.empty')}
                                 </span>
                             )}
                         </div>

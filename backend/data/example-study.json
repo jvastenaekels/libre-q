@@ -14,110 +14,113 @@
         { "score": 4, "capacity": 2 }
     ],
     "presort_config": {
-        "age": {
-            "type": "number",
-            "label": {
-                "en": "Age",
-                "fr": "Âge",
-                "fi": "Ikä"
+        "enabled": true,
+        "fields": {
+            "age": {
+                "type": "number",
+                "label": {
+                    "en": "Age",
+                    "fr": "Âge",
+                    "fi": "Ikä"
+                },
+                "required": true,
+                "min": 18,
+                "max": 99
             },
-            "required": true,
-            "min": 18,
-            "max": 99
-        },
-        "gender": {
-            "type": "select",
-            "options": [
-                {
-                    "value": "Male",
-                    "label": {
-                        "en": "Male",
-                        "fr": "Homme",
-                        "fi": "Mies"
+            "gender": {
+                "type": "select",
+                "options": [
+                    {
+                        "value": "Male",
+                        "label": {
+                            "en": "Male",
+                            "fr": "Homme",
+                            "fi": "Mies"
+                        }
+                    },
+                    {
+                        "value": "Female",
+                        "label": {
+                            "en": "Female",
+                            "fr": "Femme",
+                            "fi": "Nainen"
+                        }
+                    },
+                    {
+                        "value": "Non-binary",
+                        "label": {
+                            "en": "Non-binary",
+                            "fr": "Non-binaire",
+                            "fi": "Muunsukupuolinen"
+                        }
+                    },
+                    {
+                        "value": "Prefer not to say",
+                        "label": {
+                            "en": "Prefer not to answer",
+                            "fr": "Je préfère ne pas répondre",
+                            "fi": "En halua vastata"
+                        }
                     }
+                ],
+                "label": {
+                    "en": "Gender",
+                    "fr": "Genre",
+                    "fi": "Sukupuoli"
                 },
-                {
-                    "value": "Female",
-                    "label": {
-                        "en": "Female",
-                        "fr": "Femme",
-                        "fi": "Nainen"
-                    }
-                },
-                {
-                    "value": "Non-binary",
-                    "label": {
-                        "en": "Non-binary",
-                        "fr": "Non-binaire",
-                        "fi": "Muunsukupuolinen"
-                    }
-                },
-                {
-                    "value": "Prefer not to say",
-                    "label": {
-                        "en": "Prefer not to answer",
-                        "fr": "Je préfère ne pas répondre",
-                        "fi": "En halua vastata"
-                    }
-                }
-            ],
-            "label": {
-                "en": "Gender",
-                "fr": "Genre",
-                "fi": "Sukupuoli"
+                "required": true
             },
-            "required": true
-        },
-        "education": {
-            "type": "select",
-            "options": [
-                {
-                    "value": "High School",
-                    "label": {
-                        "en": "High School / Secondary",
-                        "fr": "Études secondaires",
-                        "fi": "Toisen asteen koulutus"
+            "education": {
+                "type": "select",
+                "options": [
+                    {
+                        "value": "High School",
+                        "label": {
+                            "en": "High School / Secondary",
+                            "fr": "Études secondaires",
+                            "fi": "Toisen asteen koulutus"
+                        }
+                    },
+                    {
+                        "value": "Bachelor",
+                        "label": {
+                            "en": "Bachelor's Degree",
+                            "fr": "Licence / Bachelor",
+                            "fi": "Kandidaatti (Bachelor)"
+                        }
+                    },
+                    {
+                        "value": "Master",
+                        "label": {
+                            "en": "Master's Degree",
+                            "fr": "Master / Maîtrise",
+                            "fi": "Maisteri (Master)"
+                        }
+                    },
+                    {
+                        "value": "PhD",
+                        "label": {
+                            "en": "PhD / Doctorate",
+                            "fr": "Doctorat",
+                            "fi": "Tohtori"
+                        }
+                    },
+                    {
+                        "value": "Other",
+                        "label": {
+                            "en": "Other",
+                            "fr": "Autre",
+                            "fi": "Muu"
+                        }
                     }
+                ],
+                "label": {
+                    "en": "Education Level",
+                    "fr": "Niveau d'études",
+                    "fi": "Koulutustaso"
                 },
-                {
-                    "value": "Bachelor",
-                    "label": {
-                        "en": "Bachelor's Degree",
-                        "fr": "Licence / Bachelor",
-                        "fi": "Kandidaatti (Bachelor)"
-                    }
-                },
-                {
-                    "value": "Master",
-                    "label": {
-                        "en": "Master's Degree",
-                        "fr": "Master / Maîtrise",
-                        "fi": "Maisteri (Master)"
-                    }
-                },
-                {
-                    "value": "PhD",
-                    "label": {
-                        "en": "PhD / Doctorate",
-                        "fr": "Doctorat",
-                        "fi": "Tohtori"
-                    }
-                },
-                {
-                    "value": "Other",
-                    "label": {
-                        "en": "Other",
-                        "fr": "Autre",
-                        "fi": "Muu"
-                    }
-                }
-            ],
-            "label": {
-                "en": "Education Level",
-                "fr": "Niveau d'études",
-                "fi": "Koulutustaso"
-            },
-            "required": true
+                "required": true
+            }
         }
     },
     "postsort_config": {
@@ -145,6 +148,8 @@
             "title": "Discover Open-Q",
             "subtitle": "Experience Q-Methodology Simple and Easy",
             "objective": "Welcome!\n\nThe goal of this study is to capture the nuance of your opinion, going beyond simple \"yes\" or \"no\" answers.\n\nBy ranking statements relative to one another, you allow us to map your unique perspective in detail. This approach is designed to respect the complexity of your point of view, rather than forcing it into rigid boxes.",
+            "condition_of_instruction": "What is your stance on this statement?",
+            "pre_instruction": "### Spontaneous Sorting\n\nIn this first phase, you will be presented with statements one by one. You should trust your **first instinct**.\n\n*   **Right** for statements you Agree with\n*   **Left** for statements you Disagree with\n*   **Down** for statements you are Neutral about",
             "instructions": null,
             "ui_labels": {
                 "start_button": "Start Study"
@@ -154,6 +159,8 @@
             "title": "Découverte d'Open-Q",
             "subtitle": "La méthodologie Q en toute simplicité",
             "objective": "Bienvenue !\n\nL'objectif de cette étude est de saisir toute la nuance de votre opinion, au-delà des simples réponses \"oui\" ou \"non\".\n\nEn classant les énoncés les uns par rapport aux autres, vous nous permettez de cartographier votre perspective unique. Cette approche est conçue pour respecter la complexité de votre point de vue, plutôt que de le forcer dans des cases rigides.",
+            "condition_of_instruction": "Quel est votre avis sur cet énoncé ?",
+            "pre_instruction": "### Classement Spontané\n\nDans cette première phase, les énoncés vous seront présentés un par un. Fiez-vous à votre **premier instinct**.\n\n*   **Droite** pour les énoncés avec lesquels vous êtes d'Accord\n*   **Gauche** pour ceux avec lesquels vous n'êtes Pas d'accord\n*   **Bas** pour ceux vis-à-vis desquels vous êtes Neutre",
             "instructions": null,
             "ui_labels": {
                 "start_button": "Commencer l'étude"
@@ -163,6 +170,8 @@
             "title": "Tutustu Open-Q-alustaan",
             "subtitle": "Q-metodologia helposti ja sujuvasti",
             "objective": "Tervetuloa!\n\nTämän tutkimuksen tavoitteena on tavoittaa mielipiteesi vivahteet, ylittäen pelkät \"kyllä\" tai \"ei\" -vastaukset.\n\nJärjestämällä väittämät suhteessa toisiinsa autat meitä kartoittamaan ainutlaatuisen näkökulmasi. Tämä menetelmä on suunniteltu kunnioittamaan näkemyksesi monimuotoisuutta sen sijaan, että se pakotettaisiin valmiisiin raameihin.",
+            "condition_of_instruction": "Mikä on näkemyksesi tästä väittämästä?",
+            "pre_instruction": "### Spontaani lajittelu\n\nTässä ensimmäisessä vaiheessa sinulle näytetään väittämiä yksi kerrallaan. Luota **ensivaistoosi**.\n\n*   **Oikealle** väittämät, joista olet Samaa mieltä\n*   **Vasemmalle** väittämät, joista olet Eri mieltä\n*   **Alas** väittämät, joihin suhtaudut Neutraalisti",
             "instructions": null,
             "ui_labels": {
                 "start_button": "Aloita tutkimus"

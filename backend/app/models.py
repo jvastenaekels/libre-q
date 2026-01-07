@@ -183,6 +183,12 @@ class Study(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    start_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    end_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # JSON Configs
     grid_config: Mapped[Any] = mapped_column(
@@ -233,6 +239,8 @@ class StudyTranslation(Base):
     subtitle: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String)
     objective: Mapped[str | None] = mapped_column(String, nullable=True)
+    condition_of_instruction: Mapped[str | None] = mapped_column(String, nullable=True)
+    pre_instruction: Mapped[str | None] = mapped_column(String, nullable=True)
     instructions: Mapped[str | None] = mapped_column(String, nullable=True)  # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(
         JSON, default=dict
@@ -332,6 +340,13 @@ class Participant(Base):
     qsort_entries: Mapped[list["QSortEntry"]] = relationship(
         back_populates="participant", cascade="all, delete-orphan"
     )
+
+    @property
+    def recruitment_token(self) -> str | None:
+        """Extract recruitment token from presort answers if present."""
+        if self.presort_answers and isinstance(self.presort_answers, dict):
+            return self.presort_answers.get("_recruitment_token")
+        return None
 
 
 class QSortEntry(Base):

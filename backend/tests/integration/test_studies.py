@@ -184,6 +184,13 @@ class TestStudyAdmin:
         auth_token_factory,
         db: AsyncSession,
     ):
+        # 1. Promote user to Superuser
+        test_user.is_superuser = True
+
+        # 2. Archive the study
+        seed_study.state = StudyState.archived
+        await db.commit()
+
         headers = auth_token_factory(test_user)
         slug = seed_study.slug
         response = await client.delete(f"/api/admin/studies/{slug}", headers=headers)

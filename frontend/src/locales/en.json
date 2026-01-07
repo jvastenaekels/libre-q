@@ -51,6 +51,12 @@
                 "message": "This study is not available for participation yet. Please check back later.",
                 "action": "Back to Home"
             },
+            "steps": {
+                "draft": { "label": "Draft", "description": "Configuration & design" },
+                "active": { "label": "Active", "description": "Collecting responses" },
+                "paused": { "label": "Paused", "description": "On hold" },
+                "closed": { "label": "Closed", "description": "Analysis & export" }
+            },
             "paused": {
                 "title": "Maintenance in Progress",
                 "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
@@ -65,6 +71,11 @@
     },
     "layout": {
         "title": "Open-Q",
+        "preparing": "Preparing your study session...",
+        "pilot_mode": "Pilot Mode: Changes are temporary & data will not be saved",
+        "default_study_title": "Q-Method Study",
+        "loading_content": "Loading study content...",
+        "change_lang_title": "Change language",
         "steps": {
             "welcome": "Welcome",
             "presort": "Profile",
@@ -121,7 +132,6 @@
     },
     "rough": {
         "header": {
-            "title": "What is your stance on this statement?",
             "subtitle": "Swipe **left** to Disagree, **right** to Agree, or **down** to be Neutral.",
             "hint": "Trust your **instinct**. This is spontaneous — you can change your mind right after."
         },
@@ -134,9 +144,7 @@
         }
     },
     "fine": {
-        "header": {
-            "title": "Sort the statements on the grid by prioritizing what matters most to you"
-        },
+        "header": {},
         "deck": {
             "title": "Available Statements",
             "all_placed": "All statements in this pile are sorted"
@@ -211,6 +219,487 @@
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
             "id_label": "Confirmation code"
+        }
+    },
+    "admin": {
+        "components": {
+            "markdown": {
+                "label": "Markdown",
+                "tooltip": "Supports Markdown for rich formatting",
+                "bold": "Bold",
+                "italic": "Italic",
+                "list": "List",
+                "link": "Link",
+                "edit": "Edit",
+                "preview": "Preview",
+                "empty": "Nothing to preview"
+            },
+            "click_to_edit": "Click to edit"
+        },
+        "layout": {
+            "title": "Admin",
+            "back_home": "Back to Home",
+            "beta": "Research beta",
+            "logout": "Log out",
+            "profile": "Profile"
+        },
+        "sidebar": {
+            "dashboard": "Dashboard",
+            "design": "Design",
+            "recruit": "Recruit",
+            "data": "Data",
+            "team": "Team",
+            "settings": "Settings",
+            "documentation": "Documentation",
+            "support": "Support",
+            "study_management": "Study Management",
+            "search": "Search...",
+            "studies": "Studies",
+            "select_study_msg": "Please select or create a study to begin."
+        },
+        "recruitment": {
+            "title": "Recruitment",
+            "description": "Generate secure links for your participants and monitor real-time recruitment efficiency.",
+            "new_link": "New Access Link",
+            "create_title": "Create Access Links",
+            "create_description": "Target specific cohorts or create general access. Each link type has different security and usage properties.",
+            "link_type": "Access Strategy",
+            "select_type": "Choose a recruitment type...",
+            "campaign_name": "Channel / Campaign Name",
+            "name_placeholder": "e.g. LinkedIn, Email Batch A, Student List...",
+            "link_count": "Batch Size",
+            "capacity_label": "Max Submissions",
+            "generate_links": "Provision Links",
+            "no_links": "No recruitment links generated yet.",
+            "unnamed": "Unnamed Channel",
+            "revoked": "Access Revoked",
+            "qr_title": "Share Access Code",
+            "qr_desc": "Participants can scan this code to leap directly into the study.",
+            "copy_link": "Copy Secure URL",
+            "table_title": "Access Control Panel",
+            "table_description": "Active channels and link lifecycle management.",
+            "types": {
+                "public": "Open Access (Public)",
+                "individual": "Single-Use Passcode",
+                "limited": "Capped Participation"
+            },
+            "guidance": {
+                "public": "Best for high-volume recruitment. A single URL for all participants.",
+                "individual": "Maximum security. Generates unique links that expire after one successful completion.",
+                "limited": "Controlled access. One link that stops working after a fixed number of submissions."
+            },
+            "stats": {
+                "total_links": "Total Channels",
+                "active_channels": "Active recruitment lots",
+                "started": "Total Sessions",
+                "engagements": "Participants who started",
+                "submitted": "Valid Data",
+                "completions": "Finished submissions",
+                "conversion": "Capture Rate",
+                "efficiency": "Final data yield"
+            },
+            "table": {
+                "name": "Campaign / Lot",
+                "type": "Entry Type",
+                "token": "Security Token",
+                "usage": "Capacity",
+                "status": "State",
+                "actions": "Manage"
+            },
+            "status": {
+                "public": "Public",
+                "individual": "Individual",
+                "limited": "Limited"
+            }
+        },
+        "breadcrumbs": {
+            "admin": "Admin",
+            "dashboard": "Dashboard",
+            "study_dashboard": "Dashboard",
+            "design": "Design",
+            "participants": "Participants",
+            "team": "Team",
+            "recruitment": "Recruit",
+            "exports": "Data",
+            "settings": "Settings"
+        },
+        "command_menu": {
+            "title": "Global Command Menu",
+            "placeholder": "Type a command or search...",
+            "no_results": "No results found.",
+            "switch_workspace": "Switch Workspace",
+            "switch_study": "Switch Study",
+            "study_actions": "Study Actions",
+            "system": "System",
+            "no_studies": "No studies in this workspace.",
+            "open_dashboard": "Open dashboard",
+            "design_study": "Study design",
+            "collaborators": "Collaborators",
+            "copy_link": "Copy public link",
+            "toggle_theme": "Toggle theme",
+            "logout": "Log out",
+            "search_label": "Search or run commands",
+            "to_open": "to open",
+            "active": "Active"
+        },
+        "dashboard": {
+            "title": "Workspace Dashboard",
+            "welcome": "Welcome back,",
+            "snapshot": "Here's a snapshot of your research activity.",
+            "create_study": "Create Study",
+            "total_studies": "Total Studies",
+            "across_statuses": "Across all statuses",
+            "active_data_collection": "Active Data Collection",
+            "receiving_responses": "Studies receiving responses",
+            "recent_studies": "Recent Studies",
+            "recent_description": "A list of your most recently updated studies.",
+            "created": "Created",
+            "no_studies": "No studies found. Create your first study to get started!"
+        },
+        "dialogs": {
+            "create_study": {
+                "title": "Create New Study",
+                "description": "Start a new Q-Methodology study. You can configure statements and settings later.",
+                "study_title": "Study Title",
+                "study_title_placeholder": "e.g. Perspectives on AI",
+                "url_slug": "URL Slug",
+                "url_slug_placeholder": "e.g. ai-perspectives-2025",
+                "cancel": "Cancel",
+                "create": "Create Study",
+                "success": "Study created successfully",
+                "error": "Failed to create study"
+            }
+        },
+        "validation": {
+            "required": "Required",
+            "slug_min": "Slug must be at least 3 characters",
+            "slug_regex": "Slug must contain only lowercase letters, numbers, and hyphens"
+        },
+        "study_overview": {
+            "title": "Overview",
+            "subtitle": "Real-time analytics and participant overview for this study.",
+            "description": "Real-time analytics and participant overview for this study.",
+            "stats": {
+                "sample_size": "Sample Size (N)",
+                "valid": "valid",
+                "completion_rate": "Completion Rate",
+                "active": "active",
+                "mobile": "mobile",
+                "median_duration": "Median Duration",
+                "time_to_complete": "Time to complete"
+            },
+            "design_mode": "Design Mode",
+            "design_mode_desc": "Update your statements and grid configuration.",
+            "edit_design": "Edit Design",
+            "recent_activity": "Recent Activity",
+            "recent_activity_desc": "Latest submissions (5 most recent)",
+            "no_participants": "No participants yet.",
+            "recently_completed": "Recently Completed",
+            "in_progress": "In Progress",
+            "submitted": "Submitted",
+            "view_data": "View",
+            "started": "Started",
+            "discarded": "Discarded",
+            "steps": {
+                "welcome": "Welcome",
+                "consent": "Consent",
+                "rough_sort": "Rough Sort",
+                "fine_sort": "Fine Sort",
+                "final": "Final Steps"
+            }
+        },
+        "study_status": {
+            "dialog": {
+                "draft": {
+                    "title": "Revert to Draft?",
+                    "desc": "This will stop data collection but allow you to modify the study design. Existing data is preserved.",
+                    "action": "Revert to Draft"
+                },
+                "active": {
+                    "title": "Launch Study?",
+                    "desc": "Activating the study will open it to participants.",
+                    "action": "Set to Active"
+                },
+                "paused": {
+                    "title": "Pause Study?",
+                    "desc": "Participants will not be able to enter the study while it is paused. You can resume later.",
+                    "action": "Pause Study"
+                },
+                "closed": {
+                    "title": "Close Study?",
+                    "desc": "This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.",
+                    "action": "Close Study"
+                }
+            }
+        },
+        "design": {
+            "toolbar": {
+                "title": "Study design",
+                "preview": "Show preview",
+                "hide_preview": "Hide preview",
+                "popout": "Pop out preview",
+                "discard": "Discard unsaved changes",
+                "test_run": "Test run",
+                "save": "Save",
+                "saving": "Saving...",
+                "closed": "Closed"
+            },
+            "tabs": {
+                "welcome": "Welcome",
+                "presort": "Pre-sort",
+                "condition": "Condition",
+                "qsort": "Q-sort",
+                "postsort": "Post-sort",
+                "interface": "Interface",
+                "theme": "Theme"
+            },
+            "view_mode": {
+                "mobile": "Mobile view",
+                "desktop": "Desktop view"
+            },
+            "intro": {
+                "welcome_title": "Welcome message",
+                "process_title": "Custom process explanation",
+                "consent_title": "Custom consent form",
+                "consent_details": "Consent form details",
+                "fields": {
+                    "title": "Study title",
+                    "title_placeholder": "Enter public title...",
+                    "subtitle": "Subtitle (optional)",
+                    "subtitle_placeholder": "A brief catchphrase...",
+                    "objective": "Study objective",
+                    "objective_placeholder": "What is the research question or purpose of this study?",
+                    "task_overview": "Task overview",
+                    "task_placeholder": "Briefly explain the study process to participants (optional)...",
+                    "consent_title_label": "Consent title",
+                    "legal_text": "Legal text / agreement",
+                    "legal_placeholder": "Enter the full legal agreement text..."
+                },
+                "consent_desc": "Participants must agree to these terms before starting."
+            },
+            "condition": {
+                "title": "Condition of Instruction",
+                "label": "The Research Question",
+                "desc": "This is the core prompt that guides participants throughout the sorting process.",
+                "field_label": "Instruction Text",
+                "placeholder": "e.g., What is your stance on these statements?",
+                "enable_pre": "Enable Pre-instruction step",
+                "pre_desc": "Provide more context or detailed instructions before the sorting task starts.",
+                "pre_label": "Pre-instruction Content",
+                "tips": {
+                    "title": "Why is this important?",
+                    "desc": "In Q-methodology, the 'Condition of Instruction' determines the point of view from which the participant sorts the items. It should be clear, singular, and consistent across all sorting phases."
+                }
+            },
+            "questions": {
+                "enable_presort": "Enable Pre-sort Survey",
+                "enable_presort_desc": "Collect demographic information or other data before the sorting task.",
+                "add_field": "Add a new field",
+                "basic_fields": "Basic fields",
+                "choice_fields": "Choice fields",
+                "labels": {
+                    "question": "Question label",
+                    "required": "Required field",
+                    "options": "Options",
+                    "multiple": "(multiple selection allowed)",
+                    "single": "(single selection)",
+                    "placeholder": "Enter your question here..."
+                },
+                "types": {
+                    "text": "Text",
+                    "long_text": "Long text",
+                    "number": "Number",
+                    "date": "Date",
+                    "email": "Email",
+                    "dropdown": "Dropdown",
+                    "radio": "Radio",
+                    "checkboxes": "Checkboxes"
+                },
+                "empty": {
+                    "title": "No questions yet",
+                    "desc": "Click above to add your first question"
+                },
+                "defaults": {
+                    "new_question": "New question",
+                    "option": "Option",
+                    "enter_answer": "Enter your answer...",
+                    "untitled": "Untitled question"
+                },
+                "actions": {
+                    "add_option": "Add option"
+                }
+            },
+            "qsort": {
+                "tabs": {
+                    "statements": "Statements",
+                    "distribution": "Distribution"
+                },
+                "bulk": {
+                    "title": "Bulk editor (quick paste)",
+                    "desc": "One statement per line. Supports \"Code: Text\" format.",
+                    "replace_all": "Replace all",
+                    "append": "Append to list",
+                    "placeholder": "Paste your statements here...\n1. First statement\n2. Second statement",
+                    "detected": "{{count}} statements detected",
+                    "process_replace": "Process & replace statements",
+                    "process_append": "Process & append statements"
+                },
+                "set": {
+                    "title": "Statement set",
+                    "clear": "Clear all",
+                    "confirm_clear": "Are you sure you want to delete ALL statements? This cannot be undone.",
+                    "updated": "Statement updated",
+                    "cleared": "All statements cleared",
+                    "imported": "Successfully imported {{count}} statements"
+                },
+                "settings": {
+                    "title": "Research settings",
+                    "desc": "Configure how statements are presented to participants",
+                    "show_codes": "Show statement codes",
+                    "show_codes_desc": "Display statement codes (e.g., \"S1\", \"S2\") alongside the text."
+                },
+                "grid": {
+                    "title": "Forced distribution grid",
+                    "desc": "The grid shape forces participants to discriminate between statements, approximating a normal distribution.",
+                    "perfect": "Perfect match!",
+                    "too_many": "too many statements",
+                    "empty_slots": "empty slots",
+                    "stat_count": "{{count}} statements",
+                    "slot_count": "{{count}} grid slots",
+                    "tooltip_title": "Why forced distribution?",
+                    "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
+                    "locked": "Grid structure is locked",
+                    "locked_desc": "The grid and statements cannot be modified while the study is active/closed. This protects data integrity.",
+                    "mismatch_title": "Grid configuration mismatch",
+                    "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match."
+                }
+            },
+            "postsort": {
+                "extreme": {
+                    "title": "Extreme columns",
+                    "desc": "Select columns that trigger follow-up questions.",
+                    "no_columns": "No columns selected.",
+                    "add_label": "Add column:",
+                    "prompt_label": "Prompt for extreme cards",
+                    "prompt_placeholder": "Why did you place this statement here?",
+                    "add": "Add",
+                    "select_placeholder": "Select..."
+                },
+                "random_comments": {
+                    "title": "Allow random comments",
+                    "desc": "Allow participants to add comments to any statement in the grid."
+                },
+                "custom": {
+                    "title": "Custom questions",
+                    "desc": "Add custom questions to the post-sort survey."
+                },
+                "missing": {
+                    "title": "Ask about missing statements",
+                    "desc": "Ask if there were missing topics.",
+                    "prompt_label": "Missing statements prompt",
+                    "prompt_placeholder": "Were there any statements you wish had been included?"
+                },
+                "general": {
+                    "title": "Ask for general feedback",
+                    "desc": "General comments at the end.",
+                    "prompt_label": "General feedback prompt",
+                    "prompt_placeholder": "Do you have any additional comments or feedback?"
+                }
+            },
+            "interface": {
+                "title": "Interface customization",
+                "desc": "Customize the buttons and labels of the interface to match your study's tone (e.g., changing \"Agree/Disagree\" to \"Like/Dislike\").",
+                "nav": {
+                    "title": "Navigation Buttons",
+                    "start": "Start Button",
+                    "next": "Next Step Button",
+                    "submit": "Submit Button",
+                    "confirm": "Confirm Sort Button",
+                    "tooltips": {
+                        "start": "Button that starts the study",
+                        "next": "Move to the next step",
+                        "submit": "Submit results at the end",
+                        "confirm": "Generic validation button"
+                    }
+                },
+                "terms": {
+                    "title": "Sorting terminology",
+                    "desc": "Define the labels for the spontaneous sort and the grid spectrum.",
+                    "rough": "Rough Sort Labels",
+                    "agree": "Agree",
+                    "neutral": "Neutral",
+                    "disagree": "Disagree",
+                    "grid": "Grid Legends (extremes)",
+                    "most_agree": "Most Agree",
+                    "most_disagree": "Most Disagree"
+                }
+            },
+            "theme": {
+                "title": "Visual branding",
+                "accent": {
+                    "title": "Accent color",
+                    "desc": "This color will be used for buttons, links, and highlights throughout the study.",
+                    "pick": "Pick a color",
+                    "reset": "Reset to default"
+                },
+                "logo": {
+                    "title": "Study logo",
+                    "desc": "Upload a custom logo to replace the default Open-Q branding.",
+                    "label": "Logo URL",
+                    "hint": "Recommended size: 200x50px. Supports PNG, SVG, JPG.",
+                    "preview": "Logo preview"
+                },
+                "tip": {
+                    "title": "Branding tip",
+                    "desc": "Ensuring high accessibility is key. When picking an accent color, make sure it has enough contrast against white backgrounds for readability."
+                }
+            }
+        },
+        "data": {
+            "table": {
+                "id_token": "ID / Token",
+                "lang": "Lang",
+                "flags": "Flags",
+                "duration": "Duration",
+                "actions": "Actions"
+            },
+            "tooltips": {
+                "suspect": "Suspect (Fast completion)",
+                "has_comments": "Has Qualitative Comments"
+            },
+            "search": {
+                "placeholder": "Search IDs...",
+                "records_found": "records found",
+                "no_results": "No results found"
+            },
+            "errors": {
+                "load_failed": "Failed to load dataset. Please try refreshing the page."
+            },
+            "detail": {
+                "title": "Participant Profile",
+                "session": "Session",
+                "discarded_badge": "Discarded",
+                "description": "Comprehensive Q-Sort results and metadata.",
+                "stats": {
+                    "duration": "Total Duration",
+                    "language": "Language Used"
+                },
+                "actions": {
+                    "discard": "Discard Participant",
+                    "restore": "Restore Participant"
+                },
+                "sort_config": "Sort Configuration",
+                "survey": {
+                    "title": "Survey Responses",
+                    "csv_note": "Full survey answers available in CSV export."
+                }
+            }
+        },
+        "status": {
+            "active": "Active",
+            "paused": "Paused",
+            "closed": "Closed",
+            "draft": "Draft"
         }
     }
 }

@@ -74,7 +74,7 @@ class TestStudyRBAC:
     @pytest.mark.parametrize(
         "role,expected_get,expected_patch,expected_delete",
         [
-            (StudyRole.owner, 200, 200, 204),
+            (StudyRole.owner, 200, 200, 403),  # Delete is now Superuser only
             (StudyRole.editor, 200, 200, 403),
             (StudyRole.viewer, 200, 403, 403),
         ],

@@ -1,12 +1,14 @@
 import {
     BadgeCheck,
+    BarChart3,
     ChevronsUpDown,
-    Database,
+    Globe,
     LayoutDashboard,
     LogOut,
     PencilRuler,
-    Send,
-    SquareTerminal,
+    Search,
+    Settings,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
@@ -35,11 +37,62 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+
+function NavLanguage() {
+    const { i18n, t } = useTranslation();
+    const currentLang = i18n.language;
+
+    const languages = [
+        { code: 'en', label: 'EN', flag: '🇬🇧' },
+        { code: 'fr', label: 'FR', flag: '🇫🇷' },
+        { code: 'fi', label: 'FI', flag: '🇫🇮' },
+    ];
+
+    return (
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton size="sm" className="text-muted-foreground">
+                            <Globe className="size-4" />
+                            <span>
+                                {languages.find((l) => l.code === currentLang)?.label || 'Language'}
+                            </span>
+                            <ChevronsUpDown className="ml-auto size-3" />
+                        </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40 rounded-lg">
+                        <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                            {t('layout.change_lang_title')}
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {languages.map((lang) => (
+                            <DropdownMenuItem
+                                key={lang.code}
+                                onSelect={() => i18n.changeLanguage(lang.code)}
+                                className={cn(
+                                    'flex items-center gap-2 cursor-pointer',
+                                    currentLang === lang.code && 'bg-accent text-accent-foreground'
+                                )}
+                            >
+                                <span className="text-sm">{lang.flag}</span>
+                                <span className="text-sm">{lang.label}</span>
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    );
+}
 
 // biome-ignore lint/suspicious/noExplicitAny: mock user
 function NavUser({ user }: { user: any }) {
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         logout();
@@ -94,13 +147,13 @@ function NavUser({ user }: { user: any }) {
                         <DropdownMenuGroup>
                             <DropdownMenuItem onSelect={() => navigate('/admin/profile')}>
                                 <BadgeCheck className="mr-2 h-4 w-4" />
-                                Profile
+                                {t('admin.layout.profile', 'Profile')}
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={handleLogout}>
                             <LogOut className="mr-2 h-4 w-4" />
-                            Log out
+                            {t('admin.layout.logout')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -113,40 +166,44 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { activeStudyId } = useAdminStore();
     const { user } = useAuth();
     const location = useLocation();
+    const { t } = useTranslation();
 
     const navMain = activeStudyId
         ? [
               {
                   title: 'Navigation',
                   url: '#',
-                  icon: SquareTerminal,
-                  isActive: true,
+                  isActive: true, // We don't use the icon/active state of the group itself anymore
                   items: [
                       {
-                          title: 'Study dashboard',
+                          title: t('admin.sidebar.dashboard'),
                           url: `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
                       },
                       {
-                          title: 'Collaborators',
-                          url: `/admin/studies/${activeStudyId}/team`,
-                          icon: Users,
-                      },
-                      {
-                          title: 'Study design',
+                          title: t('admin.sidebar.design'),
                           url: `/admin/studies/${activeStudyId}/design`,
                           icon: PencilRuler,
                       },
                       {
-                          title: 'Recruitment',
+                          title: t('admin.sidebar.recruit'),
                           url: `/admin/studies/${activeStudyId}/recruitment`,
-                          icon: Send, // Placeholder
-                          badge: 'Coming Soon',
+                          icon: UserPlus,
                       },
                       {
-                          title: 'Data & analytics',
+                          title: t('admin.sidebar.data'),
                           url: `/admin/studies/${activeStudyId}/exports`,
-                          icon: Database,
+                          icon: BarChart3,
+                      },
+                      {
+                          title: t('admin.sidebar.team'),
+                          url: `/admin/studies/${activeStudyId}/team`,
+                          icon: Users,
+                      },
+                      {
+                          title: t('admin.sidebar.settings'),
+                          url: `/admin/studies/${activeStudyId}/settings`,
+                          icon: Settings,
                       },
                   ],
               },
@@ -162,7 +219,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 {activeStudyId ? (
                     <SidebarGroup>
-                        <SidebarGroupLabel>Study Management</SidebarGroupLabel>
+                        <SidebarMenu>
+                            <SidebarMenuItem className="px-2 mb-4">
+                                <SidebarMenuButton
+                                    size="sm"
+                                    className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                    onClick={() => {
+                                        window.dispatchEvent(new CustomEvent('open-command-menu'));
+                                    }}
+                                >
+                                    <Search className="size-3.5 mr-2" />
+                                    <span className="text-xs">{t('admin.sidebar.search')}</span>
+                                    <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                        <span className="text-xs">⌘</span>K
+                                    </kbd>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+
+                        <SidebarGroupLabel className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-2">
+                            {t('admin.sidebar.study_management')}
+                        </SidebarGroupLabel>
                         <SidebarMenu>
                             {navMain[0].items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
@@ -186,11 +263,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </SidebarGroup>
                 ) : (
                     <div className="p-4 text-sm text-muted-foreground text-center">
-                        Please select or create a study to begin.
+                        {t(
+                            'admin.sidebar.select_study_msg',
+                            'Please select or create a study to begin.'
+                        )}
                     </div>
                 )}
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="gap-2">
+                <NavLanguage />
                 <NavUser user={user} />
             </SidebarFooter>
         </Sidebar>

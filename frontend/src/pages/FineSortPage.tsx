@@ -375,6 +375,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         neutralCards={unplacedNeutral}
                         gridColumns={gridColumns}
                         renderSlotContent={renderSlotContent}
+                        conditionOfInstruction={config.condition_of_instruction}
                         disableHoverZoom={activeId !== null}
                         selectedCardId={selectedCardId}
                         onCardClick={handleCardClick}

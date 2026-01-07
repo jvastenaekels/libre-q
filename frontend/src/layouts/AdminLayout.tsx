@@ -13,10 +13,12 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { useAdminStore } from '@/store/useAdminStore';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminLayout() {
     const location = useLocation();
     const { activeStudyId, setActiveStudy } = useAdminStore();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const match = location.pathname.match(/\/admin\/studies\/([^/]+)/);
@@ -44,7 +46,12 @@ export default function AdminLayout() {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+                                    <BreadcrumbLink
+                                        href="/admin"
+                                        className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-indigo-600 transition-colors"
+                                    >
+                                        {t('admin.layout.title')}
+                                    </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 {activeStudyId && (
@@ -52,7 +59,7 @@ export default function AdminLayout() {
                                         <BreadcrumbItem className="hidden md:block">
                                             <BreadcrumbLink
                                                 href={`/admin/studies/${activeStudyId}`}
-                                                className="font-medium"
+                                                className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors"
                                             >
                                                 {activeStudyId.replace(/-/g, ' ')}
                                             </BreadcrumbLink>
@@ -60,8 +67,21 @@ export default function AdminLayout() {
                                         <BreadcrumbSeparator className="hidden md:block" />
                                     </>
                                 )}
+                                {location.pathname.includes('/workspaces/') && (
+                                    <>
+                                        <BreadcrumbItem className="hidden md:block">
+                                            <BreadcrumbLink
+                                                href="#"
+                                                className="text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors pointer-events-none"
+                                            >
+                                                {location.pathname.split('/')[3].replace(/-/g, ' ')}
+                                            </BreadcrumbLink>
+                                        </BreadcrumbItem>
+                                        <BreadcrumbSeparator className="hidden md:block" />
+                                    </>
+                                )}
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage className="font-semibold text-primary">
+                                    <BreadcrumbPage className="text-sm font-black tracking-tight text-slate-900 bg-slate-100/50 px-2 py-0.5 rounded-md border border-slate-200/50 shadow-sm transition-all duration-300">
                                         {(() => {
                                             const segments = location.pathname
                                                 .split('/')
@@ -69,13 +89,16 @@ export default function AdminLayout() {
                                             const last = segments[segments.length - 1];
                                             // Map common segments to prettier names
                                             const mapping: Record<string, string> = {
-                                                design: 'Study design',
-                                                team: 'Collaborators',
-                                                recruitment: 'Recruitment',
-                                                exports: 'Data & analytics',
+                                                design: t('admin.breadcrumbs.design'),
+                                                team: t('admin.breadcrumbs.team'),
+                                                recruitment: t('admin.breadcrumbs.recruitment'),
+                                                exports: t('admin.breadcrumbs.exports'),
+                                                settings: t('admin.breadcrumbs.settings'),
                                             };
-                                            if (last === 'admin') return 'Dashboard';
-                                            if (last === activeStudyId) return 'Study dashboard';
+                                            if (last === 'admin')
+                                                return t('admin.breadcrumbs.dashboard');
+                                            if (last === activeStudyId)
+                                                return t('admin.breadcrumbs.study_dashboard');
                                             return (
                                                 mapping[last] ||
                                                 last.charAt(0).toUpperCase() + last.slice(1)
@@ -93,7 +116,7 @@ export default function AdminLayout() {
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                             </span>
                             <span className="text-[10px] font-bold uppercase tracking-wider">
-                                Research Beta
+                                {t('admin.layout.beta')}
                             </span>
                         </div>
                     </div>

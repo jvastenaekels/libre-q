@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
+import { useTranslation } from 'react-i18next';
 
 import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
 
@@ -29,6 +30,7 @@ type Statement = StatementRead;
 type Translation = StatementTranslationRead;
 
 const QSortEditor = () => {
+    const { t } = useTranslation();
     const { draft, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
     const [bulkText, setBulkText] = useState('');
@@ -101,18 +103,16 @@ const QSortEditor = () => {
             d.statements = [...currentStatements, ...newStatements];
         });
         setBulkText('');
-        toast.success(
-            `Successfully ${importMode === 'append' ? 'appended' : 'imported'} ${parsedItems.length} statements`
-        );
+        toast.success(t('admin.design.qsort.set.imported', { count: parsedItems.length }));
     };
 
     const handleClearAll = () => {
-        if (confirm('Are you sure you want to delete ALL statements? This cannot be undone.')) {
+        if (confirm(t('admin.design.qsort.set.confirm_clear'))) {
             // biome-ignore lint/suspicious/noExplicitAny: complex types
             updateDraft((d: any) => {
                 d.statements = [];
             });
-            toast.info('All statements cleared');
+            toast.info(t('admin.design.qsort.set.cleared'));
         }
     };
 
@@ -145,7 +145,7 @@ const QSortEditor = () => {
             }
         });
         setEditingIndex(null);
-        toast.success('Statement updated');
+        toast.success(t('admin.design.qsort.set.updated'));
     };
 
     return (
@@ -156,19 +156,21 @@ const QSortEditor = () => {
             >
                 <TabsList className="grid grid-cols-2 w-full max-w-[400px]">
                     <TabsTrigger value="statements" className="gap-2">
-                        <Quote className="h-4 w-4" /> Statements
+                        <Quote className="h-4 w-4" /> {t('admin.design.qsort.tabs.statements')}
                     </TabsTrigger>
                     <TabsTrigger value="grid" className="gap-2">
-                        <Grid3X3 className="h-4 w-4" /> Distribution
+                        <Grid3X3 className="h-4 w-4" /> {t('admin.design.qsort.tabs.distribution')}
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="statements" className="space-y-6 pt-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm">Bulk editor (quick paste)</CardTitle>
+                            <CardTitle className="text-sm">
+                                {t('admin.design.qsort.bulk.title')}
+                            </CardTitle>
                             <CardDescription className="text-xs">
-                                One statement per line. Supports "Code: Text" format.
+                                {t('admin.design.qsort.bulk.desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -180,15 +182,19 @@ const QSortEditor = () => {
                             >
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="replace" id="r1" />
-                                    <Label htmlFor="r1">Replace all</Label>
+                                    <Label htmlFor="r1">
+                                        {t('admin.design.qsort.bulk.replace_all')}
+                                    </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="append" id="r2" />
-                                    <Label htmlFor="r2">Append to list</Label>
+                                    <Label htmlFor="r2">
+                                        {t('admin.design.qsort.bulk.append')}
+                                    </Label>
                                 </div>
                             </RadioGroup>
                             <Textarea
-                                placeholder="Paste your statements here...&#10;1. First statement&#10;2. Second statement"
+                                placeholder={t('admin.design.qsort.bulk.placeholder')}
                                 className="min-h-[200px] font-serif text-base leading-relaxed"
                                 value={bulkText}
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -197,8 +203,10 @@ const QSortEditor = () => {
                             />
                             <div className="flex justify-between items-center">
                                 <p className="text-xs text-muted-foreground">
-                                    {bulkText.split('\n').filter((l) => l.trim() !== '').length}{' '}
-                                    statements detected
+                                    {t('admin.design.qsort.bulk.detected', {
+                                        count: bulkText.split('\n').filter((l) => l.trim() !== '')
+                                            .length,
+                                    })}
                                 </p>
                                 <Button
                                     size="sm"
@@ -206,8 +214,8 @@ const QSortEditor = () => {
                                     disabled={!bulkText.trim()}
                                 >
                                     {importMode === 'replace'
-                                        ? 'Process & replace statements'
-                                        : 'Process & append statements'}
+                                        ? t('admin.design.qsort.bulk.process_replace')
+                                        : t('admin.design.qsort.bulk.process_append')}
                                 </Button>
                             </div>
                         </CardContent>
@@ -216,7 +224,7 @@ const QSortEditor = () => {
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold flex items-center gap-2">
                             <Quote className="h-4 w-4 text-muted-foreground" />
-                            Statement set ({statements.length})
+                            {t('admin.design.qsort.set.title')} ({statements.length})
                         </h3>
                         {statements.length > 0 && (
                             <Button
@@ -226,7 +234,7 @@ const QSortEditor = () => {
                                 className="text-destructive hover:bg-destructive/5 h-8 gap-2"
                             >
                                 <Trash2 className="h-4 w-4" />
-                                Clear all
+                                {t('admin.design.qsort.set.clear')}
                             </Button>
                         )}
                     </div>
@@ -294,7 +302,7 @@ const QSortEditor = () => {
                                                         e.preventDefault();
                                                     }
                                                 }}
-                                                title="Click to edit"
+                                                title={t('admin.components.click_to_edit')}
                                             >
                                                 {item.text}
                                             </div>
@@ -323,20 +331,21 @@ const QSortEditor = () => {
                     {/* Research Settings */}
                     <Card className="shadow-sm mt-8">
                         <CardHeader>
-                            <CardTitle className="text-base font-bold">Research settings</CardTitle>
+                            <CardTitle className="text-base font-bold">
+                                {t('admin.design.qsort.settings.title')}
+                            </CardTitle>
                             <CardDescription>
-                                Configure how statements are presented to participants
+                                {t('admin.design.qsort.settings.desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-center justify-between py-2 border-t">
                                 <div className="space-y-1">
                                     <Label htmlFor="show-codes" className="text-sm font-medium">
-                                        Show statement codes
+                                        {t('admin.design.qsort.settings.show_codes')}
                                     </Label>
                                     <p className="text-xs text-muted-foreground max-w-md">
-                                        Display statement codes (e.g., "S1", "S2") alongside the
-                                        text.
+                                        {t('admin.design.qsort.settings.show_codes_desc')}
                                     </p>
                                 </div>
                                 <Switch
@@ -359,11 +368,10 @@ const QSortEditor = () => {
                         <div className="flex items-center gap-4 p-4 bg-indigo-50/50 border border-indigo-100 rounded-lg">
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-indigo-900">
-                                    Forced distribution grid
+                                    {t('admin.design.qsort.grid.title')}
                                 </p>
                                 <p className="text-xs text-indigo-600 mt-1">
-                                    The grid shape forces participants to discriminate between
-                                    statements, approximating a normal distribution.
+                                    {t('admin.design.qsort.grid.desc')}
                                 </p>
                             </div>
                             <Tooltip>
@@ -378,12 +386,12 @@ const QSortEditor = () => {
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-xs" side="left">
                                     <p>
-                                        <strong>Why forced distribution?</strong>
+                                        <strong>
+                                            {t('admin.design.qsort.grid.tooltip_title')}
+                                        </strong>
                                     </p>
                                     <p className="mt-1">
-                                        Q-methodology uses a quasi-normal distribution (kurtosis
-                                        &gt; 0) to ensure participants make meaningful distinctions.
-                                        The pyramid shape prevents central tendency bias.
+                                        {t('admin.design.qsort.grid.tooltip_desc')}
                                     </p>
                                 </TooltipContent>
                             </Tooltip>
@@ -449,14 +457,16 @@ const QSortEditor = () => {
                             <div className="flex items-center gap-2">
                                 <Quote className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-semibold">
-                                    {totalStatements} statements
+                                    {t('admin.design.qsort.grid.stat_count', {
+                                        count: totalStatements,
+                                    })}
                                 </span>
                             </div>
                             <div className="w-px h-4 bg-border" />
                             <div className="flex items-center gap-2">
                                 <Grid3X3 className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-semibold">
-                                    {totalSlots} grid slots
+                                    {t('admin.design.qsort.grid.slot_count', { count: totalSlots })}
                                 </span>
                             </div>
                             <div className="w-px h-4 bg-border" />
@@ -473,8 +483,8 @@ const QSortEditor = () => {
                                     )}
                                 >
                                     {isValid
-                                        ? 'Perfect match!'
-                                        : `${Math.abs(totalStatements - totalSlots)} ${totalStatements > totalSlots ? 'too many statements' : 'empty slots'}`}
+                                        ? t('admin.design.qsort.grid.perfect')
+                                        : `${Math.abs(totalStatements - totalSlots)} ${totalStatements > totalSlots ? t('admin.design.qsort.grid.too_many') : t('admin.design.qsort.grid.empty_slots')}`}
                                 </span>
                             </div>
                         </div>

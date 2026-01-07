@@ -25,6 +25,7 @@ import ResetPage from './pages/ResetPage';
 import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
 import { Toaster } from 'sonner';
+import GeneralSettingsPage from '@/pages/admin/GeneralSettingsPage'; // Added import
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
@@ -39,13 +40,17 @@ const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
+const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
+const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 import { studyLayoutLoader } from './layouts/StudyLayout.loader';
 import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
 import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loader';
 import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
+import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
+import { workspaceSettingsPageLoader } from './pages/admin/WorkspaceSettingsPage.loader';
 
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
@@ -88,8 +93,17 @@ const router = createBrowserRouter([
                         loader: studyOverviewPageLoader,
                     },
                     {
+                        path: 'studies/:slug/participants/:participantId',
+                        element: <ParticipantDetailsPage />,
+                    },
+                    {
                         path: 'studies/:slug/design',
                         element: <StudyDesignPage />,
+                    },
+                    {
+                        path: 'studies/:slug/settings',
+                        element: <GeneralSettingsPage />,
+                        loader: generalSettingsPageLoader,
                     },
                     {
                         path: 'studies/:slug/team',
@@ -105,6 +119,11 @@ const router = createBrowserRouter([
                         path: 'studies/:slug/exports',
                         element: <DataExportsPage />,
                         loader: dataExportsPageLoader,
+                    },
+                    {
+                        path: 'workspaces/:slug/settings',
+                        element: <WorkspaceSettingsPage />,
+                        loader: workspaceSettingsPageLoader,
                     },
                     {
                         path: 'profile',

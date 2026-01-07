@@ -13,6 +13,7 @@ from app.schemas import SubmissionInput
 from app.services.study_service import StudyService
 from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password
+from app.models import StudyState
 
 router = APIRouter()
 
@@ -153,6 +154,23 @@ async def get_study(
     def get_t_attr(attr: str, default: Any = None) -> Any:
         return getattr(translation, attr, default) if translation else default
 
+    # Calculate effective state based on dates
+    from datetime import datetime, timezone
+
+    now = datetime.now(timezone.utc)
+    effective_state = study.state.value
+
+    # Only override if currently active (don't re-open a explicitly closed/archived study)
+    if study.state == StudyState.active:
+        if study.start_date and now < study.start_date:
+            # Not yet started
+            effective_state = "scheduled"  # Frontend might need to handle this, or map to 'paused'/'closed'
+            # For now, let's treat as 'paused' which usually implies "not taking submissions"
+            effective_state = StudyState.paused.value
+        elif study.end_date and now > study.end_date:
+            # Expired
+            effective_state = StudyState.closed.value
+
     return {
         "slug": study.slug,
         "title": title,
@@ -176,8 +194,10 @@ async def get_study(
         "show_statement_codes": study.show_statement_codes,
         "randomize_statements": study.randomize_statements,
         "ui_labels": get_t_attr("ui_labels", {}) or {},
-        "state": study.state.value,
+        "state": effective_state,
         "requires_password": False,
+        "start_date": study.start_date,
+        "end_date": study.end_date,
     }
 
 

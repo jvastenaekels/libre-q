@@ -13,10 +13,9 @@ import {
     Loader2,
     Smartphone,
     Monitor,
+    Lock,
     AlertTriangle,
     ExternalLink,
-    Palette,
-    Lock,
 } from 'lucide-react';
 import Frame from 'react-frame-component';
 import { Button } from '@/components/ui/button';
@@ -32,6 +31,8 @@ import QSortEditor from '@/components/admin/designer/QSortEditor';
 import PostSortConfigEditor from '@/components/admin/designer/PostSortConfigEditor';
 import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
+import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
+import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
 import WelcomePage from '@/pages/WelcomePage';
 import PreSortPage from '@/pages/PreSortPage';
 import RoughSortPage from '@/pages/RoughSortPage';
@@ -41,9 +42,11 @@ import { useConfigStore } from '@/store/useConfigStore';
 import { LayoutProvider } from '@/contexts/LayoutContext';
 import { toast } from 'sonner';
 import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 import { applyStudyOverrides } from '@/utils/i18nOverrides';
 
 const StudyDesignPage = () => {
+    const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const _navigate = useNavigate();
     const {
@@ -94,6 +97,7 @@ const StudyDesignPage = () => {
                 description: translation?.description,
                 objective: translation?.objective,
                 instructions: translation?.instructions,
+                condition_of_instruction: translation?.condition_of_instruction,
                 consent_title: translation?.consent_title,
                 consent_description: translation?.consent_description,
                 // biome-ignore lint/suspicious/noExplicitAny: simulation context
@@ -179,9 +183,9 @@ const StudyDesignPage = () => {
                 // biome-ignore lint/suspicious/noExplicitAny: schema cast
                 data: draft as any,
             });
-            toast.success('Study design saved successfully');
+            toast.success(t('admin.design.qsort.updated') || 'Study design saved successfully');
         } catch (error) {
-            toast.error('Failed to save study design');
+            toast.error(t('common.errors.unknown') || 'Failed to save study design');
             console.error(error);
         }
     };
@@ -229,14 +233,14 @@ const StudyDesignPage = () => {
 
         // 3. Open in new tab with mode=test
         window.open(`/study/${slug}?mode=test`, '_blank');
-        toast.info('Opening study in pilot mode...');
+        toast.info(t('admin.design.toolbar.test_run') + '...');
     };
 
     if (isLoading) {
         return <DesignerSkeleton />;
     }
 
-    if (!draft) return <div>Study not found</div>;
+    if (!draft) return <div>{t('common.errors.study_not_found.title')}</div>;
 
     const renderPreview = () => {
         // Collect styles for the iframe
@@ -346,37 +350,27 @@ const StudyDesignPage = () => {
     const getPreviewTitle = () => {
         switch (activeStep) {
             case 'intro':
-                return 'Welcome Page';
+                return t('admin.design.tabs.welcome');
             case 'pre-sort':
-                return 'Questionnaire';
+                return t('admin.design.tabs.presort');
+            case 'condition':
+                return t('admin.design.tabs.condition');
             case 'q-sort':
-                return activeSubStep === 'grid' ? 'Fine Sort (Grid)' : 'Rough Sort';
+                return activeSubStep === 'grid' ? t('admin.design.qsort.grid.title') : 'Rough Sort'; // TODO: Add key for Rough Sort specifically if different from Q-sort task
             case 'post-sort':
-                return 'Post-sort Survey';
+                return t('admin.design.tabs.postsort');
             case 'branding':
-                return 'Theme Preview';
+                return t('admin.design.tabs.theme');
             case 'interface':
-                if (activeSubStep?.includes('welcome')) return 'Context: Welcome Page';
-                if (
-                    activeSubStep?.includes('agree') ||
-                    activeSubStep?.includes('disagree') ||
-                    activeSubStep?.includes('neutral')
-                ) {
-                    if (activeSubStep.includes('fine.legend')) return 'Context: Fine Sort';
-                    return 'Context: Rough Sort';
-                }
-                if (activeSubStep?.includes('submit')) return 'Context: Fine Sort (End)';
-                if (activeSubStep?.includes('continue')) return 'Context: Post-sort';
-                if (activeSubStep?.includes('next')) return 'Context: Questionnaire';
-                return 'Interface Preview';
+                return t('admin.design.tabs.interface');
             default:
-                return 'Preview';
+                return t('admin.design.toolbar.preview');
         }
     };
 
     return (
         <div
-            className="flex flex-col h-[calc(100vh-theme(spacing.16))] opacity-0 animate-in fade-in duration-500"
+            className="flex flex-col h-[calc(100vh-theme(spacing.16))] animate-in fade-in duration-500 overflow-x-hidden"
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
@@ -385,7 +379,7 @@ const StudyDesignPage = () => {
                     <div className="flex items-center gap-2 px-2 sm:px-3 py-1 bg-primary/5 rounded-md border border-primary/10 shrink-0">
                         <Wand2 className="h-4 w-4 text-primary" />
                         <span className="text-xs sm:text-sm font-semibold hidden sm:inline">
-                            Study design
+                            {t('admin.design.toolbar.title')}
                         </span>
                     </div>
                     <div className="h-4 w-px bg-border hidden sm:block" />
@@ -403,7 +397,14 @@ const StudyDesignPage = () => {
                                   : 'bg-amber-100 text-amber-700 border-amber-200'
                         )}
                     >
-                        {draft.state}
+                        {/* Translate status */}
+                        {draft.state === 'active'
+                            ? t('admin.status.active')
+                            : draft.state === 'closed'
+                              ? t('admin.status.closed')
+                              : draft.state === 'paused'
+                                ? t('admin.status.paused')
+                                : t('admin.status.draft')}
                     </div>
                 </div>
 
@@ -442,7 +443,9 @@ const StudyDesignPage = () => {
                             <Eye className="h-4 w-4 sm:mr-2" />
                         )}
                         <span className="hidden xl:inline">
-                            {isPreviewVisible ? 'Hide preview' : 'Show preview'}
+                            {isPreviewVisible
+                                ? t('admin.design.toolbar.hide_preview')
+                                : t('admin.design.toolbar.preview')}
                         </span>
                     </Button>
 
@@ -450,7 +453,7 @@ const StudyDesignPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={resetDraft}
-                        title="Discard unsaved changes"
+                        title={t('admin.design.toolbar.discard')}
                         disabled={draft.state !== 'draft'}
                         className="h-8"
                     >
@@ -464,7 +467,9 @@ const StudyDesignPage = () => {
                         className="gap-1 sm:gap-2 h-8"
                     >
                         <Eye className="h-4 w-4" />
-                        <span className="hidden sm:inline">Test run</span>
+                        <span className="hidden sm:inline">
+                            {t('admin.design.toolbar.test_run')}
+                        </span>
                     </Button>
 
                     <Button
@@ -484,7 +489,11 @@ const StudyDesignPage = () => {
                             <Save className="h-4 w-4 sm:mr-2" />
                         )}
                         <span className="hidden sm:inline">
-                            {isFullyReadOnly ? 'Closed' : isDirty ? 'Save*' : 'Save'}
+                            {isFullyReadOnly
+                                ? t('admin.design.toolbar.closed')
+                                : isDirty
+                                  ? t('admin.design.toolbar.save') + '*'
+                                  : t('admin.design.toolbar.save')}
                         </span>
                     </Button>
                 </div>
@@ -499,18 +508,16 @@ const StudyDesignPage = () => {
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Lock className="h-6 w-6 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-semibold">Study is closed</h3>
+                            <h3 className="text-lg font-semibold">{t('admin.status.closed')}</h3>
                             <p className="text-sm text-muted-foreground mt-2 mb-6">
-                                This study is permanently closed and cannot be edited. All data
-                                remains accessible for analysis, but no changes to configuration are
-                                allowed.
+                                {t('admin.design.qsort.grid.locked_desc')}
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <Button
                                     variant="outline"
                                     onClick={() => _navigate(`/admin/studies/${draft.slug}`)}
                                 >
-                                    Go to study dashboard
+                                    {t('admin.design.toolbar.closed')}
                                 </Button>
                             </div>
                         </div>
@@ -529,19 +536,25 @@ const StudyDesignPage = () => {
                                 value="intro"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                👋 Welcome
+                                👋 {t('admin.design.tabs.welcome')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pre-sort"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                📋 Questionnaire
+                                📋 {t('admin.design.tabs.presort')}
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="condition"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
+                                🎯 {t('admin.design.tabs.condition')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="q-sort"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                🃏 Q-sort task
+                                🃏 {t('admin.design.tabs.qsort')}
                                 {isStructureLocked && (
                                     <Lock className="h-3 w-3 ml-1 text-muted-foreground" />
                                 )}
@@ -550,29 +563,53 @@ const StudyDesignPage = () => {
                                 value="post-sort"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                📝 Post-sort
+                                📝 {t('admin.design.tabs.postsort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="interface"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                🎨 Interface
+                                ✨ {t('admin.design.tabs.interface')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="branding"
                                 className="gap-2 min-w-fit px-4 flex-none snap-start"
                             >
-                                <Palette className="h-4 w-4" /> Theme
+                                🎨 {t('admin.design.tabs.theme')}
                             </TabsTrigger>
                         </TabsList>
 
                         <div className="max-w-3xl mx-auto pb-20">
-                            <TabsContent value="intro" className="mt-0 outline-none">
+                            <TabsContent value="intro" className="mt-0 outline-none space-y-6">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.design.guidance.intro_title',
+                                        'Welcome to the Studio'
+                                    )}
+                                    description={t(
+                                        'admin.design.guidance.intro_desc',
+                                        'Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.'
+                                    )}
+                                />
                                 <IntroductionEditor />
                             </TabsContent>
 
                             <TabsContent value="pre-sort" className="mt-0 outline-none">
                                 <QuestionBuilder type="pre" />
+                            </TabsContent>
+
+                            <TabsContent value="condition" className="mt-0 outline-none space-y-6">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.design.guidance.condition_title',
+                                        'The Condition of Instruction'
+                                    )}
+                                    description={t(
+                                        'admin.design.guidance.condition_desc',
+                                        'This is the most critical part of your Q-study. It defines the specific point of view or scenario from which participants should sort the statements.'
+                                    )}
+                                />
+                                <ConditionOfInstructionEditor />
                             </TabsContent>
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
@@ -581,14 +618,10 @@ const StudyDesignPage = () => {
                                         <Lock className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
                                         <div className="flex-1">
                                             <h4 className="text-sm font-semibold text-blue-900">
-                                                Grid structure is locked
+                                                {t('admin.design.qsort.grid.locked')}
                                             </h4>
                                             <p className="text-sm text-blue-700 mt-1">
-                                                The grid and statements cannot be modified while the
-                                                study is <strong>{draft.state}</strong>. This
-                                                protects data integrity for existing submissions.
-                                                You can still edit translations, branding, and other
-                                                study details.
+                                                {t('admin.design.qsort.grid.locked_desc')}
                                             </p>
                                         </div>
                                     </div>
@@ -598,17 +631,27 @@ const StudyDesignPage = () => {
                                         <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                                         <div className="flex-1">
                                             <h4 className="text-sm font-semibold text-amber-900">
-                                                Grid configuration mismatch
+                                                {t('admin.design.qsort.grid.mismatch_title')}
                                             </h4>
                                             <p className="text-sm text-amber-700 mt-1">
-                                                You have <strong>{statementsCount}</strong>{' '}
-                                                statements but the grid only has slots for{' '}
-                                                <strong>{gridCapacity}</strong> items. Please adjust
-                                                the columns below to match.
+                                                {t('admin.design.qsort.grid.mismatch_desc', {
+                                                    statements: statementsCount,
+                                                    slots: gridCapacity,
+                                                })}
                                             </p>
                                         </div>
                                     </div>
                                 )}
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.design.guidance.qsort_title',
+                                        'Statement & Grid Balance'
+                                    )}
+                                    description={t(
+                                        'admin.design.guidance.qsort_desc',
+                                        'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
+                                    )}
+                                />
                                 <QSortEditor />
                             </TabsContent>
 
@@ -642,7 +685,7 @@ const StudyDesignPage = () => {
                                     variant={viewMode === 'mobile' ? 'default' : 'ghost'}
                                     className="h-6 w-6"
                                     onClick={() => setViewMode('mobile')}
-                                    title="Mobile view"
+                                    title={t('admin.design.view_mode.mobile')}
                                 >
                                     <Smartphone className="h-3 w-3" />
                                 </Button>
@@ -651,7 +694,7 @@ const StudyDesignPage = () => {
                                     variant={viewMode === 'desktop' ? 'default' : 'ghost'}
                                     className="h-6 w-6"
                                     onClick={() => setViewMode('desktop')}
-                                    title="Desktop view"
+                                    title={t('admin.design.view_mode.desktop')}
                                 >
                                     <Monitor className="h-3 w-3" />
                                 </Button>
@@ -667,7 +710,7 @@ const StudyDesignPage = () => {
                                             'width=1200,height=800'
                                         )
                                     }
-                                    title="Pop out preview"
+                                    title={t('admin.design.toolbar.popout')}
                                 >
                                     <ExternalLink className="h-3 w-3" />
                                 </Button>

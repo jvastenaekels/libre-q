@@ -109,3 +109,12 @@ unlock_study
 requires_2fa
 temp_token
 qr_code_uri
+recruitment_token
+condition_of_instruction
+pre_instruction
+get_workspace
+update_workspace
+list_workspace_members
+update_workspace_member
+remove_workspace_member
+WorkspaceInvitationCreate

@@ -41,6 +41,7 @@ import {
     AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { useTranslation } from 'react-i18next';
 
 type QuestionType =
     | 'text'
@@ -74,6 +75,7 @@ interface QuestionItemProps {
 }
 
 const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: QuestionItemProps) => {
+    const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id,
     });
@@ -144,7 +146,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     <span className="text-sm font-medium truncate">
                                         {label || (
                                             <span className="text-muted-foreground italic">
-                                                Untitled question
+                                                {t('admin.design.questions.defaults.untitled')}
                                             </span>
                                         )}
                                     </span>
@@ -169,13 +171,15 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
 
                             <AccordionContent className="pt-2 pb-4 px-1 space-y-4">
                                 <div className="grid gap-2">
-                                    <Label className="text-xs">Question label</Label>
+                                    <Label className="text-xs">
+                                        {t('admin.design.questions.labels.question')}
+                                    </Label>
                                     <Input
                                         value={label}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                             handleLabelChange(e.target.value)
                                         }
-                                        placeholder="Enter your question here..."
+                                        placeholder={t('admin.design.questions.labels.placeholder')}
                                     />
                                 </div>
 
@@ -192,7 +196,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                             htmlFor={`req-${id}`}
                                             className="text-xs cursor-pointer"
                                         >
-                                            Required field
+                                            {t('admin.design.questions.labels.required')}
                                         </Label>
                                     </div>
 
@@ -206,10 +210,11 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     question.type === 'checkbox') && (
                                     <div className="space-y-3 pt-2 border-t border-dashed">
                                         <Label className="text-xs">
-                                            Options
+                                            {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
-                                                ' (multiple selection allowed)'}
-                                            {question.type === 'radio' && ' (single selection)'}
+                                                ` ${t('admin.design.questions.labels.multiple')}`}
+                                            {question.type === 'radio' &&
+                                                ` ${t('admin.design.questions.labels.single')}`}
                                         </Label>
                                         <div className="space-y-2">
                                             {(question.options || []).map((opt, idx) => (
@@ -278,12 +283,13 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                 onClick={() => {
                                                     const newOpts = [
                                                         ...(question.options || []),
-                                                        'New Option',
+                                                        t('admin.design.questions.defaults.option'),
                                                     ];
                                                     onUpdate({ ...question, options: newOpts });
                                                 }}
                                             >
-                                                <PlusCircle className="h-3 w-3 mr-2" /> Add option
+                                                <PlusCircle className="h-3 w-3 mr-2" />{' '}
+                                                {t('admin.design.questions.actions.add_option')}
                                             </Button>
                                         </div>
                                     </div>
@@ -302,6 +308,7 @@ interface QuestionBuilderProps {
 }
 
 const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
+    const { t } = useTranslation();
     const { draft, updateDraft, activeLocale } = useStudyDesigner();
 
     const sensors = useSensors(
@@ -313,17 +320,52 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
     if (!draft) return null;
 
-    // For pre-sort, the config IS the question map. For post-sort, it's under .questions
+    // For pre-sort, the config IS the question map (legacy) or has .fields (new)
     const getQuestionsMap = () => {
-        if (type === 'pre') return (draft.presort_config as Record<string, QuestionConfig>) || {};
+        if (type === 'pre') {
+            const config = draft.presort_config || {};
+            if ('fields' in config) return (config.fields as Record<string, QuestionConfig>) || {};
+            // Legacy check: if it has 'enabled' key but no fields? unlikely given schema.
+            // If it's a record of fields (legacy):
+            if (!('enabled' in config)) return config as Record<string, QuestionConfig>;
+            return {};
+        }
         // biome-ignore lint/suspicious/noExplicitAny: postsort structure
         return ((draft.postsort_config as any)?.questions as Record<string, QuestionConfig>) || {};
     };
+
+    const isPresortEnabled =
+        type === 'pre' &&
+        (draft.presort_config && 'enabled' in draft.presort_config
+            ? draft.presort_config.enabled
+            : true);
 
     const questions = Object.entries(getQuestionsMap()).map(([key, value]) => ({
         id: key,
         ...value,
     }));
+
+    const handlePresortToggle = (checked: boolean) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+        updateDraft((d: any) => {
+            const currentConfig = d.presort_config || {};
+
+            // If currently legacy (no enabled flag), migrate to new structure
+            let newConfig: any;
+            if (!('enabled' in currentConfig)) {
+                newConfig = {
+                    enabled: checked,
+                    fields: currentConfig,
+                };
+            } else {
+                newConfig = {
+                    ...currentConfig,
+                    enabled: checked,
+                };
+            }
+            d.presort_config = newConfig;
+        });
+    };
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -342,7 +384,14 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
             updateDraft((d) => {
                 if (type === 'pre') {
-                    d.presort_config = newQuestionsMap;
+                    // Maintain enabled state if present
+                    const currentConfig = d.presort_config || {};
+                    if ('enabled' in currentConfig) {
+                        d.presort_config.fields = newQuestionsMap;
+                    } else {
+                        // Legacy
+                        d.presort_config = newQuestionsMap;
+                    }
                 } else {
                     // biome-ignore lint/suspicious/noExplicitAny: postsort structure
                     const ps = d.postsort_config as any;
@@ -358,15 +407,18 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
         const id = `q_${Date.now()}`;
         const newQuestion: QuestionConfig = {
             type: qType,
-            label: { [activeLocale]: 'New question' },
+            label: { [activeLocale]: t('admin.design.questions.defaults.new_question') },
             required: false,
             options:
                 qType === 'select' || qType === 'checkbox' || qType === 'radio'
-                    ? ['Option 1', 'Option 2']
+                    ? [
+                          `${t('admin.design.questions.defaults.option')} 1`,
+                          `${t('admin.design.questions.defaults.option')} 2`,
+                      ]
                     : undefined,
             placeholder:
                 qType === 'text' || qType === 'email' || qType === 'textarea'
-                    ? { [activeLocale]: 'Enter your answer...' }
+                    ? { [activeLocale]: t('admin.design.questions.defaults.enter_answer') }
                     : undefined,
             rows: qType === 'textarea' ? 4 : undefined,
         };
@@ -375,7 +427,20 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
         updateDraft((d: any) => {
             if (type === 'pre') {
                 if (!d.presort_config) d.presort_config = {};
-                d.presort_config[id] = newQuestion;
+
+                // Ensure structure
+                if (!('enabled' in d.presort_config)) {
+                    // Migrate to new structure if adding to legacy
+                    d.presort_config = {
+                        enabled: true,
+                        fields: { ...d.presort_config, [id]: newQuestion },
+                    };
+                } else {
+                    if (!d.presort_config.fields) d.presort_config.fields = {};
+                    d.presort_config.fields[id] = newQuestion;
+                    // Auto-enable if adding? Maybe not force it but usually yes.
+                    d.presort_config.enabled = true;
+                }
             } else {
                 if (!d.postsort_config) d.postsort_config = {};
                 if (!d.postsort_config.questions) d.postsort_config.questions = {};
@@ -386,89 +451,116 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-muted/20 p-4 rounded-lg border border-dashed space-y-3">
-                <span className="text-sm font-medium text-muted-foreground">Add a new field</span>
-
-                <div className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Basic fields
+            {type === 'pre' && (
+                <div className="bg-card p-4 rounded-lg border shadow-sm flex items-center justify-between">
+                    <div className="space-y-0.5">
+                        <Label className="text-base font-medium">
+                            {t('admin.design.questions.enable_presort')}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                            {t('admin.design.questions.enable_presort_desc')}
+                        </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('text')}
-                            className="bg-background"
-                        >
-                            <Type className="h-3.5 w-3.5 mr-1.5" /> Text
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('textarea')}
-                            className="bg-background"
-                        >
-                            <AlignLeft className="h-3.5 w-3.5 mr-1.5" /> Long text
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('number')}
-                            className="bg-background"
-                        >
-                            <Hash className="h-3.5 w-3.5 mr-1.5" /> Number
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('date')}
-                            className="bg-background"
-                        >
-                            <Calendar className="h-3.5 w-3.5 mr-1.5" /> Date
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('email')}
-                            className="bg-background"
-                        >
-                            <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
-                        </Button>
+                    <Switch checked={isPresortEnabled} onCheckedChange={handlePresortToggle} />
+                </div>
+            )}
+
+            {/* Only show builder if enabled (or if it's post-sort which we assume enabled or handled elsewhere? user request is about Pre-sort) */}
+            {(type !== 'pre' || isPresortEnabled) && (
+                <div className="bg-muted/20 p-4 rounded-lg border border-dashed space-y-3">
+                    <span className="text-sm font-medium text-muted-foreground">
+                        {t('admin.design.questions.add_field')}
+                    </span>
+
+                    <div className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            {t('admin.design.questions.basic_fields')}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('text')}
+                                className="bg-background"
+                            >
+                                <Type className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.text')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('textarea')}
+                                className="bg-background"
+                            >
+                                <AlignLeft className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.long_text')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('number')}
+                                className="bg-background"
+                            >
+                                <Hash className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.number')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('date')}
+                                className="bg-background"
+                            >
+                                <Calendar className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.date')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('email')}
+                                className="bg-background"
+                            >
+                                <Mail className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.email')}
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            {t('admin.design.questions.choice_fields')}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('select')}
+                                className="bg-background"
+                            >
+                                <ListCircle className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.dropdown')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('radio')}
+                                className="bg-background"
+                            >
+                                <Circle className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.radio')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addQuestion('checkbox')}
+                                className="bg-background"
+                            >
+                                <CheckSquare className="h-3.5 w-3.5 mr-1.5" />{' '}
+                                {t('admin.design.questions.types.checkboxes')}
+                            </Button>
+                        </div>
                     </div>
                 </div>
-
-                <div className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Choice fields
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('select')}
-                            className="bg-background"
-                        >
-                            <ListCircle className="h-3.5 w-3.5 mr-1.5" /> Dropdown
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('radio')}
-                            className="bg-background"
-                        >
-                            <Circle className="h-3.5 w-3.5 mr-1.5" /> Radio
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => addQuestion('checkbox')}
-                            className="bg-background"
-                        >
-                            <CheckSquare className="h-3.5 w-3.5 mr-1.5" /> Checkboxes
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            )}
 
             <DndContext
                 sensors={sensors}
@@ -482,9 +574,11 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                     {questions.length === 0 ? (
                         <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed rounded-xl opacity-60">
                             <Plus className="h-12 w-12 text-muted-foreground mb-4" />
-                            <p className="text-sm font-medium">No questions yet</p>
+                            <p className="text-sm font-medium">
+                                {t('admin.design.questions.empty.title')}
+                            </p>
                             <p className="text-xs text-muted-foreground mt-1">
-                                Click above to add your first question
+                                {t('admin.design.questions.empty.desc')}
                             </p>
                         </div>
                     ) : (

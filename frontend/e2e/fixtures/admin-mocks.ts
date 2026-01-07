@@ -35,7 +35,6 @@ export async function setupAdminMocks(page: Page) {
             console.log(`[404] ${resp.url()}`);
         }
     });
-    page.on('pageerror', (err) => console.error(`[Browser Error]: ${err.message}`));
 
 
     // Catch-all requests FIRST so specific routes override them (since Playwright checks in reverse order)

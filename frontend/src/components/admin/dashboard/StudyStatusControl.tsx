@@ -16,6 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from 'react-i18next';
 
 interface StudyStatusControlProps {
     slug: string;
@@ -28,6 +29,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     currentState,
     onStateChange,
 }) => {
+    const { t } = useTranslation();
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
     const queryClient = useQueryClient();
 
@@ -68,9 +70,9 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     const steps = [
         {
             id: 'draft',
-            label: 'Draft',
+            label: t('admin.study_status.steps.draft.label', 'Draft'),
             icon: Sparkles,
-            description: 'Configuration & design',
+            description: t('admin.study_status.steps.draft.description', 'Configuration & design'),
             color: 'text-amber-600',
             bg: 'bg-amber-100',
             border: 'border-amber-200',
@@ -78,9 +80,9 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
         },
         {
             id: 'active',
-            label: 'Active',
+            label: t('admin.study_status.steps.active.label', 'Active'),
             icon: Rocket,
-            description: 'Collecting responses',
+            description: t('admin.study_status.steps.active.description', 'Collecting responses'),
             color: 'text-emerald-600',
             bg: 'bg-emerald-100',
             border: 'border-emerald-200',
@@ -88,9 +90,9 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
         },
         {
             id: 'paused',
-            label: 'Paused',
+            label: t('admin.study_status.steps.paused.label', 'Paused'),
             icon: PowerOff,
-            description: 'On hold',
+            description: t('admin.study_status.steps.paused.description', 'On hold'),
             color: 'text-orange-600',
             bg: 'bg-orange-100',
             border: 'border-orange-200',
@@ -98,9 +100,9 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
         },
         {
             id: 'closed',
-            label: 'Closed',
+            label: t('admin.study_status.steps.closed.label', 'Closed'),
             icon: Lock,
-            description: 'Analysis & export',
+            description: t('admin.study_status.steps.closed.description', 'Analysis & export'),
             color: 'text-slate-600',
             bg: 'bg-slate-100',
             border: 'border-slate-200',
@@ -114,27 +116,39 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     ) => {
         const config = {
             draft: {
-                title: 'Revert to Draft?',
-                desc: 'This will stop data collection but allow you to modify the study design. Existing data is preserved.',
-                action: 'Revert to Draft',
-                variant: 'default',
+                title: t('admin.study_status.dialog.draft.title', 'Revert to Draft?'),
+                desc: t(
+                    'admin.study_status.dialog.draft.desc',
+                    'This will stop data collection but allow you to modify the study design. Existing data is preserved.'
+                ),
+                action: t('admin.study_status.dialog.draft.action', 'Revert to Draft'),
+                variant: 'default' as const,
             },
             active: {
-                title: 'Launch Study?',
-                desc: 'Activating the study will open it to participants.',
-                action: 'Set to Active',
-                variant: 'default',
+                title: t('admin.study_status.dialog.active.title', 'Launch Study?'),
+                desc: t(
+                    'admin.study_status.dialog.active.desc',
+                    'Activating the study will open it to participants.'
+                ),
+                action: t('admin.study_status.dialog.active.action', 'Set to Active'),
+                variant: 'default' as const,
             },
             paused: {
-                title: 'Pause Study?',
-                desc: 'Participants will not be able to enter the study while it is paused. You can resume later.',
-                action: 'Pause Study',
+                title: t('admin.study_status.dialog.paused.title', 'Pause Study?'),
+                desc: t(
+                    'admin.study_status.dialog.paused.desc',
+                    'Participants will not be able to enter the study while it is paused. You can resume later.'
+                ),
+                action: t('admin.study_status.dialog.paused.action', 'Pause Study'),
                 variant: 'destructive', // Warning color
             },
             closed: {
-                title: 'Close Study?',
-                desc: 'This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.',
-                action: 'Close Study',
+                title: t('admin.study_status.dialog.closed.title', 'Close Study?'),
+                desc: t(
+                    'admin.study_status.dialog.closed.desc',
+                    'This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.'
+                ),
+                action: t('admin.study_status.dialog.closed.action', 'Close Study'),
                 variant: 'destructive',
             },
         }[targetState];

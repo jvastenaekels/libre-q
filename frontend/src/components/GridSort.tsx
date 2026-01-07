@@ -84,6 +84,7 @@ interface GridSortProps {
     onValidate?: () => void;
     showCodes?: boolean;
     highlightKey?: string | null;
+    conditionOfInstruction?: string | null;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -107,6 +108,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         onValidate,
         showCodes,
         highlightKey,
+        conditionOfInstruction,
     }) => {
         const { t } = useTranslation();
 
@@ -337,7 +339,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             <ReactMarkdown
                                 components={{ p: ({ children }) => <span>{children}</span> }}
                             >
-                                {t('fine.header.title')}
+                                {conditionOfInstruction || t('fine.header.title')}
                             </ReactMarkdown>
                         </div>
                     </div>

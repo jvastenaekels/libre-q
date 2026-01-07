@@ -52,14 +52,14 @@ const IntroductionEditor = () => {
                     <span className="bg-primary/10 p-1 rounded">
                         <Info className="h-5 w-5" />
                     </span>
-                    Welcome message
+                    {t('admin.design.intro.welcome_title')}
                 </div>
 
                 <Card className="shadow-sm">
                     <CardContent className="pt-6 space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="title" className="text-sm font-semibold">
-                                Study title
+                                {t('admin.design.intro.fields.title')}
                             </Label>
                             <Input
                                 id="title"
@@ -67,7 +67,7 @@ const IntroductionEditor = () => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     handleChange('title', e.target.value)
                                 }
-                                placeholder="Enter public title..."
+                                placeholder={t('admin.design.intro.fields.title_placeholder')}
                                 className="font-semibold text-lg"
                             />
                         </div>
@@ -76,7 +76,7 @@ const IntroductionEditor = () => {
                                 htmlFor="subtitle"
                                 className="text-sm font-semibold text-slate-500"
                             >
-                                Subtitle (optional)
+                                {t('admin.design.intro.fields.subtitle')}
                             </Label>
                             <Input
                                 id="subtitle"
@@ -84,16 +84,16 @@ const IntroductionEditor = () => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     handleChange('subtitle', e.target.value)
                                 }
-                                placeholder="A brief catchphrase..."
+                                placeholder={t('admin.design.intro.fields.subtitle_placeholder')}
                             />
                         </div>
                         <div className="grid gap-2">
                             <MarkdownEditor
                                 id="objective"
-                                label="Study objective"
+                                label={t('admin.design.intro.fields.objective')}
                                 value={translation?.objective || ''}
                                 onChange={(val: string) => handleChange('objective', val)}
-                                placeholder="What is the research question or purpose of this study?"
+                                placeholder={t('admin.design.intro.fields.objective_placeholder')}
                             />
                         </div>
                     </CardContent>
@@ -106,7 +106,7 @@ const IntroductionEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5" />
                         </span>
-                        Custom process explanation
+                        {t('admin.design.intro.process_title')}
                     </div>
                     <Switch
                         id="enable-instructions"
@@ -131,10 +131,10 @@ const IntroductionEditor = () => {
                             <div className="grid gap-2">
                                 <MarkdownEditor
                                     id="instructions"
-                                    label="Task overview"
+                                    label={t('admin.design.intro.fields.task_overview')}
                                     value={translation?.instructions || ''}
                                     onChange={(val: string) => handleChange('instructions', val)}
-                                    placeholder="Briefly explain the study process to participants (optional)..."
+                                    placeholder={t('admin.design.intro.fields.task_placeholder')}
                                     className="min-h-[200px]"
                                 />
                             </div>
@@ -149,7 +149,7 @@ const IntroductionEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5" />
                         </span>
-                        Custom consent form
+                        {t('admin.design.intro.consent_title')}
                     </div>
                     <Switch
                         id="enable-consent"
@@ -177,14 +177,18 @@ const IntroductionEditor = () => {
                 {hasConsent && (
                     <Card className="shadow-sm border-primary/20 bg-primary/5">
                         <CardHeader>
-                            <CardTitle className="text-sm">Consent form details</CardTitle>
+                            <CardTitle className="text-sm">
+                                {t('admin.design.intro.consent_details')}
+                            </CardTitle>
                             <CardDescription>
-                                Participants must agree to these terms before starting.
+                                {t('admin.design.intro.consent_desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="consent-title">Consent title</Label>
+                                <Label htmlFor="consent-title">
+                                    {t('admin.design.intro.fields.consent_title_label')}
+                                </Label>
                                 <Input
                                     id="consent-title"
                                     value={translation?.consent_title || ''}
@@ -196,12 +200,12 @@ const IntroductionEditor = () => {
                             <div className="grid gap-2">
                                 <MarkdownEditor
                                     id="consent-description"
-                                    label="Legal text / agreement"
+                                    label={t('admin.design.intro.fields.legal_text')}
                                     value={translation?.consent_description || ''}
                                     onChange={(val: string) =>
                                         handleChange('consent_description', val)
                                     }
-                                    placeholder="Enter the full legal agreement text..."
+                                    placeholder={t('admin.design.intro.fields.legal_placeholder')}
                                 />
                             </div>
                         </CardContent>

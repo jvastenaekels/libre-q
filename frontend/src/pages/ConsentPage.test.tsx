@@ -145,4 +145,41 @@ describe('ConsentPage', () => {
         expect(screen.getByText('welcome.consent.label')).toBeInTheDocument();
         expect(screen.getByText('consent.default_text')).toBeInTheDocument(); // Key fallback from mock
     });
+
+    it('navigates to rough-sort if presort is disabled', async () => {
+        // Mock config with disabled presort
+        const configDisabledPresort = {
+            ...mockConfig,
+            presort_config: { enabled: false, fields: {} },
+        };
+
+        act(() => {
+            useConfigStore
+                .getState()
+                .setConfig(
+                    configDisabledPresort as unknown as import('../schemas/study').StudyConfig
+                );
+            useSessionStore.getState().resetSession();
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/rough-sort" element={<div>Rough Sort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
+        );
+
+        const checkbox = screen.getByRole('checkbox');
+        fireEvent.click(checkbox);
+
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(useSessionStore.getState().hasConsented).toBe(true);
+            expect(screen.getByText('Rough Sort Page')).toBeInTheDocument();
+        });
+    });
 });

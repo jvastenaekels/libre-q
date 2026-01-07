@@ -338,6 +338,24 @@ class StudyService:
 
                 # Increment link usage if link was used
                 if link:
+                    # Persist the token in presort_answers for admin tracking
+                    # We modify the local 'participant' object's presort_answers so it gets saved on flush?
+                    # Actually, we passed 'presort_answers' dict to constructor. We should update it before constructor or update object after.
+                    # Since presort_answers is a dict, we can modify it.
+                    # Re-fetching participant after flush might be safest, or just relying on reference.
+                    # Let's simple add it to the dict passed to constructor if we want it saved.
+                    pass
+
+                if link and data.link_token:
+                    # We need to make sure this gets saved. The Participant constructor took 'presort_answers'.
+                    # If we modify 'presort_answers' *before* constructor, it would be cleaner.
+                    # But we allow 'link' to be checked after some validations.
+                    # Let's update the object directly.
+                    participant.presort_answers = {
+                        **participant.presort_answers,
+                        "_recruitment_token": data.link_token,
+                    }
+                    # We also need to increment usage
                     await RecruitmentService.increment_usage(db, link.id)
             except IntegrityError:
                 # Race condition: Participant was created by another request in the meantime.
@@ -486,7 +504,6 @@ class StudyService:
             .where(
                 Participant.study_id == study_id,
                 Participant.status == ParticipantStatus.completed,
-                Participant.is_discarded.is_(False),
             )
             .options(selectinload(Participant.qsort_entries))
         )
@@ -529,6 +546,8 @@ class StudyService:
                     "presort": presort,
                     "postsort": postsort,
                     "language": p.language_used,
+                    "is_discarded": p.is_discarded,
+                    "discard_reason": p.discard_reason,
                 }
             )
 

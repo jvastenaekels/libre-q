@@ -58,8 +58,16 @@ export const StudyConfigSchema = z.object({
     subtitle: z.string().optional().nullable(),
     description: z.string(),
     objective: z.string().optional().nullable(),
+    condition_of_instruction: z.string().optional().nullable(),
+    pre_instruction: z.string().optional().nullable(),
     instructions: z.string(),
-    presort_config: z.record(PreSortFieldSchema),
+    presort_config: z.union([
+        z.record(PreSortFieldSchema),
+        z.object({
+            enabled: z.boolean(),
+            fields: z.record(PreSortFieldSchema),
+        }),
+    ]),
     grid_config: z.array(GridConfigSchema).optional(),
     postsort_config: z
         .object({

@@ -17,7 +17,10 @@ import {
 } from '@/components/ui/select';
 import QuestionBuilder from './QuestionBuilder';
 
+import { useTranslation } from 'react-i18next';
+
 const PostSortConfigEditor = () => {
+    const { t } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
 
@@ -134,17 +137,15 @@ const PostSortConfigEditor = () => {
                         <span className="bg-primary/10 p-1 rounded">
                             <Info className="h-5 w-5 text-primary" />
                         </span>
-                        Extreme columns
+                        {t('admin.design.postsort.extreme.title')}
                     </CardTitle>
-                    <CardDescription>
-                        Select columns that trigger follow-up questions.
-                    </CardDescription>
+                    <CardDescription>{t('admin.design.postsort.extreme.desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                         {extremeColumns.length === 0 ? (
                             <p className="text-sm text-muted-foreground italic">
-                                No columns selected.
+                                {t('admin.design.postsort.extreme.no_columns')}
                             </p>
                         ) : (
                             extremeColumns.map((score: number) => (
@@ -169,13 +170,19 @@ const PostSortConfigEditor = () => {
 
                     {unselectedScores.length > 0 && (
                         <div className="flex items-center gap-2 pt-2 border-t">
-                            <Label className="text-xs text-muted-foreground">Add column:</Label>
+                            <Label className="text-xs text-muted-foreground">
+                                {t('admin.design.postsort.extreme.add_label')}
+                            </Label>
                             <Select
                                 value={selectedScore?.toString() || ''}
                                 onValueChange={(val) => setSelectedScore(Number(val))}
                             >
                                 <SelectTrigger className="w-32 h-8">
-                                    <SelectValue placeholder="Select..." />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'admin.design.postsort.extreme.select_placeholder'
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {unselectedScores.map((score) => (
@@ -195,19 +202,22 @@ const PostSortConfigEditor = () => {
                                 disabled={selectedScore === null}
                                 className="h-8"
                             >
-                                <Plus className="h-3 w-3 mr-1" /> Add
+                                <Plus className="h-3 w-3 mr-1" />{' '}
+                                {t('admin.design.postsort.extreme.add')}
                             </Button>
                         </div>
                     )}
 
                     {extremeColumns.length > 0 && (
                         <div className="pt-4 border-t space-y-2">
-                            <Label htmlFor="extreme-prompt">Prompt for extreme cards</Label>
+                            <Label htmlFor="extreme-prompt">
+                                {t('admin.design.postsort.extreme.prompt_label')}
+                            </Label>
                             <Textarea
                                 id="extreme-prompt"
                                 value={getPromptText('extreme')}
                                 onChange={(e) => setPromptText('extreme', e.target.value)}
-                                placeholder="Why did you place this statement here?"
+                                placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
                                 className="min-h-[80px]"
                             />
                         </div>
@@ -219,9 +229,11 @@ const PostSortConfigEditor = () => {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base">Allow random comments</CardTitle>
+                            <CardTitle className="text-base">
+                                {t('admin.design.postsort.random_comments.title')}
+                            </CardTitle>
                             <CardDescription className="text-sm">
-                                Allow participants to add comments to any statement in the grid.
+                                {t('admin.design.postsort.random_comments.desc')}
                             </CardDescription>
                         </div>
                         <Switch
@@ -235,9 +247,11 @@ const PostSortConfigEditor = () => {
             <Card>
                 <CardHeader>
                     <div className="space-y-1">
-                        <CardTitle className="text-base">Custom questions</CardTitle>
+                        <CardTitle className="text-base">
+                            {t('admin.design.postsort.custom.title')}
+                        </CardTitle>
                         <CardDescription className="text-sm">
-                            Add custom questions to the post-sort survey.
+                            {t('admin.design.postsort.custom.desc')}
                         </CardDescription>
                     </div>
                 </CardHeader>
@@ -251,10 +265,10 @@ const PostSortConfigEditor = () => {
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
                             <CardTitle className="text-base">
-                                Ask about missing statements
+                                {t('admin.design.postsort.missing.title')}
                             </CardTitle>
                             <CardDescription className="text-sm">
-                                Ask if there were missing topics.
+                                {t('admin.design.postsort.missing.desc')}
                             </CardDescription>
                         </div>
                         <Switch checked={askMissing} onCheckedChange={toggleAskMissing} />
@@ -262,12 +276,14 @@ const PostSortConfigEditor = () => {
                 </CardHeader>
                 {askMissing && (
                     <CardContent className="space-y-2">
-                        <Label htmlFor="missing-prompt">Missing statements prompt</Label>
+                        <Label htmlFor="missing-prompt">
+                            {t('admin.design.postsort.missing.prompt_label')}
+                        </Label>
                         <Input
                             id="missing-prompt"
                             value={getPromptText('missing')}
                             onChange={(e) => setPromptText('missing', e.target.value)}
-                            placeholder="Were there any statements you wish had been included?"
+                            placeholder={t('admin.design.postsort.missing.prompt_placeholder')}
                         />
                     </CardContent>
                 )}
@@ -277,9 +293,11 @@ const PostSortConfigEditor = () => {
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base">Ask for general feedback</CardTitle>
+                            <CardTitle className="text-base">
+                                {t('admin.design.postsort.general.title')}
+                            </CardTitle>
                             <CardDescription className="text-sm">
-                                General comments at the end.
+                                {t('admin.design.postsort.general.desc')}
                             </CardDescription>
                         </div>
                         <Switch
@@ -290,12 +308,14 @@ const PostSortConfigEditor = () => {
                 </CardHeader>
                 {askGeneralComment && (
                     <CardContent className="space-y-2">
-                        <Label htmlFor="general-prompt">General feedback prompt</Label>
+                        <Label htmlFor="general-prompt">
+                            {t('admin.design.postsort.general.prompt_label')}
+                        </Label>
                         <Textarea
                             id="general-prompt"
                             value={getPromptText('general')}
                             onChange={(e) => setPromptText('general', e.target.value)}
-                            placeholder="Do you have any additional comments or feedback?"
+                            placeholder={t('admin.design.postsort.general.prompt_placeholder')}
                             className="min-h-[80px]"
                         />
                     </CardContent>

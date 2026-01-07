@@ -51,6 +51,12 @@
                 "message": "Cette étude n'est pas encore accessible pour recueillir des participations. Merci de revenir plus tard.",
                 "action": "Retour à l'accueil"
             },
+            "steps": {
+                "draft": { "label": "Brouillon", "description": "Configuration et design" },
+                "active": { "label": "Active", "description": "Collecte de réponses" },
+                "paused": { "label": "En pause", "description": "En attente" },
+                "closed": { "label": "Close", "description": "Analyse et export" }
+            },
             "paused": {
                 "title": "Maintenance en cours",
                 "message": "La collecte de données est temporairement suspendue pour maintenance. Nous serons de retour très prochainement.",
@@ -65,11 +71,16 @@
     },
     "layout": {
         "title": "Open-Q",
+        "preparing": "Préparation de votre session...",
+        "pilot_mode": "Mode Pilote : Les modifications sont temporaires et ne seront pas sauvegardées",
+        "default_study_title": "Étude Q-Method",
+        "loading_content": "Chargement du contenu de l'étude...",
+        "change_lang_title": "Changer de langue",
         "steps": {
             "welcome": "Bienvenue",
             "presort": "Profil",
-            "rough": "Classement spontané",
-            "fine": "Classement sur la grille",
+            "rough": "Tri spontané",
+            "fine": "Tri sur la grille",
             "review": "Réflexions"
         },
         "mobile_step": "Étape",
@@ -110,18 +121,17 @@
     "consent": {
         "title": "Consentement à la participation",
         "subtitle": "Veuillez lire attentivement les informations suivantes.",
-        "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et le déroulement de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à classer des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-classement pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de classement et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
+        "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et le déroulement de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à trier des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-tri pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de tri et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
     },
     "presort": {
         "title": "À propos de vous",
         "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
-        "submit": "Continuer vers le classement",
+        "submit": "Continuer vers le tri",
         "select_placeholder": "Sélectionner...",
         "error_required": "Merci de répondre à cette question."
     },
     "rough": {
         "header": {
-            "title": "Quelle est votre position face à cet énoncé ?",
             "subtitle": "Glissez à **gauche** pour « Pas d'accord », à **droite** pour « D'accord », ou en **bas** pour « Neutre / Indécis ».",
             "hint": "Fiez-vous à votre **instinct**. C'est du spontané — vous pourrez changer d'avis juste après."
         },
@@ -130,13 +140,11 @@
             "subtitle": "Nous allons maintenant affiner les nuances."
         },
         "instructions": {
-            "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour classer"
+            "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour trier"
         }
     },
     "fine": {
-        "header": {
-            "title": "Classez les énoncés sur la grille en priorisant ce qui compte le plus pour vous"
-        },
+        "header": {},
         "deck": {
             "title": "Énoncés disponibles",
             "all_placed": "Tous les énoncés de cette pile sont classés"
@@ -161,8 +169,8 @@
             "label": "Légende du spectre"
         },
         "actions": {
-            "validate": "Confirmer le classement",
-            "finish": "Terminer le classement",
+            "validate": "Confirmer le tri",
+            "finish": "Terminer le tri",
             "ready": "Voir la vue d'ensemble",
             "not_ready": "Veuillez placer tous les énoncés pour continuer"
         },
@@ -211,6 +219,487 @@
             "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
             "id_label": "Code de confirmation"
+        }
+    },
+    "admin": {
+        "components": {
+            "markdown": {
+                "label": "Markdown",
+                "tooltip": "Supporte le Markdown pour un formatage riche",
+                "bold": "Gras",
+                "italic": "Italique",
+                "list": "Liste",
+                "link": "Lien",
+                "edit": "Éditer",
+                "preview": "Aperçu",
+                "empty": "Rien à prévisualiser"
+            },
+            "click_to_edit": "Cliquer pour éditer"
+        },
+        "layout": {
+            "title": "Admin",
+            "back_home": "Retour à l'accueil",
+            "beta": "Recherche bêta",
+            "logout": "Déconnexion",
+            "profile": "Profil"
+        },
+        "sidebar": {
+            "dashboard": "Tableau de bord",
+            "design": "Design",
+            "recruit": "Recrutement",
+            "data": "Données",
+            "team": "Équipe",
+            "settings": "Réglages",
+            "documentation": "Documentation",
+            "support": "Support",
+            "study_management": "Gestion",
+            "search": "Chercher...",
+            "studies": "Études",
+            "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer."
+        },
+        "recruitment": {
+            "title": "Recrutement",
+            "description": "Gérez l'accès des participants, les canaux de recrutement et suivez les taux de conversion.",
+            "new_link": "Nouveau lien d'accès",
+            "create_title": "Créer des liens d'accès",
+            "create_description": "Ciblez des cohortes spécifiques ou créez un accès général. Chaque type de lien a des propriétés de sécurité différentes.",
+            "link_type": "Stratégie d'accès",
+            "select_type": "Choisir un type de recrutement...",
+            "campaign_name": "Nom du canal / de la campagne",
+            "name_placeholder": "ex: LinkedIn, Email Lot A, Liste étudiants...",
+            "link_count": "Taille du lot",
+            "capacity_label": "Capacité maximale",
+            "generate_links": "Générer les liens",
+            "no_links": "Aucun lien de recrutement généré pour le moment.",
+            "unnamed": "Canal sans nom",
+            "revoked": "Accès révoqué",
+            "qr_title": "Partager le code d'accès",
+            "qr_desc": "Les participants peuvent scanner ce code pour accéder instantanément à l'étude.",
+            "copy_link": "Copier l'URL sécurisée",
+            "table_title": "Contrôle des accès",
+            "table_description": "Gestion des canaux actifs et du cycle de vie des liens.",
+            "types": {
+                "public": "Accès ouvert (Public)",
+                "individual": "Usage unique",
+                "limited": "Capacité limitée"
+            },
+            "guidance": {
+                "public": "Idéal pour les réseaux sociaux. Un seul lien pour tous avec plusieurs participations possibles.",
+                "individual": "Sécurité maximale. Génère des liens uniques qui expirent après une participation validée.",
+                "limited": "Accès contrôlé. Un seul lien qui cesse de fonctionner après un nombre fixe de participations."
+            },
+            "stats": {
+                "total_links": "Canaux",
+                "active_channels": "Lots de recrutement actifs",
+                "started": "Sessions",
+                "engagements": "Participants ayant commencé",
+                "submitted": "Données",
+                "completions": "Soumissions terminées",
+                "conversion": "Taux de conversion",
+                "efficiency": "Efficacité"
+            },
+            "table": {
+                "name": "Campagne / Lot",
+                "type": "Type d'entrée",
+                "token": "Jeton",
+                "usage": "Capacité",
+                "status": "État",
+                "actions": "Gérer"
+            },
+            "status": {
+                "public": "Public",
+                "individual": "Individuel",
+                "limited": "Limité"
+            }
+        },
+        "breadcrumbs": {
+            "admin": "Admin",
+            "dashboard": "Tableau de bord",
+            "study_dashboard": "Vue d'ensemble",
+            "design": "Design",
+            "participants": "Participants",
+            "team": "Équipe",
+            "recruitment": "Recrutement",
+            "exports": "Données",
+            "settings": "Réglages"
+        },
+        "command_menu": {
+            "title": "Menu de commandes global",
+            "placeholder": "Tapez une commande ou cherchez...",
+            "no_results": "Aucun résultat trouvé.",
+            "switch_workspace": "Changer d'espace de travail",
+            "switch_study": "Changer d'étude",
+            "study_actions": "Actions de l'étude",
+            "system": "Système",
+            "no_studies": "Aucune étude dans cet espace.",
+            "open_dashboard": "Ouvrir le tableau de bord",
+            "design_study": "Conception de l'étude",
+            "collaborators": "Collaborateurs",
+            "copy_link": "Copier le lien public",
+            "toggle_theme": "Changer de thème",
+            "logout": "Déconnexion",
+            "search_label": "Chercher ou lancer des commandes",
+            "to_open": "pour ouvrir",
+            "active": "Actif"
+        },
+        "dashboard": {
+            "title": "Tableau de bord de l'espace",
+            "welcome": "Bon retour,",
+            "snapshot": "Voici un aperçu de votre activité de recherche.",
+            "create_study": "Créer une étude",
+            "total_studies": "Total des études",
+            "across_statuses": "Tous statuts confondus",
+            "active_data_collection": "Collecte de données active",
+            "receiving_responses": "Études recevant des réponses",
+            "recent_studies": "Études récentes",
+            "recent_description": "Une liste de vos études mises à jour récemment.",
+            "created": "Créée",
+            "no_studies": "Aucune étude trouvée. Créez votre première étude pour commencer !"
+        },
+        "dialogs": {
+            "create_study": {
+                "title": "Créer une nouvelle étude",
+                "description": "Démarrez une nouvelle étude de méthodologie Q. Vous pourrez configurer les énoncés et les paramètres plus tard.",
+                "study_title": "Titre de l'étude",
+                "study_title_placeholder": "ex. Perspectives sur l'IA",
+                "url_slug": "Slug URL",
+                "url_slug_placeholder": "ex. ia-perspectives-2025",
+                "cancel": "Annuler",
+                "create": "Créer l'étude",
+                "success": "Étude créée avec succès",
+                "error": "Échec de la création de l'étude"
+            }
+        },
+        "validation": {
+            "required": "Requis",
+            "slug_min": "Le slug doit contenir au moins 3 caractères",
+            "slug_regex": "Le slug ne doit contenir que des lettres minuscules, des chiffres et des traits d'union"
+        },
+        "study_overview": {
+            "title": "Tableau de bord",
+            "subtitle": "Analyses en temps réel et aperçu des participants pour cette étude.",
+            "description": "Analytique en temps réel et aperçu des participants pour cette étude.",
+            "stats": {
+                "sample_size": "Taille de l'échantillon (N)",
+                "valid": "validé(s)",
+                "completion_rate": "Taux de complétion",
+                "active": "actifs",
+                "mobile": "mobile",
+                "median_duration": "Durée médiane",
+                "time_to_complete": "Temps pour compléter"
+            },
+            "design_mode": "Mode Conception",
+            "design_mode_desc": "Mettez à jour vos énoncés et la configuration de la grille.",
+            "edit_design": "Modifier la conception",
+            "recent_activity": "Activité récente",
+            "recent_activity_desc": "Dernières soumissions (5 plus récentes)",
+            "no_participants": "Aucun participant pour le moment.",
+            "recently_completed": "Récemment complété",
+            "in_progress": "En cours",
+            "submitted": "Soumis il y a",
+            "view_data": "Voir",
+            "started": "Commencé il y a",
+            "discarded": "Rejeté",
+            "steps": {
+                "welcome": "Bienvenue",
+                "consent": "Consentement",
+                "rough_sort": "Tri initial",
+                "fine_sort": "Tri final",
+                "final": "Étapes finales"
+            }
+        },
+        "study_status": {
+            "dialog": {
+                "draft": {
+                    "title": "Revenir au brouillon ?",
+                    "desc": "Cela arrêtera la collecte de données mais vous permettra de modifier la conception de l'étude. Les données existantes sont conservées.",
+                    "action": "Revenir au brouillon"
+                },
+                "active": {
+                    "title": "Lancer l'étude ?",
+                    "desc": "L'activation de l'étude l'ouvrira aux participants.",
+                    "action": "Mettre en ligne"
+                },
+                "paused": {
+                    "title": "Mettre en pause ?",
+                    "desc": "Les participants ne pourront pas entrer dans l'étude tant qu'elle est en pause. Vous pourrez reprendre plus tard.",
+                    "action": "Mettre en pause"
+                },
+                "closed": {
+                    "title": "Fermer l'étude ?",
+                    "desc": "Cela empêchera les nouveaux participants d'entrer. Les sessions existantes peuvent encore se terminer. Vous pourrez rouvrir plus tard.",
+                    "action": "Fermer l'étude"
+                }
+            }
+        },
+        "design": {
+            "toolbar": {
+                "title": "Conception de l'étude",
+                "preview": "Afficher l'aperçu",
+                "hide_preview": "Masquer l'aperçu",
+                "popout": "Aperçu détaché",
+                "discard": "Ignorer les changements",
+                "test_run": "Test grandeur nature",
+                "save": "Enregistrer",
+                "saving": "Enregistrement...",
+                "closed": "Fermé"
+            },
+            "tabs": {
+                "welcome": "Bienvenue",
+                "presort": "Profil",
+                "condition": "Condition",
+                "qsort": "Classement Q",
+                "postsort": "Post-tri",
+                "interface": "Interface",
+                "theme": "Thème"
+            },
+            "view_mode": {
+                "mobile": "Vue mobile",
+                "desktop": "Vue bureau"
+            },
+            "intro": {
+                "welcome_title": "Message de bienvenue",
+                "process_title": "Explication personnalisée du processus",
+                "consent_title": "Formulaire de consentement personnalisé",
+                "consent_details": "Détails du consentement",
+                "fields": {
+                    "title": "Titre de l'étude",
+                    "title_placeholder": "Entrez le titre public...",
+                    "subtitle": "Sous-titre (optionnel)",
+                    "subtitle_placeholder": "Une brève accroche...",
+                    "objective": "Objectif de l'étude",
+                    "objective_placeholder": "Quelle est la question de recherche ou le but de cette étude ?",
+                    "task_overview": "Aperçu de la tâche",
+                    "task_placeholder": "Expliquez brièvement le processus aux participants (optionnel)...",
+                    "consent_title_label": "Titre du consentement",
+                    "legal_text": "Texte légal / accord",
+                    "legal_placeholder": "Entrez le texte complet de l'accord..."
+                },
+                "consent_desc": "Les participants doivent accepter ces conditions avant de commencer."
+            },
+            "condition": {
+                "title": "Condition d'instruction",
+                "label": "La question de recherche",
+                "desc": "C'est la consigne centrale qui guide les participants tout au long du processus de classement.",
+                "field_label": "Texte de la consigne",
+                "placeholder": "Ex: Quel est votre avis sur ces énoncés ?",
+                "enable_pre": "Activer l'étape de pré-instruction",
+                "pre_desc": "Fournir plus de contexte ou des instructions détaillées avant le début de la tâche de classement.",
+                "pre_label": "Contenu de la pré-instruction",
+                "tips": {
+                    "title": "Pourquoi est-ce important ?",
+                    "desc": "Dans la méthodologie Q, la 'Condition d'instruction' détermine le point de vue depuis lequel le participant classe les items. Elle doit être claire, unique et cohérente à travers toutes les phases de tri."
+                }
+            },
+            "questions": {
+                "enable_presort": "Activer le questionnaire pré-tri",
+                "enable_presort_desc": "Recueillir des informations démographiques ou autres avant la tâche de tri.",
+                "add_field": "Ajouter un champ",
+                "basic_fields": "Champs basiques",
+                "choice_fields": "Champs à choix",
+                "labels": {
+                    "question": "Libellé de la question",
+                    "required": "Champ obligatoire",
+                    "options": "Options",
+                    "multiple": "(choix multiples autorisés)",
+                    "single": "(choix unique)",
+                    "placeholder": "Entrez votre question ici..."
+                },
+                "types": {
+                    "text": "Texte",
+                    "long_text": "Texte long",
+                    "number": "Nombre",
+                    "date": "Date",
+                    "email": "Email",
+                    "dropdown": "Menu déroulant",
+                    "radio": "Radio",
+                    "checkboxes": "Cases à cocher"
+                },
+                "empty": {
+                    "title": "Aucune question pour le moment",
+                    "desc": "Cliquez ci-dessus pour ajouter votre première question"
+                },
+                "defaults": {
+                    "new_question": "Nouvelle question",
+                    "option": "Option",
+                    "enter_answer": "Entrez votre réponse...",
+                    "untitled": "Question sans titre"
+                },
+                "actions": {
+                    "add_option": "Ajouter une option"
+                }
+            },
+            "qsort": {
+                "tabs": {
+                    "statements": "Énoncés",
+                    "distribution": "Distribution"
+                },
+                "bulk": {
+                    "title": "Ajout en masse (copier-coller)",
+                    "desc": "Un énoncé par ligne. Supporte le format \"Code: Texte\".",
+                    "replace_all": "Tout remplacer",
+                    "append": "Ajouter à la liste",
+                    "placeholder": "Collez vos énoncés ici...\n1. Premier énoncé\n2. Second énoncé",
+                    "detected": "{{count}} énoncés détectés",
+                    "process_replace": "Traiter et remplacer",
+                    "process_append": "Traiter et ajouter"
+                },
+                "set": {
+                    "title": "Jeu d'énoncés",
+                    "clear": "Tout effacer",
+                    "confirm_clear": "Êtes-vous sûr de vouloir supprimer TOUS les énoncés ? Cette action est irréversible.",
+                    "updated": "Énoncé mis à jour",
+                    "cleared": "Tous les énoncés ont été effacés",
+                    "imported": "{{count}} énoncés importés avec succès"
+                },
+                "settings": {
+                    "title": "Paramètres de recherche",
+                    "desc": "Configurer la présentation des énoncés aux participants",
+                    "show_codes": "Afficher les codes des énoncés",
+                    "show_codes_desc": "Afficher les codes (ex. S1, S2) à côté du texte."
+                },
+                "grid": {
+                    "title": "Grille de distribution forcée",
+                    "desc": "La forme de la grille oblige les participants à discriminer entre les énoncés.",
+                    "perfect": "Parfait !",
+                    "too_many": "énoncés en trop",
+                    "empty_slots": "emplacements vides",
+                    "stat_count": "{{count}} énoncés",
+                    "slot_count": "{{count}} emplacements",
+                    "tooltip_title": "Pourquoi une distribution forcée ?",
+                    "tooltip_desc": "La méthode Q utilise une distribution quasi-normale pour assurer que les participants effectuent des distinctions significatives.",
+                    "locked": "La structure de la grille est verrouillée",
+                    "locked_desc": "La grille et les énoncés ne peuvent pas être modifiés tant que l'étude est active/fermée. Cela protège l'intégrité des données.",
+                    "mismatch_title": "Erreur de configuration de la grille",
+                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous."
+                }
+            },
+            "postsort": {
+                "extreme": {
+                    "title": "Colonnes extrêmes",
+                    "desc": "Sélectionnez les colonnes qui déclenchent des questions de suivi.",
+                    "no_columns": "Aucune colonne sélectionnée.",
+                    "add_label": "Ajouter une colonne :",
+                    "prompt_label": "Question pour les cartes extrêmes",
+                    "prompt_placeholder": "Pourquoi avez-vous placé cet énoncé ici ?",
+                    "add": "Ajouter",
+                    "select_placeholder": "Sélectionner..."
+                },
+                "random_comments": {
+                    "title": "Autoriser les commentaires libres",
+                    "desc": "Permettre aux participants d'ajouter des commentaires à n'importe quel énoncé."
+                },
+                "custom": {
+                    "title": "Questions personnalisées",
+                    "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
+                },
+                "missing": {
+                    "title": "Demander s'il manque des énoncés",
+                    "desc": "Demander s'il y avait des sujets manquants.",
+                    "prompt_label": "Question sur les énoncés manquants",
+                    "prompt_placeholder": "Y avait-il des énoncés que vous auriez aimé voir inclus ?"
+                },
+                "general": {
+                    "title": "Demander un retour général",
+                    "desc": "Commentaires généraux à la fin.",
+                    "prompt_label": "Question pour le retour général",
+                    "prompt_placeholder": "Avez-vous des commentaires ou remarques supplémentaires ?"
+                }
+            },
+            "interface": {
+                "title": "Personnalisation de l'interface",
+                "desc": "Personnalisez les boutons et libellés pour correspondre au ton de votre étude (ex. changer « D'accord / Pas d'accord » en « J'aime / Je n'aime pas »).",
+                "nav": {
+                    "title": "Boutons de navigation",
+                    "start": "Bouton de démarrage",
+                    "next": "Bouton Étape suivante",
+                    "submit": "Bouton Soumettre",
+                    "confirm": "Bouton Valider le classement",
+                    "tooltips": {
+                        "start": "Bouton qui démarre l'étude",
+                        "next": "Passer à l'étape suivante",
+                        "submit": "Soumettre les résultats à la fin",
+                        "confirm": "Bouton de validation générique"
+                    }
+                },
+                "terms": {
+                    "title": "Terminologie de tri",
+                    "desc": "Définissez les libellés pour le tri initial et le spectre de la grille.",
+                    "rough": "Libellés du tri initial",
+                    "agree": "D'accord",
+                    "neutral": "Neutre",
+                    "disagree": "Pas d'accord",
+                    "grid": "Légendes de la grille (extrêmes)",
+                    "most_agree": "Le plus en accord",
+                    "most_disagree": "Le plus en désaccord"
+                }
+            },
+            "theme": {
+                "title": "Identité visuelle",
+                "accent": {
+                    "title": "Couleur d'accentuation",
+                    "desc": "Cette couleur sera utilisée pour les boutons, liens et mises en évidence dans toute l'étude.",
+                    "pick": "Choisir une couleur",
+                    "reset": "Rétablir le défaut"
+                },
+                "logo": {
+                    "title": "Logo de l'étude",
+                    "desc": "Téléchargez un logo personnalisé pour remplacer la marque Open-Q par défaut.",
+                    "label": "URL du logo",
+                    "hint": "Taille recommandée : 200x50px. Supporte PNG, SVG, JPG.",
+                    "preview": "Aperçu du logo"
+                },
+                "tip": {
+                    "title": "Conseil de marque",
+                    "desc": "Assurer une haute accessibilité est essentiel. Lorsque vous choisissez une couleur d'accentuation, assurez-vous qu'elle offre un contraste suffisant sur fond blanc pour la lisibilité."
+                }
+            }
+        },
+        "data": {
+            "table": {
+                "id_token": "ID / Jeton",
+                "lang": "Langue",
+                "flags": "Indicateurs",
+                "duration": "Durée",
+                "actions": "Actions"
+            },
+            "tooltips": {
+                "suspect": "Suspect (Complétion rapide)",
+                "has_comments": "Contient des commentaires qualitatifs"
+            },
+            "search": {
+                "placeholder": "Rechercher par ID...",
+                "records_found": "enregistrements trouvés",
+                "no_results": "Aucun résultat trouvé"
+            },
+            "errors": {
+                "load_failed": "Échec du chargement des données. Veuillez actualiser la page."
+            },
+            "detail": {
+                "title": "Profil du participant",
+                "session": "Session",
+                "discarded_badge": "Rejeté",
+                "description": "Résultats complets du Q-Sort et métadonnées.",
+                "stats": {
+                    "duration": "Durée totale",
+                    "language": "Langue utilisée"
+                },
+                "actions": {
+                    "discard": "Rejeter le participant",
+                    "restore": "Restaurer le participant"
+                },
+                "sort_config": "Configuration du tri",
+                "survey": {
+                    "title": "Réponses au questionnaire",
+                    "csv_note": "Réponses complètes disponibles dans l'export CSV."
+                }
+            }
+        },
+        "status": {
+            "active": "Actif",
+            "paused": "En pause",
+            "closed": "Fermé",
+            "draft": "Brouillon"
         }
     }
 }

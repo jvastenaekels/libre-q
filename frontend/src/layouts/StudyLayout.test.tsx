@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
@@ -292,5 +292,29 @@ describe('Layout Route Protection', () => {
         );
 
         expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
+    });
+
+    it('Skips rendering Pre-sort step node when disabled', () => {
+        useSessionStore.setState({ hasConsented: true });
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                presort_config: { enabled: false, fields: {} },
+            } as any,
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        const stepper = screen.getByTestId('stepper-container');
+        // Within the stepper, we expect 4 buttons (steps 1, 3, 4, 5)
+        const stepButtons = within(stepper).getAllByRole('button');
+        expect(stepButtons).toHaveLength(4);
     });
 });

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,15 +27,6 @@ import { Input } from '@/components/ui/input';
 import { useCreateStudyApiAdminStudiesPost } from '@/api/generated';
 import { useAdminStore } from '@/store/useAdminStore';
 
-const formSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(100),
-    slug: z
-        .string()
-        .min(3, 'Slug must be at least 3 characters')
-        .max(50)
-        .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
-});
-
 interface CreateStudyDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -44,6 +36,22 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
     const { setActiveStudy } = useAdminStore();
     const navigate = useNavigate();
     const createStudyMutation = useCreateStudyApiAdminStudiesPost();
+    const { t } = useTranslation();
+
+    const formSchema = z.object({
+        title: z.string().min(1, t('admin.validation.required', 'Required')).max(100),
+        slug: z
+            .string()
+            .min(3, t('admin.validation.slug_min', 'Slug must be at least 3 characters'))
+            .max(50)
+            .regex(
+                /^[a-z0-9-]+$/,
+                t(
+                    'admin.validation.slug_regex',
+                    'Slug must contain only lowercase letters, numbers, and hyphens'
+                )
+            ),
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -86,13 +94,16 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                 },
             });
 
-            toast.success('Study created successfully');
+            toast.success(t('admin.dialogs.create_study.success', 'Study created successfully'));
             setActiveStudy(newStudy.slug);
             navigate(`/admin/studies/${newStudy.slug}`);
             onOpenChange(false);
             form.reset();
         } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Failed to create study';
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : t('admin.dialogs.create_study.error', 'Failed to create study');
             toast.error(message);
         }
     };
@@ -101,10 +112,14 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Study</DialogTitle>
+                    <DialogTitle>
+                        {t('admin.dialogs.create_study.title', 'Create New Study')}
+                    </DialogTitle>
                     <DialogDescription>
-                        Start a new Q-Methodology study. You can configure statements and settings
-                        later.
+                        {t(
+                            'admin.dialogs.create_study.description',
+                            'Start a new Q-Methodology study. You can configure statements and settings later.'
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -115,9 +130,17 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Study Title</FormLabel>
+                                    <FormLabel>
+                                        {t('admin.dialogs.create_study.study_title', 'Study Title')}
+                                    </FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g. Perspectives on AI" {...field} />
+                                        <Input
+                                            placeholder={t(
+                                                'admin.dialogs.create_study.study_title_placeholder',
+                                                'e.g. Perspectives on AI'
+                                            )}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -129,9 +152,17 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             name="slug"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>URL Slug</FormLabel>
+                                    <FormLabel>
+                                        {t('admin.dialogs.create_study.url_slug', 'URL Slug')}
+                                    </FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g. ai-perspectives-2025" {...field} />
+                                        <Input
+                                            placeholder={t(
+                                                'admin.dialogs.create_study.url_slug_placeholder',
+                                                'e.g. ai-perspectives-2025'
+                                            )}
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -144,13 +175,13 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                                 variant="outline"
                                 onClick={() => onOpenChange(false)}
                             >
-                                Cancel
+                                {t('admin.dialogs.create_study.cancel', 'Cancel')}
                             </Button>
                             <Button type="submit" disabled={createStudyMutation.isPending}>
                                 {createStudyMutation.isPending && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
-                                Create Study
+                                {t('admin.dialogs.create_study.create', 'Create Study')}
                             </Button>
                         </DialogFooter>
                     </form>

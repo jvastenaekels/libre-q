@@ -75,6 +75,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
         return () => observer.disconnect();
     }, []);
 
+    const isPresortEnabled = React.useMemo(() => {
+        if (!config?.presort_config) return true; // Default to true if missing (legacy)
+        if ('enabled' in config.presort_config) {
+            return config.presort_config.enabled;
+        }
+        return true;
+    }, [config?.presort_config]);
+
     if (!config) return null;
 
     const study = config;
@@ -84,12 +92,16 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     };
 
     const steps = [
-        {
-            key: 'profile',
-            icon: <User size={20} className="text-blue-600" />,
-            title: t('welcome.steps.profile.title'),
-            description: t('welcome.steps.profile.description'),
-        },
+        ...(isPresortEnabled
+            ? [
+                  {
+                      key: 'profile',
+                      icon: <User size={20} className="text-blue-600" />,
+                      title: t('welcome.steps.profile.title'),
+                      description: t('welcome.steps.profile.description'),
+                  },
+              ]
+            : []),
         {
             key: 'rough',
             icon: <Zap size={20} className="text-amber-500 fill-amber-100" />,

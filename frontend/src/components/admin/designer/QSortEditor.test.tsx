@@ -16,6 +16,26 @@ vi.mock('sonner', () => ({
     },
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => {
+            const translations: Record<string, string> = {
+                'admin.design.qsort.tabs.statements': 'Statements',
+                'admin.design.qsort.tabs.distribution': 'Distribution',
+                'admin.design.qsort.bulk.title': 'Bulk editor',
+                'admin.design.qsort.bulk.desc': 'Paste your statements here',
+                'admin.design.qsort.set.title': 'Statement set',
+                'admin.design.qsort.set.clear': 'Clear All',
+                'admin.design.qsort.bulk.process_replace': 'Process & Replace',
+                'admin.design.qsort.bulk.process_append': 'Process & Append',
+                'admin.design.qsort.bulk.append': 'Append',
+                'admin.design.qsort.bulk.placeholder': 'Paste your statements here',
+            };
+            return translations[key] || key;
+        },
+    }),
+}));
+
 describe('QSortEditor', () => {
     const mockUpdateDraft = vi.fn();
     const mockDraft = {

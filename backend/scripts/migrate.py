@@ -98,6 +98,38 @@ async def migrate_studies_table():
             )
             migrations_applied = True
 
+        # start_date
+        if not await check_column_exists(conn, "studies", "start_date"):
+            logger.info("  Adding 'start_date' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE studies ADD COLUMN start_date TIMESTAMP WITH TIME ZONE"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text("ALTER TABLE studies ADD COLUMN start_date TIMESTAMP")
+                )
+            migrations_applied = True
+
+        # end_date
+        if not await check_column_exists(conn, "studies", "end_date"):
+            logger.info("  Adding 'end_date' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE studies ADD COLUMN end_date TIMESTAMP WITH TIME ZONE"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text("ALTER TABLE studies ADD COLUMN end_date TIMESTAMP")
+                )
+            migrations_applied = True
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Studies table updated")

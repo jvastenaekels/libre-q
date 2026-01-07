@@ -82,7 +82,7 @@ class WorkspaceMemberRead(BaseModel):
     """Schema for reading workspace member details."""
 
     user_id: int
-    user_email: str | None = None
+    user: UserRead
     role: WorkspaceRole
     joined_at: datetime
     model_config = ConfigDict(from_attributes=True)
@@ -106,6 +106,26 @@ class WorkspaceCreate(BaseModel):
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
 
 
+class WorkspaceUpdate(BaseModel):
+    """Schema for updating a workspace."""
+
+    title: str | None = None
+    slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
+
+
+class WorkspaceMemberUpdate(BaseModel):
+    """Schema for updating a workspace member."""
+
+    role: WorkspaceRole
+
+
+class WorkspaceInvitationCreate(BaseModel):
+    """Schema for creating a workspace invitation."""
+
+    email: str
+    role: WorkspaceRole = WorkspaceRole.researcher
+
+
 # Translation Schemas
 
 
@@ -118,6 +138,8 @@ class StudyTranslationBase(BaseModel):
     instructions: str | None = None
     subtitle: str | None = None
     objective: str | None = None
+    condition_of_instruction: str | None = None
+    pre_instruction: str | None = None
     consent_title: str | None = None
     consent_description: str | None = None
     consent_accept: str | None = None
@@ -219,6 +241,8 @@ class StudyBase(BaseModel):
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
     randomize_statements: bool = False
+    start_date: datetime | None = None
+    end_date: datetime | None = None
 
 
 class StudyCreate(StudyBase):
@@ -253,6 +277,8 @@ class StudyUpdate(BaseModel):
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
     access_password: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
 
     @model_validator(mode="after")
     def check_grid_symmetry(self) -> "StudyUpdate":
@@ -275,6 +301,8 @@ class StudyRead(StudyBase):
     id: int
     workspace_id: int
     created_at: datetime
+    start_date: datetime | None = None
+    end_date: datetime | None = None
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
     recruitment_links: list["RecruitmentLinkRead"] = []
@@ -393,6 +421,10 @@ class ParticipantRead(BaseModel):
     user_agent: str | None
     # We don't expose IP address directly to researchers usually, maybe masked or hash
     # For now, let's keep it private or added if requested.
+
+    # Computed fields
+    recruitment_token: str | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 

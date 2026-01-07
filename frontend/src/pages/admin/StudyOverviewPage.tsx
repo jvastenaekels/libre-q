@@ -1,4 +1,4 @@
-import { useLoaderData, useRevalidator } from 'react-router-dom';
+import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
 import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
 
@@ -13,13 +13,21 @@ import {
     CheckCircle2,
     Clock,
     AlertTriangle,
-    ArrowRight,
     Table as TableIcon,
+    LayoutDashboard,
+    Copy,
+    Eye,
+    Link as LinkIcon,
 } from 'lucide-react';
+import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
+import { enUS, fr, fi } from 'date-fns/locale';
+import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
 
 interface LoaderData {
     stats: StudyStatsRead;
@@ -31,79 +39,88 @@ interface LoaderData {
 const StudyOverviewPage = () => {
     const { stats, participants, study, slug } = useLoaderData() as LoaderData;
     const revalidator = useRevalidator();
+    const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+
+    // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
+    const dateLocales: Record<string, any> = {
+        en: enUS,
+        fr: fr,
+        fi: fi,
+    };
+    const currentLocale = dateLocales[i18n.language] || enUS;
 
     const recentParticipants = (participants || []).slice(0, 5);
 
+    // Helper: Generate consistent color from participant ID
+    const getParticipantColor = (id: string) => {
+        const hue = (id.charCodeAt(0) + id.charCodeAt(1)) % 360;
+        return {
+            hue,
+            bg: `hsl(${hue}, 70%, 92%)`,
+            border: `hsl(${hue}, 60%, 75%)`,
+            text: `hsl(${hue}, 70%, 35%)`,
+        };
+    };
+
+    // Helper: Determine current step from progress percentage
+    const _getCurrentStep = (progress: number) => {
+        if (progress < 20) return t('admin.study_overview.steps.welcome', 'Welcome');
+        if (progress < 40) return t('admin.study_overview.steps.consent', 'Consent');
+        if (progress < 60) return t('admin.study_overview.steps.rough_sort', 'Rough Sort');
+        if (progress < 90) return t('admin.study_overview.steps.fine_sort', 'Fine Sort');
+        return t('admin.study_overview.steps.final', 'Final Steps');
+    };
+
+    const getStatusLabel = (state: string) => {
+        return t(`admin.status.${state}`, state.charAt(0).toUpperCase() + state.slice(1));
+    };
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
-            <header className="flex flex-col gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1 min-w-0">
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
-                        <span className="truncate">{slug}</span>
-                        {stats && (
-                            <Badge
-                                variant="outline"
-                                role="status"
-                                className={cn(
-                                    'ml-2 font-bold uppercase tracking-widest text-[10px]',
-                                    study?.state === 'active'
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                        : study?.state === 'paused'
-                                          ? 'bg-orange-50 text-orange-700 border-orange-100'
-                                          : study?.state === 'closed'
-                                            ? 'bg-slate-50 text-slate-700 border-slate-100'
-                                            : 'bg-amber-50 text-amber-700 border-amber-100'
-                                )}
-                            >
-                                {study?.state === 'active'
-                                    ? 'Active'
-                                    : study?.state === 'paused'
-                                      ? 'Paused'
-                                      : study?.state === 'closed'
-                                        ? 'Closed'
-                                        : 'Draft'}
-                            </Badge>
-                        )}
+            <StudyPageHeader
+                title={t('admin.study_overview.title', 'Overview')}
+                description={t(
+                    'admin.study_overview.subtitle',
+                    'Real-time analytics and participant overview for this study.'
+                )}
+                icon={LayoutDashboard}
+                statusBadge={
+                    study?.state !== 'active' && (
+                        <Badge
+                            variant="outline"
+                            role="status"
+                            className={cn(
+                                'font-black uppercase tracking-[0.2em] text-[10px] px-2 py-0.5 rounded-full',
+                                study?.state === 'paused'
+                                    ? 'bg-orange-50 text-orange-700 border-orange-100'
+                                    : study?.state === 'closed'
+                                      ? 'bg-slate-50 text-slate-700 border-slate-100'
+                                      : 'bg-amber-50 text-amber-700 border-amber-100'
+                            )}
+                        >
+                            {getStatusLabel(study?.state || 'draft')}
+                        </Badge>
+                    )
+                }
+                actions={
+                    <div className="flex items-center gap-2">
                         {study?.state === 'draft' && (
                             <Button
                                 asChild
                                 size="sm"
                                 variant="outline"
-                                className="ml-4 gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
+                                className="gap-2 border-indigo-100 hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm font-bold text-xs"
                             >
                                 <Link to={`/admin/studies/${slug}/design`}>
-                                    <PencilRuler className="h-4 w-4" />
-                                    Edit study design
+                                    <PencilRuler className="h-3.5 w-3.5" />
+                                    {t('admin.study_overview.edit_design', 'Edit design')}
                                 </Link>
                             </Button>
                         )}
-                    </h1>
-                    <p className="text-slate-500 text-sm">
-                        Real-time analytics and participant overview for this study.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    {study?.translations?.map((t) => (
-                        <Badge key={t.language_code} variant="secondary" className="text-xs">
-                            {t.language_code.toUpperCase()}
-                        </Badge>
-                    ))}
-                    {study?.state === 'active' && (
-                        <div className="bg-white shadow-sm border rounded-lg px-4 py-2 flex items-center gap-3">
-                            <div className="relative">
-                                <Activity className="h-4 w-4 text-emerald-500" />
-                                <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                            </div>
-                            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                                Receiving data
-                            </span>
-                        </div>
-                    )}
-                </div>
-            </header>
+                    </div>
+                }
+            />
 
             {/* Key Metrics Dashboard + Study Status */}
             {stats && (
@@ -125,14 +142,18 @@ const StudyOverviewPage = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                         <Users className="h-4 w-4 text-indigo-600" />
                                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Sample size (N)
+                                            {t(
+                                                'admin.study_overview.sample_size',
+                                                'Sample size (N)'
+                                            )}
                                         </div>
                                     </div>
                                     <div className="text-4xl font-bold text-slate-900 mb-1">
                                         {stats.started_count}
                                     </div>
                                     <p className="text-xs text-slate-400 font-medium">
-                                        {stats.completed_count} completed
+                                        {stats.completed_count}{' '}
+                                        {t('admin.study_overview.completed', 'completed')}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -143,7 +164,10 @@ const StudyOverviewPage = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Completion rate
+                                            {t(
+                                                'admin.study_overview.completion_rate',
+                                                'Completion rate'
+                                            )}
                                         </div>
                                     </div>
                                     <div className="text-4xl font-bold text-emerald-600 mb-2">
@@ -162,7 +186,11 @@ const StudyOverviewPage = () => {
                                     />
                                     <div className="flex justify-between text-[10px] text-slate-400">
                                         <span>
-                                            {stats.started_count - stats.completed_count} active
+                                            {stats.started_count - stats.completed_count}{' '}
+                                            {t(
+                                                'admin.study_overview.active_participants',
+                                                'active'
+                                            )}
                                         </span>
                                         <span>
                                             {Math.round(
@@ -171,7 +199,7 @@ const StudyOverviewPage = () => {
                                                         (stats.device_breakdown?.desktop || 0))) *
                                                     100
                                             ) || 0}
-                                            % mobile
+                                            % {t('admin.study_overview.mobile_users', 'mobile')}
                                         </span>
                                     </div>
                                 </CardContent>
@@ -183,7 +211,10 @@ const StudyOverviewPage = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                         <Clock className="h-4 w-4 text-amber-500" />
                                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Median duration
+                                            {t(
+                                                'admin.study_overview.median_duration',
+                                                'Median duration'
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex items-baseline gap-2 mb-1">
@@ -195,11 +226,17 @@ const StudyOverviewPage = () => {
                                         {stats.median_duration_seconds &&
                                             stats.median_duration_seconds < 120 && (
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold uppercase ring-1 ring-amber-200">
-                                                    <AlertTriangle size={9} /> Suspect
+                                                    <AlertTriangle size={9} />{' '}
+                                                    {t('admin.study_overview.suspect', 'Suspect')}
                                                 </span>
                                             )}
                                     </div>
-                                    <p className="text-[10px] text-slate-400">Time to complete</p>
+                                    <p className="text-[10px] text-slate-400">
+                                        {t(
+                                            'admin.study_overview.time_to_complete',
+                                            'Time to complete'
+                                        )}
+                                    </p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -214,88 +251,360 @@ const StudyOverviewPage = () => {
                         <div className="space-y-1">
                             <CardTitle className="text-lg flex items-center gap-2">
                                 <Activity className="h-5 w-5 text-indigo-500" />
-                                Recent activity
+                                {t('admin.study_overview.recent_activity', 'Recent activity')}
                             </CardTitle>
                             <CardDescription>
-                                Latest submissions (last 5 of {(participants || []).length})
+                                {t('admin.study_overview.latest_submissions', {
+                                    total: (participants || []).length,
+                                    defaultValue: `Latest submissions (last 5 of ${(participants || []).length})`,
+                                })}
                             </CardDescription>
                         </div>
-                        <Button
-                            asChild
-                            variant="default"
-                            size="sm"
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                        >
-                            <Link to={`/admin/studies/${slug}/exports`}>
-                                Explore analytics
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
                     </CardHeader>
                     <CardContent className="p-0">
-                        {/* Simple List */}
-                        <div className="divide-y divide-slate-50">
-                            {recentParticipants.length === 0 ? (
-                                <div className="p-8 text-center text-slate-400 text-sm">
-                                    No participants yet.
-                                </div>
-                            ) : (
-                                recentParticipants.map((p) => (
-                                    <div
-                                        key={p.id}
-                                        className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-mono font-bold text-slate-500">
-                                                {p.language_used.substring(0, 2).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-medium text-slate-900 font-mono">
-                                                    {p.session_token.substring(0, 8)}...
-                                                </div>
-                                                <div className="text-xs text-slate-500 flex items-center gap-1">
-                                                    {p.submitted_at ? (
-                                                        <>
-                                                            Submitted{' '}
-                                                            {formatDistanceToNow(
-                                                                new Date(
-                                                                    p.submitted_at as unknown as string
-                                                                ),
-                                                                { addSuffix: true }
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        'In Progress'
-                                                    )}
-                                                </div>
-                                            </div>
+                        {recentParticipants.length === 0 ? (
+                            <div className="p-8 text-center text-slate-400 text-sm">
+                                {t('admin.study_overview.no_participants', 'No participants yet.')}
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-100">
+                                {/* Recently Completed Section */}
+                                {recentParticipants.filter(
+                                    (p) => p.status === 'completed' && !p.is_discarded
+                                ).length > 0 && (
+                                    <div className="p-3">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 px-1">
+                                            {t(
+                                                'admin.study_overview.recently_completed',
+                                                'Recently Completed'
+                                            )}{' '}
+                                            (
+                                            {
+                                                recentParticipants.filter(
+                                                    (p) =>
+                                                        p.status === 'completed' && !p.is_discarded
+                                                ).length
+                                            }
+                                            )
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <Badge
-                                                variant="outline"
-                                                className={cn(
-                                                    'capitalize',
-                                                    p.is_discarded
-                                                        ? 'bg-red-50 text-red-700 border-red-100'
-                                                        : p.status === 'completed'
-                                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                                          : 'bg-slate-50 text-slate-600 border-slate-100'
-                                                )}
-                                            >
-                                                {p.is_discarded ? 'Discarded' : p.status}
-                                            </Badge>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter(
+                                                    (p) =>
+                                                        p.status === 'completed' && !p.is_discarded
+                                                )
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 hover:bg-emerald-50/30 transition-colors rounded-lg border border-emerald-100 bg-emerald-50/20 group"
+                                                    >
+                                                        <div className="flex items-center gap-3 flex-1">
+                                                            {(() => {
+                                                                const colors = getParticipantColor(
+                                                                    p.session_token
+                                                                );
+                                                                return (
+                                                                    <div
+                                                                        className="h-9 w-9 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-sm"
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                colors.bg,
+                                                                            borderColor:
+                                                                                colors.border,
+                                                                            color: colors.text,
+                                                                        }}
+                                                                    >
+                                                                        {p.session_token
+                                                                            .substring(0, 2)
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-mono font-bold text-slate-800">
+                                                                        {p.session_token.substring(
+                                                                            0,
+                                                                            8
+                                                                        )}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            navigator.clipboard.writeText(
+                                                                                p.session_token
+                                                                            );
+                                                                            toast.success(
+                                                                                'ID copied'
+                                                                            );
+                                                                        }}
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                    >
+                                                                        <Copy className="h-3 w-3 text-slate-400" />
+                                                                    </button>
+                                                                    {p.recruitment_token && (
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="ml-1 h-5 bg-white text-slate-500 border-slate-200 gap-1 pl-1.5 pr-2"
+                                                                        >
+                                                                            <LinkIcon className="w-3 h-3" />
+                                                                            <span className="font-mono text-[10px]">
+                                                                                {
+                                                                                    p.recruitment_token
+                                                                                }
+                                                                            </span>
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="text-xs text-emerald-600 font-medium mt-0.5 cursor-help">
+                                                                                {t(
+                                                                                    'admin.study_overview.submitted',
+                                                                                    'Submitted'
+                                                                                )}{' '}
+                                                                                {formatDistanceToNow(
+                                                                                    new Date(
+                                                                                        p.submitted_at as unknown as string
+                                                                                    ),
+                                                                                    {
+                                                                                        addSuffix: true,
+                                                                                        locale: currentLocale,
+                                                                                    }
+                                                                                )}
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="text-xs">
+                                                                            {format(
+                                                                                new Date(
+                                                                                    p.submitted_at as unknown as string
+                                                                                ),
+                                                                                'PPpp',
+                                                                                {
+                                                                                    locale: currentLocale,
+                                                                                }
+                                                                            )}
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/admin/studies/${slug}/participants/${p.id}`
+                                                                )
+                                                            }
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                                            {t(
+                                                                'admin.study_overview.view_data',
+                                                                'View'
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                ))}
                                         </div>
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                )}
+
+                                {/* In Progress Section */}
+                                {recentParticipants.filter((p) => !p.completed && !p.is_discarded)
+                                    .length > 0 && (
+                                    <div className="p-3">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 px-1">
+                                            {t('admin.study_overview.in_progress', 'In Progress')} (
+                                            {
+                                                recentParticipants.filter(
+                                                    (p) => !p.completed && !p.is_discarded
+                                                ).length
+                                            }
+                                            )
+                                        </div>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter((p) => !p.completed && !p.is_discarded)
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 hover:bg-slate-50/50 transition-colors rounded-lg border border-slate-100 bg-white group"
+                                                    >
+                                                        <div className="flex items-center gap-3 flex-1">
+                                                            {(() => {
+                                                                const colors = getParticipantColor(
+                                                                    p.session_token
+                                                                );
+                                                                return (
+                                                                    <div
+                                                                        className="h-9 w-9 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-sm"
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                colors.bg,
+                                                                            borderColor:
+                                                                                colors.border,
+                                                                            color: colors.text,
+                                                                        }}
+                                                                    >
+                                                                        {p.session_token
+                                                                            .substring(0, 2)
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-mono font-bold text-slate-800">
+                                                                        {p.session_token.substring(
+                                                                            0,
+                                                                            8
+                                                                        )}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            navigator.clipboard.writeText(
+                                                                                p.session_token
+                                                                            );
+                                                                            toast.success(
+                                                                                'ID copied'
+                                                                            );
+                                                                        }}
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                    >
+                                                                        <Copy className="h-3 w-3 text-slate-400" />
+                                                                    </button>
+                                                                    {p.recruitment_token && (
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="ml-1 h-5 bg-white text-slate-500 border-slate-200 gap-1 pl-1.5 pr-2"
+                                                                        >
+                                                                            <LinkIcon className="w-3 h-3" />
+                                                                            <span className="font-mono text-[10px]">
+                                                                                {
+                                                                                    p.recruitment_token
+                                                                                }
+                                                                            </span>
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="text-xs text-slate-500 mt-0.5 cursor-help">
+                                                                                {t(
+                                                                                    'admin.study_overview.started'
+                                                                                )}{' '}
+                                                                                {formatDistanceToNow(
+                                                                                    new Date(
+                                                                                        p.created_at as unknown as string
+                                                                                    ),
+                                                                                    {
+                                                                                        addSuffix: true,
+                                                                                        locale: currentLocale,
+                                                                                    }
+                                                                                )}
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="text-xs">
+                                                                            {format(
+                                                                                new Date(
+                                                                                    p.created_at as unknown as string
+                                                                                ),
+                                                                                'PPpp',
+                                                                                {
+                                                                                    locale: currentLocale,
+                                                                                }
+                                                                            )}
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            </div>
+                                                        </div>
+
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/admin/studies/${slug}/participants/${p.id}`
+                                                                )
+                                                            }
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                                            {t(
+                                                                'admin.study_overview.view_data',
+                                                                'View'
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Discarded Section (if any) */}
+                                {recentParticipants.filter((p) => p.is_discarded).length > 0 && (
+                                    <div className="p-3 bg-red-50/20">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-3 px-1">
+                                            {t('admin.study_overview.discarded', 'Discarded')} (
+                                            {
+                                                recentParticipants.filter((p) => p.is_discarded)
+                                                    .length
+                                            }
+                                            )
+                                        </div>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter((p) => p.is_discarded)
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 transition-colors rounded-lg border border-red-100 bg-red-50/50 opacity-60"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-red-100 to-red-50 border border-red-200 flex items-center justify-center text-xs font-bold text-red-600 shadow-sm">
+                                                                {p.language_used
+                                                                    .substring(0, 2)
+                                                                    .toUpperCase()}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-mono font-bold text-slate-700">
+                                                                    {p.session_token.substring(
+                                                                        0,
+                                                                        8
+                                                                    )}
+                                                                </div>
+                                                                <div className="text-xs text-red-600 font-medium mt-0.5">
+                                                                    {t(
+                                                                        'admin.study_overview.discarded',
+                                                                        'Discarded'
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
                             <Link
                                 to={`/admin/studies/${slug}/exports`}
                                 className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                             >
                                 <TableIcon className="w-3 h-3" />
-                                View all participants and data details
+                                {t(
+                                    'admin.study_overview.view_all',
+                                    'View all participants and data details'
+                                )}
                             </Link>
                         </div>
                     </CardContent>

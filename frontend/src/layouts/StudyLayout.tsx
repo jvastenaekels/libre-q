@@ -74,6 +74,16 @@ const StudyLayoutContent: React.FC = () => {
     const handleStepClick = (stepId: number) => {
         if (stepId > maxReachedStep) return;
 
+        // Skip presort if disabled
+        if (
+            stepId === 2 &&
+            config?.presort_config &&
+            'enabled' in config.presort_config &&
+            config.presort_config.enabled === false
+        ) {
+            return;
+        }
+
         const routes: Record<number, string> = {
             1: 'welcome',
             2: 'presort',
@@ -169,7 +179,7 @@ const StudyLayoutContent: React.FC = () => {
                 ></div>
                 <div className="space-y-2 text-center animate-pulse">
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
-                    <p className="text-slate-400 text-sm">Preparing your study session...</p>
+                    <p className="text-slate-400 text-sm">{t('layout.preparing')}</p>
                 </div>
                 <div className="w-full max-w-md space-y-3 pt-8">
                     <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse"></div>
@@ -249,7 +259,7 @@ const StudyLayoutContent: React.FC = () => {
             {isPilotModePersistent && (
                 <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-[11px] font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                    Pilot Mode: Changes are temporary & data will not be saved
+                    {t('layout.pilot_mode')}
                 </div>
             )}
             {/* Header */}
@@ -279,17 +289,17 @@ const StudyLayoutContent: React.FC = () => {
                         {branding?.logo_url ? (
                             <img
                                 src={branding.logo_url}
-                                alt={config?.title || 'Study Logo'}
+                                alt={config?.title || t('layout.default_study_title')}
                                 className="h-8 w-auto object-contain"
                             />
                         ) : currentStep === 1 ? (
                             <img
                                 src="/open-q-logo.svg"
-                                alt="Open-Q"
+                                alt={t('layout.title')}
                                 className="h-8 w-auto object-contain"
                             />
                         ) : (
-                            config?.title || 'Q-Method Study'
+                            config?.title || t('layout.default_study_title')
                         )}
                     </div>
 
@@ -371,8 +381,19 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/* CENTER: Stepper (Desktop Only) */}
                 <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
-                    <div className="flex items-center gap-1">
+                    <div data-testid="stepper-container" className="flex items-center gap-1">
                         {steps.map((step, index) => {
+                            // Check if presort is disabled
+                            const isPresortDisabled =
+                                config?.presort_config &&
+                                'enabled' in config.presort_config &&
+                                config.presort_config.enabled === false;
+
+                            // Skip rendering the step if it's the disabled presort step
+                            if (step.id === 2 && isPresortDisabled) {
+                                return null;
+                            }
+
                             const status =
                                 currentStep === step.id
                                     ? 'current'
@@ -385,7 +406,20 @@ const StudyLayoutContent: React.FC = () => {
                             return (
                                 <div key={step.id} className="flex items-center">
                                     {/* Connection Line */}
-                                    {index > 0 && (
+                                    {index > 0 &&
+                                        !(step.id === 3 && isPresortDisabled) && ( // Don't show line before step 3 if step 2 is hidden
+                                            <div
+                                                className="w-8 h-0.5 mx-2 transition-colors duration-300"
+                                                style={{
+                                                    backgroundColor:
+                                                        status === 'upcoming'
+                                                            ? '#e2e8f0'
+                                                            : 'var(--brand-accent)',
+                                                }}
+                                            />
+                                        )}
+                                    {/* Special case for connecting 1 to 3 directly if 2 is gone */}
+                                    {step.id === 3 && isPresortDisabled && (
                                         <div
                                             className="w-8 h-0.5 mx-2 transition-colors duration-300"
                                             style={{
@@ -469,7 +503,7 @@ const StudyLayoutContent: React.FC = () => {
                             type="button"
                             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                             className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
-                            title="Change language"
+                            title={t('layout.change_lang_title')}
                         >
                             <Globe size={20} />
                         </button>
@@ -527,7 +561,7 @@ const StudyLayoutContent: React.FC = () => {
                                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                                     <div className="w-12 h-12 border-4 border-t-transparent border-indigo-600 rounded-full animate-spin" />
                                     <p className="text-slate-500 font-medium">
-                                        Loading study content...
+                                        {t('layout.loading_content')}
                                     </p>
                                 </div>
                             }

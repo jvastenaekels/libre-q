@@ -148,6 +148,19 @@ html {
     .animate-loading-line {
         animation: loading-line 1.5s infinite linear;
     }
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.1); }
+    }
+    .animate-pulse-slow {
+        animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .glass {
+        @apply bg-white/40 backdrop-blur-xl border-white/20 shadow-xl;
+    }
+    .dark .glass {
+        @apply bg-slate-950/40 border-white/10;
+    }
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
     }
@@ -157,6 +170,9 @@ html {
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 10px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #334155;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;

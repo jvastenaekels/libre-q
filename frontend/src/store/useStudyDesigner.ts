@@ -40,6 +40,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                 postsort_config: study.postsort_config,
                 default_language: study.default_language,
                 show_statement_codes: study.show_statement_codes,
+                randomize_statements: study.randomize_statements,
+                branding: study.branding,
 
                 translations: (study.translations || []).map((t) => ({
                     language_code: t.language_code,

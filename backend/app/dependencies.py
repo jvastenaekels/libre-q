@@ -1,7 +1,7 @@
 """Dependency injection definitions."""
 
 from collections.abc import Callable
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import jwt
 from fastapi import Depends, HTTPException, Path, status
@@ -14,12 +14,15 @@ from app.core.config import settings
 from app.database import get_db
 from app.models import (
     Study,
+    StudyCollaborator,
+    StudyRole,
     User,
     WorkspaceMember,
     WorkspaceRole,
-    StudyCollaborator,
-    StudyRole,
 )
+
+if TYPE_CHECKING:
+    from app.models import Workspace
 from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
@@ -80,6 +83,57 @@ STUDY_ROLE_HIERARCHY = {
     StudyRole.editor: 20,
     StudyRole.viewer: 10,
 }
+
+
+WORKSPACE_ROLE_HIERARCHY = {
+    WorkspaceRole.admin: 30,
+    WorkspaceRole.researcher: 20,
+    WorkspaceRole.viewer: 10,
+}
+
+
+def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
+    """Factory creating a dependency to verify workspace access."""
+
+    async def permission_dependency(
+        slug: str = Path(..., description="The slug of the workspace"),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ) -> "Workspace":
+        """Dependency that returns the Workspace if the user has required workspace role."""
+        from app.models import Workspace
+
+        query = (
+            select(Workspace, WorkspaceMember)
+            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+            .where(Workspace.slug == slug)
+            .where(WorkspaceMember.user_id == current_user.id)
+        )
+
+        result = await db.execute(query)
+        row = result.one_or_none()
+
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Workspace not found or access denied",
+            )
+
+        workspace, member = row
+
+        # Check Role Hierarchy
+        required_level = WORKSPACE_ROLE_HIERARCHY[required_role]
+        user_level = WORKSPACE_ROLE_HIERARCHY[member.role]
+
+        if user_level < required_level:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required: {required_role.value}",
+            )
+
+        return cast(Workspace, workspace)
+
+    return permission_dependency
 
 
 def check_study_permission(required_role: StudyRole) -> Callable:

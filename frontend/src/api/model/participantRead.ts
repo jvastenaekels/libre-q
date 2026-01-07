@@ -23,4 +23,5 @@ export interface ParticipantRead {
     is_discarded: boolean;
     discard_reason: ParticipantReadDiscardReason;
     user_agent: ParticipantReadUserAgent;
+    recruitment_token?: string;
 }
