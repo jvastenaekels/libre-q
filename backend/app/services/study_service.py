@@ -29,32 +29,98 @@ from .recruitment_service import RecruitmentService
 from ..utils.crypto import hash_ip
 
 
-DEFAULT_PROCESS_STEPS = [
-    {
-        "id": "profile",
-        "icon": "User",
-        "title": "Let's meet",
-        "description": "A few quick questions to better understand your background.",
-    },
-    {
-        "id": "rough",
-        "icon": "Zap",
-        "title": "First impressions",
-        "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree).",
-    },
-    {
-        "id": "fine",
-        "icon": "Scale",
-        "title": "Your perspective",
-        "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.",
-    },
-    {
-        "id": "post",
-        "icon": "MessageSquareText",
-        "title": "Why",
-        "description": "A few words to explain your most significant choices.",
-    },
-]
+DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
+    "en": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Let's meet",
+            "description": "A few quick questions to better understand your background.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "First impressions",
+            "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Your perspective",
+            "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Why",
+            "description": "A few words to explain your most significant choices.",
+            "color": "#10b981",
+        },
+    ],
+    "fr": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Faisons connaissance",
+            "description": "Quelques questions rapides pour mieux comprendre votre parcours.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "Premières impressions",
+            "description": "Découvrez les affirmations et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Votre perspective",
+            "description": "Placez les affirmations sur la grille pour affiner votre point de vue, en donnant la priorité à ce qui compte le plus pour vous.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Pourquoi",
+            "description": "Quelques mots pour expliquer vos choix les plus significatifs.",
+            "color": "#10b981",
+        },
+    ],
+    "fi": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Tutustutaan",
+            "description": "Muutama nopea kysymys taustasi ymmärtämiseksi.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "Ensivaikutelma",
+            "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Näkökulmasi",
+            "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Miksi",
+            "description": "Muutama sana perustellaksesi merkittävimmät valintasi.",
+            "color": "#10b981",
+        },
+    ],
+}
 
 
 class StudyService:
@@ -260,7 +326,7 @@ class StudyService:
             "grid_config": study.grid_config,
             "statements": statements_data,
             "process_steps": getattr(translation, "process_steps", [])
-            or DEFAULT_PROCESS_STEPS,
+            or DEFAULT_PROCESS_STEPS.get(resolved_lang, DEFAULT_PROCESS_STEPS["en"]),
             "consent": {
                 "title": get_t_attr("consent_title"),
                 "description": get_t_attr("consent_description"),
@@ -694,6 +760,7 @@ class StudyService:
             "study": {
                 "slug": study.slug,
                 "grid_config": study.grid_config,
+                "postsort_config": study.postsort_config,
                 "statements": [
                     {
                         "id": s.id,

@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import ImageUploadInput from './ImageUploadInput';
 
 const BrandingEditor = () => {
     const { t } = useTranslation();
@@ -101,14 +102,14 @@ const BrandingEditor = () => {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-6 gap-2 pt-2">
+                        <div className="grid grid-cols-8 gap-1.5 pt-2">
                             {['#4f46e5', '#7c3aed', '#db2777', '#dc2626', '#ea580c', '#16a34a'].map(
                                 (color) => (
                                     <button
                                         key={color}
                                         type="button"
                                         className={cn(
-                                            'aspect-square rounded-xl border-2 transition-all flex items-center justify-center shadow-sm',
+                                            'aspect-square rounded-lg border-2 transition-all flex items-center justify-center shadow-sm',
                                             branding.accent_color === color
                                                 ? 'border-indigo-600 scale-110 shadow-indigo-200'
                                                 : 'border-transparent hover:border-slate-300'
@@ -117,7 +118,7 @@ const BrandingEditor = () => {
                                         onClick={() => updateBranding('accent_color', color)}
                                     >
                                         {branding.accent_color === color && (
-                                            <div className="w-2 h-2 bg-white rounded-full shadow-inner" />
+                                            <div className="w-1.5 h-1.5 bg-white rounded-full shadow-inner" />
                                         )}
                                     </button>
                                 )
@@ -148,37 +149,14 @@ const BrandingEditor = () => {
                         </div>
                     </CardHeader>
                     <CardContent className="px-0 space-y-4">
-                        <div className="grid gap-3">
-                            <Label
-                                htmlFor="logo-url"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                            >
-                                {t('admin.design.theme.logo.label')}
-                            </Label>
-                            <Input
-                                id="logo-url"
-                                value={branding.logo_url || ''}
-                                onChange={(e) => updateBranding('logo_url', e.target.value)}
-                                placeholder="https://example.com/logo.png"
-                                className="font-medium text-sm rounded-xl h-10"
-                            />
-                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">
-                                {t('admin.design.theme.logo.hint')}
-                            </p>
-                        </div>
-
-                        {branding.logo_url && (
-                            <div className="p-6 bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center transition-all hover:bg-white hover:border-indigo-300 group">
-                                <img
-                                    src={branding.logo_url}
-                                    alt={t('admin.design.theme.logo.preview')}
-                                    className="max-h-16 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-300"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).style.display = 'none';
-                                    }}
-                                />
-                            </div>
-                        )}
+                        <ImageUploadInput
+                            id="logo-url"
+                            value={branding.logo_url || ''}
+                            onChange={(value) => updateBranding('logo_url', value)}
+                            label={t('admin.design.theme.logo.label')}
+                            recommendedSize="200x50px"
+                            maxFileSize={500 * 1024}
+                        />
                     </CardContent>
                 </Card>
 
@@ -248,24 +226,21 @@ const BrandingEditor = () => {
                                                 )}
                                                 className="h-8 text-xs font-medium"
                                             />
-                                            <Input
+                                            <ImageUploadInput
                                                 value={partner.logo_url}
-                                                onChange={(e) => {
+                                                onChange={(value) => {
                                                     const newPartners = [
                                                         ...(branding.partners || []),
                                                     ];
                                                     newPartners[index] = {
                                                         ...partner,
-                                                        logo_url: e.target.value,
+                                                        logo_url: value,
                                                     };
                                                     // biome-ignore lint/suspicious/noExplicitAny: complex partner update
                                                     updateBranding('partners', newPartners as any);
                                                 }}
-                                                placeholder={t(
-                                                    'admin.design.theme.partners.url_placeholder',
-                                                    'Logo URL (https://...)'
-                                                )}
-                                                className="h-8 text-xs text-slate-500 font-mono"
+                                                recommendedSize="120x40px"
+                                                maxFileSize={300 * 1024}
                                             />
                                         </div>
                                         <button

@@ -65,10 +65,14 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 />
             );
         case 'select':
+            if (!Array.isArray(fieldConfig.options)) {
+                console.warn(`SurveyField: options is not an array for ${id}`, fieldConfig.options);
+                return null;
+            }
             return (
                 <select id={id} {...register(id)} className={commonClasses}>
                     <option value="">{t('presort.select_placeholder', 'Select an option')}</option>
-                    {fieldConfig.options?.map((opt) => {
+                    {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
                         const optLabel =
                             typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
@@ -81,9 +85,12 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 </select>
             );
         case 'radio':
+            if (!Array.isArray(fieldConfig.options)) {
+                return null;
+            }
             return (
                 <div className="space-y-2 mt-2">
-                    {fieldConfig.options?.map((opt) => {
+                    {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
                         const optLabel =
                             typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
@@ -107,9 +114,12 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 </div>
             );
         case 'checkbox':
+            if (!Array.isArray(fieldConfig.options)) {
+                return null;
+            }
             return (
                 <div className="space-y-2 mt-2">
-                    {fieldConfig.options?.map((opt) => {
+                    {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
                         const optLabel =
                             typeof opt === 'object' ? getLocalizedText(opt.label) : opt;

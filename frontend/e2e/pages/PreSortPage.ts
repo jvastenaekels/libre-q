@@ -14,24 +14,24 @@ export class PreSortPage extends BasePage {
         await this.page.waitForTimeout(1000);
 
         // Name selectors are robust with RHF
-        const ageInput = this.page.locator('input[name="age"]');
+        // Use label-based selection for robustness
+        const ageInput = this.page.getByLabel('Age', { exact: false });
         await expect(ageInput).toBeVisible({ timeout: 10000 });
         await ageInput.fill('25');
 
         // Verify filling
         const ageVal = await ageInput.inputValue();
         if (ageVal !== '25') {
-            // Try force
             await ageInput.fill('25', { force: true });
         }
 
-        const genderSelect = this.page.locator('select[name="gender"]');
+        const genderSelect = this.page.getByLabel('Gender', { exact: false });
         await expect(genderSelect).toBeVisible();
-        await genderSelect.selectOption({ index: 1 });
+        await genderSelect.selectOption({ label: 'Female' }); // Select by label if possible
 
-        const educationSelect = this.page.locator('select[name="education"]');
+        const educationSelect = this.page.getByLabel('Education', { exact: false });
         await expect(educationSelect).toBeVisible();
-        await educationSelect.selectOption({ index: 1 });
+        await educationSelect.selectOption({ label: 'Bachelor' });
 
         await expect(this.submitButton).toBeVisible();
         await expect(this.submitButton).toBeEnabled();

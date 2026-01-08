@@ -367,7 +367,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     {/* Card Zone */}
                     <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md min-w-[6rem] min-h-[8rem] sm:min-w-[12rem] sm:min-h-[9rem]">
                         <div className="w-full h-full relative">
-
                             <CardStack
                                 ref={cardStackRef}
                                 key={currentCard.id}
@@ -422,9 +421,15 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         </button>
                         {/* Desktop Keyboard Shortcuts Hint */}
                         <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
-                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">←</kbd>
-                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">↓</kbd>
-                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">→</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                ←
+                            </kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                ↓
+                            </kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                →
+                            </kbd>
                         </div>
                     </div>
                 </div>

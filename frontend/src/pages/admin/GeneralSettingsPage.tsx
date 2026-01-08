@@ -1,5 +1,4 @@
 import { Calendar } from '@/components/ui/calendar';
-import { Calendar as CalendarIcon, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +33,19 @@ import * as z from 'zod';
 import { AdminService } from '@/api/admin';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { parseApiErrorSync } from '@/lib/error-utils';
+import {
+    Loader2,
+    Globe,
+    Calendar as CalendarIconAlt,
+    Archive,
+    Trash2,
+    Save,
+    Info,
+    ShieldAlert,
+    Settings,
+} from 'lucide-react';
+
 // Removing useAdminStudy as we use loader now
 
 const studyFormSchema = z.object({
@@ -100,19 +112,19 @@ export default function GeneralSettingsPage() {
                 end_date: data.end_date?.toISOString(),
             } as unknown as StudyUpdate);
 
-            toast.success('Settings updated', { description: 'Study settings have been saved.' });
+            toast.success(t('admin.settings.save_success'), {
+                description: t('admin.settings.save_success_desc'),
+            });
 
             if (data.slug !== slug) {
-                // Redirect if slug changed
                 navigate(`/admin/studies/${data.slug}/settings`);
             } else {
-                // RR7 automatically revalidates loaders on submission if using Form,
-                // but since we use AdminService directly, we might need manual revalidation
                 navigate('.', { replace: true });
             }
-        } catch (_error) {
-            toast.error('Error', {
-                description: 'Failed to update settings. Slug might be taken.',
+        } catch (error) {
+            const { message } = parseApiErrorSync(error);
+            toast.error(t('admin.settings.save_error'), {
+                description: message || t('admin.settings.save_error_desc'),
             });
         }
     }
@@ -121,29 +133,31 @@ export default function GeneralSettingsPage() {
         if (!study || !slug) return;
         try {
             await AdminService.updateStudyState(slug, 'archived');
-            toast.success('Study Archived', {
-                description: 'The study is now archived and read-only.',
+            toast.success(t('admin.settings.archive_success'), {
+                description: t('admin.settings.archive_success_desc'),
             });
             navigate('.', { replace: true });
-        } catch (_error) {
-            toast.error('Error', {
-                description: 'Failed to archive study. Is it closed?',
+        } catch (error) {
+            const { message } = parseApiErrorSync(error);
+            toast.error(t('admin.settings.archive_error'), {
+                description: message || t('admin.settings.archive_error_desc'),
             });
         }
     };
 
     const handleDelete = async () => {
         if (!study || !slug) return;
-        if (!confirm('Are you sure? This action is IRREVERSIBLE.')) return;
+        if (!confirm(t('admin.settings.danger.delete_confirm'))) return;
         try {
             await AdminService.deleteStudy(slug);
-            toast.success('Study Deleted', {
-                description: 'The study has been permanently removed.',
+            toast.success(t('admin.settings.delete_success'), {
+                description: t('admin.settings.delete_success_desc'),
             });
             navigate('/admin');
-        } catch (_error) {
-            toast.error('Error', {
-                description: 'Failed to delete study.',
+        } catch (error) {
+            const { message } = parseApiErrorSync(error);
+            toast.error(t('admin.settings.delete_error'), {
+                description: message || t('admin.settings.delete_error_desc'),
             });
         }
     };
@@ -154,37 +168,72 @@ export default function GeneralSettingsPage() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.settings.title', 'General Settings')}
-                description={t(
-                    'admin.settings.description',
-                    'Manage basic study configuration, URL slug, and lifecycle states.'
-                )}
+                title={t('admin.settings.title')}
+                description={t('admin.settings.description')}
                 icon={Settings}
             />
 
             <div className="space-y-6 max-w-4xl">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Basic Information</CardTitle>
+                        <Card className="shadow-md border-none bg-white overflow-hidden">
+                            <CardHeader className="border-b border-slate-50 bg-slate-50/30">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Info className="h-5 w-5 text-indigo-500" />
+                                    <CardTitle className="text-lg">
+                                        {t('admin.settings.basic.title')}
+                                    </CardTitle>
+                                </div>
                                 <CardDescription>
-                                    Configure the study identity and availability window.
+                                    {t('admin.settings.basic.description')}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="p-6 space-y-6">
+                                {/* Title */}
+                                <FormField
+                                    control={form.control}
+                                    name="title"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                {t('admin.workspaces.settings.general.label_title')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    disabled={isArchived}
+                                                    className="h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                                 {/* Slug */}
                                 <FormField
                                     control={form.control}
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>URL Slug</FormLabel>
+                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <Globe className="w-3 h-3" />
+                                                {t('admin.settings.basic.slug_label')}
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input {...field} disabled={isArchived} />
+                                                <div className="relative">
+                                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs select-none">
+                                                        /study/
+                                                    </div>
+                                                    <Input
+                                                        {...field}
+                                                        disabled={isArchived}
+                                                        className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
+                                                    />
+                                                </div>
                                             </FormControl>
-                                            <FormDescription>
-                                                The unique identifier used in the URL.
+                                            <FormDescription className="text-[11px]">
+                                                {t('admin.settings.basic.slug_description')}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -192,31 +241,37 @@ export default function GeneralSettingsPage() {
                                 />
 
                                 {/* Dates */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FormField
                                         control={form.control}
                                         name="start_date"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
-                                                <FormLabel>Start Date (Optional)</FormLabel>
+                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <CalendarIconAlt className="w-3 h-3" />
+                                                    {t('admin.settings.basic.start_date_label')}
+                                                </FormLabel>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <FormControl>
                                                             <Button
                                                                 variant={'outline'}
                                                                 className={cn(
-                                                                    'w-full pl-3 text-left font-normal',
-                                                                    !field.value &&
-                                                                        'text-muted-foreground'
+                                                                    'h-11 rounded-xl bg-slate-50 border-slate-100 w-full pl-3 text-left font-normal',
+                                                                    !field.value && 'text-slate-400'
                                                                 )}
                                                                 disabled={isArchived}
                                                             >
                                                                 {field.value ? (
                                                                     format(field.value, 'PPP')
                                                                 ) : (
-                                                                    <span>Pick a date</span>
+                                                                    <span>
+                                                                        {t(
+                                                                            'admin.settings.basic.pick_date'
+                                                                        )}
+                                                                    </span>
                                                                 )}
-                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                <CalendarIconAlt className="ml-auto h-4 w-4 opacity-50" />
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
@@ -224,6 +279,9 @@ export default function GeneralSettingsPage() {
                                                         className="w-auto p-0"
                                                         align="start"
                                                     >
+                                                        {/* Assuming Calendar is still properly imported/available if needed,
+                                                            or we use a custom one if it was part of shadcn calendar.
+                                                            Re-checking imports above. */}
                                                         <Calendar
                                                             mode="single"
                                                             selected={field.value || undefined}
@@ -235,8 +293,10 @@ export default function GeneralSettingsPage() {
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
-                                                <FormDescription>
-                                                    Automatically opens the study on this date.
+                                                <FormDescription className="text-[11px]">
+                                                    {t(
+                                                        'admin.settings.basic.start_date_description'
+                                                    )}
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -248,25 +308,31 @@ export default function GeneralSettingsPage() {
                                         name="end_date"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
-                                                <FormLabel>End Date (Optional)</FormLabel>
+                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <CalendarIconAlt className="w-3 h-3" />
+                                                    {t('admin.settings.basic.end_date_label')}
+                                                </FormLabel>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <FormControl>
                                                             <Button
                                                                 variant={'outline'}
                                                                 className={cn(
-                                                                    'w-full pl-3 text-left font-normal',
-                                                                    !field.value &&
-                                                                        'text-muted-foreground'
+                                                                    'h-11 rounded-xl bg-slate-50 border-slate-100 w-full pl-3 text-left font-normal',
+                                                                    !field.value && 'text-slate-400'
                                                                 )}
                                                                 disabled={isArchived}
                                                             >
                                                                 {field.value ? (
                                                                     format(field.value, 'PPP')
                                                                 ) : (
-                                                                    <span>Pick a date</span>
+                                                                    <span>
+                                                                        {t(
+                                                                            'admin.settings.basic.pick_date'
+                                                                        )}
+                                                                    </span>
                                                                 )}
-                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                <CalendarIconAlt className="ml-auto h-4 w-4 opacity-50" />
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
@@ -285,8 +351,8 @@ export default function GeneralSettingsPage() {
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
-                                                <FormDescription>
-                                                    Automatically closes the study on this date.
+                                                <FormDescription className="text-[11px]">
+                                                    {t('admin.settings.basic.end_date_description')}
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -294,15 +360,31 @@ export default function GeneralSettingsPage() {
                                     />
                                 </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between border-t px-6 py-4">
-                                <div className="text-sm text-slate-500">
-                                    Current State:{' '}
-                                    <Badge variant={isArchived ? 'secondary' : 'default'}>
+                            <CardFooter className="flex justify-between border-t border-slate-50 bg-slate-50/30 px-6 py-4">
+                                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                                    {t('admin.settings.lifecycle.current_state')}
+                                    <Badge
+                                        variant={isArchived ? 'secondary' : 'default'}
+                                        className={cn(
+                                            'font-black tracking-widest text-[10px] px-2.5 py-0.5',
+                                            !isArchived &&
+                                                'bg-indigo-600 shadow-lg shadow-indigo-100'
+                                        )}
+                                    >
                                         {study.state}
                                     </Badge>
                                 </div>
-                                <Button type="submit" disabled={isArchived}>
-                                    Save Changes
+                                <Button
+                                    type="submit"
+                                    disabled={isArchived || form.formState.isSubmitting}
+                                    className="rounded-xl px-6 font-black shadow-lg shadow-indigo-100 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                >
+                                    {form.formState.isSubmitting ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : (
+                                        <Save className="w-4 h-4 mr-2" />
+                                    )}
+                                    {t('admin.settings.save_button')}
                                 </Button>
                             </CardFooter>
                         </Card>
@@ -310,34 +392,42 @@ export default function GeneralSettingsPage() {
                 </Form>
 
                 {/* Archiving Section */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Archiving</CardTitle>
+                <Card className="shadow-md border-none bg-white overflow-hidden">
+                    <CardHeader className="border-b border-slate-50 bg-slate-50/30">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Archive className="h-5 w-5 text-amber-500" />
+                            <CardTitle className="text-lg">
+                                {t('admin.settings.lifecycle.title')}
+                            </CardTitle>
+                        </div>
                         <CardDescription>
-                            Archive the study to make it read-only for everyone.
+                            {t('admin.settings.lifecycle.description')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="bg-amber-50 p-4 rounded-md border border-amber-200 text-sm text-amber-800">
-                            <p>
-                                To archive a study, it must first be <strong>Closed</strong>. Once
-                                archived, no further changes can be made.
-                            </p>
+                    <CardContent className="p-6">
+                        <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 text-xs font-medium text-amber-800 flex items-start gap-3">
+                            <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
+                            <p>{t('admin.settings.lifecycle.notice')}</p>
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="px-6 pb-6 pt-0">
                         {isArchived ? (
-                            <Button disabled variant="outline" className="w-full sm:w-auto">
-                                Study is Archived
+                            <Button
+                                disabled
+                                variant="outline"
+                                className="w-full sm:w-auto rounded-xl font-bold bg-slate-50 border-slate-100"
+                            >
+                                {t('admin.settings.lifecycle.archived_status')}
                             </Button>
                         ) : (
                             <Button
                                 variant="secondary"
                                 disabled={!isClosed}
                                 onClick={handleArchive}
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto rounded-xl font-black bg-amber-100 text-amber-700 hover:bg-amber-200 border-none shadow-sm"
                             >
-                                Archive Study
+                                <Archive className="w-4 h-4 mr-2" />
+                                {t('admin.settings.lifecycle.archive_button')}
                             </Button>
                         )}
                     </CardFooter>
@@ -345,27 +435,35 @@ export default function GeneralSettingsPage() {
 
                 {/* Danger Zone (Superuser Only) */}
                 {user?.is_superuser && (
-                    <Card className="border-red-200">
-                        <CardHeader>
-                            <CardTitle className="text-red-600">Danger Zone</CardTitle>
-                            <CardDescription>Actions here are irreversible.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="bg-red-50 p-4 rounded-md border border-red-200 text-sm text-red-800 mb-4">
-                                Deleting a study removes ALL data (participants, answers, config)
-                                permanently. Study must be <strong>Archived</strong> before
-                                deletion.
+                    <Card className="shadow-md border border-red-100 bg-white overflow-hidden">
+                        <CardHeader className="border-b border-red-50 bg-red-50/30">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Trash2 className="h-5 w-5 text-red-500" />
+                                <CardTitle className="text-lg text-red-600">
+                                    {t('admin.settings.danger.title')}
+                                </CardTitle>
                             </div>
+                            <CardDescription className="text-red-400">
+                                {t('admin.settings.danger.description')}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100 text-xs font-medium text-red-800 flex items-start gap-3">
+                                <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
+                                <p>{t('admin.settings.danger.notice')}</p>
+                            </div>
+                        </CardContent>
+                        <CardFooter className="px-6 pb-6 pt-0">
                             <Button
                                 variant="destructive"
                                 disabled={!isArchived}
                                 onClick={handleDelete}
-                                className="w-full sm:w-auto flex items-center gap-2"
+                                className="w-full sm:w-auto rounded-xl font-black shadow-lg shadow-red-100 flex items-center gap-2 px-6"
                             >
                                 <Trash2 size={16} />
-                                Delete Study
+                                {t('admin.settings.danger.delete_button')}
                             </Button>
-                        </CardContent>
+                        </CardFooter>
                     </Card>
                 )}
             </div>

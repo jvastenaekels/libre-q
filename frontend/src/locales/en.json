@@ -15,6 +15,7 @@
         "cards": "statements",
         "close": "Close",
         "optional": "Optional",
+        "processing": "Processing...",
         "statement": "Statement",
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
@@ -88,6 +89,52 @@
         "navigation": "Navigation",
         "language": "English"
     },
+    "auth": {
+        "login": {
+            "title": "Admin Login",
+            "email_label": "Email Address",
+            "password_label": "Password",
+            "submit": "Continue",
+            "forgot_password": "Forgot?",
+            "loading": "Authenticating...",
+            "subtitle": "Enter your credentials to manage your studies",
+            "card_title": "Sign in",
+            "card_description": "Secure access to your research dashboard",
+            "privacy": "By signing in, you agree to our Terms and Privacy Policy.",
+            "powered_by": "Powered by",
+            "welcome_back": "Welcome back!",
+            "error_401": "Invalid email or password",
+            "error_generic": "Something went wrong. Please try again."
+        },
+        "register": {
+            "title": "Create Account",
+            "subtitle": "Join the research project",
+            "secure_invitation": "Secure Invitation",
+            "invitation_to": "Invitation To:",
+            "study_label": "Study",
+            "role_label": "Role",
+            "email_label": "Email Address",
+            "password_label": "Choose Password",
+            "confirm_password_label": "Confirm Password",
+            "placeholder_password": "••••••••",
+            "submit": "Complete Registration",
+            "loading": "Creating Account...",
+            "success_title": "Welcome Aboard!",
+            "success_desc": "Your account has been created and linked to the study.",
+            "success_cta": "Go to Dashboard",
+            "success_hint": "You can now log in to the administrative dashboard to begin collaborating.",
+            "invalid_title": "Invalid Invitation",
+            "invalid_desc": "This invitation link is invalid or has expired.",
+            "missing_token_title": "Missing Token",
+            "missing_token_desc": "This page requires a valid invitation token. Please check the link you received.",
+            "verifying": "Verifying your invitation...",
+            "privacy_hint": "By registering, you agree to follow the research ethics guidelines configured for this study.",
+            "errors": {
+                "password_mismatch": "Passwords do not match",
+                "generic_fail": "Registration failed"
+            }
+        }
+    },
     "welcome": {
         "start": "Get Started",
         "consent": {
@@ -142,7 +189,7 @@
     "rough": {
         "header": {
             "subtitle": "Swipe **left** to Disagree, **right** to Agree, or **down** to be Neutral.",
-            "hint": "Trust your **instinct**. This is spontaneous — you can change your mind right after."
+            "hint": "This is spontaneous — you can change your mind right after."
         },
         "complete": {
             "title": "First Step Complete",
@@ -249,6 +296,9 @@
             "profile": "Profile"
         },
         "sidebar": {
+            "home": "Dashboard",
+            "add_study": "Add Study",
+            "create_project": "CREATE NEW PROJECT",
             "dashboard": "Dashboard",
             "design": "Design",
             "recruit": "Recruit",
@@ -694,8 +744,14 @@
                     "too_few": "{{count}} statements missing",
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
-                    "locked": "Grid structure is locked",
-                    "locked_desc": "The grid and statements cannot be modified while the study is active/closed. This protects data integrity.",
+                    "locked": "Design Locked",
+                    "locked_desc": "This study is no longer in draft mode. Modifications are restricted to preserve data integrity for existing participants.",
+                    "locked_active": "Study is Active",
+                    "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode (warning: this may invalidate existing results).",
+                    "locked_paused": "Study is Paused",
+                    "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
+                    "locked_closed": "Study is Closed",
+                    "locked_closed_desc": "This study is completed. The design is archived and cannot be changed.",
                     "mismatch_title": "Grid configuration mismatch",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match."
                 }
@@ -781,15 +837,34 @@
                     "desc": "Add logos of supporting institutions or partners.",
                     "add": "Add Partner",
                     "name_label": "Partner Name",
+                    "name_placeholder": "Institution Name",
                     "logo_label": "Logo URL",
                     "url_label": "Website (optional)",
                     "url_placeholder": "Logo URL (https://...)"
+                },
+                "upload": {
+                    "upload": "Upload",
+                    "recommended": "Recommended",
+                    "invalid_type": "Invalid file type. Use PNG, JPG, or SVG.",
+                    "file_too_large": "File too large. Maximum size: {{size}}KB.",
+                    "conversion_error": "Failed to process image.",
+                    "processing": "Processing image...",
+                    "drag_drop": "Drag & drop or click to upload",
+                    "max": "Max"
                 }
             }
         },
         "data": {
             "title": "Analytics & Data",
             "description": "Inspect participant performance, qualitative feedback, and export datasets.",
+            "stats": {
+                "email_collection": "Email Collection",
+                "participants": "participants",
+                "newsletter": "Newsletter Consent",
+                "opt_in": "opt-in",
+                "follow_up": "Follow-up Interview",
+                "interested": "interested"
+            },
             "tabs": {
                 "browse": "Interactive view",
                 "export": "Export data"
@@ -846,6 +921,63 @@
                     "title": "Survey Responses",
                     "csv_note": "Full survey answers available in CSV export."
                 }
+            },
+            "team": {
+                "title": "Study Team",
+                "description": "Manage collaborators and study-level access control.",
+                "invite_title": "Invite Collaborator",
+                "invite_description": "Generate a secure link to invite a new member to this study.",
+                "email_label": "Email Address",
+                "role_label": "Role",
+                "select_role": "Select a role",
+                "generate_link": "Generate Link",
+                "invite_success": "Invitation link generated!",
+                "invite_error": "Failed to generate invitation",
+                "copy_success": "Link copied to clipboard",
+                "share_label": "Share this link with the invitee:",
+                "collab_overview": "Collaboration Overview",
+                "active_members": "Active Members",
+                "permissions_info": "Permissions Info",
+                "list_title": "Research Team",
+                "list_description": "Manage access for existing collaborators.",
+                "added_on": "Added on",
+                "headers": {
+                    "collaborator": "Collaborator",
+                    "role": "Role",
+                    "actions": "Actions"
+                },
+                "roles": {
+                    "owner": "Owner (Full Control)",
+                    "editor": "Editor (Design & Analysis)",
+                    "viewer": "Viewer (Read-only)",
+                    "owner_badge": "OWNER",
+                    "editor_badge": "EDITOR",
+                    "viewer_badge": "VIEWER"
+                },
+                "permissions": {
+                    "owner": "Can delete the study and manage team.",
+                    "editor": "Can modify design and view results.",
+                    "viewer": "Read-only access to all modules."
+                }
+            },
+            "empty_states": {
+                "participants": {
+                    "title": "Ready to launch?",
+                    "desc": "Share your study link to start collecting responses. Your first participant is just a click away.",
+                    "action": "Copy Study Link",
+                    "hint": "Or scan the QR code",
+                    "copy_success": "Study link copied to clipboard!"
+                },
+                "team": {
+                    "title": "You're flying solo",
+                    "desc": "Invite collaborators to help manage this study. They can view data, edit the design, or just observe.",
+                    "action": "Invite your first collaborator"
+                },
+                "designer": {
+                    "title": "Tabula Rasa",
+                    "desc": "This study has no statements yet. Add your Q-set items to begin designing your sort.",
+                    "action": "Load Example Q-Set"
+                }
             }
         },
         "status": {
@@ -853,6 +985,93 @@
             "paused": "Paused",
             "closed": "Closed",
             "draft": "Draft"
+        },
+        "settings": {
+            "title": "General Settings",
+            "description": "Manage basic study configuration, URL slug, and lifecycle states.",
+            "basic": {
+                "title": "Basic Information",
+                "description": "Configure the study identity and availability window.",
+                "slug_label": "URL Slug",
+                "slug_description": "The unique identifier used in the URL.",
+                "start_date_label": "Start Date (Optional)",
+                "start_date_description": "Automatically opens the study on this date.",
+                "end_date_label": "End Date (Optional)",
+                "end_date_description": "Automatically closes the study on this date.",
+                "pick_date": "Pick a date"
+            },
+            "lifecycle": {
+                "title": "Archiving",
+                "description": "Archive the study to make it read-only for everyone.",
+                "notice": "To archive a study, it must first be Closed. Once archived, no further changes can be made.",
+                "archived_status": "Study is Archived",
+                "archive_button": "Archive Study",
+                "current_state": "Current State"
+            },
+            "danger": {
+                "title": "Danger Zone",
+                "description": "Actions here are irreversible.",
+                "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be Archived before deletion.",
+                "delete_button": "Delete Study",
+                "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
+            },
+            "save_button": "Save Changes",
+            "save_success": "Settings updated",
+            "save_success_desc": "Study settings have been saved.",
+            "save_error": "Error updating settings",
+            "save_error_desc": "Failed to update settings. Slug might be taken.",
+            "archive_success": "Study Archived",
+            "archive_success_desc": "The study is now archived and read-only.",
+            "archive_error": "Error archiving study",
+            "archive_error_desc": "Failed to archive study. Is it closed?",
+            "delete_success": "Study Deleted",
+            "delete_success_desc": "The study has been permanently removed.",
+            "delete_error": "Error deleting study",
+            "delete_error_desc": "Failed to delete study."
+        },
+        "workspaces": {
+            "title": "Workspaces",
+            "settings": {
+                "title": "Workspace Settings",
+                "identity_desc": "Manage workspace identity and team access control.",
+                "general": {
+                    "title": "General Settings",
+                    "desc": "Identity and primary identification of your workspace.",
+                    "label_title": "Workspace Title",
+                    "placeholder_title": "My Awesome Lab",
+                    "label_slug": "URL Slug",
+                    "placeholder_slug": "my-lab",
+                    "slug_hint": "Changing the slug will update all your research dashboard links.",
+                    "save": "Save Changes",
+                    "save_success": "Workspace updated successfully",
+                    "save_error": "Failed to update workspace"
+                },
+                "team": {
+                    "title": "Team Members",
+                    "desc": "List of users with access to this workspace.",
+                    "col_user": "User",
+                    "col_role": "Role",
+                    "col_joined": "Joined",
+                    "col_actions": "Actions",
+                    "remove_confirm": "Are you sure you want to remove this member?",
+                    "remove_success": "Member removed successfully",
+                    "remove_error": "Failed to remove member",
+                    "growth_title": "Team Growth",
+                    "growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
+                    "invite_button": "Invite Collaborator",
+                    "coming_soon": "Coming Soon",
+                    "invite_modal": {
+                        "title": "Invite Collaborator",
+                        "desc": "Send a secure invitation to join your research team.",
+                        "email_label": "Collaborator Email",
+                        "role_label": "Assigned Role",
+                        "success": "Invitation link generated!",
+                        "error": "Failed to create invitation.",
+                        "send": "Create & Send Invitation",
+                        "copy_hint": "Copy this link and send it manually if the email fails."
+                    }
+                }
+            }
         }
     }
 }

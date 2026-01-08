@@ -14,7 +14,6 @@ from app.dependencies import (
 from app.models import (
     Participant,
     Study,
-    StudyCollaborator,
     StudyRole,
     StudyState,
     User,
@@ -85,12 +84,9 @@ async def create_study(
     db.add(db_study)
     await db.flush()  # to get ID
 
-    # 4. Add creator as Study Owner
-    db.add(
-        StudyCollaborator(
-            study_id=db_study.id, user_id=current_user.id, role=StudyRole.owner
-        )
-    )
+    # 4. Add creator as Study Owner -> No longer needed, Workspace roles apply
+    # Check if we should enforce that creator is at least Admin/Owner?
+    # Already checked in permission block above.
 
     from app.models import Statement, StatementTranslation, StudyTranslation
     from app.services.study_service import DEFAULT_PROCESS_STEPS
@@ -99,7 +95,9 @@ async def create_study(
         t_data = t_in.model_dump()
         # Inject default process steps if not provided
         if not t_data.get("process_steps"):
-            t_data["process_steps"] = DEFAULT_PROCESS_STEPS
+            t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
+                t_data.get("language_code", "en"), DEFAULT_PROCESS_STEPS["en"]
+            )
         db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
     # 4. Add Statements and their translations
@@ -368,17 +366,14 @@ async def get_participant(
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
         .where(
             Participant.id == participant_id,
-            (
-                (StudyCollaborator.user_id == current_user.id)
-                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
-            )
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
+            WorkspaceMember.user_id == current_user.id,
+            # Role check: Owner/Admin/Researcher can view details. Viewers might be restricted?
+            # Assuming Viewer can also view if they have study access.
+            WorkspaceMember.role.in_(
+                [WorkspaceRole.owner, WorkspaceRole.admin, WorkspaceRole.researcher]
             ),
         )
         .options(selectinload(Participant.qsort_entries))
@@ -408,17 +403,12 @@ async def discard_participant(
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
         .where(
             Participant.id == participant_id,
-            (
-                (StudyCollaborator.user_id == current_user.id)
-                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
-            )
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
+            WorkspaceMember.user_id == current_user.id,
+            WorkspaceMember.role.in_(
+                [WorkspaceRole.owner, WorkspaceRole.admin, WorkspaceRole.researcher]
             ),
         )
     )

@@ -47,15 +47,8 @@ const StudyDesignPage = () => {
     const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
-    const {
-        draft,
-        activeStep,
-        activeLocale,
-        setStudy,
-        setActiveStep,
-        setActiveLocale,
-        resetDraft,
-    } = useStudyDesigner();
+    const { draft, activeStep, activeLocale, setStudy, setActiveStep, setActiveLocale } =
+        useStudyDesigner();
 
     const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
@@ -77,7 +70,7 @@ const StudyDesignPage = () => {
     const isDirty = JSON.stringify(draft) !== JSON.stringify(study);
 
     // Permission States
-    const isFullyReadOnly = draft?.state === 'closed' || draft?.state === 'paused';
+    const isFullyReadOnly = draft?.state !== 'draft';
     const isStructureLocked = draft?.state !== 'draft'; // active, paused, closed
 
     useEffect(() => {
@@ -185,7 +178,8 @@ const StudyDesignPage = () => {
                     </div>
                     <div className="h-4 w-px bg-border hidden sm:block" />
                     <h2 className="text-xs sm:text-sm font-medium truncate min-w-0">
-                        {draft.translations?.find((t) => t.language_code === activeLocale)?.title || draft.slug}
+                        {draft.translations?.find((t) => t.language_code === activeLocale)?.title ||
+                            draft.slug}
                     </h2>
                     {/* Status Badge */}
                     <div
@@ -326,28 +320,57 @@ const StudyDesignPage = () => {
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative">
-                {/* Read-only Overlay - Only for CLOSED studies */}
+                {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
                     <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 pointer-events-none">
                         <div className="bg-background border shadow-lg rounded-xl p-6 max-w-md text-center pointer-events-auto">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Lock className="h-6 w-6 text-red-600" />
+                            <div
+                                className={cn(
+                                    'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4',
+                                    draft.state === 'active'
+                                        ? 'bg-blue-100'
+                                        : draft.state === 'paused'
+                                          ? 'bg-amber-100'
+                                          : 'bg-red-100'
+                                )}
+                            >
+                                {draft.state === 'active' ? (
+                                    <Globe className="h-6 w-6 text-blue-600" />
+                                ) : draft.state === 'paused' ? (
+                                    <Lock className="h-6 w-6 text-amber-600" />
+                                ) : (
+                                    <Lock className="h-6 w-6 text-red-600" />
+                                )}
                             </div>
                             <h3 className="text-lg font-semibold">
-                                {draft.state === 'closed'
-                                    ? t('admin.status.closed')
-                                    : t('admin.status.paused')}
+                                {draft.state === 'active'
+                                    ? t('admin.design.qsort.grid.locked_active')
+                                    : draft.state === 'paused'
+                                      ? t('admin.design.qsort.grid.locked_paused')
+                                      : t('admin.design.qsort.grid.locked_closed')}
                             </h3>
-                            <p className="text-sm text-muted-foreground mt-2 mb-6">
-                                {t('admin.design.qsort.grid.locked_desc')}
+                            <p className="text-sm text-muted-foreground mt-2 mb-6 text-pretty">
+                                {draft.state === 'active'
+                                    ? t('admin.design.qsort.grid.locked_active_desc')
+                                    : draft.state === 'paused'
+                                      ? t('admin.design.qsort.grid.locked_paused_desc')
+                                      : t('admin.design.qsort.grid.locked_closed_desc')}
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <Button
                                     variant="outline"
                                     onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                 >
-                                    {t('admin.design.toolbar.closed')}
+                                    {t('admin.design.toolbar.back_to_study', 'Back to Study')}
                                 </Button>
+                                {draft.state === 'active' && (
+                                    <Button
+                                        variant="default"
+                                        onClick={() => navigate(`/admin/studies/${draft.slug}`)}
+                                    >
+                                        {t('admin.study.state.manage')}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -363,49 +386,70 @@ const StudyDesignPage = () => {
                         <TabsList className="bg-slate-100/50 backdrop-blur-sm border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-10 scrollbar-none snap-x snap-mandatory rounded-xl h-11">
                             <TabsTrigger
                                 value="intro"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100"
                             >
-                                👋 {t('admin.design.tabs.welcome')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    👋
+                                </span>{' '}
+                                {t('admin.design.tabs.welcome')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pre-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100"
                             >
-                                📋 {t('admin.design.tabs.presort')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    📋
+                                </span>{' '}
+                                {t('admin.design.tabs.presort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="condition"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100"
                             >
-                                🎯 {t('admin.design.tabs.condition')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    🎯
+                                </span>{' '}
+                                {t('admin.design.tabs.condition')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="q-sort"
                                 data-testid="tab-q-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100"
                             >
-                                🃏 {t('admin.design.tabs.qsort')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    🧩
+                                </span>{' '}
+                                {t('admin.design.tabs.qsort')}
                                 {isStructureLocked && (
-                                    <Lock size={12} className="text-muted-foreground/60" />
+                                    <Lock size={12} className="text-muted-foreground/60 ml-1" />
                                 )}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100"
                             >
-                                🏁 {t('admin.design.tabs.postsort')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    🏁
+                                </span>{' '}
+                                {t('admin.design.tabs.postsort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="branding"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100"
                             >
-                                🎨 {t('admin.design.tabs.theme')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    🎨
+                                </span>{' '}
+                                {t('admin.design.tabs.theme')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="interface"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-cyan-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-cyan-100"
                             >
-                                ✨ {t('admin.design.tabs.interface')}
+                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                    ✨
+                                </span>{' '}
+                                {t('admin.design.tabs.interface')}
                             </TabsTrigger>
                         </TabsList>
 

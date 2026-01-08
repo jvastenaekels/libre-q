@@ -113,24 +113,7 @@ class WorkspaceMember(Base):
     user: Mapped["User"] = relationship(back_populates="memberships")
 
 
-class StudyCollaborator(Base):
-    """Association model for study collaborators with roles."""
-
-    __tablename__ = "study_collaborators"
-
-    study_id: Mapped[int] = mapped_column(
-        ForeignKey("studies.id", ondelete="CASCADE"), primary_key=True
-    )
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
-    )
-    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
-    added_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-
-    study: Mapped["Study"] = relationship(back_populates="collaborators")
-    user: Mapped["User"] = relationship(back_populates="study_collaborations")
+# StudyCollaborator model removed (RBAC Refactor)
 
 
 # User Model
@@ -152,10 +135,6 @@ class User(Base):
 
     # Relationships
     memberships: Mapped[list["WorkspaceMember"]] = relationship(
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )
-    study_collaborations: Mapped[list["StudyCollaborator"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
@@ -217,9 +196,6 @@ class Study(Base):
     )
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="study", cascade="all, delete-orphan"
-    )
-    collaborators: Mapped[list["StudyCollaborator"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
     recruitment_links: Mapped[list["RecruitmentLink"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
@@ -419,10 +395,17 @@ class Invitation(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, index=True)
-    study_id: Mapped[int] = mapped_column(
-        ForeignKey("studies.id", ondelete="CASCADE"), index=True
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
     )
-    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
+    # study_id removed or made nullable if keeping for legacy ref?
+    # Replacing study_id with workspace_id entirely for now.
+    study_id: Mapped[int | None] = mapped_column(
+        ForeignKey("studies.id", ondelete="SET NULL"), nullable=True
+    )
+    role: Mapped[WorkspaceRole] = mapped_column(
+        SAEnum(WorkspaceRole), default=WorkspaceRole.viewer
+    )
     token: Mapped[str] = mapped_column(String, unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -432,4 +415,4 @@ class Invitation(Base):
         DateTime(timezone=True), nullable=True
     )
 
-    study: Mapped["Study"] = relationship()
+    workspace: Mapped["Workspace"] = relationship()

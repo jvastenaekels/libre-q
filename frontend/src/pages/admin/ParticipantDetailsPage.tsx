@@ -30,7 +30,7 @@ export default function ParticipantDetailsPage() {
         useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
 
     // Find the participant
-    const participant = studyData?.participants?.find((p) => p.id === participantId);
+    const participant = studyData?.participants?.find((p) => String(p.id) === participantId);
 
     const handleToggleDiscard = async (isDiscarded: boolean) => {
         if (!participant) return;
@@ -94,7 +94,9 @@ export default function ParticipantDetailsPage() {
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.studies.study', 'Study')}: ${studyData.study.slug}`}
+                    description={`${t('admin.studies.study', 'Study')}: ${
+                        studyData.study.translations[0]?.title || studyData.study.slug
+                    }`}
                     icon={User}
                 />
             </div>

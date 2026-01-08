@@ -15,6 +15,7 @@
         "cards": "väitettä",
         "close": "Sulje",
         "optional": "Valinnainen",
+        "processing": "Käsitellään...",
         "statement": "Väite",
         "errors": {
             "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
@@ -89,6 +90,52 @@
         "navigation": "Navigointi",
         "language": "Suomi"
     },
+    "auth": {
+        "login": {
+            "title": "Järjestelmänvalvojan kirjautuminen",
+            "email_label": "Sähköpostiosoite",
+            "password_label": "Salasana",
+            "submit": "Jatka",
+            "forgot_password": "Unohditko?",
+            "loading": "Tunnistaudutaan...",
+            "subtitle": "Syötä tunnistetietosi tutkimusten hallintaa varten",
+            "card_title": "Kirjaudu sisään",
+            "card_description": "Suojattu pääsy tutkimuksen hallintapaneeliin",
+            "privacy": "Kirjautumalla sisään hyväksyt käyttöehdot ja tietosuojakäytäntömme.",
+            "powered_by": "Tarjoaa",
+            "welcome_back": "Tervetuloa takaisin!",
+            "error_401": "Virheellinen sähköposti tai salasana",
+            "error_generic": "Jotain meni vikaan. Yritä uudelleen."
+        },
+        "register": {
+            "title": "Luo tili",
+            "subtitle": "Liity tutkimusprojektiin",
+            "secure_invitation": "Suojattu kutsu",
+            "invitation_to": "Kutsu kohteeseen:",
+            "study_label": "Tutkimus",
+            "role_label": "Rooli",
+            "email_label": "Sähköpostiosoite",
+            "password_label": "Valitse salasana",
+            "confirm_password_label": "Vahvista salasana",
+            "placeholder_password": "••••••••",
+            "submit": "Viimeistele rekisteröinti",
+            "loading": "Luodaan tiliä...",
+            "success_title": "Tervetuloa mukaan!",
+            "success_desc": "Tilisi on luotu ja linkitetty tutkimukseen.",
+            "success_cta": "Siirry hallintapaneeliin",
+            "success_hint": "Voit nyt kirjautua hallintapaneeliin aloittaaksesi yhteistyön.",
+            "invalid_title": "Virheellinen kutsu",
+            "invalid_desc": "Tämä kutsulinkki on virheellinen tai vanhentunut.",
+            "missing_token_title": "Puuttuva tunnus",
+            "missing_token_desc": "Tämä sivu vaatii voimassa olevan kutsutunnuksen. Tarkista saamasi linkki.",
+            "verifying": "Vahvistetaan kutsuasi...",
+            "privacy_hint": "Rekisteröitymällä sitoudut noudattamaan tälle tutkimukselle määritettyjä tutkimuseettisiä ohjeita.",
+            "errors": {
+                "password_mismatch": "Salasanat eivät täsmää",
+                "generic_fail": "Rekisteröityminen epäonnistui"
+            }
+        }
+    },
     "welcome": {
         "start": "Aloita",
         "consent": {
@@ -143,7 +190,7 @@
     "rough": {
         "header": {
             "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
-            "hint": "Luota **vaistoosi**. Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
+            "hint": "Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
         },
         "complete": {
             "title": "Ensimmäinen vaihe valmis",
@@ -250,6 +297,9 @@
             "profile": "Profiili"
         },
         "sidebar": {
+            "home": "Hallintapaneeli",
+            "add_study": "Lisää tutkimus",
+            "create_project": "LUO UUSI PROJEKTI",
             "dashboard": "Kojelauta",
             "design": "Suunnittelu",
             "recruit": "Rekrytointi",
@@ -695,8 +745,14 @@
                     "too_few": "{{count}} väitettä puuttuu",
                     "tooltip_title": "Miksi pakotettu jakauma?",
                     "tooltip_desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja.",
-                    "locked": "Ruudukon rakenne on lukittu",
-                    "locked_desc": "Ruudukkoa ja väittämiä ei voi muokata, kun tutkimus on aktiivinen/suljettu.",
+                    "locked": "Suunnittelu Lukittu",
+                    "locked_desc": "Tämä tutkimus ei ole enää luonnostilassa. Muutoksia on rajoitettu tietojen eheyden säilyttämiseksi.",
+                    "locked_active": "Tutkimus on Aktiivinen",
+                    "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan (varoitus: tämä voi mitätöidä olemassa olevat tulokset).",
+                    "locked_paused": "Tutkimus on Keskeytetty",
+                    "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
+                    "locked_closed": "Tutkimus on Suljettu",
+                    "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
                     "mismatch_title": "Ruudukon konfiguraatiovirhe",
                     "mismatch_desc": "Sinulla on {{statements}} väittämää, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla."
                 }
@@ -781,15 +837,34 @@
                     "desc": "Lisää tukevien instituutioiden tai kumppaneiden logot.",
                     "add": "Lisää kumppani",
                     "name_label": "Kumppanin nimi",
+                    "name_placeholder": "Instituution nimi",
                     "logo_label": "Logon URL",
                     "url_label": "Verkkosivusto (valinnainen)",
                     "url_placeholder": "Logon URL (https://...)"
+                },
+                "upload": {
+                    "upload": "Lataa",
+                    "recommended": "Suositeltu",
+                    "invalid_type": "Virheellinen tiedostotyyppi. Käytä PNG-, JPG- tai SVG-tiedostoa.",
+                    "file_too_large": "Tiedosto on liian suuri. Maksimikoko: {{size}}KB.",
+                    "conversion_error": "Kuvan käsittely epäonnistui.",
+                    "processing": "Käsitellään kuvaa...",
+                    "drag_drop": "Vedä ja pudota tai napsauta ladataksesi",
+                    "max": "Maks"
                 }
             }
         },
         "data": {
             "title": "Analytiikka & Tiedot",
             "description": "Tarkastele osallistujien suorituksia, laadullista palautetta ja vie tietoaineistoja.",
+            "stats": {
+                "email_collection": "Sähköpostien kerääminen",
+                "participants": "osallistujaa",
+                "newsletter": "Uutiskirjeen tilaus",
+                "opt_in": "tilausta",
+                "follow_up": "Jatkotuudun haastattelu",
+                "interested": "kiinnostunutta"
+            },
             "tabs": {
                 "browse": "Interaktiivinen näkymä",
                 "export": "Vie tiedot"
@@ -846,6 +921,63 @@
                     "title": "Kyselyvastaukset",
                     "csv_note": "Täydelliset vastaukset saatavilla CSV-viennissä."
                 }
+            },
+            "team": {
+                "title": "Tutkimustiimi",
+                "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
+                "invite_title": "Kutsu yhteistyökumppani",
+                "invite_description": "Luo turvallinen linkki uuden jäsenen kutsumiseksi tähän tutkimukseen.",
+                "email_label": "Sähköpostiosoite",
+                "role_label": "Rooli",
+                "select_role": "Valitse rooli",
+                "generate_link": "Luo linkki",
+                "invite_success": "Kutsulinkki luotu!",
+                "invite_error": "Kutsun luominen epäonnistui",
+                "copy_success": "Linkki kopioitu leikepöydälle",
+                "share_label": "Jaa tämä linkki kutsuttavan kanssa:",
+                "collab_overview": "Yhteistyön yleiskatsaus",
+                "active_members": "Aktiiviset jäsenet",
+                "permissions_info": "Lupatiedot",
+                "list_title": "Tutkimustiimi",
+                "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
+                "added_on": "Lisätty",
+                "headers": {
+                    "collaborator": "Yhteistyökumppani",
+                    "role": "Rooli",
+                    "actions": "Toiminnot"
+                },
+                "roles": {
+                    "owner": "Omistaja (Täydet oikeudet)",
+                    "editor": "Muokkaja (Suunnittelu ja analyysi)",
+                    "viewer": "Katsoja (Vain luku)",
+                    "owner_badge": "OMISTAJA",
+                    "editor_badge": "MUOKKAAJA",
+                    "viewer_badge": "KATSOJA"
+                },
+                "permissions": {
+                    "owner": "Voi poistaa tutkimuksen ja hallinnoida tiimiä.",
+                    "editor": "Voi muokata suunnitelmaa ja tarkastella tuloksia.",
+                    "viewer": "Vain luku -pääsy kaikkiin moduuleihin."
+                }
+            },
+            "empty_states": {
+                "participants": {
+                    "title": "Valmiina julkaisuun?",
+                    "desc": "Jaa tutkimuslinkkisi aloittaaksesi vastausten keräämisen. Ensimmäinen osallistuja on vain klikkauksen päässä.",
+                    "action": "Kopioi tutkimuslinkki",
+                    "hint": "Tai skannaa QR-koodi",
+                    "copy_success": "Tutkimuslinkki kopioitu leikepöydälle!"
+                },
+                "team": {
+                    "title": "Työskentelet yksin",
+                    "desc": "Kutsu yhteistyökumppaneita auttamaan tämän tutkimuksen hallinnassa. He voivat tarkastella tietoja, muokata suunnitelmaa tai vain seurata.",
+                    "action": "Kutsu ensimmäinen yhteistyökumppanisi"
+                },
+                "designer": {
+                    "title": "Tabula Rasa",
+                    "desc": "Tässä tutkimuksessa ei ole vielä väitteitä. Lisää Q-set-kohtia aloittaaksesi lajittelun suunnittelun.",
+                    "action": "Lataa esimerkki Q-Set"
+                }
             }
         },
         "status": {
@@ -853,6 +985,93 @@
             "paused": "Tauolla",
             "closed": "Suljettu",
             "draft": "Luonnos"
+        },
+        "settings": {
+            "title": "General Settings",
+            "description": "Manage basic study configuration, URL slug, and lifecycle states.",
+            "basic": {
+                "title": "Basic Information",
+                "description": "Configure the study identity and availability window.",
+                "slug_label": "URL Slug",
+                "slug_description": "The unique identifier used in the URL.",
+                "start_date_label": "Start Date (Optional)",
+                "start_date_description": "Automatically opens the study on this date.",
+                "end_date_label": "End Date (Optional)",
+                "end_date_description": "Automatically closes the study on this date.",
+                "pick_date": "Pick a date"
+            },
+            "lifecycle": {
+                "title": "Archiving",
+                "description": "Archive the study to make it read-only for everyone.",
+                "notice": "To archive a study, it must first be Closed. Once archived, no further changes can be made.",
+                "archived_status": "Study is Archived",
+                "archive_button": "Archive Study",
+                "current_state": "Current State"
+            },
+            "danger": {
+                "title": "Danger Zone",
+                "description": "Actions here are irreversible.",
+                "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be Archived before deletion.",
+                "delete_button": "Delete Study",
+                "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
+            },
+            "save_button": "Save Changes",
+            "save_success": "Settings updated",
+            "save_success_desc": "Study settings have been saved.",
+            "save_error": "Error updating settings",
+            "save_error_desc": "Failed to update settings. Slug might be taken.",
+            "archive_success": "Study Archived",
+            "archive_success_desc": "The study is now archived and read-only.",
+            "archive_error": "Error archiving study",
+            "archive_error_desc": "Failed to archive study. Is it closed?",
+            "delete_success": "Study Deleted",
+            "delete_success_desc": "The study has been permanently removed.",
+            "delete_error": "Error deleting study",
+            "delete_error_desc": "Failed to delete study."
+        },
+        "workspaces": {
+            "title": "Työtilat",
+            "settings": {
+                "title": "Työtilan asetukset",
+                "identity_desc": "Hallitse työtilan identiteettiä ja tiimin käyttöoikeuksia.",
+                "general": {
+                    "title": "Yleiset asetukset",
+                    "desc": "Työtilasi identiteetti ja ensisijainen tunnistus.",
+                    "label_title": "Työtilan nimi",
+                    "placeholder_title": "Oma mahtava laboratorio",
+                    "label_slug": "URL-osoitteen polku",
+                    "placeholder_slug": "oma-labra",
+                    "slug_hint": "Polun muuttaminen päivittää kaikki tutkimuksen hallintapaneelin linkit.",
+                    "save": "Tallenna muutokset",
+                    "save_success": "Työtila päivitetty onnistuneesti",
+                    "save_error": "Työtilan päivitys epäonnistui"
+                },
+                "team": {
+                    "title": "Tiimin jäsenet",
+                    "desc": "Luettelo käyttäjistä, joilla on pääsy tähän työtilaan.",
+                    "col_user": "Käyttäjä",
+                    "col_role": "Rooli",
+                    "col_joined": "Liittynyt",
+                    "col_actions": "Toiminnot",
+                    "remove_confirm": "Haluatko varmasti poistaa tämän jäsenen?",
+                    "remove_success": "Jäsen poistettu onnistuneesti",
+                    "remove_error": "Jäsenen poistaminen epäonnistui",
+                    "growth_title": "Tiimin kasvu",
+                    "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He pystyvät hallitsemaan kaikkia tämän työtilan tutkimuksia.",
+                    "invite_button": "Kutsu yhteistyökumppani",
+                    "coming_soon": "Tulossa pian",
+                    "invite_modal": {
+                        "title": "Kutsu yhteistyökumppani",
+                        "desc": "Lähetä suojattu kutsu liittyäksesi tutkimustiimiisi.",
+                        "email_label": "Yhteistyökumppanin sähköposti",
+                        "role_label": "Määritetty rooli",
+                        "success": "Kutsulinkki luotu!",
+                        "error": "Kutsun luominen epäonnistui.",
+                        "send": "Luo ja lähetä kutsu",
+                        "copy_hint": "Kopioi tämä linkki ja lähetä se manuaalisesti, jos sähköposti epäonnistuu."
+                    }
+                }
+            }
         }
     }
 }

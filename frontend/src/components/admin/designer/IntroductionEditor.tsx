@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Info } from 'lucide-react';
+import { Hand, Clipboard, ShieldCheck } from 'lucide-react';
 import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
@@ -49,9 +49,9 @@ const IntroductionEditor = () => {
     return (
         <div className="space-y-8">
             <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <span className="bg-primary/10 p-1 rounded">
-                        <Info className="h-5 w-5" />
+                <div className="flex items-center gap-2 text-indigo-600 font-semibold text-lg">
+                    <span className="bg-indigo-50 p-1 rounded-lg border border-indigo-100 shadow-sm">
+                        <Hand className="h-5 w-5" />
                     </span>
                     {t('admin.design.intro.welcome_title')}
                 </div>
@@ -103,9 +103,9 @@ const IntroductionEditor = () => {
 
             <section className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                        <span className="bg-primary/10 p-1 rounded">
-                            <Info className="h-5 w-5" />
+                    <div className="flex items-center gap-2 text-amber-600 font-semibold text-lg">
+                        <span className="bg-amber-50 p-1 rounded-lg border border-amber-100 shadow-sm">
+                            <Clipboard className="h-5 w-5" />
                         </span>
                         {t('admin.design.intro.process_title')}
                     </div>
@@ -155,9 +155,9 @@ const IntroductionEditor = () => {
 
             <section className="space-y-4 pb-12">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                        <span className="bg-primary/10 p-1 rounded">
-                            <Info className="h-5 w-5" />
+                    <div className="flex items-center gap-2 text-emerald-600 font-semibold text-lg">
+                        <span className="bg-emerald-50 p-1 rounded-lg border border-emerald-100 shadow-sm">
+                            <ShieldCheck className="h-5 w-5" />
                         </span>
                         {t('admin.design.intro.consent_title')}
                     </div>

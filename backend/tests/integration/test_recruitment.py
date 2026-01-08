@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import User, StudyRole
+from app.models import User
 
 
 @pytest.mark.asyncio
@@ -19,12 +19,12 @@ class TestRecruitment:
         auth_token_factory,
         study_factory,
         workspace_factory,
-        study_collaborator_factory,
+        workspace_member_factory,
     ):
         # 1. Setup
         ws = await workspace_factory(owner=test_user)
         study = await study_factory(workspace=ws, owner=test_user)
-        await study_collaborator_factory(study, test_user, StudyRole.owner)
+        # test_user is already admin of workspace via factory
         headers = auth_token_factory(test_user)
 
         # 2. Create Links
@@ -63,21 +63,24 @@ class TestInvitations:
         auth_token_factory,
         study_factory,
         workspace_factory,
-        study_collaborator_factory,
+        workspace_member_factory,
     ):
         ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
-        await study_collaborator_factory(study, test_user, StudyRole.owner)
+        await study_factory(workspace=ws, owner=test_user)
+        # test_user is admin
         headers = auth_token_factory(test_user)
 
         # 1. Invite
         response = await client.post(
-            f"/api/admin/invitations/{study.slug}/invite",
-            json={"email": "collab@test.com", "role": "editor"},
+            f"/api/admin/workspaces/{ws.slug}/invitations",
+            json={"email": "collab@test.com", "role": "researcher"},
             headers=headers,
         )
         assert response.status_code == 200
-        token = response.json()["token"]
+        data = response.json()
+        token = data["token"]
+        # Also check invite_url matches expected format
+        assert "register?token=" in data["invite_url"]
 
         # 2. Verify Token
         response = await client.get(f"/api/admin/invitations/verify?token={token}")

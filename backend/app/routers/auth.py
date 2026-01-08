@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.models import User, StudyCollaborator, StudyRole
+from app.models import User
 from app.utils.security import (
     create_access_token,
     verify_password,
@@ -109,7 +109,8 @@ async def register_user(
     If an `invitation_token` is provided:
     1. Decodes and verifies the token.
     2. Ensures the token's subject matches the provided email.
-    3. Automatically adds the new user as a collaborator to the study specified in the token.
+    2. Ensures the token's subject matches the provided email.
+    3. Automatically adds the new user as a member of the workspace specified in the token.
     """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
@@ -147,14 +148,16 @@ async def register_user(
     db.add(new_user)
     await db.flush()  # get user id
 
-    # 4. Process invitation (link to study)
-    if invitation_payload:
-        collab = StudyCollaborator(
-            study_id=invitation_payload["study_id"],
+    # 4. Process invitation (link to workspace)
+    if invitation_payload and "workspace_id" in invitation_payload:
+        from app.models import WorkspaceMember, WorkspaceRole
+
+        ws_member = WorkspaceMember(
+            workspace_id=invitation_payload["workspace_id"],
             user_id=new_user.id,
-            role=StudyRole(invitation_payload["role"]),
+            role=WorkspaceRole(invitation_payload["role"]),
         )
-        db.add(collab)
+        db.add(ws_member)
 
     await db.commit()
     await db.refresh(new_user)

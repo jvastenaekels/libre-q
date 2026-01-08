@@ -8,11 +8,9 @@ import {
     FileText,
     LayoutDashboard,
     LogOut,
-    Moon,
     PencilRuler,
     Search,
     Settings,
-    Sun,
     UserPlus,
     Users,
 } from 'lucide-react';
@@ -67,12 +65,6 @@ export const CommandMenu = () => {
             navigator.clipboard.writeText(link);
             toast.success('Study link copied!');
         }
-    };
-
-    const handleThemeToggle = () => {
-        const root = document.documentElement;
-        root.classList.toggle('dark');
-        toast.success(root.classList.contains('dark') ? 'Dark mode enabled' : 'Light mode enabled');
     };
 
     const handleLogout = () => {
@@ -293,17 +285,6 @@ export const CommandMenu = () => {
                         heading={t('admin.command_menu.system', 'System')}
                         className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
                     >
-                        <Command.Item
-                            value="theme toggle dark light"
-                            onSelect={() => runCommand(handleThemeToggle)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
-                        >
-                            <div className="flex h-6 w-6 items-center justify-center rounded bg-amber-100 dark:bg-amber-900/40">
-                                <Sun className="h-3.5 w-3.5 text-amber-600 dark:hidden" />
-                                <Moon className="h-3.5 w-3.5 text-indigo-400 hidden dark:block" />
-                            </div>
-                            <span>{t('admin.command_menu.toggle_theme', 'Toggle Theme')}</span>
-                        </Command.Item>
                         <Command.Item
                             value="logout sign out"
                             onSelect={() => runCommand(handleLogout)}

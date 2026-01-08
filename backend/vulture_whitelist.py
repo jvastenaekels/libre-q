@@ -127,3 +127,10 @@ effective_emails_from_name
 requires_password
 icon
 partners
+# New for Workspace Invitations/Workspaces
+delete_workspace  # unused function (backend/app/routers/admin/workspaces.py)
+create_invitation  # unused function (backend/app/routers/admin/workspaces.py)
+user_role  # unused variable (backend/app/schemas.py)
+config  # unused variable (backend/app/models.py)
+color  # unused variable (backend/app/schemas.py)
+InvitationCreate  # unused class (backend/app/schemas.py)

@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import User, StudyRole, StudyCollaborator
+from app.models import User, WorkspaceRole, WorkspaceMember
 from app.utils.security import create_invitation_token
 
 # Test Data
@@ -85,21 +85,17 @@ class TestRegistration:
         db: AsyncSession,
         user_factory,
         workspace_factory,
-        study_factory,
-        study_collaborator_factory,
     ):
-        """Registration with valid invitation token adds user to study."""
-        # Setup: Create study
+        """Registration with valid invitation token adds user to workspace."""
+        # Setup: Create workspace
         owner = await user_factory()
         workspace = await workspace_factory(owner=owner)
-        study = await study_factory(workspace=workspace, owner=owner)
-        await study_collaborator_factory(study, owner, StudyRole.owner)
 
-        # Create invitation token
+        # Create invitation token for workspace
         token = create_invitation_token(
             email="invited@example.com",
-            study_id=study.id,
-            role="editor",
+            workspace_id=workspace.id,
+            role="researcher",  # WorkspaceRole
         )
 
         # Register with token
@@ -113,19 +109,19 @@ class TestRegistration:
         )
         assert response.status_code == 201
 
-        # Verify collaborator was added
+        # Verify WorkspaceMember was added
         result = await db.execute(
-            select(StudyCollaborator).where(StudyCollaborator.study_id == study.id)
+            select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace.id)
         )
-        collabs = result.scalars().all()
-        # Refresh test_user check would be cleaner if we had more helpers
-        # but this verifies the link exists in the association table
-        assert len(collabs) == 2  # Owner + Invited
+        members = result.scalars().all()
+        assert len(members) == 2  # Owner + Invited
+        invited = next(m for m in members if m.user_id != owner.id)
+        assert invited.role == WorkspaceRole.researcher
 
     async def test_register_invitation_token_email_mismatch(self, client: AsyncClient):
         """Invitation token email must match registration email."""
         token = create_invitation_token(
-            email="invited@example.com", study_id=1, role="editor"
+            email="invited@example.com", workspace_id=1, role="researcher"
         )
         response = await client.post(
             "/api/register",
@@ -142,8 +138,8 @@ class TestRegistration:
         """Expired invitation token is rejected."""
         token = create_invitation_token(
             email="late@example.com",
-            study_id=1,
-            role="editor",
+            workspace_id=1,
+            role="researcher",
             expires_delta=timedelta(minutes=-1),
         )
         response = await client.post(

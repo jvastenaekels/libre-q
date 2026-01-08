@@ -158,6 +158,34 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                             onChange={(icon) => onUpdate({ ...step, icon })}
                                         />
                                     </div>
+
+                                    <div className="grid gap-2">
+                                        <Label className="text-xs">
+                                            {t(
+                                                'admin.design.intro.process_steps.fields.color',
+                                                'Color'
+                                            )}
+                                        </Label>
+                                        <div className="flex items-center gap-3">
+                                            <Input
+                                                type="color"
+                                                value={step.color || '#3b82f6'}
+                                                onChange={(e) =>
+                                                    onUpdate({ ...step, color: e.target.value })
+                                                }
+                                                className="w-12 h-10 p-1 cursor-pointer"
+                                            />
+                                            <Input
+                                                type="text"
+                                                value={step.color || ''}
+                                                onChange={(e) =>
+                                                    onUpdate({ ...step, color: e.target.value })
+                                                }
+                                                placeholder="#000000"
+                                                className="font-mono text-xs"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>

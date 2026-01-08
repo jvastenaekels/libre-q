@@ -186,16 +186,32 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                     key={step.id || index}
                                     className="flex gap-4 items-start group"
                                 >
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center group-hover:border-primary/30 group-hover:shadow-md transition-all duration-300">
+                                    <div
+                                        className="flex-shrink-0 w-12 h-12 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center group-hover:shadow-md transition-all duration-300"
+                                        style={{
+                                            backgroundColor: step.color
+                                                ? `color-mix(in srgb, ${step.color}, transparent 92%)`
+                                                : 'white',
+                                            borderColor: step.color
+                                                ? `color-mix(in srgb, ${step.color}, transparent 80%)`
+                                                : undefined,
+                                        }}
+                                    >
                                         <DynamicIcon
                                             name={step.icon}
                                             size={24}
-                                            className="text-primary"
-                                            style={{ color: 'var(--brand-accent)' }}
+                                            style={{ color: step.color || 'var(--brand-accent)' }}
                                         />
                                     </div>
                                     <div className="pt-0.5">
-                                        <h4 className="text-slate-900 font-bold text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                        <h4
+                                            className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
+                                            style={{
+                                                color: step.color
+                                                    ? `color-mix(in srgb, ${step.color}, black 20%)`
+                                                    : undefined,
+                                            }}
+                                        >
                                             {step.title}
                                         </h4>
                                         <p className="text-slate-600 leading-relaxed text-[0.95rem]">

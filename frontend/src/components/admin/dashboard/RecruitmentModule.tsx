@@ -2,7 +2,7 @@ import type React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Copy, QrCode, ExternalLink, Check, Share2, Megaphone } from 'lucide-react';
+import { Copy, QrCode, ExternalLink, Check, Megaphone } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
@@ -15,7 +15,7 @@ interface RecruitmentModuleProps {
 const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
     const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
-    const [showQR, setShowQR] = useState(false);
+    const [showQR, setShowQR] = useState(true);
 
     // Construct the public study URL
     const publicUrl = `${window.location.origin}/study/${slug}`;
@@ -124,25 +124,6 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                                 'Scan or print this code for physical recruitment materials (flyers, posters).'
                             )}
                         </p>
-                    </div>
-                )}
-
-                {!showQR && (
-                    <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100/50 flex gap-4">
-                        <div className="p-2 rounded-lg bg-white shadow-sm self-start">
-                            <Share2 className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div className="space-y-1">
-                            <h5 className="text-[11px] font-bold text-indigo-900">
-                                {t('admin.recruitment.analytics_title', 'Campaign Analytics')}
-                            </h5>
-                            <p className="text-[10px] text-indigo-600/70 leading-normal">
-                                {t(
-                                    'admin.recruitment.analytics_desc',
-                                    'Direct links and QR scans are automatically tracked in the Health Dashboard above.'
-                                )}
-                            </p>
-                        </div>
                     </div>
                 )}
             </CardContent>

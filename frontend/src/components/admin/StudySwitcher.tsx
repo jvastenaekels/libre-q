@@ -94,7 +94,10 @@ export function StudySwitcher() {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight ml-1">
                                     <span className="truncate font-bold tracking-tight text-slate-900 leading-none">
-                                        {activeStudy ? (activeStudy.translations?.[0]?.title || activeStudy.slug) : 'Select Study'}
+                                        {activeStudy
+                                            ? activeStudy.translations?.[0]?.title ||
+                                              activeStudy.slug
+                                            : 'Select Study'}
                                     </span>
                                 </div>
                                 <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
@@ -150,9 +153,11 @@ export function StudySwitcher() {
                                     <Plus className="size-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold">Add Study</span>
+                                    <span className="text-sm font-bold">
+                                        {t('admin.sidebar.add_study')}
+                                    </span>
                                     <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                        Create New Project
+                                        {t('admin.sidebar.create_project')}
                                     </span>
                                 </div>
                             </DropdownMenuItem>

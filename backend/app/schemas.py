@@ -9,7 +9,6 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from app.models import (
     ParticipantStatus,
     RecruitmentLinkType,
-    StudyRole,
     StudyState,
     WorkspaceRole,
 )
@@ -151,6 +150,7 @@ class ProcessStep(BaseModel):
     title: str = Field(..., min_length=1, max_length=100)
     description: str = Field(..., max_length=500)
     icon: str = Field(..., description="Lucide icon name")
+    color: str | None = Field(None, description="Hex color code or CSS variable")
 
 
 class StudyTranslationBase(BaseModel):
@@ -326,6 +326,7 @@ class StudyRead(StudyBase):
 
     id: int
     workspace_id: int
+    workspace: WorkspaceRead | None = None
     created_at: datetime
     start_date: datetime | None = None
     end_date: datetime | None = None
@@ -475,10 +476,10 @@ class ParticipantDiscardUpdate(BaseModel):
 
 
 class InvitationCreate(BaseModel):
-    """Schema for creating a study invitation."""
+    """Schema for creating a study/workspace invitation."""
 
     email: str
-    role: StudyRole = StudyRole.editor
+    role: WorkspaceRole = WorkspaceRole.researcher
 
 
 class InvitationLink(BaseModel):

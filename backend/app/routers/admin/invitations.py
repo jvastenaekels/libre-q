@@ -1,41 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, HTTPException, status
 
-from app.core.config import settings
-from app.dependencies import check_study_permission
-from app.models import Study, StudyRole
-from app.schemas import InvitationCreate, InvitationLink
-from app.utils.security import create_invitation_token, decode_invitation_token
-from app.utils.email import send_invitation_email
+from app.utils.security import decode_invitation_token
 
 router = APIRouter(tags=["Admin Invitations"])
 
 
-@router.post("/{slug}/invite", response_model=InvitationLink)
-async def invite_collaborator(
-    invite: InvitationCreate,
-    background_tasks: BackgroundTasks,
-    study: Study = Depends(check_study_permission(StudyRole.editor)),
-):
-    """Generate a JWT invitation link and send an email."""
-    token = create_invitation_token(
-        email=invite.email,
-        study_id=study.id,
-        role=invite.role.value,
-    )
-
-    # URL for the invitation
-    invite_url = f"{settings.FRONTEND_URL}/register?token={token}"
-
-    # Send email in background
-    background_tasks.add_task(
-        send_invitation_email,
-        email_to=invite.email,
-        context_name=study.slug,
-        invite_url=invite_url,
-        context_type="study",
-    )
-
-    return InvitationLink(invite_url=invite_url, token=token)
+# Endpoint /slug/invite is deprecated and removed. Functionality moved to workspaces endpoint.
 
 
 @router.get("/verify")
@@ -45,7 +15,7 @@ async def verify_invitation(token: str):
         payload = decode_invitation_token(token)
         return {
             "email": payload["sub"],
-            "study_id": payload["study_id"],
+            "workspace_id": payload.get("workspace_id"),
             "role": payload["role"],
         }
     except Exception as e:

@@ -251,6 +251,16 @@ const StudyLayoutContent: React.FC = () => {
     const branding = config?.branding;
     const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
 
+    // Filter steps based on config
+    const isPresortDisabled =
+        config?.presort_config &&
+        'enabled' in config.presort_config &&
+        config.presort_config.enabled === false;
+
+    const visibleSteps = steps.filter((step) => !(step.id === 2 && isPresortDisabled));
+
+    const currentVisibleIndex = visibleSteps.findIndex((s) => s.id === currentStep);
+
     return (
         <div
             className="h-dvh bg-gray-50 flex flex-col overflow-hidden"
@@ -279,14 +289,15 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
                         className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
-                        style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                        style={{
+                            width: `${((currentVisibleIndex + 1) / visibleSteps.length) * 100}%`,
+                        }}
                     />
                 </div>
 
                 {/* LEFT: Branding / Context */}
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
-                        {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {branding?.partners && branding.partners.length > 0 ? (
                             <div className="flex items-center gap-4">
@@ -332,7 +343,8 @@ const StudyLayoutContent: React.FC = () => {
                                 ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
-                            {t('layout.mobile_step')} {currentStep}/{steps.length}
+                            {t('layout.mobile_step')} {currentVisibleIndex + 1}/
+                            {visibleSteps.length}
                             <ChevronDown
                                 size={12}
                                 className={`transition-transform duration-200 ${isStepMenuOpen ? 'rotate-180' : ''}`}
@@ -345,7 +357,7 @@ const StudyLayoutContent: React.FC = () => {
                                 <div className="px-3 py-1 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                     {t('layout.navigation')}
                                 </div>
-                                {steps.map((step) => {
+                                {visibleSteps.map((step, index) => {
                                     const isReached = step.id <= maxReachedStep;
                                     const isCurrent = step.id === currentStep;
 
@@ -378,7 +390,7 @@ const StudyLayoutContent: React.FC = () => {
                                             `}
                                         >
                                             <span className="text-sm">
-                                                {step.id}. {t(step.labelKey)}
+                                                {index + 1}. {t(step.labelKey)}
                                             </span>
                                             {isReached && !isCurrent && currentStep > step.id && (
                                                 <Check
@@ -397,18 +409,7 @@ const StudyLayoutContent: React.FC = () => {
                 {/* CENTER: Stepper (Desktop Only) */}
                 <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
                     <div data-testid="stepper-container" className="flex items-center gap-1">
-                        {steps.map((step, index) => {
-                            // Check if presort is disabled
-                            const isPresortDisabled =
-                                config?.presort_config &&
-                                'enabled' in config.presort_config &&
-                                config.presort_config.enabled === false;
-
-                            // Skip rendering the step if it's the disabled presort step
-                            if (step.id === 2 && isPresortDisabled) {
-                                return null;
-                            }
-
+                        {visibleSteps.map((step, index) => {
                             const status =
                                 currentStep === step.id
                                     ? 'current'
@@ -421,20 +422,7 @@ const StudyLayoutContent: React.FC = () => {
                             return (
                                 <div key={step.id} className="flex items-center">
                                     {/* Connection Line */}
-                                    {index > 0 &&
-                                        !(step.id === 3 && isPresortDisabled) && ( // Don't show line before step 3 if step 2 is hidden
-                                            <div
-                                                className="w-8 h-0.5 mx-2 transition-colors duration-300"
-                                                style={{
-                                                    backgroundColor:
-                                                        status === 'upcoming'
-                                                            ? '#e2e8f0'
-                                                            : 'var(--brand-accent)',
-                                                }}
-                                            />
-                                        )}
-                                    {/* Special case for connecting 1 to 3 directly if 2 is gone */}
-                                    {step.id === 3 && isPresortDisabled && (
+                                    {index > 0 && (
                                         <div
                                             className="w-8 h-0.5 mx-2 transition-colors duration-300"
                                             style={{
@@ -501,7 +489,7 @@ const StudyLayoutContent: React.FC = () => {
                                     {/* Label (Current Only) */}
                                     {status === 'current' && (
                                         <span className="ml-3 font-bold text-slate-800 text-sm whitespace-nowrap animate-in fade-in slide-in-from-left-2">
-                                            {t(step.labelKey)}
+                                            {index + 1}. {t(step.labelKey)}
                                         </span>
                                     )}
                                 </div>
