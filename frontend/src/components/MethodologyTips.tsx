@@ -7,6 +7,7 @@
 import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useConfigStore } from '@/store/useConfigStore';
 
 interface MethodologyTipsProps {
     variant: 'mobile' | 'desktop';
@@ -14,11 +15,12 @@ interface MethodologyTipsProps {
 
 const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const { t } = useTranslation();
+    const { config } = useConfigStore();
     const [step, setStep] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const tips = [
+    const defaultTips = [
         t('fine.workbench.methodology.extremes'),
         t('fine.workbench.methodology.vertical'),
         t('fine.workbench.methodology.constraint'),
@@ -26,6 +28,8 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
         t('fine.workbench.methodology.zoom'),
         t('fine.workbench.methodology.flexibility'),
     ];
+
+    const tips = config?.methodology_tips?.length ? config.methodology_tips : defaultTips;
 
     const nextTip = useCallback(() => {
         setStep((prev) => (prev + 1) % tips.length);

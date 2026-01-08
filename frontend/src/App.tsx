@@ -30,7 +30,7 @@ import GeneralSettingsPage from '@/pages/admin/GeneralSettingsPage'; // Added im
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
+import LoginPage from './pages/LoginPage';
 
 // Admin imports
 import RequireAdmin from './components/auth/RequireAdmin';

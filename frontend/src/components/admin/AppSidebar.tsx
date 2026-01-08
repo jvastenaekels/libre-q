@@ -9,7 +9,6 @@ import {
     Search,
     Settings,
     UserPlus,
-    Users,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';

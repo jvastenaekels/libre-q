@@ -14,12 +14,44 @@ from pathlib import Path
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy import text, inspect, select
-from app.database import engine, SessionLocal
-from app.models import Study, StudyCollaborator, StudyRole, WorkspaceMember
+from sqlalchemy import text, inspect, event
+from app.database import engine
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
+
+
+class MigrationEngine:
+    """Wrapper for database operations during migration with safety features."""
+
+    def __init__(self, engine):
+        self.engine = engine
+        self._lock_file = None
+
+    async def __aenter__(self):
+        # 1. Acquire File Lock
+        lock_file_path = Path(__file__).parent / "migration.lock"
+        self._lock_fh = open(lock_file_path, "w")
+        if sys.platform != "win32":
+            import fcntl
+
+            try:
+                fcntl.flock(self._lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                logger.error("✗ Another migration is already in progress. Exiting.")
+                self._lock_fh.close()
+                sys.exit(1)
+
+        # 2. Add Timeouts to the connection
+        # We don't modify the global engine, we just ensure we use it carefully
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if sys.platform != "win32":
+            import fcntl
+
+            fcntl.flock(self._lock_fh, fcntl.LOCK_UN)
+        self._lock_fh.close()
 
 
 async def check_column_exists(conn, table_name: str, column_name: str) -> bool:
@@ -252,6 +284,38 @@ async def migrate_translations_table():
                 )
             migrations_applied = True
 
+        # methodology_tips
+        if not await check_column_exists(
+            conn, "study_translations", "methodology_tips"
+        ):
+            logger.info("  Adding 'methodology_tips' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN methodology_tips JSON DEFAULT '[]'::json"
+                    )
+                )
+            migrations_applied = True
+
+        # step_help
+        if not await check_column_exists(conn, "study_translations", "step_help"):
+            logger.info("  Adding 'step_help' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN step_help JSON DEFAULT '{}'::json"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN step_help JSON DEFAULT '{}'"
+                    )
+                )
+            migrations_applied = True
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Translations table updated")
@@ -435,64 +499,12 @@ async def verify_workspace_tables():
         logger.info("✓ Workspace tables verified")
 
 
-async def migrate_data_collaborators():
-    """Migrate workspace members to study collaborators."""
-    logger.info("Checking for necessary data migration (Workspace -> Collaborators)...")
-
-    # Map WorkspaceRole to StudyRole
-    ROLE_MAP = {
-        "admin": StudyRole.owner,
-        "researcher": StudyRole.editor,
-        "viewer": StudyRole.viewer,
-    }
-
-    async with SessionLocal() as db:
-        # Check if we have workspace members but no collaborators (or need to sync)
-        # This is a bit naive, but safe since we check for existence before adding.
-
-        # Verify tables exist first to avoid crashing if schema is broken
-        try:
-            await db.execute(select(WorkspaceMember).limit(1))
-            await db.execute(select(StudyCollaborator).limit(1))
-        except Exception:
-            logger.warning("Skipping data migration: Tables not ready")
-            return
-
-        members_result = await db.execute(select(WorkspaceMember))
-        members = members_result.scalars().all()
-
-        member_migrated_count = 0
-        for member in members:
-            # Find all studies in this workspace
-            studies_in_ws_result = await db.execute(
-                select(Study).where(Study.workspace_id == member.workspace_id)
-            )
-            studies_in_ws = studies_in_ws_result.scalars().all()
-
-            for study in studies_in_ws:
-                # Check if collaborator already exists
-                existing = await db.execute(
-                    select(StudyCollaborator).where(
-                        StudyCollaborator.study_id == study.id,
-                        StudyCollaborator.user_id == member.user_id,
-                    )
-                )
-                if not existing.scalar_one_or_none():
-                    collab = StudyCollaborator(
-                        study_id=study.id,
-                        user_id=member.user_id,
-                        role=ROLE_MAP.get(member.role, StudyRole.viewer),
-                    )
-                    db.add(collab)
-                    member_migrated_count += 1
-
-        if member_migrated_count > 0:
-            await db.commit()
-            logger.info(
-                f"✓ Migrated {member_migrated_count} workspace memberships to collaborators"
-            )
-        else:
-            logger.info("✓ Data migration up to date (no new collaborators to migrate)")
+@event.listens_for(engine.sync_engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    """Set busy_timeout for SQLite to prevent 'database is locked' errors."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA busy_timeout=30000")  # 30 seconds
+    cursor.close()
 
 
 async def run_all_migrations():
@@ -502,18 +514,16 @@ async def run_all_migrations():
     logger.info("=" * 60)
 
     try:
-        # First verify core tables exist
-        await verify_workspace_tables()
+        async with MigrationEngine(engine):
+            # First verify core tables exist
+            await verify_workspace_tables()
 
-        # Then apply column migrations
-        await migrate_studies_table()
-        await migrate_translations_table()
-        await migrate_participants_table()
-        await migrate_users_table()
-        await migrate_recruitment_invitation_tables()
-
-        # Then run data migrations
-        await migrate_data_collaborators()
+            # Then apply column migrations
+            await migrate_studies_table()
+            await migrate_translations_table()
+            await migrate_participants_table()
+            await migrate_users_table()
+            await migrate_recruitment_invitation_tables()
 
         logger.info("=" * 60)
         logger.info("✓ All migrations completed successfully!")

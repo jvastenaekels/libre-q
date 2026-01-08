@@ -156,7 +156,10 @@ export function WorkspaceSwitcher() {
                                                               : 'bg-slate-100'
                                                     )}
                                                 >
-                                                    {workspace.user_role}
+                                                    {t(
+                                                        `admin.workspace.roles.${workspace.user_role}`,
+                                                        workspace.user_role
+                                                    )}
                                                 </span>
                                                 <span className="mx-1">•</span>
                                                 <Layout className="size-2.5" /> {studyCount}

@@ -18,8 +18,11 @@ async def global_exception_handler(request: Request, exc: Exception):
 
     Logs the error with trace and returns a clean JSON response.
     """
-    # Log the full traceback for debugging
-    logger.error(f"Unhandled Exception: {str(exc)}\n{traceback.format_exc()}")
+    # Log the full traceback for debugging with request context
+    logger.error(
+        f"Unhandled Exception on {request.method} {request.url}: {str(exc)}\n"
+        f"{traceback.format_exc()}"
+    )
 
     return JSONResponse(
         status_code=500,

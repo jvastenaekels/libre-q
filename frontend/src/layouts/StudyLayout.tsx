@@ -37,13 +37,14 @@ import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
+import HelpOverlay from '../components/study/HelpOverlay';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
-    { id: 2, labelKey: 'layout.steps.presort' },
-    { id: 3, labelKey: 'layout.steps.rough' },
-    { id: 4, labelKey: 'layout.steps.fine' },
-    { id: 5, labelKey: 'layout.steps.review' },
+    { id: 2, labelKey: 'welcome.steps.profile.title' },
+    { id: 3, labelKey: 'welcome.steps.rough.title' },
+    { id: 4, labelKey: 'welcome.steps.fine.title' },
+    { id: 5, labelKey: 'welcome.steps.post.title' },
 ];
 
 const StudyLayoutContent: React.FC = () => {
@@ -489,7 +490,7 @@ const StudyLayoutContent: React.FC = () => {
                                     {/* Label (Current Only) */}
                                     {status === 'current' && (
                                         <span className="ml-3 font-bold text-slate-800 text-sm whitespace-nowrap animate-in fade-in slide-in-from-left-2">
-                                            {index + 1}. {t(step.labelKey)}
+                                            {t(step.labelKey)}
                                         </span>
                                     )}
                                 </div>
@@ -581,6 +582,9 @@ const StudyLayoutContent: React.FC = () => {
                     {headerAction}
                 </div>
             )}
+
+            {/* Help Overlay (Floating) */}
+            <HelpOverlay />
         </div>
     );
 };

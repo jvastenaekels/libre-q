@@ -45,7 +45,6 @@ export default function AdminLayout() {
         // Map common segments to i18n keys
         const mapping: Record<string, string> = {
             design: t('admin.breadcrumbs.design'),
-            team: t('admin.breadcrumbs.team'),
             recruitment: t('admin.breadcrumbs.recruitment'),
             exports: t('admin.breadcrumbs.exports'),
             settings: t('admin.breadcrumbs.settings'),

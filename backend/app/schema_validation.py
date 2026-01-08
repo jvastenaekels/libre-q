@@ -7,6 +7,7 @@ Provides helpful error messages when schema is out of sync.
 """
 
 import logging
+import sys
 from typing import List, Tuple
 
 from sqlalchemy import inspect
@@ -77,6 +78,8 @@ async def validate_schema() -> None:
                 }
                 if "ui_labels" not in trans_columns:
                     issues.append(("missing_column", "study_translations.ui_labels"))
+                if "step_help" not in trans_columns:
+                    issues.append(("missing_column", "study_translations.step_help"))
 
         await conn.run_sync(_check)
 
@@ -102,3 +105,14 @@ async def validate_schema() -> None:
             raise SchemaValidationError("\n".join(error_msg))
 
         logger.info("✓ Database schema validation passed")
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    logging.basicConfig(level=logging.INFO)
+    try:
+        asyncio.run(validate_schema())
+    except Exception as e:
+        print(e)
+        sys.exit(1)

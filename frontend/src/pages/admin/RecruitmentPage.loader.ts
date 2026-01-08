@@ -3,7 +3,7 @@ import {
     getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey,
 } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
-import type { LoaderFunctionArgs } from 'react-router-dom';
+import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const recruitmentPageLoader = async ({ params }: LoaderFunctionArgs) => {
     const { slug } = params;
@@ -17,6 +17,9 @@ export const recruitmentPageLoader = async ({ params }: LoaderFunctionArgs) => {
         return { links, slug };
     } catch (error) {
         console.error('Failed to load recruitment links:', error);
-        throw error;
+        import('@/store/useAdminStore').then(({ useAdminStore }) => {
+            useAdminStore.getState().setActiveStudy(null);
+        });
+        throw redirect('/admin');
     }
 };

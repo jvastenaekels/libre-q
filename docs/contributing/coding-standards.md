@@ -28,6 +28,7 @@ We use **Python 3.13+** with strict adherence to type hinting.
 
 - **Asynchronous Core:** We use `ext.asyncio` with `AsyncSession` for high-concurrency performance.
 - **Explicit Relationships:** Define foreign keys and relationships explicitly in models. Avoid implicit joins.
+- **Async-Safe Loading:** Mandatory usage of `lazy="selectin"` for all relationships in models, or `selectinload()` in queries, to prevent synchronous I/O errors during async serialization.
 
 ### 2.3 Style & Structure
 

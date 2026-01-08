@@ -17,6 +17,8 @@
         "optional": "Valinnainen",
         "processing": "Käsitellään...",
         "statement": "Väite",
+        "back": "Takaisin",
+        "cancel": "Peruuta",
         "errors": {
             "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
             "not_found": "Tutkimusta ei löytynyt.",
@@ -90,6 +92,34 @@
         "navigation": "Navigointi",
         "language": "Suomi"
     },
+    "study": {
+        "help": {
+            "title": "Apua & Tietoa",
+            "trigger": "Apua",
+            "what": "Mitä kysymme",
+            "why": "Miksi se on tärkeää",
+            "step_1": {
+                "what": "Tutustu tutkimuksen tavoitteisiin ja vahvista vapaaehtoinen osallistumisesi.",
+                "why": "Varmistaa, että olet täysin tietoinen tutkimusprosessista ja olet antanut suostumuksesi siihen."
+            },
+            "step_2": {
+                "what": "Vastaa muutamaan lyhyeen profiiliasi koskevaan kysymykseen.",
+                "why": "Auttaa meitä ymmärtämään, miten eri näkökulmat korreloivat osallistujien taustojen kanssa."
+            },
+            "step_3": {
+                "what": "Lajittele väittämät spontaanisti kolmeen luokkaan: Samaa mieltä, Neutraali ja Eri mieltä.",
+                "why": "Tallentaa alustavan, intuitiivisen reaktiosi tutkimuksen keskeisiin teemoihin."
+            },
+            "step_4": {
+                "what": "Jaa väittämät ruudukkoon mieltymyksesi mukaan.",
+                "why": "Luo jäsennellyn ja mitattavissa olevan kartan juuri sinun näkökulmastasi."
+            },
+            "step_5": {
+                "what": "Tarkista lopullinen lajittelusi ja anna halutessasi lisäpohdintoja.",
+                "why": "Mahdollistaa näkökulmasi täsmentämisen ja rikastuttaa tietoa laadullisilla yksityiskohdilla."
+            }
+        }
+    },
     "auth": {
         "login": {
             "title": "Järjestelmänvalvojan kirjautuminen",
@@ -145,6 +175,8 @@
         "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
         "restart": "Aloita uusi istunto",
         "preview_title": "Esikatselu",
+        "conducted_by": "Tämän tutkimuksen toteuttaa",
+        "how_it_works": "Tutkimuksen kulku",
         "objective_label": "Tutkimuksen tavoite",
         "instructions_label": "Kulku",
         "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi.",
@@ -321,6 +353,12 @@
                 "new_workspace": "Uusi työtila",
                 "new_workspace_desc": "Luo uusi organisaatio"
             },
+            "roles": {
+                "owner": "Omistaja",
+                "admin": "Ylläpitäjä",
+                "researcher": "Tutkija",
+                "member": "Jäsen"
+            },
             "create": {
                 "title": "Luo työtila",
                 "description": "Luo uusi organisaatio hallinnoidaksesi tutkimuksiasi ja tiimiäsi.",
@@ -454,11 +492,13 @@
                 "study_title": "Tutkimuksen otsikko",
                 "study_title_placeholder": "esim. Näkökulmia tekoälyyn",
                 "url_slug": "URL-tunniste",
-                "url_slug_placeholder": "esim. ai-nakokulmia-2025",
+                "url_slug_placeholder": "esim. ai-perspectives-2025",
                 "cancel": "Peruuta",
                 "create": "Luo tutkimus",
                 "success": "Tutkimus luotu onnistuneesti",
-                "error": "Tutkimuksen luominen epäonnistui"
+                "error": "Tutkimuksen luominen epäonnistui",
+                "languages": "Kielet",
+                "languages_desc": "Valitse aktivoitavat kielet. Sisältö alustetaan paikallisilla oletusteksteillä."
             }
         },
         "validation": {
@@ -588,6 +628,7 @@
                 "save": "Tallenna",
                 "saving": "Tallennetaan...",
                 "closed": "Suljettu",
+                "back_to_study": "Palaa tutkimukseen",
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
                 "select_lang": "Valitse kieli"
@@ -665,7 +706,7 @@
                 "pre_label": "Esiohjeen sisältö",
                 "tips": {
                     "title": "Miksi tämä on tärkeää?",
-                    "desc": "Q-metodologiassa 'Ohjeistuksen ehto' määrittää näkökulman, josta osallistuja lajittelee kohteet. Sen tulisi olla selkeä, yksiselitteinen ja johdonmukainen kaikissa lajitteluvaiheissa."
+                    "desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja."
                 }
             },
             "questions": {
@@ -811,6 +852,17 @@
                     "grid": "Ruudukon selitteet (ääripäät)",
                     "most_agree": "Täysin samaa mieltä",
                     "most_disagree": "Täysin eri mieltä"
+                },
+                "hints": {
+                    "title": "Metodologiset vinkit",
+                    "desc": "Lisää tai muokkaa kelluvia vinkkejä auttaaksesi osallistujia ruudukkolajitteluvaiheessa.",
+                    "placeholder": "Kirjoita metodologinen vinkki...",
+                    "add": "Lisää vinkki",
+                    "reset": "Palauta oletukset"
+                },
+                "help": {
+                    "title": "Vaiheittainen ohjaus (Mitä/Miksi)",
+                    "desc": "Mukauta osallistujien saatavilla olevaa kontekstisidonnaista apua kussakin vaiheessa '?' -kuvakkeen kautta."
                 }
             },
             "theme": {
@@ -825,22 +877,22 @@
                     "title": "Tutkimuksen logo",
                     "desc": "Lataa oma logo korvataksesi oletusarvoisen Open-Q-brändäyksen.",
                     "label": "Logon URL",
-                    "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG -tiedostoja.",
-                    "preview": "Logon esikatselu"
-                },
-                "tip": {
-                    "title": "Suunnitteluvinkki",
-                    "desc": "Esteettömyys on avainasemassa. Kun valitset tehosteväriä, varmista, että siinä on riittävä kontrasti valkoista taustaa vasten luettavuuden varmistamiseksi."
+                    "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG.",
+                    "preview": "Logon esikatselu",
+                    "help_title": "Missä tämä logo näkyy?",
+                    "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä."
                 },
                 "partners": {
                     "title": "Institutionaaliset kumppanit",
                     "desc": "Lisää tukevien instituutioiden tai kumppaneiden logot.",
                     "add": "Lisää kumppani",
                     "name_label": "Kumppanin nimi",
-                    "name_placeholder": "Instituution nimi",
+                    "name_placeholder": "Institution nimi",
                     "logo_label": "Logon URL",
                     "url_label": "Verkkosivusto (valinnainen)",
-                    "url_placeholder": "Logon URL (https://...)"
+                    "url_placeholder": "https://...",
+                    "help_title": "Logojen näyttäminen",
+                    "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä."
                 },
                 "upload": {
                     "upload": "Lataa",
@@ -1046,6 +1098,8 @@
                     "save_success": "Työtila päivitetty onnistuneesti",
                     "save_error": "Työtilan päivitys epäonnistui"
                 },
+                "team_growth_title": "Tiimin hallinta",
+                "team_growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He voivat hallinnoida kaikkia työtilan tutkimuksia.",
                 "team": {
                     "title": "Tiimin jäsenet",
                     "desc": "Luettelo käyttäjistä, joilla on pääsy tähän työtilaan.",

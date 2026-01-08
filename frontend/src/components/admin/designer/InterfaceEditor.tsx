@@ -3,18 +3,37 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCcw, MousePointerClick, ArrowRight, Info } from 'lucide-react';
+import {
+    RefreshCcw,
+    MousePointerClick,
+    ArrowRight,
+    Info,
+    Lightbulb,
+    Trash2,
+    Plus,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const InterfaceEditor = () => {
     const { draft, activeLocale, updateTranslation, setActiveSubStep } = useStudyDesigner();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
     const uiLabels = translation?.ui_labels || {};
+
+    // Helper to get translations in the active study locale (not the admin UI locale)
+    const tStudy = (key: string) => i18n.t(key, { lng: activeLocale }) as string;
+
+    const visibleSteps = [
+        { id: 'presort', labelKey: 'study.steps.presort' },
+        { id: 'rough', labelKey: 'study.steps.rough' },
+        { id: 'fine', labelKey: 'study.steps.fine' },
+        { id: 'post', labelKey: 'study.steps.post' },
+    ];
 
     const updateLabel = (key: string, value: string) => {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
@@ -28,7 +47,7 @@ const InterfaceEditor = () => {
         });
     };
 
-    const getLabel = (key: string) => (uiLabels[key] || t(key)) as string;
+    const getLabel = (key: string) => (uiLabels[key] || tStudy(key)) as string;
 
     return (
         <div className="space-y-8">
@@ -72,7 +91,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('welcome.start')}
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                                 onFocus={() => setActiveSubStep('welcome.start')}
-                                placeholder={t('welcome.start')}
+                                placeholder={tStudy('welcome.start')}
                                 className="font-bold text-sm h-10 rounded-xl"
                             />
                         </div>
@@ -96,7 +115,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('common.next')}
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
                                 onFocus={() => setActiveSubStep('common.next')}
-                                placeholder={t('common.next')}
+                                placeholder={tStudy('common.next')}
                                 className="font-bold text-sm h-10 rounded-xl"
                             />
                         </div>
@@ -123,7 +142,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('post.submit')}
                                 onChange={(e) => updateLabel('post.submit', e.target.value)}
                                 onFocus={() => setActiveSubStep('post.submit')}
-                                placeholder={t('post.submit')}
+                                placeholder={tStudy('post.submit')}
                                 className="font-bold text-sm h-10 rounded-xl"
                             />
                         </div>
@@ -149,7 +168,7 @@ const InterfaceEditor = () => {
                                     updateLabel('fine.actions.validate', e.target.value)
                                 }
                                 onFocus={() => setActiveSubStep('fine.actions.validate')}
-                                placeholder={t('fine.actions.validate')}
+                                placeholder={tStudy('fine.actions.validate')}
                                 className="font-bold text-sm h-10 rounded-xl"
                             />
                         </div>
@@ -184,7 +203,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.agree')}
                                     onChange={(e) => updateLabel('common.agree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.agree')}
-                                    placeholder={t('common.agree')}
+                                    placeholder={tStudy('common.agree')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -196,7 +215,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.neutral')}
                                     onChange={(e) => updateLabel('common.neutral', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.neutral')}
-                                    placeholder={t('common.neutral')}
+                                    placeholder={tStudy('common.neutral')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -208,7 +227,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.disagree')}
                                     onChange={(e) => updateLabel('common.disagree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.disagree')}
-                                    placeholder={t('common.disagree')}
+                                    placeholder={tStudy('common.disagree')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -233,7 +252,7 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.agree', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.agree')}
-                                        placeholder={t('fine.legend.agree')}
+                                        placeholder={tStudy('fine.legend.agree')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -247,7 +266,7 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.neutral', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.neutral')}
-                                        placeholder={t('fine.legend.neutral')}
+                                        placeholder={tStudy('fine.legend.neutral')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -261,13 +280,178 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.disagree', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.disagree')}
-                                        placeholder={t('fine.legend.disagree')}
+                                        placeholder={tStudy('fine.legend.disagree')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Methodology Hints */}
+            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-amber-500" />{' '}
+                        {t('admin.design.interface.hints.title')}
+                    </CardTitle>
+                    <CardDescription className="text-xs font-medium text-slate-400">
+                        {t('admin.design.interface.hints.desc')}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                        {(translation as any)?.methodology_tips?.map(
+                            (tip: string, index: number) => (
+                                <div key={index} className="flex gap-3 items-start group">
+                                    <div className="mt-2.5 size-1.5 rounded-full bg-amber-400 shrink-0" />
+                                    <div className="flex-1 space-y-2">
+                                        <Input
+                                            value={tip}
+                                            onChange={(e) => {
+                                                updateTranslation(activeLocale, (t: any) => {
+                                                    if (!t.methodology_tips)
+                                                        t.methodology_tips = [];
+                                                    t.methodology_tips[index] = e.target.value;
+                                                });
+                                            }}
+                                            placeholder={t(
+                                                'admin.design.interface.hints.placeholder'
+                                            )}
+                                            className="font-medium text-sm rounded-xl"
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            updateTranslation(activeLocale, (t: any) => {
+                                                t.methodology_tips.splice(index, 1);
+                                            });
+                                        }}
+                                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 flex-shrink-0"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )
+                        )}
+
+                        <div className="flex gap-4 pt-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    updateTranslation(activeLocale, (t: any) => {
+                                        if (!t.methodology_tips) t.methodology_tips = [];
+                                        t.methodology_tips.push('');
+                                    });
+                                }}
+                                className="rounded-xl border-dashed border-2 hover:border-indigo-500 hover:bg-slate-50/50"
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                {t('admin.design.interface.hints.add')}
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    updateTranslation(activeLocale, (t: any) => {
+                                        t.methodology_tips = [
+                                            tStudy('fine.workbench.methodology.extremes'),
+                                            tStudy('fine.workbench.methodology.vertical'),
+                                            tStudy('fine.workbench.methodology.constraint'),
+                                            tStudy('fine.workbench.methodology.relative'),
+                                            tStudy('fine.workbench.methodology.zoom'),
+                                            tStudy('fine.workbench.methodology.flexibility'),
+                                        ];
+                                    });
+                                }}
+                                className="text-slate-500 hover:text-indigo-600 rounded-xl"
+                            >
+                                <RefreshCcw className="h-4 w-4 mr-2" />
+                                {t('admin.design.interface.hints.reset')}
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Step Guidance (What/Why) */}
+            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <Info className="h-4 w-4 text-indigo-500" />{' '}
+                        {t('admin.design.interface.help.title')}
+                    </CardTitle>
+                    <CardDescription className="text-xs font-medium text-slate-400">
+                        {t('admin.design.interface.help.desc')}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                    {visibleSteps.map((step, index) => {
+                        const stepHelp =
+                            (translation as any)?.step_help?.[step.id.toString()] || {};
+
+                        return (
+                            <div key={step.id} className="space-y-4">
+                                <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-100/80 rounded-lg w-fit">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                        Step {index + 1}: {t(step.labelKey)}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2 border-slate-100">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                                            {t('study.help.what')}
+                                        </Label>
+                                        <Input
+                                            value={
+                                                stepHelp.what ||
+                                                tStudy(`study.help.step_${step.id}.what`)
+                                            }
+                                            onChange={(e) => {
+                                                updateTranslation(activeLocale, (t: any) => {
+                                                    if (!t.step_help) t.step_help = {};
+                                                    if (!t.step_help[step.id.toString()])
+                                                        t.step_help[step.id.toString()] = {};
+                                                    t.step_help[step.id.toString()].what =
+                                                        e.target.value;
+                                                });
+                                            }}
+                                            placeholder={tStudy(`study.help.step_${step.id}.what`)}
+                                            className="font-medium text-sm h-10 rounded-xl bg-white/50"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                                            {t('study.help.why')}
+                                        </Label>
+                                        <Input
+                                            value={
+                                                stepHelp.why ||
+                                                tStudy(`study.help.step_${step.id}.why`)
+                                            }
+                                            onChange={(e) => {
+                                                updateTranslation(activeLocale, (t: any) => {
+                                                    if (!t.step_help) t.step_help = {};
+                                                    if (!t.step_help[step.id.toString()])
+                                                        t.step_help[step.id.toString()] = {};
+                                                    t.step_help[step.id.toString()].why =
+                                                        e.target.value;
+                                                });
+                                            }}
+                                            placeholder={tStudy(`study.help.step_${step.id}.why`)}
+                                            className="font-medium text-sm h-10 rounded-xl bg-white/50"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </CardContent>
             </Card>
         </div>

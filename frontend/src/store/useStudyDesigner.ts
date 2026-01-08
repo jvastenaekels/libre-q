@@ -56,6 +56,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     consent_decline: t.consent_decline,
                     ui_labels: t.ui_labels,
                     process_steps: t.process_steps,
+                    methodology_tips: (t as any).methodology_tips || [],
+                    step_help: (t as any).step_help || {},
                 })),
                 statements: (study.statements || []).map((s) => ({
                     code: s.code,

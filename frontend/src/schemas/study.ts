@@ -114,6 +114,8 @@ export const StudyConfigSchema = z.object({
     branding: BrandingSchema.optional(),
     process_steps: z.array(ProcessStepSchema).optional(),
     requires_password: z.boolean().optional(),
+    methodology_tips: z.array(z.string()).optional(),
+    step_help: z.record(z.object({ what: z.string(), why: z.string() })).optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

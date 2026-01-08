@@ -170,6 +170,8 @@ class StudyTranslationBase(BaseModel):
     consent_decline: str | None = None
     ui_labels: dict[str, Any] = {}
     process_steps: list[ProcessStep] = []
+    methodology_tips: list[str] = []
+    step_help: dict[str, dict[str, str]] = {}
 
 
 class StudyTranslationCreate(StudyTranslationBase):

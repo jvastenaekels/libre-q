@@ -1,8 +1,10 @@
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useAdminStore } from '@/store/useAdminStore';
 import {
     Card,
     CardContent,
@@ -150,6 +152,7 @@ export default function GeneralSettingsPage() {
         if (!confirm(t('admin.settings.danger.delete_confirm'))) return;
         try {
             await AdminService.deleteStudy(slug);
+            useAdminStore.getState().setActiveStudy(null);
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });
@@ -410,25 +413,34 @@ export default function GeneralSettingsPage() {
                             <p>{t('admin.settings.lifecycle.notice')}</p>
                         </div>
                     </CardContent>
-                    <CardFooter className="px-6 pb-6 pt-0">
+                    <CardFooter className="px-6 pb-6 pt-0 flex flex-col gap-3 items-start">
                         {isArchived ? (
-                            <Button
-                                disabled
-                                variant="outline"
-                                className="w-full sm:w-auto rounded-xl font-bold bg-slate-50 border-slate-100"
-                            >
-                                {t('admin.settings.lifecycle.archived_status')}
-                            </Button>
+                            <Alert className="bg-slate-100 border-slate-200">
+                                <Archive className="h-4 w-4" />
+                                <AlertTitle>
+                                    {t('admin.settings.lifecycle.archived_status')}
+                                </AlertTitle>
+                                <AlertDescription>
+                                    {t('admin.settings.lifecycle.description')}
+                                </AlertDescription>
+                            </Alert>
                         ) : (
-                            <Button
-                                variant="secondary"
-                                disabled={!isClosed}
-                                onClick={handleArchive}
-                                className="w-full sm:w-auto rounded-xl font-black bg-amber-100 text-amber-700 hover:bg-amber-200 border-none shadow-sm"
-                            >
-                                <Archive className="w-4 h-4 mr-2" />
-                                {t('admin.settings.lifecycle.archive_button')}
-                            </Button>
+                            <>
+                                <Button
+                                    variant="secondary"
+                                    disabled={!isClosed}
+                                    onClick={handleArchive}
+                                    className="w-full sm:w-auto rounded-xl font-black bg-amber-100 text-amber-700 hover:bg-amber-200 border-none shadow-sm"
+                                >
+                                    <Archive className="w-4 h-4 mr-2" />
+                                    {t('admin.settings.lifecycle.archive_button')}
+                                </Button>
+                                {!isClosed && (
+                                    <p className="text-[10px] text-slate-400 font-medium ml-1">
+                                        * {t('admin.settings.lifecycle.notice').split('.')[0]}.
+                                    </p>
+                                )}
+                            </>
                         )}
                     </CardFooter>
                 </Card>
@@ -453,7 +465,7 @@ export default function GeneralSettingsPage() {
                                 <p>{t('admin.settings.danger.notice')}</p>
                             </div>
                         </CardContent>
-                        <CardFooter className="px-6 pb-6 pt-0">
+                        <CardFooter className="px-6 pb-6 pt-0 flex flex-col items-start gap-2">
                             <Button
                                 variant="destructive"
                                 disabled={!isArchived}
@@ -463,6 +475,11 @@ export default function GeneralSettingsPage() {
                                 <Trash2 size={16} />
                                 {t('admin.settings.danger.delete_button')}
                             </Button>
+                            {!isArchived && (
+                                <p className="text-[11px] text-red-400/80 font-medium">
+                                    * {t('admin.settings.danger.notice').split('. ').pop()}
+                                </p>
+                            )}
                         </CardFooter>
                     </Card>
                 )}

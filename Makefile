@@ -26,6 +26,8 @@ check:
 	cd backend && uv run deptry app/
 	cd backend && uv run vulture app/ vulture_whitelist.py --min-confidence 60
 	cd backend && uv run pip-audit
+	cd backend && uv run python -m app.schema_validation
+	python3 backend/scripts/check_relationships.py
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
 
@@ -36,7 +38,10 @@ test:
 e2e:
 	cd frontend && npm run e2e
 
-ci: lint check test
+build:
+	cd frontend && npm run build
+
+ci: lint check test build
 	@echo "\n--- Fast CI checks passed locally! (Skipped E2E) ---"
 
 ci-full: ci e2e

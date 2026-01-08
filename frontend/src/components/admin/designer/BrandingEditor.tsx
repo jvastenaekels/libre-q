@@ -157,6 +157,27 @@ const BrandingEditor = () => {
                             recommendedSize="200x50px"
                             maxFileSize={500 * 1024}
                         />
+
+                        {/* Logo location explanation */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900 mt-2">
+                            <div className="flex gap-2">
+                                <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                                <div>
+                                    <p className="font-medium mb-1 text-blue-800">
+                                        {t(
+                                            'admin.design.theme.logo.help_title',
+                                            'Where does this logo appear?'
+                                        )}
+                                    </p>
+                                    <p className="text-blue-800/90 text-xs leading-relaxed">
+                                        {t(
+                                            'admin.design.theme.logo.help_desc',
+                                            'The logo is displayed at the top of every study page and on the welcome page.'
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -317,19 +338,30 @@ const BrandingEditor = () => {
                                 {t('admin.design.theme.partners.add', 'Add Partner')}
                             </button>
                         </div>
+
+                        {/* Partners location explanation */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900 mt-4">
+                            <div className="flex gap-2">
+                                <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                                <div>
+                                    <p className="font-medium mb-1 text-blue-800">
+                                        {t(
+                                            'admin.design.theme.partners.help_title',
+                                            'Credibility & Trust'
+                                        )}
+                                    </p>
+                                    <p className="text-blue-800/90 text-xs leading-relaxed">
+                                        {t(
+                                            'admin.design.theme.partners.help_desc',
+                                            'Partner logos are prominently displayed on the study home page to reassure participants.'
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </section>
-
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-                <div className="flex gap-2">
-                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <div>
-                        <p className="font-medium mb-1">{t('admin.design.theme.tip.title')}</p>
-                        <p className="text-amber-800">{t('admin.design.theme.tip.desc')}</p>
-                    </div>
-                </div>
-            </div>
         </>
     );
 };

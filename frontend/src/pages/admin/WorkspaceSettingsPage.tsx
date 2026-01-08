@@ -183,7 +183,7 @@ export default function WorkspaceSettingsPage() {
 
     // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
     const userInWorkspace = members?.find((m: any) => m.user_id === currentUser?.id);
-    const isAdmin = userInWorkspace?.role === 'admin';
+    const isAdmin = userInWorkspace?.role === 'admin' || userInWorkspace?.role === 'owner';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -442,7 +442,7 @@ export default function WorkspaceSettingsPage() {
                         <CardHeader>
                             <CardTitle className="text-sm font-black uppercase tracking-widest text-indigo-700 flex items-center gap-2">
                                 <UserPlus className="size-4" />
-                                Team Growth
+                                {t('admin.workspaces.settings.team_growth_title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">

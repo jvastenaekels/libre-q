@@ -17,6 +17,8 @@
         "optional": "Optional",
         "processing": "Processing...",
         "statement": "Statement",
+        "back": "Back",
+        "cancel": "Cancel",
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
             "not_found": "Study not found.",
@@ -89,6 +91,34 @@
         "navigation": "Navigation",
         "language": "English"
     },
+    "study": {
+        "help": {
+            "title": "Help & Information",
+            "trigger": "Help",
+            "what": "What we ask",
+            "why": "Why it matters",
+            "step_1": {
+                "what": "Review the study objectives and confirm your voluntary participation.",
+                "why": "Ensures you are fully informed and have consented to the research process."
+            },
+            "step_2": {
+                "what": "Answer a few quick questions about your profile.",
+                "why": "Helps us understand how different perspectives correlate with participant backgrounds."
+            },
+            "step_3": {
+                "what": "Spontaneously sort the statements into three categories: Agree, Neutral, and Disagree.",
+                "why": "Captures your initial, intuitive reaction to the study s central themes."
+            },
+            "step_4": {
+                "what": "Distribute your statements on the grid based on your level of agreement.",
+                "why": "Creates a structured, measurable map of your specific point of view."
+            },
+            "step_5": {
+                "what": "Review your final sort and provide additional reflections if you wish.",
+                "why": "Allows you to clarify your perspective and enrich the data with qualitative detail."
+            }
+        }
+    },
     "auth": {
         "login": {
             "title": "Admin Login",
@@ -144,6 +174,8 @@
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
         "restart": "Start a new session",
         "preview_title": "Preview",
+        "conducted_by": "Conducted by",
+        "how_it_works": "Process",
         "objective_label": "Study Objective",
         "instructions_label": "Process",
         "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Your perspective:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Why:** a few words to explain your most significant choices.",
@@ -318,7 +350,13 @@
                 "settings": "Workspace Settings",
                 "settings_desc": "Members & Profiles",
                 "new_workspace": "New Workspace",
-                "new_workspace_desc": "Create new organization"
+                "new_workspace_desc": "Create a new organization"
+            },
+            "roles": {
+                "owner": "Owner",
+                "admin": "Administrator",
+                "researcher": "Researcher",
+                "member": "Member"
             },
             "create": {
                 "title": "Create Workspace",
@@ -457,7 +495,9 @@
                 "cancel": "Cancel",
                 "create": "Create Study",
                 "success": "Study created successfully",
-                "error": "Failed to create study"
+                "error": "Failed to create study",
+                "languages": "Languages",
+                "languages_desc": "Select the languages to enable. Content will be initialized with localized defaults."
             }
         },
         "validation": {
@@ -587,6 +627,7 @@
                 "save": "Save",
                 "saving": "Saving...",
                 "closed": "Closed",
+                "back_to_study": "Back to Study",
                 "editing_language": "Editing",
                 "manage_langs": "Manage Languages",
                 "select_lang": "Select language"
@@ -811,6 +852,17 @@
                     "grid": "Grid Legends (extremes)",
                     "most_agree": "Most Agree",
                     "most_disagree": "Most Disagree"
+                },
+                "hints": {
+                    "title": "Methodology Tips",
+                    "desc": "Add or modify floating hints to help participants during the grid sort phase.",
+                    "placeholder": "Enter a methodology tip...",
+                    "add": "Add Tip",
+                    "reset": "Reset to Defaults"
+                },
+                "help": {
+                    "title": "Step Guidance (What/Why)",
+                    "desc": "Customize the context-sensitive help available to participants at each step via the '?' overlay."
                 }
             },
             "theme": {
@@ -826,11 +878,9 @@
                     "desc": "Upload a custom logo to replace the default Open-Q branding.",
                     "label": "Logo URL",
                     "hint": "Recommended size: 200x50px. Supports PNG, SVG, JPG.",
-                    "preview": "Logo preview"
-                },
-                "tip": {
-                    "title": "Branding tip",
-                    "desc": "Ensuring high accessibility is key. When picking an accent color, make sure it has enough contrast against white backgrounds for readability."
+                    "preview": "Logo preview",
+                    "help_title": "Where does this logo appear?",
+                    "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity."
                 },
                 "partners": {
                     "title": "Institutional Partners",
@@ -839,8 +889,10 @@
                     "name_label": "Partner Name",
                     "name_placeholder": "Institution Name",
                     "logo_label": "Logo URL",
-                    "url_label": "Website (optional)",
-                    "url_placeholder": "Logo URL (https://...)"
+                    "url_label": "Website (Optional)",
+                    "url_placeholder": "https://...",
+                    "help_title": "Display of Logos",
+                    "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo."
                 },
                 "upload": {
                     "upload": "Upload",
@@ -1044,8 +1096,10 @@
                     "slug_hint": "Changing the slug will update all your research dashboard links.",
                     "save": "Save Changes",
                     "save_success": "Workspace updated successfully",
-                    "save_error": "Failed to update workspace"
+                    "save_error": "Failed to update workspace."
                 },
+                "team_growth_title": "Team Management",
+                "team_growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
                 "team": {
                     "title": "Team Members",
                     "desc": "List of users with access to this workspace.",

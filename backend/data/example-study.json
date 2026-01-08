@@ -183,7 +183,8 @@
                     "description": "A few words to explain your most significant choices.",
                     "color": "#10b981"
                 }
-            ]
+            ],
+            "step_help": {}
         },
         "fr": {
             "title": "Découverte d'Open-Q",
@@ -224,7 +225,8 @@
                     "description": "Quelques mots pour expliquer vos choix les plus significatifs.",
                     "color": "#10b981"
                 }
-            ]
+            ],
+            "step_help": {}
         },
         "fi": {
             "title": "Tutustu Open-Q-alustaan",
@@ -265,7 +267,8 @@
                     "description": "Muutama sana perustellaksesi merkittävimmät valintasi.",
                     "color": "#10b981"
                 }
-            ]
+            ],
+            "step_help": {}
         }
     },
     "statements": [

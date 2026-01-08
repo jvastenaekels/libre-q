@@ -118,11 +118,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         {/* Institutional Signature */}
                         {(study.branding as any)?.partners &&
                             (study.branding as any).partners.length > 0 && (
-                                <div className="mt-8 pt-6 border-t border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                        {t('welcome.conducted_by', 'Conducted by')}
-                                    </p>
-                                    <div className="flex flex-wrap gap-6 items-center">
+                                <div className="mt-10 pt-8 border-t border-slate-200">
+                                    <div className="flex flex-wrap gap-8 items-center justify-start">
                                         {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}
                                         {(study.branding as any).partners.map((partner: any) => (
                                             <a
@@ -131,7 +128,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={cn(
-                                                    'block transition-opacity hover:opacity-80',
+                                                    'block transition-opacity hover:opacity-70',
                                                     !partner.url && 'pointer-events-none'
                                                 )}
                                             >
@@ -139,7 +136,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                                     src={partner.logo_url}
                                                     alt={partner.name}
                                                     title={partner.name}
-                                                    className="h-8 md:h-10 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                                                    className="h-12 md:h-16 w-auto object-contain"
                                                 />
                                             </a>
                                         ))}

@@ -3,7 +3,7 @@ import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
 } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
-import type { LoaderFunctionArgs } from 'react-router-dom';
+import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const teamManagementPageLoader = async ({ params }: LoaderFunctionArgs) => {
     const { slug } = params;
@@ -18,6 +18,9 @@ export const teamManagementPageLoader = async ({ params }: LoaderFunctionArgs) =
         return { study, slug };
     } catch (error) {
         console.error('Failed to load team management data:', error);
-        throw error;
+        import('@/store/useAdminStore').then(({ useAdminStore }) => {
+            useAdminStore.getState().setActiveStudy(null);
+        });
+        throw redirect('/admin');
     }
 };

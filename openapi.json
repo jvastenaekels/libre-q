@@ -3565,6 +3565,25 @@
             "type": "array",
             "title": "Process Steps",
             "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
+            "default": {}
           }
         },
         "type": "object",
@@ -3706,6 +3725,25 @@
             "type": "array",
             "title": "Process Steps",
             "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
+            "default": {}
           },
           "id": {
             "type": "integer",

@@ -15,6 +15,7 @@ import type { StudyTranslationReadConsentAccept } from './studyTranslationReadCo
 import type { StudyTranslationReadConsentDecline } from './studyTranslationReadConsentDecline';
 import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabels';
 import type { ProcessStep } from './processStep';
+import type { StudyTranslationReadStepHelp } from './studyTranslationReadStepHelp';
 
 /**
  * Schema for reading a study translation.
@@ -42,6 +43,8 @@ export interface StudyTranslationRead {
     consent_decline?: StudyTranslationReadConsentDecline;
     ui_labels?: StudyTranslationReadUiLabels;
     process_steps?: ProcessStep[];
+    methodology_tips?: string[];
+    step_help?: StudyTranslationReadStepHelp;
     id: number;
     study_id: number;
 }

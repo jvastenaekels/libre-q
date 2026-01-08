@@ -5,8 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DEFAULT_STUDY_CONTENT, AVAILABLE_LANGUAGES } from '@/constants/studyDefaults';
 import {
     Dialog,
     DialogContent,
@@ -35,8 +38,9 @@ interface CreateStudyDialogProps {
 export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps) {
     const { setActiveStudy } = useAdminStore();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const createStudyMutation = useCreateStudyApiAdminStudiesPost();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const formSchema = z.object({
         title: z.string().min(1, t('admin.validation.required', 'Required')).max(100),
@@ -51,6 +55,9 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                     'Slug must contain only lowercase letters, numbers, and hyphens'
                 )
             ),
+        languages: z
+            .array(z.string())
+            .min(1, t('admin.validation.language_required', 'Select at least one language')),
     });
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -58,6 +65,7 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
         defaultValues: {
             title: '',
             slug: '',
+            languages: [i18n.language.split('-')[0]],
         },
     });
 
@@ -67,27 +75,24 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
             const newStudy = await createStudyMutation.mutateAsync({
                 data: {
                     slug: values.slug,
-                    translations: [
-                        {
-                            language_code: 'en',
+                    translations: values.languages.map((langCode) => {
+                        const defaults =
+                            DEFAULT_STUDY_CONTENT[langCode] || DEFAULT_STUDY_CONTENT.en;
+                        return {
+                            language_code: langCode,
                             title: values.title,
                             description: '',
-                            instructions:
-                                'Please sort the statements according to your perspective.',
-                            consent_title: 'Informed Consent',
-                            consent_accept: 'I Agree',
-                            consent_decline: 'I Decline',
-                        },
-                    ],
-                    grid_config: [
-                        { score: -2, capacity: 2 },
-                        { score: -1, capacity: 3 },
-                        { score: 0, capacity: 4 },
-                        { score: 1, capacity: 3 },
-                        { score: 2, capacity: 2 },
-                    ], // Default small normal distribution
-                    presort_config: {},
-                    postsort_config: {},
+                            instructions: defaults.instructions,
+                            consent_title: defaults.consent_title,
+                            consent_description: defaults.consent_description,
+                            consent_accept: defaults.consent_accept,
+                            consent_decline: defaults.consent_decline,
+                            process_steps: defaults.process_steps,
+                        };
+                    }),
+                    grid_config: [], // Empty grid for new studies - will be configured later
+                    presort_config: { enabled: true },
+                    postsort_config: { email: { enabled: false }, consent: { enabled: false } },
                     state: 'draft',
                     show_statement_codes: false,
                     statements: [],
@@ -95,16 +100,53 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
             });
 
             toast.success(t('admin.dialogs.create_study.success', 'Study created successfully'));
+
+            // Invalidate and refetch studies list to show the new study
+            await queryClient.invalidateQueries({ queryKey: ['/api/admin/studies/'] });
+
             setActiveStudy(newStudy.slug);
             navigate(`/admin/studies/${newStudy.slug}`);
             onOpenChange(false);
             form.reset();
         } catch (error: unknown) {
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : t('admin.dialogs.create_study.error', 'Failed to create study');
-            toast.error(message);
+            console.error('Study creation error:', error);
+
+            // Extract detailed error information
+            let errorMessage = t('admin.dialogs.create_study.error', 'Failed to create study');
+
+            if (error && typeof error === 'object') {
+                // Check for axios-style error response
+                const axiosError = error as { response?: { data?: { detail?: unknown } } };
+                if (axiosError.response?.data?.detail) {
+                    const detail = axiosError.response.data.detail;
+
+                    // Handle Pydantic validation errors (array format)
+                    if (Array.isArray(detail)) {
+                        const fieldErrors = detail
+                            .map(
+                                (err: { loc: string[]; msg: string }) =>
+                                    `${err.loc.join('.')}: ${err.msg}`
+                            )
+                            .join('\n');
+                        errorMessage = `Validation errors:\n${fieldErrors}`;
+                        console.error('Validation errors:', detail);
+                    }
+                    // Handle string error messages
+                    else if (typeof detail === 'string') {
+                        errorMessage = detail;
+                    }
+                    // Handle object error messages
+                    else if (typeof detail === 'object') {
+                        errorMessage = JSON.stringify(detail, null, 2);
+                    }
+                }
+                // Fallback to error message if available
+                else if ('message' in error && typeof error.message === 'string') {
+                    errorMessage = error.message;
+                }
+            }
+
+            toast.error(errorMessage, { duration: 10000 });
         }
     };
 
@@ -164,6 +206,72 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                                             {...field}
                                         />
                                     </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="languages"
+                            render={() => (
+                                <FormItem>
+                                    <div className="mb-4">
+                                        <FormLabel className="text-base">
+                                            {t('admin.dialogs.create_study.languages', 'Languages')}
+                                        </FormLabel>
+                                        <DialogDescription>
+                                            {t(
+                                                'admin.dialogs.create_study.languages_desc',
+                                                'Select languages to enable for this study. Content will be initialized with localized defaults.'
+                                            )}
+                                        </DialogDescription>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {AVAILABLE_LANGUAGES.map((lang) => (
+                                            <FormField
+                                                key={lang.code}
+                                                control={form.control}
+                                                name="languages"
+                                                render={({ field }) => {
+                                                    return (
+                                                        <FormItem
+                                                            key={lang.code}
+                                                            className="flex flex-row items-center space-x-3 space-y-0"
+                                                        >
+                                                            <FormControl>
+                                                                <Checkbox
+                                                                    checked={field.value?.includes(
+                                                                        lang.code
+                                                                    )}
+                                                                    onCheckedChange={(checked) => {
+                                                                        return checked
+                                                                            ? field.onChange([
+                                                                                  ...field.value,
+                                                                                  lang.code,
+                                                                              ])
+                                                                            : field.onChange(
+                                                                                  field.value?.filter(
+                                                                                      (value) =>
+                                                                                          value !==
+                                                                                          lang.code
+                                                                                  )
+                                                                              );
+                                                                    }}
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className="font-normal cursor-pointer text-sm">
+                                                                <span className="text-xl mr-2">
+                                                                    {lang.flag}
+                                                                </span>
+                                                                {lang.label}
+                                                            </FormLabel>
+                                                        </FormItem>
+                                                    );
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
                                     <FormMessage />
                                 </FormItem>
                             )}

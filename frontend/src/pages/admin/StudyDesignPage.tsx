@@ -133,6 +133,8 @@ const StudyDesignPage = () => {
                 accept: translation?.consent_accept,
                 decline: translation?.consent_decline,
             },
+            condition_of_instruction: translation?.condition_of_instruction,
+            pre_instruction: translation?.pre_instruction,
             ui_labels: translation?.ui_labels || {},
             language: activeLocale,
             // biome-ignore lint/suspicious/noExplicitAny: complex draft type

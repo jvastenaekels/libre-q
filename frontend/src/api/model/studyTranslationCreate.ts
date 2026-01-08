@@ -15,6 +15,7 @@ import type { StudyTranslationCreateConsentAccept } from './studyTranslationCrea
 import type { StudyTranslationCreateConsentDecline } from './studyTranslationCreateConsentDecline';
 import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiLabels';
 import type { ProcessStep } from './processStep';
+import type { StudyTranslationCreateStepHelp } from './studyTranslationCreateStepHelp';
 
 /**
  * Schema for creating a study translation.
@@ -42,4 +43,6 @@ export interface StudyTranslationCreate {
     consent_decline?: StudyTranslationCreateConsentDecline;
     ui_labels?: StudyTranslationCreateUiLabels;
     process_steps?: ProcessStep[];
+    methodology_tips?: string[];
+    step_help?: StudyTranslationCreateStepHelp;
 }
