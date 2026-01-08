@@ -57,6 +57,13 @@ _Solves the "Black Box" of data collection._
 - **Collaborative Workspaces**: Invite colleagues with specific roles (Owner, Editor, Viewer) to collaborate securely.
 - **One-Click Analysis Export**: Download data in ready-to-use formats for **PQMethod**, **KADE**, or **R** (qmethod package).
 
+### 4. Native Multi-Language Support
+
+_Built for global, cross-cultural research from day one._
+
+- **Fully Localized UI**: The participant interface adapts seamlessly to English, French, Finnish, and more, ensuring language is never a barrier.
+- **Cross-Cultural Study Management**: Design studies with multiple languages in mind. Switch participant instructions, statements, and consent forms instantly to compare cultural perspectives without technical friction.
+
 ---
 
 ## 🤝 Contributing & Standards
