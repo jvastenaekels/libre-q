@@ -172,14 +172,14 @@ const StudyDesignPage = () => {
             {/* Toolbar */}
             <div className="border-b bg-background px-4 sm:px-6 py-2 flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center justify-between shrink-0">
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                    <div className="flex items-center gap-2 px-2 sm:px-3 py-1 bg-primary/5 rounded-md border border-primary/10 shrink-0">
-                        <Wand2 className="h-4 w-4 text-primary" />
-                        <span className="text-xs sm:text-sm font-semibold hidden sm:inline">
+                    <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-lg shrink-0">
+                        <Wand2 className="h-4 w-4 text-indigo-600" />
+                        <span className="text-xs sm:text-sm font-black text-indigo-900 uppercase tracking-wider hidden sm:inline">
                             {t('admin.design.toolbar.title')}
                         </span>
                     </div>
                     <div className="h-4 w-px bg-border hidden sm:block" />
-                    <h2 className="text-xs sm:text-sm font-medium truncate min-w-0">
+                    <h2 className="text-xs sm:text-sm font-black text-slate-900 truncate min-w-0">
                         {draft.translations?.find((t) => t.language_code === activeLocale)?.title ||
                             draft.slug}
                     </h2>
@@ -221,7 +221,7 @@ const StudyDesignPage = () => {
                                     variant="outline"
                                     size="sm"
                                     data-testid="language-switcher"
-                                    className="h-8 gap-2 font-black bg-white/50 border-slate-200 rounded-lg hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm"
+                                    className="h-8 gap-2 font-black bg-white border-slate-200 rounded-lg hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm"
                                 >
                                     <Globe className="h-3.5 w-3.5 text-indigo-500" />
                                     {activeLocale.toUpperCase()}
@@ -299,10 +299,8 @@ const StudyDesignPage = () => {
                         onClick={handleSave}
                         disabled={updateMutation.isPending || isFullyReadOnly}
                         className={cn(
-                            'transition-all h-8 font-bold rounded-lg shadow-sm',
-                            isDirty &&
-                                !isFullyReadOnly &&
-                                'ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse'
+                            'transition-all h-8 font-black rounded-lg shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white',
+                            isDirty && !isFullyReadOnly && 'ring-2 ring-indigo-500 ring-offset-2'
                         )}
                     >
                         {updateMutation.isPending ? (

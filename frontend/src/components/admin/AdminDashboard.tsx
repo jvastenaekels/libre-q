@@ -52,10 +52,10 @@ export function AdminDashboard() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tighter bg-gradient-to-br from-slate-950 via-slate-800 to-indigo-900 bg-clip-text text-transparent">
+                    <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900">
                         {t('admin.dashboard.title')}
                     </h1>
-                    <p className="text-sm md:text-lg text-muted-foreground/80 font-medium">
+                    <p className="text-sm md:text-lg text-slate-500 font-medium">
                         {t('admin.dashboard.welcome')}{' '}
                         <span className="text-indigo-600 font-bold">
                             {user?.email.split('@')[0]}
@@ -67,7 +67,7 @@ export function AdminDashboard() {
                     <Button
                         onClick={() => setShowCreateDialog(true)}
                         size="lg"
-                        className="w-full md:w-auto shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 transition-all duration-300 hover:-translate-y-0.5"
+                        className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold h-12 px-8 rounded-xl"
                     >
                         <Plus className="mr-2 h-5 w-5" /> {t('admin.dashboard.create_study')}
                     </Button>
@@ -76,19 +76,18 @@ export function AdminDashboard() {
 
             {/* Stats Overview */}
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                <Card className="hover:shadow-xl transition-all duration-300 border border-emerald-500/10 shadow-lg bg-white/40 backdrop-blur-xl group overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-                        <CardTitle className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em]">
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden group">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
                             {t('admin.dashboard.active_data_collection')}
                         </CardTitle>
-                        <Activity className="h-4 w-4 text-emerald-500" />
+                        <Activity className="h-4 w-4 text-indigo-500" />
                     </CardHeader>
-                    <CardContent className="relative pt-4">
-                        <div className="text-3xl font-black text-emerald-600">
+                    <CardContent className="pt-4">
+                        <div className="text-3xl font-black text-indigo-600">
                             {activeStudiesCount}
                         </div>
-                        <p className="text-[10px] font-semibold text-slate-500 mt-1 uppercase tracking-wider">
+                        <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-wider">
                             {t('admin.dashboard.receiving_responses')}
                         </p>
                     </CardContent>
@@ -97,12 +96,12 @@ export function AdminDashboard() {
             </div>
 
             {/* Recent Studies */}
-            <Card className="col-span-4 border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl">
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-xl font-bold">
+            <Card className="col-span-4 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-slate-50 pb-4">
+                    <CardTitle className="text-lg font-black text-slate-900">
                         {t('admin.dashboard.recent_studies')}
                     </CardTitle>
-                    <CardDescription className="text-sm font-medium">
+                    <CardDescription className="text-sm font-medium text-slate-500">
                         {t('admin.dashboard.recent_description')}
                     </CardDescription>
                 </CardHeader>
@@ -127,10 +126,10 @@ export function AdminDashboard() {
                                             {study.slug.substring(0, 1).toUpperCase()}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                            <p className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                                                 {study.slug}
                                             </p>
-                                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-tighter mt-0.5">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-0.5">
                                                 {t('admin.dashboard.created')}{' '}
                                                 {formatDistanceToNow(new Date(study.created_at), {
                                                     addSuffix: true,

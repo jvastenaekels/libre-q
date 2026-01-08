@@ -2,7 +2,7 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Palette, Image as ImageIcon, Info, RotateCcw } from 'lucide-react';
+import { Palette, Image as ImageIcon, Info, RotateCcw, Trash2, Plus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -300,7 +300,7 @@ const BrandingEditor = () => {
                                         const newPartners = [
                                             ...(branding.partners || []),
                                             {
-                                                id: crypto.randomUUID(),
+                                                id: crypto.randomUUID() as string,
                                                 name: '',
                                                 logo_url: '',
                                                 url: '',

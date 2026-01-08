@@ -196,13 +196,13 @@ export default function WorkspaceSettingsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Workspace Profile */}
                 <div className="xl:col-span-2 space-y-6">
-                    <Card className="border-white/20 glass overflow-hidden shadow-xl shadow-indigo-500/5">
-                        <CardHeader className="bg-white/40 border-b border-sidebar-border/50">
-                            <CardTitle className="text-xl font-black text-slate-900 flex items-center gap-2">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="border-b border-slate-50 pb-4">
+                            <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                                 <Settings className="size-5 text-indigo-500" />
                                 {t('admin.workspaces.settings.general.title')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-sm font-medium text-slate-500">
                                 {t('admin.workspaces.settings.general.desc')}
                             </CardDescription>
                         </CardHeader>
@@ -217,7 +217,7 @@ export default function WorkspaceSettingsPage() {
                                         name="title"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-black uppercase tracking-widest text-slate-500">
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                     {t(
                                                         'admin.workspaces.settings.general.label_title'
                                                     )}
@@ -241,7 +241,7 @@ export default function WorkspaceSettingsPage() {
                                         name="slug"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-black uppercase tracking-widest text-slate-500">
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                     {t(
                                                         'admin.workspaces.settings.general.label_slug'
                                                     )}
@@ -274,7 +274,7 @@ export default function WorkspaceSettingsPage() {
                                         <div className="flex justify-end pt-2">
                                             <Button
                                                 type="submit"
-                                                className="h-11 rounded-xl px-6 font-bold shadow-lg shadow-indigo-500/20"
+                                                className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                                 disabled={updateWorkspaceMutation.isPending}
                                             >
                                                 {updateWorkspaceMutation.isPending ? (
@@ -299,13 +299,13 @@ export default function WorkspaceSettingsPage() {
                     </Card>
 
                     {/* Member Management */}
-                    <Card className="border-white/20 glass overflow-hidden shadow-xl shadow-indigo-500/5">
-                        <CardHeader className="bg-white/40 border-b border-sidebar-border/50">
-                            <CardTitle className="text-xl font-black text-slate-900 flex items-center gap-2">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="border-b border-slate-50 pb-4">
+                            <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                                 <Users className="size-5 text-indigo-500" />
                                 {t('admin.workspaces.settings.team.title')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-sm font-medium text-slate-500">
                                 {t('admin.workspaces.settings.team.desc')}
                             </CardDescription>
                         </CardHeader>
@@ -313,16 +313,16 @@ export default function WorkspaceSettingsPage() {
                             <Table>
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest px-6 h-12">
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider px-6 h-12">
                                             {t('admin.workspaces.settings.team.col_user')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest h-12">
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider h-12">
                                             {t('admin.workspaces.settings.team.col_role')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest h-12">
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider h-12">
                                             {t('admin.workspaces.settings.team.col_joined')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-right px-6 h-12">
+                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-right px-6 h-12">
                                             {t('admin.workspaces.settings.team.col_actions')}
                                         </TableHead>
                                     </TableRow>
@@ -438,9 +438,9 @@ export default function WorkspaceSettingsPage() {
 
                 {/* Sidebar - Invitations & Permissions Info */}
                 <div className="space-y-6">
-                    <Card className="border-indigo-100 bg-indigo-50/30 overflow-hidden">
+                    <Card className="border-indigo-100 bg-indigo-50/30 rounded-2xl overflow-hidden shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-sm font-black uppercase tracking-widest text-indigo-700 flex items-center gap-2">
+                            <CardTitle className="text-sm font-black uppercase tracking-wider text-indigo-700 flex items-center gap-2">
                                 <UserPlus className="size-4" />
                                 {t('admin.workspaces.settings.team_growth_title')}
                             </CardTitle>
@@ -455,9 +455,9 @@ export default function WorkspaceSettingsPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-slate-100 bg-white shadow-sm overflow-hidden">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                            <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                                 <Shield className="size-4 text-slate-400" />
                                 Permissions Matrix
                             </CardTitle>
@@ -581,7 +581,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                 {!inviteUrl ? (
                     <form onSubmit={handleInvite} className="space-y-4 pt-4">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                 {t('admin.workspaces.settings.team.invite_modal.email_label')}
                             </Label>
                             <Input
@@ -594,7 +594,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                 {t('admin.workspaces.settings.team.invite_modal.role_label')}
                             </Label>
                             <Select

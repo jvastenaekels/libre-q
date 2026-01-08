@@ -300,6 +300,7 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
+                        {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
                         {(branding as any)?.partners && (branding as any).partners.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}

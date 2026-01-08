@@ -336,6 +336,7 @@ const QSortEditor = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => {
+                                                    // biome-ignore lint/suspicious/noExplicitAny: complex draft type
                                                     updateDraft((d: any) => {
                                                         if (d.statements) {
                                                             d.statements.splice(idx, 1);

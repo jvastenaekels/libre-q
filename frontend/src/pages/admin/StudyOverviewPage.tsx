@@ -124,11 +124,11 @@ const StudyOverviewPage = () => {
                     <div className="bg-gradient-to-br from-slate-50 to-white px-4 py-4 rounded-xl border border-slate-100 shadow-sm mb-6">
                         <div className="grid gap-3 md:grid-cols-3">
                             {/* Sample Size */}
-                            <Card className="overflow-hidden border border-slate-200 shadow-sm bg-white">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Users className="h-4 w-4 text-indigo-600" />
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                             {t(
                                                 'admin.study_overview.sample_size',
                                                 'Sample size (N)'
@@ -143,11 +143,11 @@ const StudyOverviewPage = () => {
                             </Card>
 
                             {/* Completion Rate */}
-                            <Card className="overflow-hidden border border-slate-200 shadow-sm bg-white">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                             {t(
                                                 'admin.study_overview.completion_rate',
                                                 'Completion rate'
@@ -173,11 +173,11 @@ const StudyOverviewPage = () => {
                             </Card>
 
                             {/* Median Duration */}
-                            <Card className="overflow-hidden border border-slate-200 shadow-sm bg-white">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Clock className="h-4 w-4 text-amber-500" />
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                             {t(
                                                 'admin.study_overview.median_duration',
                                                 'Median duration'
@@ -213,7 +213,7 @@ const StudyOverviewPage = () => {
 
             <div className="grid gap-6 md:grid-cols-12 pb-12">
                 {/* Recent Activity / Analytics Promo */}
-                <Card className="col-span-12 md:col-span-8 shadow-sm border-slate-200 bg-white">
+                <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
                         <div className="space-y-1">
                             <CardTitle className="text-lg flex items-center gap-2">
@@ -240,7 +240,7 @@ const StudyOverviewPage = () => {
                                     (p) => p.status === 'completed' && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 px-1">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
                                             {t(
                                                 'admin.study_overview.recently_completed',
                                                 'Recently Completed'
@@ -385,7 +385,7 @@ const StudyOverviewPage = () => {
                                     (p: any) => !p.completed && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 px-1">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
                                             {t('admin.study_overview.in_progress', 'In Progress')} (
                                             {
                                                 recentParticipants.filter(
@@ -524,7 +524,7 @@ const StudyOverviewPage = () => {
                                 {/* Discarded Section (if any) */}
                                 {recentParticipants.filter((p) => p.is_discarded).length > 0 && (
                                     <div className="p-3 bg-red-50/20">
-                                        <div className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-3 px-1">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-red-400 mb-3 px-1">
                                             {t('admin.study_overview.discarded', 'Discarded')} (
                                             {
                                                 recentParticipants.filter((p) => p.is_discarded)

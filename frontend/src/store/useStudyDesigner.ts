@@ -58,7 +58,9 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     process_steps: t.process_steps,
                     condition_of_instruction: t.condition_of_instruction,
                     pre_instruction: t.pre_instruction,
+                    // biome-ignore lint/suspicious/noExplicitAny: methodology tips missing in generated type
                     methodology_tips: (t as any).methodology_tips || [],
+                    // biome-ignore lint/suspicious/noExplicitAny: step help missing in generated type
                     step_help: (t as any).step_help || {},
                 })),
                 statements: (study.statements || []).map((s) => ({

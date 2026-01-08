@@ -79,6 +79,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
         navigate(`/study/${slug}/consent`);
     };
 
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
     const steps = (study as any).process_steps || [];
 
     return (
@@ -116,8 +117,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         </div>
 
                         {/* Institutional Signature */}
+                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */}
                         {(study.branding as any)?.partners &&
-                            (study.branding as any).partners.length > 0 && (
+                            {
+                                /* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */
+                            }(study.branding as any).partners.length > 0 && (
                                 <div className="mt-10 pt-8 border-t border-slate-200">
                                     <div className="flex flex-wrap gap-8 items-center justify-start">
                                         {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}

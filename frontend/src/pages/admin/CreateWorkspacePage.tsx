@@ -95,7 +95,7 @@ export default function CreateWorkspacePage() {
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-8 max-w-4xl mx-auto w-full">
             <div className="flex flex-col gap-2 mb-2">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 shadow-sm">
+                    <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600 shadow-sm">
                         <Plus className="size-6" />
                     </div>
                     <h1 className="text-3xl font-black tracking-tight text-slate-900">
@@ -107,13 +107,13 @@ export default function CreateWorkspacePage() {
                 </p>
             </div>
 
-            <Card className="border-white/20 glass shadow-2xl shadow-indigo-500/5 overflow-hidden">
-                <CardHeader className="bg-white/40 border-b border-sidebar-border/50 pb-6">
-                    <CardTitle className="text-xl font-black text-slate-900 flex items-center gap-2">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-slate-50 pb-6">
+                    <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                         <Briefcase className="size-5 text-indigo-500" />
                         {t('admin.workspace.create.card_title')}
                     </CardTitle>
-                    <CardDescription className="font-medium">
+                    <CardDescription className="text-sm font-medium text-slate-500">
                         {t('admin.workspace.create.card_description')}
                     </CardDescription>
                 </CardHeader>
@@ -125,7 +125,7 @@ export default function CreateWorkspacePage() {
                                 name="title"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-xs font-black uppercase tracking-widest text-slate-500">
+                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.workspace.create.name_label')}
                                         </FormLabel>
                                         <FormControl>
@@ -147,7 +147,7 @@ export default function CreateWorkspacePage() {
                                 name="slug"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-xs font-black uppercase tracking-widest text-slate-500">
+                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.workspace.create.url_label')}
                                         </FormLabel>
                                         <FormControl>
@@ -183,7 +183,7 @@ export default function CreateWorkspacePage() {
                                 </Button>
                                 <Button
                                     type="submit"
-                                    className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 border-none"
+                                    className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm border-none"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (

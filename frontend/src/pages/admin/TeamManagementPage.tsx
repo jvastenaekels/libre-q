@@ -38,7 +38,7 @@ const TeamManagementPage = () => {
                 <div className="pt-6">
                     <Button
                         asChild
-                        className="h-12 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 text-base"
+                        className="h-12 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm text-base"
                     >
                         <Link to={`/admin/workspaces/${workspaceSlug}/settings`}>
                             {t('admin.team.go_to_workspace', 'Manage Workspace Team')}
@@ -48,14 +48,14 @@ const TeamManagementPage = () => {
                 </div>
             </div>
 
-            <Card className="w-full max-w-lg mt-8 bg-indigo-50/50 border-indigo-100">
+            <Card className="w-full max-w-lg mt-8 bg-indigo-50/50 border-indigo-100 rounded-2xl shadow-sm">
                 <CardContent className="pt-6">
                     <div className="flex gap-4">
                         <div className="shrink-0">
                             <Users className="size-5 text-indigo-500" />
                         </div>
                         <div className="space-y-1">
-                            <h3 className="text-sm font-black uppercase tracking-widest text-indigo-900">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-indigo-900">
                                 {t('admin.team.what_changed', 'What changed?')}
                             </h3>
                             <p className="text-xs text-indigo-800/70 leading-relaxed">

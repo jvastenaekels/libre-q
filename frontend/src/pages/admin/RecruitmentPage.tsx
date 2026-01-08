@@ -125,7 +125,7 @@ const RecruitmentPage = () => {
                 actions={
                     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold">
+                            <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold h-11 px-6 rounded-xl">
                                 <Plus className="h-4 w-4 mr-2" />
                                 {t('admin.recruitment.new_link', 'New Access Link')}
                             </Button>
@@ -149,7 +149,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="type"
-                                        className="text-xs font-bold uppercase tracking-wider text-slate-500"
+                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                                     >
                                         {t('admin.recruitment.link_type', 'Link Type')}
                                     </Label>
@@ -224,7 +224,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="name"
-                                        className="text-xs font-bold uppercase tracking-wider text-slate-500"
+                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                                     >
                                         {t(
                                             'admin.recruitment.campaign_name',
@@ -249,7 +249,7 @@ const RecruitmentPage = () => {
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <Label
                                             htmlFor="count"
-                                            className="text-xs font-bold uppercase tracking-wider text-slate-500"
+                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                                         >
                                             {newLinkType === 'individual'
                                                 ? t(
@@ -302,7 +302,7 @@ const RecruitmentPage = () => {
             />
 
             <div className="grid gap-6 md:grid-cols-4">
-                <Card className="md:col-span-1 shadow-sm border-slate-200 overflow-hidden relative group">
+                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Users className="h-12 w-12 text-indigo-600" />
                     </div>
@@ -321,7 +321,7 @@ const RecruitmentPage = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="md:col-span-1 shadow-sm border-slate-200 overflow-hidden relative group">
+                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Globe className="h-12 w-12 text-amber-600" />
                     </div>
@@ -341,7 +341,7 @@ const RecruitmentPage = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="md:col-span-1 shadow-sm border-slate-200 overflow-hidden relative group border-l-4 border-l-green-500">
+                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group border-l-4 border-l-green-500">
                     <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                         <CheckCircle2 className="h-12 w-12 text-green-600" />
                     </div>
@@ -387,12 +387,12 @@ const RecruitmentPage = () => {
                 </Card>
             </div>
 
-            <Card className="shadow-sm border-slate-200 overflow-hidden">
-                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
+                    <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-500">
                         {t('admin.recruitment.table_title', 'Participant Access Control')}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm font-medium text-slate-400">
                         {t(
                             'admin.recruitment.table_description',
                             'Generate and manage secure entry points for your study cohorts.'

@@ -153,11 +153,11 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>
+                <DialogHeader className="space-y-3 pb-4 border-b border-slate-50">
+                    <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">
                         {t('admin.dialogs.create_study.title', 'Create New Study')}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-sm font-medium text-slate-500">
                         {t(
                             'admin.dialogs.create_study.description',
                             'Start a new Q-Methodology study. You can configure statements and settings later.'
@@ -172,11 +172,12 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                         {t('admin.dialogs.create_study.study_title', 'Study Title')}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
+                                            className="h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500 font-medium"
                                             placeholder={t(
                                                 'admin.dialogs.create_study.study_title_placeholder',
                                                 'e.g. Perspectives on AI'
@@ -194,11 +195,12 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             name="slug"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                         {t('admin.dialogs.create_study.url_slug', 'URL Slug')}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
+                                            className="h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500 font-mono text-xs"
                                             placeholder={t(
                                                 'admin.dialogs.create_study.url_slug_placeholder',
                                                 'e.g. ai-perspectives-2025'
@@ -217,15 +219,15 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             render={() => (
                                 <FormItem>
                                     <div className="mb-4">
-                                        <FormLabel className="text-base">
+                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.dialogs.create_study.languages', 'Languages')}
                                         </FormLabel>
-                                        <DialogDescription>
+                                        <p className="text-[11px] font-medium text-slate-400 mt-1">
                                             {t(
                                                 'admin.dialogs.create_study.languages_desc',
                                                 'Select languages to enable for this study. Content will be initialized with localized defaults.'
                                             )}
-                                        </DialogDescription>
+                                        </p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         {AVAILABLE_LANGUAGES.map((lang) => (
@@ -277,15 +279,20 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             )}
                         />
 
-                        <DialogFooter>
+                        <DialogFooter className="pt-6 border-t border-slate-50 gap-3">
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="ghost"
+                                className="h-11 rounded-xl px-6 font-bold text-slate-500 hover:text-slate-900"
                                 onClick={() => onOpenChange(false)}
                             >
                                 {t('admin.dialogs.create_study.cancel', 'Cancel')}
                             </Button>
-                            <Button type="submit" disabled={createStudyMutation.isPending}>
+                            <Button
+                                type="submit"
+                                disabled={createStudyMutation.isPending}
+                                className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+                            >
                                 {createStudyMutation.isPending && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}

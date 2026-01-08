@@ -30,17 +30,17 @@ const DataExportsPage = () => {
 
             <Tabs defaultValue="browse" className="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <div className="flex-none pb-4">
-                    <TabsList className="bg-slate-100/50 border border-slate-200 p-1 rounded-xl w-full sm:w-auto grid grid-cols-2 sm:flex sm:inline-flex">
+                    <TabsList className="bg-slate-100/50 border-none p-1.5 rounded-2xl w-full sm:w-auto grid grid-cols-2 sm:flex sm:inline-flex">
                         <TabsTrigger
                             value="browse"
-                            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
+                            className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-6 py-2.5 gap-2 transition-all font-bold text-xs"
                         >
                             <TableIcon className="w-4 h-4" />
                             {t('admin.data.tabs.browse', 'Interactive view')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="export"
-                            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
+                            className="rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-6 py-2.5 gap-2 transition-all font-bold text-xs"
                         >
                             <Download className="w-4 h-4" />
                             {t('admin.data.tabs.export', 'Export data')}
@@ -69,8 +69,8 @@ const DataExportsPage = () => {
                         </div>
 
                         <div className="col-span-12 md:col-span-4 space-y-6">
-                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-sm">
-                                <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-tight mb-4 flex items-center gap-2">
+                            <div className="p-6 rounded-2xl bg-indigo-50/50 border border-indigo-100/50 shadow-sm">
+                                <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-wider mb-4 flex items-center gap-2">
                                     <Database className="w-4 h-4" />{' '}
                                     {t('admin.data.guide.title', 'Format guide')}
                                 </h3>

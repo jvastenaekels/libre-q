@@ -135,46 +135,65 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="container max-w-4xl py-10 space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Profile & Security</h1>
-                <p className="text-muted-foreground">
-                    Manage your personal information and account security.
-                </p>
-            </div>
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <StudyPageHeader
+                title="Profile & Security"
+                description="Manage your personal information and account security."
+                icon={Shield}
+            />
 
-            <div className="grid gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 pb-12">
                 {/* Profile Information */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Personal Information</CardTitle>
-                        <CardDescription>Update your name and contact details.</CardDescription>
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-fit">
+                    <CardHeader className="border-b border-slate-50 pb-4">
+                        <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <Key className="size-5 text-indigo-500" />
+                            Personal Information
+                        </CardTitle>
+                        <CardDescription className="text-sm font-medium text-slate-500">
+                            Update your name and contact details.
+                        </CardDescription>
                     </CardHeader>
                     <form onSubmit={handleProfileSubmit(onProfileSubmit)}>
                         <CardContent className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
+                                <Label
+                                    htmlFor="email"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
+                                    Email
+                                </Label>
                                 <Input
                                     id="email"
                                     {...registerProfile('email')}
                                     disabled
-                                    className="bg-muted"
+                                    className="h-11 rounded-xl bg-slate-50 border-slate-200"
                                 />
-                                <p className="text-[0.8rem] text-muted-foreground">
+                                <p className="text-[10px] text-slate-400 italic">
                                     Email cannot be changed directly. Contact admin.
                                 </p>
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="full_name">Full Name</Label>
+                                <Label
+                                    htmlFor="full_name"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
+                                    Full Name
+                                </Label>
                                 <Input
                                     id="full_name"
                                     placeholder="John Doe"
                                     {...registerProfile('full_name')}
+                                    className="h-11 rounded-xl"
                                 />
                             </div>
                         </CardContent>
-                        <CardFooter className="border-t px-6 py-4">
-                            <Button type="submit" disabled={isUpdating}>
+                        <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
+                            <Button
+                                type="submit"
+                                disabled={isUpdating}
+                                className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                            >
                                 {isUpdating ? 'Saving...' : 'Save Changes'}
                             </Button>
                         </CardFooter>
@@ -183,62 +202,51 @@ const ProfilePage = () => {
 
                 {/* Two-Factor Authentication (2FA) */}
                 <Card
-                    className={
-                        user?.is_totp_enabled
-                            ? 'border-green-100 bg-green-50/10'
-                            : 'border-slate-200'
-                    }
+                    className={cn(
+                        'border-none shadow-sm bg-white rounded-2xl overflow-hidden h-fit transition-all',
+                        user?.is_totp_enabled ? 'bg-emerald-50/20' : ''
+                    )}
                 >
-                    <CardHeader>
+                    <CardHeader className="border-b border-slate-50 pb-4">
                         <div className="flex items-center justify-between">
                             <div className="space-y-1">
-                                <CardTitle className="flex items-center gap-2">
-                                    Two-Factor Authentication (2FA)
+                                <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
+                                    <ShieldCheck className="size-5 text-indigo-500" />
+                                    Security & 2FA
                                     {user?.is_totp_enabled && (
-                                        <Badge className="bg-green-100 text-green-700 border-green-200">
+                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px] font-black uppercase tracking-wider">
                                             Enabled
                                         </Badge>
                                     )}
                                 </CardTitle>
-                                <CardDescription>
-                                    Add an extra layer of security to your account using TOTP.
+                                <CardDescription className="text-sm font-medium text-slate-500">
+                                    Add an extra layer of security using TOTP.
                                 </CardDescription>
-                            </div>
-                            <div
-                                className={
-                                    user?.is_totp_enabled ? 'text-green-600' : 'text-slate-400'
-                                }
-                            >
-                                {user?.is_totp_enabled ? (
-                                    <ShieldCheck size={32} />
-                                ) : (
-                                    <Shield size={32} />
-                                )}
                             </div>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {!user?.is_totp_enabled && !is2FASetupMode && (
-                            <div className="flex flex-col items-start gap-4 p-4 border rounded-xl bg-slate-50 border-slate-200">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-white rounded-lg border shadow-sm mt-1">
-                                        <ShieldAlert size={20} className="text-amber-500" />
+                            <div className="flex flex-col items-start gap-4 p-6 border rounded-2xl bg-slate-50 border-slate-100 shadow-inner">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-sm mt-1">
+                                        <ShieldAlert size={24} className="text-amber-500" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="font-semibold text-slate-900">
-                                            Your account is less secure
+                                        <h4 className="font-bold text-slate-900">
+                                            Account security is low
                                         </h4>
-                                        <p className="text-sm text-slate-500">
+                                        <p className="text-sm text-slate-500 font-medium">
                                             Enable two-factor authentication to protect your
-                                            workspace.
+                                            sensitive data and studies.
                                         </p>
                                     </div>
                                 </div>
                                 <Button
                                     onClick={() => setIs2FASetupMode(true)}
-                                    className="bg-indigo-600 hover:bg-indigo-700"
+                                    className="h-11 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                 >
-                                    Setup 2FA
+                                    Setup 2FA Now
                                 </Button>
                             </div>
                         )}
@@ -394,28 +402,42 @@ const ProfilePage = () => {
                 </Card>
 
                 {/* Security */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Security</CardTitle>
-                        <CardDescription>
-                            Change your password to keep your account secure.
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-fit">
+                    <CardHeader className="border-b border-slate-50 pb-4">
+                        <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <Shield size={20} className="text-indigo-500" />
+                            Password Management
+                        </CardTitle>
+                        <CardDescription className="text-sm font-medium text-slate-500">
+                            Change your password regularly to keep your account secure.
                         </CardDescription>
                     </CardHeader>
                     <form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
                         <CardContent className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">Current Password</Label>
+                                <Label
+                                    htmlFor="current_password"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
+                                    Current Password
+                                </Label>
                                 <Input
                                     id="current_password"
                                     type="password"
                                     {...registerPassword('current_password', { required: true })}
+                                    className="h-11 rounded-xl"
                                 />
                                 {passwordErrors.current_password && (
                                     <span className="text-red-500 text-xs">Required</span>
                                 )}
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="new_password">New Password</Label>
+                                <Label
+                                    htmlFor="new_password"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
+                                    New Password
+                                </Label>
                                 <Input
                                     id="new_password"
                                     type="password"
@@ -423,6 +445,7 @@ const ProfilePage = () => {
                                         required: true,
                                         minLength: 8,
                                     })}
+                                    className="h-11 rounded-xl"
                                 />
                                 {passwordErrors.new_password && (
                                     <span className="text-red-500 text-xs">
@@ -431,8 +454,12 @@ const ProfilePage = () => {
                                 )}
                             </div>
                         </CardContent>
-                        <CardFooter className="border-t px-6 py-4">
-                            <Button type="submit" disabled={isChangingPassword}>
+                        <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
+                            <Button
+                                type="submit"
+                                disabled={isChangingPassword}
+                                className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                            >
                                 {isChangingPassword ? 'Updating...' : 'Change Password'}
                             </Button>
                         </CardFooter>

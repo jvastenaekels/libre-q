@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noExplicitAny: default content is dynamic
 export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
     en: {
         instructions: 'Please sort the statements according to your perspective.',

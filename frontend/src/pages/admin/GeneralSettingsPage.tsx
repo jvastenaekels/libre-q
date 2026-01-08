@@ -179,15 +179,15 @@ export default function GeneralSettingsPage() {
             <div className="space-y-6 max-w-4xl">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <Card className="shadow-md border-none bg-white overflow-hidden">
-                            <CardHeader className="border-b border-slate-50 bg-slate-50/30">
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                            <CardHeader className="border-b border-slate-50 pb-4">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Info className="h-5 w-5 text-indigo-500" />
-                                    <CardTitle className="text-lg">
+                                    <CardTitle className="text-lg font-black text-slate-900">
                                         {t('admin.settings.basic.title')}
                                     </CardTitle>
                                 </div>
-                                <CardDescription>
+                                <CardDescription className="text-sm font-medium text-slate-500">
                                     {t('admin.settings.basic.description')}
                                 </CardDescription>
                             </CardHeader>
@@ -198,7 +198,7 @@ export default function GeneralSettingsPage() {
                                     name="title"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                 {t('admin.workspaces.settings.general.label_title')}
                                             </FormLabel>
                                             <FormControl>
@@ -219,7 +219,7 @@ export default function GeneralSettingsPage() {
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                                 <Globe className="w-3 h-3" />
                                                 {t('admin.settings.basic.slug_label')}
                                             </FormLabel>
@@ -250,7 +250,7 @@ export default function GeneralSettingsPage() {
                                         name="start_date"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                                     <CalendarIconAlt className="w-3 h-3" />
                                                     {t('admin.settings.basic.start_date_label')}
                                                 </FormLabel>
@@ -311,7 +311,7 @@ export default function GeneralSettingsPage() {
                                         name="end_date"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                                     <CalendarIconAlt className="w-3 h-3" />
                                                     {t('admin.settings.basic.end_date_label')}
                                                 </FormLabel>
@@ -363,15 +363,14 @@ export default function GeneralSettingsPage() {
                                     />
                                 </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between border-t border-slate-50 bg-slate-50/30 px-6 py-4">
-                                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            <CardFooter className="flex justify-between border-t border-slate-50 px-6 py-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                     {t('admin.settings.lifecycle.current_state')}
                                     <Badge
                                         variant={isArchived ? 'secondary' : 'default'}
                                         className={cn(
-                                            'font-black tracking-widest text-[10px] px-2.5 py-0.5',
-                                            !isArchived &&
-                                                'bg-indigo-600 shadow-lg shadow-indigo-100'
+                                            'font-black tracking-wider text-[10px] px-2.5 py-0.5',
+                                            !isArchived && 'bg-indigo-600 shadow-sm'
                                         )}
                                     >
                                         {study.state}
@@ -380,7 +379,7 @@ export default function GeneralSettingsPage() {
                                 <Button
                                     type="submit"
                                     disabled={isArchived || form.formState.isSubmitting}
-                                    className="rounded-xl px-6 font-black shadow-lg shadow-indigo-100 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
                                 >
                                     {form.formState.isSubmitting ? (
                                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -395,15 +394,15 @@ export default function GeneralSettingsPage() {
                 </Form>
 
                 {/* Archiving Section */}
-                <Card className="shadow-md border-none bg-white overflow-hidden">
-                    <CardHeader className="border-b border-slate-50 bg-slate-50/30">
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8">
+                    <CardHeader className="border-b border-slate-50 pb-4">
                         <div className="flex items-center gap-2 mb-1">
                             <Archive className="h-5 w-5 text-amber-500" />
-                            <CardTitle className="text-lg">
+                            <CardTitle className="text-lg font-black text-slate-900">
                                 {t('admin.settings.lifecycle.title')}
                             </CardTitle>
                         </div>
-                        <CardDescription>
+                        <CardDescription className="text-sm font-medium text-slate-500">
                             {t('admin.settings.lifecycle.description')}
                         </CardDescription>
                     </CardHeader>
@@ -447,15 +446,15 @@ export default function GeneralSettingsPage() {
 
                 {/* Danger Zone (Superuser Only) */}
                 {user?.is_superuser && (
-                    <Card className="shadow-md border border-red-100 bg-white overflow-hidden">
-                        <CardHeader className="border-b border-red-50 bg-red-50/30">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8 border-l-4 border-l-red-500">
+                        <CardHeader className="border-b border-slate-50 pb-4">
                             <div className="flex items-center gap-2 mb-1">
                                 <Trash2 className="h-5 w-5 text-red-500" />
-                                <CardTitle className="text-lg text-red-600">
+                                <CardTitle className="text-lg font-black text-red-600">
                                     {t('admin.settings.danger.title')}
                                 </CardTitle>
                             </div>
-                            <CardDescription className="text-red-400">
+                            <CardDescription className="text-sm font-medium text-red-400">
                                 {t('admin.settings.danger.description')}
                             </CardDescription>
                         </CardHeader>
