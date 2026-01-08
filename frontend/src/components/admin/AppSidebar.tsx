@@ -6,8 +6,6 @@ import {
     LayoutDashboard,
     LogOut,
     PencilRuler,
-    Search,
-    Settings,
     UserPlus,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
@@ -192,11 +190,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           title: t('admin.sidebar.data'),
                           url: `/admin/studies/${activeStudyId}/exports`,
                           icon: BarChart3,
-                      },
-                      {
-                          title: t('admin.sidebar.team'),
-                          url: `/admin/studies/${activeStudyId}/team`,
-                          icon: Users,
                       },
                       {
                           title: t('admin.sidebar.settings'),
