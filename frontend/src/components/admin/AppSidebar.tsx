@@ -6,6 +6,8 @@ import {
     LayoutDashboard,
     LogOut,
     PencilRuler,
+    Search,
+    Settings,
     UserPlus,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';

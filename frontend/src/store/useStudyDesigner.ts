@@ -56,6 +56,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     consent_decline: t.consent_decline,
                     ui_labels: t.ui_labels,
                     process_steps: t.process_steps,
+                    condition_of_instruction: t.condition_of_instruction,
+                    pre_instruction: t.pre_instruction,
                     methodology_tips: (t as any).methodology_tips || [],
                     step_help: (t as any).step_help || {},
                 })),
@@ -89,6 +91,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                             subtitle: '',
                             description: '',
                             instructions: '',
+                            condition_of_instruction: '',
+                            pre_instruction: null,
                         } as StudyTranslationRead;
                         draft.translations?.push(translation);
                     }
