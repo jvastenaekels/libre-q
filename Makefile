@@ -1,7 +1,7 @@
 .PHONY: install run-backend run-frontend lint check test ci
 
 install:
-	cd backend && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt
+	cd backend && uv sync
 	cd frontend && npm install
 
 run-backend:

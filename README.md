@@ -79,15 +79,17 @@ Please read our guidelines before submitting a PR:
 
 ## 🚀 Quick Start
 
-1. **Clone & Install**:
+1. **Prerequisites**: [uv](https://docs.astral.sh/uv/) (Python), [Node.js](https://nodejs.org/)
+
+2. **Clone & Install**:
 
    ```bash
    git clone https://github.com/jvastenaekels/open-q.git
    cd open-q
-   make install # (Requires Make) OR see docs/guides/contributing/development.md
+   make install
    ```
 
-2. **Run Locally**:
+3. **Run Locally**:
 
 ```bash
 # Install everything
