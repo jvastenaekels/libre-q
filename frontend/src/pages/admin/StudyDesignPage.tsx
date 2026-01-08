@@ -454,8 +454,10 @@ const StudyDesignPage = () => {
                         </TabsList>
 
                         {(() => {
-                            const isCopy = draft.translations?.find(
-                                (t) => t.language_code === activeLocale
+                            const isCopy = (
+                                draft.translations?.find(
+                                    (t) => t.language_code === activeLocale
+                                ) as any
                             )?._is_copy;
                             if (!isCopy) return null;
 

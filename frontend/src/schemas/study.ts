@@ -6,6 +6,21 @@
 
 import { z } from 'zod';
 
+export const PartnerLogoSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    logo_url: z.string(),
+    url: z.string().optional().nullable(),
+});
+
+export const ProcessStepSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+    icon: z.string(),
+    color: z.string().optional().nullable(),
+});
+
 export const ConsentSchema = z.object({
     title: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
@@ -16,6 +31,7 @@ export const ConsentSchema = z.object({
 export const BrandingSchema = z.object({
     logo_url: z.string().optional().nullable(),
     accent_color: z.string().optional().nullable(),
+    partners: z.array(PartnerLogoSchema).optional(),
 });
 
 export const GridConfigSchema = z.object({
@@ -96,6 +112,7 @@ export const StudyConfigSchema = z.object({
     show_statement_codes: z.boolean().optional(),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
     branding: BrandingSchema.optional(),
+    process_steps: z.array(ProcessStepSchema).optional(),
     requires_password: z.boolean().optional(),
 });
 

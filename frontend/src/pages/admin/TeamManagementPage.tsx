@@ -15,7 +15,7 @@ const TeamManagementPage = () => {
     const { t } = useTranslation();
 
     // Determine workspace slug, fallback to study slug's workspace logic if not present (should be present now)
-    const workspaceSlug = study.workspace?.slug || 'default';
+    const workspaceSlug = (study as any).workspace?.slug || 'default';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-8 max-w-4xl mx-auto w-full items-center justify-center min-h-[60vh]">

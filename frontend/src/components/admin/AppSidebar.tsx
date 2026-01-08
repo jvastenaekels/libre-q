@@ -250,11 +250,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         <Link to={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
-                                            {item.badge && (
-                                                <span className="ml-auto text-[9px] font-bold uppercase py-0.5 px-1.5 rounded-full bg-slate-100 text-slate-500 ring-1 ring-slate-200">
-                                                    {item.badge}
-                                                </span>
-                                            )}
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>

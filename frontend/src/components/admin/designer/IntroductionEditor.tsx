@@ -8,7 +8,7 @@ import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
 import { useTranslation } from 'react-i18next';
-import type { StudyTranslation } from '@/api/model';
+import type { StudyTranslationRead } from '@/api/model';
 
 const IntroductionEditor = () => {
     const { t } = useTranslation();
@@ -20,7 +20,7 @@ const IntroductionEditor = () => {
     const hasConsent =
         translation?.consent_title !== null && translation?.consent_title !== undefined;
 
-    const handleChange = (field: keyof StudyTranslation, value: string) => {
+    const handleChange = (field: keyof StudyTranslationRead, value: string) => {
         // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateTranslation(activeLocale, (t_trans: any) => {
             // biome-ignore lint/suspicious/noExplicitAny: complex state update
@@ -142,8 +142,6 @@ const IntroductionEditor = () => {
                                     value={translation?.instructions || ''}
                                     onChange={(val: string) => handleChange('instructions', val)}
                                     placeholder={t('admin.design.intro.fields.task_placeholder')}
-                                    minRows={1}
-                                    maxRows={1}
                                 />
                             </div>
                         </CardContent>

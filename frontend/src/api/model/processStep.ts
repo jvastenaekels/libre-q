@@ -4,6 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { ProcessStepColor } from './processStepColor';
 
 /**
  * Schema for a dynamic study process step.
@@ -20,4 +21,6 @@ export interface ProcessStep {
     description: string;
     /** Lucide icon name */
     icon: string;
+    /** Hex color code or CSS variable */
+    color?: ProcessStepColor;
 }

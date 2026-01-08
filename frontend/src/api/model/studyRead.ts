@@ -12,6 +12,7 @@ import type { StudyReadBranding } from './studyReadBranding';
 import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
 import type { StudyReadStartDate } from './studyReadStartDate';
 import type { StudyReadEndDate } from './studyReadEndDate';
+import type { StudyReadWorkspace } from './studyReadWorkspace';
 import type { StudyTranslationRead } from './studyTranslationRead';
 import type { StatementRead } from './statementRead';
 import type { RecruitmentLinkRead } from './recruitmentLinkRead';
@@ -38,6 +39,7 @@ export interface StudyRead {
     end_date?: StudyReadEndDate;
     id: number;
     workspace_id: number;
+    workspace?: StudyReadWorkspace;
     created_at: string;
     translations?: StudyTranslationRead[];
     statements?: StatementRead[];

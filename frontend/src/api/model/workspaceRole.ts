@@ -12,6 +12,7 @@ export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const WorkspaceRole = {
+    owner: 'owner',
     admin: 'admin',
     researcher: 'researcher',
     viewer: 'viewer',

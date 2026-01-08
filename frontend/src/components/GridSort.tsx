@@ -173,9 +173,9 @@ const GridToolbar: React.FC<{
     </div>
 ));
 
-const ScoreLabel: React.FC<{ score: number; className?: string }> = React.memo(
-    ({ score, className }) => (
-        <div className={cn('text-slate-400 font-bold leading-none', className)}>
+const ScoreLabel: React.FC<{ score: number; className?: string; id?: string }> = React.memo(
+    ({ score, className, id }) => (
+        <div id={id} className={cn('text-slate-400 font-bold leading-none', className)}>
             <span className="text-3xl">{score > 0 ? `+${score}` : score}</span>
         </div>
     )
@@ -659,7 +659,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 {/* PANEL: THE GRID (Canvas) */}
                 <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300">
                     <InstructionHeader
-                        instruction={conditionOfInstruction}
+                        instruction={conditionOfInstruction || null}
                         defaultText={t('fine.header.title')}
                     />
 
@@ -830,7 +830,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     <ValidationFooter
                         isAllPlaced={isAllPlaced}
                         selectedCardId={selectedCardId}
-                        onValidate={onValidate}
+                        onValidate={onValidate || (() => {})}
                         labels={inventoryLabels}
                         highlightKey={highlightKey}
                     />

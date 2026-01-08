@@ -31,7 +31,7 @@ The documentation is organized using the **Diátaxis** framework:
 
 ## ✨ Why Open-Q?
 
-Open-Q is designed to address the specific pain points of modern Q-methodology research, offering a superior alternative to legacy desktop software and generic survey tools.
+Open-Q is designed to address specific pain points of modern Q-methodology research.
 
 ### 1. Designed for the Modern Participant (UX)
 
@@ -61,7 +61,7 @@ _Solves the "Black Box" of data collection._
 
 _Built for global, cross-cultural research from day one._
 
-- **Fully Localized UI**: The participant interface adapts seamlessly to English, French, Finnish, and more, ensuring language is never a barrier.
+- **Fully Localized UI**: The participant interface adapts seamlessly to multiple languages ensuring language is never a barrier.
 - **Cross-Cultural Study Management**: Design studies with multiple languages in mind. Switch participant instructions, statements, and consent forms instantly to compare cultural perspectives without technical friction.
 
 ---

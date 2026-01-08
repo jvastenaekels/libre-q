@@ -27,7 +27,6 @@ import type {
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
-    InvitationCreate,
     InvitationLink,
     LogEntry,
     ParticipantDetailRead,
@@ -50,10 +49,12 @@ import type {
     UserUpdate,
     VerifyInvitationApiAdminInvitationsVerifyGetParams,
     WorkspaceCreate,
+    WorkspaceInvitationCreate,
     WorkspaceMemberRead,
     WorkspaceMemberUpdate,
     WorkspaceRead,
     WorkspaceUpdate,
+    WorkspaceWithRole,
 } from './model';
 
 import { customInstance } from './mutator';
@@ -373,7 +374,8 @@ export const useLoginForAccessTokenApiTokenPost = <
 If an `invitation_token` is provided:
 1. Decodes and verifies the token.
 2. Ensures the token's subject matches the provided email.
-3. Automatically adds the new user as a collaborator to the study specified in the token.
+2. Ensures the token's subject matches the provided email.
+3. Automatically adds the new user as a member of the workspace specified in the token.
  * @summary Register User
  */
 export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {
@@ -813,138 +815,7 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
 };
 
 /**
- * List studies accessible to the current user (via Workspace membership).
- * @summary List Studies
- */
-export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({ url: `/api/admin/studies/`, method: 'GET', signal });
-};
-
-export const getListStudiesApiAdminStudiesGetQueryKey = () => {
-    return [`/api/admin/studies/`] as const;
-};
-
-export const getListStudiesApiAdminStudiesGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
-        signal,
-    }) => listStudiesApiAdminStudiesGet(signal);
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
->;
-export type ListStudiesApiAdminStudiesGetQueryError = unknown;
-
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary List Studies
- */
-
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
-
-    query.queryKey = queryOptions.queryKey;
-
-    return query;
-}
-
-/**
- * Create a new study in the user's active workspace.
+ * Create a new study in the active workspace.
  * @summary Create Study
  */
 export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
@@ -1021,6 +892,137 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
 
     return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * List studies in the active workspace.
+ * @summary List Studies
+ */
+export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
+    return customInstance<StudyRead[]>({ url: `/api/admin/studies/`, method: 'GET', signal });
+};
+
+export const getListStudiesApiAdminStudiesGetQueryKey = () => {
+    return [`/api/admin/studies/`] as const;
+};
+
+export const getListStudiesApiAdminStudiesGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
+        signal,
+    }) => listStudiesApiAdminStudiesGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+>;
+export type ListStudiesApiAdminStudiesGetQueryError = HTTPValidationError;
+
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Studies
+ */
+
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
 
 /**
  * Get study details.
@@ -2604,93 +2606,6 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 }
 
 /**
- * Generate a JWT invitation link and send an email.
- * @summary Invite Collaborator
- */
-export const inviteCollaboratorApiAdminInvitationsSlugInvitePost = (
-    slug: string,
-    invitationCreate: InvitationCreate,
-    signal?: AbortSignal
-) => {
-    return customInstance<InvitationLink>({
-        url: `/api/admin/invitations/${slug}/invite`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: invitationCreate,
-        signal,
-    });
-};
-
-export const getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        TError,
-        { slug: string; data: InvitationCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationKey = ['inviteCollaboratorApiAdminInvitationsSlugInvitePost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        { slug: string; data: InvitationCreate }
-    > = (props) => {
-        const { slug, data } = props ?? {};
-
-        return inviteCollaboratorApiAdminInvitationsSlugInvitePost(slug, data);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>
->;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationBody = InvitationCreate;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationError = HTTPValidationError;
-
-/**
- * @summary Invite Collaborator
- */
-export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-            TError,
-            { slug: string; data: InvitationCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationOptions =
-        getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
  * Verify an invitation token and return details.
  * @summary Verify Invitation
  */
@@ -3462,11 +3377,11 @@ export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
 };
 
 /**
- * List all workspaces the current user is a member of.
+ * List all workspaces the current user is a member of, with their role.
  * @summary List Workspaces
  */
 export const listWorkspacesApiAdminWorkspacesGet = (signal?: AbortSignal) => {
-    return customInstance<WorkspaceRead[]>({
+    return customInstance<WorkspaceWithRole[]>({
         url: `/api/admin/workspaces/`,
         method: 'GET',
         signal,
@@ -3917,6 +3832,82 @@ export const useUpdateWorkspaceApiAdminWorkspacesSlugPatch = <
 };
 
 /**
+ * Delete a workspace (Owner only).
+ * @summary Delete Workspace
+ */
+export const deleteWorkspaceApiAdminWorkspacesSlugDelete = (slug: string) => {
+    return customInstance<void>({ url: `/api/admin/workspaces/${slug}`, method: 'DELETE' });
+};
+
+export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['deleteWorkspaceApiAdminWorkspacesSlugDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return deleteWorkspaceApiAdminWorkspacesSlugDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>
+>;
+
+export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Workspace
+ */
+export const useDeleteWorkspaceApiAdminWorkspacesSlugDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions = getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * List all members of a workspace.
  * @summary List Workspace Members
  */
@@ -4248,6 +4239,95 @@ export const useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete =
 > => {
     const mutationOptions =
         getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Invite a user to the workspace.
+ * @summary Create Invitation
+ */
+export const createInvitationApiAdminWorkspacesSlugInvitationsPost = (
+    slug: string,
+    workspaceInvitationCreate: WorkspaceInvitationCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<InvitationLink>({
+        url: `/api/admin/workspaces/${slug}/invitations`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceInvitationCreate,
+        signal,
+    });
+};
+
+export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+        TError,
+        { slug: string; data: WorkspaceInvitationCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    TError,
+    { slug: string; data: WorkspaceInvitationCreate },
+    TContext
+> => {
+    const mutationKey = ['createInvitationApiAdminWorkspacesSlugInvitationsPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+        { slug: string; data: WorkspaceInvitationCreate }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return createInvitationApiAdminWorkspacesSlugInvitationsPost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>
+>;
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationBody =
+    WorkspaceInvitationCreate;
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Invitation
+ */
+export const useCreateInvitationApiAdminWorkspacesSlugInvitationsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+            TError,
+            { slug: string; data: WorkspaceInvitationCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    TError,
+    { slug: string; data: WorkspaceInvitationCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };

@@ -15,14 +15,14 @@ export const customInstance = async <T>({
 }: {
     url: string;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    params?: Record<string, string | number | boolean | undefined>;
+    params?: Record<string, string | number | boolean | undefined | null>;
     data?: unknown;
     headers?: HeadersInit;
     signal?: AbortSignal;
 }): Promise<T> => {
     // Filter undefined params
     const cleanParams = Object.fromEntries(
-        Object.entries(params || {}).filter(([_, v]) => v !== undefined)
+        Object.entries(params || {}).filter(([_, v]) => v !== undefined && v !== null)
     ) as Record<string, string>;
 
     const query = new URLSearchParams(cleanParams).toString();

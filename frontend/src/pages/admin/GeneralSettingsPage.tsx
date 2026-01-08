@@ -122,9 +122,9 @@ export default function GeneralSettingsPage() {
                 navigate('.', { replace: true });
             }
         } catch (error) {
-            const { message } = parseApiErrorSync(error);
+            const message = parseApiErrorSync(error, t('admin.settings.save_error'));
             toast.error(t('admin.settings.save_error'), {
-                description: message || t('admin.settings.save_error_desc'),
+                description: message,
             });
         }
     }
@@ -138,9 +138,9 @@ export default function GeneralSettingsPage() {
             });
             navigate('.', { replace: true });
         } catch (error) {
-            const { message } = parseApiErrorSync(error);
+            const message = parseApiErrorSync(error, t('admin.settings.archive_error'));
             toast.error(t('admin.settings.archive_error'), {
-                description: message || t('admin.settings.archive_error_desc'),
+                description: message,
             });
         }
     };
@@ -155,9 +155,9 @@ export default function GeneralSettingsPage() {
             });
             navigate('/admin');
         } catch (error) {
-            const { message } = parseApiErrorSync(error);
+            const message = parseApiErrorSync(error, t('admin.settings.delete_error'));
             toast.error(t('admin.settings.delete_error'), {
-                description: message || t('admin.settings.delete_error_desc'),
+                description: message,
             });
         }
     };

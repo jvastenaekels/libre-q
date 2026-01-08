@@ -470,7 +470,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
             )}
 
             {/* Only show builder if enabled (or if it's post-sort which we assume enabled or handled elsewhere? user request is about Pre-sort) */}
-            {(type !== 'pre' || isPresortEnabled) && (
+            {(type !== 'pre' || !!isPresortEnabled) && (
                 <div className="bg-muted/20 p-4 rounded-lg border border-dashed space-y-3">
                     <span className="text-sm font-medium text-muted-foreground">
                         {t('admin.design.questions.add_field')}
