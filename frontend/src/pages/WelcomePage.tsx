@@ -2,7 +2,6 @@
  * Open-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
- * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
 /**
@@ -15,7 +14,7 @@
 import { ArrowRight, Target } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Markdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
@@ -113,37 +112,39 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             {t('welcome.objective_label', 'Objective of the study')}
                         </h4>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
-                            <Markdown>{study.objective}</Markdown>
+                            <ReactMarkdown>{study.objective}</ReactMarkdown>
                         </div>
 
                         {/* Institutional Signature */}
                         {/* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */}
-                        {(study.branding as any)?.partners &&
-                            {
-                                /* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */
-                            }(study.branding as any).partners.length > 0 && (
+                        {Array.isArray((study.branding as any)?.partners) &&
+                            // biome-ignore lint/suspicious/noExplicitAny: dynamic branding
+                            (study.branding as any).partners.length > 0 && (
                                 <div className="mt-10 pt-8 border-t border-slate-200">
                                     <div className="flex flex-wrap gap-8 items-center justify-start">
                                         {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}
-                                        {(study.branding as any).partners.map((partner: any) => (
-                                            <a
-                                                key={partner.id || partner.logo_url}
-                                                href={partner.url || undefined}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className={cn(
-                                                    'block transition-opacity hover:opacity-70',
-                                                    !partner.url && 'pointer-events-none'
-                                                )}
-                                            >
-                                                <img
-                                                    src={partner.logo_url}
-                                                    alt={partner.name}
-                                                    title={partner.name}
-                                                    className="h-12 md:h-16 w-auto object-contain"
-                                                />
-                                            </a>
-                                        ))}
+                                        {(study.branding as any).partners.map(
+                                            (partner: any) =>
+                                                partner.logo_url && (
+                                                    <a
+                                                        key={partner.id || partner.logo_url}
+                                                        href={partner.url || undefined}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={cn(
+                                                            'block transition-opacity hover:opacity-70',
+                                                            !partner.url && 'pointer-events-none'
+                                                        )}
+                                                    >
+                                                        <img
+                                                            src={partner.logo_url}
+                                                            alt={partner.name || ''}
+                                                            title={partner.name || ''}
+                                                            className="h-12 md:h-16 w-auto object-contain"
+                                                        />
+                                                    </a>
+                                                )
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -177,7 +178,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
                         {study.instructions && (
                             <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium mb-4">
-                                <Markdown>{study.instructions}</Markdown>
+                                <ReactMarkdown>{study.instructions}</ReactMarkdown>
                             </div>
                         )}
 

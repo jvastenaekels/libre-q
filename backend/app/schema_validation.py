@@ -80,6 +80,10 @@ async def validate_schema() -> None:
                     issues.append(("missing_column", "study_translations.ui_labels"))
                 if "step_help" not in trans_columns:
                     issues.append(("missing_column", "study_translations.step_help"))
+                if "methodology_tips" not in trans_columns:
+                    issues.append(
+                        ("missing_column", "study_translations.methodology_tips")
+                    )
 
         await conn.run_sync(_check)
 

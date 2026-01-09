@@ -301,18 +301,22 @@ const StudyLayoutContent: React.FC = () => {
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
-                        {(branding as any)?.partners && (branding as any).partners.length > 0 ? (
+                        {Array.isArray((branding as any)?.partners) &&
+                        (branding as any).partners.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
-                                {(branding as any).partners.map((partner: any) => (
-                                    <img
-                                        key={partner.id || partner.logo_url}
-                                        src={partner.logo_url}
-                                        alt={partner.name}
-                                        title={partner.name}
-                                        className="h-8 w-auto object-contain"
-                                    />
-                                ))}
+                                {(branding as any).partners.map(
+                                    (partner: any) =>
+                                        partner.logo_url && (
+                                            <img
+                                                key={partner.id || partner.logo_url}
+                                                src={partner.logo_url}
+                                                alt={partner.name || ''}
+                                                title={partner.name || ''}
+                                                className="h-8 w-auto object-contain"
+                                            />
+                                        )
+                                )}
                             </div>
                         ) : branding?.logo_url ? (
                             <img

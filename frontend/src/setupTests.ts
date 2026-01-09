@@ -24,6 +24,7 @@ vi.mock('react-i18next', () => ({
             changeLanguage: () => new Promise(() => {}),
             language: 'en',
             addResourceBundle: vi.fn(),
+            t: (key: string) => key,
         },
     }),
     initReactI18next: {

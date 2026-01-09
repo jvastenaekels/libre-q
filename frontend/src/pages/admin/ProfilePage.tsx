@@ -22,6 +22,8 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, ShieldCheck, ShieldAlert, Key, Copy, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
+import { cn } from '@/lib/utils';
 
 // Define types manually since generation might lag
 interface UserUpdate {

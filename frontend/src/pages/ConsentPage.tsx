@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Markdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { reportBug } from '../api/client';
@@ -136,9 +136,9 @@ const ConsentPage: React.FC = () => {
                 {/* Consent Description/Legal Text */}
                 <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                     {config.consent?.description ? (
-                        <Markdown>{config.consent.description}</Markdown>
+                        <ReactMarkdown>{config.consent.description}</ReactMarkdown>
                     ) : (
-                        <Markdown>{t('consent.default_text')}</Markdown>
+                        <ReactMarkdown>{t('consent.default_text')}</ReactMarkdown>
                     )}
                 </div>
 

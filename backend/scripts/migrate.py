@@ -296,6 +296,12 @@ async def migrate_translations_table():
                         "ALTER TABLE study_translations ADD COLUMN methodology_tips JSON DEFAULT '[]'::json"
                     )
                 )
+            else:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN methodology_tips JSON DEFAULT '[]'"
+                    )
+                )
             migrations_applied = True
 
         # step_help
