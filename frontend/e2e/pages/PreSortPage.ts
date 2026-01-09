@@ -31,7 +31,7 @@ export class PreSortPage extends BasePage {
 
         const educationSelect = this.page.getByLabel('Education', { exact: false });
         await expect(educationSelect).toBeVisible();
-        await educationSelect.selectOption({ label: 'Bachelor' });
+        await educationSelect.selectOption({ value: 'Bachelor' });
 
         await expect(this.submitButton).toBeVisible();
         await expect(this.submitButton).toBeEnabled();

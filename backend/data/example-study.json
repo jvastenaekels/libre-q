@@ -3,15 +3,17 @@
     "state": "active",
     "default_language": "en",
     "grid_config": [
+        { "score": -5, "capacity": 1 },
         { "score": -4, "capacity": 2 },
         { "score": -3, "capacity": 3 },
         { "score": -2, "capacity": 4 },
         { "score": -1, "capacity": 5 },
-        { "score": 0, "capacity": 6 },
+        { "score": 0, "capacity": 4 },
         { "score": 1, "capacity": 5 },
         { "score": 2, "capacity": 4 },
         { "score": 3, "capacity": 3 },
-        { "score": 4, "capacity": 2 }
+        { "score": 4, "capacity": 2 },
+        { "score": 5, "capacity": 1 }
     ],
     "presort_config": {
         "enabled": true,
@@ -125,12 +127,15 @@
     },
     "postsort_config": {
         "extreme_columns": [
-            -4,
-            4
+            -5,
+            5
         ],
         "ask_missing": true,
         "ask_general_comment": true,
         "allow_random_comments": true,
+        "email_collection_enabled": true,
+        "interview_consent_enabled": true,
+        "newsletter_consent_enabled": true,
         "questions": {
             "pilot_feeback": {
                 "type": "textarea",

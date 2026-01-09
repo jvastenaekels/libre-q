@@ -389,6 +389,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         onValidate={handleValidate}
                         showCodes={showCodes}
                         highlightKey={highlightKey}
+                        uiLabels={config.ui_labels}
                     />
                 </SortableContext>
             </div>

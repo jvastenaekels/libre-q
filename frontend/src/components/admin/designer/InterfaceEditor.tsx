@@ -16,9 +16,38 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+import { useEffect } from 'react';
+
 const InterfaceEditor = () => {
-    const { draft, activeLocale, updateTranslation, setActiveSubStep } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation, updateDraft, setActiveSubStep } =
+        useStudyDesigner();
     const { t, i18n } = useTranslation();
+
+    // Ensure structural consistency for methodology tips
+    // If one language has more tips, pad others with empty strings
+    // biome-ignore lint/correctness/useExhaustiveDependencies: updateDraft stable
+    useEffect(() => {
+        if (!draft?.translations) return;
+
+        const maxTips = Math.max(
+            ...draft.translations.map((t) => (t as any).methodology_tips?.length || 0)
+        );
+
+        const someMismatch = draft.translations.some(
+            (t) => ((t as any).methodology_tips?.length || 0) !== maxTips
+        );
+
+        if (someMismatch && maxTips > 0) {
+            updateDraft((d) => {
+                for (const t of d.translations || []) {
+                    if (!(t as any).methodology_tips) (t as any).methodology_tips = [];
+                    while ((t as any).methodology_tips.length < maxTips) {
+                        (t as any).methodology_tips.push('');
+                    }
+                }
+            });
+        }
+    }, [draft?.translations]);
 
     if (!draft) return null;
 
@@ -333,8 +362,13 @@ const InterfaceEditor = () => {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => {
-                                            updateTranslation(activeLocale, (t: any) => {
-                                                t.methodology_tips.splice(index, 1);
+                                            updateDraft((d) => {
+                                                for (const t of d.translations || []) {
+                                                    const tips = (t as any).methodology_tips;
+                                                    if (Array.isArray(tips)) {
+                                                        tips.splice(index, 1);
+                                                    }
+                                                }
                                             });
                                         }}
                                         className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
@@ -350,9 +384,12 @@ const InterfaceEditor = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                    updateTranslation(activeLocale, (t: any) => {
-                                        if (!t.methodology_tips) t.methodology_tips = [];
-                                        t.methodology_tips.push('');
+                                    updateDraft((d) => {
+                                        for (const t of d.translations || []) {
+                                            if (!(t as any).methodology_tips)
+                                                (t as any).methodology_tips = [];
+                                            (t as any).methodology_tips.push('');
+                                        }
                                     });
                                 }}
                                 className="rounded-xl border-dashed border-2 hover:border-indigo-500 hover:bg-indigo-50/30 font-bold transition-all px-6 py-5"
@@ -365,15 +402,30 @@ const InterfaceEditor = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                    updateTranslation(activeLocale, (t: any) => {
-                                        t.methodology_tips = [
-                                            tStudy('fine.workbench.methodology.extremes'),
-                                            tStudy('fine.workbench.methodology.vertical'),
-                                            tStudy('fine.workbench.methodology.constraint'),
-                                            tStudy('fine.workbench.methodology.relative'),
-                                            tStudy('fine.workbench.methodology.zoom'),
-                                            tStudy('fine.workbench.methodology.flexibility'),
-                                        ];
+                                    updateDraft((d) => {
+                                        for (const t of d.translations || []) {
+                                            const lang = t.language_code;
+                                            (t as any).methodology_tips = [
+                                                i18n.t('fine.workbench.methodology.extremes', {
+                                                    lng: lang,
+                                                }),
+                                                i18n.t('fine.workbench.methodology.vertical', {
+                                                    lng: lang,
+                                                }),
+                                                i18n.t('fine.workbench.methodology.constraint', {
+                                                    lng: lang,
+                                                }),
+                                                i18n.t('fine.workbench.methodology.relative', {
+                                                    lng: lang,
+                                                }),
+                                                i18n.t('fine.workbench.methodology.zoom', {
+                                                    lng: lang,
+                                                }),
+                                                i18n.t('fine.workbench.methodology.flexibility', {
+                                                    lng: lang,
+                                                }),
+                                            ];
+                                        }
                                     });
                                 }}
                                 className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"

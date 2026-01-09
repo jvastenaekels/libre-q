@@ -19,6 +19,8 @@
         "statement": "Statement",
         "back": "Back",
         "cancel": "Cancel",
+        "reduce": "Reduce",
+        "expand": "Expand",
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
             "not_found": "Study not found.",
@@ -82,10 +84,10 @@
         "change_lang_title": "Change language",
         "steps": {
             "welcome": "Welcome",
-            "presort": "Profile",
-            "rough": "Spontaneous Sort",
-            "fine": "Grid Sort",
-            "review": "Reflections"
+            "presort": "Pre-sort",
+            "rough": "Rough Sort",
+            "fine": "Fine Sort",
+            "review": "Post-sort"
         },
         "mobile_step": "Step",
         "navigation": "Navigation",
@@ -682,7 +684,7 @@
                         "new_desc": "Explain what the participant will do in this phase."
                     }
                 },
-                "consent_title": "Custom consent form",
+                "consent_title": "Consent Form",
                 "consent_details": "Consent form details",
                 "fields": {
                     "title": "Study title",
@@ -701,10 +703,10 @@
             },
             "condition": {
                 "title": "Condition of Instruction",
-                "label": "The Sorting Question",
+                "label": "Define Condition of Instruction",
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
                 "field_label": "Instruction Text",
-                "placeholder": "e.g., What is your stance on these statements?",
+                "placeholder": "e.g., In your experience, what characterizes a high-performing team the most?",
                 "enable_pre": "Enable Pre-instruction step",
                 "pre_desc": "Provide more context or detailed instructions before the sorting task starts.",
                 "pre_label": "Pre-instruction Content",
@@ -788,6 +790,10 @@
                     "perfect": "Perfect Balance",
                     "too_many": "{{count}} too many statements",
                     "too_few": "{{count}} statements missing",
+                    "min_reached": "Minimum range reached (±2)",
+                    "max_reached": "Maximum range reached (±6)",
+                    "remove_extreme_columns": "Remove extreme columns",
+                    "add_extreme_columns": "Add extreme columns",
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
                     "locked": "Design Locked",

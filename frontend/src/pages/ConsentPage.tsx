@@ -186,7 +186,7 @@ const ConsentPage: React.FC = () => {
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="w-full sm:w-auto px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
-                        {config.ui_labels?.start_button || t('welcome.start')}{' '}
+                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}{' '}
                         <ArrowRight size={18} />
                     </button>
                 </div>

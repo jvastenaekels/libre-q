@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -39,6 +39,18 @@ const QSortEditor = () => {
 
     // Helper to update store
     const setActiveSubTab = (v: 'statements' | 'grid') => setActiveSubStep(v);
+
+    // Auto-initialize grid if empty (-4 to +4)
+    useEffect(() => {
+        if (draft && (!draft.grid_config || draft.grid_config.length === 0)) {
+            updateDraft((d) => {
+                d.grid_config = Array.from({ length: 9 }, (_, i) => ({
+                    score: i - 4,
+                    capacity: 1,
+                }));
+            });
+        }
+    }, [draft, updateDraft]);
 
     const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -96,7 +108,10 @@ const QSortEditor = () => {
 
                 return {
                     code,
-                    translations: [{ language_code: activeLocale, text: item.text }],
+                    translations: (d.translations || []).map((t: any) => ({
+                        language_code: t.language_code,
+                        text: t.language_code === activeLocale ? item.text : '',
+                    })),
                 };
             });
 
@@ -126,6 +141,41 @@ const QSortEditor = () => {
             if (!d.grid_config) return;
             const col = d.grid_config[idx];
             col.capacity = Math.max(0, (col.capacity || 0) + delta);
+        });
+    };
+
+    const addExtremeColumns = () => {
+        updateDraft((d) => {
+            if (!d.grid_config || d.grid_config.length === 0) {
+                // Default -4 to +4 if empty
+                d.grid_config = Array.from({ length: 9 }, (_, i) => ({
+                    score: i - 4,
+                    capacity: 1,
+                }));
+                return;
+            }
+            const scores = d.grid_config.map((c: GridColumn) => c.score);
+            const minScore = Math.min(...scores);
+            const maxScore = Math.max(...scores);
+
+            if (minScore <= -6 || maxScore >= 6) {
+                toast.error(t('admin.design.qsort.grid.max_reached', 'Maximum range reached (±6)'));
+                return;
+            }
+
+            d.grid_config.unshift({ score: minScore - 1, capacity: 1 });
+            d.grid_config.push({ score: maxScore + 1, capacity: 1 });
+        });
+    };
+
+    const removeExtremeColumns = () => {
+        updateDraft((d) => {
+            if (!d.grid_config || d.grid_config.length <= 5) {
+                toast.error(t('admin.design.qsort.grid.min_reached', 'Minimum range reached (±2)'));
+                return;
+            }
+            d.grid_config.shift();
+            d.grid_config.pop();
         });
     };
 
@@ -435,7 +485,10 @@ const QSortEditor = () => {
                     <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center shadow-inner group/grid transition-all hover:bg-slate-50/80">
                         <div className="flex items-end gap-2 mb-10 overflow-x-auto max-w-full pb-6 px-6 h-[280px]">
                             {grid.map((col, idx) => (
-                                <div key={idx} className="flex flex-col items-center gap-3">
+                                <div
+                                    key={idx}
+                                    className="flex flex-col items-center gap-3 relative group/col"
+                                >
                                     <Button
                                         variant="outline"
                                         size="icon"
@@ -446,7 +499,7 @@ const QSortEditor = () => {
                                         <Plus className="h-3.5 w-3.5" />
                                     </Button>
 
-                                    <div className="flex flex-col-reverse gap-1.5 group/col">
+                                    <div className="flex flex-col-reverse gap-1.5 min-h-[40px]">
                                         {Array.from({ length: col.capacity || 0 }).map((_, i) => (
                                             <div
                                                 key={i}
@@ -461,7 +514,11 @@ const QSortEditor = () => {
                                     </div>
 
                                     <div className="mt-2 text-[11px] font-black w-9 h-9 rounded-xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter">
-                                        {col.score > 0 ? `+${col.score}` : col.score}
+                                        {col.score === Infinity || col.score === -Infinity
+                                            ? '?'
+                                            : col.score > 0
+                                              ? `+${col.score}`
+                                              : col.score}
                                     </div>
 
                                     <Button
@@ -476,6 +533,36 @@ const QSortEditor = () => {
                                     </Button>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Symmetric Column Management Buttons */}
+                        <div className="flex items-center gap-4 mb-8">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={removeExtremeColumns}
+                                className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold gap-2"
+                                title={t(
+                                    'admin.design.qsort.grid.remove_extreme_columns',
+                                    'Remove extreme columns'
+                                )}
+                            >
+                                <Minus className="h-4 w-4" />
+                                {t('common.reduce', 'Reduce')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={addExtremeColumns}
+                                className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all font-bold gap-2"
+                                title={t(
+                                    'admin.design.qsort.grid.add_extreme_columns',
+                                    'Add extreme columns'
+                                )}
+                            >
+                                <Plus className="h-4 w-4" />
+                                {t('common.expand', 'Expand')}
+                            </Button>
                         </div>
 
                         {/* Validation Footer */}

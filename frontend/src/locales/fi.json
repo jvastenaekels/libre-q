@@ -19,6 +19,8 @@
         "statement": "Väite",
         "back": "Takaisin",
         "cancel": "Peruuta",
+        "reduce": "Vähennä",
+        "expand": "Laajenna",
         "errors": {
             "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
             "not_found": "Tutkimusta ei löytynyt.",
@@ -83,10 +85,10 @@
         "change_lang_title": "Vaihda kieli",
         "steps": {
             "welcome": "Tervetuloa",
-            "presort": "Taustatiedot",
-            "rough": "Ensivaikutelma",
-            "fine": "Ruudukkolajittelu",
-            "review": "Pohdinta"
+            "presort": "Pre-sort",
+            "rough": "Karkea lajittelu",
+            "fine": "Hieno lajittelu",
+            "review": "Post-sort"
         },
         "mobile_step": "Vaihe",
         "navigation": "Navigointi",
@@ -683,7 +685,7 @@
                         "new_desc": "Explain what the participant will do in this phase."
                     }
                 },
-                "consent_title": "Mukautettu suostumuslomake",
+                "consent_title": "Suostumuslomake",
                 "consent_details": "Suostumuksen tiedot",
                 "fields": {
                     "title": "Tutkimuksen otsikko",
@@ -702,10 +704,10 @@
             },
             "condition": {
                 "title": "Ohjeistuksen ehto",
-                "label": "Lajittelukysymys",
+                "label": "Määritä ohjeistuksen ehto",
                 "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
                 "field_label": "Ohjeteksti",
-                "placeholder": "Esim. Mikä on näkemyksesi näistä väittämistä?",
+                "placeholder": "Esim. Kokemuksesi perusteella, mikä luonnehtii parhaiten huipputiimiä?",
                 "enable_pre": "Ota käyttöön esiohje-vaihe",
                 "pre_desc": "Tarjoa enemmän kontekstia tai yksityiskohtaisia ohjeita ennen lajittelutehtävän aloittamista.",
                 "pre_label": "Esiohjeen sisältö",
@@ -789,6 +791,10 @@
                     "stat_count": "{{count}} väitettä",
                     "slot_count": "{{count}} ruutua varattu",
                     "too_few": "{{count}} väitettä puuttuu",
+                    "min_reached": "Minimiraja saavutettu (±2)",
+                    "max_reached": "Maksimiraja saavutettu (±6)",
+                    "remove_extreme_columns": "Poista äärimmäiset sarakkeet",
+                    "add_extreme_columns": "Lisää äärimmäisiä sarakkeita",
                     "tooltip_title": "Miksi pakotettu jakauma?",
                     "tooltip_desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja.",
                     "locked": "Suunnittelu Lukittu",

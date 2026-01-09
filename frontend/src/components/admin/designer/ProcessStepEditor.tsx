@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -219,6 +220,53 @@ export function ProcessStepEditor() {
             coordinateGetter: sortableKeyboardCoordinates,
         })
     );
+
+    // Ensure structural consistency for process steps
+    // biome-ignore lint/correctness/useExhaustiveDependencies: updateDraft stable
+    useEffect(() => {
+        if (!draft?.translations) return;
+
+        const allIds = new Set<string>();
+        draft.translations.forEach((t) => {
+            (t as any).process_steps?.forEach((s: any) => {
+                allIds.add(s.id);
+            });
+        });
+
+        const someMismatch = draft.translations.some((t) => {
+            const tIds = (t as any).process_steps?.map((s: any) => s.id) || [];
+            return tIds.length !== allIds.size || tIds.some((id: string) => !allIds.has(id));
+        });
+
+        if (someMismatch) {
+            updateDraft((d) => {
+                // We use the first translation that has steps as the master order
+                const masterTranslation = d.translations?.find(
+                    (t) => (t as any).process_steps?.length > 0
+                );
+                const masterSteps = (masterTranslation as any)?.process_steps || [];
+
+                for (const t of d.translations || []) {
+                    if (!(t as any).process_steps) (t as any).process_steps = [];
+                    const tSteps = (t as any).process_steps;
+
+                    // Add missing steps
+                    for (const mStep of masterSteps) {
+                        if (!tSteps.find((ts: any) => ts.id === mStep.id)) {
+                            tSteps.push({
+                                ...mStep,
+                                title: '',
+                                description: '',
+                            });
+                        }
+                    }
+                    // Remove extra steps (if any)
+                    const masterIds = new Set(masterSteps.map((ms: any) => ms.id));
+                    (t as any).process_steps = tSteps.filter((ts: any) => masterIds.has(ts.id));
+                }
+            });
+        }
+    }, [draft?.translations]);
 
     if (!draft) return null;
 

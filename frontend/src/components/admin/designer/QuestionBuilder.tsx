@@ -477,146 +477,150 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                 </Card>
             )}
 
-            {/* Only show builder if enabled */}
+            {/* Only show builder and questions if enabled (for pre-sort) or if it's post-sort */}
             {(type !== 'pre' || !!isPresortEnabled) && (
-                <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
-                    <div className="flex items-center gap-2">
-                        <PlusCircle className="size-4 text-indigo-500" />
-                        <span className="text-sm font-bold text-slate-900 tracking-tight">
-                            {t('admin.design.questions.add_field')}
-                        </span>
-                    </div>
+                <>
+                    <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
+                        <div className="flex items-center gap-2">
+                            <PlusCircle className="size-4 text-indigo-500" />
+                            <span className="text-sm font-bold text-slate-900 tracking-tight">
+                                {t('admin.design.questions.add_field')}
+                            </span>
+                        </div>
 
-                    <div className="space-y-4">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            {t('admin.design.questions.basic_fields')}
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            {[
-                                { type: 'text', icon: Type, label: 'text' },
-                                { type: 'textarea', icon: AlignLeft, label: 'long_text' },
-                                { type: 'number', icon: Hash, label: 'number' },
-                                { type: 'date', icon: Calendar, label: 'date' },
-                                { type: 'email', icon: Mail, label: 'email' },
-                            ].map((field) => (
-                                <Button
-                                    key={field.type}
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => addQuestion(field.type as QuestionType)}
-                                    className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
-                                >
-                                    <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
-                                    {t(`admin.design.questions.types.${field.label}`)}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            {t('admin.design.questions.choice_fields')}
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            {[
-                                { type: 'select', icon: ListCircle, label: 'dropdown' },
-                                { type: 'radio', icon: Circle, label: 'radio' },
-                                { type: 'checkbox', icon: CheckSquare, label: 'checkboxes' },
-                            ].map((field) => (
-                                <Button
-                                    key={field.type}
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => addQuestion(field.type as QuestionType)}
-                                    className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
-                                >
-                                    <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
-                                    {t(`admin.design.questions.types.${field.label}`)}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-            >
-                <SortableContext
-                    items={questions.map((q) => q.id)}
-                    strategy={verticalListSortingStrategy}
-                >
-                    {questions.length === 0 ? (
-                        <div className="py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30 transition-all hover:bg-slate-50/50">
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
-                                <Plus className="h-8 w-8 text-slate-300" />
+                        <div className="space-y-4">
+                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                {t('admin.design.questions.basic_fields')}
                             </div>
-                            <p className="text-base font-bold text-slate-900 tracking-tight">
-                                {t('admin.design.questions.empty.title')}
-                            </p>
-                            <p className="text-sm font-medium text-slate-500 mt-2 max-w-[280px] text-center leading-relaxed">
-                                {t('admin.design.questions.empty.desc')}
-                            </p>
+                            <div className="flex flex-wrap gap-3">
+                                {[
+                                    { type: 'text', icon: Type, label: 'text' },
+                                    { type: 'textarea', icon: AlignLeft, label: 'long_text' },
+                                    { type: 'number', icon: Hash, label: 'number' },
+                                    { type: 'date', icon: Calendar, label: 'date' },
+                                    { type: 'email', icon: Mail, label: 'email' },
+                                ].map((field) => (
+                                    <Button
+                                        key={field.type}
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => addQuestion(field.type as QuestionType)}
+                                        className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                    >
+                                        <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                        {t(`admin.design.questions.types.${field.label}`)}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
-                    ) : (
-                        <div className="flex flex-col">
-                            {questions.map((q) => (
-                                <QuestionItem
-                                    key={q.id}
-                                    id={q.id}
-                                    question={q}
-                                    activeLocale={activeLocale}
-                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic question data
-                                    onUpdate={(data: any) => {
-                                        // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
-                                        updateDraft((d: any) => {
-                                            if (type === 'pre') {
-                                                // Handle both legacy and new structure
-                                                if (
-                                                    d.presort_config &&
-                                                    'enabled' in d.presort_config
-                                                ) {
-                                                    if (!d.presort_config.fields)
-                                                        d.presort_config.fields = {};
-                                                    d.presort_config.fields[q.id] = data;
-                                                } else {
-                                                    // Legacy structure
-                                                    d.presort_config[q.id] = data;
-                                                }
-                                            } else {
-                                                d.postsort_config.questions[q.id] = data;
-                                            }
-                                        });
-                                    }}
-                                    onDelete={() => {
-                                        // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
-                                        updateDraft((d: any) => {
-                                            if (type === 'pre') {
-                                                // Handle both legacy and new structure
-                                                if (
-                                                    d.presort_config &&
-                                                    'enabled' in d.presort_config
-                                                ) {
-                                                    if (d.presort_config.fields) {
-                                                        delete d.presort_config.fields[q.id];
+
+                        <div className="space-y-4">
+                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                {t('admin.design.questions.choice_fields')}
+                            </div>
+                            <div className="flex flex-wrap gap-3">
+                                {[
+                                    { type: 'select', icon: ListCircle, label: 'dropdown' },
+                                    { type: 'radio', icon: Circle, label: 'radio' },
+                                    { type: 'checkbox', icon: CheckSquare, label: 'checkboxes' },
+                                ].map((field) => (
+                                    <Button
+                                        key={field.type}
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => addQuestion(field.type as QuestionType)}
+                                        className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                    >
+                                        <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                        {t(`admin.design.questions.types.${field.label}`)}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={questions.map((q) => q.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            {questions.length === 0 ? (
+                                <div className="py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30 transition-all hover:bg-slate-50/50">
+                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                                        <Plus className="h-8 w-8 text-slate-300" />
+                                    </div>
+                                    <p className="text-base font-bold text-slate-900 tracking-tight">
+                                        {t('admin.design.questions.empty.title')}
+                                    </p>
+                                    <p className="text-sm font-medium text-slate-500 mt-2 max-w-[280px] text-center leading-relaxed">
+                                        {t('admin.design.questions.empty.desc')}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col">
+                                    {questions.map((q) => (
+                                        <QuestionItem
+                                            key={q.id}
+                                            id={q.id}
+                                            question={q}
+                                            activeLocale={activeLocale}
+                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic question data
+                                            onUpdate={(data: any) => {
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+                                                updateDraft((d: any) => {
+                                                    if (type === 'pre') {
+                                                        // Handle both legacy and new structure
+                                                        if (
+                                                            d.presort_config &&
+                                                            'enabled' in d.presort_config
+                                                        ) {
+                                                            if (!d.presort_config.fields)
+                                                                d.presort_config.fields = {};
+                                                            d.presort_config.fields[q.id] = data;
+                                                        } else {
+                                                            // Legacy structure
+                                                            d.presort_config[q.id] = data;
+                                                        }
+                                                    } else {
+                                                        d.postsort_config.questions[q.id] = data;
                                                     }
-                                                } else {
-                                                    // Legacy structure
-                                                    delete d.presort_config[q.id];
-                                                }
-                                            } else {
-                                                delete d.postsort_config.questions[q.id];
-                                            }
-                                        });
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </SortableContext>
-            </DndContext>
+                                                });
+                                            }}
+                                            onDelete={() => {
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+                                                updateDraft((d: any) => {
+                                                    if (type === 'pre') {
+                                                        // Handle both legacy and new structure
+                                                        if (
+                                                            d.presort_config &&
+                                                            'enabled' in d.presort_config
+                                                        ) {
+                                                            if (d.presort_config.fields) {
+                                                                delete d.presort_config.fields[
+                                                                    q.id
+                                                                ];
+                                                            }
+                                                        } else {
+                                                            // Legacy structure
+                                                            delete d.presort_config[q.id];
+                                                        }
+                                                    } else {
+                                                        delete d.postsort_config.questions[q.id];
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </SortableContext>
+                    </DndContext>
+                </>
+            )}
         </div>
     );
 };

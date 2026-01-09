@@ -702,7 +702,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                             <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                             <>
-                                <span>{t('post.submit')}</span>
+                                <span>{config.ui_labels?.['post.submit'] || t('post.submit')}</span>
                                 <Check size={20} strokeWidth={3} />
                             </>
                         )}

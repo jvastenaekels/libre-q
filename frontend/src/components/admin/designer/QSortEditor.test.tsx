@@ -113,7 +113,10 @@ describe('QSortEditor', () => {
 
             expect(mockUpdateDraft).toHaveBeenCalled();
             const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const draft = { statements: [{ code: 'old' }] };
+            const draft = {
+                statements: [{ code: 'old' }],
+                translations: [{ language_code: 'en' }],
+            };
             updateFn(draft);
 
             expect(draft.statements).toHaveLength(2);
@@ -137,7 +140,10 @@ describe('QSortEditor', () => {
             fireEvent.click(appendButton);
 
             const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const draft = { statements: [{ code: 's1', translations: [{ text: 'existing' }] }] };
+            const draft = {
+                statements: [{ code: 's1', translations: [{ text: 'existing' }] }],
+                translations: [{ language_code: 'en' }],
+            };
             updateFn(draft);
 
             expect(draft.statements).toHaveLength(2);
@@ -157,7 +163,7 @@ describe('QSortEditor', () => {
             fireEvent.click(replaceButton);
 
             const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const draft = { statements: [] };
+            const draft = { statements: [], translations: [{ language_code: 'en' }] };
             updateFn(draft);
 
             expect(draft.statements[0].code).toBe('TSV1');
@@ -179,7 +185,7 @@ S3: Third statement`;
             fireEvent.click(replaceButton);
 
             const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const draft = { statements: [] };
+            const draft = { statements: [], translations: [{ language_code: 'en' }] };
             updateFn(draft);
 
             expect(draft.statements).toHaveLength(3);

@@ -129,6 +129,17 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         setStep(2);
     }, [setStep]);
 
+    // Handle skipping if disabled
+    React.useEffect(() => {
+        if (
+            config?.presort_config &&
+            'enabled' in config.presort_config &&
+            !config.presort_config.enabled
+        ) {
+            navigate(`/study/${slug}/rough-sort`, { replace: true });
+        }
+    }, [config, navigate, slug]);
+
     if (!config) return null;
 
     const onSubmit = (data: Record<string, string | number | boolean>) => {
@@ -191,7 +202,8 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                         )}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                     >
-                        {t('common.next', t('presort.submit'))} <ArrowRight size={16} />
+                        {config.ui_labels?.['common.next'] || t('common.next', t('presort.submit'))}{' '}
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </form>

@@ -17,32 +17,12 @@ const IntroductionEditor = () => {
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
-    const hasConsent =
-        translation?.consent_title !== null && translation?.consent_title !== undefined;
 
     const handleChange = (field: keyof StudyTranslationRead, value: string) => {
         // biome-ignore lint/suspicious/noExplicitAny: complex state update
         updateTranslation(activeLocale, (t_trans: any) => {
             // biome-ignore lint/suspicious/noExplicitAny: complex state update
             (t_trans as any)[field] = value;
-        });
-    };
-
-    const _toggleConsent = (checked: boolean) => {
-        // biome-ignore lint/suspicious/noExplicitAny: complex state update
-        updateTranslation(activeLocale, (t_trans: any) => {
-            if (checked) {
-                t_trans.consent_title = t_trans.consent_title || t('consent.title');
-                t_trans.consent_description =
-                    t_trans.consent_description || t('consent.default_text');
-                t_trans.consent_accept = t_trans.consent_accept || t('welcome.consent.label');
-                t_trans.consent_decline = t_trans.consent_decline || t('common.close');
-            } else {
-                t_trans.consent_title = null;
-                t_trans.consent_description = null;
-                t_trans.consent_accept = null;
-                t_trans.consent_decline = null;
-            }
         });
     };
 
@@ -155,7 +135,7 @@ const IntroductionEditor = () => {
                 <ProcessStepEditor />
             </section>
 
-            {/* Consent Section */}
+            {/* Consent Section (Mandatory) */}
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
@@ -164,70 +144,45 @@ const IntroductionEditor = () => {
                         </div>
                         {t('admin.design.intro.consent_title')}
                     </div>
-                    <Switch
-                        id="enable-consent"
-                        aria-label={t('admin.design.intro.consent_title')}
-                        checked={hasConsent}
-                        onCheckedChange={(checked: boolean) => {
-                            if (checked === hasConsent) return;
-                            if (checked) {
-                                updateTranslation(activeLocale, (t_trans: any) => {
-                                    t_trans.consent_title =
-                                        t_trans.consent_title || t('consent.title');
-                                    t_trans.consent_description =
-                                        t_trans.consent_description || t('consent.default_text');
-                                });
-                            } else {
-                                updateTranslation(activeLocale, (t_trans: any) => {
-                                    t_trans.consent_title = null;
-                                    t_trans.consent_description = null;
-                                });
-                            }
-                        }}
-                    />
                 </div>
 
-                {hasConsent && (
-                    <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-sm font-bold">
-                                {t('admin.design.intro.consent_details')}
-                            </CardTitle>
-                            <CardDescription className="text-xs font-medium text-slate-500">
-                                {t('admin.design.intro.consent_desc')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid gap-2.5">
-                                <Label
-                                    htmlFor="consent-title"
-                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                                >
-                                    {t('admin.design.intro.fields.consent_title_label')}
-                                </Label>
-                                <Input
-                                    id="consent-title"
-                                    value={translation?.consent_title || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleChange('consent_title', e.target.value)
-                                    }
-                                    className="font-bold text-sm h-10 rounded-xl"
-                                />
-                            </div>
-                            <div className="grid gap-2.5">
-                                <MarkdownEditor
-                                    id="consent-description"
-                                    label={t('admin.design.intro.fields.legal_text')}
-                                    value={translation?.consent_description || ''}
-                                    onChange={(val: string) =>
-                                        handleChange('consent_description', val)
-                                    }
-                                    placeholder={t('admin.design.intro.fields.legal_placeholder')}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.intro.consent_details')}
+                        </CardTitle>
+                        <CardDescription className="text-xs font-medium text-slate-500">
+                            {t('admin.design.intro.consent_desc')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="grid gap-2.5">
+                            <Label
+                                htmlFor="consent-title"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
+                                {t('admin.design.intro.fields.consent_title_label')}
+                            </Label>
+                            <Input
+                                id="consent-title"
+                                value={translation?.consent_title || ''}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleChange('consent_title', e.target.value)
+                                }
+                                className="font-bold text-sm h-10 rounded-xl"
+                            />
+                        </div>
+                        <div className="grid gap-2.5">
+                            <MarkdownEditor
+                                id="consent-description"
+                                label={t('admin.design.intro.fields.legal_text')}
+                                value={translation?.consent_description || ''}
+                                onChange={(val: string) => handleChange('consent_description', val)}
+                                placeholder={t('admin.design.intro.fields.legal_placeholder')}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
             </section>
         </div>
     );

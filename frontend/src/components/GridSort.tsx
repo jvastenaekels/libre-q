@@ -215,7 +215,8 @@ const GridLegend: React.FC<{
     // biome-ignore lint/suspicious/noExplicitAny: translation function
     t: any;
     getLegendFontSize: (maxLen: number) => string;
-}> = React.memo(({ highlightKey, t, getLegendFontSize }) => {
+    uiLabels?: Record<string, string>;
+}> = React.memo(({ highlightKey, t, getLegendFontSize, uiLabels }) => {
     const legends = ['disagree', 'neutral', 'agree'] as const;
     const fs = getLegendFontSize(Math.max(...legends.map((key) => t(`fine.legend.${key}`).length)));
 
@@ -230,7 +231,7 @@ const GridLegend: React.FC<{
                     <LegendLabel
                         key={key}
                         type={key}
-                        label={t(`fine.legend.${key}`)}
+                        label={uiLabels?.[`fine.legend.${key}`] || t(`fine.legend.${key}`)}
                         fontSize={fs}
                         highlight={highlightKey === `fine.legend.${key}`}
                         testId={`legend-${key}`}
@@ -390,6 +391,7 @@ interface GridSortProps {
     showCodes?: boolean;
     highlightKey?: string | null;
     conditionOfInstruction?: string | null;
+    uiLabels?: Record<string, string>;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -429,6 +431,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         showCodes,
         highlightKey,
         conditionOfInstruction,
+        uiLabels,
     }) => {
         const { t } = useTranslation();
 
@@ -583,12 +586,15 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         const inventoryLabels = useMemo(
             () => ({
-                validate: t('fine.actions.validate'),
-                place: t('fine.workbench.place_on_grid'),
-                initial: t('fine.workbench.initial_instruction'),
-                finish: t('fine.actions.finish'),
+                validate: uiLabels?.['fine.actions.validate'] || t('fine.actions.validate'),
+                place:
+                    uiLabels?.['fine.workbench.place_on_grid'] || t('fine.workbench.place_on_grid'),
+                initial:
+                    uiLabels?.['fine.workbench.initial_instruction'] ||
+                    t('fine.workbench.initial_instruction'),
+                finish: uiLabels?.['fine.actions.finish'] || t('fine.actions.finish'),
             }),
-            [t]
+            [t, uiLabels]
         );
 
         const toolbarLabels = useMemo(
@@ -762,6 +768,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         highlightKey={highlightKey}
                                         t={t}
                                         getLegendFontSize={getLegendFontSize}
+                                        uiLabels={uiLabels}
                                     />
                                 </div>
                             </TransformComponent>

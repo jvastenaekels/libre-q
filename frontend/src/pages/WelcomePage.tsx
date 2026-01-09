@@ -259,7 +259,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
                     )}
                 >
-                    {t('welcome.start', 'Get Started')}
+                    {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}
                     <ArrowRight
                         size={20}
                         className="group-hover:translate-x-1 transition-transform"

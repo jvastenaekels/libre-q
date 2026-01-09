@@ -243,7 +243,8 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                                 style={{ backgroundColor: 'var(--brand-accent)' }}
                                 className="px-12 py-5 text-white rounded-full font-bold text-xl hover:brightness-110 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none"
                             >
-                                {t('common.start')} <ArrowRight size={24} />
+                                {config.ui_labels?.['common.next'] || t('common.start')}{' '}
+                                <ArrowRight size={24} />
                             </button>
                         </div>
                     </div>
@@ -269,7 +270,8 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"
                     >
-                        {t('common.next')} <ArrowRight size={18} />
+                        {config.ui_labels?.['common.next'] || t('common.next')}{' '}
+                        <ArrowRight size={18} />
                     </button>
 
                     <button
@@ -278,7 +280,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 transition-all text-sm font-bold uppercase tracking-wider active:scale-95 touch-manipulation"
                     >
                         <RotateCcw size={16} />
-                        {t('common.undo')}
+                        {config.ui_labels?.['common.undo'] || t('common.undo')}
                     </button>
                 </div>
             </div>
@@ -363,6 +365,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         highlightKey={highlightKey}
                         t={t}
                         sharedFontSize={sharedFontSize}
+                        uiLabels={config?.ui_labels}
                     />
 
                     {/* Card Zone */}
@@ -392,6 +395,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         highlightKey={highlightKey}
                         t={t}
                         sharedFontSize={sharedFontSize}
+                        uiLabels={config?.ui_labels}
                     />
                 </div>
 
@@ -407,6 +411,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         t={t}
                         sharedFontSize={sharedFontSize}
                         isNeutral
+                        uiLabels={config?.ui_labels}
                     />
 
                     <div className="flex items-center gap-4">
@@ -418,7 +423,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             aria-keyshortcuts="z"
                         >
                             <RotateCcw size={14} />
-                            {t('common.undo')}
+                            {config.ui_labels?.['common.undo'] || t('common.undo')}
                         </button>
                         {/* Desktop Keyboard Shortcuts Hint */}
                         <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
@@ -501,6 +506,7 @@ interface DeckButtonProps {
     t: any;
     sharedFontSize: string;
     isNeutral?: boolean;
+    uiLabels?: Record<string, string>;
 }
 
 const DeckButton: React.FC<DeckButtonProps> = ({
@@ -512,8 +518,9 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     highlightKey,
     t,
     sharedFontSize,
+    uiLabels,
 }) => {
-    const config = React.useMemo(() => {
+    const styleConfig = React.useMemo(() => {
         const base =
             'flex flex-col items-center justify-center rounded-2xl border-2 shadow-sm transition-all duration-200 gap-0.5 sm:gap-1 px-1.5 w-full h-full';
         switch (type) {
@@ -605,7 +612,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                             exit={{ opacity: 0 }}
                             className={cn(
                                 'absolute inset-0 rounded-2xl border-2 z-0 transform',
-                                config.bgCardClass
+                                styleConfig.bgCardClass
                             )}
                         />
                         {count > 3 && (
@@ -619,7 +626,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                                 exit={{ opacity: 0 }}
                                 className={cn(
                                     'absolute inset-0 rounded-2xl border-2 z-0 transform bg-white',
-                                    config.bgCardClass
+                                    styleConfig.bgCardClass
                                 )}
                             />
                         )}
@@ -630,19 +637,19 @@ const DeckButton: React.FC<DeckButtonProps> = ({
             <motion.button
                 style={{ scale, opacity }}
                 onClick={onClick}
-                data-testid={config.testid}
+                data-testid={styleConfig.testid}
                 // FIXED: Enforce absolute inset-0 to match background cards perfectly and be full-sized
                 className={cn(
-                    config.className,
+                    styleConfig.className,
                     'absolute inset-0 z-10',
                     highlightKey === `common.${type}` &&
                         'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
                 )}
-                aria-label={t(`common.${type}`)}
-                aria-keyshortcuts={config.ariaKey}
+                aria-label={uiLabels?.[`common.${type}`] || t(`common.${type}`)}
+                aria-keyshortcuts={styleConfig.ariaKey}
             >
                 <div className="flex flex-col items-center">
-                    {config.icon}
+                    {styleConfig.icon}
                     <span
                         lang={t('common.lang_code', { defaultValue: 'en' })}
                         className={cn(
@@ -650,7 +657,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                             'font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-[10px] sm:text-xs px-0.5'
                         )}
                     >
-                        {t(`common.${type}`)}
+                        {uiLabels?.[`common.${type}`] || t(`common.${type}`)}
                     </span>
                 </div>
             </motion.button>
@@ -662,7 +669,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                         exit={{ scale: 0, opacity: 0 }}
                         className={cn(
                             'absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-bold border-2 shadow-sm z-30 text-white border-white',
-                            config.badgeClass
+                            styleConfig.badgeClass
                         )}
                     >
                         {count}

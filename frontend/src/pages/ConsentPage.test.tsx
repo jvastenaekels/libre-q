@@ -24,7 +24,7 @@ const mockConfig = {
         description: 'Consent Description',
     },
     ui_labels: {
-        start_button: 'Start Study',
+        'welcome.start': 'Start Study',
     },
 };
 
