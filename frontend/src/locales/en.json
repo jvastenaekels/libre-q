@@ -58,10 +58,22 @@
                 "action": "Back to Home"
             },
             "steps": {
-                "draft": { "label": "Draft", "description": "Configuration & design" },
-                "active": { "label": "Active", "description": "Collecting responses" },
-                "paused": { "label": "Paused", "description": "On hold" },
-                "closed": { "label": "Closed", "description": "Analysis & export" }
+                "draft": {
+                    "label": "Draft",
+                    "description": "Configuration & design"
+                },
+                "active": {
+                    "label": "Active",
+                    "description": "Collecting responses"
+                },
+                "paused": {
+                    "label": "Paused",
+                    "description": "On hold"
+                },
+                "closed": {
+                    "label": "Closed",
+                    "description": "Analysis & export"
+                }
             },
             "paused": {
                 "title": "Maintenance in Progress",
@@ -298,7 +310,6 @@
             "select_placeholder": "Select a statement to comment...",
             "placeholder": "Your comment here..."
         },
-
         "submit": "Share my perspective",
         "validation_error": "Please briefly explain your key choices to continue.",
         "success": {
@@ -578,6 +589,20 @@
                     "label": "Closed",
                     "description": "Analysis & export"
                 }
+            },
+            "state": {
+                "activate": "Activate Study",
+                "manage": "Manage Status"
+            },
+            "notifications": {
+                "success": {
+                    "draft": "Study reverted to draft successfully",
+                    "active": "Study launched successfully",
+                    "paused": "Study paused successfully",
+                    "closed": "Study closed successfully"
+                },
+                "error": "Failed to change study state",
+                "state_changed_active": "Study is now active!"
             }
         },
         "team": {
@@ -625,19 +650,35 @@
                 "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis."
             },
             "toolbar": {
-                "title": "Study design",
+                "title": "Design",
+                "back": "Back",
                 "preview": "Show preview",
                 "hide_preview": "Hide preview",
                 "popout": "Pop out preview",
                 "discard": "Discard unsaved changes",
                 "test_run": "Test run",
                 "save": "Save",
-                "saving": "Saving...",
                 "closed": "Closed",
                 "back_to_study": "Back to Study",
-                "editing_language": "Editing",
-                "manage_langs": "Manage Languages",
+                "editing_language": "Editing language",
+                "manage_langs": "Manage languages",
                 "select_lang": "Select language"
+            },
+            "sync": {
+                "saving": "Saving...",
+                "error": "Save error",
+                "modified": "Unsaved changes",
+                "synced": "Changes saved",
+                "wait_save": "Saving in progress... please wait a moment.",
+                "recovered": "Draft recovered from local backup!",
+                "recovery_title": "Unsaved Changes Found",
+                "recovery_desc": "We found a local version of this study that is more recent than the one on the server. Would you like to restore it?",
+                "recovery_restore": "Restore local version",
+                "recovery_discard": "Discard local version"
+            },
+            "validation": {
+                "failed_title": "Configuration Incomplete",
+                "failed_desc": "Your study cannot be activated yet. Please fix the following issues:"
             },
             "languages": {
                 "manage_title": "Manage Languages",
@@ -706,7 +747,7 @@
                 "label": "Define Condition of Instruction",
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
                 "field_label": "Instruction Text",
-                "placeholder": "e.g., In your experience, what characterizes a high-performing team the most?",
+                "placeholder": "",
                 "enable_pre": "Enable Pre-instruction step",
                 "pre_desc": "Provide more context or detailed instructions before the sorting task starts.",
                 "pre_label": "Pre-instruction Content",
@@ -827,7 +868,6 @@
                     "title": "Custom questions",
                     "desc": "Add custom questions to the post-sort survey."
                 },
-
                 "email": {
                     "title": "Participant Follow-up",
                     "desc": "Collect email addresses for follow-up or research results.",
@@ -1124,6 +1164,24 @@
                     "growth_title": "Team Growth",
                     "growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
                     "invite_button": "Invite Collaborator",
+                    "permissions_matrix": {
+                        "title": "Permissions Matrix",
+                        "admin": {
+                            "label": "Admin",
+                            "badge": "Full Access",
+                            "desc": "Can manage workspace settings, members, and all studies."
+                        },
+                        "researcher": {
+                            "label": "Researcher",
+                            "badge": "Creation",
+                            "desc": "Can create and manage all studies. Restricted from workspace settings."
+                        },
+                        "viewer": {
+                            "label": "Viewer",
+                            "badge": "Read Only",
+                            "desc": "Read-only access to all studies and data in the workspace."
+                        }
+                    },
                     "coming_soon": "Coming Soon",
                     "invite_modal": {
                         "title": "Invite Collaborator",
@@ -1133,6 +1191,7 @@
                         "success": "Invitation link generated!",
                         "error": "Failed to create invitation.",
                         "send": "Create & Send Invitation",
+                        "copy_success": "Link copied to clipboard!",
                         "copy_hint": "Copy this link and send it manually if the email fails."
                     }
                 }

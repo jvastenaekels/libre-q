@@ -1,5 +1,6 @@
 """Admin routes for study management."""
 
+from typing import cast
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -160,29 +161,42 @@ async def update_study(
 ) -> Study:
     """Update study configuration."""
     # Ensure relationships are loaded for logic below
-    await db.refresh(study, attribute_names=["translations", "statements"])
+    # We use a comprehensive selectinload query to avoid MissingGreenlet errors during synchronization
+    from app.models import Statement, StudyTranslation
 
-    # Structural changes only allowed in DRAFT
-    # Check if grid_config is actually being modified relative to current DB state
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+        )
+    )
+    res = await db.execute(stmt)
+    study = res.scalar_one()
+
+    # Pre-fetch all statement translations to ensure they are in identity map
+    for s in study.statements:
+        _ = s.translations
+
+    # Relax structural checks in update_study if study is in DRAFT
+    # The frontend will hit this endpoint for auto-save.
+    # We only block grid modification if there are ALREADY participants.
     if study_update.grid_config is not None:
         new_grid = [col.model_dump() for col in study_update.grid_config]
-        # Compare with existing grid (ignoring potential tuple/list differences by strictly dumping)
-        # Existing in DB is a JSON list of dicts.
         current_grid = study.grid_config
 
-        # If they are different AND (study is not draft OR has submissions), raise error
         if new_grid != current_grid:
-            # Plan 1.1: Reject grid modification if study has submissions, regardless of state
-            stmt = select(func.count(Participant.id)).where(
+            stmt_part = select(func.count(Participant.id)).where(
                 Participant.study_id == study.id
             )
-            res = await db.execute(stmt)
-            has_submissions = (res.scalar() or 0) > 0
+            res_part = await db.execute(stmt_part)
+            has_participants = (res_part.scalar() or 0) > 0
 
-            if has_submissions or study.state != StudyState.draft:
+            if has_participants and study.state != StudyState.draft:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Cannot modify grid structure if study has submissions or is not in draft mode.",
+                    detail="Cannot modify grid structure if study is active and has participants.",
                 )
 
     # Block updates if archived
@@ -232,15 +246,37 @@ async def update_study(
 
     # 4. Update statements
     if study_update.statements is not None:
-        from app.models import StatementTranslation
+        from app.models import (
+            Statement,
+            StatementTranslation,
+        )
 
-        # We only allow updating translations for existing statements by code
-        # No adding/removing statements here if not in DRAFT (but let's keep it safe for all)
         current_statements = {s.code: s for s in study.statements}
+        updated_codes = {s.code for s in study_update.statements}
+
+        # Determine if we can do destructive changes (remove statements)
+        # Structural changes are allowed in DRAFT or if NO participants exist
+        stmt_count = select(func.count(Participant.id)).where(
+            Participant.study_id == study.id
+        )
+        res = await db.execute(stmt_count)
+        has_participants = (cast(int, res.scalar()) or 0) > 0
+
+        can_sync_structure = study.state == StudyState.draft or not has_participants
+
+        # A. Remove statements not in the update (only if allowed)
+        if can_sync_structure:
+            for code, s_obj in list(current_statements.items()):
+                if code not in updated_codes:
+                    study.statements.remove(s_obj)
+                    await db.delete(s_obj)
+                    del current_statements[code]
+
+        # B. Sync existing and add new
         for s_up in study_update.statements:
             if s_up.code in current_statements:
+                # Update existing
                 target_s = current_statements[s_up.code]
-                # Update translations for this statement
                 curr_s_trans = {t.language_code: t for t in target_s.translations}
                 new_s_trans_list = []
                 for st_in in s_up.translations:
@@ -255,19 +291,47 @@ async def update_study(
                             )
                         )
                 target_s.translations = new_s_trans_list
-            elif study.state == StudyState.draft:
-                # In DRAFT, we could technically allow adding by code, but StudyUpdate is for partials.
-                # Usually creation handles the bulk.
-                pass
+            elif can_sync_structure:
+                # Add new
+                new_s = Statement(study_id=study.id, code=s_up.code)
+                db.add(new_s)
+                # Link to study relationships so re-fetch/serialization see it
+                study.statements.append(new_s)
+
+                await db.flush()  # Get ID
+
+                # Create translations and relate them
+                for st_in in s_up.translations:
+                    new_st = StatementTranslation(
+                        statement_id=new_s.id,
+                        language_code=st_in.language_code,
+                        text=st_in.text,
+                    )
+                    db.add(new_st)
 
     await db.commit()
-    # Re-fetch with relationships for Response Serialization
     from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
     if updated_study is None:
         raise HTTPException(status_code=404, detail="Study not found after update")
     return updated_study
+
+
+@router.post("/{slug}/validate", response_model=list[str])
+async def validate_study(
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> list[str]:
+    """Check if study is ready for activation."""
+    from app.services.study_service import StudyService
+
+    # Ensure relations are loaded
+    await db.refresh(study, attribute_names=["translations", "statements"])
+    for s in study.statements:
+        await db.refresh(s, attribute_names=["translations"])
+
+    return StudyService.validate_for_activation(study)
 
 
 @router.post("/{slug}/state", response_model=StudyRead)
@@ -277,32 +341,24 @@ async def change_study_state(
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Change study state (Draft <-> Active <-> Closed <-> Archived)."""
-    # Archiving Rules
-    if new_state == StudyState.archived:
-        # Can only archive if currently closed
-        if study.state != StudyState.closed:
+    # Rules for Activation
+    if new_state == StudyState.active:
+        from app.services.study_service import StudyService
+
+        # Ensure relations are loaded for validation
+        await db.refresh(study, attribute_names=["translations", "statements"])
+        for s in study.statements:
+            await db.refresh(s, attribute_names=["translations"])
+
+        errors = StudyService.validate_for_activation(study)
+        if errors:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Study must be CLOSED before it can be archived.",
+                detail={
+                    "message": "Study is not ready for activation",
+                    "errors": errors,
+                },
             )
-
-    # Un-Archiving Rules (optional, maybe prevented if strict)
-    if study.state == StudyState.archived and new_state != StudyState.archived:
-        # If valid workflow allows un-archiving, we might allow going back to closed.
-        # For safety/strictness as requested: "once archived... superuser can delete".
-        # But implies 'archive... (only if closed; on ne peut plus rien modifier)'.
-        # If user wants to "unarchive", they might expect to go back to closed.
-        # Let's verify if "on ne peut plus rien modifier" means permanent read-only state.
-        # Assuming we allow un-archiving for now to correct mistakes unless strictly forbidden.
-        # But user request says: "archive ... (only if closed; on ne peut plus rien modifier)"
-        # This implies once archived, it's frozen.
-        # Let's enforce that you cannot change state FROM archived unless maybe superuser?
-        # Or just prevent it. "one ne peut plus rien modifier" usually means frozen.
-        # We will allow changing state OUT of archived only to 'closed' maybe? or block it.
-        # Let's BLOCK changing state FROM archived for now, as it implies finality.
-        # actually, usually unarchiving is useful. Let's block it for regular users maybe?
-        # For simplicity and strictly following "no modification", we block content updates in update_study.
-        pass
 
     study.state = new_state
     await db.commit()

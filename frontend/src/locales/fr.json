@@ -3,6 +3,7 @@
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
         "neutral": "Neutre",
+        "undo": "Annuler l'action",
         "back": "Retour",
         "cancel": "Annuler",
         "reduce": "Réduire",
@@ -577,6 +578,20 @@
                     "label": "Fermée",
                     "description": "Analyse & export"
                 }
+            },
+            "notifications": {
+                "success": {
+                    "draft": "L'étude est repassée en brouillon avec succès",
+                    "active": "L'étude a été lancée avec succès",
+                    "paused": "L'étude a été mise en pause avec succès",
+                    "closed": "L'étude a été fermée avec succès"
+                },
+                "error": "Échec du changement d'état de l'étude",
+                "state_changed_active": "L'étude est maintenant active !"
+            },
+            "state": {
+                "activate": "Activer l'étude",
+                "manage": "Gérer le statut"
             }
         },
         "team": {
@@ -625,18 +640,34 @@
             },
             "toolbar": {
                 "title": "Conception",
+                "back": "Retour",
                 "preview": "Afficher l'aperçu",
                 "hide_preview": "Masquer l'aperçu",
                 "popout": "Aperçu détaché",
                 "discard": "Ignorer les changements",
                 "test_run": "Tester l'étude",
                 "save": "Enregistrer",
-                "saving": "Enregistrement...",
                 "closed": "Fermé",
                 "back_to_study": "Retour à l'étude",
                 "editing_language": "Édition",
                 "manage_langs": "Gérer les langues",
                 "select_lang": "Choisir la langue"
+            },
+            "sync": {
+                "saving": "Enregistrement...",
+                "error": "Erreur d'enregistrement",
+                "modified": "Modifications non enregistrées",
+                "synced": "Modifications enregistrées",
+                "wait_save": "Enregistrement en cours... veuillez patienter un instant.",
+                "recovered": "Brouillon récupéré depuis la sauvegarde locale !",
+                "recovery_title": "Modifications non enregistrées trouvées",
+                "recovery_desc": "Nous avons trouvé une version locale de cette étude qui est plus récente que celle sur le serveur. Souhaitez-vous la restaurer ?",
+                "recovery_restore": "Restaurer la version locale",
+                "recovery_discard": "Ignorer la version locale"
+            },
+            "validation": {
+                "failed_title": "Configuration incomplète",
+                "failed_desc": "Votre étude ne peut pas encore être activée. Veuillez corriger les problèmes suivants :"
             },
             "languages": {
                 "manage_title": "Gérer les langues",
@@ -706,7 +737,7 @@
                 "label": "Définir la condition d'instruction",
                 "desc": "C'est la consigne centrale qui guide les participants tout au long du processus de classement.",
                 "field_label": "Texte de la consigne",
-                "placeholder": "Ex : Selon votre expérience, qu'est-ce qui caractérise le plus une équipe performante ?",
+                "placeholder": "",
                 "enable_pre": "Activer l'étape de pré-instruction",
                 "pre_desc": "Fournir plus de contexte ou des instructions détaillées avant le début de la tâche de classement.",
                 "pre_label": "Contenu de la pré-instruction",
@@ -1125,6 +1156,24 @@
                     "growth_title": "Gestion des accès",
                     "growth_desc": "Gérez les accès institutionnels en ajoutant des chercheurs à cet espace de travail. Ils pourront gérer toutes les études au sein de cet espace.",
                     "invite_button": "Inviter un collaborateur",
+                    "permissions_matrix": {
+                        "title": "Matrice des permissions",
+                        "admin": {
+                            "label": "Admin",
+                            "badge": "Accès complet",
+                            "desc": "Peut gérer les paramètres de l'espace, les membres et toutes les études."
+                        },
+                        "researcher": {
+                            "label": "Chercheur",
+                            "badge": "Création",
+                            "desc": "Peut créer et gérer toutes les études. Accès restreint aux paramètres de l'espace."
+                        },
+                        "viewer": {
+                            "label": "Observateur",
+                            "badge": "Lecture seule",
+                            "desc": "Accès en lecture seule à toutes les études et données de l'espace."
+                        }
+                    },
                     "coming_soon": "Bientôt disponible",
                     "invite_modal": {
                         "title": "Inviter un collaborateur",
@@ -1134,6 +1183,7 @@
                         "success": "Lien d'invitation généré !",
                         "error": "Échec de la création de l'invitation.",
                         "send": "Créer et envoyer l'invitation",
+                        "copy_success": "Lien copié dans le presse-papier !",
                         "copy_hint": "Copiez ce lien et envoyez-le manuellement si l'e-mail échoue."
                     }
                 }

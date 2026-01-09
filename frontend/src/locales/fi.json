@@ -579,6 +579,20 @@
                     "label": "Suljettu",
                     "description": "Analyysi ja vienti"
                 }
+            },
+            "notifications": {
+                "success": {
+                    "draft": "Tutkimus palautettu onnistuneesti luonnokseksi",
+                    "active": "Tutkimus julkaistu onnistuneesti",
+                    "paused": "Tutkimus keskeytetty onnistuneesti",
+                    "closed": "Tutkimus suljettu onnistuneesti"
+                },
+                "error": "Tutkimuksen tilan muuttaminen epäonnistui",
+                "state_changed_active": "Tutkimus on nyt aktiivinen!"
+            },
+            "state": {
+                "activate": "Aktivoi tutkimus",
+                "manage": "Hallitse tilaa"
             }
         },
         "team": {
@@ -626,19 +640,35 @@
                 "qsort_desc": "Varmista, että ruudukon kapasiteetti vastaa tarkalleen väittämien määrää. Tasapainoinen Q-sarja sisältää yleensä 30–60 kohtaa luotettavaa faktorianalyysiä varten."
             },
             "toolbar": {
-                "title": "Tutkimuksen suunnittelu",
+                "title": "Suunnittelu",
+                "back": "Takaisin",
                 "preview": "Näytä esikatselu",
                 "hide_preview": "Piilota esikatselu",
                 "popout": "Avaa esikatselu uuteen ikkunaan",
                 "discard": "Hylkää muutokset",
                 "test_run": "Koeajo",
                 "save": "Tallenna",
-                "saving": "Tallennetaan...",
                 "closed": "Suljettu",
                 "back_to_study": "Palaa tutkimukseen",
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
                 "select_lang": "Valitse kieli"
+            },
+            "sync": {
+                "saving": "Tallennetaan...",
+                "error": "Tallennusvirhe",
+                "modified": "Tallentamattomia muutoksia",
+                "synced": "Muutokset tallennettu",
+                "wait_save": "Tallennus käynnissä... odota hetki.",
+                "recovered": "Luonnos palautettu paikallisesta varmuuskopiosta!",
+                "recovery_title": "Tallentamattomia muutoksia löytyi",
+                "recovery_desc": "Löysimme tästä tutkimuksesta paikallisen version, joka on uudempi kuin palvelimella oleva. Haluatko palauttaa sen?",
+                "recovery_restore": "Palauta paikallinen versio",
+                "recovery_discard": "Hylkää paikallinen versio"
+            },
+            "validation": {
+                "failed_title": "Määritys puutteellinen",
+                "failed_desc": "Tutkimustasi ei voida vielä aktivoida. Korjaa seuraavat ongelmat:"
             },
             "languages": {
                 "manage_title": "Kielten hallinta",
@@ -707,7 +737,7 @@
                 "label": "Määritä ohjeistuksen ehto",
                 "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
                 "field_label": "Ohjeteksti",
-                "placeholder": "Esim. Kokemuksesi perusteella, mikä luonnehtii parhaiten huipputiimiä?",
+                "placeholder": "",
                 "enable_pre": "Ota käyttöön esiohje-vaihe",
                 "pre_desc": "Tarjoa enemmän kontekstia tai yksityiskohtaisia ohjeita ennen lajittelutehtävän aloittamista.",
                 "pre_label": "Esiohjeen sisältö",
@@ -1124,6 +1154,24 @@
                     "growth_title": "Tiimin kasvu",
                     "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He pystyvät hallitsemaan kaikkia tämän työtilan tutkimuksia.",
                     "invite_button": "Kutsu yhteistyökumppani",
+                    "permissions_matrix": {
+                        "title": "Käyttöoikeusmatriisi",
+                        "admin": {
+                            "label": "Admin",
+                            "badge": "Täysi pääsy",
+                            "desc": "Voi hallita työtilan asetuksia, jäseniä ja kaikkia tutkimuksia."
+                        },
+                        "researcher": {
+                            "label": "Tutkija",
+                            "badge": "Luonti",
+                            "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy työtilan asetuksiin."
+                        },
+                        "viewer": {
+                            "label": "Katsoja",
+                            "badge": "Luku-oikeus",
+                            "desc": "Vain luku -pääsy kaikkiin työtilan tutkimuksiin ja tietoihin."
+                        }
+                    },
                     "coming_soon": "Tulossa pian",
                     "invite_modal": {
                         "title": "Kutsu yhteistyökumppani",
@@ -1133,6 +1181,7 @@
                         "success": "Kutsulinkki luotu!",
                         "error": "Kutsun luominen epäonnistui.",
                         "send": "Luo ja lähetä kutsu",
+                        "copy_success": "Linkki kopioitu leikepöydälle!",
                         "copy_hint": "Kopioi tämä linkki ja lähetä se manuaalisesti, jos sähköposti epäonnistuu."
                     }
                 }

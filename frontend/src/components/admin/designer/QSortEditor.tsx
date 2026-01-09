@@ -108,6 +108,7 @@ const QSortEditor = () => {
 
                 return {
                     code,
+                    // biome-ignore lint/suspicious/noExplicitAny: complex types
                     translations: (d.translations || []).map((t: any) => ({
                         language_code: t.language_code,
                         text: t.language_code === activeLocale ? item.text : '',

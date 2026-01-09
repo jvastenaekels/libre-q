@@ -352,6 +352,76 @@ class StudyService:
         }
 
     @staticmethod
+    def validate_for_activation(study: Study) -> list[str]:
+        """
+        Comprehensive check to see if a study is ready for research.
+        Returns a list of human-readable error messages.
+        """
+        errors = []
+
+        # 1. Statements Exist
+        if not study.statements:
+            errors.append("Study must have at least one statement.")
+
+        # 2. Grid Config exists and matches statements
+        if not study.grid_config:
+            errors.append("Grid configuration is missing.")
+        else:
+            total_capacity = sum(
+                int(col.get("capacity", 0)) for col in study.grid_config
+            )
+            if len(study.statements) != total_capacity:
+                errors.append(
+                    f"Grid capacity ({total_capacity}) does not match statement count ({len(study.statements)})."
+                )
+
+        # 3. Minimum Translations
+        if not study.translations:
+            errors.append("Study must have at least one language translation.")
+        else:
+            # Check if default language has a translation
+            default_lang = study.default_language or "en"
+            has_default = any(
+                t.language_code == default_lang for t in study.translations
+            )
+            if not has_default:
+                errors.append(
+                    f"Default language ({default_lang}) translation is missing."
+                )
+
+            # Check for missing titles in any translation
+            for t in study.translations:
+                if not t.title or t.title.strip() == "":
+                    errors.append(f"Title is missing for language '{t.language_code}'.")
+
+                # Check process steps
+                for i, step in enumerate(t.process_steps):
+                    title = step.get("title")
+                    if not title or title.strip() == "":
+                        errors.append(
+                            f"Step {i + 1} title is missing for language '{t.language_code}'."
+                        )
+
+        # 4. Statements have translations for all study languages
+        study_langs = {t.language_code for t in study.translations}
+        for s in study.statements:
+            s_langs = {st.language_code for st in s.translations}
+            missing = study_langs - s_langs
+            if missing:
+                errors.append(
+                    f"Statement '{s.code}' is missing translations for: {', '.join(missing)}."
+                )
+
+            # Check for empty text in existing translations
+            for st in s.translations:
+                if not st.text or st.text.strip() == "":
+                    errors.append(
+                        f"Statement '{s.code}' has empty text for language '{st.language_code}'."
+                    )
+
+        return errors
+
+    @staticmethod
     def validate_distribution(study: Study, qsort: list[Any]):
         """Validates the Q-sort distribution against the study's grid configuration."""
         # Edge case: Ensure study has statements

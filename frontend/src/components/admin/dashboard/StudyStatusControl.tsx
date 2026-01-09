@@ -39,13 +39,8 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                 slug,
                 params: { new_state: newState },
             });
-            const stateLabels = {
-                draft: 'reverted to draft',
-                active: 'launched',
-                closed: 'closed',
-                paused: 'paused',
-            };
-            toast.success(`Study ${stateLabels[newState]} successfully`);
+
+            toast.success(t(`admin.study_status.notifications.success.${newState}`));
 
             // Invalidate all queries related to this study
             await queryClient.invalidateQueries({
@@ -60,7 +55,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 
             onStateChange();
         } catch (error) {
-            toast.error(`Failed to change study state`);
+            toast.error(t('admin.study_status.notifications.error'));
             console.error(error);
         }
     };

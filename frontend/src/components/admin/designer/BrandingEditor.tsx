@@ -220,6 +220,7 @@ const BrandingEditor = () => {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid gap-4">
+                                {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
                                 {(branding.partners || []).map((partner: any, index: number) => (
                                     <div
                                         key={partner.id || index}

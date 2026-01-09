@@ -447,9 +447,7 @@ export default function WorkspaceSettingsPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <p className="text-xs font-medium text-indigo-900/70 leading-relaxed">
-                                Need more researchers? You can invite collaborators to your
-                                workspace. They will be able to manage all studies within this
-                                workspace.
+                                {t('admin.workspaces.settings.team.growth_desc')}
                             </p>
                             <InviteMemberModal slug={slug} isAdmin={isAdmin} />
                         </CardContent>
@@ -459,7 +457,7 @@ export default function WorkspaceSettingsPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                                 <Shield className="size-4 text-slate-400" />
-                                Permissions Matrix
+                                {t('admin.workspaces.settings.team.permissions_matrix.title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 pt-2">
@@ -467,50 +465,67 @@ export default function WorkspaceSettingsPage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-black uppercase text-slate-900">
-                                            Admin
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.admin.label'
+                                            )}
                                         </span>
                                         <Badge
                                             variant="outline"
                                             className="text-[8px] h-4 bg-indigo-50 border-indigo-100 text-indigo-700"
                                         >
-                                            Full Access
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.admin.badge'
+                                            )}
                                         </Badge>
                                     </div>
                                     <p className="text-[10px] text-slate-500 leading-tight">
-                                        Can manage workspace settings, members, and all studies.
+                                        {t(
+                                            'admin.workspaces.settings.team.permissions_matrix.admin.desc'
+                                        )}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-black uppercase text-slate-900">
-                                            Researcher
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.researcher.label'
+                                            )}
                                         </span>
                                         <Badge
                                             variant="outline"
                                             className="text-[8px] h-4 bg-emerald-50 border-emerald-100 text-emerald-700"
                                         >
-                                            Creation
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.researcher.badge'
+                                            )}
                                         </Badge>
                                     </div>
                                     <p className="text-[10px] text-slate-500 leading-tight">
-                                        Can create and manage all studies. Restricted from workspace
-                                        settings.
+                                        {t(
+                                            'admin.workspaces.settings.team.permissions_matrix.researcher.desc'
+                                        )}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-black uppercase text-slate-900">
-                                            Viewer
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.viewer.label'
+                                            )}
                                         </span>
                                         <Badge
                                             variant="outline"
                                             className="text-[8px] h-4 bg-slate-50 border-slate-100 text-slate-500"
                                         >
-                                            Read Only
+                                            {t(
+                                                'admin.workspaces.settings.team.permissions_matrix.viewer.badge'
+                                            )}
                                         </Badge>
                                     </div>
                                     <p className="text-[10px] text-slate-500 leading-tight">
-                                        Read-only access to all studies and data in the workspace.
+                                        {t(
+                                            'admin.workspaces.settings.team.permissions_matrix.viewer.desc'
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -553,7 +568,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
             navigator.clipboard.writeText(inviteUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-            toast.success('Link copied to clipboard!');
+            toast.success(t('admin.workspaces.settings.team.invite_modal.copy_success'));
         }
     };
 
@@ -680,7 +695,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                 setEmail('');
                             }}
                         >
-                            Close
+                            {t('common.close')}
                         </Button>
                     </div>
                 )}

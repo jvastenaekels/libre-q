@@ -8,6 +8,8 @@ interface StudyDesignerState {
     activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface' | 'branding';
     activeSubStep?: string;
     activeLocale: string;
+    syncStatus: 'synced' | 'saving' | 'error' | 'modified';
+    lastSavedAt: Date | null;
 
     // Actions
     setStudy: (study: StudyRead) => void;
@@ -20,6 +22,86 @@ interface StudyDesignerState {
     setActiveSubStep: (step: string) => void;
     setActiveLocale: (locale: string) => void;
     resetDraft: () => void;
+    setSyncStatus: (status: 'synced' | 'saving' | 'error' | 'modified') => void;
+    setLastSavedAt: (date: Date) => void;
+    updateOriginal: (study: StudyRead) => void;
+}
+
+/**
+ * Utility to project a full StudyRead object into a StudyUpdate object,
+ * ensuring consistency between server state and designer draft.
+ */
+export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
+    return {
+        slug: study.slug,
+        state: study.state,
+        grid_config: study.grid_config,
+        presort_config: study.presort_config,
+        postsort_config: study.postsort_config,
+        default_language: study.default_language,
+        show_statement_codes: study.show_statement_codes,
+        randomize_statements: study.randomize_statements,
+        branding: study.branding,
+
+        translations: (study.translations || []).map((t) => ({
+            language_code: t.language_code,
+            title: t.title,
+            description: t.description,
+            instructions: t.instructions,
+            subtitle: t.subtitle,
+            objective: t.objective,
+            consent_title: t.consent_title,
+            consent_description: t.consent_description,
+            consent_accept: t.consent_accept,
+            consent_decline: t.consent_decline,
+            ui_labels: t.ui_labels,
+            process_steps: t.process_steps,
+            condition_of_instruction: t.condition_of_instruction,
+            pre_instruction: t.pre_instruction,
+            // biome-ignore lint/suspicious/noExplicitAny: methodology tips missing in generated type
+            methodology_tips: (t as any).methodology_tips || [],
+            // biome-ignore lint/suspicious/noExplicitAny: step help missing in generated type
+            step_help: (t as any).step_help || {},
+        })),
+        statements: (study.statements || []).map((s) => ({
+            code: s.code,
+            translations: (s.translations || []).map((st) => ({
+                language_code: st.language_code,
+                text: st.text,
+            })),
+        })),
+    };
+}
+
+/**
+ * Deeply strips any keys starting with an underscore (e.g. _is_copy)
+ * to allow for accurate content comparison.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: generic object cleaner
+function stripInternalFields(obj: any): any {
+    if (Array.isArray(obj)) {
+        return obj.map(stripInternalFields);
+    }
+    if (obj !== null && typeof obj === 'object') {
+        // biome-ignore lint/suspicious/noExplicitAny: generic object construction
+        const newObj: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (!key.startsWith('_')) {
+                newObj[key] = stripInternalFields(value);
+            }
+        }
+        return newObj;
+    }
+    return obj;
+}
+
+/**
+ * Compares two study objects by ignoring internal state fields.
+ */
+export function areStudiesEqual(a: StudyUpdate | null, b: StudyUpdate | null): boolean {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    return JSON.stringify(stripInternalFields(a)) === JSON.stringify(stripInternalFields(b));
 }
 
 export const useStudyDesigner = create<StudyDesignerState>((set) => ({
@@ -28,49 +110,13 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     activeStep: 'intro',
     activeSubStep: 'statements',
     activeLocale: 'en',
+    syncStatus: 'synced',
+    lastSavedAt: null,
 
     setStudy: (study: StudyRead) =>
         set({
             original: study,
-            draft: {
-                slug: study.slug,
-                state: study.state,
-                grid_config: study.grid_config,
-                presort_config: study.presort_config,
-                postsort_config: study.postsort_config,
-                default_language: study.default_language,
-                show_statement_codes: study.show_statement_codes,
-                randomize_statements: study.randomize_statements,
-                branding: study.branding,
-
-                translations: (study.translations || []).map((t) => ({
-                    language_code: t.language_code,
-                    title: t.title,
-                    description: t.description,
-                    instructions: t.instructions,
-                    subtitle: t.subtitle,
-                    objective: t.objective,
-                    consent_title: t.consent_title,
-                    consent_description: t.consent_description,
-                    consent_accept: t.consent_accept,
-                    consent_decline: t.consent_decline,
-                    ui_labels: t.ui_labels,
-                    process_steps: t.process_steps,
-                    condition_of_instruction: t.condition_of_instruction,
-                    pre_instruction: t.pre_instruction,
-                    // biome-ignore lint/suspicious/noExplicitAny: methodology tips missing in generated type
-                    methodology_tips: (t as any).methodology_tips || [],
-                    // biome-ignore lint/suspicious/noExplicitAny: step help missing in generated type
-                    step_help: (t as any).step_help || {},
-                })),
-                statements: (study.statements || []).map((s) => ({
-                    code: s.code,
-                    translations: (s.translations || []).map((st) => ({
-                        language_code: st.language_code,
-                        text: st.text,
-                    })),
-                })),
-            },
+            draft: projectStudyToUpdate(study),
         }),
 
     updateDraft: (fn: (d: StudyUpdate) => void) =>
@@ -116,4 +162,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
         set((state: StudyDesignerState) => ({
             draft: state.original ? ({ ...state.original } as StudyUpdate) : null,
         })),
+    setSyncStatus: (status) => set({ syncStatus: status }),
+    setLastSavedAt: (date) => set({ lastSavedAt: date }),
+    updateOriginal: (study) => set({ original: study }),
 }));

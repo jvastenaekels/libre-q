@@ -252,6 +252,7 @@ export function ProcessStepEditor() {
 
                     // Add missing steps
                     for (const mStep of masterSteps) {
+                        // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for dynamic objects
                         if (!tSteps.find((ts: any) => ts.id === mStep.id)) {
                             tSteps.push({
                                 ...mStep,
@@ -261,7 +262,9 @@ export function ProcessStepEditor() {
                         }
                     }
                     // Remove extra steps (if any)
+                    // biome-ignore lint/suspicious/noExplicitAny: complex object manipulation
                     const masterIds = new Set(masterSteps.map((ms: any) => ms.id));
+                    // biome-ignore lint/suspicious/noExplicitAny: complex object manipulation
                     (t as any).process_steps = tSteps.filter((ts: any) => masterIds.has(ts.id));
                 }
             });

@@ -147,7 +147,7 @@ class ProcessStep(BaseModel):
     """Schema for a dynamic study process step."""
 
     id: str = Field(..., description="Unique ID for DND and tracking")
-    title: str = Field(..., min_length=1, max_length=100)
+    title: str = Field(..., max_length=100)
     description: str = Field(..., max_length=500)
     icon: str = Field(..., description="Lucide icon name")
     color: str | None = Field(None, description="Hex color code or CSS variable")
@@ -157,7 +157,7 @@ class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
-    title: str = Field(..., min_length=1, max_length=200)
+    title: str = Field(..., max_length=200)
     description: str = ""
     instructions: str | None = None
     subtitle: str | None = None
@@ -192,7 +192,7 @@ class StatementTranslationBase(BaseModel):
     """Base schema for statement translations."""
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
-    text: str = Field(..., min_length=1)
+    text: str
 
 
 class StatementTranslationCreate(StatementTranslationBase):
@@ -310,16 +310,10 @@ class StudyUpdate(BaseModel):
 
     @model_validator(mode="after")
     def check_grid_symmetry(self) -> "StudyUpdate":
-        """Validate symmetry if both grid_config and statements are being updated, or if only one is updated against the other."""
-        # Note: In a partial update, we might not have both.
-        # Full validation happens in the service layer if necessary,
-        # but we catch obvious mismatches here if both are provided.
-        if self.grid_config is not None and self.statements is not None:
-            total_capacity = sum(col.capacity for col in self.grid_config)
-            if len(self.statements) != total_capacity:
-                raise ValueError(
-                    f"Grid capacity ({total_capacity}) does not match statement count ({len(self.statements)})"
-                )
+        """
+        Validate symmetry is now handled at the service layer for activation.
+        We keep this as a no-op or remove it to allow permissive drafts.
+        """
         return self
 
 

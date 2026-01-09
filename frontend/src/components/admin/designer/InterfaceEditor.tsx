@@ -30,18 +30,23 @@ const InterfaceEditor = () => {
         if (!draft?.translations) return;
 
         const maxTips = Math.max(
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
             ...draft.translations.map((t) => (t as any).methodology_tips?.length || 0)
         );
 
         const someMismatch = draft.translations.some(
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
             (t) => ((t as any).methodology_tips?.length || 0) !== maxTips
         );
 
         if (someMismatch && maxTips > 0) {
             updateDraft((d) => {
                 for (const t of d.translations || []) {
+                    // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
                     if (!(t as any).methodology_tips) (t as any).methodology_tips = [];
+                    // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
                     while ((t as any).methodology_tips.length < maxTips) {
+                        // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
                         (t as any).methodology_tips.push('');
                     }
                 }
@@ -65,6 +70,7 @@ const InterfaceEditor = () => {
     ];
 
     const updateLabel = (key: string, value: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
         // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
         updateTranslation(activeLocale, (t: any) => {
             if (!t.ui_labels) t.ui_labels = {};
@@ -338,6 +344,7 @@ const InterfaceEditor = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-4">
+                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access */}
                         {(translation as any)?.methodology_tips?.map(
                             (tip: string, index: number) => (
                                 <div key={index} className="flex gap-4 items-center group">
@@ -346,6 +353,7 @@ const InterfaceEditor = () => {
                                         <Input
                                             value={tip}
                                             onChange={(e) => {
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                                 updateTranslation(activeLocale, (t: any) => {
                                                     if (!t.methodology_tips)
                                                         t.methodology_tips = [];
@@ -364,6 +372,7 @@ const InterfaceEditor = () => {
                                         onClick={() => {
                                             updateDraft((d) => {
                                                 for (const t of d.translations || []) {
+                                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                                     const tips = (t as any).methodology_tips;
                                                     if (Array.isArray(tips)) {
                                                         tips.splice(index, 1);
@@ -386,8 +395,11 @@ const InterfaceEditor = () => {
                                 onClick={() => {
                                     updateDraft((d) => {
                                         for (const t of d.translations || []) {
+                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                             if (!(t as any).methodology_tips)
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                                 (t as any).methodology_tips = [];
+                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                             (t as any).methodology_tips.push('');
                                         }
                                     });
@@ -405,6 +417,7 @@ const InterfaceEditor = () => {
                                     updateDraft((d) => {
                                         for (const t of d.translations || []) {
                                             const lang = t.language_code;
+                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                             (t as any).methodology_tips = [
                                                 i18n.t('fine.workbench.methodology.extremes', {
                                                     lng: lang,
@@ -454,6 +467,7 @@ const InterfaceEditor = () => {
                 <CardContent className="space-y-10">
                     {visibleSteps.map((step, index) => {
                         const stepHelp =
+                            // biome-ignore lint/suspicious/noExplicitAny: dynamic optional property
                             (translation as any)?.step_help?.[step.id.toString()] || {};
 
                         return (
@@ -474,6 +488,7 @@ const InterfaceEditor = () => {
                                                 tStudy(`study.help.step_${step.id}.what`)
                                             }
                                             onChange={(e) => {
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                                 updateTranslation(activeLocale, (t: any) => {
                                                     if (!t.step_help) t.step_help = {};
                                                     if (!t.step_help[step.id.toString()])
@@ -496,6 +511,7 @@ const InterfaceEditor = () => {
                                                 tStudy(`study.help.step_${step.id}.why`)
                                             }
                                             onChange={(e) => {
+                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
                                                 updateTranslation(activeLocale, (t: any) => {
                                                     if (!t.step_help) t.step_help = {};
                                                     if (!t.step_help[step.id.toString()])

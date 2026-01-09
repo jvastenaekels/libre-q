@@ -15,6 +15,7 @@ const TeamManagementPage = () => {
     const { t } = useTranslation();
 
     // Determine workspace slug, fallback to study slug's workspace logic if not present (should be present now)
+    // biome-ignore lint/suspicious/noExplicitAny: workspace slug fallback
     const workspaceSlug = (study as any).workspace?.slug || 'default';
 
     return (

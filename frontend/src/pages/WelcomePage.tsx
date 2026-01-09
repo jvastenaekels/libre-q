@@ -124,6 +124,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                     <div className="flex flex-wrap gap-8 items-center justify-start">
                                         {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}
                                         {(study.branding as any).partners.map(
+                                            // biome-ignore lint/suspicious/noExplicitAny: partner data
                                             (partner: any) =>
                                                 partner.logo_url && (
                                                     <a

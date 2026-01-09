@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
     Wand2,
-    Save,
     Eye,
     Loader2,
     Lock,
@@ -14,10 +13,29 @@ import {
     ChevronDown,
     Languages,
     Settings2,
+    History,
+    Rocket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
-import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
 import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
 import QSortEditor from '@/components/admin/designer/QSortEditor';
@@ -26,13 +44,13 @@ import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { SyncStatusIndicator } from '@/components/admin/designer/SyncStatusIndicator';
+import { customInstance } from '@/api/mutator';
 
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
-import {
-    useGetStudyApiAdminStudiesSlugGet,
-    useUpdateStudyApiAdminStudiesSlugPatch,
-} from '@/api/generated';
+import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -47,8 +65,18 @@ const StudyDesignPage = () => {
     const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
-    const { draft, activeStep, activeLocale, setStudy, setActiveStep, setActiveLocale } =
-        useStudyDesigner();
+    const {
+        draft,
+        activeStep,
+        activeLocale,
+        setStudy,
+        setActiveStep,
+        setActiveLocale,
+        syncStatus,
+    } = useStudyDesigner();
+
+    // Enable auto-save
+    useAutoSave();
 
     const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
@@ -57,34 +85,70 @@ const StudyDesignPage = () => {
             enabled: !!slug,
         },
     });
-    const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
 
     // Initialize designer state when study is loaded
     useEffect(() => {
         if (study) {
-            setStudy(study);
+            const currentDraft = useStudyDesigner.getState().draft;
+            if (!currentDraft) {
+                // First time load: initialize both original and draft
+                setStudy(study);
+            } else {
+                // Background update: only update 'original' to keep comparison accurate
+                // but keep our local 'draft' intact
+                useStudyDesigner.getState().updateOriginal(study);
+            }
         }
     }, [study, setStudy]);
 
+    const [isActivating, setIsActivating] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<string[]>([]);
+    const [isValidationErrorOpen, setIsValidationErrorOpen] = useState(false);
+
     // Dirty State Detection
-    const isDirty = JSON.stringify(draft) !== JSON.stringify(study);
+    const isDirty = syncStatus !== 'synced';
 
     // Permission States
     const isFullyReadOnly = draft?.state !== 'draft';
     const isStructureLocked = draft?.state !== 'draft'; // active, paused, closed
 
-    useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            // biome-ignore lint/suspicious/noExplicitAny: window hack
-            if (isDirty && !(window as any).__isAutoLogout) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        };
+    // Recovery logic: Detect local backup on mount
+    const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
+    const [backupToRestore, setBackupToRestore] = useState<StudyUpdate | null>(null);
 
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }, [isDirty]);
+    useEffect(() => {
+        if (!study || !slug) return;
+
+        const backupJson = localStorage.getItem(`open-q-draft-backup-${slug}`);
+        if (backupJson) {
+            try {
+                const backup = JSON.parse(backupJson);
+                // Compare normalized server version with backup to avoid false positives
+                const serverDraft = projectStudyToUpdate(study);
+                if (!areStudiesEqual(backup, serverDraft)) {
+                    setBackupToRestore(backup);
+                    setIsRecoveryModalOpen(true);
+                }
+            } catch (e) {
+                console.error('Failed to parse backup:', e);
+            }
+        }
+    }, [study, slug]);
+
+    const handleRestoreBackup = () => {
+        if (backupToRestore) {
+            setStudy(backupToRestore);
+            toast.success(t('admin.design.sync.recovered', 'Draft recovered from local backup!'));
+        }
+        setIsRecoveryModalOpen(false);
+    };
+
+    const handleDiscardBackup = () => {
+        if (slug) {
+            localStorage.removeItem(`open-q-draft-backup-${slug}`);
+        }
+        setIsRecoveryModalOpen(false);
+    };
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;
@@ -94,19 +158,45 @@ const StudyDesignPage = () => {
     );
     const isGridValid = statementsCount === gridCapacity;
 
-    const handleSave = async () => {
+    const handleActivate = async () => {
         if (!slug || !draft) return;
 
+        if (isDirty) {
+            toast.warning(
+                t('admin.design.sync.wait_save', 'Saving in progress... please wait a moment.')
+            );
+            return;
+        }
+
+        setIsActivating(true);
         try {
-            await updateMutation.mutateAsync({
-                slug,
-                // biome-ignore lint/suspicious/noExplicitAny: schema cast
-                data: draft as any,
+            // 1. Explicit Validation
+            const errors = await customInstance<string[]>({
+                url: `/api/admin/studies/${slug}/validate`,
+                method: 'POST',
             });
-            toast.success(t('admin.design.qsort.updated') || 'Study design saved successfully');
+
+            if (errors.length > 0) {
+                setValidationErrors(errors);
+                setIsValidationErrorOpen(true);
+                return;
+            }
+
+            // 2. Perform state change
+            await customInstance({
+                url: `/api/admin/studies/${slug}/state`,
+                method: 'POST',
+                params: { new_state: 'active' },
+            });
+
+            toast.success(t('admin.study.state_changed_active') || 'Study is now active!');
+            // Reload or partial update? For now, re-fetch study
+            window.location.reload();
         } catch (error) {
-            toast.error(t('common.errors.unknown') || 'Failed to save study design');
+            toast.error(t('common.errors.unknown') || 'Failed to activate study');
             console.error(error);
+        } finally {
+            setIsActivating(false);
         }
     };
 
@@ -294,26 +384,26 @@ const StudyDesignPage = () => {
                         </span>
                     </Button>
 
+                    <SyncStatusIndicator className="hidden sm:flex mr-4" />
+
                     <Button
                         size="sm"
-                        onClick={handleSave}
-                        disabled={updateMutation.isPending || isFullyReadOnly}
+                        onClick={handleActivate}
+                        disabled={isActivating || isFullyReadOnly}
                         className={cn(
-                            'transition-all h-8 font-black rounded-lg shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white',
-                            isDirty && !isFullyReadOnly && 'ring-2 ring-indigo-500 ring-offset-2'
+                            'transition-all h-8 font-black rounded-lg shadow-sm',
+                            !isFullyReadOnly
+                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                : 'bg-slate-100 text-slate-400'
                         )}
                     >
-                        {updateMutation.isPending ? (
+                        {isActivating ? (
                             <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
                         ) : (
-                            <Save className="h-4 w-4 sm:mr-2" />
+                            <Rocket className="h-4 w-4 sm:mr-2" />
                         )}
                         <span className="hidden sm:inline">
-                            {isFullyReadOnly
-                                ? t('admin.design.toolbar.closed')
-                                : isDirty
-                                  ? `${t('admin.design.toolbar.save')}*`
-                                  : t('admin.design.toolbar.save')}
+                            {t('admin.study_status.state.activate', 'Activate Study')}
                         </span>
                     </Button>
                 </div>
@@ -458,6 +548,7 @@ const StudyDesignPage = () => {
                             const isCopy = (
                                 draft.translations?.find(
                                     (t) => t.language_code === activeLocale
+                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic copy flag
                                 ) as any
                             )?._is_copy;
                             if (!isCopy) return null;
@@ -567,6 +658,69 @@ const StudyDesignPage = () => {
                     </Tabs>
                 </div>
             </div>
+            {/* Validation Error Dialog */}
+            <Dialog open={isValidationErrorOpen} onOpenChange={setIsValidationErrorOpen}>
+                <DialogContent className="max-w-md rounded-3xl p-6">
+                    <DialogHeader>
+                        <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-4 border border-rose-100">
+                            <AlertTriangle className="h-6 w-6 text-rose-500" />
+                        </div>
+                        <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">
+                            {t('admin.design.validation.failed_title', 'Configuration Incomplete')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
+                            {t(
+                                'admin.design.validation.failed_desc',
+                                'Your study cannot be activated yet. Please fix the following issues:'
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4 space-y-3">
+                        {validationErrors.map((err, idx) => (
+                            <div
+                                key={idx}
+                                className="flex gap-3 text-sm font-bold text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100"
+                            >
+                                <div className="h-2 w-2 rounded-full bg-rose-400 mt-1.5 shrink-0" />
+                                <span>{err}</span>
+                            </div>
+                        ))}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            <AlertDialog open={isRecoveryModalOpen} onOpenChange={setIsRecoveryModalOpen}>
+                <AlertDialogContent className="max-w-lg rounded-3xl p-8">
+                    <AlertDialogHeader>
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
+                            <History className="h-6 w-6 text-indigo-500" />
+                        </div>
+                        <AlertDialogTitle className="text-xl font-black text-slate-900 tracking-tight">
+                            {t('admin.design.sync.recovery_title', 'Unsaved Changes Found')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
+                            {t(
+                                'admin.design.sync.recovery_desc',
+                                'We found a local version of this study that is more recent than the one on the server. Would you like to restore it?'
+                            )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
+                        <AlertDialogCancel
+                            onClick={handleDiscardBackup}
+                            className="rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-slate-50"
+                        >
+                            {t('admin.design.sync.recovery_discard', 'Discard local version')}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleRestoreBackup}
+                            className="rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200"
+                        >
+                            {t('admin.design.sync.recovery_restore', 'Restore local version')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

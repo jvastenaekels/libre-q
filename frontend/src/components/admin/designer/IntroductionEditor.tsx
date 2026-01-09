@@ -1,7 +1,6 @@
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Hand, Clipboard, ShieldCheck } from 'lucide-react';
 import type React from 'react';
@@ -88,49 +87,26 @@ const IntroductionEditor = () => {
 
             {/* Process Overview Section */}
             <section className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
-                        <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
-                            <Clipboard className="h-5 w-5 text-indigo-600" />
-                        </div>
-                        {t('admin.design.intro.process_title')}
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Clipboard className="h-5 w-5 text-indigo-600" />
                     </div>
-                    <Switch
-                        id="enable-instructions"
-                        aria-label={t('admin.design.intro.process_title')}
-                        checked={
-                            translation?.instructions !== null &&
-                            translation?.instructions !== undefined
-                        }
-                        onCheckedChange={(checked: boolean) => {
-                            const currentlyEnabled =
-                                translation?.instructions !== null &&
-                                translation?.instructions !== undefined;
-                            if (checked === currentlyEnabled) return;
-                            if (checked) {
-                                handleChange('instructions', '');
-                            } else {
-                                handleChange('instructions', null as any);
-                            }
-                        }}
-                    />
+                    {t('admin.design.intro.process_title')}
                 </div>
 
-                {translation?.instructions !== undefined && translation?.instructions !== null && (
-                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                        <CardContent className="pt-6">
-                            <div className="grid gap-2.5">
-                                <MarkdownEditor
-                                    id="instructions"
-                                    label={t('admin.design.intro.fields.task_overview')}
-                                    value={translation?.instructions || ''}
-                                    onChange={(val: string) => handleChange('instructions', val)}
-                                    placeholder={t('admin.design.intro.fields.task_placeholder')}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardContent className="pt-6">
+                        <div className="grid gap-2.5">
+                            <MarkdownEditor
+                                id="instructions"
+                                label={t('admin.design.intro.fields.task_overview')}
+                                value={translation?.instructions || ''}
+                                onChange={(val: string) => handleChange('instructions', val)}
+                                placeholder={t('admin.design.intro.fields.task_placeholder')}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
 
                 <ProcessStepEditor />
             </section>
