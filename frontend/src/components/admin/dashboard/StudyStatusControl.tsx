@@ -42,15 +42,15 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 
             toast.success(t(`admin.study_status.notifications.success.${newState}`));
 
-            // Invalidate all queries related to this study
+            // Invalidate queries more explicitly to ensure cache refresh
+            // 1. Invalidate the specific study query
             await queryClient.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey;
-                    return (
-                        Array.isArray(key) &&
-                        key.some((k) => typeof k === 'string' && k.includes(slug))
-                    );
-                },
+                queryKey: [`/api/admin/studies/${slug}`],
+            });
+
+            // 2. Also invalidate the studies list
+            await queryClient.invalidateQueries({
+                queryKey: ['/api/admin/studies/'],
             });
 
             onStateChange();

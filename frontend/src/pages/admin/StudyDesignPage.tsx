@@ -90,13 +90,28 @@ const StudyDesignPage = () => {
     useEffect(() => {
         if (study) {
             const currentDraft = useStudyDesigner.getState().draft;
+
             if (!currentDraft) {
                 // First time load: initialize both original and draft
                 setStudy(study);
             } else {
-                // Background update: only update 'original' to keep comparison accurate
-                // but keep our local 'draft' intact
+                // Background update (e.g., after state change in dashboard)
+                // Update original first
                 useStudyDesigner.getState().updateOriginal(study);
+
+                // Check if draft has unsaved changes
+                const projectedUpdate = projectStudyToUpdate(study);
+                const draftHasChanges = !areStudiesEqual(currentDraft, projectedUpdate);
+
+                // If draft has no real changes, sync it with the new data
+                // This prevents false "unsaved changes" warnings
+                if (!draftHasChanges) {
+                    useStudyDesigner.setState({
+                        draft: projectedUpdate,
+                        syncStatus: 'synced'
+                    });
+                }
+                // Otherwise, keep the draft as-is (user has real unsaved changes)
             }
         }
     }, [study, setStudy]);

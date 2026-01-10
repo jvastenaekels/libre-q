@@ -10,6 +10,9 @@ run-backend:
 run-frontend:
 	cd frontend && npm run dev
 
+seed:
+	cd backend && uv run python seed.py data/example-study.json
+
 # -------------------------
 # Quality & Verification
 # -------------------------

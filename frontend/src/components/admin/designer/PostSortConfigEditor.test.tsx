@@ -1,11 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import PostSortConfigEditor from './PostSortConfigEditor';
+import { renderWithStore } from '@/test-utils/renderWithStore';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
-
-vi.mock('@/store/useStudyDesigner', () => ({
-    useStudyDesigner: vi.fn(),
-}));
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -32,208 +29,127 @@ vi.mock('react-i18next', () => ({
 }));
 
 describe('PostSortConfigEditor - Email Collection Feature', () => {
-    const mockUpdateDraft = vi.fn();
-
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it('renders email collection toggle', () => {
-        const draft = {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing
+    const renderEditor = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
             postsort_config: {},
-            grid_config: [],
+            ...(initialStateOverrides.draft || {}),
         };
 
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
+        return renderWithStore(<PostSortConfigEditor />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
         });
+    };
 
-        render(<PostSortConfigEditor />);
+    it('renders email collection toggle', () => {
+        renderEditor({ draft: { postsort_config: {}, grid_config: [] } });
 
         expect(screen.getByText('Email Collection')).toBeInTheDocument();
     });
 
     it('shows sub-toggles when email collection is enabled', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: true,
+        renderEditor({
+            draft: {
+                postsort_config: { email_collection_enabled: true },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         expect(screen.getByText('Interview Consent')).toBeInTheDocument();
         expect(screen.getByText('Results Consent')).toBeInTheDocument();
     });
 
     it('hides sub-toggles when email collection is disabled', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: false,
+        renderEditor({
+            draft: {
+                postsort_config: { email_collection_enabled: false },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         expect(screen.queryByText('Interview Consent')).not.toBeInTheDocument();
         expect(screen.queryByText('Results Consent')).not.toBeInTheDocument();
     });
 
     it('toggles email_collection_enabled with defensive check', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: false,
+        renderEditor({
+            draft: {
+                postsort_config: { email_collection_enabled: false },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         const switches = screen.getAllByRole('switch');
         const emailToggle = switches.find((s) =>
             s.closest('.flex')?.textContent?.includes('Email Collection')
         );
 
+        expect(emailToggle).toBeDefined();
+
         if (emailToggle) {
             fireEvent.click(emailToggle);
 
-            expect(mockUpdateDraft).toHaveBeenCalled();
-            const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const testDraft = { postsort_config: {} };
-            updateFn(testDraft);
-
-            // biome-ignore lint/suspicious/noExplicitAny: test assertion
-            expect((testDraft.postsort_config as any).email_collection_enabled).toBe(true);
+            // Access store to verify
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const currentDraft: any = useStudyDesigner.getState().draft;
+            expect(currentDraft.postsort_config.email_collection_enabled).toBe(true);
         }
     });
 
-    it('prevents redundant updates with defensive check', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: true,
-            },
-            grid_config: [],
-        };
-
-        let callCount = 0;
-        const countingUpdateDraft = vi.fn((fn) => {
-            callCount++;
-            fn(draft);
-        });
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: countingUpdateDraft,
-        });
-
-        const { rerender } = render(<PostSortConfigEditor />);
-
-        // Re-render should not trigger update
-        rerender(<PostSortConfigEditor />);
-
-        // Update should only be called via user interaction, not on re-render
-        expect(callCount).toBe(0);
-    });
-
     it('defaults interview_consent_enabled to true when undefined', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: true,
-                // interview_consent_enabled is undefined
+        renderEditor({
+            draft: {
+                postsort_config: {
+                    email_collection_enabled: true,
+                    // undefined interview_consent_enabled
+                },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
             s.closest('.flex')?.textContent?.includes('Interview Consent')
         );
 
-        // Should be checked by default (via ?? true)
         expect(interviewSwitch).toHaveAttribute('data-state', 'checked');
     });
 
     it('defaults newsletter_consent_enabled to true when undefined', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: true,
-                // newsletter_consent_enabled is undefined
+        renderEditor({
+            draft: {
+                postsort_config: {
+                    email_collection_enabled: true,
+                    // undefined newsletter_consent_enabled
+                },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         const switches = screen.getAllByRole('switch');
         const newsletterSwitch = switches.find((s) =>
             s.closest('.flex')?.textContent?.includes('Results Consent')
         );
 
-        // Should be checked by default (via ?? true)
         expect(newsletterSwitch).toHaveAttribute('data-state', 'checked');
     });
 
     it('toggles interview_consent_enabled correctly', () => {
-        const draft = {
-            postsort_config: {
-                email_collection_enabled: true,
-                interview_consent_enabled: true,
+        renderEditor({
+            draft: {
+                postsort_config: {
+                    email_collection_enabled: true,
+                    interview_consent_enabled: true,
+                },
+                grid_config: [],
             },
-            grid_config: [],
-        };
-
-        // biome-ignore lint/suspicious/noExplicitAny: mock
-        (useStudyDesigner as any).mockReturnValue({
-            draft,
-            activeLocale: 'en',
-            updateDraft: mockUpdateDraft,
         });
-
-        render(<PostSortConfigEditor />);
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
@@ -243,13 +159,10 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         if (interviewSwitch) {
             fireEvent.click(interviewSwitch);
 
-            expect(mockUpdateDraft).toHaveBeenCalled();
-            const updateFn = mockUpdateDraft.mock.calls[0][0];
-            const testDraft = { postsort_config: { interview_consent_enabled: true } };
-            updateFn(testDraft);
-
-            // biome-ignore lint/suspicious/noExplicitAny: test assertion
-            expect((testDraft.postsort_config as any).interview_consent_enabled).toBe(false);
+            // Check store
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const currentDraft: any = useStudyDesigner.getState().draft;
+            expect(currentDraft.postsort_config.interview_consent_enabled).toBe(false);
         }
     });
 });

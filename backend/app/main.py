@@ -19,6 +19,10 @@ from app.routers.admin import recruitment as admin_recruitment
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
 from app.routers.admin import workspaces as admin_workspaces
+from app.core.config import settings
+
+# Import test router (only active in test/dev environments)
+from app.routers import test as test_router
 
 # Configure Logging
 logging.basicConfig(
@@ -118,6 +122,10 @@ app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]
 )
 app.include_router(logs.router, prefix="/api", tags=["logs"])
+
+# Include test router (only active in test/dev environments)
+if settings.ENVIRONMENT in ["test", "development"]:
+    app.include_router(test_router.router)
 
 
 @app.get("/health")

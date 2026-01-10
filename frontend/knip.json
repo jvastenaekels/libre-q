@@ -9,7 +9,8 @@
         "src/schemas/study.ts",
         "src/api/generated.ts",
         "src/api/model/**",
-        "src/components/ui/**"
+        "src/components/ui/**",
+        "e2e/**"
     ],
     "ignoreBinaries": ["playwright", "python3"],
     "ignoreDependencies": [
