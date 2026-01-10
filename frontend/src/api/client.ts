@@ -122,17 +122,38 @@ async function request(
     if (!response.ok) {
         const errorText = await response.text();
         let message = errorText;
+        let code: string | undefined;
+        let details: unknown | undefined;
 
         try {
             const parsed = JSON.parse(errorText);
-            if (parsed.detail) {
+
+            // Standard Error Schema Parsing
+            if (parsed.message) {
+                message = parsed.message;
+            } else if (parsed.detail) {
+                // Fallback for legacy/fastapi default errors if any remain
                 message =
                     typeof parsed.detail === 'string'
                         ? parsed.detail
                         : JSON.stringify(parsed.detail);
             }
+
+            if (parsed.code) {
+                code = parsed.code;
+            }
+            if (parsed.details !== undefined) {
+                details = parsed.details;
+            }
         } catch (_e) {
-            // Keep original errorText if not JSON
+            // Keep original errorText if not JSON (e.g. 502 Bad Gateway HTML)
+            if (response.status === 502) {
+                message = 'Service unavailable (Bad Gateway)';
+                code = 'bad_gateway';
+            } else if (response.status === 504) {
+                message = 'Gateway Timeout';
+                code = 'gateway_timeout';
+            }
         }
 
         if (response.status === 401) {
@@ -142,7 +163,7 @@ async function request(
                 window.location.href = '/login?reason=session_expired';
             }
         }
-        throw new ApiError(response.status, message);
+        throw new ApiError(response.status, message, code, details);
     }
     return {
         data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
