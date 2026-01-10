@@ -33,10 +33,6 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
 }));
 
-vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null }),
-}));
-
 describe('WelcomePage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
