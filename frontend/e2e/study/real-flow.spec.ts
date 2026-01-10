@@ -8,10 +8,10 @@ import { FineSortPage } from '../pages/FineSortPage';
 import { PostSortPage } from '../pages/PostSortPage';
 
 test.describe('Participant Flow (Real Backend)', () => {
-    test('should complete the full study lifecycle and save data', async ({ 
-        page, 
-        testDb, 
-        authToken 
+    test('should complete the full study lifecycle and save data', async ({
+        page,
+        testDb,
+        authToken
     }) => {
         // 1. Setup: Create a study with known configuration
         const studyData = testDataBuilders.study({
@@ -25,9 +25,9 @@ test.describe('Participant Flow (Real Backend)', () => {
             ],
             presort_config: testDataBuilders.presortConfig({
                 'age': testDataBuilders.presortField('number', 'Age', { required: true }),
-                'gender': testDataBuilders.presortField('select', 'Gender', { 
-                    required: true, 
-                    options: ['Male', 'Female', 'Non-binary', 'Prefer not to say'] 
+                'gender': testDataBuilders.presortField('select', 'Gender', {
+                    required: true,
+                    options: ['Male', 'Female', 'Non-binary', 'Prefer not to say']
                 }),
                 'education': testDataBuilders.presortField('select', 'Education', {
                     required: true,
@@ -82,17 +82,17 @@ test.describe('Participant Flow (Real Backend)', () => {
         // If the Page Object doesn't support "Do the sort", we might need to extend it.
         // Checking existing FineSortPage... it seems to have verifyLayout but maybe not "performSort".
         // Use a simple filler strategy if needed.
-        
+
         // Let's implement a simple "move all to grid" loop if the page object doesn't have one
         // Inspecting FineSortPage in next step if this fails. For now, assuming verifyLayout is a check, not an action.
-        
+
         await fineSortPage.completeFineSort(studyData.statements.length); // Assuming this method exists or we create it
 
         // 7. M Post-Sort (if any)
         // Default study has no post-sort questions, so we should land on "Thank You" or similar
         // Or if there is a PostSortPage for feedback
         await expect(page).toHaveURL(/.*\/post-sort/);
-        
+
         // 8. VERIFICATION: Check DB
         // We need to fetch submissions from the API using the admin token
         const submissions = await testDb.getSubmissions(authToken, study.id);

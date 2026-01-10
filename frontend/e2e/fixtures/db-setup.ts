@@ -38,9 +38,14 @@ export class TestDatabase {
     /**
      * Seed base data: admin user and workspace
      */
+    private workspaceId: number | undefined;
+
+    /**
+     * Seed base data: admin user and workspace
+     */
     private async seedBaseData() {
         try {
-            await fetch(`${this.baseUrl}/api/test/seed`, {
+            const response = await fetch(`${this.baseUrl}/api/test/seed`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -55,6 +60,14 @@ export class TestDatabase {
                     },
                 }),
             });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Seed failed: ${response.status} ${text}`);
+            }
+
+            const data = await response.json();
+            this.workspaceId = data.workspace_id;
         } catch (error) {
             console.error('Failed to seed base data:', error);
             throw error;
@@ -83,14 +96,18 @@ export class TestDatabase {
      * Create a study via API
      */
     async createStudy(token: string, config: Partial<StudyConfig>) {
+        if (!this.workspaceId) {
+            throw new Error('Workspace ID not initialized. Did seedBaseData run?');
+        }
         const response = await fetch(`${this.baseUrl}/api/admin/studies/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
+                'X-Workspace-ID': this.workspaceId.toString(),
             },
             body: JSON.stringify({
-                workspace_id: 1, // Default test workspace
+                workspace_id: this.workspaceId,
                 slug: config.slug || `test-${Date.now()}`,
                 translations: config.translations || [
                     {
@@ -109,6 +126,33 @@ export class TestDatabase {
         if (!response.ok) {
             const error = await response.text();
             throw new Error(`Failed to create study: ${error}`);
+        }
+
+        const study = await response.json();
+
+        // Auto-activate if requested
+        if (config.state === 'active') {
+            await this.activateStudy(token, study.slug);
+            study.state = 'active';
+        }
+
+        return study;
+    }
+
+    /**
+     * Activate a study
+     */
+    async activateStudy(token: string, slug: string) {
+        const response = await fetch(`${this.baseUrl}/api/admin/studies/${slug}/state?new_state=active`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Failed to activate study: ${error}`);
         }
 
         return response.json();

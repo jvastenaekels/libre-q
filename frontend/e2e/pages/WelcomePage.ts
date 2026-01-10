@@ -15,7 +15,10 @@ export class WelcomePage extends BasePage {
     }
 
     async startStudy() {
+        console.log('Waiting for start button...');
         await expect(this.startButton.first()).toBeVisible({ timeout: 30000 });
+        console.log('Start button visible. Clicking...');
         await this.startButton.first().click();
+        console.log('Clicked start button.');
     }
 }

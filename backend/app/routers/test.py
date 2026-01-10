@@ -60,67 +60,61 @@ else:
         Idempotent - won't create duplicates
         """
         try:
-            # Check if user exists
+            # Upsert User
+            hashed_password = get_password_hash(data.user.password)
             result = await db.execute(
-                text("SELECT id FROM users WHERE email = :email"),
-                {"email": data.user.email},
+                text("""
+                    INSERT INTO users (email, hashed_password, is_active, is_superuser, is_totp_enabled)
+                    VALUES (:email, :password, true, :is_superuser, false)
+                    ON CONFLICT (email) 
+                    DO UPDATE SET hashed_password = EXCLUDED.hashed_password
+                    RETURNING id
+                """),
+                {
+                    "email": data.user.email,
+                    "password": hashed_password,
+                    "is_superuser": data.user.is_superuser,
+                },
             )
-            existing_user = result.fetchone()
+            user_id = result.scalar()
 
-            if not existing_user:
-                # Create test user
-                hashed_password = get_password_hash(data.user.password)
+            # Upsert Workspace
+            result = await db.execute(
+                text("""
+                    INSERT INTO workspaces (title, slug, created_at, config)
+                    VALUES (:title, :slug, NOW(), :config)
+                    ON CONFLICT (slug) 
+                    DO NOTHING
+                    RETURNING id
+                """),
+                {
+                    "title": data.workspace.name,
+                    "slug": data.workspace.slug,
+                    "config": "{}",
+                },
+            )
+            workspace_id = result.scalar()
+
+            if not workspace_id:
+                # If existing, fetch ID
                 result = await db.execute(
-                    text("""
-                        INSERT INTO users (email, hashed_password, is_active, is_superuser)
-                        VALUES (:email, :password, true, :is_superuser)
-                        RETURNING id
-                    """),
-                    {
-                        "email": data.user.email,
-                        "password": hashed_password,
-                        "is_superuser": data.user.is_superuser,
-                    },
+                    text("SELECT id FROM workspaces WHERE slug = :slug"),
+                    {"slug": data.workspace.slug},
                 )
-                user_id = result.scalar()
+                workspace_id = result.scalar_one()
             else:
-                user_id = existing_user[0]
-
-            # Check if workspace exists
-            result = await db.execute(
-                text("SELECT id FROM workspaces WHERE slug = :slug"),
-                {"slug": data.workspace.slug},
-            )
-            existing_workspace = result.fetchone()
-
-            if not existing_workspace:
-                # Create test workspace
-                result = await db.execute(
-                    text("""
-                        INSERT INTO workspaces (name, slug, created_at)
-                        VALUES (:name, :slug, NOW())
-                        RETURNING id
-                    """),
-                    {
-                        "name": data.workspace.name,
-                        "slug": data.workspace.slug,
-                    },
-                )
-                workspace_id = result.scalar()
-
-                # Add user as owner
+                # Add user as owner only if new workspace (or idempotent check)
                 await db.execute(
                     text("""
                         INSERT INTO workspace_members (workspace_id, user_id, role)
                         VALUES (:workspace_id, :user_id, 'owner')
+                        ON CONFLICT (workspace_id, user_id) DO NOTHING
                     """),
                     {
                         "workspace_id": workspace_id,
                         "user_id": user_id,
                     },
                 )
-            else:
-                workspace_id = existing_workspace[0]
 
             await db.commit()
 
@@ -199,13 +193,13 @@ else:
         try:
             # Delete in correct order to respect foreign keys
             tables_to_clean = [
-                "participant_responses",
+                "qsort_entries",
                 "participants",
                 "recruitment_links",
-                "study_collaborators",
                 "statement_translations",
                 "statements",
                 "study_translations",
+                "invitations",
                 "studies",
             ]
 
@@ -229,13 +223,13 @@ else:
         try:
             # Delete everything in reverse dependency order
             tables_to_clean = [
-                "participant_responses",
+                "qsort_entries",
                 "participants",
                 "recruitment_links",
-                "study_collaborators",
                 "statement_translations",
                 "statements",
                 "study_translations",
+                "invitations",
                 "studies",
                 "workspace_members",
                 "workspaces",
