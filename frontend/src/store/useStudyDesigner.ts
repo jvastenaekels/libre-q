@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { StudyRead, StudyUpdate, StudyTranslationRead } from '@/api/model';
 import { produce } from 'immer';
 
-interface StudyDesignerState {
+export interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
     activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface' | 'branding';

@@ -8,14 +8,14 @@ import type { StudyRead } from '../api/model';
 const demoStudy: StudyRead = {
     id: 1,
     slug: 'demo-study',
-    title: 'Demo Study',
-    description: 'A study for testing',
     state: 'draft',
     created_at: new Date().toISOString(),
     workspace_id: 1,
     default_language: 'en',
     translations: [
         {
+            id: 1,
+            study_id: 1,
             language_code: 'en',
             title: 'Demo Study',
             description: 'A study for testing',
@@ -27,20 +27,17 @@ const demoStudy: StudyRead = {
         {
             id: 1,
             code: 's1',
-            study_id: 1,
-            translations: [{ language_code: 'en', text: 'Statement 1' }],
+            translations: [{ id: 1, statement_id: 1, language_code: 'en', text: 'Statement 1' }],
         },
         {
             id: 2,
             code: 's2',
-            study_id: 1,
-            translations: [{ language_code: 'en', text: 'Statement 2' }],
+            translations: [{ id: 2, statement_id: 2, language_code: 'en', text: 'Statement 2' }],
         },
         {
             id: 3,
             code: 's3',
-            study_id: 1,
-            translations: [{ language_code: 'en', text: 'Statement 3' }],
+            translations: [{ id: 3, statement_id: 3, language_code: 'en', text: 'Statement 3' }],
         },
     ],
     grid_config: [

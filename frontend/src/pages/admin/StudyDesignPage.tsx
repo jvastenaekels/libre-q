@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { StudyUpdate, StudyRead } from '@/api/model';
 import {
     Wand2,
     Eye,
@@ -108,7 +109,7 @@ const StudyDesignPage = () => {
                 if (!draftHasChanges) {
                     useStudyDesigner.setState({
                         draft: projectedUpdate,
-                        syncStatus: 'synced'
+                        syncStatus: 'synced',
                     });
                 }
                 // Otherwise, keep the draft as-is (user has real unsaved changes)
@@ -152,7 +153,7 @@ const StudyDesignPage = () => {
 
     const handleRestoreBackup = () => {
         if (backupToRestore) {
-            setStudy(backupToRestore);
+            setStudy(backupToRestore as unknown as StudyRead);
             toast.success(t('admin.design.sync.recovered', 'Draft recovered from local backup!'));
         }
         setIsRecoveryModalOpen(false);

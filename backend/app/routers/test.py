@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 from app.core.config import settings
-from app.db.session import get_db
-from app.core.security import get_password_hash
+from app.database import get_db
+from app.utils.security import get_password_hash
 
 router = APIRouter(prefix="/api/test", tags=["test"])
 
@@ -32,6 +32,11 @@ else:
     class TestSeedData(BaseModel):
         user: TestUserData
         workspace: TestWorkspaceData
+
+    class TestMemberData(BaseModel):
+        email: str
+        workspace_slug: str
+        role: str
 
     @router.post("/init")
     async def init_test_db(db: AsyncSession = Depends(get_db)):
@@ -77,7 +82,7 @@ else:
                         "is_superuser": data.user.is_superuser,
                     },
                 )
-                user_id = result.fetchone()[0]
+                user_id = result.scalar()
             else:
                 user_id = existing_user[0]
 
@@ -101,7 +106,7 @@ else:
                         "slug": data.workspace.slug,
                     },
                 )
-                workspace_id = result.fetchone()[0]
+                workspace_id = result.scalar()
 
                 # Add user as owner
                 await db.execute(
@@ -130,6 +135,61 @@ else:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
 
+    @router.post("/members")
+    async def add_test_member(data: TestMemberData, db: AsyncSession = Depends(get_db)):
+        """
+        Add a user to a workspace for testing purposes
+        """
+        try:
+            # Get user
+            result = await db.execute(
+                text("SELECT id FROM users WHERE email = :email"),
+                {"email": data.email},
+            )
+            user = result.fetchone()
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+            user_id = user[0]
+
+            # Get workspace
+            result = await db.execute(
+                text("SELECT id FROM workspaces WHERE slug = :slug"),
+                {"slug": data.workspace_slug},
+            )
+            workspace = result.fetchone()
+            if not workspace:
+                raise HTTPException(status_code=404, detail="Workspace not found")
+            workspace_id = workspace[0]
+
+            # Check if member exists
+            result = await db.execute(
+                text(
+                    "SELECT user_id FROM workspace_members WHERE workspace_id = :wid AND user_id = :uid"
+                ),
+                {"wid": workspace_id, "uid": user_id},
+            )
+            if result.fetchone():
+                return {"status": "ok", "message": "Member already exists"}
+
+            # Add member
+            await db.execute(
+                text("""
+                    INSERT INTO workspace_members (workspace_id, user_id, role)
+                    VALUES (:wid, :uid, :role)
+                """),
+                {"wid": workspace_id, "uid": user_id, "role": data.role},
+            )
+            await db.commit()
+            return {"status": "ok", "message": "Member added"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"Failed to add member: {str(e)}"
+            )
+
     @router.post("/cleanup")
     async def cleanup_test_data(db: AsyncSession = Depends(get_db)):
         """
@@ -150,7 +210,7 @@ else:
             ]
 
             for table in tables_to_clean:
-                await db.execute(text(f"DELETE FROM {table}"))
+                await db.execute(text(f"DELETE FROM {table}"))  # nosec
 
             await db.commit()
 
@@ -183,7 +243,7 @@ else:
             ]
 
             for table in tables_to_clean:
-                await db.execute(text(f"DELETE FROM {table}"))
+                await db.execute(text(f"DELETE FROM {table}"))  # nosec
 
             await db.commit()
 

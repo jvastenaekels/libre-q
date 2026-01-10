@@ -70,16 +70,18 @@ const InterfaceEditor = () => {
     ];
 
     const updateLabel = (key: string, value: string) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
-        updateTranslation(activeLocale, (t: any) => {
-            if (!t.ui_labels) t.ui_labels = {};
-            if (!value) {
-                delete t.ui_labels[key];
-            } else {
-                t.ui_labels[key] = value;
+        updateTranslation(
+            activeLocale,
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
+            (t: any) => {
+                if (!t.ui_labels) t.ui_labels = {};
+                if (!value) {
+                    delete t.ui_labels[key];
+                } else {
+                    t.ui_labels[key] = value;
+                }
             }
-        });
+        );
     };
 
     const getLabel = (key: string) => (uiLabels[key] || tStudy(key)) as string;

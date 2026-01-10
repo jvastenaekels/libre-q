@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright configuration for E2E testing with real backend
+ * Playwright configuration for headless E2E testing.
  * See https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
@@ -29,10 +29,6 @@ export default defineConfig({
     /* Reporter to use */
     reporter: [['html', { open: 'never' }], ['list']],
 
-    /* Global setup and teardown for real backend testing */
-    globalSetup: './e2e/fixtures/global-setup.ts',
-    globalTeardown: './e2e/fixtures/global-teardown.ts',
-
     /* Shared settings for all projects */
     use: {
         /* Explicit headless mode */
@@ -58,51 +54,32 @@ export default defineConfig({
     },
 
     /* Configure projects for major browsers */
+    /* On CI, only run Chromium and mobile-chrome to stay within timeout */
+    /* Configure projects for major browsers */
     projects: [
         {
             name: 'Admin E2E',
-            testMatch: /admin\/.*\.spec\.ts/,
-            testIgnore: /admin\/configuration\/.*\.spec\.ts/,
-            use: { ...devices['Desktop Chrome'] },
-        },
-        {
-            name: 'Admin Config Tests',
-            testMatch: /admin\/configuration\/.*\.spec\.ts/,
-            use: { ...devices['Desktop Chrome'] },
-        },
-        {
-            name: 'Integration Tests',
-            testMatch: /integration\/.*\.spec\.ts/,
+            testMatch: /.*admin\/.*\.spec\.ts/,
             use: { ...devices['Desktop Chrome'] },
         },
         {
             name: 'Study E2E',
-            testMatch: /study\/.*\.spec\.ts/,
+            testMatch: /.*study\/.*\.spec\.ts/,
             use: { ...devices['Desktop Chrome'] },
         },
         // Mobile variants for Study only (typically Admin is desktop focused)
         {
             name: 'Study Mobile Chrome',
-            testMatch: /study\/.*\.spec\.ts/,
+            testMatch: /.*study\/.*\.spec\.ts/,
             use: { ...devices['Pixel 5'] },
         },
     ],
 
-    /* Run both frontend and backend servers before starting tests */
-    webServer: [
-        {
-            command: 'cd ../backend && uvicorn app.main:app --port 8000',
-            url: 'http://localhost:8000/health',
-            reuseExistingServer: !process.env.CI,
-            timeout: 120 * 1000,
-            stdout: 'pipe',
-            stderr: 'pipe',
-        },
-        {
-            command: 'npm run dev -- --host 127.0.0.1',
-            url: 'http://127.0.0.1:5173',
-            reuseExistingServer: !process.env.CI,
-            timeout: 120 * 1000,
-        },
-    ],
+    /* Run local dev server before starting tests */
+    webServer: {
+        command: 'npm run dev -- --host 127.0.0.1',
+        url: 'http://127.0.0.1:5173',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+    },
 });

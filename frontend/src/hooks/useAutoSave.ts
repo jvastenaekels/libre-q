@@ -106,7 +106,7 @@ export function useAutoSave(debounceMs = 2000) {
                     console.error(`Auto-save attempt ${retry + 1} failed:`, error);
 
                     if (retry < 3 && navigator.onLine) {
-                        const delay = Math.pow(2, retry) * 1000;
+                        const delay = 2 ** retry * 1000;
                         setTimeout(() => attemptSave(retry + 1), delay);
                     } else {
                         setSyncStatus('error');

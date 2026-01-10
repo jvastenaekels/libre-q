@@ -422,8 +422,7 @@ describe('RoughSortPage', () => {
         );
 
         // This triggers the useMemo for sharedFontSize
-        // Even with standard labels 'common.agree' (len 12), it hits the > 10 branch
-        expect(screen.getByText('common.agree')).toBeTruthy();
+        expect(screen.getByText('ExtremelyLongAgreeLabel')).toBeTruthy();
 
         // Cleanup
         Object.defineProperty(window, 'innerWidth', { value: originalWidth, configurable: true });

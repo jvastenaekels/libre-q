@@ -1,10 +1,8 @@
-import { screen, fireEvent, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import QSortEditor from './QSortEditor';
 import { renderWithStore } from '@/test-utils/renderWithStore';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import type { StudyUpdate } from '@/api/model';
 
 vi.mock('sonner', () => ({
     toast: {

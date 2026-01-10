@@ -69,6 +69,7 @@ describe('ConditionOfInstructionEditor', () => {
 
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const currentDraft: any = useStudyDesigner.getState().draft;
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
         expect(enTranslation.condition_of_instruction).toBe('Test instruction');
     });
@@ -115,6 +116,7 @@ describe('ConditionOfInstructionEditor', () => {
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const currentDraft: any = useStudyDesigner.getState().draft;
             const enTranslation = currentDraft.translations.find(
+                // biome-ignore lint/suspicious/noExplicitAny: access internal structure
                 (t: any) => t.language_code === 'en'
             );
             expect(enTranslation.pre_instruction).toBe('');
@@ -139,6 +141,7 @@ describe('ConditionOfInstructionEditor', () => {
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const currentDraft: any = useStudyDesigner.getState().draft;
             const enTranslation = currentDraft.translations.find(
+                // biome-ignore lint/suspicious/noExplicitAny: access internal structure
                 (t: any) => t.language_code === 'en'
             );
             expect(enTranslation.pre_instruction).toBe(null);
@@ -188,6 +191,7 @@ describe('ConditionOfInstructionEditor', () => {
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const currentDraft: any = useStudyDesigner.getState().draft;
             const enTranslation = currentDraft.translations.find(
+                // biome-ignore lint/suspicious/noExplicitAny: access internal structure
                 (t: any) => t.language_code === 'en'
             );
             expect(enTranslation.pre_instruction).toBe('Updated content');
@@ -208,6 +212,7 @@ describe('ConditionOfInstructionEditor', () => {
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             let currentDraft: any = useStudyDesigner.getState().draft;
             let enTranslation = currentDraft.translations.find(
+                // biome-ignore lint/suspicious/noExplicitAny: access internal structure
                 (t: any) => t.language_code === 'en'
             );
             expect(enTranslation.pre_instruction).toBe('My instruction');
@@ -215,12 +220,14 @@ describe('ConditionOfInstructionEditor', () => {
             // Disable (content is lost)
             fireEvent.click(toggle);
             currentDraft = useStudyDesigner.getState().draft;
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
             expect(enTranslation.pre_instruction).toBe(null);
 
             // Re-enable (starts fresh)
             fireEvent.click(toggle);
             currentDraft = useStudyDesigner.getState().draft;
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
             expect(enTranslation.pre_instruction).toBe('');
         });

@@ -1,5 +1,5 @@
-import { test, expect } from '../../fixtures/db-setup';
-import { testDataBuilders } from '../../fixtures/test-data';
+import { test, expect } from '../fixtures/db-setup';
+import { testDataBuilders } from '../fixtures/test-data';
 
 /**
  * Integration Testing: State Management Flows

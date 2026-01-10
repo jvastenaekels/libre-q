@@ -101,6 +101,7 @@ describe('InterfaceEditor', () => {
         // Verify store update
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const currentDraft: any = useStudyDesigner.getState().draft;
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
         expect(enTranslation.ui_labels['common.next']).toBe('Forward');
     });
@@ -115,6 +116,7 @@ describe('InterfaceEditor', () => {
         // Verify store update
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const currentDraft: any = useStudyDesigner.getState().draft;
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
         expect(enTranslation.ui_labels['welcome.start']).toBeUndefined();
     });

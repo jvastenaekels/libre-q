@@ -103,7 +103,7 @@ describe('Study Consistency (Admin -> Participant)', () => {
         // Actually, renderWithStore resets 'useStudyDesigner'. It does NOT touch 'useConfigStore'.
         // So we can use renderWithStore just for the Providers wrapper.
         renderWithStore(<PreSortPage />, {
-            initialState: { draft: null } // We don't care about admin store here
+            initialState: { draft: null }, // We don't care about admin store here
         });
 
         // 5. Assert: Verify the Unique Label appears
@@ -117,8 +117,10 @@ describe('Study Consistency (Admin -> Participant)', () => {
             <div>
                 {/* We'll simulate the effect of ConditionOfInstructionEditor */}
                 <button
+                    type="button"
                     onClick={() => {
                         const designer = useStudyDesigner.getState();
+                        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
                         designer.updateTranslation('en', (t: any) => {
                             t.pre_instruction = 'This is important pre-instruction content!';
                         });
@@ -140,9 +142,7 @@ describe('Study Consistency (Admin -> Participant)', () => {
                             },
                         ],
                         grid_config: [],
-                        statements: [
-                            { id: 1, text: 'Statement 1', code: 'S1' },
-                        ],
+                        statements: [{ id: 1, text: 'Statement 1', code: 'S1' }],
                     },
                     activeLocale: 'en',
                 },
@@ -156,6 +156,7 @@ describe('Study Consistency (Admin -> Participant)', () => {
         // 3. Bridge: Extract admin config and inject into participant
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const adminDraft = useStudyDesigner.getState().draft as any;
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = adminDraft.translations.find((t: any) => t.language_code === 'en');
 
         const participantConfig = {
@@ -182,10 +183,14 @@ describe('Study Consistency (Admin -> Participant)', () => {
         });
 
         // 5. Assert: Pre-instruction content appears
-        expect(await screen.findByText('This is important pre-instruction content!')).toBeInTheDocument();
+        expect(
+            await screen.findByText('This is important pre-instruction content!')
+        ).toBeInTheDocument();
 
         // Verify pre-instruction screen is showing (has the start/next button)
-        const startButtons = screen.getAllByText(/admin.design.condition.title|common.start|common.next/i);
+        const startButtons = screen.getAllByText(
+            /admin.design.condition.title|common.start|common.next/i
+        );
         expect(startButtons.length).toBeGreaterThan(0);
     });
 });

@@ -302,10 +302,12 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
                         {Array.isArray((branding as any)?.partners) &&
+                        // biome-ignore lint/suspicious/noExplicitAny: branding partners data
                         (branding as any).partners.length > 0 ? (
                             <div className="flex items-center gap-4">
                                 {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
                                 {(branding as any).partners.map(
+                                    // biome-ignore lint/suspicious/noExplicitAny: partner data
                                     (partner: any) =>
                                         partner.logo_url && (
                                             <img

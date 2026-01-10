@@ -1,4 +1,4 @@
-.PHONY: install run-backend run-frontend lint check test ci
+.PHONY: install run-backend run-frontend lint check test ci run-ci ci-full run-ci-full
 
 install:
 	cd backend && uv sync
@@ -39,7 +39,7 @@ test:
 	cd frontend && npm run test -- --run --coverage
 
 e2e:
-	cd frontend && npm run e2e
+	cd frontend && ENVIRONMENT=test npm run e2e
 
 build:
 	cd frontend && npm run build
@@ -49,6 +49,9 @@ ci: lint check test build
 
 ci-full: ci e2e
 	@echo "\n--- All CI (Full) checks passed locally! ---"
+
+run-ci: ci
+run-ci-full: ci-full
 
 cleanup:
 	@echo "Cleaning up temporary files..."

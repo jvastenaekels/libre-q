@@ -6,10 +6,10 @@ This directory contains E2E tests that run against a **real backend** and **real
 
 ```bash
 # Run all E2E tests with real backend
-npx playwright test --config=playwright-real-backend.config.ts
+npx playwright test
 
 # Run only configuration tests
-npx playwright test --config=playwright-real-backend.config.ts --project="Admin Config Tests"
+npx playwright test --project="Admin Config Tests"
 
 # Run specific test file
 npx playwright test e2e/admin/configuration/presort-fields.spec.ts
@@ -137,6 +137,7 @@ DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/openq_test
    ```
 
 3. **Write systematic tests**:
+
    ```typescript
    test.describe("New Feature", () => {
      test.beforeEach(async ({ testDb, authToken }) => {

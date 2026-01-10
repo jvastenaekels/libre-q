@@ -46,6 +46,22 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
             configurable: true,
             value: 375,
         });
+
+        // Mock matchMedia for mobile
+        Object.defineProperty(window, 'matchMedia', {
+            writable: true,
+            value: vi.fn().mockImplementation((query) => ({
+                matches: true, // Always match mobile queries
+                media: query,
+                onchange: null,
+                addListener: vi.fn(),
+                removeListener: vi.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+            })),
+        });
+
         window.dispatchEvent(new Event('resize'));
     });
 

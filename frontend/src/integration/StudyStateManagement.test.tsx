@@ -1,8 +1,4 @@
-import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderWithProviders } from '@/test-utils/test-utils';
-import StudyDesignPage from '@/pages/admin/StudyDesignPage';
-import GeneralSettingsPage from '@/pages/admin/GeneralSettingsPage';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test-utils/server';
 
@@ -94,7 +90,9 @@ describe('Study State Management Integration Tests', () => {
             server.use(
                 http.post('/api/admin/studies/test-study/validate', () => {
                     return HttpResponse.json({
-                        errors: [{ field: 'statements', message: 'At least one statement required' }],
+                        errors: [
+                            { field: 'statements', message: 'At least one statement required' },
+                        ],
                     });
                 })
             );
@@ -111,10 +109,7 @@ describe('Study State Management Integration Tests', () => {
         it('shows error when activation fails', async () => {
             server.use(
                 http.post('/api/admin/studies/test-study/state', () => {
-                    return HttpResponse.json(
-                        { detail: 'Validation failed' },
-                        { status: 400 }
-                    );
+                    return HttpResponse.json({ detail: 'Validation failed' }, { status: 400 });
                 })
             );
 
@@ -233,10 +228,7 @@ describe('Study State Management Integration Tests', () => {
         it('blocks participant access to closed studies', async () => {
             server.use(
                 http.get('/api/study/test-study', () => {
-                    return HttpResponse.json(
-                        { detail: 'Study is closed' },
-                        { status: 403 }
-                    );
+                    return HttpResponse.json({ detail: 'Study is closed' }, { status: 403 });
                 })
             );
 
@@ -272,10 +264,14 @@ describe('Study State Management Integration Tests', () => {
             const states = ['draft', 'active', 'closed', 'archived'];
 
             states.forEach((state) => {
-                const badgeClass = state === 'active' ? 'bg-green-500' :
-                                  state === 'draft' ? 'bg-amber-500' :
-                                  state === 'closed' ? 'bg-red-500' :
-                                  'bg-slate-500';
+                const badgeClass =
+                    state === 'active'
+                        ? 'bg-green-500'
+                        : state === 'draft'
+                          ? 'bg-amber-500'
+                          : state === 'closed'
+                            ? 'bg-red-500'
+                            : 'bg-slate-500';
 
                 expect(badgeClass).toBeDefined();
             });
