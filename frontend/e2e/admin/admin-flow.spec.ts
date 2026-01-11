@@ -1,24 +1,24 @@
-import { test } from '@playwright/test';
-import { setupAdminMocks, resetStores } from '../fixtures/admin-mocks';
+import { test, expect } from '../fixtures/db-setup';
 import { AdminPage } from '../pages/AdminPage';
+import { testDataBuilders } from '../fixtures/test-data';
 
-// Initialize mocks
-test.beforeEach(async ({ page }) => {
-    resetStores();
-    await setupAdminMocks(page);
-});
-
-test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
+test.describe('Admin Flow (Real Backend)', () => {
     let adminPage: AdminPage;
 
     test.beforeEach(async ({ page }) => {
         adminPage = new AdminPage(page);
-
-        // 1. LOGIN
-        await adminPage.login();
     });
 
-    test('Zero to Hero: Full Lifecycle', async ({ page }) => {
+    test('Zero to Hero: Full Lifecycle', async ({ page, testDb, authToken }) => {
+        // 1. LOGIN (Handled by authToken/testDb mostly, but we can do UI login if needed)
+        // For "Zero to Hero" we usually want to test the UI flow from scratch.
+        // But authToken helper helps us get a valid user created.
+        // Let's use the UI login with the user created by testDb.
+
+        // testDb.createStudy is not needed if we create via UI, but we need a user.
+        // The fixture `auth_token` creates a user and workspace.
+        await testDb.loginToAdminUI(page);
+
         // 2. CREATE STUDY
         await adminPage.createStudy('Zero Hero Study', 'zero-hero');
 
@@ -29,34 +29,16 @@ test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
         await adminPage.launchStudy();
         await adminPage.verifyStatus('Active');
 
-        // 5. DATA SIMULATION & MONITOR
-        // Logic for checking participants involves mocking specific endpoints which are handled in setupAdminMocks
-        // But we need to verify the table shows up.
-        // The original test mocked data simulation dynamically.
-        // Our setupAdminMocks uses `participantsStore`.
-        // We need to inject data into `participantsStore`.
-        const { getParticipantsStore } = await import('../fixtures/admin-mocks');
-        getParticipantsStore().push({
-            id: 101,
-            session_token: 'sess-12345678',
-            status: 'completed',
-            progress: 100,
-            is_completed: true,
-            is_discarded: false,
-            created_at: new Date().toISOString(),
-            submitted_at: new Date().toISOString(),
-            language_used: 'en',
-        });
+        // 5. DATA SIMULATION
+        // We need to inject a participant via API/DB because we can't easily simulate a separate browser user here efficiently
+        // (though we could open a context, but let's use testDb for speed)
+        await testDb.createParticipant(authToken, 'zero-hero', testDataBuilders.participantResult());
 
-        // Reload to see data
-        const participantsRes = page.waitForResponse(
-            /\/api\/admin\/studies\/zero-hero\/participants/
-        );
         await page.reload();
-        await participantsRes;
-
-        // Verify participant visible (using exact false to match partial token or ID)
-        await adminPage.verifyParticipant(/sess-123/);
+        // Verify participant visible
+        // Wait for table
+        await expect(page.locator('table')).toBeVisible();
+        await expect(page.locator('text=Completed')).toBeVisible();
 
         // 6. EXPORT
         await adminPage.exportCSV();

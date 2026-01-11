@@ -11,6 +11,7 @@ import ImageUploadInput from './ImageUploadInput';
 import type { PartnerLogo } from '@/api/model/partnerLogo';
 import type { StudyReadBranding } from '@/api/model/studyReadBranding';
 import type { StudyRead } from '@/api/model/studyRead';
+import type { BrandingBase } from '@/api/model/brandingBase';
 
 const BrandingEditor = () => {
     const { t } = useTranslation();
@@ -26,16 +27,12 @@ const BrandingEditor = () => {
         partners: [],
     };
 
-    const updateBranding = <T extends keyof StudyReadBranding>(
-        field: T,
-        value: StudyReadBranding[T]
-    ) => {
+    const updateBranding = <T extends keyof BrandingBase>(field: T, value: BrandingBase[T]) => {
         updateDraft((d) => {
             const draftAny = d as unknown as StudyRead;
             if (!draftAny.branding) {
                 draftAny.branding = { logo_url: null, accent_color: null, partners: [] };
             }
-            // @ts-expect-error - dynamic field access on StudyReadBranding
             draftAny.branding[field] = value;
         });
     };

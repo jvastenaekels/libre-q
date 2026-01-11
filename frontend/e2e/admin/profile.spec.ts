@@ -1,23 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/db-setup';
 
 test.describe('Admin Profile Management', () => {
     test.describe.configure({ mode: 'serial' });
 
-    test.beforeEach(async ({ page }) => {
-        // Assuming standard admin login flow from other tests
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('admin@example.com');
-        await page.getByLabel('Password').fill('admin123');
-        await page.getByRole('button', { name: 'Continue' }).click();
-        await expect(page).toHaveURL(/\/admin/);
+    test.beforeEach(async ({ page, testDb }) => {
+        await testDb.loginToAdminUI(page);
     });
 
-    test('should verify sidebar profile link exists', async ({ page }) => {
+    test('should verify sidebar profile link exists', async ({ page, testDb }) => {
+        const email = testDb.getUserEmail();
         // Check if user menu (dropdown) contains profile link
         // Sidebar usually has a user badge/name
         const _userMenu = page
             .locator(
-                'button[data-testid="user-menu-trigger"], button:has-text("admin@example.com")'
+                `button[data-testid="user-menu-trigger"], button:has-text("${email}")`
             )
             .first();
         // Or closer inspection of AppSidebar.ts might be needed if selectors are tricky,
@@ -26,19 +22,21 @@ test.describe('Admin Profile Management', () => {
 
         // Let's try to find the user menu trigger. Use a broad selector if unsure of 'data-testid'.
         // Typically it shows the user's name or email.
-        await page.getByText('admin@example.com').click();
+        await page.getByText(email).click();
 
         // Check for "Profile" menu item
         await expect(page.getByRole('menuitem', { name: 'Profile' })).toBeVisible();
         await expect(page.getByRole('menuitem', { name: 'Log out' })).toBeVisible();
     });
 
-    test('should navigate to profile page and update name', async ({ page }) => {
+    test('should navigate to profile page and update name', async ({ page, testDb }) => {
         await page.goto('/admin/profile');
+
+        const email = testDb.getUserEmail();
 
         // Check initial state
         await expect(page.getByLabel('Email')).toBeDisabled();
-        await expect(page.getByLabel('Email')).toHaveValue('admin@example.com');
+        await expect(page.getByLabel('Email')).toHaveValue(email);
 
         // Update Name
         const newName = `Admin User ${Date.now()}`;

@@ -173,7 +173,10 @@ async def update_study(
         )
     )
     res = await db.execute(stmt)
-    study = res.scalar_one()
+    study = res.scalar_one_or_none()  # type: ignore[assignment]
+
+    if study is None:
+        raise HTTPException(status_code=404, detail="Study not found")
 
     # Pre-fetch all statement translations to ensure they are in identity map
     for s in study.statements:

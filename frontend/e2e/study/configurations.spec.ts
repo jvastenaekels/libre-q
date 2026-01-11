@@ -22,8 +22,7 @@ test.describe('Study Configurations', () => {
         const study = await testDb.createStudy(authToken, studyData);
 
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -52,8 +51,7 @@ test.describe('Study Configurations', () => {
         const study = await testDb.createStudy(authToken, studyData);
 
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -106,8 +104,7 @@ test.describe('Study Configurations', () => {
         const study = await testDb.createStudy(authToken, studyData);
 
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -157,8 +154,7 @@ test.describe('Study Configurations', () => {
         const s = await testDb.createStudy(authToken, minimalStudyData);
 
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${s.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(s.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -202,8 +198,7 @@ test.describe('Study Configurations', () => {
         const study = await testDb.createStudy(authToken, studyData);
 
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);

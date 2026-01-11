@@ -27,7 +27,7 @@ export class RoughSortPage extends BasePage {
                 } else {
                     await this.agreeBtn.click();
                 }
-                await this.page.waitForTimeout(200); // Animation wait
+                await this.page.waitForTimeout(500); // Animation wait
             }
         } else {
             // Custom distribution logic would go here if needed

@@ -26,16 +26,22 @@ export class PreSortPage extends BasePage {
         }
 
         const genderSelect = this.page.getByLabel('Gender', { exact: false });
-        await expect(genderSelect).toBeVisible();
-        await genderSelect.selectOption({ label: 'Female' }); // Select by label if possible
+        await expect(genderSelect).toBeVisible({ timeout: 5000 });
+        // Use index 1 to select first real option (0 is usually placeholder)
+        await genderSelect.selectOption({ index: 1 });
 
         const educationSelect = this.page.getByLabel('Education', { exact: false });
-        await expect(educationSelect).toBeVisible();
-        await educationSelect.selectOption({ value: 'Bachelor' });
+        await expect(educationSelect).toBeVisible({ timeout: 5000 });
+        // Use index 1 to select first real option
+        await educationSelect.selectOption({ index: 1 });
 
+        await this.page.waitForTimeout(300); // Allow form validation
         await expect(this.submitButton).toBeVisible();
-        await expect(this.submitButton).toBeEnabled();
+        await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
         await this.submitButton.click();
+
+        // Wait for navigation away from presort
+        await this.page.waitForURL((url) => !url.href.includes('/presort'), { timeout: 15000 });
     }
     async submit() {
         await this.submitButton.click();

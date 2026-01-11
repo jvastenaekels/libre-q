@@ -12,51 +12,102 @@ export class TestDatabase {
         this.baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
     }
 
+    getUserEmail() {
+        if (!this.uniqueUserEmail) {
+            throw new Error('Test user not initialized');
+        }
+        return this.uniqueUserEmail;
+    }
+
+    /**
+     * Helper to log in via UI
+     */
+    async loginToAdminUI(page: any) {
+        if (!this.uniqueUserEmail || !this.userId || !this.workspaceId) {
+            throw new Error('Test user not initialized');
+        }
+
+        const token = await this.login();
+
+        await page.addInitScript(({ token, user, workspace }) => {
+            window.localStorage.setItem('admin-auth-storage', JSON.stringify({
+                state: {
+                    token: token,
+                    user: user,
+                    workspaces: [workspace],
+                    currentWorkspace: workspace,
+                },
+                version: 1,
+            }));
+        }, {
+            token,
+            user: { id: this.userId, email: this.uniqueUserEmail, is_superuser: true },
+            workspace: {
+                id: this.workspaceId,
+                slug: this.currentWorkspaceSlug,
+                title: `Test Workspace ${this.userId}`, // Match seed logic roughly
+                user_role: 'owner'
+            }
+        });
+
+        await page.goto('/admin');
+        await page.waitForURL(/\/admin/);
+    }
+
     /**
      * Setup: Run migrations and seed base data
      */
-    async setup() {
-        // Backend should handle migrations on startup
-        // Seed minimal required data (admin user, workspace)
-        await this.seedBaseData();
+    private uniqueUserEmail: string | undefined;
+    private uniqueUserPass: string = 'testpassword';
+    private workspaceId: number | undefined;
+    private userId: number | undefined;
+    private currentWorkspaceSlug: string | undefined;
+
+    getWorkspaceSlug() {
+        if (!this.currentWorkspaceSlug) {
+            throw new Error('Workspace slug not initialized');
+        }
+        return this.currentWorkspaceSlug;
     }
 
     /**
-     * Cleanup: Truncate all tables except migrations
+     * Setup: Seed unique test data (user and workspace)
+     */
+    async setup() {
+        // Generate unique test identity
+        const testId = Date.now().toString() + Math.random().toString().slice(2, 6);
+        this.uniqueUserEmail = `test-${testId}@example.com`;
+
+        await this.seedUniqueData(testId);
+    }
+
+    /**
+     * Cleanup: Removed to prevent interfering with other parallel tests.
+     * We rely on the "Add-Only" strategy where each test uses unique isolated data.
+     * A global cleanup can be run at the end of the suite if needed.
      */
     async cleanup() {
-        try {
-            // Call backend endpoint to cleanup test data
-            await fetch(`${this.baseUrl}/api/test/cleanup`, {
-                method: 'POST',
-            });
-        } catch (error) {
-            console.warn('Database cleanup failed:', error);
-        }
+        // No-op for per-test cleanup to ensure isolation
     }
 
     /**
-     * Seed base data: admin user and workspace
+     * Seed unique data: user and workspace for this specific test instance
      */
-    private workspaceId: number | undefined;
-
-    /**
-     * Seed base data: admin user and workspace
-     */
-    private async seedBaseData() {
+    private async seedUniqueData(testId: string) {
         try {
+            const workspaceSlug = `workspace-${testId}`;
             const response = await fetch(`${this.baseUrl}/api/test/seed`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     user: {
-                        email: 'test@example.com',
-                        password: 'testpassword',
+                        email: this.uniqueUserEmail,
+                        password: this.uniqueUserPass,
                         is_superuser: true,
                     },
                     workspace: {
-                        name: 'Test Workspace',
-                        slug: 'test-workspace',
+                        name: `Test Workspace ${testId}`,
+                        slug: workspaceSlug,
                     },
                 }),
             });
@@ -68,20 +119,28 @@ export class TestDatabase {
 
             const data = await response.json();
             this.workspaceId = data.workspace_id;
+            this.userId = data.user_id;
+            this.currentWorkspaceSlug = workspaceSlug;
         } catch (error) {
-            console.error('Failed to seed base data:', error);
+            console.error('Failed to seed unique test data:', error);
             throw error;
         }
     }
 
     /**
+     * Seed base data: admin user and workspace
+     */
+    /**
      * Login and get auth token
      */
-    async login(email: string = 'test@example.com', password: string = 'testpassword') {
+    async login() {
+        if (!this.uniqueUserEmail) {
+            throw new Error('Test user not initialized. Did setup() run?');
+        }
         const response = await fetch(`${this.baseUrl}/api/token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ username: email, password }),
+            body: new URLSearchParams({ username: this.uniqueUserEmail, password: this.uniqueUserPass }),
         });
 
         if (!response.ok) {
@@ -97,7 +156,7 @@ export class TestDatabase {
      */
     async createStudy(token: string, config: Partial<StudyConfig>) {
         if (!this.workspaceId) {
-            throw new Error('Workspace ID not initialized. Did seedBaseData run?');
+            throw new Error('Workspace ID not initialized. Did setup() run?');
         }
         const response = await fetch(`${this.baseUrl}/api/admin/studies/`, {
             method: 'POST',
@@ -127,6 +186,7 @@ export class TestDatabase {
 
         if (!response.ok) {
             const error = await response.text();
+            console.error('Study Creation Failed:', error);
             throw new Error(`Failed to create study: ${error}`);
         }
 
@@ -195,6 +255,21 @@ export class TestDatabase {
 
         return response.json();
     }
+
+    /**
+     * Create participant session
+     */
+    async createParticipant(token: string, studySlug: string, overrides: any = {}) {
+        const response = await fetch(`${this.baseUrl}/api/study/${studySlug}/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+             const txt = await response.text();
+             throw new Error(`Failed to start participant: ${txt}`);
+        }
+        return response.json();
+    }
 }
 
 /**
@@ -208,7 +283,7 @@ export const test = base.extend<{
         const db = new TestDatabase();
         await db.setup();
         await use(db);
-        await db.cleanup();
+        // await db.cleanup(); // DISABLED: Add-only strategy
     },
 
     authToken: async ({ testDb }, use) => {

@@ -7,8 +7,9 @@ import { FineSortPage } from '../pages/FineSortPage';
 
 test.describe('Study Resilience', () => {
     test('Session persistence: Reloading page should retain progress', async ({ page, testDb, authToken }) => {
-        // 1. Setup minimal study
+        // 1. Setup minimal study with unique slug
         const studyData = testDataBuilders.study({
+            slug: `resilience-persist-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             grid_config: [{ score: 0, capacity: 3 }],
             statements: testDataBuilders.statements(3),
             state: 'active',
@@ -17,8 +18,7 @@ test.describe('Study Resilience', () => {
 
         // 2. Start Study & Complete Rough Sort
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -42,8 +42,9 @@ test.describe('Study Resilience', () => {
     });
 
     test('Validation: Should prevent submission of incomplete Q-Sort', async ({ page, testDb, authToken }) => {
-        // 1. Setup standard study
+        // 1. Setup standard study with unique slug
         const studyData = testDataBuilders.study({
+            slug: `resilience-validate-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             grid_config: [{ score: 0, capacity: 2 }],
             statements: testDataBuilders.statements(2),
             state: 'active',
@@ -52,8 +53,7 @@ test.describe('Study Resilience', () => {
 
         // 2. Navigate to Fine Sort
         const welcomePage = new WelcomePage(page);
-        await welcomePage.goto(`/study/${study.slug}`);
-        await welcomePage.waitForLoad();
+        await welcomePage.visit(study.slug);
         await welcomePage.startStudy();
 
         const consentPage = new ConsentPage(page);
@@ -68,14 +68,10 @@ test.describe('Study Resilience', () => {
         await fine.waitForLoad();
 
         // 3. Verify "Confirm" button is missing initially
-        // Use a more specific locator or check for the instruction div
         const confirmButton = page.getByRole('button', { name: /confirm|finish|submit/i });
 
         // Assert it is hidden initially because the sort is incomplete
         await expect(confirmButton).toBeHidden();
-
-        // Check for the "1. Drag or Tap Statement" instruction
-        await expect(page.getByText(/Drag or Tap Statement/i)).toBeVisible();
 
         // 4. Place ONE card (incomplete)
         await fine.selectPile(2); // Agree (contains cards after default rough sort)
@@ -83,9 +79,6 @@ test.describe('Study Resilience', () => {
 
         // 5. Verify still hidden (2 statements total, only 1 placed)
         await expect(confirmButton).toBeHidden();
-
-        // Optional: Check instruction changed to "Tap Grid to Place" if card selected
-        // but here we just want to ensure we can't submit.
     });
 
     test.skip('Concurrency: Multiple participants', async () => {

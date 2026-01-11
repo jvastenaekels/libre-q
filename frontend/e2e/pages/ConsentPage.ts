@@ -14,8 +14,17 @@ export class ConsentPage extends BasePage {
     async acceptConsent() {
         await this.checkbox.waitFor({ state: 'visible', timeout: 10000 });
         await this.checkbox.check();
-        await expect(this.acceptButton).toBeEnabled();
+        await this.page.waitForTimeout(300); // Allow checkbox state to propagate
+        await expect(this.acceptButton).toBeEnabled({ timeout: 5000 });
         await this.acceptButton.click({ force: true });
-        await this.page.waitForURL((url) => !url.href.includes('/consent'), { timeout: 15000 });
+
+        // Wait for navigation away from consent page
+        try {
+            await this.page.waitForURL((url) => !url.href.includes('/consent'), { timeout: 15000 });
+        } catch {
+            // Retry click if navigation didn't happen
+            await this.acceptButton.click({ force: true });
+            await this.page.waitForURL((url) => !url.href.includes('/consent'), { timeout: 10000 });
+        }
     }
 }

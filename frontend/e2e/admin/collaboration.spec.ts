@@ -1,4 +1,4 @@
-import { test, expect } from '../../fixtures/db-setup';
+import { test, expect } from '../fixtures/db-setup';
 
 test.describe('Collaboration Integration', () => {
     const apiUrl = process.env.API_BASE_URL || 'http://localhost:8000';
@@ -19,7 +19,8 @@ test.describe('Collaboration Integration', () => {
 
         // 2. Admin (User A) creates invitation
         // 'test-workspace' is created by testDb fixture setup
-        const inviteResponse = await fetch(`${apiUrl}/api/admin/workspaces/test-workspace/invitations`, {
+        const workspaceSlug = testDb.getWorkspaceSlug();
+        const inviteResponse = await fetch(`${apiUrl}/api/admin/workspaces/${workspaceSlug}/invitations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

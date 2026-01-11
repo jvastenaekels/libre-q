@@ -38,7 +38,7 @@ class TestAuth:
             data={"username": test_user.email, "password": "wrongpassword"},
         )
         assert response.status_code == 401
-        assert "Incorrect" in response.json()["detail"]
+        assert "Incorrect" in response.json()["message"]
 
     async def test_login_nonexistent_user(self, client: AsyncClient):
         """Non-existent user returns 401."""
@@ -77,7 +77,7 @@ class TestRegistration:
             json={"email": test_user.email, "password": "anypassword"},
         )
         assert response.status_code == 400
-        assert "already exists" in response.json()["detail"]
+        assert "already exists" in response.json()["message"]
 
     async def test_register_with_valid_invitation(
         self,
@@ -132,7 +132,7 @@ class TestRegistration:
             },
         )
         assert response.status_code == 400
-        assert "does not match" in response.json()["detail"]
+        assert "does not match" in response.json()["message"]
 
     async def test_register_invitation_token_expired(self, client: AsyncClient):
         """Expired invitation token is rejected."""
@@ -151,7 +151,7 @@ class TestRegistration:
             },
         )
         assert response.status_code == 400
-        assert "Invalid invitation token" in response.json()["detail"]
+        assert "Invalid invitation token" in response.json()["message"]
 
 
 @pytest.mark.asyncio

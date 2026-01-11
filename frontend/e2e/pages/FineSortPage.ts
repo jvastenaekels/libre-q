@@ -83,6 +83,22 @@ export class FineSortPage extends BasePage {
      * Completes the Fine Sort by placing all cards onto the grid using keyboard drag-and-drop.
      * Iterates through all 3 tabs (Disagree, Neutral, Agree) and empties the decks.
      */
+    /**
+     * Aliases moveFirstCardToGrid for tests that semantically want "drag"
+     * but we use the robust click-click implementation.
+     */
+    async dragFirstCardToSlot() {
+        return this.moveFirstCardToGrid();
+    }
+
+    async tapFirstCard() {
+        const deckCard = this.deckContainer.locator('[data-testid^="card-"]').first();
+        await expect(deckCard).toBeVisible();
+        await deckCard.click();
+        const innerCard = deckCard.locator('div').first();
+        await expect(innerCard).toHaveClass(/ring-2/);
+    }
+
     async completeFineSort(expectedTotalCards: number) {
         // Zoom out to ensure grid is fully visible (critical for mobile tests to avoid footer overlap)
         const zoomOutBtn = this.page.getByRole('button', { name: /zoom out/i }).first();

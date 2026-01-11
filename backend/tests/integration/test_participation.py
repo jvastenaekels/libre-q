@@ -83,7 +83,7 @@ class TestSubmissionValidation:
         }
         response = await client.post("/api/submit", json=payload)
         assert response.status_code == 400
-        assert "not active" in response.json()["detail"]
+        assert "not active" in response.json()["message"]
 
     async def test_invalid_grid_distribution(
         self, client: AsyncClient, seed_study: Study
@@ -105,7 +105,7 @@ class TestSubmissionValidation:
         }
         response = await client.post("/api/submit", json=payload)
         assert response.status_code == 400
-        assert "incorrect number of cards" in response.json()["detail"]
+        assert "incorrect number of cards" in response.json()["message"]
 
     async def test_alien_statement_rejected(
         self,
@@ -140,7 +140,7 @@ class TestSubmissionValidation:
         }
         response = await client.post("/api/submit", json=payload)
         assert response.status_code == 400
-        assert "does not belong" in response.json()["detail"]
+        assert "does not belong" in response.json()["message"]
 
 
 @pytest.mark.asyncio

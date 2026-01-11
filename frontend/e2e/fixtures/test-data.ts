@@ -8,7 +8,7 @@ export const testDataBuilders = {
      * Create a study configuration
      */
     study: (overrides?: Partial<StudyData>): StudyData => ({
-        slug: `test-study-${Date.now()}`,
+        slug: `test-study-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
         title: 'Test Study',
         state: 'draft',
         workspace_id: 1,
@@ -197,6 +197,13 @@ export const testDataBuilders = {
         logo_url: `https://example.com/logos/${name.toLowerCase().replace(/\s+/g, '-')}.png`,
         url: `https://${name.toLowerCase().replace(/\s+/g, '')}.com`,
         ...overrides,
+    }),
+
+    /**
+     * Create participant result dummy data
+     */
+    participantResult: (overrides?: any) => ({
+        ...overrides
     }),
 };
 

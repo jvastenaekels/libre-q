@@ -136,3 +136,10 @@ color  # unused variable (backend/app/schemas.py)
 InvitationCreate  # unused class (backend/app/schemas.py)
 validate_study  # unused function (backend/app/routers/admin/studies.py)
 SchemaValidationError  # unused class (backend/app/schema_validation.py)
+# New for Study Invitations & Test Utils
+accept_invitation
+init_test_db
+seed_test_data
+add_test_member
+cleanup_test_data
+cleanup_all_test_data

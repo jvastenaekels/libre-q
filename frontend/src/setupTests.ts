@@ -39,11 +39,14 @@ vi.mock('react-i18next', () => ({
 // Mock local i18n module
 vi.mock('./i18n', () => ({
     default: {
-        changeLanguage: vi.fn(),
+        changeLanguage: vi.fn().mockImplementation(() => Promise.resolve()),
         language: 'en',
-        addResourceBundle: vi.fn(),
+        addResourceBundle: vi.fn().mockReturnThis(),
+        removeResourceBundle: vi.fn().mockReturnThis(),
+        reloadResources: vi.fn().mockImplementation(() => Promise.resolve()),
         init: vi.fn().mockReturnValue(Promise.resolve()),
         use: vi.fn().mockReturnThis(),
+        t: (key: string) => key,
     },
     t: (key: string) => key,
 }));
