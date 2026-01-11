@@ -13,6 +13,14 @@ run-frontend:
 seed:
 	cd backend && uv run python seed.py data/example-study.json
 
+generate-api:
+	cd backend && uv run python ../export_openapi.py
+	cd frontend && npm run generate:api
+
+check-api: generate-api
+	@echo "Checking if API client is up to date..."
+	git diff --exit-code frontend/src/api/generated.ts frontend/openapi.json
+
 # -------------------------
 # Quality & Verification
 # -------------------------
@@ -31,6 +39,7 @@ check:
 	cd backend && uv run pip-audit
 	cd backend && uv run python -m app.schema_validation
 	python3 backend/scripts/check_relationships.py
+	$(MAKE) check-api
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
 
