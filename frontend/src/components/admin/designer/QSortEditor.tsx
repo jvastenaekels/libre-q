@@ -40,14 +40,21 @@ const QSortEditor = () => {
     // Helper to update store
     const setActiveSubTab = (v: 'statements' | 'grid') => setActiveSubStep(v);
 
-    // Auto-initialize grid if empty (-4 to +4)
+    // Auto-initialize grid if empty (-4 to +4) with bell curve (total 34)
     useEffect(() => {
         if (draft && (!draft.grid_config || draft.grid_config.length === 0)) {
             updateDraft((d) => {
-                d.grid_config = Array.from({ length: 9 }, (_, i) => ({
-                    score: i - 4,
-                    capacity: 1,
-                }));
+                d.grid_config = [
+                    { score: -4, capacity: 2 },
+                    { score: -3, capacity: 3 },
+                    { score: -2, capacity: 4 },
+                    { score: -1, capacity: 5 },
+                    { score: 0, capacity: 6 },
+                    { score: 1, capacity: 5 },
+                    { score: 2, capacity: 4 },
+                    { score: 3, capacity: 3 },
+                    { score: 4, capacity: 2 },
+                ];
             });
         }
     }, [draft, updateDraft]);
@@ -149,10 +156,17 @@ const QSortEditor = () => {
         updateDraft((d) => {
             if (!d.grid_config || d.grid_config.length === 0) {
                 // Default -4 to +4 if empty
-                d.grid_config = Array.from({ length: 9 }, (_, i) => ({
-                    score: i - 4,
-                    capacity: 1,
-                }));
+                d.grid_config = [
+                    { score: -4, capacity: 2 },
+                    { score: -3, capacity: 3 },
+                    { score: -2, capacity: 4 },
+                    { score: -1, capacity: 5 },
+                    { score: 0, capacity: 6 },
+                    { score: 1, capacity: 5 },
+                    { score: 2, capacity: 4 },
+                    { score: 3, capacity: 3 },
+                    { score: 4, capacity: 2 },
+                ];
                 return;
             }
             const scores = d.grid_config.map((c: GridColumn) => c.score);
