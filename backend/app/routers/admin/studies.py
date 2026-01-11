@@ -36,7 +36,7 @@ from app.schemas import (
 router = APIRouter()
 
 
-@router.post("/", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
 async def create_study(
     study: StudyCreate,
     current_user: User = Depends(get_current_user),
@@ -125,7 +125,7 @@ async def create_study(
     return updated_study
 
 
-@router.get("/", response_model=list[StudyRead])
+@router.get("", response_model=list[StudyRead])
 async def list_studies(
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),

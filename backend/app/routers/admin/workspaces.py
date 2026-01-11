@@ -26,7 +26,7 @@ from fastapi import BackgroundTasks
 router = APIRouter()
 
 
-@router.get("/", response_model=list[WorkspaceWithRole])
+@router.get("", response_model=list[WorkspaceWithRole])
 async def list_workspaces(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
@@ -50,7 +50,7 @@ async def list_workspaces(
     ]
 
 
-@router.post("/", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
 async def create_workspace(
     workspace_in: WorkspaceCreate,
     current_user: User = Depends(get_current_active_user),
