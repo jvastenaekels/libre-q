@@ -91,6 +91,7 @@ pre-commit run --all-files
 
 | Scope     | Command (from root)         | Description                             |
 | --------- | --------------------------- | --------------------------------------- |
+| **All**   | `make generate-api`         | Sync Frontend Client with Backend API   |
 | **Back**  | `make lint-back`            | Run Ruff (Lint & Format)                |
 | **Back**  | `make type-back`            | Run Mypy (Types)                        |
 | **Back**  | `make test-back`            | Run Pytest                              |
@@ -99,6 +100,16 @@ pre-commit run --all-files
 | **Front** | `npm run lint:duplication`  | Check for copy-pasted code (JSCPD)      |
 | **Front** | `npm run lint:architecture` | Check architectural rules (Dep-Cruiser) |
 | **Front** | `npm run e2e`               | Run E2E Tests (Playwright)              |
+
+### API Client Synchronization
+
+If you modify Backend Routes (e.g., `backend/app/routers/...`):
+
+1. Run **`make generate-api`** to regeneration the frontend client.
+2. This ensures `frontend/src/api/generated.ts` matches the backend (OpenAPI spec).
+3. Commit the updated client files.
+
+> **Note:** The CI pipeline runs `make check-api` and will fail if the client is out of sync.
 
 ## 🏗️ Architecture Checks
 
