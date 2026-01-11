@@ -829,7 +829,7 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
  */
 export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
     return customInstance<StudyRead>({
-        url: `/api/admin/studies/`,
+        url: `/api/admin/studies`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: studyCreate,
@@ -907,7 +907,7 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
  * @summary List Studies
  */
 export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({ url: `/api/admin/studies/`, method: 'GET', signal });
+    return customInstance<StudyRead[]>({ url: `/api/admin/studies`, method: 'GET', signal });
 };
 
 export const getListStudiesApiAdminStudiesGetQueryKey = () => {
@@ -2775,7 +2775,7 @@ export function useVerifyInvitationApiAdminInvitationsVerifyGet<
  * @summary List Users
  */
 export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead[]>({ url: `/api/admin/users/`, method: 'GET', signal });
+    return customInstance<UserRead[]>({ url: `/api/admin/users`, method: 'GET', signal });
 };
 
 export const getListUsersApiAdminUsersGetQueryKey = () => {
@@ -2891,7 +2891,7 @@ export function useListUsersApiAdminUsersGet<
  */
 export const createUserApiAdminUsersPost = (userCreate: UserCreate, signal?: AbortSignal) => {
     return customInstance<UserRead>({
-        url: `/api/admin/users/`,
+        url: `/api/admin/users`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: userCreate,
@@ -3391,7 +3391,7 @@ export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
  */
 export const listWorkspacesApiAdminWorkspacesGet = (signal?: AbortSignal) => {
     return customInstance<WorkspaceWithRole[]>({
-        url: `/api/admin/workspaces/`,
+        url: `/api/admin/workspaces`,
         method: 'GET',
         signal,
     });
@@ -3533,7 +3533,7 @@ export const createWorkspaceApiAdminWorkspacesPost = (
     signal?: AbortSignal
 ) => {
     return customInstance<WorkspaceRead>({
-        url: `/api/admin/workspaces/`,
+        url: `/api/admin/workspaces`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: workspaceCreate,
