@@ -5899,6 +5899,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         undefined,
     ]),
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
@@ -6179,6 +6180,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
             undefined,
         ]),
         created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         translations: faker.helpers.arrayElement([
             Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                 () => ({
@@ -6467,6 +6469,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         undefined,
     ]),
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
@@ -6747,6 +6750,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         undefined,
     ]),
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
@@ -7030,6 +7034,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         undefined,
     ]),
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),

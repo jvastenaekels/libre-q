@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import { useParams } from 'react-router-dom';
+import { mergeStudyUpdates } from '@/utils/mergeStudy';
+import { toast } from 'sonner';
 
 /**
  * Custom hook that monitors the study designer draft and automatically
@@ -9,7 +11,7 @@ import { useParams } from 'react-router-dom';
  */
 export function useAutoSave(debounceMs = 2000) {
     const { slug } = useParams<{ slug: string }>();
-    const { draft, original, syncStatus, setSyncStatus, setLastSavedAt, updateOriginal } =
+    const { draft, original, syncStatus, setSyncStatus, setLastSavedAt, updateOriginal, updateDraft } =
         useStudyDesigner();
 
     const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
@@ -97,10 +99,54 @@ export function useAutoSave(debounceMs = 2000) {
                     // Sync original and backup immediately to reflect server state
                     updateOriginal(result);
                     localStorage.setItem(`open-q-draft-backup-${slug}`, draftJson);
-                } catch (error) {
+                } catch (error: any) {
                     // If it was cancelled, don't show error
                     if (error instanceof Error && error.name === 'AbortError') {
                         return;
+                    }
+
+                    // Optimistic Locking: 409 Conflict
+                    if (error?.response?.status === 409 && error.response.data?.detail?.server_state) {
+                        try {
+                            const serverRead = error.response.data.detail.server_state;
+                            const serverUpdate = projectStudyToUpdate(serverRead);
+                            const originalUpdate = original ? projectStudyToUpdate(original) : null;
+
+                            const mergeResult = mergeStudyUpdates(draft, serverUpdate, originalUpdate);
+
+                            if (mergeResult.success && mergeResult.merged) {
+                                toast.info('Synced with concurrent changes from another user');
+                                
+                                // 1. Update Baseline
+                                updateOriginal(serverRead);
+                                
+                                // 2. Update Draft with Merged Content
+                                // We use a special update to replace everything
+                                updateDraft((d) => {
+                                    // Clear existing keys to ensure removal works
+                                    // Though Immer might prefer just setting properties
+                                    Object.keys(d).forEach(k => {
+                                        // @ts-ignore
+                                        if (mergeResult.merged[k] === undefined) delete d[k];
+                                    });
+                                    Object.assign(d, mergeResult.merged);
+                                });
+
+                                // 3. Retry save immediately with new timestamp
+                                if (retry < 5) {
+                                    attemptSave(retry + 1);
+                                    return;
+                                }
+                            } else {
+                                // Hard Conflict
+                                toast.error('Conflict detected. Some changes could not be merged.');
+                                // TODO: Open Conflict Resolution Modal
+                                setSyncStatus('error');
+                                return;
+                            }
+                        } catch (mergeError) {
+                            console.error("Auto-merge failed", mergeError);
+                        }
                     }
 
                     console.error(`Auto-save attempt ${retry + 1} failed:`, error);

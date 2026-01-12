@@ -77,6 +77,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
                 text: st.text,
             })),
         })),
+        last_updated_at: study.updated_at,
     };
 }
 

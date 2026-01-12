@@ -115,6 +115,7 @@ export * from './studyUpdateBranding';
 export * from './studyUpdateDefaultLanguage';
 export * from './studyUpdateEndDate';
 export * from './studyUpdateGridConfig';
+export * from './studyUpdateLastUpdatedAt';
 export * from './studyUpdatePostsortConfig';
 export * from './studyUpdatePostsortConfigAnyOf';
 export * from './studyUpdatePresortConfig';

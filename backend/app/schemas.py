@@ -307,6 +307,7 @@ class StudyUpdate(BaseModel):
     access_password: str | None = None
     start_date: datetime | None = None
     end_date: datetime | None = None
+    last_updated_at: datetime | None = None
 
     @model_validator(mode="after")
     def check_grid_symmetry(self) -> "StudyUpdate":
@@ -324,6 +325,7 @@ class StudyRead(StudyBase):
     workspace_id: int
     workspace: WorkspaceRead | None = None
     created_at: datetime
+    updated_at: datetime
     start_date: datetime | None = None
     end_date: datetime | None = None
     translations: list[StudyTranslationRead] = []

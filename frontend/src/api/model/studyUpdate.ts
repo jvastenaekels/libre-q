@@ -18,6 +18,7 @@ import type { StudyUpdateStatements } from './studyUpdateStatements';
 import type { StudyUpdateAccessPassword } from './studyUpdateAccessPassword';
 import type { StudyUpdateStartDate } from './studyUpdateStartDate';
 import type { StudyUpdateEndDate } from './studyUpdateEndDate';
+import type { StudyUpdateLastUpdatedAt } from './studyUpdateLastUpdatedAt';
 
 /**
  * Schema for updating a study.
@@ -37,4 +38,5 @@ export interface StudyUpdate {
     access_password?: StudyUpdateAccessPassword;
     start_date?: StudyUpdateStartDate;
     end_date?: StudyUpdateEndDate;
+    last_updated_at?: StudyUpdateLastUpdatedAt;
 }

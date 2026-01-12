@@ -41,6 +41,7 @@ export interface StudyRead {
     workspace_id: number;
     workspace?: StudyReadWorkspace;
     created_at: string;
+    updated_at: string;
     translations?: StudyTranslationRead[];
     statements?: StatementRead[];
     recruitment_links?: RecruitmentLinkRead[];
