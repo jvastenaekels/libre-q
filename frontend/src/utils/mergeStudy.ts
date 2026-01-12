@@ -1,6 +1,6 @@
 import type { StudyUpdate } from '@/api/model';
 
-export interface MergeResult {
+interface MergeResult {
     success: boolean;
     merged?: StudyUpdate;
     conflicts?: string[];

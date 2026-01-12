@@ -187,6 +187,31 @@ describe('QSortEditor', () => {
             expect(confirmSpy).toHaveBeenCalled();
             expect(screen.queryByText('Existing Statement')).not.toBeInTheDocument();
         });
+
+        it('re-sequences statement codes', async () => {
+            const user = userEvent.setup();
+            vi.spyOn(window, 'confirm').mockImplementation(() => true);
+
+            renderEditor({
+                draft: {
+                    ...mockDraft,
+                    statements: [
+                        { code: 'custom-1', translations: [{ language_code: 'en', text: 'S1' }] },
+                        { code: 'gap-5', translations: [{ language_code: 'en', text: 'S2' }] },
+                    ],
+                },
+            });
+
+            expect(screen.getByText('custom-1')).toBeInTheDocument();
+            expect(screen.getByText('gap-5')).toBeInTheDocument();
+
+            const resetButton = screen.getByText('Reset Codes');
+            await user.click(resetButton);
+
+            expect(screen.getByText('s1')).toBeInTheDocument();
+            expect(screen.getByText('s2')).toBeInTheDocument();
+            expect(screen.queryByText('custom-1')).not.toBeInTheDocument();
+        });
     });
 
     describe('Translation Management', () => {
@@ -205,13 +230,73 @@ describe('QSortEditor', () => {
         });
     });
 
-    describe('Validation', () => {
+    describe('Validation & Distribution', () => {
         it('validates grid total matches statement count', () => {
-            // 1 statement in mockDraft, grid capacity is 14
-            // Should show mismatch warning/error if implemented in UI
             renderEditor({ activeSubStep: 'grid' });
-            // For now just check it renders
             expect(screen.getByText('Forced distribution grid')).toBeInTheDocument();
+        });
+
+        it('maintains symmetry when symmetry lock is enabled', async () => {
+            const user = userEvent.setup();
+            renderEditor({ activeSubStep: 'grid' });
+
+            const increaseButtons = screen.getAllByLabelText(/Increase capacity for column/i);
+
+            // Column 0 and Column 4 should initially have 2 slots each
+            expect(screen.getByTestId('grid-column-0-slots').children).toHaveLength(2);
+            expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(2);
+
+            // Increase capacity of column 0
+            await user.click(increaseButtons[0]);
+
+            // Symmetry lock (default true) should increase column 4 too
+            expect(screen.getByTestId('grid-column-0-slots').children).toHaveLength(3);
+            expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(3);
+        });
+
+        it('allows independent adjustment when symmetry lock is disabled', async () => {
+            const user = userEvent.setup();
+            renderEditor({ activeSubStep: 'grid', draft: { ...mockDraft, symmetry_lock: false } });
+
+            const increaseButtons = screen.getAllByLabelText(/Increase capacity for column/i);
+
+            expect(screen.getByTestId('grid-column-0-slots').children).toHaveLength(2);
+            expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(2);
+
+            await user.click(increaseButtons[0]);
+
+            // Only column 0 should increase
+            expect(screen.getByTestId('grid-column-0-slots').children).toHaveLength(3);
+            expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(2);
+        });
+
+        it('auto-shapes grid into a balanced distribution', async () => {
+            const user = userEvent.setup();
+            renderEditor({
+                activeSubStep: 'grid',
+                draft: {
+                    ...mockDraft,
+                    statements: Array(10).fill({ code: 's', translations: [] }),
+                    grid_config: [
+                        { score: -2, capacity: 5 },
+                        { score: -1, capacity: 0 },
+                        { score: 0, capacity: 0 },
+                        { score: 1, capacity: 0 },
+                        { score: 2, capacity: 5 },
+                    ],
+                },
+            });
+
+            const autoBalanceButton = screen.getByText(/Auto-Balance/i);
+            await user.click(autoBalanceButton);
+
+            // For N=10 and 5 columns, result should be [1, 2, 4, 2, 1]
+            // per the binomial weight distribution logic: 1, 4, 6, 4, 1 (total 16) -> scaled to 10
+            expect(screen.getByTestId('grid-column-0-slots').children).toHaveLength(1);
+            expect(screen.getByTestId('grid-column-1-slots').children).toHaveLength(2);
+            expect(screen.getByTestId('grid-column-2-slots').children).toHaveLength(4);
+            expect(screen.getByTestId('grid-column-3-slots').children).toHaveLength(2);
+            expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(1);
         });
     });
 });

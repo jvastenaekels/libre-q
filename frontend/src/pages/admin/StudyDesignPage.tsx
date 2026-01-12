@@ -16,6 +16,8 @@ import {
     Settings2,
     History,
     Rocket,
+    ArrowRight,
+    Lightbulb,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -61,6 +63,17 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import LanguageManagerModal from '@/components/admin/designer/LanguageManagerModal';
+import { CircleCheck, CircleDashed, ArrowLeft, CheckCircle } from 'lucide-react';
+
+const DESIGN_STEPS = [
+    { id: 'intro', label: 'Welcome' },
+    { id: 'pre-sort', label: 'Presort' },
+    { id: 'condition', label: 'Instruction' },
+    { id: 'q-sort', label: 'Grid & Q-Set' },
+    { id: 'post-sort', label: 'Post-sort' },
+    { id: 'branding', label: 'Branding' },
+    { id: 'interface', label: 'Interface' },
+];
 
 const StudyDesignPage = () => {
     const { t } = useTranslation();
@@ -125,8 +138,8 @@ const StudyDesignPage = () => {
     const isDirty = syncStatus !== 'synced';
 
     // Permission States
-    const isFullyReadOnly = draft?.state !== 'draft';
-    const isStructureLocked = draft?.state !== 'draft'; // active, paused, closed
+    const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
+    const isStructureLocked = draft ? draft.state !== 'draft' : false; // active, paused, closed
 
     // Recovery logic: Detect local backup on mount
     const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
@@ -269,6 +282,41 @@ const StudyDesignPage = () => {
     }
 
     if (!draft) return <div>{t('common.errors.study_not_found.title')}</div>;
+
+    const currentStepIndex = DESIGN_STEPS.findIndex((s) => s.id === activeStep);
+    const nextStep = DESIGN_STEPS[currentStepIndex + 1];
+    const prevStep = DESIGN_STEPS[currentStepIndex - 1];
+
+    // Design Checklist logic
+    const checklist = [
+        {
+            label: t('admin.design.checklist.statements', 'Statements defined'),
+            isComplete: (draft.statements?.length || 0) > 0,
+            required: true,
+        },
+        {
+            label: t('admin.design.checklist.grid_balance', 'Grid balanced'),
+            isComplete: isGridValid,
+            required: true,
+        },
+        {
+            label: t('admin.design.checklist.branding', 'Logo & Colors'),
+            isComplete: !!draft.branding?.primary_color,
+            required: false,
+        },
+        {
+            label: t('admin.design.checklist.instructions', 'Instructions set'),
+            isComplete: !!draft.translations?.find((t) => t.language_code === activeLocale)
+                ?.condition_of_instruction,
+            required: true,
+        },
+    ];
+
+    const completedRequiredCount = checklist.filter(
+        (item) => item.required && item.isComplete
+    ).length;
+    const totalRequiredCount = checklist.filter((item) => item.required).length;
+    const isLaunchReady = completedRequiredCount === totalRequiredCount;
 
     return (
         <div
@@ -670,8 +718,180 @@ const StudyDesignPage = () => {
                             <TabsContent value="branding" className="mt-0 outline-none">
                                 <BrandingEditor />
                             </TabsContent>
+
+                            {/* Sequential Navigation Buttons */}
+                            <div className="mt-16 flex items-center justify-between pt-8 border-t border-slate-100">
+                                {prevStep ? (
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setActiveStep(
+                                                prevStep.id as
+                                                    | 'intro'
+                                                    | 'pre-sort'
+                                                    | 'condition'
+                                                    | 'q-sort'
+                                                    | 'post-sort'
+                                                    | 'interface'
+                                                    | 'branding'
+                                            )
+                                        }
+                                        className="gap-2 h-12 px-6 rounded-xl font-bold text-slate-500 hover:text-slate-900 group"
+                                        data-testid="back-step-button"
+                                    >
+                                        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                                        {t('common.back', 'Back')}
+                                    </Button>
+                                ) : (
+                                    <div />
+                                )}
+
+                                {nextStep ? (
+                                    <Button
+                                        onClick={() =>
+                                            setActiveStep(
+                                                nextStep.id as
+                                                    | 'intro'
+                                                    | 'pre-sort'
+                                                    | 'condition'
+                                                    | 'q-sort'
+                                                    | 'post-sort'
+                                                    | 'interface'
+                                                    | 'branding'
+                                            )
+                                        }
+                                        className="gap-2 h-12 px-8 rounded-xl font-bold bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-md group"
+                                        data-testid="next-step-button"
+                                    >
+                                        {t('common.next', 'Next Step')}
+                                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleActivate}
+                                        disabled={isActivating || isFullyReadOnly || !isLaunchReady}
+                                        className="gap-2 h-12 px-8 rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 transition-all"
+                                    >
+                                        <Rocket className="h-5 w-5" />
+                                        {t('admin.study_status.state.activate', 'Activate Study')}
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </Tabs>
+                </div>
+
+                {/* Design Checklist Sidebar/Widget */}
+                <div
+                    className="xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto"
+                    data-testid="readiness-checklist"
+                >
+                    <div className="sticky top-0 space-y-8">
+                        <div>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-indigo-50 rounded-xl">
+                                    <CheckCircle className="h-5 w-5 text-indigo-600" />
+                                </div>
+                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">
+                                    {t('admin.design.checklist.title', 'Launch Readiness')}
+                                </h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                {checklist.map((item, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="flex items-start gap-3 p-3 rounded-xl border border-transparent transition-all hover:bg-slate-50"
+                                    >
+                                        {item.isComplete ? (
+                                            <CircleCheck className="h-5 w-5 text-green-500 shrink-0" />
+                                        ) : item.required ? (
+                                            <CircleDashed className="h-5 w-5 text-slate-300 shrink-0" />
+                                        ) : (
+                                            <CircleDashed className="h-5 w-5 text-slate-200 shrink-0" />
+                                        )}
+                                        <div className="space-y-0.5">
+                                            <p
+                                                className={cn(
+                                                    'text-xs font-bold leading-tight',
+                                                    item.isComplete
+                                                        ? 'text-slate-900'
+                                                        : 'text-slate-500'
+                                                )}
+                                            >
+                                                {item.label}
+                                            </p>
+                                            {item.required && !item.isComplete && (
+                                                <p className="text-[10px] font-medium text-rose-500 uppercase tracking-tighter">
+                                                    Required
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100">
+                            <div className="bg-slate-50 rounded-2xl p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                        Progress
+                                    </span>
+                                    <span className="text-xs font-black text-indigo-600">
+                                        {completedRequiredCount}/{totalRequiredCount}
+                                    </span>
+                                </div>
+                                <div
+                                    className="h-2 w-full bg-slate-200 rounded-full overflow-hidden"
+                                    data-testid="checklist-progress"
+                                >
+                                    <div
+                                        className="h-full bg-indigo-600 transition-all duration-1000"
+                                        style={{
+                                            width: `${(completedRequiredCount / totalRequiredCount) * 100}%`,
+                                        }}
+                                    />
+                                </div>
+                                <p
+                                    className="text-[10px] font-medium text-slate-500 mt-3 leading-relaxed"
+                                    data-testid="checklist-status"
+                                >
+                                    {isLaunchReady
+                                        ? t(
+                                              'admin.design.checklist.ready',
+                                              'All essential parts are ready. You can now launch your study!'
+                                          )
+                                        : t(
+                                              'admin.design.checklist.pending',
+                                              'Complete the required steps above to enable study activation.'
+                                          )}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Quick Tips */}
+                        <div className="bg-indigo-600 rounded-2xl p-5 text-white shadow-xl shadow-indigo-100">
+                            <Lightbulb className="h-5 w-5 mb-3 opacity-80" />
+                            <h4 className="text-xs font-black uppercase tracking-widest mb-2">
+                                {t('admin.design.tips.title', 'Quick Tip')}
+                            </h4>
+                            <p className="text-xs font-medium leading-relaxed opacity-90">
+                                {t(
+                                    'admin.design.tips.pilot',
+                                    'Always run a test sort yourself before sharing the link with participants.'
+                                )}
+                            </p>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleTestRun}
+                                className="w-full mt-4 bg-white/10 border-white/20 hover:bg-white/20 text-white rounded-lg font-bold border-0"
+                            >
+                                {t('admin.design.toolbar.test_run')}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
             {/* Validation Error Dialog */}

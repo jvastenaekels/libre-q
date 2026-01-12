@@ -14,6 +14,8 @@ import {
     Grid3X3,
     Trash2,
     HelpCircle,
+    RotateCcw,
+    Wand2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -144,11 +146,40 @@ const QSortEditor = () => {
     const totalStatements = statements.length;
     const isValid = totalSlots === totalStatements;
 
+    const isSymmetric =
+        grid.length > 0 &&
+        grid.every((col, idx) => {
+            const oppositeIdx = grid.length - 1 - idx;
+            return col.capacity === grid[oppositeIdx].capacity;
+        });
+
+    const isBellShaped =
+        isSymmetric &&
+        grid.length >= 5 &&
+        (() => {
+            const centerIdx = Math.floor(grid.length / 2);
+            for (let i = 0; i < centerIdx; i++) {
+                if ((grid[i].capacity || 0) > (grid[i + 1].capacity || 0)) return false;
+            }
+            return true;
+        })();
+
     const updateGridCapacity = (idx: number, delta: number) => {
         updateDraft((d) => {
             if (!d.grid_config) return;
             const col = d.grid_config[idx];
             col.capacity = Math.max(0, (col.capacity || 0) + delta);
+
+            // Symmetry Lock Logic
+            if (d.symmetry_lock ?? true) {
+                const oppositeIdx = d.grid_config.length - 1 - idx;
+                if (oppositeIdx !== idx && d.grid_config[oppositeIdx]) {
+                    d.grid_config[oppositeIdx].capacity = Math.max(
+                        0,
+                        (d.grid_config[oppositeIdx].capacity || 0) + delta
+                    );
+                }
+            }
         });
     };
 
@@ -192,6 +223,99 @@ const QSortEditor = () => {
             d.grid_config.shift();
             d.grid_config.pop();
         });
+    };
+
+    const autoShapeGrid = () => {
+        if (totalStatements === 0) {
+            toast.error(
+                t(
+                    'admin.design.qsort.grid.no_statements',
+                    'Add statements first to auto-shape the grid'
+                )
+            );
+            return;
+        }
+
+        updateDraft((d) => {
+            if (!d.grid_config || d.grid_config.length === 0) return;
+
+            const numColumns = d.grid_config.length;
+            const N = totalStatements;
+
+            // Binomial coefficient helper
+            const getBinomial = (n: number, k: number): number => {
+                if (k < 0 || k > n) return 0;
+                if (k === 0 || k === n) return 1;
+                if (k > n / 2) k = n - k;
+                let res = 1;
+                for (let i = 1; i <= k; i++) res = (res * (n - i + 1)) / i;
+                return res;
+            };
+
+            const weights = [];
+            for (let i = 0; i < numColumns; i++) {
+                weights.push(getBinomial(numColumns - 1, i));
+            }
+
+            const totalWeight = weights.reduce((a, b) => a + b, 0);
+            const idealCapacities = weights.map((w) => (w / totalWeight) * N);
+
+            const newCapacities = new Array(numColumns).fill(0);
+            let currentTotal = 0;
+
+            // Maintain horizontal symmetry
+            const half = Math.floor(numColumns / 2);
+            for (let i = 0; i < half; i++) {
+                const pairAvg = idealCapacities[i];
+                const cap = Math.max(1, Math.floor(pairAvg));
+                newCapacities[i] = cap;
+                newCapacities[numColumns - 1 - i] = cap;
+                currentTotal += cap * 2;
+            }
+
+            // Center column if exists
+            if (numColumns % 2 !== 0) {
+                const centerIdx = half;
+                const cap = Math.max(1, N - currentTotal);
+                newCapacities[centerIdx] = cap;
+                currentTotal += cap;
+            }
+
+            // Final bridge: if currentTotal !== N, adjust from center outwards to keep symmetry
+            const diff = N - currentTotal;
+            if (diff !== 0) {
+                // If diff is odd and we have no center, we must break symmetry slightly or adjust N
+                // But N is fixed. If K is even and diff is odd, one side will have +1.
+
+                const centerIdx = Math.floor(numColumns / 2);
+                if (numColumns % 2 !== 0) {
+                    // Symmetric adjustment possible at center
+                    newCapacities[centerIdx] += diff;
+                } else {
+                    // Even columns, must adjust a pair or break symmetry
+                    if (diff % 2 === 0) {
+                        const left = centerIdx - 1;
+                        const right = centerIdx;
+                        newCapacities[left] += diff / 2;
+                        newCapacities[right] += diff / 2;
+                    } else {
+                        // Break symmetry by 1 at the center
+                        newCapacities[centerIdx] += diff;
+                    }
+                }
+            }
+
+            // Ensure no capacity is below 1 if N >= K
+            for (let i = 0; i < numColumns; i++) {
+                if (newCapacities[i] <= 0 && N >= numColumns) newCapacities[i] = 1;
+                if (d.grid_config && d.grid_config[i]) {
+                    d.grid_config[i].capacity = newCapacities[i];
+                }
+            }
+        });
+        toast.success(
+            t('admin.design.qsort.grid.reshaped', 'Grid reshaped to a balanced distribution')
+        );
     };
 
     const handleSaveStatement = () => {
@@ -317,15 +441,50 @@ const QSortEditor = () => {
                             </span>
                         </h3>
                         {statements.length > 0 && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleClearAll}
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                                {t('admin.design.qsort.set.clear')}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (
+                                            confirm(
+                                                t(
+                                                    'admin.design.qsort.set.confirm_reset_codes',
+                                                    'Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?'
+                                                )
+                                            )
+                                        ) {
+                                            updateDraft((d) => {
+                                                if (d.statements) {
+                                                    // biome-ignore lint/suspicious/noExplicitAny: complex draft
+                                                    d.statements.forEach((s: any, idx: number) => {
+                                                        s.code = `s${idx + 1}`;
+                                                    });
+                                                }
+                                            });
+                                            toast.success(
+                                                t(
+                                                    'admin.design.qsort.set.codes_reset',
+                                                    'Statement codes re-sequenced'
+                                                )
+                                            );
+                                        }
+                                    }}
+                                    className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                    {t('admin.design.qsort.set.reset_codes', 'Reset Codes')}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleClearAll}
+                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    {t('admin.design.qsort.set.clear')}
+                                </Button>
+                            </div>
                         )}
                     </div>
 
@@ -496,6 +655,66 @@ const QSortEditor = () => {
                         </div>
                     </TooltipProvider>
 
+                    {/* Distribution Visualizer (Mini Chart) */}
+                    <div className="flex items-end justify-center gap-1.5 h-16 mb-2 px-10">
+                        {grid.map((col, idx) => {
+                            const maxCapacity = Math.max(...grid.map((c) => c.capacity || 1));
+                            const heightPercentage = ((col.capacity || 0) / maxCapacity) * 100;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="group/bar relative flex-1 flex flex-col items-center justify-end h-full"
+                                >
+                                    <div
+                                        className={cn(
+                                            'w-full rounded-t-sm transition-all duration-500 ease-out',
+                                            isValid
+                                                ? 'bg-indigo-400 group-hover/bar:bg-indigo-500'
+                                                : 'bg-slate-300 group-hover/bar:bg-slate-400'
+                                        )}
+                                        style={{ height: `${heightPercentage}%` }}
+                                    >
+                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-bold py-0.5 px-1.5 rounded pointer-events-none whitespace-nowrap z-10">
+                                            {col.capacity} {t('common.slots', 'slots')}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Shape Indicators */}
+                    <div className="flex items-center justify-center gap-6 py-2 px-6 bg-slate-50 border border-slate-100 rounded-2xl mb-8 mx-10">
+                        <div className="flex items-center gap-2">
+                            {isValid ? (
+                                <div className="size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                            ) : (
+                                <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                            )}
+                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600">
+                                {totalStatements} {t('admin.design.qsort.grid.statements')} vs{' '}
+                                {totalSlots} {t('common.slots')}
+                            </span>
+                        </div>
+                        <div className="w-px h-3 bg-slate-200" />
+                        <div className="flex items-center gap-2">
+                            {isBellShaped ? (
+                                <span className="text-[11px] font-black uppercase tracking-widest text-indigo-600 flex items-center gap-1.5">
+                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                    {t('admin.design.qsort.grid.ideal_shape')}
+                                </span>
+                            ) : isSymmetric ? (
+                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                    {t('admin.design.qsort.grid.symmetric')}
+                                </span>
+                            ) : (
+                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                    {t('admin.design.qsort.grid.asymmetric')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Visual Grid Representative */}
                     <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center shadow-inner group/grid transition-all hover:bg-slate-50/80">
                         <div className="flex items-end gap-2 mb-10 overflow-x-auto max-w-full pb-6 px-6 h-[280px]">
@@ -514,7 +733,10 @@ const QSortEditor = () => {
                                         <Plus className="h-3.5 w-3.5" />
                                     </Button>
 
-                                    <div className="flex flex-col-reverse gap-1.5 min-h-[40px]">
+                                    <div
+                                        className="flex flex-col-reverse gap-1.5 min-h-[40px]"
+                                        data-testid={`grid-column-${idx}-slots`}
+                                    >
                                         {Array.from({ length: col.capacity || 0 }).map((_, i) => (
                                             <div
                                                 key={i}
@@ -551,33 +773,84 @@ const QSortEditor = () => {
                         </div>
 
                         {/* Symmetric Column Management Buttons */}
-                        <div className="flex items-center gap-4 mb-8">
+                        <div className="flex items-center gap-6 mb-8">
+                            <div className="flex items-center gap-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={removeExtremeColumns}
+                                    className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold gap-2"
+                                    title={t(
+                                        'admin.design.qsort.grid.remove_extreme_columns',
+                                        'Remove extreme columns'
+                                    )}
+                                >
+                                    <Minus className="h-4 w-4" />
+                                    {t('common.reduce', 'Reduce')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={addExtremeColumns}
+                                    className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all font-bold gap-2"
+                                    title={t(
+                                        'admin.design.qsort.grid.add_extreme_columns',
+                                        'Add extreme columns'
+                                    )}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    {t('common.expand', 'Expand')}
+                                </Button>
+                            </div>
+
+                            <div className="w-px h-8 bg-slate-200" />
+
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={removeExtremeColumns}
-                                className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold gap-2"
+                                onClick={autoShapeGrid}
+                                className="h-10 px-6 rounded-2xl bg-indigo-50 text-indigo-600 border-indigo-100 shadow-sm hover:bg-indigo-100 transition-all font-bold gap-2"
                                 title={t(
-                                    'admin.design.qsort.grid.remove_extreme_columns',
-                                    'Remove extreme columns'
+                                    'admin.design.qsort.grid.auto_balance_desc',
+                                    'Reshape grid to a balanced semi-normal distribution'
                                 )}
                             >
-                                <Minus className="h-4 w-4" />
-                                {t('common.reduce', 'Reduce')}
+                                <Wand2 className="h-4 w-4" />
+                                {t('admin.design.qsort.grid.auto_balance', 'Auto-Balance')}
                             </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={addExtremeColumns}
-                                className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all font-bold gap-2"
-                                title={t(
-                                    'admin.design.qsort.grid.add_extreme_columns',
-                                    'Add extreme columns'
-                                )}
-                            >
-                                <Plus className="h-4 w-4" />
-                                {t('common.expand', 'Expand')}
-                            </Button>
+
+                            <div className="w-px h-8 bg-slate-200" />
+
+                            <div className="flex items-center gap-3">
+                                <Switch
+                                    id="symmetry-lock"
+                                    checked={draft.symmetry_lock ?? true}
+                                    onCheckedChange={(checked) => {
+                                        updateDraft((d) => {
+                                            d.symmetry_lock = checked;
+                                        });
+                                    }}
+                                />
+                                <Label
+                                    htmlFor="symmetry-lock"
+                                    className="text-xs font-bold text-slate-600 cursor-pointer"
+                                >
+                                    {t('admin.design.qsort.grid.symmetry_lock', 'Symmetry Lock')}
+                                </Label>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <HelpCircle className="h-3.5 w-3.5 text-slate-400" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="text-[10px] max-w-[200px]">
+                                            {t(
+                                                'admin.design.qsort.grid.symmetry_lock_desc',
+                                                'Automatically apply changes to opposite columns to maintain a balanced distribution.'
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                         </div>
 
                         {/* Validation Footer */}

@@ -647,7 +647,20 @@
                 "intro_title": "Welcome to the Studio",
                 "intro_desc": "Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.",
                 "qsort_title": "Statement & Grid Balance",
-                "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis."
+                "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually follows a quasi-normal (bell curve) distribution."
+            },
+            "checklist": {
+                "title": "Launch Readiness",
+                "statements": "Statements defined",
+                "grid_balance": "Grid balanced",
+                "branding": "Logo & Colors",
+                "instructions": "Instructions set",
+                "ready": "All essential parts are ready. You can now launch your study!",
+                "pending": "Complete the required steps above to enable study activation."
+            },
+            "tips": {
+                "title": "Quick Tip",
+                "pilot": "Always run a test sort yourself before sharing the link with participants."
             },
             "toolbar": {
                 "title": "Design",
@@ -815,7 +828,10 @@
                     "confirm_clear": "Are you sure you want to delete ALL statements? This cannot be undone.",
                     "updated": "Statement updated",
                     "cleared": "All statements cleared",
-                    "imported": "Successfully imported {{count}} statements"
+                    "imported": "Successfully imported {{count}} statements",
+                    "reset_codes": "Reset Codes",
+                    "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
+                    "codes_reset": "Statement codes re-sequenced"
                 },
                 "settings": {
                     "title": "Research settings",
@@ -835,6 +851,16 @@
                     "max_reached": "Maximum range reached (±6)",
                     "remove_extreme_columns": "Remove extreme columns",
                     "add_extreme_columns": "Add extreme columns",
+                    "symmetry_lock": "Symmetry Lock",
+                    "symmetry_lock_desc": "Automatically apply changes to opposite columns to maintain a balanced distribution.",
+                    "auto_balance": "Auto-Balance",
+                    "auto_balance_desc": "Reshape grid to a balanced semi-normal distribution",
+                    "reshaped": "Grid reshaped to a balanced distribution",
+                    "no_statements": "Add statements first to auto-shape the grid",
+                    "statements": "statements",
+                    "ideal_shape": "Ideal Shape",
+                    "symmetric": "Symmetric",
+                    "asymmetric": "Asymmetric",
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
                     "locked": "Design Locked",

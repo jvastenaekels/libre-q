@@ -191,7 +191,9 @@ export function useAutoSave(debounceMs = 2000) {
         setLastSavedAt,
         updateOriginal,
         updateMutation,
-        debounceMs,
+        debounceMs, // 2. Update Draft with Merged Content
+        // We use a special update to replace everything
+        updateDraft,
     ]);
 
     return {
