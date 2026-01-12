@@ -29,10 +29,6 @@ const mockConfig = {
     },
 };
 
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
-}));
-
 describe('WelcomePage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -52,7 +48,7 @@ describe('WelcomePage', () => {
     it('renders instructions markdown', () => {
         renderWithProviders(<WelcomePage />);
         // Label
-        expect(screen.getByText('How it works')).toBeInTheDocument();
+        expect(screen.getByText('Process')).toBeInTheDocument();
 
         // Markdown Content - split check to be resilient to formatting/newlines
         expect(screen.getByText('Content')).toBeInTheDocument();

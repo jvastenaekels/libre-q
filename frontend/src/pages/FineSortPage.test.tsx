@@ -120,10 +120,7 @@ vi.mock('../components/GridSort', () => ({
 }));
 
 // Mock Translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
+// Mock Translation removed
 
 describe('FineSortPage Integration', () => {
     beforeEach(() => {

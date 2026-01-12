@@ -4,26 +4,7 @@ import ConditionOfInstructionEditor from './ConditionOfInstructionEditor';
 import { renderWithStore } from '@/test-utils/renderWithStore';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => {
-            const translations: Record<string, string> = {
-                'admin.design.condition.title': 'Condition of Instruction',
-                'admin.design.condition.label': 'Instruction Label',
-                'admin.design.condition.desc': 'Description',
-                'admin.design.condition.field_label': 'Condition Field',
-                'admin.design.condition.placeholder': 'Enter condition',
-                'admin.design.condition.enable_pre': 'Enable Pre-Instruction',
-                'admin.design.condition.pre_label': 'Pre-Instruction Content',
-                'admin.design.condition.pre_desc': 'Enter pre-instruction',
-                'admin.design.condition.tips.title': 'Tips',
-                'admin.design.condition.tips.desc': 'Tips description',
-            };
-            return translations[key] || key;
-        },
-    }),
-}));
+// Mock removed
 
 describe('ConditionOfInstructionEditor', () => {
     // biome-ignore lint/suspicious/noExplicitAny: test helper
@@ -58,13 +39,13 @@ describe('ConditionOfInstructionEditor', () => {
         renderEditor();
 
         expect(screen.getByText('Condition of Instruction')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Enter condition')).toBeInTheDocument();
+        expect(screen.getByLabelText('Instruction Text')).toBeInTheDocument();
     });
 
     it('updates condition_of_instruction field', () => {
         renderEditor();
 
-        const input = screen.getByPlaceholderText('Enter condition');
+        const input = screen.getByLabelText('Instruction Text');
         fireEvent.change(input, { target: { value: 'Test instruction' } });
 
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
@@ -78,7 +59,7 @@ describe('ConditionOfInstructionEditor', () => {
         it('shows toggle for enabling pre-instruction', () => {
             renderEditor();
 
-            expect(screen.getByText('Enable Pre-Instruction')).toBeInTheDocument();
+            expect(screen.getByText('Enable Pre-instruction step')).toBeInTheDocument();
             const toggle = screen.getByRole('switch');
             expect(toggle).toBeInTheDocument();
         });
@@ -152,7 +133,7 @@ describe('ConditionOfInstructionEditor', () => {
         it('does not show editor when pre-instruction is disabled', () => {
             renderEditor();
 
-            expect(screen.queryByText('Pre-Instruction Content')).not.toBeInTheDocument();
+            expect(screen.queryByText('Pre-instruction Content')).not.toBeInTheDocument();
         });
 
         it('shows markdown editor when pre-instruction is enabled', () => {
@@ -168,7 +149,7 @@ describe('ConditionOfInstructionEditor', () => {
                 },
             });
 
-            expect(screen.getByText('Pre-Instruction Content')).toBeInTheDocument();
+            expect(screen.getByText('Pre-instruction Content')).toBeInTheDocument();
         });
 
         it('updates pre_instruction content', () => {
@@ -206,7 +187,7 @@ describe('ConditionOfInstructionEditor', () => {
             fireEvent.click(toggle);
 
             // Add content
-            const textarea = screen.getByPlaceholderText('Enter pre-instruction');
+            const textarea = screen.getByRole('textbox');
             fireEvent.change(textarea, { target: { value: 'My instruction' } });
 
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure

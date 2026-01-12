@@ -74,7 +74,7 @@ describe('MethodologyTips', () => {
             nextButton.click();
         });
 
-        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
+        expect(screen.getByText('fine.workbench.methodology.vertical')).toBeInTheDocument();
     });
 
     it('pauses rotation on interaction', () => {
@@ -86,7 +86,7 @@ describe('MethodologyTips', () => {
         });
 
         // Should be at tip 2 now.
-        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
+        expect(screen.getByText('fine.workbench.methodology.vertical')).toBeInTheDocument();
 
         // Advance time by normal interval (should NOT move because paused)
         act(() => {
@@ -94,6 +94,6 @@ describe('MethodologyTips', () => {
         });
 
         // Should still be at tip 2 (rotation paused)
-        expect(screen.getByText(/fine.workbench.methodology.vertical/i)).toBeInTheDocument();
+        expect(screen.getByText('fine.workbench.methodology.vertical')).toBeInTheDocument();
     });
 });

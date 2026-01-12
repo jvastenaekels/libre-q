@@ -28,6 +28,11 @@ vi.mock('./i18n', async () => {
     return { default: testI18n.default };
 });
 
+vi.mock('@/i18n', async () => {
+    const testI18n = await import('./test-utils/i18n-test');
+    return { default: testI18n.default };
+});
+
 // Polyfill ResizeObserver
 vi.stubGlobal(
     'ResizeObserver',
@@ -52,7 +57,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Polyfill scrollTo
-window.scrollTo = vi.fn();
+// Mocks removed
 window.confirm = vi.fn();
 
 // MSW Server Setup

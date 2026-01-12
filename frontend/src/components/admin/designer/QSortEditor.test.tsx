@@ -13,11 +13,7 @@ vi.mock('sonner', () => ({
     },
 }));
 
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-    }),
-}));
+// Mock removed
 
 describe('QSortEditor', () => {
     // biome-ignore lint/suspicious/noExplicitAny: convenient partial mock
@@ -76,15 +72,13 @@ describe('QSortEditor', () => {
             await user.click(distributionTab);
 
             // UI should switch to grid config
-            expect(screen.getByText('admin.design.qsort.grid.title')).toBeInTheDocument();
+            expect(screen.getByText('Forced distribution grid')).toBeInTheDocument();
         });
 
         it('displays statements tab content by default', () => {
             renderEditor();
-            expect(screen.getByText('admin.design.qsort.bulk.title')).toBeInTheDocument();
-            expect(
-                screen.getByText('admin.design.qsort.set.title', { exact: false })
-            ).toBeInTheDocument();
+            expect(screen.getByText('Bulk editor (quick paste)')).toBeInTheDocument();
+            expect(screen.getByText('Q-set', { exact: false })).toBeInTheDocument();
         });
     });
 
@@ -93,11 +87,11 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const textarea = screen.getByPlaceholderText('admin.design.qsort.bulk.placeholder');
+            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
             await user.type(textarea, 'S1: New Statement 1\nS2: New Statement 2');
 
             const replaceButton = screen.getByRole('button', {
-                name: 'admin.design.qsort.bulk.process_replace',
+                name: 'Process & replace statements',
             });
             await user.click(replaceButton);
 
@@ -112,14 +106,14 @@ describe('QSortEditor', () => {
             renderEditor();
 
             // Switch to append
-            const appendRadio = screen.getByLabelText('admin.design.qsort.bulk.append');
+            const appendRadio = screen.getByLabelText('Append to list');
             await user.click(appendRadio);
 
-            const textarea = screen.getByPlaceholderText('admin.design.qsort.bulk.placeholder');
+            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
             await user.type(textarea, 'S2: Appended');
 
             const appendButton = screen.getByRole('button', {
-                name: 'admin.design.qsort.bulk.process_append',
+                name: 'Process & append statements',
             });
             await user.click(appendButton);
 
@@ -132,11 +126,11 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const textarea = screen.getByPlaceholderText('admin.design.qsort.bulk.placeholder');
+            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
             await user.type(textarea, 'TSV1\tTab Separated Text');
 
             const replaceButton = screen.getByRole('button', {
-                name: 'admin.design.qsort.bulk.process_replace',
+                name: 'Process & replace statements',
             });
             await user.click(replaceButton);
 
@@ -148,12 +142,12 @@ describe('QSortEditor', () => {
             renderEditor();
 
             const textarea = screen.getByPlaceholderText(
-                'admin.design.qsort.bulk.placeholder'
+                /Paste your statements here/i
             ) as HTMLTextAreaElement;
             await user.type(textarea, 'S1: Test');
 
             const replaceButton = screen.getByRole('button', {
-                name: 'admin.design.qsort.bulk.process_replace',
+                name: 'Process & replace statements',
             });
             await user.click(replaceButton);
 
@@ -187,7 +181,7 @@ describe('QSortEditor', () => {
 
             renderEditor();
 
-            const clearButton = screen.getByText('admin.design.qsort.set.clear');
+            const clearButton = screen.getByText('Clear all');
             await user.click(clearButton);
 
             expect(confirmSpy).toHaveBeenCalled();
@@ -205,7 +199,7 @@ describe('QSortEditor', () => {
     describe('Grid Configuration', () => {
         it('displays grid columns', () => {
             renderEditor({ activeSubStep: 'grid' });
-            expect(screen.getByText('admin.design.qsort.grid.title')).toBeInTheDocument();
+            expect(screen.getByText('Forced distribution grid')).toBeInTheDocument();
             // Should see input fields for the grid
             // (Assuming grid editor renders inputs implies it's working)
         });
@@ -217,7 +211,7 @@ describe('QSortEditor', () => {
             // Should show mismatch warning/error if implemented in UI
             renderEditor({ activeSubStep: 'grid' });
             // For now just check it renders
-            expect(screen.getByText('admin.design.qsort.grid.title')).toBeInTheDocument();
+            expect(screen.getByText('Forced distribution grid')).toBeInTheDocument();
         });
     });
 });

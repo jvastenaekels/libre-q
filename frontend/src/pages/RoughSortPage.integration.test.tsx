@@ -43,10 +43,7 @@ vi.mock('../hooks/useStudyConfig', () => ({
 }));
 
 // Mock translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
+// Mock Translation removed
 
 describe('RoughSortPage Integration', () => {
     beforeEach(() => {
@@ -75,7 +72,7 @@ describe('RoughSortPage Integration', () => {
             initialEntries: ['/study/demo/sort/rough'],
         });
 
-        const nextBtns = screen.getAllByText('common.next');
+        const nextBtns = screen.getAllByText('Next step');
         expect(nextBtns.length).toBeGreaterThan(0);
     });
 
@@ -101,6 +98,6 @@ describe('RoughSortPage Integration', () => {
             initialEntries: ['/study/demo/sort/rough'],
         });
 
-        expect(screen.queryByText('common.next')).toBeNull();
+        expect(screen.queryByText('Next step')).toBeNull();
     });
 });

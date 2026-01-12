@@ -1,25 +1,10 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import QuestionBuilder from './QuestionBuilder';
 import { renderWithStore } from '@/test-utils/renderWithStore';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => {
-            const translations: Record<string, string> = {
-                'admin.design.questions.enable_presort': 'Enable Pre-sort Survey',
-                'admin.design.questions.enable_presort_desc': 'Collect demographic information',
-                'admin.design.questions.add_field': 'Add a new field',
-                'admin.design.questions.basic_fields': 'Basic fields',
-                'admin.design.questions.types.text': 'Text',
-                'admin.design.questions.defaults.new_question': 'New question',
-                'admin.design.questions.defaults.untitled': 'Untitled',
-            };
-            return translations[key] || key;
-        },
-    }),
-}));
+// Mock removed
 
 describe('QuestionBuilder - Presort Config Migration', () => {
     // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility

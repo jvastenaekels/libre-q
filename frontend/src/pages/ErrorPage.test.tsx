@@ -15,10 +15,7 @@ const mockResetConfig = vi.fn();
 const mockResetResponses = vi.fn();
 const mockNavigate = vi.fn();
 
-// Mock I18n
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-}));
+// Mocks
 
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
@@ -68,8 +65,8 @@ describe('ErrorPage', () => {
             </MemoryRouter>
         );
         // "common.errors.default_title" matches mock translation key
-        expect(screen.getByText('common.errors.default_title')).toBeInTheDocument();
-        expect(screen.getByText('common.errors.unknown')).toBeInTheDocument();
+        expect(screen.getByText('Oops! Something went wrong.')).toBeInTheDocument();
+        expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument();
     });
 
     it('renders specific 404 UI', () => {
@@ -78,8 +75,8 @@ describe('ErrorPage', () => {
                 <ErrorPage error={new ApiError(404, 'Not found')} />
             </MemoryRouter>
         );
-        expect(screen.getByText('common.errors.404.title')).toBeInTheDocument();
-        expect(screen.queryByText('common.errors.default_title')).not.toBeInTheDocument();
+        expect(screen.getByText('Page Not Found')).toBeInTheDocument();
+        expect(screen.queryByText('Oops! Something went wrong.')).not.toBeInTheDocument();
     });
 
     it('resets session on button click for generic error', () => {
@@ -90,7 +87,7 @@ describe('ErrorPage', () => {
         );
 
         // Button text is now from translation keys
-        const resetButton = screen.getByRole('button', { name: 'common.errors.reset' });
+        const resetButton = screen.getByRole('button', { name: 'Reset Session' });
         fireEvent.click(resetButton);
 
         expect(mockResetSession).toHaveBeenCalled();
@@ -107,7 +104,7 @@ describe('ErrorPage', () => {
             </MemoryRouter>
         );
 
-        const retryButton = screen.getByRole('button', { name: 'common.errors.retry' });
+        const retryButton = screen.getByRole('button', { name: 'Retry' });
         fireEvent.click(retryButton);
         expect(onRetry).toHaveBeenCalled();
     });

@@ -12,6 +12,10 @@ import { applyStudyOverrides, resetBaseLocales } from './i18nOverrides';
 describe('i18nOverrides utility', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Setup spies on i18n methods
+        vi.spyOn(i18n, 'addResourceBundle');
+        vi.spyOn(i18n, 'removeResourceBundle');
+        vi.spyOn(i18n, 'reloadResources');
     });
 
     it('should apply study overrides from config successfully', () => {

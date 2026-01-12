@@ -1,36 +1,10 @@
 import { screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import InterfaceEditor from './InterfaceEditor';
 import { renderWithStore } from '@/test-utils/renderWithStore';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => {
-            const translations: Record<string, string> = {
-                'admin.design.interface.nav.start': 'Start Button',
-                'admin.design.interface.nav.next': 'Next Button',
-                'admin.design.interface.nav.submit': 'Submit Button',
-                'admin.design.interface.terms.most_agree': 'Most Agree',
-                'admin.design.interface.terms.most_disagree': 'Most Disagree',
-                'admin.design.interface.terms.neutral': 'Neutral',
-                'admin.design.interface.nav.title': 'Navigation',
-                'admin.design.interface.terms.title': 'Terms',
-                'admin.design.interface.hints.title': 'Hints',
-                'admin.design.interface.help.title': 'Help',
-                'study.steps.presort': 'Presort',
-                'study.steps.rough': 'Rough Sort',
-                'study.steps.fine': 'Fine Sort',
-                'study.steps.post': 'Post Sort',
-            };
-            return translations[key] || key;
-        },
-        i18n: {
-            t: (key: string) => key,
-            language: 'en',
-        },
-    }),
-}));
+// Mock removed
 
 describe('InterfaceEditor', () => {
     // biome-ignore lint/suspicious/noExplicitAny: weak typing
@@ -77,7 +51,7 @@ describe('InterfaceEditor', () => {
 
         // Check for labels
         expect(screen.getByText('Start Button')).toBeInTheDocument();
-        expect(screen.getByText('Next Button')).toBeInTheDocument();
+        expect(screen.getByText('Next Step Button')).toBeInTheDocument();
         expect(screen.getByText('Submit Button')).toBeInTheDocument();
 
         // Check for existing value from draft
@@ -95,7 +69,7 @@ describe('InterfaceEditor', () => {
     it('updates labels via updateTranslation', () => {
         renderEditor();
 
-        const nextButtonInput = screen.getByPlaceholderText('common.next');
+        const nextButtonInput = screen.getByPlaceholderText('Next step');
         fireEvent.change(nextButtonInput, { target: { value: 'Forward' } });
 
         // Verify store update

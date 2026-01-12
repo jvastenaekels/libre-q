@@ -28,14 +28,6 @@ const mockConfig = {
     },
 };
 
-// Mock i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string, defaultValue: string) => defaultValue || key,
-        i18n: { language: 'en' },
-    }),
-}));
-
 // Mock useStudyConfig logic if strictly needed, but we mock the store directly
 vi.mock('../hooks/useStudyConfig', () => ({
     useStudyConfig: () => ({ isLoading: false, error: null }),
