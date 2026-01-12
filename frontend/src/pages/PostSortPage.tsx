@@ -189,7 +189,8 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         const keyList = Array.isArray(keys) ? keys : [keys];
 
         for (const key of keyList) {
-            const promptConfig = prompts[key];
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic key access
+            const promptConfig = (prompts as any)[key];
             if (promptConfig) {
                 if (typeof promptConfig === 'string') return promptConfig;
                 const currentLang = i18n.language || 'en';
