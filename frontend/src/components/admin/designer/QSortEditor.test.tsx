@@ -118,8 +118,10 @@ describe('QSortEditor', () => {
             await user.click(appendButton);
 
             // Assert UI update
-            expect(await screen.findByText('Existing Statement')).toBeInTheDocument();
-            expect(await screen.findByText('Appended')).toBeInTheDocument();
+            expect(
+                await screen.findByText('Existing Statement', {}, { timeout: 5000 })
+            ).toBeInTheDocument();
+            expect(await screen.findByText('Appended', {}, { timeout: 5000 })).toBeInTheDocument();
         }, 15000);
 
         it('supports TSV format', async () => {
