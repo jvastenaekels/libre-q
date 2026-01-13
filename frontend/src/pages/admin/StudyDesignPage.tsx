@@ -2,7 +2,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import type { StudyUpdate, StudyRead, StudyTranslationRead } from '@/api/model';
+import type {
+    StudyUpdate,
+    StudyRead,
+    StudyTranslationRead,
+    StudyTranslationCreate,
+} from '@/api/model';
 import {
     Wand2,
     Eye,
@@ -338,8 +343,8 @@ const StudyDesignPage = () => {
     // Calculate readiness for all languages for the global indicator
     const globalRequirementsMet = (draft.statements?.length || 0) > 0 && isGridValid;
     const languageReadiness = (draft.translations || [])
-        .filter((t: StudyTranslationRead & { is_disabled?: boolean }) => !t.is_disabled)
-        .map((tr: StudyTranslationRead) => {
+        .filter((t: StudyTranslationCreate & { is_disabled?: boolean }) => !t.is_disabled)
+        .map((tr: StudyTranslationCreate) => {
             const isTranslationComplete = !!(
                 tr.title &&
                 tr.consent_title &&
@@ -429,8 +434,11 @@ const StudyDesignPage = () => {
                                 {(() => {
                                     const activeLangs = (draft.translations || [])
                                         .filter(
-                                            (t: StudyTranslationRead & { is_disabled?: boolean }) =>
-                                                !t.is_disabled
+                                            (
+                                                t: StudyTranslationCreate & {
+                                                    is_disabled?: boolean;
+                                                }
+                                            ) => !t.is_disabled
                                         )
                                         .map((t) => t.language_code);
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
-import type { StudyTranslationRead } from '@/api/model';
+import type { StudyTranslationCreate } from '@/api/model';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -459,7 +459,7 @@ const QSortEditor = () => {
                                             d.statements.push({
                                                 code: `s${newIdx}`,
                                                 translations: (d.translations || []).map(
-                                                    (t: StudyTranslationRead) => ({
+                                                    (t: StudyTranslationCreate) => ({
                                                         language_code: t.language_code,
                                                         text: '',
                                                     })

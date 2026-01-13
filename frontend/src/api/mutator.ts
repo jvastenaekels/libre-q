@@ -51,6 +51,25 @@ export const customInstance = async <T>({
 
     if (!response.ok) {
         const errorText = await response.text();
+        let message = errorText;
+        let code: string | undefined;
+        let details: unknown | undefined;
+
+        try {
+            const parsed = JSON.parse(errorText);
+            if (parsed.message) {
+                message = parsed.message;
+            } else if (parsed.detail) {
+                message =
+                    typeof parsed.detail === 'string'
+                        ? parsed.detail
+                        : JSON.stringify(parsed.detail);
+            }
+            if (parsed.code) code = parsed.code;
+            if (parsed.details !== undefined) details = parsed.details;
+        } catch (_e) {
+            // Not JSON
+        }
 
         // 401 Unauthorized: Clear session and redirect to login
         if (response.status === 401) {
@@ -80,8 +99,7 @@ export const customInstance = async <T>({
                 status: response.status,
             });
         }
-
-        throw new ApiError(response.status, errorText || 'Request failed');
+        throw new ApiError(response.status, message, code, details);
     }
 
     // Handle 204 No Content

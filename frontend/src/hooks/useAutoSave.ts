@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
+import type { StudyUpdate, StudyRead } from '@/api/model';
 import { useParams } from 'react-router-dom';
+import type { ApiError } from '@/api/client';
 import { mergeStudyUpdates } from '@/utils/mergeStudy';
 import { toast } from 'sonner';
 
@@ -115,24 +117,16 @@ export function useAutoSave(debounceMs = 2000) {
                     updateOriginal(result);
                     localStorage.setItem(`open-q-draft-backup-${slug}`, draftJson);
                 } catch (error) {
-                    const axiosError = error as {
-                        response?: {
-                            status: number;
-                            data?: { details?: { server_state: StudyRead } };
-                        };
-                    };
-                    // If it was cancelled, don't show error
                     if (error instanceof Error && error.name === 'AbortError') {
                         return;
                     }
 
+                    const apiError = error as ApiError & { details: { server_state: StudyRead } };
+
                     // Optimistic Locking: 409 Conflict
-                    if (
-                        axiosError?.response?.status === 409 &&
-                        axiosError.response.data?.details?.server_state
-                    ) {
+                    if (apiError?.status === 409 && apiError.details?.server_state) {
                         try {
-                            const serverRead = axiosError.response.data.details.server_state;
+                            const serverRead = apiError.details.server_state;
                             const serverUpdate = projectStudyToUpdate(serverRead);
                             const originalUpdate = original ? projectStudyToUpdate(original) : null;
 
