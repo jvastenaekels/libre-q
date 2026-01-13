@@ -1,4 +1,3 @@
-import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
@@ -23,42 +22,25 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { StudyRead, StudyUpdate } from '@/api/model';
 import * as z from 'zod';
 import { AdminService } from '@/api/admin';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { parseApiErrorSync } from '@/lib/error-utils';
-import {
-    Loader2,
-    Globe,
-    Calendar as CalendarIconAlt,
-    Archive,
-    Trash2,
-    Save,
-    Info,
-    ShieldAlert,
-    Settings,
-} from 'lucide-react';
+import { Loader2, Globe, Archive, Trash2, Save, Info, ShieldAlert, Settings } from 'lucide-react';
 
 // Removing useAdminStudy as we use loader now
 
 const studyFormSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(200),
     slug: z
         .string()
         .min(3)
         .max(100)
         .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
-    start_date: z.date().optional().nullable(),
-    end_date: z.date().optional().nullable(),
 });
 
 type StudyFormValues = z.infer<typeof studyFormSchema>;
@@ -78,13 +60,7 @@ export default function GeneralSettingsPage() {
     const form = useForm<StudyFormValues>({
         resolver: zodResolver(studyFormSchema),
         defaultValues: {
-            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-            title: (study as any)?.title || '',
             slug: study?.slug || '',
-            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-            start_date: (study as any).start_date ? new Date((study as any).start_date) : null,
-            // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-            end_date: (study as any).end_date ? new Date((study as any).end_date) : null,
         },
     });
 
@@ -93,13 +69,7 @@ export default function GeneralSettingsPage() {
     useEffect(() => {
         if (study) {
             form.reset({
-                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-                title: (study as any).title || '',
                 slug: study.slug || '',
-                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-                start_date: (study as any).start_date ? new Date((study as any).start_date) : null,
-                // biome-ignore lint/suspicious/noExplicitAny: API type definition stale
-                end_date: (study as any).end_date ? new Date((study as any).end_date) : null,
             });
         }
     }, [study, form]);
@@ -108,10 +78,7 @@ export default function GeneralSettingsPage() {
         if (!slug) return;
         try {
             await AdminService.updateStudy(slug, {
-                title: data.title,
                 slug: data.slug,
-                start_date: data.start_date?.toISOString(),
-                end_date: data.end_date?.toISOString(),
             } as unknown as StudyUpdate);
 
             toast.success(t('admin.settings.save_success'), {
@@ -178,7 +145,8 @@ export default function GeneralSettingsPage() {
 
             <div className="space-y-6 max-w-4xl">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Basic Information Card - Only URL Slug */}
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader className="border-b border-slate-50 pb-4">
                                 <div className="flex items-center gap-2 mb-1">
@@ -191,28 +159,7 @@ export default function GeneralSettingsPage() {
                                     {t('admin.settings.basic.description')}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="p-6 space-y-6">
-                                {/* Title */}
-                                <FormField
-                                    control={form.control}
-                                    name="title"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                                {t('admin.workspaces.settings.general.label_title')}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    disabled={isArchived}
-                                                    className="h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
+                            <CardContent className="p-6">
                                 {/* Slug */}
                                 <FormField
                                     control={form.control}
@@ -242,140 +189,8 @@ export default function GeneralSettingsPage() {
                                         </FormItem>
                                     )}
                                 />
-
-                                {/* Dates */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="start_date"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-col">
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                                    <CalendarIconAlt className="w-3 h-3" />
-                                                    {t('admin.settings.basic.start_date_label')}
-                                                </FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button
-                                                                variant={'outline'}
-                                                                className={cn(
-                                                                    'h-11 rounded-xl bg-slate-50 border-slate-100 w-full pl-3 text-left font-normal',
-                                                                    !field.value && 'text-slate-400'
-                                                                )}
-                                                                disabled={isArchived}
-                                                            >
-                                                                {field.value ? (
-                                                                    format(field.value, 'PPP')
-                                                                ) : (
-                                                                    <span>
-                                                                        {t(
-                                                                            'admin.settings.basic.pick_date'
-                                                                        )}
-                                                                    </span>
-                                                                )}
-                                                                <CalendarIconAlt className="ml-auto h-4 w-4 opacity-50" />
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        {/* Assuming Calendar is still properly imported/available if needed,
-                                                            or we use a custom one if it was part of shadcn calendar.
-                                                            Re-checking imports above. */}
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value || undefined}
-                                                            onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date < new Date('1900-01-01')
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormDescription className="text-[11px]">
-                                                    {t(
-                                                        'admin.settings.basic.start_date_description'
-                                                    )}
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="end_date"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-col">
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                                    <CalendarIconAlt className="w-3 h-3" />
-                                                    {t('admin.settings.basic.end_date_label')}
-                                                </FormLabel>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <FormControl>
-                                                            <Button
-                                                                variant={'outline'}
-                                                                className={cn(
-                                                                    'h-11 rounded-xl bg-slate-50 border-slate-100 w-full pl-3 text-left font-normal',
-                                                                    !field.value && 'text-slate-400'
-                                                                )}
-                                                                disabled={isArchived}
-                                                            >
-                                                                {field.value ? (
-                                                                    format(field.value, 'PPP')
-                                                                ) : (
-                                                                    <span>
-                                                                        {t(
-                                                                            'admin.settings.basic.pick_date'
-                                                                        )}
-                                                                    </span>
-                                                                )}
-                                                                <CalendarIconAlt className="ml-auto h-4 w-4 opacity-50" />
-                                                            </Button>
-                                                        </FormControl>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent
-                                                        className="w-auto p-0"
-                                                        align="start"
-                                                    >
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value || undefined}
-                                                            onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date < new Date('1900-01-01')
-                                                            }
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                                <FormDescription className="text-[11px]">
-                                                    {t('admin.settings.basic.end_date_description')}
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between border-t border-slate-50 px-6 py-4">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                                    {t('admin.settings.lifecycle.current_state')}
-                                    <Badge
-                                        variant={isArchived ? 'secondary' : 'default'}
-                                        className={cn(
-                                            'font-black tracking-wider text-[10px] px-2.5 py-0.5',
-                                            !isArchived && 'bg-indigo-600 shadow-sm'
-                                        )}
-                                    >
-                                        {study.state}
-                                    </Badge>
-                                </div>
+                            <CardFooter className="flex justify-end border-t border-slate-50 px-6 py-4">
                                 <Button
                                     type="submit"
                                     disabled={isArchived || form.formState.isSubmitting}
