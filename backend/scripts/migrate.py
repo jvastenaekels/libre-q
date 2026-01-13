@@ -179,6 +179,25 @@ async def migrate_studies_table():
             )
             migrations_applied = True
 
+        # updated_at
+        if not await check_column_exists(conn, "studies", "updated_at"):
+            logger.info("  Adding 'updated_at' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE studies ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE studies ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                    )
+                )
+            migrations_applied = True
+            logger.info("  Added 'updated_at' column")
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Studies table updated")
