@@ -287,7 +287,7 @@ const StudyDesignPage = () => {
     const nextStep = DESIGN_STEPS[currentStepIndex + 1];
     const prevStep = DESIGN_STEPS[currentStepIndex - 1];
 
-    // Design Checklist logic
+    // Design Checklist logic - in logical/chronological order
     const checklist = [
         {
             label: t('admin.design.checklist.statements', 'Statements defined'),
@@ -298,11 +298,6 @@ const StudyDesignPage = () => {
             label: t('admin.design.checklist.grid_balance', 'Grid balanced'),
             isComplete: isGridValid,
             required: true,
-        },
-        {
-            label: t('admin.design.checklist.branding', 'Logo & Colors'),
-            isComplete: !!draft.branding?.primary_color,
-            required: false,
         },
         {
             label: t('admin.design.checklist.instructions', 'Instructions set'),
