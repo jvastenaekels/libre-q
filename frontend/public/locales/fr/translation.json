@@ -657,7 +657,14 @@
                 "branding": "Logo & Couleurs",
                 "instructions": "Consignes définies",
                 "ready": "Tous les éléments essentiels sont prêts. Vous pouvez lancer votre étude !",
-                "pending": "Complétez les étapes requises ci-dessus pour activer l'étude."
+                "pending": "Complétez les étapes requises ci-dessus pour activer l'étude.",
+                "study_title": "Titre de l'étude défini",
+                "consent_defined": "Formulaire de consentement défini",
+                "progress": "Progression",
+                "languages": "Langues",
+                "status_ready": "Prêt",
+                "status_pending": "En attente",
+                "required": "Requis"
             },
             "tips": {
                 "title": "Conseil rapide",

@@ -290,12 +290,12 @@ const StudyDesignPage = () => {
 
     const checklist = [
         {
-            label: t('admin.design.checklist.title', 'Study Title defined'),
+            label: t('admin.design.checklist.study_title', 'Study Title defined'),
             isComplete: !!currentTranslation?.title,
             required: true,
         },
         {
-            label: t('admin.design.checklist.consent', 'Consent Form defined'),
+            label: t('admin.design.checklist.consent_defined', 'Consent Form defined'),
             isComplete: !!(
                 currentTranslation?.consent_title && currentTranslation?.consent_description
             ),
@@ -552,7 +552,7 @@ const StudyDesignPage = () => {
                     </div>
                 )}
                 {/* Left Pane: Editor */}
-                <div className="flex-1 overflow-y-auto bg-muted/30 p-6">
+                <div className="flex-1 overflow-y-auto bg-muted/30 p-6 min-w-0">
                     <Tabs
                         value={activeStep}
                         // biome-ignore lint/suspicious/noExplicitAny: enum cast
@@ -849,7 +849,10 @@ const StudyDesignPage = () => {
                                             </p>
                                             {item.required && !item.isComplete && (
                                                 <p className="text-[9px] font-medium text-rose-500 uppercase tracking-tighter">
-                                                    Required
+                                                    {t(
+                                                        'admin.design.checklist.required',
+                                                        'Required'
+                                                    )}
                                                 </p>
                                             )}
                                         </div>
@@ -862,7 +865,7 @@ const StudyDesignPage = () => {
                             <div className="bg-slate-50 rounded-2xl p-4">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                        Progress
+                                        {t('admin.design.checklist.progress', 'Progress')}
                                     </span>
                                     <span className="text-xs font-black text-indigo-600">
                                         {completedRequiredCount}/{totalRequiredCount}
@@ -915,14 +918,20 @@ const StudyDesignPage = () => {
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
                                                 <CheckCircle className="h-3 w-3" />
                                                 <span className="text-[10px] font-bold uppercase tracking-wide">
-                                                    Ready
+                                                    {t(
+                                                        'admin.design.checklist.status_ready',
+                                                        'Ready'
+                                                    )}
                                                 </span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">
                                                 <CircleDashed className="h-3 w-3" />
                                                 <span className="text-[10px] font-bold uppercase tracking-wide">
-                                                    Pending
+                                                    {t(
+                                                        'admin.design.checklist.status_pending',
+                                                        'Pending'
+                                                    )}
                                                 </span>
                                             </div>
                                         )}

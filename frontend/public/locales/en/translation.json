@@ -657,7 +657,14 @@
                 "branding": "Logo & Colors",
                 "instructions": "Instructions set",
                 "ready": "All essential parts are ready. You can now launch your study!",
-                "pending": "Complete the required steps above to enable study activation."
+                "pending": "Complete the required steps above to enable study activation.",
+                "study_title": "Study Title defined",
+                "consent_defined": "Consent Form defined",
+                "progress": "Progress",
+                "languages": "Languages",
+                "status_ready": "Ready",
+                "status_pending": "Pending",
+                "required": "Required"
             },
             "tips": {
                 "title": "Quick Tip",
