@@ -17,7 +17,6 @@ import {
     History,
     Rocket,
     ArrowRight,
-    Lightbulb,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -437,6 +436,7 @@ const StudyDesignPage = () => {
                         variant="secondary"
                         size="sm"
                         onClick={handleTestRun}
+                        disabled
                         className="gap-2 h-8 font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg shadow-sm transition-all"
                     >
                         <Eye className="h-4 w-4 text-indigo-500" />
@@ -785,8 +785,8 @@ const StudyDesignPage = () => {
                     </Tabs>
                 </div>
 
-                {/* Design Checklist Sidebar/Widget */}
-                <div className="xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto">
+                {/* Design Checklist Sidebar/Widget */}{/* Hidden on smaller screens for responsiveness */}
+                <div className="hidden xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto">
                     <div className="sticky top-0 space-y-8">
                         <div>
                             <div className="flex items-center gap-3 mb-6">
@@ -871,27 +871,7 @@ const StudyDesignPage = () => {
                             </div>
                         </div>
 
-                        {/* Quick Tips */}
-                        <div className="bg-indigo-600 rounded-2xl p-5 text-white shadow-xl shadow-indigo-100">
-                            <Lightbulb className="h-5 w-5 mb-3 opacity-80" />
-                            <h4 className="text-xs font-black uppercase tracking-widest mb-2">
-                                {t('admin.design.tips.title', 'Quick Tip')}
-                            </h4>
-                            <p className="text-xs font-medium leading-relaxed opacity-90">
-                                {t(
-                                    'admin.design.tips.pilot',
-                                    'Always run a test sort yourself before sharing the link with participants.'
-                                )}
-                            </p>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleTestRun}
-                                className="w-full mt-4 bg-white/10 border-white/20 hover:bg-white/20 text-white rounded-lg font-bold border-0"
-                            >
-                                {t('admin.design.toolbar.test_run')}
-                            </Button>
-                        </div>
+                        {/* Quick Tips removed as requested */}
                     </div>
                 </div>
             </div>
