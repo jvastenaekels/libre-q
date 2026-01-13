@@ -41,6 +41,8 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
     code = "error"
     if exc.status_code == 404:
         code = "resource_not_found"
+        if str(exc.detail) == "Not Found":
+            exc.detail = "API endpoint not found"
     elif exc.status_code == 401:
         code = "unauthorized"
     elif exc.status_code == 403:
