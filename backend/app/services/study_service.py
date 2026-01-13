@@ -701,6 +701,7 @@ class StudyService:
                 for entry in data.qsort
             ]
             db.add_all(new_entries)
+            await db.flush()
             # await db.commit() -> Handled by router
         except Exception as e:
             # Edge case: Handle commit failures

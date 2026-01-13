@@ -649,6 +649,19 @@
                 "qsort_title": "Väittämien ja ruudukon tasapaino",
                 "qsort_desc": "Varmista, että ruudukon kapasiteetti vastaa tarkalleen väittämien määrää. Tasapainoinen Q-sarja sisältää yleensä 30–60 kohtaa luotettavaa faktorianalyysiä varten."
             },
+            "checklist": {
+                "title": "Launch Readiness",
+                "statements": "Statements defined",
+                "grid_balance": "Grid balanced",
+                "branding": "Logo & Colors",
+                "instructions": "Instructions set",
+                "ready": "All essential parts are ready. You can now launch your study!",
+                "pending": "Complete the required steps above to enable study activation."
+            },
+            "tips": {
+                "title": "Quick Tip",
+                "pilot": "Always run a test sort yourself before sharing the link with participants."
+            },
             "toolbar": {
                 "title": "Suunnittelu",
                 "back": "Takaisin",
@@ -815,7 +828,10 @@
                     "confirm_clear": "Haluatko varmasti poistaa KAIKKI väittämät? Tätä toimintoa ei voi kumota.",
                     "updated": "Väittämä päivitetty",
                     "cleared": "Kaikki väittämät poistettu",
-                    "imported": "{{count}} väittämää tuotu onnistuneesti"
+                    "imported": "{{count}} väittämää tuotu onnistuneesti",
+                    "reset_codes": "Reset Codes",
+                    "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
+                    "codes_reset": "Statement codes re-sequenced"
                 },
                 "settings": {
                     "title": "Tutkimusasetukset",
@@ -846,7 +862,17 @@
                     "locked_closed": "Tutkimus on Suljettu",
                     "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
                     "mismatch_title": "Ruudukon konfiguraatiovirhe",
-                    "mismatch_desc": "Sinulla on {{statements}} väittämää, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla."
+                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
+                    "asymmetric": "Asymmetric",
+                    "auto_balance": "Auto-balance",
+                    "auto_balance_desc": "Automatically adjust grid to match statement count.",
+                    "ideal_shape": "Ideal Shape",
+                    "no_statements": "No statements",
+                    "reshaped": "Grid reshaped",
+                    "statements": "Statements",
+                    "symmetric": "Symmetric",
+                    "symmetry_lock": "Symmetry Lock",
+                    "symmetry_lock_desc": "Keep grid symmetric when adding/removing columns."
                 }
             },
             "postsort": {

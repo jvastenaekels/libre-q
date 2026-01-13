@@ -649,6 +649,19 @@
                 "qsort_title": "Equilibre de la grille",
                 "qsort_desc": "Assurez-vous que la capacité de votre grille correspond exactement au nombre d'énoncés. Un Q-set équilibré compte généralement entre 30 et 60 items pour une analyse factorielle robuste."
             },
+            "checklist": {
+                "title": "État de préparation",
+                "statements": "Énoncés définis",
+                "grid_balance": "Grille équilibrée",
+                "branding": "Logo & Couleurs",
+                "instructions": "Consignes définies",
+                "ready": "Tous les éléments essentiels sont prêts. Vous pouvez lancer votre étude !",
+                "pending": "Complétez les étapes requises ci-dessus pour activer l'étude."
+            },
+            "tips": {
+                "title": "Conseil rapide",
+                "pilot": "Testez toujours le tri vous-même avant de partager le lien avec les participants."
+            },
             "toolbar": {
                 "title": "Conception",
                 "back": "Retour",
@@ -815,7 +828,10 @@
                     "confirm_clear": "Êtes-vous sûr de vouloir supprimer TOUS les énoncés ? Cette action est irréversible.",
                     "updated": "Énoncé mis à jour",
                     "cleared": "Tous les énoncés ont été effacés",
-                    "imported": "{{count}} énoncés importés avec succès"
+                    "imported": "{{count}} énoncés importés avec succès",
+                    "reset_codes": "Réinitialiser les codes",
+                    "confirm_reset_codes": "Êtes-vous sûr de vouloir re-sequencer tous les codes d'énoncés (S1, S2, S3...) ?",
+                    "codes_reset": "Codes des énoncés réinitialisés"
                 },
                 "settings": {
                     "title": "Paramètres de recherche",
@@ -846,7 +862,17 @@
                     "locked_closed": "L'étude est clôturée",
                     "locked_closed_desc": "Cette étude est terminée. La conception est archivée et ne peut plus être modifiée.",
                     "mismatch_title": "Erreur de configuration de la grille",
-                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous."
+                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
+                    "asymmetric": "Asymétrique",
+                    "auto_balance": "Auto-équilibrage",
+                    "auto_balance_desc": "Ajuster automatiquement la grille pour correspondre au nombre d'énoncés.",
+                    "ideal_shape": "Forme idéale",
+                    "no_statements": "Aucun énoncé",
+                    "reshaped": "Grille redimensionnée",
+                    "statements": "Énoncés",
+                    "symmetric": "Symétrique",
+                    "symmetry_lock": "Verrouillage de symétrie",
+                    "symmetry_lock_desc": "Maintenir la grille symétrique lors de l'ajout/suppression de colonnes."
                 }
             },
             "postsort": {
