@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import type { StudyTranslationRead } from '@/api/model';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -64,19 +65,18 @@ const QSortEditor = () => {
     const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingText, setEditingText] = useState('');
+    const [editingCode, setEditingCode] = useState('');
 
     if (!draft) return null;
 
     // --- Statements Logic ---
     const statements: Statement[] = (draft.statements || []) as Statement[];
-    const localizedStatements = statements
-        .map((s: Statement) => {
-            const t = (s.translations as Translation[])?.find(
-                (st: Translation) => st.language_code === activeLocale
-            );
-            return { code: s.code, text: t?.text || '' };
-        })
-        .filter((item) => item.text.trim() !== '');
+    const localizedStatements = statements.map((s: Statement) => {
+        const t = (s.translations as Translation[])?.find(
+            (st: Translation) => st.language_code === activeLocale
+        );
+        return { code: s.code, text: t?.text || '' };
+    });
 
     const handleBulkSave = () => {
         const lines = bulkText
@@ -324,6 +324,9 @@ const QSortEditor = () => {
             if (d.statements?.[editingIndex as number]) {
                 const statement = d.statements[editingIndex as number];
 
+                // Update code
+                statement.code = editingCode;
+
                 const translation = statement.translations?.find(
                     // biome-ignore lint/suspicious/noExplicitAny: complex types
                     (t: any) => t.language_code === activeLocale
@@ -450,6 +453,35 @@ const QSortEditor = () => {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => {
+                                        updateDraft((d) => {
+                                            if (!d.statements) d.statements = [];
+                                            const newIdx = d.statements.length + 1;
+                                            d.statements.push({
+                                                code: `s${newIdx}`,
+                                                translations: (d.translations || []).map(
+                                                    (t: StudyTranslationRead) => ({
+                                                        language_code: t.language_code,
+                                                        text: '',
+                                                    })
+                                                ),
+                                            });
+                                        });
+                                        // Set editing state for the new statement
+                                        // We use the current length as the index for the new element
+                                        const newIdx = statements.length;
+                                        setEditingIndex(newIdx);
+                                        setEditingText('');
+                                        setEditingCode(`s${newIdx + 1}`);
+                                    }}
+                                    className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    {t('common.add', 'Add')}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
                                         if (
                                             confirm(
                                                 t(
@@ -501,9 +533,17 @@ const QSortEditor = () => {
                                     key={idx}
                                     className="flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100"
                                 >
-                                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
-                                        {item.code}
-                                    </span>
+                                    {isEditing ? (
+                                        <Input
+                                            value={editingCode}
+                                            onChange={(e) => setEditingCode(e.target.value)}
+                                            className="w-16 h-8 text-[10px] font-black font-mono text-center p-0 rounded-lg border-indigo-200 focus:ring-indigo-500/20"
+                                        />
+                                    ) : (
+                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
+                                            {item.code}
+                                        </span>
+                                    )}
 
                                     {isEditing ? (
                                         <>
@@ -548,11 +588,13 @@ const QSortEditor = () => {
                                                 onClick={() => {
                                                     setEditingIndex(idx);
                                                     setEditingText(item.text);
+                                                    setEditingCode(item.code);
                                                 }}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter' || e.key === ' ') {
                                                         setEditingIndex(idx);
                                                         setEditingText(item.text);
+                                                        setEditingCode(item.code);
                                                         e.preventDefault();
                                                     }
                                                 }}

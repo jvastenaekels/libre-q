@@ -13,7 +13,8 @@
  */
 
 import { Check, ChevronDown, Globe } from 'lucide-react';
-import type { StudyRead } from '@/api/model';
+import type { PartnerLogo } from '@/api/model';
+import type { StudyConfig } from '@/schemas/study';
 import type React from 'react';
 import { useEffect, useRef, useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -134,7 +135,7 @@ const StudyLayoutContent: React.FC = () => {
     // --- RR7 Loader Data ---
     // This component uses `useLoaderData` to hydrate the config store.
     // In tests, we mock `useLoaderData` (see setupTests.ts) to avoid "Data Router" errors.
-    const { study } = useLoaderData() as { study: StudyRead };
+    const { study } = useLoaderData() as { study: StudyConfig };
 
     // Sync loader data to config store
     useEffect(() => {
@@ -142,8 +143,7 @@ const StudyLayoutContent: React.FC = () => {
         console.log('[StudyLayout] Loader data keys:', study ? Object.keys(study) : 'null');
         if (study) {
             console.log('[StudyLayout] Setting config', study);
-            // biome-ignore lint/suspicious/noExplicitAny: API type definition mismatch
-            setConfig(study as any);
+            setConfig(study);
         } else {
             console.error('[StudyLayout] Loader data is falsy!');
         }
@@ -318,31 +318,26 @@ const StudyLayoutContent: React.FC = () => {
                         )}
 
                         {/* Show Partner Logos */}
-                        {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
-                        {Array.isArray((branding as any)?.partners) &&
-                            // biome-ignore lint/suspicious/noExplicitAny: branding partners data
-                            (branding as any).partners.length > 0 && (
-                                <div className="flex items-center gap-4 border-l border-slate-200 pl-4">
-                                    {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
-                                    {(branding as any).partners.map(
-                                        // biome-ignore lint/suspicious/noExplicitAny: partner data
-                                        (partner: any) =>
-                                            partner.logo_url && (
-                                                <img
-                                                    key={partner.id || partner.logo_url}
-                                                    src={partner.logo_url}
-                                                    alt={partner.name || ''}
-                                                    title={partner.name || ''}
-                                                    className="h-6 w-auto object-contain opacity-80"
-                                                />
-                                            )
-                                    )}
-                                </div>
-                            )}
+                        {Array.isArray(branding?.partners) && branding.partners.length > 0 && (
+                            <div className="flex items-center gap-4 border-l border-slate-200 pl-4">
+                                {branding.partners.map(
+                                    (partner: PartnerLogo) =>
+                                        partner.logo_url && (
+                                            <img
+                                                key={partner.id || partner.logo_url}
+                                                src={partner.logo_url}
+                                                alt={partner.name || ''}
+                                                title={partner.name || ''}
+                                                className="h-6 w-auto object-contain opacity-80"
+                                            />
+                                        )
+                                )}
+                            </div>
+                        )}
 
                         {/* Fallback to Title if no logos */}
                         {!branding?.logo_url &&
-                            !((branding as any)?.partners?.length > 0) &&
+                            !(branding?.partners && branding.partners.length > 0) &&
                             (currentStep === 1 ? (
                                 <img
                                     src="/open-q-logo.svg"

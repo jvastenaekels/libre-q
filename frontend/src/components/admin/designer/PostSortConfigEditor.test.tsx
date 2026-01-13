@@ -39,7 +39,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
             },
         });
 
-        expect(screen.getByText('Offer follow-up interview')).toBeInTheDocument();
+        expect(screen.getByText('Offer follow-up')).toBeInTheDocument();
         expect(
             screen.getByText('Offer to subscribe to a mailing list about study outcomes')
         ).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
             },
         });
 
-        expect(screen.queryByText('Offer follow-up interview')).not.toBeInTheDocument();
+        expect(screen.queryByText('Offer follow-up')).not.toBeInTheDocument();
         expect(
             screen.queryByText('Offer to subscribe to a mailing list about study outcomes')
         ).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Offer follow-up interview')
+            s.closest('.flex')?.textContent?.includes('Offer follow-up')
         );
 
         expect(interviewSwitch).toHaveAttribute('data-state', 'checked');
@@ -137,7 +137,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Offer follow-up interview')
+            s.closest('.flex')?.textContent?.includes('Offer follow-up')
         );
 
         if (interviewSwitch) {

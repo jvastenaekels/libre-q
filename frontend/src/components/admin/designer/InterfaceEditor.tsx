@@ -483,7 +483,7 @@ const InterfaceEditor = () => {
                             <div key={step.id} className="space-y-6">
                                 <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-900">
-                                        Step {index + 1}: {t(step.labelKey)}
+                                        {t('common.step', 'Step')} {index + 1}: {t(step.labelKey)}
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pl-6 border-l-2 border-slate-100">

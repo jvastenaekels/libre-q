@@ -87,7 +87,7 @@ describe('GeneralSettingsPage', () => {
     it('submits update with only slug', async () => {
         const user = userEvent.setup();
 
-        vi.mocked(AdminService.updateStudy).mockResolvedValue({} as any);
+        vi.mocked(AdminService.updateStudy).mockResolvedValue({} as never);
 
         renderPage();
 
@@ -106,7 +106,10 @@ describe('GeneralSettingsPage', () => {
                 })
             );
             // Ensure no other fields were sent (dates, title) - checking the call arguments
-            const args = vi.mocked(AdminService.updateStudy).mock.calls[0][1] as any;
+            const args = vi.mocked(AdminService.updateStudy).mock.calls[0][1] as Record<
+                string,
+                unknown
+            >;
             expect(args.title).toBeUndefined();
             expect(args.start_date).toBeUndefined();
             expect(args.end_date).toBeUndefined();
@@ -126,7 +129,7 @@ describe('GeneralSettingsPage', () => {
             slug: 'test-study',
         });
 
-        vi.mocked(AdminService.updateStudyState).mockResolvedValue({} as any);
+        vi.mocked(AdminService.updateStudyState).mockResolvedValue({} as never);
 
         renderPage();
 

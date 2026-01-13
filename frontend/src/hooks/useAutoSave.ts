@@ -102,8 +102,7 @@ export function useAutoSave(debounceMs = 2000) {
                 try {
                     const result = await updateMutation.mutateAsync({
                         slug,
-                        // biome-ignore lint/suspicious/noExplicitAny: schema cast
-                        data: draft as any,
+                        data: draft as StudyUpdate,
                     });
 
                     // Success
@@ -115,7 +114,13 @@ export function useAutoSave(debounceMs = 2000) {
                     // Sync original and backup immediately to reflect server state
                     updateOriginal(result);
                     localStorage.setItem(`open-q-draft-backup-${slug}`, draftJson);
-                } catch (error: any) {
+                } catch (error) {
+                    const axiosError = error as {
+                        response?: {
+                            status: number;
+                            data?: { details?: { server_state: StudyRead } };
+                        };
+                    };
                     // If it was cancelled, don't show error
                     if (error instanceof Error && error.name === 'AbortError') {
                         return;
@@ -123,11 +128,11 @@ export function useAutoSave(debounceMs = 2000) {
 
                     // Optimistic Locking: 409 Conflict
                     if (
-                        error?.response?.status === 409 &&
-                        error.response.data?.details?.server_state
+                        axiosError?.response?.status === 409 &&
+                        axiosError.response.data?.details?.server_state
                     ) {
                         try {
-                            const serverRead = error.response.data.details.server_state;
+                            const serverRead = axiosError.response.data.details.server_state;
                             const serverUpdate = projectStudyToUpdate(serverRead);
                             const originalUpdate = original ? projectStudyToUpdate(original) : null;
 

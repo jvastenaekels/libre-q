@@ -197,26 +197,12 @@ async def update_study(
             res_part = await db.execute(stmt_part)
             has_participants = (res_part.scalar() or 0) > 0
 
-            if has_participants and study.state != StudyState.draft:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Cannot modify grid structure if study is active and has participants.",
-                )
-
-    # Block updates if archived
-    if study.state == StudyState.archived:
+    # Block ALL updates if not in DRAFT state.
+    # State transitions must happen via the dedicated /state endpoint.
+    if study.state != StudyState.draft:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot update an archived study.",
-        )
-
-    if study.state == StudyState.closed:
-        # We might allow updating purely metadata or config that doesn't affect data validity.
-        # But for now, keeping strict.
-        # Exception: We might want to allow archiving (which is a state change, handled in separate endpoint).
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot update a closed study.",
+            detail=f"Cannot update study in {study.state.value} state. Switch it back to draft first.",
         )
 
     # Optimistic Locking Check

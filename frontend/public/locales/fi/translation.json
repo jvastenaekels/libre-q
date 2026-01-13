@@ -17,6 +17,7 @@
         "optional": "Valinnainen",
         "processing": "Käsitellään...",
         "statement": "Väite",
+        "step": "Vaihe",
         "back": "Takaisin",
         "cancel": "Peruuta",
         "reduce": "Vähennä",
@@ -131,6 +132,12 @@
                 "what": "Tarkista lopullinen lajittelusi ja anna halutessasi lisäpohdintoja.",
                 "why": "Mahdollistaa näkökulmasi selventämisen ja rikastuttaa tietoja laadullisilla yksityiskohdilla."
             }
+        },
+        "steps": {
+            "presort": "Esikysely",
+            "rough": "Karkea lajittelu",
+            "fine": "Ruudukkoasettelu",
+            "post": "Lopullinen arviointi"
         }
     },
     "auth": {
@@ -314,7 +321,7 @@
             "title": "Tulokset ja yhteystiedot",
             "email_label": "Sähköpostiosoitteesi (valinnainen)",
             "email_placeholder": "esimerkki@email.com",
-            "interview_consent": "Suostun siihen, että minuun otetaan tarvittaessa yhteyttä jatkohaastattelua varten.",
+            "interview_consent": "Suostun siihen, että tutkija ottaa minuun tarvittaessa yhteyttä jatkotoimenpiteitä varten.",
             "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
             "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
         }
@@ -651,7 +658,7 @@
                 "qsort_desc": "Varmista, että ruudukon kapasiteetti vastaa tarkalleen väittämien määrää. Tasapainoinen Q-sarja sisältää yleensä 30–60 kohtaa luotettavaa faktorianalyysiä varten."
             },
             "checklist": {
-                "title": "Valmiina julkaisuun",
+                "title": "Tarkistuslista",
                 "statements": "Väittämät",
                 "grid_balance": "Ruudukko tasapainossa",
                 "branding": "Logo & Värit",
@@ -910,9 +917,9 @@
                 "email": {
                     "title": "Osallistujan seuranta",
                     "desc": "Kerää sähköpostiosoitteita seurantaa tai tuloksia varten.",
-                    "interview": "Tarjoa seurantahaastattelua",
+                    "interview": "Tarjoa seurantaa",
                     "results": "Tarjoa mahdollisuutta liittyä postituslistalle tutkimuksen tuloksista",
-                    "interview_warning": "Huom: Suostumus haastatteluun poistaa anonymiteetin tutkijalta.",
+                    "interview_warning": "Huom: Suostumus yhteydenottoon poistaa anonymiteetin tutkijalta.",
                     "results_hint": "Sähköpostia käytetään vain tulosten lähettämiseen, anonymiteetti säilyy."
                 }
             },

@@ -338,10 +338,8 @@ const StudyDesignPage = () => {
     // Calculate readiness for all languages for the global indicator
     const globalRequirementsMet = (draft.statements?.length || 0) > 0 && isGridValid;
     const languageReadiness = (draft.translations || [])
-        // biome-ignore lint/suspicious/noExplicitAny: duck typing
-        .filter((t: any) => !t.is_disabled)
-        // biome-ignore lint/suspicious/noExplicitAny: duck typing
-        .map((tr: any) => {
+        .filter((t: StudyTranslationRead & { is_disabled?: boolean }) => !t.is_disabled)
+        .map((tr: StudyTranslationRead) => {
             const isTranslationComplete = !!(
                 tr.title &&
                 tr.consent_title &&
@@ -363,7 +361,7 @@ const StudyDesignPage = () => {
 
     return (
         <div
-            className="flex flex-col h-[calc(100vh-theme(spacing.16))] animate-in fade-in duration-500 overflow-x-hidden"
+            className="flex flex-col h-[calc(100vh-theme(spacing.16))] animate-in fade-in duration-500 overflow-hidden max-w-full"
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
@@ -430,8 +428,10 @@ const StudyDesignPage = () => {
                                 <DropdownMenuSeparator className="bg-slate-100 mb-1" />
                                 {(() => {
                                     const activeLangs = (draft.translations || [])
-                                        // biome-ignore lint/suspicious/noExplicitAny: duck typing translation
-                                        .filter((t) => !(t as any).is_disabled)
+                                        .filter(
+                                            (t: StudyTranslationRead & { is_disabled?: boolean }) =>
+                                                !t.is_disabled
+                                        )
                                         .map((t) => t.language_code);
 
                                     const langs = activeLangs.length > 0 ? activeLangs : ['en'];
@@ -513,10 +513,10 @@ const StudyDesignPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-1 overflow-hidden relative">
+            <div className="flex flex-1 overflow-hidden relative max-w-full">
                 {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
-                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 pointer-events-none">
+                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
                         <div className="bg-white border-none shadow-2xl rounded-3xl p-10 max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
                             <div
                                 className={cn(
@@ -837,7 +837,7 @@ const StudyDesignPage = () => {
                                     <CheckCircle className="h-5 w-5 text-indigo-600" />
                                 </div>
                                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">
-                                    {t('admin.design.checklist.title', 'Launch Readiness')}
+                                    {t('admin.design.checklist.title', 'Checklist')}
                                 </h3>
                             </div>
 
@@ -848,11 +848,20 @@ const StudyDesignPage = () => {
                                         className="flex items-start gap-2.5 p-2 rounded-lg border border-transparent transition-all hover:bg-slate-50"
                                     >
                                         {item.isComplete ? (
-                                            <CircleCheck className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                                            <CircleCheck
+                                                data-testid="checklist-item-complete"
+                                                className="h-4 w-4 text-green-500 shrink-0 mt-0.5"
+                                            />
                                         ) : item.required ? (
-                                            <CircleDashed className="h-4 w-4 text-slate-300 shrink-0 mt-0.5" />
+                                            <CircleDashed
+                                                data-testid="checklist-item-incomplete"
+                                                className="h-4 w-4 text-slate-300 shrink-0 mt-0.5"
+                                            />
                                         ) : (
-                                            <CircleDashed className="h-4 w-4 text-slate-200 shrink-0 mt-0.5" />
+                                            <CircleDashed
+                                                data-testid="checklist-item-optional"
+                                                className="h-4 w-4 text-slate-200 shrink-0 mt-0.5"
+                                            />
                                         )}
                                         <div className="space-y-0.5">
                                             <p
@@ -865,58 +874,12 @@ const StudyDesignPage = () => {
                                             >
                                                 {item.label}
                                             </p>
-                                            {item.required && !item.isComplete && (
-                                                <p className="text-[9px] font-medium text-rose-500 uppercase tracking-tighter">
-                                                    {t(
-                                                        'admin.design.checklist.required',
-                                                        'Required'
-                                                    )}
-                                                </p>
-                                            )}
+                                            {/* Required label removed as per user request */}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-
-                        <div className="pt-6 border-t border-slate-100">
-                            <div className="bg-slate-50 rounded-2xl p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                        {t('admin.design.checklist.progress', 'Progress')}
-                                    </span>
-                                    <span className="text-xs font-black text-indigo-600">
-                                        {completedRequiredCount}/{totalRequiredCount}
-                                    </span>
-                                </div>
-                                <div
-                                    className="h-2 w-full bg-slate-200 rounded-full overflow-hidden"
-                                    data-testid="checklist-progress"
-                                >
-                                    <div
-                                        className="h-full bg-indigo-600 transition-all duration-1000"
-                                        style={{
-                                            width: `${(completedRequiredCount / totalRequiredCount) * 100}%`,
-                                        }}
-                                    />
-                                </div>
-                                <p
-                                    className="text-[10px] font-medium text-slate-500 mt-3 leading-relaxed"
-                                    data-testid="checklist-status"
-                                >
-                                    {isLaunchReady
-                                        ? t(
-                                              'admin.design.checklist.ready',
-                                              'All essential parts are ready. You can now launch your study!'
-                                          )
-                                        : t(
-                                              'admin.design.checklist.pending',
-                                              'Complete the required steps above to enable study activation.'
-                                          )}
-                                </p>
-                            </div>
-                        </div>
-
                         <div className="pt-6 border-t border-slate-100">
                             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
                                 {t('admin.design.checklist.languages', 'Languages')}

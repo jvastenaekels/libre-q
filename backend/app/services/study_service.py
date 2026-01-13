@@ -394,6 +394,29 @@ class StudyService:
                 if not t.title or t.title.strip() == "":
                     errors.append(f"Title is missing for language '{t.language_code}'.")
 
+                if not t.consent_title or t.consent_title.strip() == "":
+                    errors.append(
+                        f"Consent title is missing for language '{t.language_code}'."
+                    )
+
+                if not t.consent_description or t.consent_description.strip() == "":
+                    errors.append(
+                        f"Consent description is missing for language '{t.language_code}'."
+                    )
+
+                if (
+                    not t.condition_of_instruction
+                    or t.condition_of_instruction.strip() == ""
+                ):
+                    errors.append(
+                        f"Grid sort instructions are missing for language '{t.language_code}'."
+                    )
+
+                if not t.pre_instruction or t.pre_instruction.strip() == "":
+                    errors.append(
+                        f"Preliminary sort instructions are missing for language '{t.language_code}'."
+                    )
+
                 # Check process steps
                 for i, step in enumerate(t.process_steps):
                     title = step.get("title")

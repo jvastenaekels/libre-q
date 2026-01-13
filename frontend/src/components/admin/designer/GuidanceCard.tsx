@@ -31,7 +31,7 @@ export const GuidanceCard: React.FC<GuidanceCardProps> = ({
     return (
         <div
             className={cn(
-                'flex gap-5 p-6 rounded-2xl border shadow-sm animate-in fade-in slide-in-from-top-4 duration-700',
+                'flex items-start gap-5 p-6 rounded-2xl border shadow-sm animate-in fade-in slide-in-from-top-4 duration-700',
                 styles[type],
                 className
             )}

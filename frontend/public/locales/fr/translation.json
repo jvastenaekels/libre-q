@@ -21,6 +21,7 @@
         "optional": "Optionnel",
         "processing": "Traitement en cours...",
         "statement": "Énoncé",
+        "step": "Étape",
         "errors": {
             "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
             "not_found": "Étude non trouvée.",
@@ -131,6 +132,12 @@
                 "what": "Révisez votre classement final et apportez des réflexions complémentaires si vous le souhaitez.",
                 "why": "Permet de préciser votre pensée et d'enrichir les données avec des détails qualitatifs."
             }
+        },
+        "steps": {
+            "presort": "Formulaire de pré-tri",
+            "rough": "Tri préliminaire",
+            "fine": "Placement sur la grille",
+            "post": "Phase post-tri"
         }
     },
     "auth": {
@@ -215,7 +222,7 @@
     "consent": {
         "title": "Consentement à la participation",
         "subtitle": "Veuillez lire attentivement les informations suivantes.",
-        "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et le déroulement de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à trier des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-tri pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de tri et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
+        "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et la présentation de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à trier des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-tri pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de tri et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
     },
     "presort": {
         "title": "À propos de vous",
@@ -314,7 +321,7 @@
             "title": "Restitutions & Contact",
             "email_label": "Votre adresse email (optionnel)",
             "email_placeholder": "exemple@email.com",
-            "interview_consent": "J'accepte d'être potentiellement contacté(e) pour un entretien de suivi.",
+            "interview_consent": "J'accepte d'être recontacté(e) par le chercheur.",
             "newsletter_consent": "Je souhaite être tenu(e) au courant des résultats de l'étude.",
             "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Il est stocké uniquement pour les finalités cochées ci-dessus."
         }
@@ -535,7 +542,7 @@
             "median_duration": "Durée médiane",
             "time_to_complete": "Temps de complétion",
             "recent_activity": "Activité récente",
-            "latest_submissions": "Dernières soumissions (5 sur {{total}})",
+            "latest_submissions": "Dernières soumissions ({{count}} sur {{total}})",
             "recently_completed": "Récemment complété",
             "view_all": "Voir tous les participants et détails",
             "no_participants": "Aucun participant pour le moment.",
@@ -651,7 +658,7 @@
                 "qsort_desc": "Assurez-vous que la capacité de votre grille correspond exactement au nombre d'énoncés. Un Q-set équilibré compte généralement entre 30 et 60 items pour une analyse factorielle robuste."
             },
             "checklist": {
-                "title": "État de préparation",
+                "title": "Vérification",
                 "statements": "Énoncés",
                 "grid_balance": "Grille équilibrée",
                 "branding": "Logo & Couleurs",
@@ -726,7 +733,7 @@
                 "desktop": "Vue bureau"
             },
             "intro": {
-                "welcome_title": "Message de bienvenue",
+                "welcome_title": "Présentation de l'étude",
                 "process_title": "Aperçu du déroulement",
                 "process_steps": {
                     "title": "Aperçu du déroulement",
@@ -910,9 +917,9 @@
                 "email": {
                     "title": "Suivi des participants",
                     "desc": "Collecter les adresses email pour un recontact ou l'envoi des résultats.",
-                    "interview": "Proposer un entretien de suivi",
+                    "interview": "Proposer un suivi",
                     "results": "Proposer l'inscription à une liste de diffusion concernant les suites de l'étude",
-                    "interview_warning": "Note : L'accord pour un entretien lève l'anonymat vis-à-vis du chercheur.",
+                    "interview_warning": "Note : L'accord pour un recontact lève l'anonymat vis-à-vis du chercheur.",
                     "results_hint": "L'e-mail ne sera utilisé que pour l'envoi des résultats, préservant l'anonymat."
                 }
             },

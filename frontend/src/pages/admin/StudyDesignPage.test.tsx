@@ -103,19 +103,9 @@ describe('StudyDesignPage Feature Tests', () => {
         renderPage();
 
         await waitFor(() => {
-            const status = screen.getByTestId('checklist-status');
-            expect(status.textContent).toMatch(/All essential parts are ready/i);
-
-            const progress = screen.getByTestId('checklist-progress')
-                .firstElementChild as HTMLElement;
-            // 3 required items in mockStudy: Statements (3), Grid (6 slots, 6 items), Instructions (Test instruction)
-            // Wait, mockStudy has these:
-            // statements: length 6
-            // grid_config: capacity 6
-            // condition_of_instruction: 'Test instruction'
-            // Branding: primary_color exists
-            // All 4 required items are complete (I removed Branding from required in the code actually, let's check)
-            expect(progress.style.width).toBe('100%');
+            // Check for specific checklist items and their completion
+            const incompleteItems = screen.queryAllByTestId('checklist-item-incomplete');
+            expect(incompleteItems).toHaveLength(0);
         });
     });
 
@@ -132,9 +122,10 @@ describe('StudyDesignPage Feature Tests', () => {
 
         renderPage();
 
-        await waitFor(() => {
-            const status = screen.getByTestId('checklist-status');
-            expect(status.textContent).toMatch(/Complete the required steps/i);
+        await waitFor(async () => {
+            // The "Grid balanced" item should be incomplete
+            const incompleteItems = await screen.findAllByTestId('checklist-item-incomplete');
+            expect(incompleteItems.length).toBeGreaterThan(0);
         });
     });
 
@@ -142,9 +133,9 @@ describe('StudyDesignPage Feature Tests', () => {
         renderPage();
 
         // Should start at Welcome tab
-        expect(await screen.findByText(/Welcome to the Studio/i)).toBeInTheDocument();
+        expect(await screen.findByText(/👋/)).toBeInTheDocument(); // Icon for Welcome tab
 
-        // Click "Next Step" - using fireEvent to bypass potential pointer-events issues in JSDOM
+        // Click "Next Step"
         const nextButton = await screen.findByTestId('next-step-button');
         fireEvent.click(nextButton);
 
@@ -159,7 +150,7 @@ describe('StudyDesignPage Feature Tests', () => {
 
         // Should be back at Welcome
         await waitFor(() => {
-            expect(screen.getByText(/Welcome to the Studio/i)).toBeInTheDocument();
+            expect(screen.getByText(/👋/)).toBeInTheDocument();
         });
     });
 });

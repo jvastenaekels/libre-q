@@ -49,12 +49,16 @@ describe('useAutoSave', () => {
         };
 
         // Mock both the hook and getState
-        vi.mocked(useStudyDesigner).mockReturnValue(mockStoreState);
-        (useStudyDesigner as any).getState = vi.fn().mockReturnValue(mockStoreState);
+        vi.mocked(useStudyDesigner).mockReturnValue(
+            mockStoreState as unknown as ReturnType<typeof useStudyDesigner>
+        );
+        (useStudyDesigner as unknown as { getState: () => typeof mockStoreState }).getState = vi
+            .fn()
+            .mockReturnValue(mockStoreState);
 
         vi.mocked(useUpdateStudyApiAdminStudiesSlugPatch).mockReturnValue({
             mutateAsync: mockMutateAsync,
-        } as any);
+        } as unknown as ReturnType<typeof useUpdateStudyApiAdminStudiesSlugPatch>);
     });
 
     afterEach(() => {
@@ -78,8 +82,12 @@ describe('useAutoSave', () => {
             ...partialState,
         };
 
-        vi.mocked(useStudyDesigner).mockReturnValue(fullState);
-        (useStudyDesigner as any).getState = vi.fn().mockReturnValue(fullState);
+        vi.mocked(useStudyDesigner).mockReturnValue(
+            fullState as unknown as ReturnType<typeof useStudyDesigner>
+        );
+        (useStudyDesigner as unknown as { getState: () => typeof fullState }).getState = vi
+            .fn()
+            .mockReturnValue(fullState);
 
         return fullState;
     };

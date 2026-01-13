@@ -222,8 +222,9 @@ const StudyOverviewPage = () => {
                             </CardTitle>
                             <CardDescription>
                                 {t('admin.study_overview.latest_submissions', {
+                                    count: recentParticipants.length,
                                     total: (participants || []).length,
-                                    defaultValue: `Latest submissions (last 5 of ${(participants || []).length})`,
+                                    defaultValue: `Latest submissions (${recentParticipants.length} of ${(participants || []).length})`,
                                 })}
                             </CardDescription>
                         </div>

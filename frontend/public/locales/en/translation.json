@@ -17,6 +17,7 @@
         "optional": "Optional",
         "processing": "Processing...",
         "statement": "Statement",
+        "step": "Step",
         "back": "Back",
         "cancel": "Cancel",
         "reduce": "Reduce",
@@ -131,6 +132,12 @@
                 "what": "Review your final sort and provide additional reflections if you wish.",
                 "why": "Allows you to clarify your perspective and enrich the data with qualitative detail."
             }
+        },
+        "steps": {
+            "presort": "Pre-sort Survey",
+            "rough": "Preliminary Sort",
+            "fine": "Grid Placement",
+            "post": "Post-sort Stage"
         }
     },
     "auth": {
@@ -314,7 +321,7 @@
             "title": "Results & Contact",
             "email_label": "Your email address (Optional)",
             "email_placeholder": "example@email.com",
-            "interview_consent": "I agree to be potentially contacted for a follow-up interview.",
+            "interview_consent": "I agree to be contacted by the researcher for follow-up.",
             "newsletter_consent": "I wish to be informed about the study results.",
             "gdpr_note": "Your email will never be publicly shared. It is stored solely for the purposes selected above."
         }
@@ -651,7 +658,7 @@
                 "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually follows a quasi-normal (bell curve) distribution."
             },
             "checklist": {
-                "title": "Launch Readiness",
+                "title": "Checklist",
                 "statements": "Statements",
                 "grid_balance": "Grid balanced",
                 "branding": "Logo & Colors",
@@ -910,7 +917,7 @@
                 "email": {
                     "title": "Participant Follow-up",
                     "desc": "Collect email addresses for follow-up or research results.",
-                    "interview": "Offer follow-up interview",
+                    "interview": "Offer follow-up",
                     "results": "Offer to subscribe to a mailing list about study outcomes",
                     "interview_warning": "Note: agreeing to be contacted lifts anonymity for the researcher.",
                     "results_hint": "Email solely for results, anonymity preserved."
