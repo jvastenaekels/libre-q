@@ -112,7 +112,7 @@ const LoginPage = () => {
                                         className="pl-10 bg-slate-50/50 border-slate-200"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        required
+                                        autoComplete="email"
                                     />
                                 </div>
                             </div>
@@ -128,6 +128,7 @@ const LoginPage = () => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
+                                        autoComplete="current-password"
                                     />
                                 </div>
                             </div>

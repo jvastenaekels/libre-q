@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type {
     StudyUpdate,
@@ -162,10 +162,17 @@ const StudyDesignPage = () => {
     // Recovery logic: Detect local backup on mount
     const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
     const [backupToRestore, setBackupToRestore] = useState<StudyUpdate | null>(null);
+    const hasCheckedRecovery = useRef(false);
 
     useEffect(() => {
+        // Only run this check once per page load to prevent annoying popups while editing
+        if (hasCheckedRecovery.current) return;
+
         const backupJson = localStorage.getItem(`open-q-draft-backup-${slug}`);
+
+        // We need draft to be loaded to compare
         if (backupJson && draft) {
+            hasCheckedRecovery.current = true;
             try {
                 const backup = JSON.parse(backupJson);
                 // Compare current live draft (with defaults/normalizations) with backup
@@ -176,6 +183,9 @@ const StudyDesignPage = () => {
             } catch (e) {
                 console.error('Failed to parse backup:', e);
             }
+        } else if (draft) {
+            // If draft is loaded but no backup exists, we can also consider the check "done"
+            hasCheckedRecovery.current = true;
         }
     }, [slug, draft]);
 
