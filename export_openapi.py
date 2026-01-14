@@ -8,8 +8,9 @@ ROOT_DIR = os.getcwd()
 if os.path.basename(ROOT_DIR) == 'backend':
     ROOT_DIR = os.path.dirname(ROOT_DIR)
 
-sys.path.append(os.path.join(ROOT_DIR, 'backend'))
-os.chdir(ROOT_DIR)
+backend_dir = os.path.join(ROOT_DIR, 'backend')
+sys.path.append(backend_dir)
+os.chdir(backend_dir)
 
 from app.main import app
 from fastapi.openapi.utils import get_openapi
@@ -24,16 +25,17 @@ def main():
     )
 
     # Write to root openapi.json
-    with open('openapi.json', 'w') as f:
+    with open(os.path.join(ROOT_DIR, 'openapi.json'), 'w') as f:
         json.dump(schema, f, indent=2)
         f.write('\n')
 
     # Write to frontend openapi.json
-    with open('frontend/openapi.json', 'w') as f:
+    frontend_path = os.path.join(ROOT_DIR, 'frontend', 'openapi.json')
+    with open(frontend_path, 'w') as f:
         json.dump(schema, f, indent=2)
         f.write('\n')
 
-    print("OpenAPI schema exported successfully to openapi.json and frontend/openapi.json")
+    print(f"OpenAPI schema exported successfully to {os.path.join(ROOT_DIR, 'openapi.json')} and {frontend_path}")
 
 if __name__ == "__main__":
     main()

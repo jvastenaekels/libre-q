@@ -2,7 +2,7 @@
 
 import secrets
 import string
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 from sqlalchemy import select
@@ -31,7 +31,7 @@ class RecruitmentService:
         """Create one or more recruitment links for a study."""
         expires_at = None
         if expires_in_days:
-            expires_at = datetime.now() + timedelta(days=expires_in_days)
+            expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
 
         links = []
         for _ in range(count):
@@ -109,7 +109,7 @@ class RecruitmentService:
         if not link.is_active:
             return None
 
-        if link.expires_at and link.expires_at < datetime.now():
+        if link.expires_at and link.expires_at < datetime.now(timezone.utc):
             return None
 
         if link.capacity is not None and link.usage_count >= link.capacity:

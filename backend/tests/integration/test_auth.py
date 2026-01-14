@@ -118,10 +118,14 @@ class TestRegistration:
         invited = next(m for m in members if m.user_id != owner.id)
         assert invited.role == WorkspaceRole.researcher
 
-    async def test_register_invitation_token_email_mismatch(self, client: AsyncClient):
+    async def test_register_invitation_token_email_mismatch(
+        self, client: AsyncClient, user_factory, workspace_factory
+    ):
         """Invitation token email must match registration email."""
+        owner = await user_factory()
+        workspace = await workspace_factory(owner=owner)
         token = create_invitation_token(
-            email="invited@example.com", workspace_id=1, role="researcher"
+            email="invited@example.com", workspace_id=workspace.id, role="researcher"
         )
         response = await client.post(
             "/api/register",
@@ -134,11 +138,15 @@ class TestRegistration:
         assert response.status_code == 400
         assert "does not match" in response.json()["message"]
 
-    async def test_register_invitation_token_expired(self, client: AsyncClient):
+    async def test_register_invitation_token_expired(
+        self, client: AsyncClient, user_factory, workspace_factory
+    ):
         """Expired invitation token is rejected."""
+        owner = await user_factory()
+        workspace = await workspace_factory(owner=owner)
         token = create_invitation_token(
             email="late@example.com",
-            workspace_id=1,
+            workspace_id=workspace.id,
             role="researcher",
             expires_delta=timedelta(minutes=-1),
         )

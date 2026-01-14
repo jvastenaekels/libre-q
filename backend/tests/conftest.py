@@ -37,10 +37,11 @@ TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword"
 
 # Use PostgreSQL for testing
-# Fallback to local dev DB if not specified, but usually set via environment
+# We use the 'open_q' database as default since creating new databases
+# (like 'open_q_test') might require superuser permissions not available in all environments.
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://open_q_user:open-q-pwd@127.0.0.1:5432/open_q_test",
+    "postgresql+asyncpg://open_q_user:open-q-pwd@127.0.0.1:5432/open_q",
 )
 
 

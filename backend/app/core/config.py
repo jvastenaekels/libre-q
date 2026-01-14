@@ -38,9 +38,9 @@ class Settings(BaseSettings):
     def assemble_db_url(cls, v: str | None) -> str:
         """Assembles and validates the database URL."""
         if not v:
-            raise ValueError(
-                "DATABASE_URL must be configured. Open-Q now requires PostgreSQL."
-            )
+            # For static analysis, OpenAPI generation, and CI checks that don't need a real DB,
+            # we provide a dummy PostgreSQL URL. Connection will fail later if actually needed.
+            return "postgresql+asyncpg://localhost/open_q_dummy"
 
         # 1. Handle postgres/postgresql prefix for asyncpg
         if v.startswith("postgres://"):
