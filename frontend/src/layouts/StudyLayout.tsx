@@ -28,7 +28,6 @@ import {
     useLoaderData,
 } from 'react-router-dom';
 import { ApiError } from '../api/client';
-import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -40,6 +39,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
+import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -598,7 +598,10 @@ const StudyLayoutContent: React.FC = () => {
                 <div
                     className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
                 >
-                    <ErrorBoundary>
+                    <ComponentErrorBoundary
+                        title="Unable to load study step"
+                        onReset={() => window.location.reload()}
+                    >
                         <Suspense
                             fallback={
                                 <div className="flex-1 flex flex-col items-center justify-center space-y-4">
@@ -611,7 +614,7 @@ const StudyLayoutContent: React.FC = () => {
                         >
                             <Outlet />
                         </Suspense>
-                    </ErrorBoundary>
+                    </ComponentErrorBoundary>
                 </div>
             </main>
 

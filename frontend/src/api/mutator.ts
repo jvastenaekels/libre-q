@@ -37,75 +37,109 @@ export const customInstance = async <T>({
     const currentWorkspace = useAuthStore.getState().currentWorkspace;
     const workspaceId = currentWorkspace?.id ? String(currentWorkspace.id) : undefined;
 
-    const response = await fetch(fullUrl, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
-            ...(headers as Record<string, string>),
-        },
-        body: data ? (data instanceof URLSearchParams ? data : JSON.stringify(data)) : undefined,
-        signal,
-    });
+    // Timeout Logic
+    const timeout = 30000; // 30 seconds
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        let message = errorText;
-        let code: string | undefined;
-        let details: unknown | undefined;
-
-        try {
-            const parsed = JSON.parse(errorText);
-            if (parsed.message) {
-                message = parsed.message;
-            } else if (parsed.detail) {
-                message =
-                    typeof parsed.detail === 'string'
-                        ? parsed.detail
-                        : JSON.stringify(parsed.detail);
-            }
-            if (parsed.code) code = parsed.code;
-            if (parsed.details !== undefined) details = parsed.details;
-        } catch (_e) {
-            // Not JSON
-        }
-
-        // 401 Unauthorized: Clear session and redirect to login
-        if (response.status === 401) {
-            // Set flag to prevent unsaved changes dialog
-            // biome-ignore lint/suspicious/noExplicitAny: window hack
-            (window as any).__isAutoLogout = true;
-
-            useAuthStore.getState().logout();
-            useSessionStore.getState().resetSession();
-            // Optional: Redirect to login if not already there
-            if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login?reason=session_expired';
-            }
-        }
-
-        // 403 Forbidden: Show error toast but don't logout immediately
-        // (Handled by React Mutation/Query error states usually, but unexpected 403s should be visible)
-        if (response.status === 403) {
-            // We can let the UI handle specific 403s, but logging it is good.
-            console.warn('Access Forbidden:', url);
-        }
-
-        // Auto-report 500 Server Errors
-        if (response.status >= 500) {
-            reportBug(`Server Error ${response.status} at ${url}: ${errorText}`, {
-                endpoint: url,
-                status: response.status,
-            });
-        }
-        throw new ApiError(response.status, message, code, details);
+    // If an external signal is provided, listen to it
+    if (signal) {
+        signal.addEventListener('abort', () => controller.abort());
     }
 
-    // Handle 204 No Content
-    if (response.status === 204) {
-        return {} as T;
-    }
+    try {
+        const response = await fetch(fullUrl, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
+                ...(headers as Record<string, string>),
+            },
+            body: data
+                ? data instanceof URLSearchParams
+                    ? data
+                    : JSON.stringify(data)
+                : undefined,
+            signal: controller.signal,
+        });
 
-    return response.json();
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            let message = errorText;
+            let code: string | undefined;
+            let details: unknown | undefined;
+
+            try {
+                const parsed = JSON.parse(errorText);
+                if (parsed.message) {
+                    message = parsed.message;
+                } else if (parsed.detail) {
+                    message =
+                        typeof parsed.detail === 'string'
+                            ? parsed.detail
+                            : JSON.stringify(parsed.detail);
+                }
+                if (parsed.code) code = parsed.code;
+                if (parsed.details !== undefined) details = parsed.details;
+            } catch (_e) {
+                // Not JSON
+            }
+
+            // 401 Unauthorized: Clear session and redirect to login
+            if (response.status === 401) {
+                // Set flag to prevent unsaved changes dialog
+                // biome-ignore lint/suspicious/noExplicitAny: window hack
+                (window as any).__isAutoLogout = true;
+
+                useAuthStore.getState().logout();
+                useSessionStore.getState().resetSession();
+                // Optional: Redirect to login if not already there
+                if (!window.location.pathname.includes('/login')) {
+                    window.location.href = '/login?reason=session_expired';
+                }
+            }
+
+            // 403 Forbidden: Show error toast but don't logout immediately
+            // (Handled by React Mutation/Query error states usually, but unexpected 403s should be visible)
+            if (response.status === 403) {
+                // We can let the UI handle specific 403s, but logging it is good.
+                console.warn('Access Forbidden:', url);
+            }
+
+            // Auto-report 500 Server Errors
+            if (response.status >= 500) {
+                reportBug(`Server Error ${response.status} at ${url}: ${errorText}`, {
+                    endpoint: url,
+                    status: response.status,
+                });
+            }
+            throw new ApiError(response.status, message, code, details);
+        }
+
+        // Handle 204 No Content
+        if (response.status === 204) {
+            return {} as T;
+        }
+
+        return response.json();
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            // Check if it was our timeout or the external signal
+            if (signal?.aborted) {
+                // Re-throw if it wasn't a timeout (user cancellation)
+                // However, Orval/ReactQuery often expects just an error.
+                // We can distinguish by checking if timeout fired.
+                // But wait, we can't easily check if timeout fired vs signal fired sharing the same controller..
+                // Actually, if signal.aborted is true, it's likely the cause/precedence.
+                throw error;
+            }
+            throw new ApiError(408, 'Request timed out', 'timeout');
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
+    }
 };

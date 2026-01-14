@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import type { StudyUpdate, StudyRead } from '@/api/model';
-import { useParams } from 'react-router-dom';
+import { useBlocker, useParams } from 'react-router-dom';
 import type { ApiError } from '@/api/client';
 import { mergeStudyUpdates } from '@/utils/mergeStudy';
 import { toast } from 'sonner';
@@ -42,12 +42,32 @@ export function useAutoSave(debounceMs = 2000) {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (syncStatus === 'modified' || syncStatus === 'saving') {
                 e.preventDefault();
-                e.returnValue = ''; // Required for some browsers
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
             }
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [syncStatus]);
+
+    // 3. React Router Navigation Guard (Internal Link Blocking)
+    const blocker = useBlocker(
+        ({ currentLocation, nextLocation }) =>
+            (syncStatus === 'modified' || syncStatus === 'saving') &&
+            currentLocation.pathname !== nextLocation.pathname
+    );
+
+    useEffect(() => {
+        if (blocker.state === 'blocked') {
+            const confirm = window.confirm(
+                'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
+            );
+            if (confirm) {
+                blocker.proceed();
+            } else {
+                blocker.reset();
+            }
+        }
+    }, [blocker]);
 
     useEffect(() => {
         if (!draft || !slug) return;

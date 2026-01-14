@@ -99,6 +99,20 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                 };
             }
 
+            if (error.status === 408) {
+                return {
+                    title: t('common.errors.timeout.title', 'Request Timeout'),
+                    message: t(
+                        'common.errors.timeout.message',
+                        'The server took too long to respond. Please check your connection and try again.'
+                    ),
+                    icon: WifiOff,
+                    showReset: false,
+                    showHome: false,
+                    showRetry: true,
+                };
+            }
+
             if (error.code === 'conflict') {
                 return {
                     title: t('common.errors.conflict_title') || 'Conflict',
