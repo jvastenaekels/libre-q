@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Layout, Activity, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -15,12 +15,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 
 export function AdminDashboard() {
-    const { user } = useAuth();
+    const { user, currentWorkspace } = useAuthStore();
     const navigate = useNavigate();
-    const { setActiveStudy, activeWorkspaceId } = useAdminStore();
+    const { setActiveStudy } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
-    const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet();
+    const { data: allStudies, isLoading, refetch } = useListStudiesApiAdminStudiesGet();
     const { t, i18n } = useTranslation();
+
+    // Refetch studies when workspace changes
+    useEffect(() => {
+        if (currentWorkspace?.id) {
+            refetch();
+        }
+    }, [currentWorkspace?.id, refetch]);
+    
     // biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns
     const dateLocales: Record<string, any> = {
         en: enUS,
@@ -29,7 +37,7 @@ export function AdminDashboard() {
     };
     const currentLocale = dateLocales[i18n.language] || enUS;
 
-    const studies = allStudies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const studies = allStudies?.filter((s) => s.workspace_id === currentWorkspace?.id);
 
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length || 0;
     const _totalStudies = studies?.length || 0;
