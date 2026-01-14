@@ -28,7 +28,7 @@ export function AdminDashboard() {
             refetch();
         }
     }, [currentWorkspace?.id, refetch]);
-    
+
     // biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns
     const dateLocales: Record<string, any> = {
         en: enUS,

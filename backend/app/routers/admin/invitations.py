@@ -19,14 +19,17 @@ async def verify_invitation(token: str, db: AsyncSession = Depends(get_db)):
     try:
         payload = decode_invitation_token(token)
         workspace_id = payload.get("workspace_id")
-        
+
         workspace_name = "Unknown Workspace"
         if workspace_id:
             from app.models import Workspace
-            result = await db.execute(select(Workspace).where(Workspace.id == workspace_id))
+
+            result = await db.execute(
+                select(Workspace).where(Workspace.id == workspace_id)
+            )
             workspace = result.scalar_one_or_none()
             if workspace:
-                workspace_name = workspace.name
+                workspace_name = workspace.title
 
         return {
             "email": payload["sub"],

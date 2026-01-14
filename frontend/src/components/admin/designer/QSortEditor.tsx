@@ -264,7 +264,9 @@ const QSortEditor = () => {
             const idealCapacities = weights.map((w) => (w / totalWeight) * N);
 
             // Start with minimum 1 per column (if N sufficient)
-            const newCapacities = new Array(numColumns).fill(0).map(() => (N >= numColumns ? 1 : 0));
+            const newCapacities: number[] = new Array(numColumns)
+                .fill(0)
+                .map(() => (N >= numColumns ? 1 : 0));
             let currentTotal = newCapacities.reduce((a, b) => a + b, 0);
 
             // Iteratively distribute remaining slots to the column with the biggest "hunger" (ideal - current)
@@ -307,13 +309,13 @@ const QSortEditor = () => {
                         // If we are here with even columns and 1 slot left, it's an impossible symmetric state.
                         // We'll dump it to one of the central-most columns or the center if odd.
                         if (isOddCols) {
-                             newCapacities[centerIdx]++;
-                             currentTotal++;
+                            newCapacities[centerIdx]++;
+                            currentTotal++;
                         } else {
-                             // Even columns, 1 left. Break symmetry slightly or add to one of the middle ones?
-                             // Convention: add to left middle.
-                             newCapacities[centerIdx - 1]++;
-                             currentTotal++;
+                            // Even columns, 1 left. Break symmetry slightly or add to one of the middle ones?
+                            // Convention: add to left middle.
+                            newCapacities[centerIdx - 1]++;
+                            currentTotal++;
                         }
                     }
                 }

@@ -86,5 +86,5 @@ class TestInvitations:
         response = await client.get(f"/api/admin/invitations/verify?token={token}")
         assert response.status_code == 200
         assert response.json()["email"] == "collab@test.com"
-        assert response.json()["workspace_name"] == ws.name
+        assert response.json()["workspace_name"] == ws.title
         assert response.json()["workspace_id"] == ws.id

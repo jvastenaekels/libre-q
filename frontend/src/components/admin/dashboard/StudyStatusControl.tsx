@@ -153,7 +153,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
         return (
             <AlertDialog>
                 <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="z-[9999] max-w-[95vw] sm:max-w-lg">
                     <AlertDialogHeader>
                         <AlertDialogTitle>{config.title}</AlertDialogTitle>
                         <AlertDialogDescription>{config.desc}</AlertDialogDescription>

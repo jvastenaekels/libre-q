@@ -6,7 +6,7 @@
     "postinstall": "echo 'Postinstall root skipping'"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": "24.x"
   },
   "dependencies": {
     "immer": "^11.1.3"
