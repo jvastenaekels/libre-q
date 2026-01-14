@@ -43,7 +43,7 @@ const RegistrationPage = () => {
         data: invite,
         isLoading: isVerifying,
         error: verifyError,
-    } = useQuery<{ email: string; study_id: number; role: string }>({
+    } = useQuery<{ email: string; workspace_name: string; role: string }>({
         queryKey: ['verify-invite', token],
         queryFn: ({ signal }) =>
             customInstance({
@@ -185,26 +185,37 @@ const RegistrationPage = () => {
                     <p className="text-slate-500 font-medium">{t('auth.register.subtitle')}</p>
                 </div>
 
-                <Card className="shadow-2xl border-none bg-white/80 backdrop-blur-xl">
-                    <CardHeader>
+                <Card className="shadow-2xl border-none bg-white/90 backdrop-blur-xl ring-1 ring-slate-900/5">
+                    <CardHeader className="pb-2">
                         <CardTitle className="flex items-center justify-between">
-                            <span>{t('auth.register.title')}</span>
-                            <UserPlus className="h-5 w-5 text-primary" />
-                        </CardTitle>
-                        <CardDescription className="bg-slate-50/50 p-4 rounded-xl border-dashed border-2 border-slate-200 mt-2 flex flex-col gap-2">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">
-                                {t('auth.register.invitation_to')}
+                            <span className="text-xl tracking-tight">
+                                {t('auth.register.title')}
                             </span>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-bold text-slate-700">
-                                    {t('auth.register.study_label')} #{invite?.study_id}
-                                </span>
-                                <Badge
-                                    variant="outline"
-                                    className="bg-white text-[10px] font-bold uppercase"
-                                >
-                                    {invite?.role}
-                                </Badge>
+                            <UserPlus className="h-5 w-5 text-indigo-600" />
+                        </CardTitle>
+                        <CardDescription className="pt-4">
+                            <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
+                                <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
+                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                                        {t('auth.register.invitation_to')}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-slate-900">
+                                            {invite?.workspace_name}
+                                        </span>
+                                        <span className="text-xs text-slate-500 font-medium">
+                                            {t('admin.workspace.switcher.new_workspace_desc')}
+                                        </span>
+                                    </div>
+                                    <Badge
+                                        variant="outline"
+                                        className="bg-white text-[10px] font-bold uppercase text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
+                                    >
+                                        {invite?.role}
+                                    </Badge>
+                                </div>
                             </div>
                         </CardDescription>
                     </CardHeader>

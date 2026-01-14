@@ -14,13 +14,24 @@ router = APIRouter(tags=["Admin Invitations"])
 
 
 @router.get("/verify")
-async def verify_invitation(token: str):
-    """Verify an invitation token and return details."""
+async def verify_invitation(token: str, db: AsyncSession = Depends(get_db)):
+    """Verify an invitation token and return details including workspace name."""
     try:
         payload = decode_invitation_token(token)
+        workspace_id = payload.get("workspace_id")
+        
+        workspace_name = "Unknown Workspace"
+        if workspace_id:
+            from app.models import Workspace
+            result = await db.execute(select(Workspace).where(Workspace.id == workspace_id))
+            workspace = result.scalar_one_or_none()
+            if workspace:
+                workspace_name = workspace.name
+
         return {
             "email": payload["sub"],
-            "workspace_id": payload.get("workspace_id"),
+            "workspace_id": workspace_id,
+            "workspace_name": workspace_name,
             "role": payload["role"],
         }
     except Exception as e:

@@ -263,54 +263,64 @@ const QSortEditor = () => {
             const totalWeight = weights.reduce((a, b) => a + b, 0);
             const idealCapacities = weights.map((w) => (w / totalWeight) * N);
 
-            const newCapacities = new Array(numColumns).fill(0);
-            let currentTotal = 0;
+            // Start with minimum 1 per column (if N sufficient)
+            const newCapacities = new Array(numColumns).fill(0).map(() => (N >= numColumns ? 1 : 0));
+            let currentTotal = newCapacities.reduce((a, b) => a + b, 0);
 
-            // Maintain horizontal symmetry
-            const half = Math.floor(numColumns / 2);
-            for (let i = 0; i < half; i++) {
-                const pairAvg = idealCapacities[i];
-                const cap = Math.max(1, Math.floor(pairAvg));
-                newCapacities[i] = cap;
-                newCapacities[numColumns - 1 - i] = cap;
-                currentTotal += cap * 2;
-            }
+            // Iteratively distribute remaining slots to the column with the biggest "hunger" (ideal - current)
+            // while respecting symmetry constraints.
+            const centerIdx = Math.floor(numColumns / 2);
+            const isOddCols = numColumns % 2 !== 0;
 
-            // Center column if exists
-            if (numColumns % 2 !== 0) {
-                const centerIdx = half;
-                const cap = Math.max(1, N - currentTotal);
-                newCapacities[centerIdx] = cap;
-                currentTotal += cap;
-            }
+            while (currentTotal < N) {
+                let bestIdx = -1;
+                let maxDiff = -Infinity;
 
-            // Final bridge: if currentTotal !== N, adjust from center outwards to keep symmetry
-            const diff = N - currentTotal;
-            if (diff !== 0) {
-                // If diff is odd and we have no center, we must break symmetry slightly or adjust N
-                // But N is fixed. If K is even and diff is odd, one side will have +1.
+                // Only scan first half + center
+                const limit = isOddCols ? centerIdx : centerIdx - 1;
 
-                const centerIdx = Math.floor(numColumns / 2);
-                if (numColumns % 2 !== 0) {
-                    // Symmetric adjustment possible at center
-                    newCapacities[centerIdx] += diff;
+                for (let i = 0; i <= limit; i++) {
+                    const diff = idealCapacities[i] - newCapacities[i];
+                    if (diff > maxDiff) {
+                        maxDiff = diff;
+                        bestIdx = i;
+                    }
+                }
+
+                if (bestIdx === -1) break; // Should not happen
+
+                // Apply changes
+                if (isOddCols && bestIdx === centerIdx) {
+                    newCapacities[centerIdx]++;
+                    currentTotal++;
                 } else {
-                    // Even columns, must adjust a pair or break symmetry
-                    if (diff % 2 === 0) {
-                        const left = centerIdx - 1;
-                        const right = centerIdx;
-                        newCapacities[left] += diff / 2;
-                        newCapacities[right] += diff / 2;
+                    // It's a side column pair
+                    if (N - currentTotal >= 2) {
+                        newCapacities[bestIdx]++;
+                        newCapacities[numColumns - 1 - bestIdx]++;
+                        currentTotal += 2;
                     } else {
-                        // Break symmetry by 1 at the center
-                        newCapacities[centerIdx] += diff;
+                        // Only 1 slot left, but we wanted to add to a pair.
+                        // We must dump it in the center to maintain symmetry (if possible)
+                        // If cols are even, we can't maintain symmetry with 1 slot left unless we break it.
+                        // But typically N parity matches grid structure for valid symmetric sorts.
+                        // If we are here with even columns and 1 slot left, it's an impossible symmetric state.
+                        // We'll dump it to one of the central-most columns or the center if odd.
+                        if (isOddCols) {
+                             newCapacities[centerIdx]++;
+                             currentTotal++;
+                        } else {
+                             // Even columns, 1 left. Break symmetry slightly or add to one of the middle ones?
+                             // Convention: add to left middle.
+                             newCapacities[centerIdx - 1]++;
+                             currentTotal++;
+                        }
                     }
                 }
             }
 
-            // Ensure no capacity is below 1 if N >= K
+            // Apply to draft
             for (let i = 0; i < numColumns; i++) {
-                if (newCapacities[i] <= 0 && N >= numColumns) newCapacities[i] = 1;
                 if (d.grid_config?.[i]) {
                     d.grid_config[i].capacity = newCapacities[i];
                 }
