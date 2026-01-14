@@ -12,7 +12,8 @@
  * Manages the top navigation bar, step progress, and locale switching.
  */
 
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe, WifiOff } from 'lucide-react';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import type { PartnerLogo } from '@/api/model';
 import type { StudyConfig } from '@/schemas/study';
 import type React from 'react';
@@ -72,6 +73,9 @@ const StudyLayoutContent: React.FC = () => {
     const [isStepMenuOpen, setIsStepMenuOpen] = useState(false);
     const langMenuRef = useRef<HTMLDivElement>(null);
     const stepMenuRef = useRef<HTMLDivElement>(null);
+
+    // Network Status
+    const { isOnline } = useNetworkStatus();
 
     const handleStepClick = (stepId: number) => {
         if (stepId > maxReachedStep) return;
@@ -283,6 +287,19 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-[11px] font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     {t('layout.pilot_mode')}
+                </div>
+            )}
+
+            {/* Offline Status Banner */}
+            {!isOnline && (
+                <div className="bg-slate-800 text-white px-4 py-2 flex items-center justify-center gap-2 text-sm font-medium sticky top-0 z-[70] shadow-md animate-in fade-in slide-in-from-top duration-300">
+                    <WifiOff size={16} className="animate-pulse" />
+                    <span>
+                        {t(
+                            'common.status.offline',
+                            'You are offline. Changes are queued and will sync when reconnected.'
+                        )}
+                    </span>
                 </div>
             )}
             {/* Header */}

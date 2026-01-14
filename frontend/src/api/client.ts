@@ -124,10 +124,25 @@ async function request(
         ...options?.headers,
     };
 
-    const response = await fetch(fullUrl, {
-        ...options,
-        headers,
-    });
+    const controller = new AbortController();
+    const timeout = 30000; // 30 seconds
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    let response: Response;
+    try {
+        response = await fetch(fullUrl, {
+            ...options,
+            headers,
+            signal: controller.signal,
+        });
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw new ApiError(408, 'Request timed out', 'timeout');
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
         const errorText = await response.text();
