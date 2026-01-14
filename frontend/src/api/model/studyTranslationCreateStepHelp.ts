@@ -5,6 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type StudyTranslationCreateStepHelp = {
-    [key: string]: { [key: string]: string };
-};
+export type StudyTranslationCreateStepHelp = { [key: string]: { [key: string]: string } };

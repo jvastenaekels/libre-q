@@ -1137,7 +1137,7 @@
           "Admin Invitations"
         ],
         "summary": "Verify Invitation",
-        "description": "Verify an invitation token and return details.",
+        "description": "Verify an invitation token and return details including workspace name.",
         "operationId": "verify_invitation_api_admin_invitations_verify_get",
         "parameters": [
           {
@@ -3835,7 +3835,8 @@
                 "type": "null"
               }
             ],
-            "title": "Consent Accept"
+            "title": "Consent Accept",
+            "default": "Accept"
           },
           "consent_decline": {
             "anyOf": [
@@ -3846,7 +3847,8 @@
                 "type": "null"
               }
             ],
-            "title": "Consent Decline"
+            "title": "Consent Decline",
+            "default": "Decline"
           },
           "ui_labels": {
             "additionalProperties": true,
@@ -3994,7 +3996,8 @@
                 "type": "null"
               }
             ],
-            "title": "Consent Accept"
+            "title": "Consent Accept",
+            "default": "Accept"
           },
           "consent_decline": {
             "anyOf": [
@@ -4005,7 +4008,8 @@
                 "type": "null"
               }
             ],
-            "title": "Consent Decline"
+            "title": "Consent Decline",
+            "default": "Decline"
           },
           "ui_labels": {
             "additionalProperties": true,
