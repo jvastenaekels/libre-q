@@ -65,7 +65,9 @@ export default function AdminLayout() {
             <CommandMenu />
             <AppSidebar />
 
-            <SidebarInset>
+            <SidebarInset
+                className={cn(location.pathname.includes('/design') && '!m-0 !rounded-none')}
+            >
                 <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                     <div className="flex items-center gap-2 px-4">
                         <SidebarTrigger className="-ml-1" />
@@ -126,7 +128,9 @@ export default function AdminLayout() {
                 <div
                     className={cn(
                         'flex flex-1 flex-col transition-all duration-300 min-w-0',
-                        !location.pathname.includes('/design') && 'gap-4 p-4 pt-0'
+                        !location.pathname.includes('/design')
+                            ? 'gap-4 p-4 pt-0'
+                            : 'overflow-hidden'
                     )}
                 >
                     <Outlet />
