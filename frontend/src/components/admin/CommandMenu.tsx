@@ -29,12 +29,13 @@ export const CommandMenu = () => {
     const navigate = useNavigate();
     const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } =
         useAdminStore();
-    const logout = useAuthStore((state) => state.logout);
+    const { logout, setCurrentWorkspace } = useAuthStore();
     const { data: studies } = useListStudiesApiAdminStudiesGet();
     const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
     const { t } = useTranslation();
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const isValidStudy = activeStudyId && filteredStudies?.some((s) => s.slug === activeStudyId);
 
     // Toggle on Cmd+K or Ctrl+K
     useEffect(() => {
@@ -60,7 +61,7 @@ export const CommandMenu = () => {
     };
 
     const handleCopyLink = () => {
-        if (activeStudyId) {
+        if (isValidStudy) {
             const link = `${window.location.origin}/study/${activeStudyId}/welcome`;
             navigator.clipboard.writeText(link);
             toast.success('Study link copied!');
@@ -110,6 +111,8 @@ export const CommandMenu = () => {
                                     onSelect={() =>
                                         runCommand(() => {
                                             setActiveWorkspace(ws.id);
+                                            setCurrentWorkspace(ws);
+                                            setActiveStudy(null);
                                             toast.success(`Switched to ${ws.title}`);
                                         })
                                     }
@@ -179,8 +182,8 @@ export const CommandMenu = () => {
                         )}
                     </Command.Group>
 
-                    {/* Contextual Actions (only when study is active) */}
-                    {activeStudyId && (
+                    {/* Contextual Actions (only when study is active and valid) */}
+                    {isValidStudy && (
                         <Command.Group
                             heading={t('admin.command_menu.study_actions', 'Study Actions')}
                             className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"

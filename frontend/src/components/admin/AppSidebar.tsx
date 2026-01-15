@@ -160,13 +160,20 @@ function NavUser({ user }: { user: any }) {
     );
 }
 
+import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { activeStudyId } = useAdminStore();
+    const { activeStudyId, activeWorkspaceId } = useAdminStore();
     const { user } = useAuth();
     const location = useLocation();
     const { t } = useTranslation();
 
-    const navMain = activeStudyId
+    const { data: studies } = useListStudiesApiAdminStudiesGet();
+    const isValidStudy =
+        activeStudyId &&
+        studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId);
+
+    const navMain = isValidStudy
         ? [
               {
                   title: 'Navigation',
@@ -210,7 +217,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <StudySwitcher />
             </SidebarHeader>
             <SidebarContent>
-                {activeStudyId ? (
+                {isValidStudy ? (
                     <SidebarGroup>
                         <SidebarMenu>
                             <SidebarMenuItem className="px-2 mb-4">
@@ -235,19 +242,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {t('admin.sidebar.study_management')}
                         </SidebarGroupLabel> */}
                         <SidebarMenu>
-                            {navMain[0].items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={location.pathname === item.url}
-                                    >
-                                        <Link to={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            {navMain.map((group) =>
+                                group.items.map((item) => (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={location.pathname === item.url}
+                                        >
+                                            <Link to={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))
+                            )}
                         </SidebarMenu>
                     </SidebarGroup>
                 ) : (
