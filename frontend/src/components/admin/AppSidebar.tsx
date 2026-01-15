@@ -160,13 +160,20 @@ function NavUser({ user }: { user: any }) {
     );
 }
 
+import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { activeStudyId } = useAdminStore();
+    const { activeStudyId, activeWorkspaceId } = useAdminStore();
     const { user } = useAuth();
     const location = useLocation();
     const { t } = useTranslation();
 
-    const navMain = activeStudyId
+    const { data: studies } = useListStudiesApiAdminStudiesGet();
+    const isValidStudy =
+        activeStudyId &&
+        studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId);
+
+    const navMain = isValidStudy
         ? [
               {
                   title: 'Navigation',
@@ -210,7 +217,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <StudySwitcher />
             </SidebarHeader>
             <SidebarContent>
-                {activeStudyId ? (
+                {isValidStudy ? (
                     <SidebarGroup>
                         <SidebarMenu>
                             <SidebarMenuItem className="px-2 mb-4">

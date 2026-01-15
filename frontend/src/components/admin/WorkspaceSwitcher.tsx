@@ -26,10 +26,13 @@ import { useAuthStore } from '@/store/useAuthStore';
 import type { WorkspaceWithRole } from '@/types/backend';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { useAdminStore } from '@/store/useAdminStore';
+
 export function WorkspaceSwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { setActiveWorkspace, setActiveStudy } = useAdminStore();
 
     // Fetch data using generated hook (React Query)
     const { data: workspacesData, isLoading: isWorkspacesLoading } =
@@ -49,14 +52,23 @@ export function WorkspaceSwitcher() {
         }
     }, [workspaces, setWorkspaces]);
 
+    // Sync activeWorkspaceId if currentWorkspace is set but not in admin store
+    React.useEffect(() => {
+        if (currentWorkspace) {
+            setActiveWorkspace(currentWorkspace.id);
+        }
+    }, [currentWorkspace, setActiveWorkspace]);
+
     const isLoading = isWorkspacesLoading || isStudiesLoading;
 
     // Auto-select first workspace if none selected and data loaded
     React.useEffect(() => {
         if (!currentWorkspace && workspaces && workspaces.length > 0) {
-            setCurrentWorkspace(workspaces[0]);
+            const first = workspaces[0];
+            setCurrentWorkspace(first);
+            setActiveWorkspace(first.id);
         }
-    }, [currentWorkspace, workspaces, setCurrentWorkspace]);
+    }, [currentWorkspace, workspaces, setCurrentWorkspace, setActiveWorkspace]);
 
     if (isLoading) {
         return (
@@ -122,7 +134,13 @@ export function WorkspaceSwitcher() {
                                 return (
                                     <DropdownMenuItem
                                         key={workspace.id}
-                                        onClick={() => setCurrentWorkspace(workspace)}
+                                        onClick={() => {
+                                            if (workspace.id !== currentWorkspace?.id) {
+                                                setCurrentWorkspace(workspace);
+                                                setActiveWorkspace(workspace.id);
+                                                setActiveStudy(null);
+                                            }
+                                        }}
                                         className={cn(
                                             'flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 outline-none',
                                             isActive
