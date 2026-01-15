@@ -27,7 +27,14 @@ export class ApiError extends Error {
     }
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+const getBaseUrl = () => {
+    try {
+        return import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+    } catch {
+        return '';
+    }
+};
+const BASE_URL = getBaseUrl();
 
 // --- Error Reporting ---
 

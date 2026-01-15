@@ -4,7 +4,14 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useSessionStore } from '../store/useSessionStore';
 
 // Re-using the logic from client.ts but adaptable for Orval's signature
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+const getBaseUrl = () => {
+    try {
+        return import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+    } catch {
+        return '';
+    }
+};
+const BASE_URL = getBaseUrl();
 
 export const customInstance = async <T>({
     url,
