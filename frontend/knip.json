@@ -10,6 +10,7 @@
     "src/api/generated.ts",
     "src/api/model/**",
     "src/components/ui/**",
+    "src/styles/**",
     "e2e/**"
   ],
   "ignoreBinaries": ["playwright", "python3"],
