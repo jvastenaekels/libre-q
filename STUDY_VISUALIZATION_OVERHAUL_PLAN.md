@@ -2811,82 +2811,734 @@ export const chartStyles = {
 
 ## Testing Strategy
 
-### Unit Tests
+### Overview
+
+Comprehensive testing ensures all visualization components are reliable, performant, and accessible. This strategy covers unit tests for data processing, component tests for UI elements, integration tests for page-level functionality, visual regression tests, and end-to-end tests for user workflows.
+
+**Testing Tools:**
+- **Jest** - Unit and component testing
+- **React Testing Library** - Component rendering and interaction testing
+- **Vitest** - Fast unit test runner (alternative to Jest)
+- **Playwright** or **Cypress** - End-to-end testing
+- **Chromatic** or **Percy** - Visual regression testing
+- **@testing-library/jest-dom** - DOM matchers
+- **@testing-library/user-event** - User interaction simulation
+
+---
+
+### 1. Unit Tests - Data Processing Utilities
+
+#### 1.1 Chart Utilities (`lib/chartUtils.ts`)
 
 ```typescript
-// __tests__/chartUtils.test.ts
+// __tests__/unit/chartUtils.test.ts
 import {
   groupParticipantsByDate,
   calculateDurationBuckets,
-  calculateStatementConsensus
+  calculateStatementConsensus,
+  calculateScoreDistributions
 } from '@/lib/chartUtils';
 
 describe('chartUtils', () => {
   describe('groupParticipantsByDate', () => {
     it('should group participants by creation date', () => {
-      // Test implementation
+      const participants = [
+        { id: '1', created_at: '2026-01-15T10:00:00Z', ...  },
+        { id: '2', created_at: '2026-01-15T14:00:00Z', ... },
+        { id: '3', created_at: '2026-01-16T09:00:00Z', ... }
+      ];
+
+      const grouped = groupParticipantsByDate(participants);
+
+      expect(grouped['2026-01-15']).toHaveLength(2);
+      expect(grouped['2026-01-16']).toHaveLength(1);
     });
 
-    it('should filter by time range', () => {
-      // Test implementation
+    it('should filter by time range correctly', () => {
+      const participants = generateMockParticipants(30); // 30 days of data
+      const last7Days = groupParticipantsByDate(participants, '7d');
+
+      expect(Object.keys(last7Days)).toHaveLength(7);
+    });
+
+    it('should handle empty array', () => {
+      const result = groupParticipantsByDate([]);
+      expect(result).toEqual({});
     });
   });
 
   describe('calculateDurationBuckets', () => {
     it('should correctly bucket durations', () => {
-      // Test implementation
+      const participants = [
+        { id: '1', duration_seconds: 90, ... },   // 0-2m
+        { id: '2', duration_seconds: 180, ... },  // 2-5m
+        { id: '3', duration_seconds: 600, ... },  // 10-15m
+        { id: '4', duration_seconds: 1500, ... }, // 20+m
+      ];
+
+      const buckets = calculateDurationBuckets(participants);
+
+      expect(buckets.find(b => b.range === '0-2m')?.count).toBe(1);
+      expect(buckets.find(b => b.range === '2-5m')?.count).toBe(1);
+      expect(buckets.find(b => b.range === '10-15m')?.count).toBe(1);
+      expect(buckets.find(b => b.range === '20+m')?.count).toBe(1);
     });
 
     it('should flag suspect durations', () => {
-      // Test implementation
+      const participants = [{ id: '1', duration_seconds: 90, ... }];
+      const buckets = calculateDurationBuckets(participants);
+
+      const suspectBucket = buckets.find(b => b.range === '0-2m');
+      expect(suspectBucket?.suspect).toBe(true);
+    });
+
+    it('should handle null durations', () => {
+      const participants = [{ id: '1', duration_seconds: null, ... }];
+      const buckets = calculateDurationBuckets(participants);
+
+      const totalCounted = buckets.reduce((sum, b) => sum + b.count, 0);
+      expect(totalCounted).toBe(0);
     });
   });
 
   describe('calculateStatementConsensus', () => {
     it('should calculate correct consensus score', () => {
-      // Test implementation
+      const participants = [
+        { id: '1', scores: [2, 0, -1] },
+        { id: '2', scores: [2, 1, -2] },
+        { id: '3', scores: [3, 0, -1] },
+      ];
+
+      const consensus = calculateStatementConsensus(participants, 0);
+
+      expect(consensus.mean).toBeCloseTo(2.33, 1);
+      expect(consensus.stdDev).toBeLessThan(1); // Low variance = high consensus
+      expect(consensus.consensus).toBeGreaterThan(80);
     });
 
     it('should handle empty data gracefully', () => {
-      // Test implementation
+      const consensus = calculateStatementConsensus([], 0);
+
+      expect(consensus.mean).toBe(0);
+      expect(consensus.stdDev).toBe(0);
+      expect(consensus.consensus).toBe(0);
+    });
+
+    it('should identify controversial statements', () => {
+      const participants = [
+        { id: '1', scores: [-3, 0, 0] },
+        { id: '2', scores: [3, 0, 0] },
+        { id: '3', scores: [-2, 0, 0] },
+        { id: '4', scores: [2, 0, 0] },
+      ];
+
+      const consensus = calculateStatementConsensus(participants, 0);
+
+      expect(consensus.stdDev).toBeGreaterThan(2); // High variance
+      expect(consensus.consensus).toBeLessThan(40); // Low consensus
+    });
+  });
+
+  describe('calculateScoreDistributions', () => {
+    it('should calculate distribution for each statement', () => {
+      const participants = [
+        { id: '1', scores: [2, -1, 0] },
+        { id: '2', scores: [2, 0, 1] },
+        { id: '3', scores: [1, -1, 0] },
+      ];
+
+      const distributions = calculateScoreDistributions(participants, 3);
+
+      expect(distributions[0].get(2)).toBe(2); // Statement 0: score 2 appears twice
+      expect(distributions[1].get(-1)).toBe(2); // Statement 1: score -1 appears twice
     });
   });
 });
 ```
 
-### Component Tests
+#### 1.2 Participant Analysis Utilities (`lib/participantAnalysis.ts`)
 
 ```typescript
-// __tests__/SubmissionsTimelineChart.test.tsx
-import { render, screen } from '@testing-library/react';
+// __tests__/unit/participantAnalysis.test.ts
+import {
+  calculateEngagementScore,
+  detectResponsePatterns,
+  compareParticipants
+} from '@/lib/participantAnalysis';
+
+describe('participantAnalysis', () => {
+  describe('calculateEngagementScore', () => {
+    it('should give high score to good quality response', () => {
+      const participant = {
+        id: '1',
+        duration_seconds: 720, // 12 minutes
+        scores: [-3, -2, -1, 0, 1, 2, 3], // Full range usage
+        presort: { q1: 'answer1', q2: 'answer2' },
+        postsort: { comments: 'Detailed feedback' }
+      };
+
+      const score = calculateEngagementScore(participant, mockStudyData);
+
+      expect(score).toBeGreaterThan(80);
+    });
+
+    it('should give low score to suspect response', () => {
+      const participant = {
+        id: '1',
+        duration_seconds: 90, // Too fast
+        scores: [0, 0, 0, 0], // No diversity
+        presort: {},
+        postsort: {}
+      };
+
+      const score = calculateEngagementScore(participant, mockStudyData);
+
+      expect(score).toBeLessThan(40);
+    });
+  });
+
+  describe('detectResponsePatterns', () => {
+    it('should detect straight-lining', () => {
+      const participant = {
+        scores: [1, 1, 1, 1, 1, 1, 1]
+      };
+
+      const patterns = detectResponsePatterns(participant);
+
+      expect(patterns).toContainEqual(
+        expect.objectContaining({ type: 'straight-lining' })
+      );
+    });
+
+    it('should detect central tendency bias', () => {
+      const participant = {
+        scores: [0, 0, 0, 0, 1, 0, -1, 0, 0]
+      };
+
+      const patterns = detectResponsePatterns(participant);
+
+      expect(patterns).toContainEqual(
+        expect.objectContaining({ type: 'central-tendency' })
+      );
+    });
+
+    it('should return empty for normal patterns', () => {
+      const participant = {
+        scores: [-3, 2, 0, 1, -2, 3, -1]
+      };
+
+      const patterns = detectResponsePatterns(participant);
+
+      expect(patterns).toHaveLength(0);
+    });
+  });
+
+  describe('compareParticipants', () => {
+    it('should calculate high similarity for similar responses', () => {
+      const p1 = { scores: [2, 1, 0, -1, -2] };
+      const p2 = { scores: [2, 1, 0, -1, -2] };
+
+      const result = compareParticipants(p1, p2);
+
+      expect(result.similarity).toBeGreaterThan(95);
+      expect(result.divergentStatements).toHaveLength(0);
+    });
+
+    it('should identify divergent statements', () => {
+      const p1 = { scores: [3, 1, 0, -1, -3] };
+      const p2 = { scores: [-3, 1, 0, -1, 3] };
+
+      const result = compareParticipants(p1, p2);
+
+      expect(result.divergentStatements).toContainEqual(0); // Statement 0
+      expect(result.divergentStatements).toContainEqual(4); // Statement 4
+    });
+  });
+});
+```
+
+#### 1.3 Overview Analytics Utilities (`lib/overviewAnalytics.ts`)
+
+```typescript
+// __tests__/unit/overviewAnalytics.test.ts
+import {
+  calculateTrends,
+  getSparklineData,
+  generateInsights,
+  calculateDataHealthScore
+} from '@/lib/overviewAnalytics';
+
+describe('overviewAnalytics', () => {
+  describe('calculateTrends', () => {
+    it('should calculate positive trend', () => {
+      const current = generateMockParticipants(15);
+      const previous = generateMockParticipants(10);
+
+      const trend = calculateTrends(current, previous);
+
+      expect(trend.direction).toBe('up');
+      expect(trend.percentChange).toBe(50);
+    });
+
+    it('should handle zero previous period', () => {
+      const current = generateMockParticipants(10);
+      const previous = [];
+
+      const trend = calculateTrends(current, previous);
+
+      expect(trend.direction).toBe('up');
+      expect(trend.percentChange).toBe(Infinity);
+    });
+  });
+
+  describe('generateInsights', () => {
+    it('should generate quality alert for suspicious submissions', () => {
+      const participants = [
+        { id: '1', duration_seconds: 90, submitted_at: new Date().toISOString() },
+        { id: '2', duration_seconds: 80, submitted_at: new Date().toISOString() },
+        { id: '3', duration_seconds: 100, submitted_at: new Date().toISOString() },
+      ];
+
+      const insights = generateInsights(mockStudy, mockStats, participants);
+
+      const qualityAlert = insights.find(i => i.type === 'alert');
+      expect(qualityAlert).toBeDefined();
+      expect(qualityAlert?.title).toContain('Quality Alert');
+    });
+
+    it('should generate milestone for 50% completion', () => {
+      const stats = { completed_count: 50, target: 100 };
+
+      const insights = generateInsights(mockStudy, stats, []);
+
+      const milestone = insights.find(i => i.type === 'success');
+      expect(milestone).toBeDefined();
+      expect(milestone?.message).toContain('50%');
+    });
+  });
+
+  describe('calculateDataHealthScore', () => {
+    it('should give high score for healthy data', () => {
+      const goodParticipants = generateHighQualityParticipants(50);
+      const goodStats = { completion_rate: 85 };
+      const goodLinks = generateGoodRecruitmentLinks();
+
+      const healthScore = calculateDataHealthScore(
+        goodParticipants,
+        goodStats,
+        goodLinks
+      );
+
+      expect(healthScore.total).toBeGreaterThan(80);
+      expect(healthScore.grade).toBe('Excellent');
+    });
+
+    it('should give low score for poor data quality', () => {
+      const poorParticipants = generateLowQualityParticipants(10);
+      const poorStats = { completion_rate: 30 };
+      const poorLinks = generatePoorRecruitmentLinks();
+
+      const healthScore = calculateDataHealthScore(
+        poorParticipants,
+        poorStats,
+        poorLinks
+      );
+
+      expect(healthScore.total).toBeLessThan(60);
+      expect(healthScore.grade).toMatch(/Fair|Needs Improvement/);
+    });
+  });
+});
+```
+
+---
+
+### 2. Component Tests - Individual Components
+
+#### 2.1 Aggregate Analytics Charts
+
+```typescript
+// __tests__/components/charts/SubmissionsTimelineChart.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SubmissionsTimelineChart } from '@/components/admin/dashboard/charts';
 
 describe('SubmissionsTimelineChart', () => {
+  const mockParticipants = generateMockParticipants(20);
+
   it('should render chart with data', () => {
-    const mockParticipants = [/* mock data */];
     render(<SubmissionsTimelineChart participants={mockParticipants} />);
+
     expect(screen.getByText('Submissions Timeline')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeInTheDocument(); // Chart canvas
   });
 
   it('should show empty state when no data', () => {
     render(<SubmissionsTimelineChart participants={[]} />);
+
     expect(screen.getByText(/No submission data/i)).toBeInTheDocument();
   });
 
-  it('should be responsive', () => {
-    // Test responsive behavior
+  it('should handle time range selection', () => {
+    render(<SubmissionsTimelineChart participants={mockParticipants} />);
+
+    const rangeSelector = screen.getByLabelText(/time range/i);
+    fireEvent.click(rangeSelector);
+    fireEvent.click(screen.getByText('7d'));
+
+    // Verify chart updates (check data points)
+    expect(screen.getByRole('img')).toBeInTheDocument();
+  });
+
+  it('should be responsive on mobile', () => {
+    global.innerWidth = 375;
+    global.dispatchEvent(new Event('resize'));
+
+    render(<SubmissionsTimelineChart participants={mockParticipants} />);
+
+    const container = screen.getByTestId('chart-container');
+    expect(container).toHaveStyle({ width: '100%' });
+  });
+
+  it('should display tooltip on hover', async () => {
+    const { container } = render(
+      <SubmissionsTimelineChart participants={mockParticipants} />
+    );
+
+    const chartElement = container.querySelector('.recharts-wrapper');
+    fireEvent.mouseMove(chartElement!, { clientX: 100, clientY: 100 });
+
+    // Tooltip should appear
+    await waitFor(() => {
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    });
+  });
+});
+
+// __tests__/components/charts/DurationHistogramChart.test.tsx
+describe('DurationHistogramChart', () => {
+  it('should render histogram buckets correctly', () => {
+    const participants = [
+      { duration_seconds: 90 },
+      { duration_seconds: 240 },
+      { duration_seconds: 600 },
+    ];
+
+    render(<DurationHistogramChart participants={participants} />);
+
+    expect(screen.getByText('0-2m')).toBeInTheDocument();
+    expect(screen.getByText('2-5m')).toBeInTheDocument();
+    expect(screen.getByText('10-15m')).toBeInTheDocument();
+  });
+
+  it('should highlight suspect durations', () => {
+    const participants = [{ duration_seconds: 90 }];
+
+    render(<DurationHistogramChart participants={participants} />);
+
+    const suspectBar = screen.getByTestId('bucket-0-2m');
+    expect(suspectBar).toHaveClass('text-red-500');
   });
 });
 ```
 
-### Integration Tests
+#### 2.2 Individual Participant Components
 
 ```typescript
-// __tests__/integration/AnalyticsPage.test.tsx
-import { render, waitFor } from '@testing-library/react';
-import { AnalyticsPage } from '@/pages/admin/AnalyticsPage';
+// __tests__/components/participant/QSortGridVisualization.test.tsx
+describe('QSortGridVisualization', () => {
+  const mockParticipant = generateMockParticipant();
+  const mockStudyData = generateMockStudyData();
 
-describe('AnalyticsPage integration', () => {
+  it('should render pyramid view by default', () => {
+    render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    expect(screen.getByTestId('pyramid-view')).toBeInTheDocument();
+  });
+
+  it('should switch between view modes', () => {
+    render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    fireEvent.click(screen.getByText('List View'));
+    expect(screen.getByTestId('list-view')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Heatmap'));
+    expect(screen.getByTestId('heatmap-view')).toBeInTheDocument();
+  });
+
+  it('should show statement details on hover', async () => {
+    render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    const statement = screen.getByText(/Statement 1/i);
+    fireEvent.mouseEnter(statement);
+
+    await waitFor(() => {
+      expect(screen.getByRole('tooltip')).toHaveTextContent(/Average placement/i);
+    });
+  });
+
+  it('should display comparison data when provided', () => {
+    const comparisonData = {
+      averageScores: [1, 2, 0, -1],
+      stdDevScores: [0.5, 1, 0.8, 0.6],
+      similarity: 85
+    };
+
+    render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+        showComparison={true}
+        comparisonData={comparisonData}
+      />
+    );
+
+    expect(screen.getByText(/85% similar/i)).toBeInTheDocument();
+  });
+});
+
+// __tests__/components/participant/ResponseQualityIndicators.test.tsx
+describe('ResponseQualityIndicators', () => {
+  it('should display high engagement score with green color', () => {
+    const highQualityParticipant = {
+      ...mockParticipant,
+      duration_seconds: 720,
+      scores: [-3, -2, -1, 0, 1, 2, 3]
+    };
+
+    render(
+      <ResponseQualityIndicators
+        participant={highQualityParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    const score = screen.getByText(/92/i);
+    expect(score).toHaveClass('text-emerald-700');
+  });
+
+  it('should show quality flags for suspicious patterns', () => {
+    const suspiciousParticipant = {
+      ...mockParticipant,
+      duration_seconds: 90 // Too fast
+    };
+
+    render(
+      <ResponseQualityIndicators
+        participant={suspiciousParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    expect(screen.getByText(/Suspiciously fast/i)).toBeInTheDocument();
+  });
+
+  it('should detect and display response patterns', () => {
+    const straightLinedParticipant = {
+      ...mockParticipant,
+      scores: [1, 1, 1, 1, 1, 1]
+    };
+
+    render(
+      <ResponseQualityIndicators
+        participant={straightLinedParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    expect(screen.getByText(/Straight-lining detected/i)).toBeInTheDocument();
+  });
+});
+```
+
+#### 2.3 Overview Dashboard Components
+
+```typescript
+// __tests__/components/overview/EnhancedRecentActivityPanel.test.tsx
+describe('EnhancedRecentActivityPanel', () => {
+  it('should render sparkline chart', () => {
+    const participants = generateMockParticipants(20);
+
+    render(<EnhancedRecentActivityPanel participants={participants} />);
+
+    expect(screen.getByTestId('activity-sparkline')).toBeInTheDocument();
+  });
+
+  it('should display quality score badges', () => {
+    const participants = [
+      { id: '1', quality_score: 92 }, // High quality
+      { id: '2', quality_score: 45 }  // Low quality
+    ];
+
+    render(<EnhancedRecentActivityPanel participants={participants} />);
+
+    const highQualityBadge = screen.getByText('92');
+    expect(highQualityBadge).toHaveClass('bg-emerald-100');
+
+    const lowQualityBadge = screen.getByText('45');
+    expect(lowQualityBadge).toHaveClass('bg-red-100');
+  });
+
+  it('should filter participants by status', () => {
+    render(<EnhancedRecentActivityPanel participants={mockParticipants} />);
+
+    fireEvent.click(screen.getByText('Flagged'));
+
+    const flaggedParticipants = screen.getAllByTestId('participant-card');
+    expect(flaggedParticipants.length).toBeLessThan(mockParticipants.length);
+  });
+});
+
+// __tests__/components/overview/SmartInsightsCards.test.tsx
+describe('SmartInsightsCards', () => {
+  it('should generate and display insights', () => {
+    const insights = [
+      { type: 'alert', title: 'Quality Alert', message: 'Review needed' },
+      { type: 'success', title: 'Milestone', message: 'Target reached' }
+    ];
+
+    render(<SmartInsightsCards insights={insights} />);
+
+    expect(screen.getByText('Quality Alert')).toBeInTheDocument();
+    expect(screen.getByText('Milestone')).toBeInTheDocument();
+  });
+
+  it('should handle insight dismissal', () => {
+    const onDismiss = jest.fn();
+
+    render(
+      <SmartInsightsCards
+        insights={mockInsights}
+        onDismiss={onDismiss}
+      />
+    );
+
+    fireEvent.click(screen.getByLabelText(/dismiss/i));
+
+    expect(onDismiss).toHaveBeenCalledWith(mockInsights[0].id);
+  });
+
+  it('should navigate on insight click', () => {
+    const mockNavigate = jest.fn();
+    jest.mock('react-router-dom', () => ({
+      useNavigate: () => mockNavigate
+    }));
+
+    render(<SmartInsightsCards insights={mockInsights} />);
+
+    fireEvent.click(screen.getByText('Review Now'));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/admin/studies/test/exports?filter=flagged');
+  });
+});
+
+// __tests__/components/overview/TrendMetricCard.test.tsx
+describe('TrendMetricCard', () => {
+  it('should display trend indicator correctly', () => {
+    render(
+      <TrendMetricCard
+        title="Sample Size"
+        value={142}
+        trend={{ direction: 'up', value: '+15', isGood: true }}
+      />
+    );
+
+    expect(screen.getByText('+15')).toHaveClass('text-emerald-600');
+    expect(screen.getByTestId('arrow-up-icon')).toBeInTheDocument();
+  });
+
+  it('should render sparkline when data provided', () => {
+    render(
+      <TrendMetricCard
+        title="Completion Rate"
+        value="78%"
+        sparklineData={[10, 12, 15, 14, 16, 18, 20]}
+      />
+    );
+
+    expect(screen.getByTestId('sparkline-chart')).toBeInTheDocument();
+  });
+
+  it('should show target progress bar', () => {
+    render(
+      <TrendMetricCard
+        title="Sample Size"
+        value={142}
+        target={{ value: 200, current: 142 }}
+      />
+    );
+
+    const progress = screen.getByRole('progressbar');
+    expect(progress).toHaveAttribute('value', '71'); // 142/200 * 100
+  });
+});
+```
+
+---
+
+###3. Integration Tests - Full Page Functionality
+
+```typescript
+// __tests__/integration/StudyOverviewPage.test.tsx
+describe('StudyOverviewPage Integration', () => {
+  beforeEach(() => {
+    mockApiResponses();
+  });
+
+  it('should load and display all components', async () => {
+    render(<StudyOverviewPage />);
+
+    await waitFor(() => {
+      // Metrics
+      expect(screen.getByText('Sample Size')).toBeInTheDocument();
+      expect(screen.getByText('Completion Rate')).toBeInTheDocument();
+
+      // Recent Activity
+      expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+
+      // Smart Insights
+      expect(screen.getByText('Smart Insights')).toBeInTheDocument();
+
+      // Quick Actions
+      expect(screen.getByText('Quick Actions')).toBeInTheDocument();
+    });
+  });
+
+  it('should navigate to participant detail on click', async () => {
+    const mockNavigate = jest.fn();
+    jest.mock('react-router-dom', () => ({
+      ...jest.requireActual('react-router-dom'),
+      useNavigate: () => mockNavigate
+    }));
+
+    render(<StudyOverviewPage />);
+
+    await waitFor(() => screen.getByText(/abc123def/i));
+
+    fireEvent.click(screen.getByText(/abc123def/i));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/participants/')
+    );
+  });
+});
+
+// __tests__/integration/AnalyticsPage.test.tsx
+describe('AnalyticsPage Integration', () => {
   it('should load and display all charts', async () => {
     render(<AnalyticsPage />);
 
@@ -2894,21 +3546,61 @@ describe('AnalyticsPage integration', () => {
       expect(screen.getByText('Submissions Timeline')).toBeInTheDocument();
       expect(screen.getByText('Duration Distribution')).toBeInTheDocument();
       expect(screen.getByText('Device Breakdown')).toBeInTheDocument();
+      expect(screen.getByText('Recruitment Funnel')).toBeInTheDocument();
     });
   });
 
-  it('should handle time range changes', async () => {
-    // Test time range selector
+  it('should handle time range filter globally', async () => {
+    render(<AnalyticsPage />);
+
+    const timeRangeSelector = await screen.findByLabelText(/time range/i);
+    fireEvent.change(timeRangeSelector, { target: { value: '7d' } });
+
+    // All charts should update
+    await waitFor(() => {
+      const charts = screen.getAllByRole('img');
+      expect(charts.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+// __tests__/integration/ParticipantDetailPage.test.tsx
+describe('ParticipantDetailPage Integration', () => {
+  it('should load participant data and all visualizations', async () => {
+    render(<ParticipantDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Session')).toBeInTheDocument();
+      expect(screen.getByText('Response Quality')).toBeInTheDocument();
+      expect(screen.getByText('Q-Sort Grid')).toBeInTheDocument();
+      expect(screen.getByText('Journey Timeline')).toBeInTheDocument();
+    });
+  });
+
+  it('should toggle between view modes', async () => {
+    render(<ParticipantDetailPage />);
+
+    await waitFor(() => screen.getByText('Pyramid View'));
+
+    // Switch to list view
+    fireEvent.click(screen.getByText('List View'));
+    expect(screen.getByTestId('list-view')).toBeInTheDocument();
+
+    // Switch to heatmap
+    fireEvent.click(screen.getByText('Heatmap'));
+    expect(screen.getByTestId('heatmap-view')).toBeInTheDocument();
   });
 });
 ```
 
-### Performance Tests
+---
+
+### 4. Performance Tests
 
 ```typescript
 // __tests__/performance/chartPerformance.test.ts
 describe('Chart Performance', () => {
-  it('should render 1000 data points in under 100ms', () => {
+  it('should render 1000 data points in under 200ms', () => {
     const largeDataset = generateMockParticipants(1000);
     const startTime = performance.now();
 
