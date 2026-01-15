@@ -19,8 +19,8 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
+import { useViewport } from '@/contexts/ViewportContext';
+
 import { cn } from '@/lib/utils';
 
 // Sub-component: Droppable Pile
@@ -443,7 +443,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
     }) => {
         const { t } = useTranslation();
 
-        const isMobile = useIsMobile();
+        const { isMobile, isDesktop } = useViewport();
 
         // Deck Management Hook
         const {
@@ -568,7 +568,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         // Responsive: Disable autofit on mobile selection
         useEffect(() => {
-            if (selectedCardId && window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP) {
+            if (selectedCardId && !isDesktop) {
                 setAutoFitEnabled(false);
             }
         }, [selectedCardId]);

@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
+import { useViewport } from '@/contexts/ViewportContext';
 
 interface GridColumn {
     score: number;
@@ -23,6 +23,7 @@ export const useGridCalculations = ({
     selectedCardId,
     onDimensionsChange,
 }: UseGridCalculationsProps) => {
+    const { isDesktop } = useViewport(); // Centralized viewport detection
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [cardDimensions, setCardDimensions] = useState({
         width: 160,
@@ -34,8 +35,8 @@ export const useGridCalculations = ({
 
         // Grid Anchoring: Do not resize cards when in Mobile Focus Mode (Deck Collapsed)
         // This prevents "Layout Thrashing" / Chaos.
-        // Use DESKTOP breakpoint (1024px) for focus mode detection
-        if (selectedCardId && window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP) return;
+        // Use isDesktop check from context
+        if (selectedCardId && !isDesktop) return;
 
         const wrapper = wrapperRef.current;
         const W = wrapper.clientWidth;
@@ -92,7 +93,7 @@ export const useGridCalculations = ({
                 return prev;
             return { width: newWidth, height: newHeight };
         });
-    }, [gridColumns, selectedCardId]);
+    }, [gridColumns, selectedCardId, isDesktop]);
 
     // Notify parent of dimension changes via Effect to avoid "setState during render" warning
     useEffect(() => {
@@ -102,11 +103,11 @@ export const useGridCalculations = ({
     // Initial Calculation and responsive trigger
     useEffect(() => {
         // Only calculate if NOT in focus mode (anchoring)
-        // Use DESKTOP breakpoint (1024px) for focus mode detection
-        if (!selectedCardId || window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP) {
+        // Use isDesktop check from context
+        if (!selectedCardId || isDesktop) {
             calculateOptimalSize();
         }
-    }, [selectedCardId, calculateOptimalSize]);
+    }, [selectedCardId, calculateOptimalSize, isDesktop]);
 
     // Resize Observer
     useEffect(() => {

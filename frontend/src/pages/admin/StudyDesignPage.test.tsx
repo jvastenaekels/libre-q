@@ -24,6 +24,10 @@ vi.mock('react-router-dom', async () => {
         useParams: vi.fn(() => ({ slug: 'test-study-designer' })),
         useNavigate: vi.fn(() => vi.fn()),
         MemoryRouter: ({ children }: { children: React.ReactNode }) => children,
+        useBlocker: vi
+            .fn()
+            .mockReturnValue({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() }),
+        useBeforeUnload: vi.fn(),
     };
 });
 

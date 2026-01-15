@@ -10,6 +10,7 @@ import type React from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
+import { useViewport } from '@/contexts/ViewportContext';
 
 interface CardStackProps {
     statement: { id: number; text: string; code?: string };
@@ -29,6 +30,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     y,
     ref,
 }) => {
+    const { width } = useViewport();
     const controls = useAnimation();
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
     const [isOverflowing, setIsOverflowing] = useState(false);
@@ -44,9 +46,9 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
 
     // Dynamic Typography
     const textLength = statement.text.length;
-    let fontSizeClass = 'text-xl sm:text-2xl';
-    if (textLength > 150) fontSizeClass = 'text-sm sm:text-base';
-    else if (textLength > 80) fontSizeClass = 'text-lg sm:text-xl';
+    let fontSizeClass = 'text-xl @sm:text-2xl';
+    if (textLength > 150) fontSizeClass = 'text-sm @sm:text-base';
+    else if (textLength > 80) fontSizeClass = 'text-lg @sm:text-xl';
 
     // Overflow Detection
     useEffect(() => {
@@ -58,10 +60,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
         };
 
         checkOverflow();
-        // Re-check on statement change or window resize (typography auto-scale might change things)
-        window.addEventListener('resize', checkOverflow);
-        return () => window.removeEventListener('resize', checkOverflow);
-    }, []);
+    }, [statement.text, width]);
 
     useImperativeHandle(ref, () => ({
         swipe: async (direction) => {
@@ -96,8 +95,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     }));
 
     const handleDragEnd = async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-        const threshold =
-            typeof window !== 'undefined' ? Math.min(100, window.innerWidth * 0.25) : 100;
+        const threshold = Math.min(100, width * 0.25);
         const { x: offsetX, y: offsetY } = info.offset;
 
         if (offsetX > threshold) {
@@ -127,7 +125,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     };
 
     return (
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div className="relative w-full h-full flex items-center justify-center @container">
             {/* Dummy Cards for Depth Effect */}
             <div className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-sm scale-90 translate-y-4 opacity-50 z-0" />
             <div className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-sm scale-95 translate-y-2 opacity-80 z-0" />

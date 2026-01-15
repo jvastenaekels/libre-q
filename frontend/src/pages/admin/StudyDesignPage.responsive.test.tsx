@@ -23,6 +23,10 @@ vi.mock('react-router-dom', async () => {
         useNavigate: vi.fn(() => vi.fn()),
         // Mock MemoryRouter to avoid nested router in preview
         MemoryRouter: ({ children }: { children: React.ReactNode }) => children,
+        useBlocker: vi
+            .fn()
+            .mockReturnValue({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() }),
+        useBeforeUnload: vi.fn(),
     };
 });
 

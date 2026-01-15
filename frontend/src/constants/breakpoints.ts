@@ -35,26 +35,3 @@ export const BREAKPOINTS = {
      */
     '2XL': 1400,
 } as const;
-
-/**
- * Semantic breakpoint aliases for common use cases.
- */
-export const SEMANTIC_BREAKPOINTS = {
-    /**
-     * Traditional mobile breakpoint (screens below 768px).
-     * Use this for mobile vs. desktop detection.
-     */
-    MOBILE: BREAKPOINTS.MD,
-
-    /**
-     * Desktop breakpoint (screens 1024px and above).
-     * Use this for desktop-specific features like focus mode.
-     */
-    DESKTOP: BREAKPOINTS.LG,
-
-    /**
-     * Wide desktop displays (1400px and above).
-     * Use for ultra-wide optimizations.
-     */
-    WIDE: BREAKPOINTS['2XL'],
-} as const;

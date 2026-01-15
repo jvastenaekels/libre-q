@@ -88,5 +88,9 @@ vi.mock('react-router-dom', async () => {
     return {
         ...actual,
         useLoaderData: vi.fn().mockReturnValue({}),
+        useBlocker: vi
+            .fn()
+            .mockReturnValue({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() }),
+        useBeforeUnload: vi.fn(),
     };
 });

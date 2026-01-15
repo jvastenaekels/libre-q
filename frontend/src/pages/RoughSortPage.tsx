@@ -6,7 +6,7 @@
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
-import { BREAKPOINTS, SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
+import { BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
@@ -17,6 +17,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
+import { useViewport } from '@/contexts/ViewportContext';
 
 import { cn } from '@/lib/utils';
 
@@ -27,6 +28,7 @@ interface RoughSortPageProps {
 const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const { isDesktop } = useViewport();
 
     // Config Store
     const config = useConfigStore((state) => state.config);
@@ -74,12 +76,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Auto-dismiss tip on first interaction (mobile only)
     useEffect(() => {
-        if (
-            !showTip ||
-            typeof window === 'undefined' ||
-            window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP
-        )
-            return;
+        if (!showTip || isDesktop) return;
 
         const unsubscribeX = x.on('change', (latest) => {
             if (Math.abs(latest) > 5) {
@@ -149,11 +146,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
         // Auto-dismiss tip on button click (mobile only)
-        if (
-            showTip &&
-            typeof window !== 'undefined' &&
-            window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP
-        ) {
+        if (showTip && !isDesktop) {
             setShowTip(false);
         }
         // We now delegate to the card stack to animate first
@@ -205,8 +198,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Memoized font scale advisor
     const sharedFontSize = React.useMemo(() => {
-        if (typeof window === 'undefined' || window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP)
-            return 'text-sm';
+        if (isDesktop) return 'text-sm';
 
         const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
         const words = labels.flatMap((l) => l.split(/[\s/]+/));
@@ -492,6 +484,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     sharedFontSize,
     uiLabels,
 }) => {
+    const { width } = useViewport();
     const styleConfig = React.useMemo(() => {
         const base =
             'flex flex-col items-center justify-center rounded-2xl border-2 shadow-sm transition-all duration-200 gap-0.5 sm:gap-1 px-1.5 w-full h-full';
@@ -537,7 +530,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     }, [type]);
 
     // Adaptive stack effect values
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < BREAKPOINTS.SM;
+    const isMobile = width < BREAKPOINTS.SM;
     const rotate1 =
         type === 'agree'
             ? isMobile

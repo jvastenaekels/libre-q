@@ -15,6 +15,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n-test';
+import { ViewportProvider } from '@/contexts/ViewportContext';
 
 /**
  * Custom render helper that wraps components with common providers.
@@ -55,9 +56,11 @@ export const AllTheProviders: React.FC<AllTheProvidersProps> = ({
     return (
         <QueryClientProvider client={queryClient}>
             <I18nextProvider i18n={i18n}>
-                <MemoryRouter initialEntries={initialEntries}>
-                    <LayoutProvider>{children}</LayoutProvider>
-                </MemoryRouter>
+                <ViewportProvider>
+                    <MemoryRouter initialEntries={initialEntries}>
+                        <LayoutProvider>{children}</LayoutProvider>
+                    </MemoryRouter>
+                </ViewportProvider>
             </I18nextProvider>
         </QueryClientProvider>
     );

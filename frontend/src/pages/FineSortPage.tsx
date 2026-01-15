@@ -26,6 +26,7 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
+import { useViewport } from '@/contexts/ViewportContext';
 import {
     rectSortingStrategy,
     SortableContext,
@@ -36,7 +37,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
+
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
 import { useFineSortDrag } from '../hooks/useFineSortDrag';
@@ -55,6 +56,7 @@ interface FineSortPageProps {
 const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     // 1. Hooks (Store / Router) - Top Level
     const config = useConfigStore((state) => state.config);
+    const { isDesktop } = useViewport();
     const rough = useResponseStore((state) => state.rough);
     const qsort = useResponseStore((state) => state.qsort);
 
@@ -292,11 +294,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         isSelected={selectedCardId === statement.id}
                         onAction={handleCardClick}
                         dimensions={dimensions}
-                        disableHoverZoom={
-                            activeId !== null ||
-                            (typeof window !== 'undefined' &&
-                                window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP)
-                        }
+                        disableHoverZoom={activeId !== null || !isDesktop}
                     />
                 );
             }

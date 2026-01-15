@@ -176,6 +176,8 @@ const router = createBrowserRouter([
     },
 ]);
 
+import { ViewportProvider } from '@/contexts/ViewportContext';
+
 const App = () => {
     return (
         <ErrorBoundary>
@@ -186,7 +188,9 @@ const App = () => {
                     </div>
                 }
             >
-                <RouterProvider router={router} />
+                <ViewportProvider>
+                    <RouterProvider router={router} />
+                </ViewportProvider>
             </Suspense>
             <Toaster richColors position="top-center" closeButton />
         </ErrorBoundary>
