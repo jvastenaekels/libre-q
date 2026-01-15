@@ -545,7 +545,7 @@ const StudyLayoutContent: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                            className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
+                            className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-slate-100 text-slate-600 transition-colors touch-manipulation"
                             title={t('layout.change_lang_title')}
                         >
                             <Globe size={20} />
