@@ -152,7 +152,7 @@ const GridToolbar: React.FC<{
         <button
             type="button"
             onClick={onZoomIn}
-            className="p-2 hover:bg-slate-100 rounded text-slate-600"
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
             aria-label={labels.in}
         >
             <ZoomIn size={20} />
@@ -160,7 +160,7 @@ const GridToolbar: React.FC<{
         <button
             type="button"
             onClick={onZoomOut}
-            className="p-2 hover:bg-slate-100 rounded text-slate-600"
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
             aria-label={labels.out}
         >
             <ZoomOut size={20} />
@@ -169,7 +169,7 @@ const GridToolbar: React.FC<{
         <button
             type="button"
             onClick={onReset}
-            className="p-2 hover:bg-slate-100 rounded text-slate-600"
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
             aria-label={labels.fit}
         >
             <RotateCcw size={20} />
