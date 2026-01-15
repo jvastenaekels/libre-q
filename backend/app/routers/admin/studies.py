@@ -46,7 +46,7 @@ async def create_study(
             detail="Study with this slug already exists",
         )
 
-    # 2. Find a valid workspace for the user (Admin or Researcher)
+    # 2. Find a valid workspace for the user (Owner or Researcher)
     # In a real app, workspace_id might be passed in headers or body.
     # Here we pick the first workspace where user has create permissions.
     ws_query = (
@@ -54,7 +54,7 @@ async def create_study(
         .join(WorkspaceMember)
         .where(WorkspaceMember.user_id == current_user.id)
         .where(
-            WorkspaceMember.role.in_([WorkspaceRole.admin, WorkspaceRole.researcher])
+            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher])
         )
         .limit(1)
     )
@@ -64,7 +64,7 @@ async def create_study(
     if not workspace:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be an Admin or Researcher in a Workspace to create a study.",
+            detail="You need to be an Owner or Researcher in a Workspace to create a study.",
         )
 
     # 3. Create Study
@@ -131,7 +131,7 @@ async def list_studies(
             (StudyCollaborator.user_id == current_user.id)
             | (
                 (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
+                & (WorkspaceMember.role == WorkspaceRole.owner)
             )
         )
         .distinct()
@@ -271,7 +271,7 @@ async def delete_study(
     study: Study = Depends(check_study_permission(StudyRole.owner)),
     db: AsyncSession = Depends(get_db),
 ):
-    """Delete a study (Workspace Admin only)."""
+    """Delete a study (Workspace Owner only)."""
     await db.delete(study)
     await db.commit()
     return None
@@ -310,7 +310,7 @@ async def get_participant(
             )
             | (
                 (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
+                & (WorkspaceMember.role == WorkspaceRole.owner)
             ),
         )
         .options(selectinload(Participant.qsort_entries))
@@ -350,7 +350,7 @@ async def discard_participant(
             )
             | (
                 (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
+                & (WorkspaceMember.role == WorkspaceRole.owner)
             ),
         )
     )

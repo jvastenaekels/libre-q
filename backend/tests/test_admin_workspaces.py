@@ -20,7 +20,7 @@ async def test_list_workspaces(
     await db.flush()
 
     member = WorkspaceMember(
-        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.admin
+        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.owner
     )
     db.add(member)
     await db.commit()
@@ -50,4 +50,4 @@ async def test_create_workspace(
     assert data["slug"] == "new-workspace-123"
     assert data["title"] == "New Workspace"
     assert len(data["members"]) == 1
-    assert data["members"][0]["role"] == "admin"
+    assert data["members"][0]["role"] == "owner"

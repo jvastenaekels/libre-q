@@ -22,7 +22,7 @@ async def rbac_workspace(db: AsyncSession):
 @pytest_asyncio.fixture
 async def users(db: AsyncSession):
     """Creates multiple users for testing."""
-    # u1: admin, u2: researcher, u3: viewer, u4: non-member
+    # u1: owner, u2: researcher, u3: viewer, u4: non-member
     users = []
     for i in range(1, 5):
         u = User(
@@ -46,7 +46,7 @@ async def test_workspace_rbac_flow(
     # 1. Setup Memberships
     members = [
         WorkspaceMember(
-            workspace_id=rbac_workspace.id, user_id=admin.id, role=WorkspaceRole.admin
+            workspace_id=rbac_workspace.id, user_id=admin.id, role=WorkspaceRole.owner
         ),
         WorkspaceMember(
             workspace_id=rbac_workspace.id,
@@ -60,7 +60,7 @@ async def test_workspace_rbac_flow(
     db.add_all(members)
     await db.commit()
 
-    # 2. Admin creates a study
+    # 2. Owner creates a study
     admin_token = create_access_token(subject=admin.email)
     headers_admin = {"Authorization": f"Bearer {admin_token}"}
 
@@ -74,7 +74,7 @@ async def test_workspace_rbac_flow(
         "presort_config": {},
         "postsort_config": {},
     }
-    # Admin creates
+    # Owner creates
     res = await client.post("/api/admin/studies/", json=payload, headers=headers_admin)
     assert res.status_code == 201
 
@@ -87,7 +87,7 @@ async def test_workspace_rbac_flow(
     assert res2.status_code == 201
 
     # 4. Viewer tries to create study -> Forbidden?
-    # Logic in router: `WorkspaceMember.role.in_([WorkspaceRole.admin, WorkspaceRole.researcher])`
+    # Logic in router: `WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher])`
     view_token = create_access_token(subject=viewer.email)
     headers_view = {"Authorization": f"Bearer {view_token}"}
 
@@ -98,7 +98,7 @@ async def test_workspace_rbac_flow(
     # 5. Access Control on 'rbac-study'
     study_slug = "rbac-study"
 
-    # Admin: DELETE (Allowed)
+    # Owner: DELETE (Allowed)
     # Researcher: UPDATE (Allowed)
     # Viewer: READ (Allowed), UPDATE (Denis)
     # Outsider: READ (Denied)
@@ -129,10 +129,10 @@ async def test_workspace_rbac_flow(
     )
     assert r.status_code == 200
 
-    # Researcher cannot Delete (Admin only)
+    # Researcher cannot Delete (Owner only)
     r = await client.delete(f"/api/admin/studies/{study_slug}", headers=headers_res)
     assert r.status_code == 403
 
-    # Admin can Delete
+    # Owner can Delete
     r = await client.delete(f"/api/admin/studies/{study_slug}", headers=headers_admin)
     assert r.status_code == 204

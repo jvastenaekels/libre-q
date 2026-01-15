@@ -1,7 +1,10 @@
 """Migration script for study collaboration.
 
-This script migrates Study.owner_id and WorkspaceMember data into the
-new StudyCollaborator table.
+⚠️  DEPRECATION NOTICE:
+This script is for historical migrations only. It references the old 'admin'
+workspace role which has been renamed to 'owner' as of 2026-01-15.
+
+For new migrations, use Alembic in /backend/alembic/
 """
 
 import asyncio
@@ -15,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 # Map WorkspaceRole to StudyRole
 ROLE_MAP = {
-    "admin": StudyRole.owner,
+    "admin": StudyRole.owner,  # Legacy - for historical migrations
+    "owner": StudyRole.owner,  # New value
     "researcher": StudyRole.editor,
     "viewer": StudyRole.viewer,
 }
@@ -46,10 +50,16 @@ async def migrate():
                     )
                 )
                 if not existing.scalar_one_or_none():
+                    # Handle both enum values and raw strings for robustness during transition
+                    role_str = (
+                        str(member.role).split(".")[-1]
+                        if hasattr(member.role, "value")
+                        else str(member.role)
+                    )
                     collab = StudyCollaborator(
                         study_id=study.id,
                         user_id=member.user_id,
-                        role=ROLE_MAP.get(member.role, StudyRole.viewer),
+                        role=ROLE_MAP.get(role_str, StudyRole.viewer),
                     )
                     db.add(collab)
                     member_migrated_count += 1

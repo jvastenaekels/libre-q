@@ -29,7 +29,7 @@ function NavUser({ user }: { user: any }) {
                     </div>
                     <div className="flex flex-col text-left">
                         <span className="font-semibold text-sm">{user?.email}</span>
-                        <span className="text-xs text-muted-foreground">Admin</span>
+                        <span className="text-xs text-muted-foreground">Owner</span>
                     </div>
                 </SidebarMenuButton>
             </SidebarMenuItem>

@@ -54,7 +54,9 @@ async def init_db(reset: bool = False):
             )
             return
 
-        print("2. No users found. Initializing admin account and default workspace...")
+        print(
+            "2. No users found. Initializing superuser account and default workspace..."
+        )
 
         # 1. Create Initial Admin User
         from app.utils.security import get_password_hash
@@ -81,16 +83,17 @@ async def init_db(reset: bool = False):
         session.add(default_workspace)
         await session.flush()  # get ID
 
-        # 3. Add Admin to Workspace
+        # 3. Add Owner to Workspace
         member = WorkspaceMember(
             workspace_id=default_workspace.id,
             user_id=owner.id,
-            role=WorkspaceRole.admin,
+            role=WorkspaceRole.owner,
         )
         session.add(member)
 
         await session.commit()
-        print(f"3. Admin user created: {admin_email}")
+        print(f"3. Superuser created: {admin_email}")
+        print("   (Workspace Owner role assigned)")
         print(f"4. Default workspace created: {default_workspace.title}")
         print("\nNote: To seed a study, use: python seed.py data/example-study.json")
         print("--- Initialization Complete ---")

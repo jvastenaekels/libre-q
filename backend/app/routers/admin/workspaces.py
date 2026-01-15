@@ -36,7 +36,7 @@ async def create_workspace(
     db: AsyncSession = Depends(get_db),
 ) -> Workspace:
     """
-    Create a new workspace and assign the current user as Admin.
+    Create a new workspace and assign the current user as Owner.
     """
     # Check if slug exists globally
     query = select(Workspace).where(Workspace.slug == workspace_in.slug)
@@ -55,11 +55,11 @@ async def create_workspace(
     db.add(workspace)
     await db.flush()  # To get ID
 
-    # Create Member (Admin)
+    # Create Member (Owner)
     member = WorkspaceMember(
         workspace_id=workspace.id,
         user_id=current_user.id,
-        role=WorkspaceRole.admin,
+        role=WorkspaceRole.owner,
     )
     db.add(member)
     await db.commit()

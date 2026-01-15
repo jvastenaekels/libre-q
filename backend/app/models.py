@@ -46,7 +46,7 @@ class ParticipantStatus(str, Enum):
 class WorkspaceRole(str, Enum):
     """Enum for workspace roles."""
 
-    admin = "admin"
+    owner = "owner"  # Renamed from 'admin' for consistency with StudyRole
     researcher = "researcher"
     viewer = "viewer"
 

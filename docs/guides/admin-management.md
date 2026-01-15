@@ -2,13 +2,18 @@
 
 This guide explains how to manage accounts, research teams, and study permissions in Open-Q.
 
+⚠️ **Important Terminology Update (2026-01-15)**:
+
+- **Workspace Owner** (formerly "Admin"): Full control within a workspace
+- **Superuser**: System-level administrator with global access
+
 ---
 
 ## 👤 User Management
 
 User accounts are managed by **Superusers**. A superuser can list all system users and create new accounts.
 
-### Bootstrapping the First Admin
+### Bootstrapping the First Superuser
 
 If your system is fresh, use the CLI to create your first superuser:
 
@@ -17,7 +22,7 @@ cd backend
 python scripts/create_user.py
 ```
 
-Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`.
+Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`. This user will be added as the **Owner** of the default workspace.
 
 ### API Access
 
@@ -58,6 +63,8 @@ Open-Q supports three roles with varying levels of access:
 | Change Study State                 |  ✅   |   ✅   |   ❌   |
 | Manage Collaborators               |  ✅   |   ❌   |   ❌   |
 | Delete Study                       |  ✅   |   ❌   |   ❌   |
+
+**Note**: Workspace Owners automatically have Owner-level access to all studies in their workspace.
 
 ---
 

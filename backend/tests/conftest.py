@@ -104,13 +104,13 @@ async def test_user(db: AsyncSession):
 
 @pytest_asyncio.fixture
 async def test_workspace(db: AsyncSession, test_user: User):
-    """Create a test workspace and add test_user as admin."""
+    """Create a test workspace and add test_user as owner."""
     ws = Workspace(title="Test Workspace", slug="test-workspace")
     db.add(ws)
     await db.flush()
 
     member = WorkspaceMember(
-        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.admin
+        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.owner
     )
     db.add(member)
     await db.commit()
@@ -226,7 +226,7 @@ async def workspace_factory(db: AsyncSession):
         await db.flush()
 
         member = WorkspaceMember(
-            workspace_id=ws.id, user_id=owner.id, role=WorkspaceRole.admin
+            workspace_id=ws.id, user_id=owner.id, role=WorkspaceRole.owner
         )
         db.add(member)
         await db.commit()

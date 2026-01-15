@@ -70,7 +70,7 @@ async def get_current_active_user(
 # --- RBAC Logic ---
 
 ROLE_MAP = {
-    WorkspaceRole.admin: StudyRole.owner,
+    WorkspaceRole.owner: StudyRole.owner,
     WorkspaceRole.researcher: StudyRole.editor,
     WorkspaceRole.viewer: StudyRole.viewer,
 }
