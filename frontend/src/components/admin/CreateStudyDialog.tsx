@@ -81,7 +81,7 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                         return {
                             language_code: langCode,
                             title: values.title,
-                            description: '',
+                            description: undefined,
                             instructions: defaults.instructions,
                             consent_title: defaults.consent_title,
                             consent_description: defaults.consent_description,
