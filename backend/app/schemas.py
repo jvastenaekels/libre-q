@@ -202,7 +202,7 @@ class StudyTranslationBase(BaseModel):
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     title: str = Field(..., max_length=200)
-    description: str | None = Field(None, max_length=2000)
+    description: str = Field("", max_length=2000)
     instructions: str | None = Field(None, max_length=2000)
     subtitle: str | None = Field(None, max_length=200)
     objective: str | None = Field(None, max_length=1000)
@@ -219,7 +219,6 @@ class StudyTranslationBase(BaseModel):
 
     @field_validator(
         "title",
-        "description",
         "instructions",
         "subtitle",
         "objective",
