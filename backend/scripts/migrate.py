@@ -5,6 +5,7 @@ It ensures that the database is upgraded to the latest version.
 """
 
 import os
+import shutil
 import subprocess
 import sys
 
@@ -22,8 +23,7 @@ def run_alembic_upgrade():
         # In many environments, 'alembic' should be in the path
         cmd = ["alembic", "upgrade", "head"]
 
-        # If uv is present and we're in a uv-managed environment
-        if os.path.exists("uv.lock"):
+        if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]
 
         print(f"Executing: {' '.join(cmd)}")
