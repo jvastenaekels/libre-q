@@ -10,7 +10,7 @@ export interface ResetOptions {
 
 /**
  * Creates a reusable handler for resetting study fields to their default localized values.
- * 
+ *
  * @param updateDraft - The updateDraft function from the study designer store
  * @param t - The translation function
  * @param options - Configuration for confirmations and notifications
@@ -31,7 +31,7 @@ export const createResetToDefaultHandler = (
         const doReset = () => {
             updateDraft((d) => {
                 if (!d.translations) return;
-                
+
                 for (const trans of d.translations) {
                     const lang = trans.language_code;
                     const defaults = DEFAULT_STUDY_CONTENT[lang] || DEFAULT_STUDY_CONTENT.en;
@@ -39,7 +39,7 @@ export const createResetToDefaultHandler = (
                     if (defaults && defaults[field] !== undefined) {
                         const defaultValue = defaults[field];
                         const valueToApply = transform ? transform(defaultValue) : defaultValue;
-                        
+
                         // biome-ignore lint/suspicious/noExplicitAny: dynamic field access
                         (trans as any)[field] = JSON.parse(JSON.stringify(valueToApply));
                     }

@@ -112,7 +112,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
         await page.getByTestId("start-btn").click(); // Welcome Page
         await page.getByTestId("consent-checkbox").check(); // Consent Page
         await page.getByTestId("consent-accept-btn").click(); // Consent Page form
-        
+
         // Rough sort navigation - sort all cards to agree using keyboard for speed
         await page.waitForTimeout(1000);
         while ((await page.locator('[data-testid^="card-"]').count()) > 0) {
@@ -150,7 +150,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
         await page.getByTestId("start-btn").click(); // Welcome Page
         await page.getByTestId("consent-checkbox").check(); // Consent Page
         await page.getByTestId("consent-accept-btn").click(); // Consent Page form
-        
+
         // Complete rough sort - sort all to agree using keyboard for speed
         await page.waitForTimeout(1000);
         while ((await page.locator('[data-testid^="card-"]').count()) > 0) {
@@ -165,7 +165,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
 
         // Switch to Agree deck in Fine Sort
         await page.getByTestId("deck-agree").click();
-        
+
         // Ensure cards are visible in the deck
         await expect(page.locator('[data-testid^="card-"]').first()).toBeVisible({ timeout: 10000 });
 
@@ -182,10 +182,10 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
         for (let i = 0; i < smallestColumn.capacity; i++) {
           const card = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
           const targetSlot = page.locator(`#slot_${colIndex}_${i}`);
-          
+
           await card.click();
           await targetSlot.click();
-          
+
           // Wait for card to be placed
           await expect(targetSlot.locator('[data-testid^="card-"]')).toBeVisible();
         }
