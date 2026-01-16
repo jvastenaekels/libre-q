@@ -26,6 +26,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
   for (const distribution of GRID_DISTRIBUTIONS) {
     test.describe(`Grid Distribution: ${distribution}`, () => {
       let studySlug: string;
+      let statementsCount: number;
 
       test.beforeEach(async ({ testDb, authToken }) => {
         const gridConfig = testDataBuilders.gridConfig(distribution);
@@ -38,26 +39,26 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
         const study = await testDb.createStudy(
           authToken,
           testDataBuilders.study({
-            slug: `test-grid-${distribution}-${Date.now()}`,
+            slug: `test-grid-${distribution}-${Math.random().toString(36).substring(2, 7)}`,
             statements: testDataBuilders.statements(totalCapacity),
             grid_config: gridConfig,
+            state: "draft",
           }),
         );
         studySlug = study.slug;
+        statementsCount = totalCapacity;
       });
 
       test(`Admin: Can configure ${distribution} grid`, async ({
         page,
-        authToken,
+        testDb,
       }) => {
         // Login and navigate to study designer
-        await page.goto("/admin");
-        await page.fill('input[name="username"]', "test@example.com");
-        await page.fill('input[name="password"]', "testpassword");
-        await page.click('button[type="submit"]');
+        await testDb.loginToAdminUI(page);
 
         // Navigate to Q-Sort configuration
         await page.getByText(studySlug).click();
+        await page.getByRole("link", { name: /design/i }).first().click();
         await page.getByTestId("tab-q-sort").click();
         await page.getByTestId("subtab-grid").click();
 
@@ -108,21 +109,33 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
 
         // Navigate to study
         await page.goto(`/study/${studySlug}`);
-        await page.click('button:has-text("Accept")'); // Consent
-        await page.click('button:has-text("Continue")'); // Pre-sort (if any)
-        await page.click('button:has-text("Continue")'); // Rough sort
+        await page.getByTestId("start-btn").click(); // Welcome Page
+        await page.getByTestId("consent-checkbox").check(); // Consent Page
+        await page.getByTestId("consent-accept-btn").click(); // Consent Page form
+        
+        // Rough sort navigation - sort all cards to agree using keyboard for speed
+        await page.waitForTimeout(1000);
+        while ((await page.locator('[data-testid^="card-"]').count()) > 0) {
+          const card = page.locator('[data-testid^="card-"]').first();
+          const cardId = await card.getAttribute("data-testid");
+          await page.keyboard.press("ArrowRight");
+          // Wait for this specific card to disappear to ensure the app processed the vote
+          await expect(page.locator(`[data-testid="${cardId}"]`)).not.toBeVisible({
+            timeout: 5000,
+          });
+        }
+        await page.getByTestId("rough-sort-next-btn").click({ timeout: 10000 }); // Continue to Fine Sort
 
         // Verify grid is rendered
         const gridConfig = testDataBuilders.gridConfig(distribution);
         for (const column of gridConfig) {
-          // Check column exists with correct capacity
-          const columnLocator = page.locator(`[data-score="${column.score}"]`);
-          await expect(columnLocator).toBeVisible();
+          // Check column exists by ID
+          const columnLocator = page.locator(`#column-${column.score}`);
+          await expect(columnLocator).toBeVisible({ timeout: 15000 });
 
-          // Verify capacity indicator
-          await expect(
-            page.locator(`text=0 / ${column.capacity}`),
-          ).toBeVisible();
+          // Verify number of slots matches capacity
+          const slotCount = await columnLocator.locator('[id^="slot_"]').count();
+          expect(slotCount).toBe(column.capacity);
         }
       });
 
@@ -134,50 +147,67 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
         await testDb.updateStudy(authToken, studySlug, { state: "active" });
 
         await page.goto(`/study/${studySlug}`);
-        await page.click('button:has-text("Accept")');
-        await page.click('button:has-text("Continue")');
-
-        // Complete rough sort - put all in agree
-        const allAgreeBtn = page.locator('button:has-text("All Agree")');
-        if (await allAgreeBtn.isVisible()) {
-          await allAgreeBtn.click();
+        await page.getByTestId("start-btn").click(); // Welcome Page
+        await page.getByTestId("consent-checkbox").check(); // Consent Page
+        await page.getByTestId("consent-accept-btn").click(); // Consent Page form
+        
+        // Complete rough sort - sort all to agree using keyboard for speed
+        await page.waitForTimeout(1000);
+        while ((await page.locator('[data-testid^="card-"]').count()) > 0) {
+          const card = page.locator('[data-testid^="card-"]').first();
+          const cardId = await card.getAttribute("data-testid");
+          await page.keyboard.press("ArrowRight");
+          await expect(page.locator(`[data-testid="${cardId}"]`)).not.toBeVisible({
+            timeout: 5000,
+          });
         }
-        await page.click('button:has-text("Continue")');
+        await page.getByTestId("rough-sort-next-btn").click({ timeout: 15000 });
 
-        // Try to overfill a column
+        // Switch to Agree deck in Fine Sort
+        await page.getByTestId("deck-agree").click();
+        
+        // Ensure cards are visible in the deck
+        await expect(page.locator('[data-testid^="card-"]').first()).toBeVisible({ timeout: 10000 });
+
         const gridConfig = testDataBuilders.gridConfig(distribution);
         const smallestColumn = gridConfig.reduce((min, col) =>
           col.capacity < min.capacity ? col : min,
         );
 
-        // Drag cards to smallest column until full
-        for (let i = 0; i < smallestColumn.capacity; i++) {
-          const card = page.locator("[data-card]").first();
-          const column = page.locator(`[data-score="${smallestColumn.score}"]`);
-          await card.dragTo(column);
-        }
-
-        // Verify column is full
-        await expect(
-          page.locator(
-            `text=${smallestColumn.capacity} / ${smallestColumn.capacity}`,
-          ),
-        ).toBeVisible();
-
-        // Try to add one more - should fail or swap
-        const extraCard = page.locator("[data-card]").first();
-        const fullColumn = page.locator(
-          `[data-score="${smallestColumn.score}"]`,
+        const colIndex = gridConfig.findIndex(
+          (c) => c.score === smallestColumn.score,
         );
 
-        // Before drag
-        const countBefore = await fullColumn.locator("[data-card]").count();
+        // Place cards in smallest column until full using click-to-place
+        for (let i = 0; i < smallestColumn.capacity; i++) {
+          const card = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
+          const targetSlot = page.locator(`#slot_${colIndex}_${i}`);
+          
+          await card.click();
+          await targetSlot.click();
+          
+          // Wait for card to be placed
+          await expect(targetSlot.locator('[data-testid^="card-"]')).toBeVisible();
+        }
 
-        await extraCard.dragTo(fullColumn);
+        // Verify column is full (all slots have cards)
+        const filledSlotsCount = await page
+          .locator(`#column-${smallestColumn.score} [data-testid^="card-"]`)
+          .count();
+        expect(filledSlotsCount).toBe(smallestColumn.capacity);
 
-        // After drag - should either reject or swap
-        const countAfter = await fullColumn.locator("[data-card]").count();
-        expect(countAfter).toBe(smallestColumn.capacity); // Still at capacity
+        // Try to add one more - should fail or swap
+        const extraCard = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
+        const firstSlot = page.locator(`#slot_${colIndex}_0`);
+
+        await extraCard.click();
+        await firstSlot.click();
+
+        // After drag - should either reject or swap, but column count should remain same
+        const finalColumnCount = await page
+          .locator(`#column-${smallestColumn.score} [data-testid^="card-"]`)
+          .count();
+        expect(finalColumnCount).toBe(smallestColumn.capacity); // Still at capacity
       });
 
       test(`Edge Case: ${distribution} grid total capacity matches statements`, async ({
@@ -224,8 +254,9 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
       const study = await testDb.createStudy(
         authToken,
         testDataBuilders.study({
-          slug: `test-grid-manip-${Date.now()}`,
-          statements: testDataBuilders.statements(10),
+          slug: `test-grid-manip-${Math.random().toString(36).substring(2, 7)}`,
+          statements: testDataBuilders.statements(23),
+          grid_config: testDataBuilders.gridConfig("symmetric"), // 7 columns
         }),
       );
       studySlug = study.slug;
@@ -234,6 +265,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
     test("Admin: Can expand grid", async ({ page, testDb }) => {
       await testDb.loginToAdminUI(page);
       await page.getByText(studySlug).click();
+      await page.getByRole("link", { name: /design/i }).first().click();
       await page.getByTestId("tab-q-sort").click();
       await page.getByTestId("subtab-grid").click();
 
@@ -249,12 +281,14 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
       const finalCount = await page
         .locator('[data-testid^="grid-column-"]')
         .count();
-      expect(finalCount).toBe(initialCount + 2);
+      // Each column has 2 elements: -score and -slots
+      expect(finalCount).toBe(initialCount + 4);
     });
 
     test("Admin: Can reduce grid", async ({ page, testDb }) => {
       await testDb.loginToAdminUI(page);
       await page.getByText(studySlug).click();
+      await page.getByRole("link", { name: /design/i }).first().click();
       await page.getByTestId("tab-q-sort").click();
       await page.getByTestId("subtab-grid").click();
 
@@ -268,7 +302,9 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
       const finalCount = await page
         .locator('[data-testid^="grid-column-"]')
         .count();
-      expect(finalCount).toBe(initialCount - 2);
+      // Each column has 2 elements: -score and -slots
+      // Symmetric reduction removes 2 columns (one extremes left/right)
+      expect(finalCount).toBe(initialCount - 4);
     });
 
     test("Admin: Can modify column capacity", async ({
@@ -284,6 +320,7 @@ test.describe("Q-Sort Grid Configuration Testing", () => {
       await testDb.loginToAdminUI(page);
 
       await page.getByText(studySlug).click();
+      await page.getByRole("link", { name: /design/i }).first().click();
       await page.getByTestId("tab-q-sort").click();
       await page.getByTestId("subtab-grid").click();
 

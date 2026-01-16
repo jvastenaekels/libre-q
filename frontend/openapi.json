@@ -3839,32 +3839,6 @@
             ],
             "title": "Consent Description"
           },
-          "consent_accept": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Consent Accept",
-            "default": "Accept"
-          },
-          "consent_decline": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Consent Decline",
-            "default": "Decline"
-          },
           "ui_labels": {
             "additionalProperties": true,
             "type": "object",
@@ -3997,32 +3971,6 @@
               }
             ],
             "title": "Consent Description"
-          },
-          "consent_accept": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Consent Accept",
-            "default": "Accept"
-          },
-          "consent_decline": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Consent Decline",
-            "default": "Decline"
           },
           "ui_labels": {
             "additionalProperties": true,

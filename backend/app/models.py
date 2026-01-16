@@ -240,8 +240,6 @@ class StudyTranslation(Base):
     )  # Button adjustments
     consent_title: Mapped[str | None] = mapped_column(String, nullable=True)
     consent_description: Mapped[str | None] = mapped_column(String, nullable=True)
-    consent_accept: Mapped[str | None] = mapped_column(String, nullable=True)
-    consent_decline: Mapped[str | None] = mapped_column(String, nullable=True)
     process_steps: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
     methodology_tips: Mapped[list[str]] = mapped_column(JSON, default=list)
     step_help: Mapped[dict] = mapped_column(JSON, default=dict)

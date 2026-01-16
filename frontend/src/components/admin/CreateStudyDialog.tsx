@@ -85,8 +85,6 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                             instructions: defaults.instructions,
                             consent_title: defaults.consent_title,
                             consent_description: defaults.consent_description,
-                            consent_accept: defaults.consent_accept,
-                            consent_decline: defaults.consent_decline,
                             process_steps: defaults.process_steps,
                         };
                     }),

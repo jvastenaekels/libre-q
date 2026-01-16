@@ -274,8 +274,7 @@ const StudyDesignPage = () => {
             consent: {
                 title: translation?.consent_title,
                 description: translation?.consent_description,
-                accept: translation?.consent_accept,
-                decline: translation?.consent_decline,
+                // consent_accept and consent_decline removed
             },
             condition_of_instruction: translation?.condition_of_instruction,
 

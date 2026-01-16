@@ -3,6 +3,9 @@
     "agree": "Jokseenkin samaa mieltä",
     "disagree": "Jokseenkin eri mieltä",
     "neutral": "Neutraali",
+    "reset_to_default": "Palauta oletus",
+    "reset_to_default_success": "Palautettu oletusarvo",
+    "reset_to_default_confirm": "Haluatko varmasti palauttaa tämän kentän oletusarvon? Kaikki tekemäsi muutokset menetetään.",
     "undo": "Kumoa",
     "next": "Seuraava",
     "submit": "Lähetä vastaukset",
@@ -709,7 +712,8 @@
         "languages": "Kielet",
         "status_ready": "Valmis",
         "status_pending": "Odottaa",
-        "required": "Pakollinen"
+        "required": "Pakollinen",
+        "reset_defaults": "Palauta oletukset"
       },
       "tips": {
         "title": "Quick Tip",
@@ -772,6 +776,7 @@
       },
       "intro": {
         "welcome_title": "Tervetuloviesti",
+        "reset": "Nollaa ohje",
         "process_title": "Vaiheiden yleiskatsaus",
         "process_steps": {
           "title": "Vaiheiden yleiskatsaus",
@@ -789,6 +794,13 @@
           "defaults": {
             "new_step": "New study step",
             "new_desc": "Explain what the participant will do in this phase."
+          },
+          "reset": {
+            "instructions": "Nollaa ohjeet",
+            "consent_title": "Nollaa suostumuksen otsikko",
+            "consent_description": "Nollaa suostumuksen kuvaus",
+            "process_steps": "Nollaa vaiheet",
+            "process_steps_confirm": "Haluatko varmasti palauttaa kaikki vaiheet oletusarvoihin? Tämä korvaa omat vaiheesi."
           }
         },
         "consent_title": "Suostumuslomake",

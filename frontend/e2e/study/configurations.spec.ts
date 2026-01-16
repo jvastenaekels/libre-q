@@ -239,6 +239,6 @@ test.describe("Study Configurations", () => {
     // Verify Consent Checkbox
     // Label usually contains "interview" or similar text from translations
     // Default text?
-    await expect(page.getByText("interview", { exact: false })).toBeVisible();
+    await expect(page.getByText("contacted", { exact: false })).toBeVisible();
   });
 });

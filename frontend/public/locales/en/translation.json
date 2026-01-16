@@ -3,6 +3,9 @@
     "agree": "Somewhat agree",
     "disagree": "Somewhat disagree",
     "neutral": "Neutral",
+    "reset_to_default": "Reset to Default",
+    "reset_to_default_success": "Restored to default",
+    "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
     "undo": "Undo",
     "next": "Next step",
     "submit": "Share my perspective",
@@ -709,7 +712,8 @@
         "languages": "Languages",
         "status_ready": "Ready",
         "status_pending": "Pending",
-        "required": "Required"
+        "required": "Required",
+        "reset_defaults": "Reset to Defaults"
       },
       "tips": {
         "title": "Quick Tip",
@@ -789,9 +793,17 @@
           "defaults": {
             "new_step": "New study step",
             "new_desc": "Explain what the participant will do in this phase."
+          },
+          "reset": {
+            "instructions": "Reset Instructions",
+            "consent_title": "Reset Consent Title",
+            "consent_description": "Reset Consent Description",
+            "process_steps": "Reset Process Steps",
+            "process_steps_confirm": "Are you sure you want to reset all process steps to defaults? This will replace your custom steps."
           }
         },
         "consent_title": "Consent Form",
+        "reset": "Reset Instruction",
         "consent_details": "Consent form details",
         "fields": {
           "title": "Study title",

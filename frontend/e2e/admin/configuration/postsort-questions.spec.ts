@@ -30,14 +30,12 @@ test.describe("Post-Sort Configuration Testing", () => {
       studySlug = study.slug;
     });
 
-    test("Admin: Can enable email collection", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Admin: Can enable email collection", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Post-Sort");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-post-sort").click();
 
       // Enable email collection
       const emailToggle = page.locator("#enable-email-collection");
@@ -81,7 +79,10 @@ test.describe("Post-Sort Configuration Testing", () => {
 
       // Navigate through study to post-sort
       await page.goto(`/study/${studySlug}`);
-      await page.click('button:has-text("Accept")');
+      // Accept consent (New Flow)
+      await page.click('[data-testid="start-btn"]');
+      await page.check('[data-testid="consent-checkbox"]');
+      await page.click('[data-testid="consent-accept-btn"]');
 
       // Skip through to post-sort (implementation-specific)
       // ... complete study flow ...
@@ -158,14 +159,12 @@ test.describe("Post-Sort Configuration Testing", () => {
       studySlug = study.slug;
     });
 
-    test("Admin: Can enable interview consent", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Admin: Can enable interview consent", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Post-Sort");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-post-sort").click();
 
       const consentToggle = page.locator("#enable-interview-consent");
       await consentToggle.check();
@@ -239,14 +238,12 @@ test.describe("Post-Sort Configuration Testing", () => {
           studySlug = study.slug;
         });
 
-        test(`Admin: Can add ${questionType} question`, async ({ page }) => {
-          await page.goto("/admin");
-          await page.fill('input[name="username"]', "test@example.com");
-          await page.fill('input[name="password"]', "testpassword");
-          await page.click('button[type="submit"]');
+        test(`Admin: Can add ${questionType} question`, async ({ page, testDb }) => {
+          await testDb.loginToAdminUI(page);
 
           await page.click(`text=${studySlug}`);
-          await page.click("text=Post-Sort");
+          await page.getByRole("link", { name: /design/i }).first().click();
+          await page.getByTestId("tab-post-sort").click();
 
           // Add question
           await page.click('button:has-text("Add Question")');

@@ -33,6 +33,8 @@ import { useTranslation } from 'react-i18next';
 import { IconPicker } from './IconPicker';
 import type { ProcessStep } from '@/api/model';
 import * as LucideIcons from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
+import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
 interface ProcessStepItemProps {
     id: string;
@@ -347,9 +349,26 @@ export function ProcessStepEditor() {
         });
     };
 
+    const resetSteps = () => {
+        const handler = createResetToDefaultHandler(updateDraft, t, {
+            requireConfirmation: true,
+            confirmMessage: t('admin.design.intro.process_steps.reset.process_steps_confirm'),
+        });
+        handler('process_steps');
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end gap-3">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetSteps}
+                    className="h-11 rounded-xl font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    {t('admin.design.intro.process_steps.reset.process_steps')}
+                </Button>
                 <Button
                     variant="outline"
                     size="sm"

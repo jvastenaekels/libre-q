@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
-    RefreshCcw,
+    RotateCcw,
     MousePointerClick,
     ArrowRight,
     Info,
@@ -12,6 +12,7 @@ import {
     Trash2,
     Plus,
 } from 'lucide-react';
+import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -22,6 +23,8 @@ const InterfaceEditor = () => {
     const { draft, activeLocale, updateTranslation, updateDraft, setActiveSubStep } =
         useStudyDesigner();
     const { t, i18n } = useTranslation();
+
+    const resetToDefaults = createResetToDefaultHandler(updateDraft, t);
 
     // Ensure resources for the active editing language are loaded
     useEffect(() => {
@@ -230,7 +233,7 @@ const InterfaceEditor = () => {
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
-                        <RefreshCcw className="h-4 w-4 text-indigo-500" />
+                        <RotateCcw className="h-4 w-4 text-indigo-500" />
                         <CardTitle className="text-sm font-bold">
                             {t('admin.design.interface.terms.title')}
                         </CardTitle>
@@ -426,37 +429,10 @@ const InterfaceEditor = () => {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => {
-                                    updateDraft((d) => {
-                                        for (const t of d.translations || []) {
-                                            const lang = t.language_code;
-                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                            (t as any).methodology_tips = [
-                                                i18n.t('fine.workbench.methodology.extremes', {
-                                                    lng: lang,
-                                                }),
-                                                i18n.t('fine.workbench.methodology.vertical', {
-                                                    lng: lang,
-                                                }),
-                                                i18n.t('fine.workbench.methodology.constraint', {
-                                                    lng: lang,
-                                                }),
-                                                i18n.t('fine.workbench.methodology.relative', {
-                                                    lng: lang,
-                                                }),
-                                                i18n.t('fine.workbench.methodology.zoom', {
-                                                    lng: lang,
-                                                }),
-                                                i18n.t('fine.workbench.methodology.flexibility', {
-                                                    lng: lang,
-                                                }),
-                                            ];
-                                        }
-                                    });
-                                }}
+                                onClick={() => resetToDefaults('methodology_tips')}
                                 className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
                             >
-                                <RefreshCcw className="size-4 mr-2" />
+                                <RotateCcw className="size-4 mr-2" />
                                 {t('admin.design.interface.hints.reset')}
                             </Button>
                         </div>

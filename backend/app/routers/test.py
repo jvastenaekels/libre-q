@@ -44,7 +44,15 @@ else:
         Initialize test database - ensure tables exist
         This is typically handled by app startup, but useful for explicit initialization
         """
+        from app.database import engine, Base
+
         try:
+            # Explicitly create tables if they don't exist
+            # This handles cases where migrations might have been skipped or
+            # the DB was wiped after startup.
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+
             # Test database connection
             await db.execute(text("SELECT 1"))
             return {"status": "ok", "message": "Database initialized"}

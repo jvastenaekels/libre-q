@@ -95,6 +95,8 @@ test.describe("Admin Flow (Real Backend)", () => {
           instructions: "Sort these according to agreement",
           condition_of_instruction:
             "Please sort these statements according to your agreement.",
+          consent_title: "Informed Consent",
+          consent_description: "Please read and accept the terms to proceed.",
         },
       ],
     });

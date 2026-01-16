@@ -4,12 +4,18 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Target } from 'lucide-react';
+import { Target, RotateCcw } from 'lucide-react';
 import type React from 'react';
+import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
 const ConditionOfInstructionEditor = () => {
     const { t } = useTranslation();
-    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
+
+    const resetField = createResetToDefaultHandler(updateDraft, t);
+
+    const resetInstruction = () => 
+        resetField('condition_of_instruction');
 
     if (!draft) return null;
 
@@ -47,12 +53,25 @@ const ConditionOfInstructionEditor = () => {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid gap-3">
-                            <Label
-                                htmlFor="condition_of_instruction"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                            >
-                                {t('admin.design.condition.field_label', 'Instruction Text')}
-                            </Label>
+                            <div className="flex items-center justify-between">
+                                <Label
+                                    htmlFor="condition_of_instruction"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
+                                    {t('admin.design.condition.field_label', 'Instruction Text')}
+                                </Label>
+                                <button
+                                    type="button"
+                                    onClick={resetInstruction}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] 
+                                             font-black uppercase tracking-wider text-slate-500 
+                                             hover:bg-slate-100 hover:text-indigo-600 transition-colors 
+                                             shadow-sm border bg-white"
+                                >
+                                    <RotateCcw className="size-3" />
+                                    {t('common.reset_to_default')}
+                                </button>
+                            </div>
                             <Input
                                 id="condition_of_instruction"
                                 value={translation?.condition_of_instruction || ''}

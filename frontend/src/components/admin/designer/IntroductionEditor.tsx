@@ -8,10 +8,13 @@ import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
 import { useTranslation } from 'react-i18next';
 import type { StudyTranslationRead } from '@/api/model';
+import { RotateCcw, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
 const IntroductionEditor = () => {
     const { t } = useTranslation();
-    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
     if (!draft) return null;
 
@@ -23,6 +26,17 @@ const IntroductionEditor = () => {
             // biome-ignore lint/suspicious/noExplicitAny: complex state update
             (t_trans as any)[field] = value;
         });
+    };
+
+    const resetField = createResetToDefaultHandler(updateDraft, t);
+
+    const resetInstructions = () => resetField('instructions');
+
+    const resetConsent = () => {
+        if (window.confirm(t('common.reset_to_default_confirm'))) {
+            resetField('consent_title');
+            resetField('consent_description');
+        }
     };
 
     return (
@@ -96,10 +110,25 @@ const IntroductionEditor = () => {
 
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="pt-6">
-                        <div className="grid gap-2.5">
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    {t('admin.design.intro.fields.task_overview')}
+                                </Label>
+                                <button
+                                    type="button"
+                                    onClick={resetInstructions}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] 
+                                             font-black uppercase tracking-wider text-slate-500 
+                                             hover:bg-slate-100 hover:text-indigo-600 transition-colors 
+                                             shadow-sm border bg-white"
+                                >
+                                    <RotateCcw className="size-3" />
+                                    {t('common.reset_to_default')}
+                                </button>
+                            </div>
                             <MarkdownEditor
                                 id="instructions"
-                                label={t('admin.design.intro.fields.task_overview')}
                                 value={translation?.instructions || ''}
                                 onChange={(val: string) => handleChange('instructions', val)}
                                 placeholder={t('admin.design.intro.fields.task_placeholder')}
@@ -124,12 +153,25 @@ const IntroductionEditor = () => {
 
                 <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-sm font-bold">
-                            {t('admin.design.intro.consent_details')}
-                        </CardTitle>
-                        <CardDescription className="text-xs font-medium text-slate-500">
-                            {t('admin.design.intro.consent_desc')}
-                        </CardDescription>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-sm font-bold">
+                                    {t('admin.design.intro.consent_details')}
+                                </CardTitle>
+                                <CardDescription className="text-xs font-medium text-slate-500">
+                                    {t('admin.design.intro.consent_desc')}
+                                </CardDescription>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={resetConsent}
+                                className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
+                            >
+                                <RotateCcw className="size-4 mr-2" />
+                                {t('admin.design.reset_defaults')}
+                            </Button>
+                        </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid gap-2.5">

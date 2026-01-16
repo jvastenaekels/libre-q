@@ -167,8 +167,6 @@ async def seed_study(db, test_user, test_workspace):
         instructions="Instr",
         consent_title="Consent",
         consent_description="Legal",
-        consent_accept="Yes",
-        consent_decline="No",
     )
     db.add(trans)
 
@@ -273,8 +271,6 @@ async def study_factory(db: AsyncSession):
             instructions="Instr",
             consent_title="Yes",
             consent_description="Legal",
-            consent_accept="Yes",
-            consent_decline="No",
         )
         db.add(trans)
         await db.commit()

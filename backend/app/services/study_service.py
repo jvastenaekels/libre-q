@@ -337,8 +337,6 @@ class StudyService:
             "consent": {
                 "title": get_t_attr("consent_title"),
                 "description": get_t_attr("consent_description"),
-                "accept": get_t_attr("consent_accept"),
-                "decline": get_t_attr("consent_decline"),
             },
             "condition_of_instruction": condition_of_instruction,
             "available_languages": [t.language_code for t in study.translations],

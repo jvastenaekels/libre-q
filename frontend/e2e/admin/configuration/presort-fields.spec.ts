@@ -44,16 +44,14 @@ test.describe("Presort Field Configuration Testing", () => {
         studySlug = study.slug;
       });
 
-      test(`Admin: Can add ${fieldType} field`, async ({ page, authToken }) => {
+      test(`Admin: Can add ${fieldType} field`, async ({ page, testDb }) => {
         // Navigate to study designer
-        await page.goto("/admin");
-        await page.fill('input[name="username"]', "test@example.com");
-        await page.fill('input[name="password"]', "testpassword");
-        await page.click('button[type="submit"]');
+        await testDb.loginToAdminUI(page);
 
         // Navigate to presort configuration
         await page.click(`text=${studySlug}`);
-        await page.click("text=Pre-Sort");
+        await page.getByRole("link", { name: /design/i }).first().click();
+        await page.getByTestId("tab-pre-sort").click();
 
         // Add a new field
         await page.click('button:has-text("Add Field")');
@@ -148,7 +146,10 @@ test.describe("Presort Field Configuration Testing", () => {
         await page.goto(`/study/${studySlug}`);
 
         // Accept consent
-        await page.click('button:has-text("Accept")');
+        // Accept consent (New Flow)
+        await page.click('[data-testid="start-btn"]');
+        await page.check('[data-testid="consent-checkbox"]');
+        await page.click('[data-testid="consent-accept-btn"]');
 
         // Verify field renders
         await expect(
@@ -184,7 +185,10 @@ test.describe("Presort Field Configuration Testing", () => {
 
         // Navigate to study
         await page.goto(`/study/${studySlug}`);
-        await page.click('button:has-text("Accept")');
+        // Accept consent (New Flow)
+        await page.click('[data-testid="start-btn"]');
+        await page.check('[data-testid="consent-checkbox"]');
+        await page.click('[data-testid="consent-accept-btn"]');
 
         // Try to proceed without filling required field
         await page.click('button:has-text("Continue")');
@@ -258,7 +262,10 @@ test.describe("Presort Field Configuration Testing", () => {
 
         // Test invalid value
         await page.goto(`/study/${studySlug}`);
-        await page.click('button:has-text("Accept")');
+        // Accept consent (New Flow)
+        await page.click('[data-testid="start-btn"]');
+        await page.check('[data-testid="consent-checkbox"]');
+        await page.click('[data-testid="consent-accept-btn"]');
 
         if (edgeCaseValue.invalid) {
           await fillField(page, fieldType, edgeCaseValue.invalid);

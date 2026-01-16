@@ -27,14 +27,12 @@ test.describe("Branding Configuration Testing", () => {
       studySlug = study.slug;
     });
 
-    test("Admin: Can add custom logo", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Admin: Can add custom logo", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       // Add logo URL
       await page.fill('input[name="logoUrl"]', "https://example.com/logo.png");
@@ -45,7 +43,7 @@ test.describe("Branding Configuration Testing", () => {
 
     test("API: Logo config saves correctly", async ({ testDb, authToken }) => {
       const branding = testDataBuilders.branding({
-        logo_url: "https://example.com/custom-log o.png",
+        logo_url: "https://example.com/custom-logo.png",
       });
 
       await testDb.updateStudy(authToken, studySlug, { branding });
@@ -74,14 +72,12 @@ test.describe("Branding Configuration Testing", () => {
       await expect(page.locator('img[src*="logo.png"]')).toBeVisible();
     });
 
-    test("Validation: Invalid URL rejected", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Validation: Invalid URL rejected", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       // Try invalid URL
       await page.fill('input[name="logoUrl"]', "not-a-url");
@@ -126,14 +122,12 @@ test.describe("Branding Configuration Testing", () => {
       studySlug = study.slug;
     });
 
-    test("Admin: Can set accent color", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Admin: Can set accent color", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       // Set accent color
       const colorInput = page.locator(
@@ -176,14 +170,12 @@ test.describe("Branding Configuration Testing", () => {
       expect(color).toBeDefined();
     });
 
-    test("Validation: Invalid color format rejected", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Validation: Invalid color format rejected", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       // Try invalid color
       const colorInput = page.locator('input[name="accentColor"]');
@@ -212,14 +204,12 @@ test.describe("Branding Configuration Testing", () => {
       studySlug = study.slug;
     });
 
-    test("Admin: Can add partner logo", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Admin: Can add partner logo", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       // Add partner
       await page.click('button:has-text("Add Partner")');
@@ -275,14 +265,12 @@ test.describe("Branding Configuration Testing", () => {
       }
     });
 
-    test("Validation: Partner logo URL validated", async ({ page }) => {
-      await page.goto("/admin");
-      await page.fill('input[name="username"]', "test@example.com");
-      await page.fill('input[name="password"]', "testpassword");
-      await page.click('button[type="submit"]');
+    test("Validation: Partner logo URL validated", async ({ page, testDb }) => {
+      await testDb.loginToAdminUI(page);
 
       await page.click(`text=${studySlug}`);
-      await page.click("text=Branding");
+      await page.getByRole("link", { name: /design/i }).first().click();
+      await page.getByTestId("tab-branding").click();
 
       await page.click('button:has-text("Add Partner")');
       await page.fill('input[name="partnerName"]', "Test Partner");

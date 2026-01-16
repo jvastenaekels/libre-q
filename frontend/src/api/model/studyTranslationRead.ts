@@ -10,8 +10,6 @@ import type { StudyTranslationReadObjective } from './studyTranslationReadObject
 import type { StudyTranslationReadConditionOfInstruction } from './studyTranslationReadConditionOfInstruction';
 import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
 import type { StudyTranslationReadConsentDescription } from './studyTranslationReadConsentDescription';
-import type { StudyTranslationReadConsentAccept } from './studyTranslationReadConsentAccept';
-import type { StudyTranslationReadConsentDecline } from './studyTranslationReadConsentDecline';
 import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabels';
 import type { ProcessStep } from './processStep';
 import type { StudyTranslationReadStepHelp } from './studyTranslationReadStepHelp';
@@ -35,8 +33,6 @@ export interface StudyTranslationRead {
     condition_of_instruction?: StudyTranslationReadConditionOfInstruction;
     consent_title?: StudyTranslationReadConsentTitle;
     consent_description?: StudyTranslationReadConsentDescription;
-    consent_accept?: StudyTranslationReadConsentAccept;
-    consent_decline?: StudyTranslationReadConsentDecline;
     ui_labels?: StudyTranslationReadUiLabels;
     process_steps?: ProcessStep[];
     methodology_tips?: string[];

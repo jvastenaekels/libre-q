@@ -59,8 +59,6 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
             objective: t.objective,
             consent_title: t.consent_title,
             consent_description: t.consent_description,
-            consent_accept: t.consent_accept,
-            consent_decline: t.consent_decline,
             ui_labels: t.ui_labels,
             process_steps: t.process_steps,
             condition_of_instruction: t.condition_of_instruction,

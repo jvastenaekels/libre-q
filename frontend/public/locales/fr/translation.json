@@ -3,6 +3,9 @@
     "agree": "Plutôt d'accord",
     "disagree": "Plutôt pas d'accord",
     "neutral": "Neutre",
+    "reset_to_default": "Réinitialiser",
+    "reset_to_default_success": "Valeur par défaut restaurée",
+    "reset_to_default_confirm": "Êtes-vous sûr de vouloir réinitialiser ce champ ? Vos modifications seront perdues.",
     "undo": "Annuler l'action",
     "back": "Retour",
     "cancel": "Annuler",
@@ -674,7 +677,8 @@
         "languages": "Langues",
         "status_ready": "Prêt",
         "status_pending": "En attente",
-        "required": "Requis"
+        "required": "Requis",
+        "reset_defaults": "Réinitialiser par défaut"
       },
       "tips": {
         "title": "Conseil rapide",
@@ -754,6 +758,13 @@
           "defaults": {
             "new_step": "Nouvelle étape de l'étude",
             "new_desc": "Expliquez ce que le participant fera durant cette phase."
+          },
+          "reset": {
+            "instructions": "Réinitialiser les consignes",
+            "consent_title": "Réinitialiser le titre du consentement",
+            "consent_description": "Réinitialiser la description du consentement",
+            "process_steps": "Réinitialiser les étapes",
+            "process_steps_confirm": "Êtes-vous sûr de vouloir réinitialiser toutes les étapes par défaut ? Cela remplacera vos étapes personnalisées."
           }
         },
         "consent_title": "Formulaire de consentement",
@@ -775,6 +786,7 @@
       },
       "condition": {
         "title": "Condition d'instruction",
+        "reset": "Réinitialiser la consigne",
         "label": "Définir la condition d'instruction",
         "desc": "C'est la consigne centrale qui guide les participants tout au long du processus de classement.",
         "field_label": "Texte de la consigne",

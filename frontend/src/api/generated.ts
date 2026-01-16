@@ -5952,20 +5952,6 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 ]),
                 undefined,
             ]),
-            consent_accept: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_decline: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
             ui_labels: faker.helpers.arrayElement([{}, undefined]),
             process_steps: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
@@ -6234,20 +6220,6 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                     consent_description: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
                             faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    consent_accept: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 50 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    consent_decline: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 50 } }),
                             null,
                         ]),
                         undefined,
@@ -6527,20 +6499,6 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 ]),
                 undefined,
             ]),
-            consent_accept: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_decline: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
             ui_labels: faker.helpers.arrayElement([{}, undefined]),
             process_steps: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
@@ -6805,20 +6763,6 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
             consent_description: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_accept: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_decline: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
                     null,
                 ]),
                 undefined,
@@ -7090,20 +7034,6 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
             consent_description: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_accept: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            consent_decline: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 50 } }),
                     null,
                 ]),
                 undefined,

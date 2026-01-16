@@ -210,8 +210,6 @@ class StudyTranslationBase(BaseModel):
 
     consent_title: str | None = Field(None, max_length=200)
     consent_description: str | None = Field(None, max_length=5000)
-    consent_accept: str | None = Field("Accept", max_length=50)
-    consent_decline: str | None = Field("Decline", max_length=50)
     ui_labels: dict[str, Any] = {}
     process_steps: list[ProcessStep] = []
     methodology_tips: list[str] = []
@@ -225,8 +223,6 @@ class StudyTranslationBase(BaseModel):
         "condition_of_instruction",
         "consent_title",
         "consent_description",
-        "consent_accept",
-        "consent_decline",
     )
     @classmethod
     def validate_trans_strings(cls, v: str | None) -> str | None:
@@ -367,16 +363,6 @@ class StudyCreate(StudyBase):
 
     translations: list[StudyTranslationCreate]
     statements: list[StatementCreate] = []
-
-    @model_validator(mode="after")
-    def check_grid_symmetry(self) -> "StudyCreate":
-        """Validate that total grid capacity matches the number of statements."""
-        total_capacity = sum(col.capacity for col in self.grid_config)
-        if len(self.statements) != total_capacity:
-            raise ValueError(
-                f"Grid capacity ({total_capacity}) does not match statement count ({len(self.statements)})"
-            )
-        return self
 
 
 class StudyUpdate(BaseModel):

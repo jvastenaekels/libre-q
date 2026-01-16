@@ -42,8 +42,6 @@ export const testDataBuilders = {
         condition_of_instruction: "What is your stance on this statement?",
         consent_title: "Informed Consent",
         consent_description: "Please read and accept the terms to proceed.",
-        consent_accept: "I Agree",
-        consent_decline: "I Decline",
       },
     ],
     statements: testDataBuilders.statements(23),
@@ -257,8 +255,6 @@ export interface StudyData {
     condition_of_instruction?: string;
     consent_title?: string;
     consent_description?: string;
-    consent_accept?: string;
-    consent_decline?: string;
   }>;
   statements: StatementData[];
   grid_config: GridColumn[];

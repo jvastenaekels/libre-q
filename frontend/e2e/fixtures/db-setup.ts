@@ -191,8 +191,6 @@ export class TestDatabase {
             condition_of_instruction: "Condition of instruction",
             consent_title: "Informed Consent",
             consent_description: "Please read and accept the terms to proceed.",
-            consent_accept: "I Agree",
-            consent_decline: "I Decline",
           },
         ],
         grid_config: config.grid_config || [],
@@ -377,8 +375,6 @@ interface StudyConfig {
     condition_of_instruction?: string;
     consent_title?: string;
     consent_description?: string;
-    consent_accept?: string;
-    consent_decline?: string;
   }>;
   grid_config?: Array<{ score: number; capacity: number }>;
   statements?: Array<{
