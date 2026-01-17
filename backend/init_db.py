@@ -33,25 +33,19 @@ async def init_db(reset: bool = False):
             await conn.execute(text("CREATE SCHEMA public"))
             print("   Tables dropped.")
 
-    import subprocess
-
     print("1. Running database migrations (Alembic)...")
     try:
-        import shutil
-        # Locate alembic binary relative to python executable
-        bin_dir = os.path.dirname(sys.executable)
-        alembic_bin = os.path.join(bin_dir, "alembic")
+        from alembic.config import Config
+        from alembic import command
 
-        cmd = [alembic_bin, "upgrade", "head"]
+        # Ensure we are in the directory containing alembic.ini (backend/)
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(backend_dir)
 
-        # Fallback to simple command if binary not found there
-        if not os.path.exists(alembic_bin):
-            cmd = ["alembic", "upgrade", "head"]
-
-        if os.path.exists("uv.lock") and shutil.which("uv"):
-            cmd = ["uv", "run", "alembic", "upgrade", "head"]
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        print("✓ Database migrations completed successfully.")
+    except Exception as e:
         print(f"✗ Migration failed: {e}")
         sys.exit(1)
 
