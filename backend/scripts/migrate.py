@@ -19,9 +19,8 @@ def run_alembic_upgrade():
     os.chdir(backend_dir)
 
     try:
-        # We use 'uv run' if possible, or just 'alembic'
-        # In many environments, 'alembic' should be in the path
-        cmd = ["alembic", "upgrade", "head"]
+        # We use 'uv run' if possible, or python -m alembic
+        cmd = [sys.executable, "-m", "alembic", "upgrade", "head"]
 
         if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]

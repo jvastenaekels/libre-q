@@ -39,7 +39,8 @@ async def init_db(reset: bool = False):
     try:
         import shutil
 
-        cmd = ["alembic", "upgrade", "head"]
+        # Use python -m alembic to ensure we use the installed module
+        cmd = [sys.executable, "-m", "alembic", "upgrade", "head"]
         if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]
         subprocess.run(cmd, check=True)
