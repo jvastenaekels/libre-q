@@ -25,37 +25,39 @@ export default defineConfig({
         manualChunks: (id) => {
           // 1. Isolation of Framework Core
           if (
-            id.includes("node_modules/react") ||
-            id.includes("node_modules/react-dom") ||
-            id.includes("node_modules/react-router") ||
-            id.includes("node_modules/zustand")
+            id.includes("/node_modules/react/") ||
+            id.includes("/node_modules/react-dom/") ||
+            id.includes("/node_modules/react-router/") ||
+            id.includes("/node_modules/react-router-dom/") ||
+            id.includes("/node_modules/zustand/")
           ) {
             return "vendor-react-core";
           }
 
           // 2. Heavy Charts & Tables (Admin Dashboard ONLY)
           if (
-            id.includes("node_modules/recharts") ||
-            id.includes("node_modules/d3-") ||
-            id.includes("node_modules/@tanstack/react-table")
+            id.includes("/node_modules/recharts/") ||
+            id.includes("/node_modules/d3-") ||
+            id.includes("/node_modules/@tanstack/react-table/")
           ) {
             return "vendor-admin-charts";
           }
 
           // 3. Interactive Libraries (Participant + Admin)
-          // Grouped to avoid waterfall requests
           if (
-            id.includes("node_modules/framer-motion") ||
-            id.includes("node_modules/@dnd-kit")
+            id.includes("/node_modules/framer-motion/") ||
+            id.includes("/node_modules/@dnd-kit/")
           ) {
             return "vendor-interactive";
           }
 
-          // 4. UI Kit (Shared)
-          if (
-            id.includes("node_modules/@radix-ui") ||
-            id.includes("node_modules/lucide-react")
-          ) {
+          // 4. lucide-react (Special handling to avoid split registry errors)
+          if (id.includes("/node_modules/lucide-react/")) {
+            return "vendor-lucide";
+          }
+
+          // 5. UI Kit (Shared Radix components)
+          if (id.includes("/node_modules/@radix-ui/")) {
             return "vendor-ui";
           }
         },
