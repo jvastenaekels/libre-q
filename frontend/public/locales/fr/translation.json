@@ -742,6 +742,7 @@
       "intro": {
         "welcome_title": "Présentation de l'étude",
         "process_title": "Aperçu du déroulement",
+        "reset": "Réinitialiser",
         "process_steps": {
           "title": "Aperçu du déroulement",
           "desc": "Définissez les phases affichées aux participants sur la page d'accueil. Si vide, les étapes par défaut seront utilisées.",
@@ -786,7 +787,6 @@
       },
       "condition": {
         "title": "Condition d'instruction",
-        "reset": "Réinitialiser la consigne",
         "label": "Définir la condition d'instruction",
         "desc": "C'est la consigne centrale qui guide les participants tout au long du processus de classement.",
         "field_label": "Texte de la consigne",

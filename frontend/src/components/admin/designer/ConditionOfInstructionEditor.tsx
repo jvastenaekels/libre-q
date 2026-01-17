@@ -14,8 +14,7 @@ const ConditionOfInstructionEditor = () => {
 
     const resetField = createResetToDefaultHandler(updateDraft, t);
 
-    const resetInstruction = () =>
-        resetField('condition_of_instruction');
+    const resetInstruction = () => resetField('condition_of_instruction');
 
     if (!draft) return null;
 

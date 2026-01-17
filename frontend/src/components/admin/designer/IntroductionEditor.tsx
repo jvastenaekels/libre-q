@@ -8,7 +8,7 @@ import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
 import { useTranslation } from 'react-i18next';
 import type { StudyTranslationRead } from '@/api/model';
-import { RotateCcw, Plus } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
