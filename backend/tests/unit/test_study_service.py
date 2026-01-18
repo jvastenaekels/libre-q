@@ -78,8 +78,9 @@ async def test_process_submission_new_participant(db, active_study):
         ],
     )
 
-    code = await StudyService.process_submission(db, data, "127.0.0.1")
-    assert code == str(session_token)[:8].upper()
+    result = await StudyService.process_submission(db, data, "127.0.0.1")
+    assert result["confirmation_code"] == str(session_token)[:8].upper()
+    assert "id" in result
 
     # Verify DB
     res = await db.execute(
@@ -155,8 +156,8 @@ async def test_process_submission_completed_early_return(db, active_study):
     )
 
     # Should return existing code and NOT update anything
-    code = await StudyService.process_submission(db, data, "1.2.3.4")
-    assert code == str(session_token)[:8].upper()
+    result = await StudyService.process_submission(db, data, "1.2.3.4")
+    assert result["confirmation_code"] == str(session_token)[:8].upper()
 
     # Double check if it actually didn't update
     db.expire_all()

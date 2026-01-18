@@ -61,24 +61,54 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
     const [uploadMethod, setUploadMethod] = useState<'file' | 'paste'>('file');
     const [pastedJson, setPastedJson] = useState('');
 
-    // File dropzone handler
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        const file = acceptedFiles[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
+    // Validate configuration - defined first so it can be used in onDrop
+    const handleConfigLoaded = useCallback(
+        async (configData: unknown) => {
             try {
-                const json = JSON.parse(e.target?.result as string);
-                await handleConfigLoaded(json);
-            } catch (error: any) {
-                toast.error(t('admin.import.invalid_json', 'Invalid JSON file'), {
-                    description: error.message,
+                setStep('validate');
+                setConfig(configData);
+
+                const result = await AdminService.validateStudyImport(configData);
+                setValidation(result.data);
+
+                // Suggest a slug based on original
+                const originalSlug =
+                    (configData as { study?: { slug?: string } })?.study?.slug || 'imported-study';
+                const timestamp = Date.now().toString().slice(-6);
+                setNewSlug(`${originalSlug}-${timestamp}`);
+            } catch (error: unknown) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                toast.error(t('admin.import.validation_failed', 'Validation failed'), {
+                    description: errorMsg,
                 });
+                setStep('upload');
             }
-        };
-        reader.readAsText(file);
-    }, []);
+        },
+        [t]
+    );
+
+    // File dropzone handler
+    const onDrop = useCallback(
+        (acceptedFiles: File[]) => {
+            const file = acceptedFiles[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const json = JSON.parse(e.target?.result as string);
+                    await handleConfigLoaded(json);
+                } catch (error: unknown) {
+                    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                    toast.error(t('admin.import.invalid_json', 'Invalid JSON file'), {
+                        description: errorMsg,
+                    });
+                }
+            };
+            reader.readAsText(file);
+        },
+        [handleConfigLoaded, t]
+    );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -91,31 +121,11 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
         try {
             const json = JSON.parse(pastedJson);
             await handleConfigLoaded(json);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error';
             toast.error(t('admin.import.invalid_json', 'Invalid JSON'), {
-                description: error.message,
+                description: errorMsg,
             });
-        }
-    };
-
-    // Validate configuration
-    const handleConfigLoaded = async (configData: any) => {
-        try {
-            setStep('validate');
-            setConfig(configData);
-
-            const result = await AdminService.validateStudyImport(configData);
-            setValidation(result.data);
-
-            // Suggest a slug based on original
-            const originalSlug = configData.study?.slug || 'imported-study';
-            const timestamp = Date.now().toString().slice(-6);
-            setNewSlug(`${originalSlug}-${timestamp}`);
-        } catch (error: any) {
-            toast.error(t('admin.import.validation_failed', 'Validation failed'), {
-                description: error.message,
-            });
-            setStep('upload');
         }
     };
 

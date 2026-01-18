@@ -10,7 +10,7 @@
  * Sets up routing, global error handling, and lazy loading of pages.
  */
 
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -35,14 +35,17 @@ const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
 import LoginPage from './pages/LoginPage';
 
 // Admin imports
+// Admins imports
 import RequireAdmin from './components/auth/RequireAdmin';
-const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+// const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+import AdminLayout from './layouts/AdminLayout';
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 
-const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
+// const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
+import DataExportsPage from './pages/admin/DataExportsPage';
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
@@ -181,17 +184,9 @@ import { ViewportProvider } from '@/contexts/ViewportContext';
 const App = () => {
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
-                        Loading session...
-                    </div>
-                }
-            >
-                <ViewportProvider>
-                    <RouterProvider router={router} />
-                </ViewportProvider>
-            </Suspense>
+            <ViewportProvider>
+                <RouterProvider router={router} />
+            </ViewportProvider>
             <Toaster richColors position="top-center" closeButton />
         </ErrorBoundary>
     );

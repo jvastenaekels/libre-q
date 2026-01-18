@@ -34,11 +34,13 @@ async def submit_study(
     user_agent = request.headers.get("user-agent")
 
     try:
-        confirmation_code = await StudyService.process_submission(
-            db, data, client_ip, user_agent
-        )
+        result = await StudyService.process_submission(db, data, client_ip, user_agent)
         await db.commit()
-        return {"status": "success", "confirmation_code": confirmation_code}
+        return {
+            "status": "success",
+            "confirmation_code": result["confirmation_code"],
+            "id": result["id"],
+        }
     except HTTPException:
         # Re-raise HTTP exceptions (they're already properly formatted)
         raise

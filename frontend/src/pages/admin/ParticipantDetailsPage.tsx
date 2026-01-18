@@ -33,7 +33,9 @@ export default function ParticipantDetailsPage() {
         useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
 
     // Find the participant
-    const participant = studyData?.participants?.find((p) => String(p.id) === participantId);
+    const participant = studyData?.participants?.find(
+        (p) => String(p.db_id || p.id) === participantId
+    );
 
     const handleToggleDiscard = async (isDiscarded: boolean) => {
         if (!participant) return;

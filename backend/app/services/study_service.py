@@ -734,7 +734,10 @@ class StudyService:
         if participant and participant not in db.new and not is_newly_created:
             # Update existing participant
             if participant.status == ParticipantStatus.completed:
-                return str(participant.session_token)[:8].upper()
+                return {
+                    "confirmation_code": str(participant.session_token)[:8].upper(),
+                    "id": participant.id,
+                }
 
             participant.language_used = data.language_used
             participant.presort_answers = presort_answers
@@ -783,7 +786,7 @@ class StudyService:
                 detail=f"Database error while saving Q-sort entries: {str(e)}",
             )
 
-        return confirmation_code
+        return {"confirmation_code": confirmation_code, "id": participant.id}
 
     @staticmethod
     async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:
@@ -889,6 +892,7 @@ class StudyService:
             participant_data.append(
                 {
                     "id": str(p.session_token)[:8].upper(),
+                    "db_id": p.id,
                     "duration_seconds": (
                         p.submitted_at - p.consented_at
                     ).total_seconds()

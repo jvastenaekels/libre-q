@@ -80,9 +80,19 @@ export const useSubmitStudy = () => {
 
                 if (status === 'completed') {
                     setIsSuccess(true);
-                    const code = (data as { confirmation_code: string }).confirmation_code;
-                    setConfirmationCode(code);
-                    session.completeSession(code);
+                    // biome-ignore lint/suspicious/noExplicitAny: API types are unknown
+                    const responseData = data as any;
+                    const code =
+                        responseData?.confirmation_code || responseData?.data?.confirmation_code;
+
+                    if (code) {
+                        setConfirmationCode(code);
+                        session.completeSession(code);
+                    } else {
+                        console.warn('No confirmation code in response:', data);
+                        // Mark as complete even if code is missing to show success screen
+                        session.completeSession('SUBMITTED');
+                    }
                 }
             } catch (err: unknown) {
                 console.error(err);

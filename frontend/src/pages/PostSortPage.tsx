@@ -300,7 +300,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 >
                     <Check size={40} strokeWidth={3} />
                 </div>
-                <h1 className="text-3xl font-bold text-slate-800 mb-4">
+                <h1
+                    className="text-3xl font-bold text-slate-800 mb-4"
+                    data-testid="thank-you-message"
+                >
                     {t('post.success.title', 'Thank You!')}
                 </h1>
                 <p className="text-lg text-slate-600 mb-2">

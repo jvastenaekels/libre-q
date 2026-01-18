@@ -35,14 +35,14 @@ test.describe('State Management Flow Tests', () => {
             ).toBeVisible();
 
             // 3. Activate study
-            await testDb.updateStudy(authToken, study.slug, { state: 'active' });
+            await testDb.updateStudyState(authToken, study.slug, 'active');
 
             // 4. Verify participant can now access
             await page.goto(`/study/${study.slug}`);
             await expect(page.getByRole('button', { name: 'Get Started' })).toBeVisible();
 
             // 5. Pause study
-            await testDb.updateStudy(authToken, study.slug, { state: 'paused' });
+            await testDb.updateStudyState(authToken, study.slug, 'paused');
 
             // 6. Verify participant cannot access paused study
             await page.goto(`/study/${study.slug}`);
@@ -53,12 +53,12 @@ test.describe('State Management Flow Tests', () => {
             ).toBeVisible();
 
             // 7. Reactivate
-            await testDb.updateStudy(authToken, study.slug, { state: 'active' });
+            await testDb.updateStudyState(authToken, study.slug, 'active');
             await page.goto(`/study/${study.slug}`);
             await expect(page.getByRole('button', { name: 'Get Started' })).toBeVisible();
 
             // 8. Close study
-            await testDb.updateStudy(authToken, study.slug, { state: 'closed' });
+            await testDb.updateStudyState(authToken, study.slug, 'closed');
 
             // 9. Verify participant cannot access closed study
             await page.goto(`/study/${study.slug}`);
@@ -206,18 +206,26 @@ test.describe('State Management Flow Tests', () => {
                 })
             );
 
-            // Update configuration
+            // Update configuration (Switch to draft -> Update -> Active)
+            await testDb.updateStudyState(authToken, study.slug, 'draft');
             await testDb.updateStudy(authToken, study.slug, {
                 translations: [
                     {
                         language_code: 'en',
                         title: 'Updated Study',
+                        description: 'Updated Description',
+                        instructions: 'Updated Instructions',
+                        objective: 'Updated Objective',
+                        condition_of_instruction: 'Updated Condition',
+                        consent_title: 'Informed Consent',
+                        consent_description: 'Please read and accept terms.',
                         ui_labels: {
                             'common.agree': 'NEW AGREE LABEL',
                         },
                     },
                 ],
             });
+            await testDb.updateStudyState(authToken, study.slug, 'active');
 
             // New participant session
             const participantPage = await context.newPage();

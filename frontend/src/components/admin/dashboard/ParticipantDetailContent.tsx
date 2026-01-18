@@ -83,11 +83,12 @@ export function ParticipantDetailContent({
                         <h2 className="text-2xl font-black flex items-center gap-2 text-slate-900">
                             {t('admin.data.detail.session', 'Session')}
                             <span className="font-mono bg-indigo-600 text-white px-2.5 py-0.5 rounded-lg text-lg shadow-lg shadow-indigo-200">
-                                {participant.id.substring(0, 8)}
+                                {String(participant.id).substring(0, 8)}
                             </span>
                             {participant.is_discarded && (
                                 <Badge
                                     variant="destructive"
+                                    data-testid="discarded-badge"
                                     className="ml-2 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ring-2 ring-red-100 shadow-sm animate-in fade-in zoom-in duration-300"
                                 >
                                     {t('admin.data.detail.discarded_badge', 'Discarded')}

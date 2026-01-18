@@ -109,7 +109,9 @@ export class AdminPage extends BasePage {
             const keys = Object.keys(localStorage).filter((k) =>
                 k.startsWith('open-q-draft-backup-')
             );
-            keys.forEach((k) => localStorage.removeItem(k));
+            keys.forEach((k) => {
+                localStorage.removeItem(k);
+            });
         });
 
         await this.page.reload();

@@ -31,6 +31,7 @@ import {
     Mail,
     Bell,
     Users,
+    Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGetStudyDumpApiAdminStudiesSlugDumpGet } from '@/api/generated';
@@ -46,6 +47,7 @@ export interface DumpStatement {
 
 export interface DumpParticipant {
     id: string;
+    db_id: number;
     duration_seconds: number | null;
     scores: (number | null)[]; // Array index matches study.statements index
     placements: Record<string, number>;
@@ -87,12 +89,53 @@ interface InteractiveDataViewProps {
     participants?: ParticipantRead[]; // Optional: can be provided from loader
 }
 
-export default function InteractiveDataView({ slug }: InteractiveDataViewProps) {
+export default function InteractiveDataView(props: InteractiveDataViewProps) {
+    const { slug } = props;
     const { t } = useTranslation();
     // Determine type usage for useGetStudyDumpApiAdminStudiesSlugDumpGet
     // Casting broadly as we validated the structure manually
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);
-    const data = rawData as unknown as DumpResponse;
+    // const data = rawData as unknown as DumpResponse;
+
+    const { participants } = props;
+
+    // effectiveParticipants logic to handle mapping from Input/List type to Dump type
+    const effectiveParticipants = useMemo(() => {
+        const dumpData = rawData as unknown as DumpResponse | null;
+        if (dumpData?.participants) return dumpData.participants;
+        if (participants) {
+            return participants.map((p) => ({
+                id: String(p.id).substring(0, 8),
+                db_id: p.id,
+                duration_seconds: (p as { duration_seconds?: number }).duration_seconds ?? null,
+                scores: [],
+                placements: {},
+                presort: {},
+                postsort: {},
+                language: 'en',
+                is_discarded: p.is_discarded,
+                discard_reason: p.discard_reason,
+            })) as DumpParticipant[];
+        }
+        return [];
+    }, [rawData, participants]);
+
+    const data = useMemo(() => {
+        if (rawData) return rawData as unknown as DumpResponse;
+        if (participants) {
+            return {
+                study: {
+                    slug,
+                    statements: [],
+                    translations: [],
+                    postsort_config: {},
+                },
+                participants: effectiveParticipants,
+                statement_id_to_index: {},
+            } as DumpResponse;
+        }
+        return null;
+    }, [rawData, participants, effectiveParticipants, slug]);
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
@@ -101,7 +144,7 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
-            navigate(`/admin/studies/${slug}/participants/${participant.id}`);
+            navigate(`/admin/studies/${slug}/participants/${participant.db_id || participant.id}`);
         },
         [navigate, slug]
     );
@@ -166,6 +209,15 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                                     className="text-indigo-500"
                                 >
                                     <MessageSquare className="h-3.5 w-3.5" />
+                                </div>
+                            )}
+                            {p.is_discarded && (
+                                <div
+                                    className="text-red-500"
+                                    title="Discarded"
+                                    data-testid="row-discarded-indicator"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5" />
                                 </div>
                             )}
                         </div>
@@ -237,7 +289,7 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
         },
     });
 
-    if (isLoading) {
+    if (isLoading && !data) {
         return (
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -257,12 +309,17 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
         );
     }
 
-    if (error || !data) {
+    if ((error && !data) || (!data && !isLoading)) {
         return (
             <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-center text-sm text-red-600">
                 {t('admin.data.errors.load_failed')}
             </div>
         );
+    }
+
+    // TypeScript guard: ensure data is loaded
+    if (!data) {
+        return null;
     }
 
     return (
@@ -412,9 +469,14 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                                     key={row.id}
                                     className={cn(
                                         'cursor-pointer hover:bg-indigo-50/30 transition-colors border-slate-50 group',
-                                        row.original.is_discarded &&
+                                        !!row.original.is_discarded &&
                                             'opacity-50 bg-slate-50/50 italic grayscale-[0.5]'
                                     )}
+                                    data-testid={
+                                        row.original.is_discarded
+                                            ? 'participant-row-discarded'
+                                            : 'participant-row-active'
+                                    }
                                     onClick={() => handleViewParticipant(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (

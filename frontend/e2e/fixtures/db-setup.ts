@@ -220,8 +220,15 @@ export class TestDatabase {
      * Activate a study
      */
     async activateStudy(token: string, slug: string) {
+        return this.updateStudyState(token, slug, 'active');
+    }
+
+    /**
+     * Change study state
+     */
+    async updateStudyState(token: string, slug: string, newState: string) {
         const response = await fetch(
-            `${this.baseUrl}/api/admin/studies/${slug}/state?new_state=active`,
+            `${this.baseUrl}/api/admin/studies/${slug}/state?new_state=${newState}`,
             {
                 method: 'POST',
                 headers: {
@@ -232,7 +239,7 @@ export class TestDatabase {
 
         if (!response.ok) {
             const error = await response.text();
-            throw new Error(`Failed to activate study: ${error}`);
+            throw new Error(`Failed to change study state to ${newState}: ${error}`);
         }
 
         return response.json();
@@ -336,7 +343,8 @@ export class TestDatabase {
             const txt = await response.text();
             throw new Error(`Failed to submit participant data: ${txt}`);
         }
-        return response.json();
+        const data = await response.json();
+        return { ...data, session_token: sessionToken };
     }
 }
 

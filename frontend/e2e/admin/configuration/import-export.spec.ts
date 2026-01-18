@@ -9,7 +9,11 @@ test.describe('Import/Export Study Configuration', () => {
         adminPage = new AdminPage(page);
     });
 
-    test('should export a study config and import it as a new study', async ({ page, testDb, authToken }) => {
+    test('should export a study config and import it as a new study', async ({
+        page,
+        testDb,
+        authToken,
+    }) => {
         // 1. Setup: Create a study with specific configuration via API
         const sourceSlug = `source-study-${Date.now()}`;
         const sourceTitle = 'Source Study for Export';
@@ -32,15 +36,17 @@ test.describe('Import/Export Study Configuration', () => {
         await testDb.updateStudy(authToken, sourceSlug, {
             statements,
             grid_config: gridConfig,
-            translations: [{
-                language_code: 'en',
-                title: sourceTitle,
-                description: 'Description to be preserved',
-                instructions: 'Instructions to be preserved',
-                condition_of_instruction: 'Condition to be preserved',
-                consent_title: 'Consent Title',
-                consent_description: 'Consent Description',
-            }],
+            translations: [
+                {
+                    language_code: 'en',
+                    title: sourceTitle,
+                    description: 'Description to be preserved',
+                    instructions: 'Instructions to be preserved',
+                    condition_of_instruction: 'Condition to be preserved',
+                    consent_title: 'Consent Title',
+                    consent_description: 'Consent Description',
+                },
+            ],
         });
 
         // 2. Export Configuration
@@ -123,12 +129,12 @@ test.describe('Import/Export Study Configuration', () => {
         await Promise.race([
             validLocator.waitFor({ state: 'visible' }),
             errorLocator.waitFor({ state: 'visible' }),
-            invalidJsonLocator.waitFor({ state: 'visible' })
+            invalidJsonLocator.waitFor({ state: 'visible' }),
         ]);
 
         if (await errorLocator.isVisible()) {
-             // If errors are visible, fail the test
-             throw new Error('Import validation showed errors. Check screenshot.');
+            // If errors are visible, fail the test
+            throw new Error('Import validation showed errors. Check screenshot.');
         }
 
         if (await invalidJsonLocator.isVisible()) {
@@ -174,6 +180,5 @@ test.describe('Import/Export Study Configuration', () => {
         // Let's verify the grid config size via UI roughly (e.g. 3 columns).
         await page.getByRole('tab', { name: 'Q-sort' }).click();
         // Maybe check grid visual if possible, or just trust the functional part.
-
     });
 });
