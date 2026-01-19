@@ -74,6 +74,7 @@ export default function ParticipantDetailsPage() {
             grid_config: study.grid_config as any,
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
             postsort_config: study.postsort_config as any,
+            state: study.state || 'draft',
         };
 
         const studyDump: DumpResponse = {
@@ -117,6 +118,7 @@ export default function ParticipantDetailsPage() {
             is_discarded: participant.is_discarded,
             is_test_run: participant.is_test_run,
             discard_reason: participant.discard_reason,
+            status: participant.status,
         };
 
         return { studyData: studyDump, participantData: adaptedParticipant };

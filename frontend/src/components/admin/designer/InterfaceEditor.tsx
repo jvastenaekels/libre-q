@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-const InterfaceEditor = () => {
+const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
     const { draft, activeLocale, updateTranslation, updateDraft, setActiveSubStep } =
         useStudyDesigner();
     const { t, i18n } = useTranslation();
@@ -177,6 +177,7 @@ const InterfaceEditor = () => {
                                 {uiLabels['welcome.start'] && (
                                     <button
                                         type="button"
+                                        disabled={readOnly}
                                         onClick={() => resetLabel('welcome.start')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
                                                  font-black uppercase tracking-wider text-slate-400
@@ -194,6 +195,7 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                                 onFocus={() => setActiveSubStep('welcome.start')}
                                 placeholder={tPlaceHolder('welcome.start')}
+                                disabled={readOnly}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -217,6 +219,7 @@ const InterfaceEditor = () => {
                                 {uiLabels['common.next'] && (
                                     <button
                                         type="button"
+                                        disabled={readOnly}
                                         onClick={() => resetLabel('common.next')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
                                                  font-black uppercase tracking-wider text-slate-400
@@ -234,6 +237,7 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
                                 onFocus={() => setActiveSubStep('common.next')}
                                 placeholder={tPlaceHolder('common.next')}
+                                disabled={readOnly}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -260,6 +264,7 @@ const InterfaceEditor = () => {
                                 {uiLabels['post.submit'] && (
                                     <button
                                         type="button"
+                                        disabled={readOnly}
                                         onClick={() => resetLabel('post.submit')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
                                                  font-black uppercase tracking-wider text-slate-400
@@ -277,6 +282,7 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('post.submit', e.target.value)}
                                 onFocus={() => setActiveSubStep('post.submit')}
                                 placeholder={tPlaceHolder('post.submit')}
+                                disabled={readOnly}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -300,6 +306,7 @@ const InterfaceEditor = () => {
                                 {uiLabels['fine.actions.validate'] && (
                                     <button
                                         type="button"
+                                        disabled={readOnly}
                                         onClick={() => resetLabel('fine.actions.validate')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
                                                  font-black uppercase tracking-wider text-slate-400
@@ -319,6 +326,7 @@ const InterfaceEditor = () => {
                                 }
                                 onFocus={() => setActiveSubStep('fine.actions.validate')}
                                 placeholder={tPlaceHolder('fine.actions.validate')}
+                                disabled={readOnly}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -353,6 +361,7 @@ const InterfaceEditor = () => {
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    disabled={readOnly}
                                     onClick={() =>
                                         resetTerminologyGroup([
                                             'common.agree',
@@ -378,6 +387,7 @@ const InterfaceEditor = () => {
                                     onChange={(e) => updateLabel('common.agree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.agree')}
                                     placeholder={tPlaceHolder('common.agree')}
+                                    disabled={readOnly}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -391,6 +401,7 @@ const InterfaceEditor = () => {
                                     onChange={(e) => updateLabel('common.neutral', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.neutral')}
                                     placeholder={tPlaceHolder('common.neutral')}
+                                    disabled={readOnly}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -404,6 +415,7 @@ const InterfaceEditor = () => {
                                     onChange={(e) => updateLabel('common.disagree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.disagree')}
                                     placeholder={tPlaceHolder('common.disagree')}
+                                    disabled={readOnly}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -426,6 +438,7 @@ const InterfaceEditor = () => {
                                     <Button
                                         variant="ghost"
                                         size="sm"
+                                        disabled={readOnly}
                                         onClick={() =>
                                             resetTerminologyGroup([
                                                 'fine.legend.agree',
@@ -453,6 +466,7 @@ const InterfaceEditor = () => {
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.agree')}
                                         placeholder={tPlaceHolder('fine.legend.agree')}
+                                        disabled={readOnly}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -468,6 +482,7 @@ const InterfaceEditor = () => {
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.neutral')}
                                         placeholder={tPlaceHolder('fine.legend.neutral')}
+                                        disabled={readOnly}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -483,6 +498,7 @@ const InterfaceEditor = () => {
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.disagree')}
                                         placeholder={tPlaceHolder('fine.legend.disagree')}
+                                        disabled={readOnly}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -526,12 +542,14 @@ const InterfaceEditor = () => {
                                             placeholder={t(
                                                 'admin.design.interface.hints.placeholder'
                                             )}
+                                            disabled={readOnly}
                                             className="font-medium text-sm rounded-xl h-10 bg-slate-50/30"
                                         />
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        disabled={readOnly}
                                         onClick={() => {
                                             updateDraft((d) => {
                                                 for (const t of d.translations || []) {
@@ -567,6 +585,7 @@ const InterfaceEditor = () => {
                                         }
                                     });
                                 }}
+                                disabled={readOnly}
                                 className="rounded-xl border-dashed border-2 hover:border-indigo-500 hover:bg-indigo-50/30 font-bold transition-all px-6 py-5"
                             >
                                 <Plus className="size-4 mr-2" />
@@ -576,6 +595,7 @@ const InterfaceEditor = () => {
                             <Button
                                 variant="ghost"
                                 size="sm"
+                                disabled={readOnly}
                                 onClick={() => resetToDefaults('methodology_tips')}
                                 className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
                             >
@@ -620,6 +640,7 @@ const InterfaceEditor = () => {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => resetStepHelp(step.id.toString())}
+                                            disabled={readOnly}
                                             className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold h-8 text-xs"
                                         >
                                             <RotateCcw className="size-3.5 mr-2" />
@@ -650,6 +671,7 @@ const InterfaceEditor = () => {
                                             placeholder={tPlaceHolder(
                                                 `study.help.step_${step.id}.what`
                                             )}
+                                            disabled={readOnly}
                                             className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>
@@ -675,6 +697,7 @@ const InterfaceEditor = () => {
                                             placeholder={tPlaceHolder(
                                                 `study.help.step_${step.id}.why`
                                             )}
+                                            disabled={readOnly}
                                             className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>

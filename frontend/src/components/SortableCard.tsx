@@ -77,7 +77,7 @@ const innerCardStyles = cva(
             variant: {
                 hand: 'px-2 py-2',
                 compact: 'p-1.5',
-                grid: 'p-3',
+                grid: 'px-3 py-2',
             },
             isSelected: {
                 true: 'border-blue-500 ring-2 ring-blue-300 shadow-md scale-[1.02] z-10',
@@ -99,7 +99,7 @@ const textStyles = cva('w-full text-center font-medium text-slate-800', {
         variant: {
             hand: 'text-sm sm:text-base leading-relaxed',
             compact: 'text-xs leading-tight text-slate-700',
-            grid: 'text-sm font-medium leading-snug text-slate-800',
+                grid: 'text-sm font-medium leading-tight text-slate-800',
         },
         allowScroll: {
             false: '',

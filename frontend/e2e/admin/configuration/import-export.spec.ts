@@ -1,6 +1,6 @@
 import { test, expect } from '../../fixtures/db-setup';
 import { AdminPage } from '../../pages/AdminPage';
-import fs from 'fs';
+import fs from 'node:fs';
 
 test.describe('Import/Export Study Configuration', () => {
     let adminPage: AdminPage;

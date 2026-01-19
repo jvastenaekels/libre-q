@@ -43,6 +43,7 @@ import {
     useClearTestRunsApiAdminStudiesSlugTestRunsDelete,
     getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey,
 } from '@/api/generated';
+import { customInstance } from '@/api/mutator';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -92,6 +93,7 @@ export interface DumpParticipant {
     is_test_run: boolean;
     submitted_at?: string;
     recruitment_token?: string;
+    status: string;
 }
 
 export interface DumpResponse {
@@ -105,6 +107,7 @@ export interface DumpResponse {
             newsletter_consent_enabled?: boolean;
             interview_consent_enabled?: boolean;
         } & Record<string, any>;
+        state: string;
     };
     participants: DumpParticipant[];
     statement_id_to_index: Record<string, number>;
@@ -148,6 +151,7 @@ export default function InteractiveDataView({
                 discard_reason: p.discard_reason,
                 submitted_at: p.submitted_at || p.created_at,
                 recruitment_token: p.recruitment_token,
+                status: p.status,
             })) as DumpParticipant[];
         }
         return [];
@@ -156,7 +160,7 @@ export default function InteractiveDataView({
     const data = useMemo(() => {
         if (rawData) return rawData as unknown as DumpResponse;
         return {
-            study: { slug, statements: [], translations: [], postsort_config: {} },
+            study: { slug, statements: [], translations: [], postsort_config: {}, state: 'draft' },
             participants: effectiveParticipants,
             statement_id_to_index: {},
         } as DumpResponse;
@@ -164,7 +168,6 @@ export default function InteractiveDataView({
 
     const { mutate: clearTestRuns, isPending: isClearing } =
         useClearTestRunsApiAdminStudiesSlugTestRunsDelete();
-
     const handleClearTestRuns = useCallback(() => {
         clearTestRuns(
             { slug },
@@ -179,6 +182,22 @@ export default function InteractiveDataView({
             }
         );
     }, [clearTestRuns, slug, queryClient, t]);
+
+    const handleClearAllParticipants = useCallback(async () => {
+        try {
+            await customInstance({
+                url: `/api/admin/studies/${slug}/participants`,
+                method: 'DELETE',
+            });
+            toast.success(t('admin.data.actions.clear_all_success', 'All participants successfully cleared!'));
+            queryClient.invalidateQueries({
+                queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
+            });
+        } catch (error) {
+            toast.error(t('admin.data.actions.clear_all_error', 'Failed to clear participants'));
+            console.error(error);
+        }
+    }, [slug, queryClient, t]);
 
     const filteredParticipants = useMemo(() => {
         return effectiveParticipants.filter((p) => {
@@ -241,6 +260,25 @@ export default function InteractiveDataView({
                         </span>
                     </div>
                 ),
+            }),
+            columnHelper.accessor('status', {
+                header: t('admin.data.table.status', 'Status'),
+                cell: (info) => {
+                    const status = info.getValue() as string;
+                    return (
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                'h-5 text-[10px] uppercase px-2 font-black border-none',
+                                status === 'completed'
+                                    ? 'bg-emerald-50 text-emerald-600'
+                                    : 'bg-slate-50 text-slate-400'
+                            )}
+                        >
+                            {t(`admin.data.status.${status}`, status)}
+                        </Badge>
+                    );
+                },
             }),
             columnHelper.display({
                 id: 'quality',
@@ -422,14 +460,6 @@ export default function InteractiveDataView({
                         <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                             <Mail className="w-5 h-5" />
                         </div>
-                        <Badge variant="outline" className="bg-slate-50 font-bold border-slate-100">
-                            {Math.round(
-                                (data.participants.filter((p) => p.postsort.email).length /
-                                    Math.max(1, liveCount)) *
-                                    100
-                            )}
-                            % {t('admin.data.stats.opt_in')}
-                        </Badge>
                     </div>
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
                         {t('admin.data.stats.email_collection')}
@@ -571,9 +601,52 @@ export default function InteractiveDataView({
                                         </AlertDialogCancel>
                                         <AlertDialogAction
                                             onClick={handleClearTestRuns}
-                                            className="bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold h-12 shadow-lg shadow-red-200 border-none"
+                                            className="rounded-2xl font-bold h-12 bg-red-600 hover:bg-red-700"
                                         >
-                                            {t('common.delete')}
+                                            {t('common.confirm_delete')}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
+
+                        {activeTab === 'live' && liveCount > 0 && data.study.state === 'draft' && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="h-11 rounded-xl border-rose-100 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-200 font-bold gap-2 shadow-sm"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="hidden sm:inline">
+                                            {t('admin.data.actions.clear_all_data', 'Clear All Data')}
+                                        </span>
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                                            <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
+                                                <Trash2 className="w-5 h-5" />
+                                            </div>
+                                            {t('admin.data.actions.clear_all_data', 'Clear All Data')}
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                                            {t(
+                                                'admin.data.actions.clear_all_confirm',
+                                                'Are you sure you want to delete ALL responses for this study? This will unlock the study structure and allow you to modify the grid or statement codes again. This action cannot be undone.'
+                                            )}
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="gap-2">
+                                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                                            {t('common.cancel')}
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleClearAllParticipants}
+                                            className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
+                                        >
+                                            {t('common.confirm_delete')}
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>

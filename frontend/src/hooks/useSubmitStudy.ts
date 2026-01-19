@@ -33,7 +33,7 @@ export const useSubmitStudy = () => {
                 if (!config) throw new Error('Study config is missing');
 
                 const searchParams = new URLSearchParams(window.location.search);
-                const isTestMode = searchParams.get('mode') === 'test';
+                const isTestMode = searchParams.get('mode') === 'test' || session.isPilotMode;
 
                 if (!isTestMode && !session.token) throw new Error('No session token');
 

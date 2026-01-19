@@ -872,7 +872,6 @@ class StudyService:
             select(Participant)
             .where(
                 Participant.study_id == study_id,
-                Participant.status == ParticipantStatus.completed,
             )
             .options(selectinload(Participant.qsort_entries))
         )
@@ -919,12 +918,15 @@ class StudyService:
                     "is_discarded": p.is_discarded,
                     "discard_reason": p.discard_reason,
                     "is_test_run": p.is_test_run,
+                    "status": p.status.value,
+                    "recruitment_token": getattr(p, "recruitment_token", None),
                 }
             )
 
         return {
             "study": {
                 "slug": study.slug,
+                "state": study.state.value,
                 "grid_config": study.grid_config,
                 "postsort_config": study.postsort_config,
                 "statements": [

@@ -386,6 +386,7 @@
             "studies": "Tutkimukset",
             "select_study": "Valitse tutkimus",
             "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi.",
+            "view_all_studies": "Kaikki tutkimukset",
             "study": "Tutkimus"
         },
         "workspace": {
@@ -1017,16 +1018,17 @@
                     "asymmetric": "Epäsymmetrinen",
                     "tooltip_title": "Jakauman logiikka",
                     "tooltip_desc": "Q-metodologiassa pakotettu jakauma on yleensä lähes normaali. Tämä pakottaa osallistujan tekemään vaikeita valintoja ja erottelemaan kohteet selkeästi.",
-                    "locked": "Suunnittelu Lukittu",
+                    "locked": "Suunnittelu lukittu",
                     "locked_desc": "Tämä tutkimus ei ole enää luonnostilassa. Muutoksia on rajoitettu tietojen eheyden säilyttämiseksi.",
-                    "locked_active": "Tutkimus on Aktiivinen",
+                    "locked_active": "Tutkimus on aktiivinen",
                     "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan (varoitus: tämä voi mitätöidä olemassa olevat tulokset).",
-                    "locked_paused": "Tutkimus on Keskeytetty",
+                    "locked_paused": "Tutkimus on keskeytetty",
                     "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
-                    "locked_closed": "Tutkimus on Suljettu",
+                    "locked_closed": "Tutkimus on suljettu",
                     "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
                     "mismatch_title": "Ruudukon konfiguraatiovirhe",
-                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla."
+                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
+                    "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
                 }
             },
             "postsort": {
@@ -1145,8 +1147,8 @@
                 "email_collection": "Sähköpostien kerääminen",
                 "participants": "osallistujaa",
                 "newsletter": "Uutiskirjeen tilaus",
-                "opt_in": "tilausta",
-                "follow_up": "Jatkotuudun haastattelu",
+                "opt_in": "vastausosuus",
+                "follow_up": "Jatko-osallistuminen",
                 "interested": "kiinnostunutta"
             },
             "tabs": {
@@ -1155,11 +1157,20 @@
                 "browse": "Interaktiivinen näkymä",
                 "export": "Tiedonvienti"
             },
+            "status": {
+                "started": "aloitettu",
+                "completed": "valmis",
+                "discarded": "hylätty"
+            },
             "actions": {
                 "clear_test_runs": "Puhdista testitiedot",
                 "clear_test_runs_confirm": "Poistetaanko kaikki testi-istunnot? Tätä toimintoa ei voi peruuttaa.",
                 "clear_test_runs_success": "Testitiedot puhdistettu onnistuneesti",
-                "clear_test_runs_error": "Testitietojen puhdistus epäonnistui"
+                "clear_test_runs_error": "Testitietojen puhdistus epäonnistui",
+                "clear_all_data": "Tyhjennä kaikki tiedot",
+                "clear_all_confirm": "Haluatko varmasti poistaa KAIKKI vastaukset tästä tutkimuksesta? Tämä avaa tutkimuksen rakenteen ja mahdollistaa ruudukon tai väittämien koodien muokkaamisen uudelleen. Tätä toimintoa ei voi peruuttaa.",
+                "clear_all_success": "Kaikki vastaukset tyhjennetty onnistuneesti!",
+                "clear_all_error": "Vastausten tyhjennys epäonnistui"
             },
             "guide": {
                 "title": "Muoto-opas",

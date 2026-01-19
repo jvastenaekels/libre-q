@@ -279,7 +279,7 @@ const StudyLayoutContent: React.FC = () => {
 
     return (
         <div
-            className="min-h-screen bg-gray-50 flex flex-col overflow-hidden"
+            className="h-[100dvh] bg-gray-50 flex flex-col overflow-hidden"
             style={{ '--brand-accent': accentColor } as React.CSSProperties}
         >
             {/* Pilot Mode Banner */}

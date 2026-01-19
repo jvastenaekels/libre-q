@@ -660,7 +660,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         ]);
 
         return (
-            <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
+            <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
                 {/* PANEL: THE GRID (Canvas) */}
                 <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300">
                     <InstructionHeader

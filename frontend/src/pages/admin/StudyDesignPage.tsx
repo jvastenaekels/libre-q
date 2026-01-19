@@ -215,7 +215,11 @@ const StudyDesignPage = () => {
     const isDirty = syncStatus !== 'synced';
 
     // Permission States
+    // isFullyReadOnly: Entire UI is blocked for high-level actions (study is non-draft: active, paused, archived)
     const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
+
+    // isStructureLocked: Critical structural elements ARE BLOCKED (Grid, Statement codes/add/remove, Question add/remove)
+    // Locked if not in draft OR if there is real data.
     const isStructureLocked =
         (draft?.state !== 'draft' && !!draft) || (original?.participant_count ?? 0) > 0;
 
@@ -794,15 +798,15 @@ const StudyDesignPage = () => {
                                         'Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.'
                                     )}
                                 />
-                                <IntroductionEditor readOnly={isStructureLocked} />
+                                <IntroductionEditor readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             <TabsContent value="pre-sort" className="mt-0 outline-none">
-                                <QuestionBuilder type="pre" readOnly={isStructureLocked} />
+                                <QuestionBuilder type="pre" readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             <TabsContent value="condition" className="mt-0 outline-none space-y-6">
-                                <ConditionOfInstructionEditor readOnly={isStructureLocked} />
+                                <ConditionOfInstructionEditor readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
@@ -818,6 +822,16 @@ const StudyDesignPage = () => {
                                             <p className="text-sm font-medium opacity-70 leading-relaxed">
                                                 {t('admin.design.qsort.grid.locked_desc')}
                                             </p>
+                                            {original?.state === 'draft' && (
+                                                <Button
+                                                    variant="link"
+                                                    className="h-auto p-0 text-indigo-700 underline font-bold text-xs mt-2 hover:text-indigo-900"
+                                                    onClick={() => navigate(`/admin/studies/${slug}?tab=data`)}
+                                                >
+                                                    {t('admin.design.qsort.grid.unlock_hint', 'Go to Data Explorer to purge sessions and unlock structure')}
+                                                </Button>
+                                            )}
+
                                         </div>
                                     </div>
                                 )}
@@ -853,15 +867,15 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">
-                                <PostSortConfigEditor readOnly={isStructureLocked} />
+                                <PostSortConfigEditor readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             <TabsContent value="interface" className="mt-0 outline-none">
-                                <InterfaceEditor />
+                                <InterfaceEditor readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             <TabsContent value="branding" className="mt-0 outline-none">
-                                <BrandingEditor />
+                                <BrandingEditor readOnly={isFullyReadOnly} />
                             </TabsContent>
 
                             {/* Sequential Navigation Buttons */}

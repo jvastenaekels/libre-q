@@ -386,6 +386,7 @@
             "studies": "Studies",
             "select_study": "Select Study",
             "select_study_msg": "Please select or create a study to begin.",
+            "view_all_studies": "All Studies",
             "study": "Study"
         },
         "workspace": {
@@ -1025,8 +1026,8 @@
                     "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
                     "locked_closed": "Study is Closed",
                     "locked_closed_desc": "This study is completed. The design is archived and cannot be changed.",
-                    "mismatch_title": "Grid configuration mismatch",
-                    "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match."
+                    "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
+                    "unlock_hint": "Go to Data Explorer to purge sessions and unlock structure"
                 }
             },
             "postsort": {
@@ -1142,11 +1143,11 @@
             "title": "Data Explorer",
             "description": "Monitor real-time participation, analyze data quality, and manage research sessions.",
             "stats": {
-                "email_collection": "Lead Generation",
+                "email_collection": "Email Collection",
                 "participants": "total",
-                "newsletter": "Opt-ins",
-                "opt_in": "conversion",
-                "follow_up": "Research Leads",
+                "newsletter": "Newsletter Consent",
+                "opt_in": "response rate",
+                "follow_up": "Follow-up Potential",
                 "interested": "interested"
             },
             "tabs": {
@@ -1155,11 +1156,20 @@
                 "browse": "Interactive View",
                 "export": "Export Hub"
             },
+            "status": {
+                "started": "started",
+                "completed": "completed",
+                "discarded": "discarded"
+            },
             "actions": {
                 "clear_test_runs": "Purge Test Data",
                 "clear_test_runs_confirm": "Delete all test sessions? This action is irreversible and for maintenance only.",
                 "clear_test_runs_success": "Pipeline cleaned: Test data purged",
-                "clear_test_runs_error": "System failure: Could not purge test data"
+                "clear_test_runs_error": "System failure: Could not purge test data",
+                "clear_all_data": "Clear All Data",
+                "clear_all_confirm": "Are you sure you want to delete ALL responses for this study? This will unlock the study structure and allow you to modify the grid or statement codes again. This action cannot be undone.",
+                "clear_all_success": "All participants successfully cleared!",
+                "clear_all_error": "Failed to clear participants"
             },
             "guide": {
                 "title": "Format guide",

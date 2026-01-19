@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 interface AdminState {
     activeWorkspaceId: number | null;
     activeStudyId: string | null;
+    lastVisitedStudySlug: string | null;
     sidebarOpen: boolean;
     setActiveWorkspace: (id: number | null) => void;
     setActiveStudy: (id: string | null) => void;
@@ -16,9 +17,14 @@ export const useAdminStore = create<AdminState>()(
         (set) => ({
             activeWorkspaceId: null,
             activeStudyId: null,
+            lastVisitedStudySlug: null,
             sidebarOpen: true,
             setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
-            setActiveStudy: (id) => set({ activeStudyId: id }),
+            setActiveStudy: (id) =>
+                set((state) => ({
+                    activeStudyId: id,
+                    lastVisitedStudySlug: id ?? state.lastVisitedStudySlug,
+                })),
             setSidebarOpen: (open) => set({ sidebarOpen: open }),
             toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
         }),
@@ -27,6 +33,7 @@ export const useAdminStore = create<AdminState>()(
             partialize: (state) => ({
                 activeWorkspaceId: state.activeWorkspaceId,
                 activeStudyId: state.activeStudyId,
+                lastVisitedStudySlug: state.lastVisitedStudySlug,
                 sidebarOpen: state.sidebarOpen,
             }),
         }

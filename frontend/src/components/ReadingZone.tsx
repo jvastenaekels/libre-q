@@ -138,7 +138,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                             className="text-xs mb-1.5 gap-2"
                             iconSize={14}
                         />
-                        <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
+                        <p className="text-slate-800 text-base font-medium leading-relaxed">
                             {displayCard.text}
                         </p>
                     </div>

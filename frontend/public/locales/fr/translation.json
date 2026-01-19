@@ -386,6 +386,7 @@
             "studies": "Études",
             "select_study": "Sélectionner une étude",
             "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer.",
+            "view_all_studies": "Toutes les études",
             "study": "Étude"
         },
         "workspace": {
@@ -1011,12 +1012,12 @@
                     "balanced": "Grille équilibrée selon les standards",
                     "no_statements": "Ajoutez d'abord des énoncés pour auto-équilibrer la grille",
                     "statements": "énoncés",
-                    "ideal_shape": "Forme Idéale",
+                    "ideal_shape": "Forme idéale",
                     "symmetric": "Symétrique",
                     "asymmetric": "Asymétrique",
                     "tooltip_title": "Logique de distribution",
                     "tooltip_desc": "Dans la méthode Q, une distribution forcée est généralement quasi-normale. Cela oblige le participant à faire des choix difficiles et à discriminer clairement entre les items.",
-                    "locked": "Conception Verrouillée",
+                    "locked": "Conception verrouillée",
                     "locked_desc": "Cette étude n'est plus en mode brouillon. Les modifications sont restreintes pour préserver l'intégrité des données.",
                     "locked_active": "L'étude est active",
                     "locked_active_desc": "L'étude collecte actuellement des données. Pour modifier la conception, vous devez d'abord la repasser en brouillon (attention : cela peut invalider les résultats existants).",
@@ -1024,8 +1025,8 @@
                     "locked_paused_desc": "L'étude est actuellement en pause. La conception reste verrouillée pour protéger les données existantes.",
                     "locked_closed": "L'étude est clôturée",
                     "locked_closed_desc": "Cette étude est terminée. La conception est archivée et ne peut plus être modifiée.",
-                    "mismatch_title": "Erreur de configuration de la grille",
-                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous."
+                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
+                    "unlock_hint": "Aller dans l'explorateur de données pour purger les sessions et débloquer la structure"
                 }
             },
             "postsort": {
@@ -1138,27 +1139,36 @@
             }
         },
         "data": {
-            "title": "Explorateur de Données",
+            "title": "Explorateur de données",
             "description": "Suivi de la participation en temps réel, analyse de la qualité et gestion des sessions.",
             "stats": {
-                "email_collection": "Génération de Leads",
+                "email_collection": "Collecte d'emails",
                 "participants": "au total",
-                "newsletter": "Opt-ins",
-                "opt_in": "conversion",
-                "follow_up": "Pistes de Recherche",
+                "newsletter": "Consentements newsletter",
+                "opt_in": "de participation",
+                "follow_up": "Suivi qualitatif",
                 "interested": "intéressés"
             },
             "tabs": {
-                "live": "Participants Directs",
-                "test": "Sessions de Test",
-                "browse": "Vue Interactive",
-                "export": "Hub d'Export"
+                "live": "Participants directs",
+                "test": "Sessions de test",
+                "browse": "Vue interactive",
+                "export": "Hub d'export"
+            },
+            "status": {
+                "started": "en cours",
+                "completed": "terminé",
+                "discarded": "rejeté"
             },
             "actions": {
-                "clear_test_runs": "Purger les Tests",
+                "clear_test_runs": "Purger les tests",
                 "clear_test_runs_confirm": "Supprimer toutes les sessions de test ? Cette action est irréversible et réservée à la maintenance.",
                 "clear_test_runs_success": "Pipeline nettoyé : données de test purgées",
-                "clear_test_runs_error": "Échec système : impossible de purger les tests"
+                "clear_test_runs_error": "Échec système : impossible de purger les tests",
+                "clear_all_data": "Effacer toutes les données",
+                "clear_all_confirm": "Voulez-vous vraiment supprimer TOUTES les réponses pour cette étude ? Cela débloquera la structure de l'étude et vous permettra de modifier à nouveau la grille ou les codes des énoncés. Cette action est irréversible.",
+                "clear_all_success": "Toutes les participations ont été effacées !",
+                "clear_all_error": "Échec de la suppression des participations"
             },
             "guide": {
                 "title": "Guide des formats",

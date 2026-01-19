@@ -194,7 +194,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             if (promptConfig) {
                 if (typeof promptConfig === 'string') return promptConfig;
                 const currentLang = i18n.language || 'en';
-                const text = promptConfig[currentLang] || promptConfig.en;
+                const text =
+                    promptConfig[currentLang] ||
+                    promptConfig.en ||
+                    Object.values(promptConfig)[0];
                 if (text) return text;
             }
         }

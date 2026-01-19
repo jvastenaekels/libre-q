@@ -13,7 +13,7 @@ import type { StudyReadBranding } from '@/api/model/studyReadBranding';
 import type { StudyRead } from '@/api/model/studyRead';
 import type { BrandingBase } from '@/api/model/brandingBase';
 
-const BrandingEditor = () => {
+const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
     const { draft, updateDraft } = useStudyDesigner();
 
@@ -96,6 +96,7 @@ const BrandingEditor = () => {
                                             onChange={(e) =>
                                                 updateBranding('accent_color', e.target.value)
                                             }
+                                            disabled={readOnly}
                                             className="w-10 h-10 p-1 cursor-pointer rounded-lg border-2"
                                         />
                                         <Input
@@ -105,10 +106,12 @@ const BrandingEditor = () => {
                                                 updateBranding('accent_color', e.target.value)
                                             }
                                             placeholder="#000000"
+                                            disabled={readOnly}
                                             className="max-w-[120px] font-bold text-sm h-10 rounded-xl"
                                         />
                                         <button
                                             type="button"
+                                            disabled={readOnly}
                                             onClick={() => updateBranding('accent_color', null)}
                                             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-500 hover:bg-slate-100 transition-colors shadow-sm border bg-white"
                                         >
@@ -138,6 +141,7 @@ const BrandingEditor = () => {
                                                 : 'border-transparent hover:border-slate-300'
                                         )}
                                         style={{ backgroundColor: color }}
+                                        disabled={readOnly}
                                         onClick={() => updateBranding('accent_color', color)}
                                     >
                                         {branding.accent_color === color && (
@@ -273,6 +277,7 @@ const BrandingEditor = () => {
                                                             updateBranding('partners', newPartners);
                                                         }}
                                                         placeholder="Institution Name"
+                                                        disabled={readOnly}
                                                         className="h-9 text-sm font-bold rounded-xl"
                                                     />
                                                 </div>
@@ -294,6 +299,7 @@ const BrandingEditor = () => {
                                             </div>
                                             <button
                                                 type="button"
+                                                disabled={readOnly}
                                                 onClick={() => {
                                                     const newPartners = (
                                                         branding.partners || []
@@ -322,7 +328,8 @@ const BrandingEditor = () => {
                                         ];
                                         updateBranding('partners', newPartners);
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-bold text-sm"
+                                    disabled={readOnly}
+                                    className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-bold text-sm disabled:opacity-50"
                                 >
                                     <Plus className="size-4" />
                                     {t('admin.design.theme.partners.add', 'Add Partner')}

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { ChevronsUpDown, Plus } from 'lucide-react';
+import { ChevronsUpDown, Plus, LayoutGrid } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +26,7 @@ import { CreateStudyDialog } from './CreateStudyDialog';
 export function StudySwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet();
     const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
@@ -145,6 +147,19 @@ export function StudySwitcher() {
                                 })}
                             </div>
                             <DropdownMenuSeparator className="bg-slate-100 my-1" />
+                            <DropdownMenuItem
+                                className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
+                                onClick={() => navigate('/admin?dashboard=true')}
+                            >
+                                <div className="flex size-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300 group-hover:bg-white shadow-sm">
+                                    <LayoutGrid className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold">
+                                        {t('admin.sidebar.view_all_studies', 'All Studies')}
+                                    </span>
+                                </div>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                                 className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
                                 onClick={() => setShowCreateDialog(true)}

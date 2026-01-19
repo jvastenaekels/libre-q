@@ -985,3 +985,23 @@ async def clear_test_runs(
     )
     await db.commit()
     return None
+
+
+@router.delete("/{slug}/participants", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_all_participants(
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete ALL participants for this study. Only allowed in DRAFT state."""
+    if study.state != StudyState.draft:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete all participants unless study is in DRAFT state.",
+        )
+    from sqlalchemy import delete
+
+    from app.models import Participant
+
+    await db.execute(delete(Participant).where(Participant.study_id == study.id))
+    await db.commit()
+    return None

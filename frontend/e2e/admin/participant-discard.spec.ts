@@ -30,7 +30,7 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         await testDb.updateStudy(authToken, studySlug, { state: 'active' });
 
         // Add test participants
-        const p1 = await testDb.createParticipant(
+        const _p1 = await testDb.createParticipant(
             authToken,
             studySlug,
             testDataBuilders.participantResult({})

@@ -11,11 +11,18 @@
  */
 
 import { lazy, useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom';
+import {
+    createBrowserRouter,
+    RouterProvider,
+    Navigate,
+    useParams,
+    useLocation,
+} from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 
 import { useAuthStore } from './store/useAuthStore';
+import { useAdminStore } from './store/useAdminStore';
 import StudyLayout from './layouts/StudyLayout';
 import ConsentPage from './pages/ConsentPage';
 import ErrorPage from './pages/ErrorPage';
@@ -68,12 +75,19 @@ const AdminDashboard = lazy(() =>
 );
 
 const AdminIndex = () => {
-    // activeStudyId removed as it was unused
     const { user, workspaces } = useAuthStore();
+    const { lastVisitedStudySlug } = useAdminStore();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
 
     // If superuser has no workspaces, redirect to create workspace page
     if (user?.is_superuser && (!workspaces || workspaces.length === 0)) {
         return <Navigate to="/admin/workspaces/new" replace />;
+    }
+
+    // Auto-redirect to last study if available, unless forced to dashboard
+    if (lastVisitedStudySlug && !searchParams.has('dashboard')) {
+        return <Navigate to={`/admin/studies/${lastVisitedStudySlug}`} replace />;
     }
 
     return <AdminDashboard />;
