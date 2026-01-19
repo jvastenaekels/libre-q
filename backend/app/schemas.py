@@ -282,10 +282,8 @@ class StatementBase(BaseModel):
     @field_validator("code")
     @classmethod
     def validate_code(cls, v: str) -> str:
-        res = validate_non_empty_string(v)
-        if res is None:
-            raise ValueError("Statement code cannot be empty")
-        return res
+        # Relaxed for drafts.
+        return v
 
 
 class StatementCreate(StatementBase):
@@ -311,10 +309,8 @@ class StatementUpdate(BaseModel):
     @field_validator("code")
     @classmethod
     def validate_code(cls, v: str) -> str:
-        res = validate_non_empty_string(v)
-        if res is None:
-            raise ValueError("Statement code cannot be empty")
-        return res
+        # Relaxed for drafts.
+        return v
 
 
 class GridColumn(BaseModel):
