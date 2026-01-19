@@ -392,45 +392,43 @@ const StudyDesignPage = () => {
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
-            <div className="border-b bg-background px-6 py-3 flex flex-col lg:flex-row gap-4 lg:items-center justify-between shrink-0 min-w-0">
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div
-                        className="flex items-center justify-center h-9 w-9 bg-indigo-50/50 border border-indigo-100 rounded-xl shrink-0"
-                        title={t('admin.design.toolbar.title')}
-                    >
-                        <Wand2 className="h-4.5 w-4.5 text-indigo-600" />
-                    </div>
-                    <div className="h-5 w-px bg-border hidden lg:block" />
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <div className="flex items-center gap-3">
-                            <h2 className="text-sm font-bold text-slate-800 truncate">
-                                {draft.translations?.find((t) => t.language_code === activeLocale)
-                                    ?.title || draft.slug}
-                            </h2>
-                            {/* Status Badge */}
-                            <div
-                                role="status"
-                                data-testid="study-status"
-                                className={cn(
-                                    'px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0',
-                                    draft.state === 'active'
-                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                        : draft.state === 'closed'
-                                          ? 'bg-red-50 text-red-700 border-red-200'
-                                          : 'bg-amber-50 text-amber-700 border-amber-200'
-                                )}
-                            >
-                                {draft.state === 'active'
-                                    ? t('admin.status.active')
+            <div className="border-b bg-background px-6 py-3 shrink-0">
+                <div className="flex items-center justify-between gap-4 min-w-0">
+                    {/* Left section: Icon + Title + Status */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div
+                            className="flex items-center justify-center h-9 w-9 bg-indigo-50/50 border border-indigo-100 rounded-xl shrink-0"
+                            title={t('admin.design.toolbar.title')}
+                        >
+                            <Wand2 className="h-4.5 w-4.5 text-indigo-600" />
+                        </div>
+                        <div className="h-6 w-px bg-border hidden lg:block" />
+                        <h2 className="text-sm font-bold text-slate-800 truncate flex-1">
+                            {draft.translations?.find((t) => t.language_code === activeLocale)
+                                ?.title || draft.slug}
+                        </h2>
+                        {/* Status Badge */}
+                        <div
+                            role="status"
+                            data-testid="study-status"
+                            className={cn(
+                                'px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0 hidden sm:flex',
+                                draft.state === 'active'
+                                    ? 'bg-green-50 text-green-700 border-green-200'
                                     : draft.state === 'closed'
-                                      ? t('admin.status.closed')
-                                      : draft.state === 'paused'
-                                        ? t('admin.status.paused')
-                                        : t('admin.status.draft')}
-                            </div>
+                                      ? 'bg-red-50 text-red-700 border-red-200'
+                                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                            )}
+                        >
+                            {draft.state === 'active'
+                                ? t('admin.status.active')
+                                : draft.state === 'closed'
+                                  ? t('admin.status.closed')
+                                  : draft.state === 'paused'
+                                    ? t('admin.status.paused')
+                                    : t('admin.status.draft')}
                         </div>
                     </div>
-                </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                     {/* Language Switcher - Study Content Language */}
