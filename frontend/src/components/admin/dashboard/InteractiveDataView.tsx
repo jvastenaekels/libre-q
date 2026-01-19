@@ -234,7 +234,7 @@ export default function InteractiveDataView({
                                 {p.is_discarded && (
                                     <Badge
                                         variant="destructive"
-                                        className="h-4 text-[9px] uppercase px-1.5 font-black"
+                                        className="h-4 text-[10px] px-1.5 font-semibold"
                                     >
                                         {t('admin.data.detail.discarded_badge')}
                                     </Badge>
@@ -255,7 +255,7 @@ export default function InteractiveDataView({
                 cell: (info) => (
                     <div className="flex items-center gap-2 text-slate-600 font-medium">
                         <Globe className="h-3.5 w-3.5 text-slate-300" />
-                        <span className="uppercase text-xs tracking-tight">
+                        <span className="text-xs font-medium">
                             {info.getValue() === 'US' ? 'EN' : info.getValue()}
                         </span>
                     </div>
@@ -269,7 +269,7 @@ export default function InteractiveDataView({
                         <Badge
                             variant="outline"
                             className={cn(
-                                'h-5 text-[10px] uppercase px-2 font-black border-none',
+                                'h-5 text-[10px] px-2 font-semibold border-none',
                                 status === 'completed'
                                     ? 'bg-emerald-50 text-emerald-600'
                                     : 'bg-slate-50 text-slate-400'
@@ -461,7 +461,7 @@ export default function InteractiveDataView({
                             <Mail className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                    <p className="text-xs font-semibold text-slate-500 mb-1">
                         {t('admin.data.stats.email_collection')}
                     </p>
                     <div className="flex items-baseline gap-2">
@@ -480,7 +480,7 @@ export default function InteractiveDataView({
                             <Bell className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                    <p className="text-xs font-semibold text-slate-500 mb-1">
                         {t('admin.data.stats.newsletter')}
                     </p>
                     <div className="flex items-baseline gap-2">
@@ -496,7 +496,7 @@ export default function InteractiveDataView({
                             <Users className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                    <p className="text-xs font-semibold text-slate-500 mb-1">
                         {t('admin.data.stats.follow_up')}
                     </p>
                     <div className="flex items-baseline gap-2">
@@ -666,7 +666,7 @@ export default function InteractiveDataView({
                                     {headerGroup.headers.map((header) => (
                                         <TableHead
                                             key={header.id}
-                                            className="h-14 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-6"
+                                            className="h-14 text-xs font-semibold text-slate-600 px-6"
                                         >
                                             {header.isPlaceholder
                                                 ? null

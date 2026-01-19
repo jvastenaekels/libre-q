@@ -94,7 +94,7 @@ const StudyOverviewPage = () => {
                         variant="outline"
                         role="status"
                         className={cn(
-                            'font-black uppercase tracking-[0.2em] text-[10px] px-2 py-0.5 rounded-full',
+                            'font-semibold text-[10px] px-2 py-0.5 rounded-full',
                             study?.state === 'active'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                                 : study?.state === 'paused'
@@ -133,7 +133,7 @@ const StudyOverviewPage = () => {
                                 <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Users className="h-4 w-4 text-indigo-600" />
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                        <div className="text-xs font-semibold text-slate-500">
                                             {t(
                                                 'admin.study_overview.sample_size',
                                                 'Sample size (N)'
@@ -151,7 +151,7 @@ const StudyOverviewPage = () => {
                                 <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                        <div className="text-xs font-semibold text-slate-500">
                                             {t(
                                                 'admin.study_overview.completion_rate',
                                                 'Completion rate'
@@ -180,7 +180,7 @@ const StudyOverviewPage = () => {
                                 <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Clock className="h-4 w-4 text-amber-500" />
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                        <div className="text-xs font-semibold text-slate-500">
                                             {t(
                                                 'admin.study_overview.median_duration',
                                                 'Median duration'
@@ -195,7 +195,7 @@ const StudyOverviewPage = () => {
                                         </div>
                                         {stats.median_duration_seconds &&
                                             stats.median_duration_seconds < 120 && (
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold uppercase ring-1 ring-amber-200">
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-semibold ring-1 ring-amber-200">
                                                     <AlertTriangle size={9} />{' '}
                                                     {t('admin.study_overview.suspect', 'Suspect')}
                                                 </span>
@@ -273,7 +273,7 @@ const StudyOverviewPage = () => {
                                     (p) => p.status === 'completed' && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="flex items-center text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                        <div className="flex items-center text-xs font-semibold text-slate-500 mb-3 px-1">
                                             <CheckCircle2 className="w-3 h-3 mr-1.5" />
                                             {t(
                                                 'admin.study_overview.recently_completed',
@@ -422,7 +422,7 @@ const StudyOverviewPage = () => {
                                     (p: any) => !p.completed && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="flex items-center text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                        <div className="flex items-center text-xs font-semibold text-slate-500 mb-3 px-1">
                                             <Clock className="w-3 h-3 mr-1.5" />
                                             {t('admin.study_overview.in_progress', 'In Progress')} (
                                             {
@@ -565,7 +565,7 @@ const StudyOverviewPage = () => {
                                 {/* Discarded Section (if any) */}
                                 {recentParticipants.filter((p) => p.is_discarded).length > 0 && (
                                     <div className="p-3 bg-red-50/20">
-                                        <div className="text-[10px] font-black uppercase tracking-wider text-red-400 mb-3 px-1">
+                                        <div className="text-xs font-semibold text-red-500 mb-3 px-1">
                                             {t('admin.study_overview.discarded', 'Discarded')} (
                                             {
                                                 recentParticipants.filter((p) => p.is_discarded)
