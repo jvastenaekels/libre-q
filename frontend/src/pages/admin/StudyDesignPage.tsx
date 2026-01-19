@@ -412,7 +412,7 @@ const StudyDesignPage = () => {
                                 role="status"
                                 data-testid="study-status"
                                 className={cn(
-                                    'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border shrink-0',
+                                    'px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0',
                                     draft.state === 'active'
                                         ? 'bg-green-50 text-green-700 border-green-200'
                                         : draft.state === 'closed'
@@ -452,7 +452,7 @@ const StudyDesignPage = () => {
                                 align="end"
                                 className="w-56 rounded-xl shadow-xl border-slate-100 p-1.5"
                             >
-                                <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
                                     {t('admin.design.toolbar.select_lang', 'Select language')}
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-slate-100 my-1" />
@@ -479,8 +479,8 @@ const StudyDesignPage = () => {
                                                     : 'hover:bg-slate-50 text-slate-600'
                                             )}
                                         >
-                                            <span className="flex items-center gap-3 uppercase tracking-wide">
-                                                {lang}
+                                            <span className="flex items-center gap-3">
+                                                {lang.toUpperCase()}
                                             </span>
                                             {activeLocale === lang && (
                                                 <Check className="h-3.5 w-3.5" />
@@ -550,7 +550,7 @@ const StudyDesignPage = () => {
                         ) : (
                             <CheckCircle className="h-3.5 w-3.5 mr-2 opacity-50" />
                         )}
-                        <span className="hidden xl:inline text-xs uppercase tracking-wide font-bold">
+                        <span className="hidden xl:inline text-xs font-bold">
                             {syncStatus === 'saving'
                                 ? t('admin.design.sync.saving')
                                 : syncStatus === 'synced'
