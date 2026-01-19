@@ -386,9 +386,7 @@ class StudyService:
             "postsort_config": study.postsort_config,
             "grid_config": study.grid_config,
             "statements": statements_data,
-            "process_steps": StudyService._get_effective_steps(
-                study, translation, resolved_lang
-            ),
+            "process_steps": getattr(translation, "process_steps", []) or [],
             "consent": {
                 "title": get_t_attr("consent_title"),
                 "description": get_t_attr("consent_description"),
@@ -410,30 +408,6 @@ class StudyService:
             "branding": study.branding
             or {"logo_url": None, "accent_color": None, "partners": []},
         }
-
-    @staticmethod
-    def _get_effective_steps(
-        study: Study, translation: StudyTranslation | None, lang: str
-    ) -> list[dict[str, Any]]:
-        """Determine process steps by combining custom translations with filtered system defaults."""
-        custom_steps = getattr(translation, "process_steps", [])
-        if custom_steps:
-            return custom_steps
-
-        # Fallback to filtered defaults
-        base_steps = DEFAULT_PROCESS_STEPS.get(lang, DEFAULT_PROCESS_STEPS["en"])
-
-        filtered = []
-        for step in base_steps:
-            if step["id"] == "profile":
-                if (study.presort_config or {}).get("enabled", True):
-                    filtered.append(step)
-            elif step["id"] == "post":
-                if (study.postsort_config or {}).get("enabled", True):
-                    filtered.append(step)
-            else:
-                filtered.append(step)
-        return filtered
 
     @staticmethod
     def validate_for_activation(study: Study) -> list[str]:
