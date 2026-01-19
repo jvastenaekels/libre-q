@@ -107,7 +107,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
     // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
     const studyLang = (study as any).language || 'en';
-    const defaultSteps = DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
+    const defaultSteps =
+        DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
     const rawSteps = (study as any).process_steps;
     const steps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
 

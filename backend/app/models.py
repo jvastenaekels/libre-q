@@ -216,6 +216,10 @@ class Study(Base):
     def requires_password(self) -> bool:
         return bool(self.access_password)
 
+    @property
+    def participant_count(self) -> int:
+        return len([p for p in self.participants if not p.is_test_run])
+
 
 class StudyTranslation(Base):
     """SQLAlchemy model for study translations."""

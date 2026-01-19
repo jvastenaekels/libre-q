@@ -83,7 +83,7 @@ function parseCSVOrTSV(text: string, separator: string = '\t') {
     return result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
 }
 
-const QSortEditor = () => {
+const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
@@ -509,134 +509,137 @@ const QSortEditor = () => {
                 </TabsList>
 
                 <TabsContent value="statements" className="space-y-8 pt-6">
-                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                        <CardHeader className="pb-4">
-                            <div className="flex items-center gap-3 mb-1">
-                                <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
-                                    <Plus className="h-4 w-4 text-indigo-600" />
-                                </div>
-                                <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
-                                    {t('admin.design.qsort.bulk.title')}
-                                </CardTitle>
-                            </div>
-                            <CardDescription className="text-sm font-medium text-slate-500">
-                                {t('admin.design.qsort.bulk.desc')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <RadioGroup
-                                defaultValue="replace"
-                                value={importMode}
-                                onValueChange={(v) =>
-                                    setImportMode(v as 'replace' | 'append' | 'sync')
-                                }
-                                className="flex flex-wrap gap-6"
-                            >
-                                <div className="flex items-center space-x-2.5">
-                                    <RadioGroupItem
-                                        value="replace"
-                                        id="r1"
-                                        className="text-indigo-600"
-                                    />
-                                    <Label
-                                        htmlFor="r1"
-                                        className="text-sm font-bold text-slate-700 cursor-pointer"
-                                    >
-                                        {t('admin.design.qsort.bulk.replace_all')}
-                                    </Label>
-                                </div>
-                                <div className="flex items-center space-x-2.5">
-                                    <RadioGroupItem
-                                        value="append"
-                                        id="r2"
-                                        className="text-indigo-600"
-                                    />
-                                    <Label
-                                        htmlFor="r2"
-                                        className="text-sm font-bold text-slate-700 cursor-pointer"
-                                    >
-                                        {t('admin.design.qsort.bulk.append')}
-                                    </Label>
-                                </div>
-                                <div className="flex items-center space-x-2.5">
-                                    <RadioGroupItem
-                                        value="sync"
-                                        id="r3"
-                                        className="text-indigo-600"
-                                    />
-                                    <Label
-                                        htmlFor="r3"
-                                        className="text-sm font-bold text-slate-700 cursor-pointer"
-                                    >
-                                        {t('admin.design.qsort.bulk.sync_by_code')}
-                                    </Label>
-                                </div>
-                            </RadioGroup>
-                            <div className="space-y-3">
-                                <Textarea
-                                    placeholder={t('admin.design.qsort.bulk.placeholder')}
-                                    className="min-h-[200px] font-serif text-base leading-relaxed rounded-xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30"
-                                    value={bulkText}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        setBulkText(e.target.value)
-                                    }
-                                />
-                                {detectedFormat.type && (
-                                    <div className="flex flex-wrap gap-2 px-1">
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
-                                            <CheckCircle2 className="h-3 w-3" />
-                                            {t(
-                                                `admin.design.qsort.bulk.detected_format.${detectedFormat.type}`
-                                            )}
-                                        </span>
-                                        {detectedFormat.hasCode && (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
-                                                <Wand2 className="h-3 w-3" />
-                                                {t(
-                                                    'admin.design.qsort.bulk.detected_format.with_codes'
-                                                )}
-                                            </span>
-                                        )}
-                                        {detectedFormat.langs.length > 0 && (
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
-                                                {t(
-                                                    'admin.design.qsort.bulk.detected_format.multi_lang',
-                                                    {
-                                                        langs: detectedFormat.langs
-                                                            .join(', ')
-                                                            .toUpperCase(),
-                                                    }
-                                                )}
-                                            </span>
-                                        )}
+                    {!readOnly && (
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                                        <Plus className="h-4 w-4 text-indigo-600" />
                                     </div>
-                                )}
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <p className="text-xs font-black uppercase tracking-widest text-slate-400 px-1">
-                                    {t('admin.design.qsort.bulk.detected', {
-                                        count: bulkText.split('\n').filter((l) => l.trim() !== '')
-                                            .length,
-                                    })}
-                                </p>
-                                <Button
-                                    size="sm"
-                                    onClick={handleBulkSave}
-                                    disabled={!bulkText.trim()}
-                                    className="rounded-lg font-bold shadow-sm"
+                                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                        {t('admin.design.qsort.bulk.title')}
+                                    </CardTitle>
+                                </div>
+                                <CardDescription className="text-sm font-medium text-slate-500">
+                                    {t('admin.design.qsort.bulk.desc')}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <RadioGroup
+                                    defaultValue="replace"
+                                    value={importMode}
+                                    onValueChange={(v) =>
+                                        setImportMode(v as 'replace' | 'append' | 'sync')
+                                    }
+                                    className="flex flex-wrap gap-6"
                                 >
-                                    {importMode === 'replace'
-                                        ? t('admin.design.qsort.bulk.process_replace')
-                                        : importMode === 'append'
-                                          ? t('admin.design.qsort.bulk.process_append')
-                                          : t(
-                                                'admin.design.qsort.bulk.process_sync',
-                                                'Sync statements'
+                                    <div className="flex items-center space-x-2.5">
+                                        <RadioGroupItem
+                                            value="replace"
+                                            id="r1"
+                                            className="text-indigo-600"
+                                        />
+                                        <Label
+                                            htmlFor="r1"
+                                            className="text-sm font-bold text-slate-700 cursor-pointer"
+                                        >
+                                            {t('admin.design.qsort.bulk.replace_all')}
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2.5">
+                                        <RadioGroupItem
+                                            value="append"
+                                            id="r2"
+                                            className="text-indigo-600"
+                                        />
+                                        <Label
+                                            htmlFor="r2"
+                                            className="text-sm font-bold text-slate-700 cursor-pointer"
+                                        >
+                                            {t('admin.design.qsort.bulk.append')}
+                                        </Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2.5">
+                                        <RadioGroupItem
+                                            value="sync"
+                                            id="r3"
+                                            className="text-indigo-600"
+                                        />
+                                        <Label
+                                            htmlFor="r3"
+                                            className="text-sm font-bold text-slate-700 cursor-pointer"
+                                        >
+                                            {t('admin.design.qsort.bulk.sync_by_code')}
+                                        </Label>
+                                    </div>
+                                </RadioGroup>
+                                <div className="space-y-3">
+                                    <Textarea
+                                        placeholder={t('admin.design.qsort.bulk.placeholder')}
+                                        className="min-h-[200px] font-serif text-base leading-relaxed rounded-xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30"
+                                        value={bulkText}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                                            setBulkText(e.target.value)
+                                        }
+                                    />
+                                    {detectedFormat.type && (
+                                        <div className="flex flex-wrap gap-2 px-1">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                <CheckCircle2 className="h-3 w-3" />
+                                                {t(
+                                                    `admin.design.qsort.bulk.detected_format.${detectedFormat.type}`
+                                                )}
+                                            </span>
+                                            {detectedFormat.hasCode && (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                    <Wand2 className="h-3 w-3" />
+                                                    {t(
+                                                        'admin.design.qsort.bulk.detected_format.with_codes'
+                                                    )}
+                                                </span>
                                             )}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                            {detectedFormat.langs.length > 0 && (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                    {t(
+                                                        'admin.design.qsort.bulk.detected_format.multi_lang',
+                                                        {
+                                                            langs: detectedFormat.langs
+                                                                .join(', ')
+                                                                .toUpperCase(),
+                                                        }
+                                                    )}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                    <p className="text-xs font-black uppercase tracking-widest text-slate-400 px-1">
+                                        {t('admin.design.qsort.bulk.detected', {
+                                            count: bulkText
+                                                .split('\n')
+                                                .filter((l) => l.trim() !== '').length,
+                                        })}
+                                    </p>
+                                    <Button
+                                        size="sm"
+                                        onClick={handleBulkSave}
+                                        disabled={!bulkText.trim()}
+                                        className="rounded-lg font-bold shadow-sm"
+                                    >
+                                        {importMode === 'replace'
+                                            ? t('admin.design.qsort.bulk.process_replace')
+                                            : importMode === 'append'
+                                              ? t('admin.design.qsort.bulk.process_append')
+                                              : t(
+                                                    'admin.design.qsort.bulk.process_sync',
+                                                    'Sync statements'
+                                                )}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                         <h3 className="text-base font-bold text-slate-900 flex items-center gap-3 tracking-tight">
@@ -649,37 +652,39 @@ const QSortEditor = () => {
                             </span>
                         </h3>
                         <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                    updateDraft((d) => {
-                                        if (!d.statements) d.statements = [];
-                                        const newIdx = d.statements.length + 1;
-                                        d.statements.push({
-                                            code: `s${newIdx}`,
-                                            translations: (d.translations || []).map(
-                                                (t: StudyTranslationCreate) => ({
-                                                    language_code: t.language_code,
-                                                    text: '',
-                                                })
-                                            ),
+                            {!readOnly && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        updateDraft((d) => {
+                                            if (!d.statements) d.statements = [];
+                                            const newIdx = d.statements.length + 1;
+                                            d.statements.push({
+                                                code: `s${newIdx}`,
+                                                translations: (d.translations || []).map(
+                                                    (t: StudyTranslationCreate) => ({
+                                                        language_code: t.language_code,
+                                                        text: '',
+                                                    })
+                                                ),
+                                            });
                                         });
-                                    });
-                                    // Set editing state for the new statement
-                                    // We use the current length as the index for the new element
-                                    const newIdx = statements.length;
-                                    setEditingIndex(newIdx);
-                                    setEditingText('');
-                                    setEditingCode(`s${newIdx + 1}`);
-                                }}
-                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
-                            >
-                                <Plus className="h-4 w-4" />
-                                {t('common.add')}
-                            </Button>
+                                        // Set editing state for the new statement
+                                        // We use the current length as the index for the new element
+                                        const newIdx = statements.length;
+                                        setEditingIndex(newIdx);
+                                        setEditingText('');
+                                        setEditingCode(`s${newIdx + 1}`);
+                                    }}
+                                    className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    {t('common.add')}
+                                </Button>
+                            )}
 
-                            {statements.length > 0 && (
+                            {statements.length > 0 && !readOnly && (
                                 <>
                                     <Button
                                         variant="ghost"
@@ -739,7 +744,7 @@ const QSortEditor = () => {
                                     key={idx}
                                     className="flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100"
                                 >
-                                    {isEditing ? (
+                                    {isEditing && !readOnly ? (
                                         <Input
                                             value={editingCode}
                                             onChange={(e) => setEditingCode(e.target.value)}
@@ -790,8 +795,14 @@ const QSortEditor = () => {
                                             <div
                                                 role="button"
                                                 tabIndex={0}
-                                                className="flex-1 cursor-text hover:bg-slate-50 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed"
+                                                className={cn(
+                                                    'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed',
+                                                    !readOnly
+                                                        ? 'cursor-text hover:bg-slate-50'
+                                                        : 'cursor-default'
+                                                )}
                                                 onClick={() => {
+                                                    if (readOnly) return;
                                                     setEditingIndex(idx);
                                                     setEditingText(item.text);
                                                     setEditingCode(item.code);
@@ -808,21 +819,23 @@ const QSortEditor = () => {
                                             >
                                                 {item.text}
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => {
-                                                    // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-                                                    updateDraft((d: any) => {
-                                                        if (d.statements) {
-                                                            d.statements.splice(idx, 1);
-                                                        }
-                                                    });
-                                                }}
-                                                className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            {!readOnly && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => {
+                                                        // biome-ignore lint/suspicious/noExplicitAny: complex draft type
+                                                        updateDraft((d: any) => {
+                                                            if (d.statements) {
+                                                                d.statements.splice(idx, 1);
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </>
                                     )}
                                 </div>
@@ -861,6 +874,7 @@ const QSortEditor = () => {
                                             d.show_statement_codes = checked;
                                         });
                                     }}
+                                    disabled={readOnly}
                                 />
                             </div>
 
@@ -884,6 +898,7 @@ const QSortEditor = () => {
                                             d.randomize_statement_order = checked;
                                         });
                                     }}
+                                    disabled={readOnly}
                                 />
                             </div>
                         </CardContent>
@@ -1013,15 +1028,17 @@ const QSortEditor = () => {
                                     key={idx}
                                     className="flex flex-col items-center gap-4 relative group/col"
                                 >
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 hover:bg-slate-900 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
-                                        onClick={() => updateGridCapacity(idx, 1)}
-                                        aria-label={`Increase capacity for column ${idx}`}
-                                    >
-                                        <Plus className="h-4 w-4" />
-                                    </Button>
+                                    {!readOnly && (
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8 hover:bg-slate-900 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
+                                            onClick={() => updateGridCapacity(idx, 1)}
+                                            aria-label={`Increase capacity for column ${idx}`}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    )}
 
                                     <div
                                         className="flex flex-col-reverse gap-1.5 min-h-[40px] px-2 py-3 rounded-2xl transition-all group-hover/col:bg-indigo-50/50"
@@ -1044,50 +1061,56 @@ const QSortEditor = () => {
                                         {col.score > 0 ? `+${col.score}` : col.score}
                                     </div>
 
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 hover:bg-red-500 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
-                                        onClick={() => updateGridCapacity(idx, -1)}
-                                        disabled={(col.capacity || 0) <= 0}
-                                        aria-label={`Decrease capacity for column ${idx}`}
-                                    >
-                                        <Minus className="h-4 w-4" />
-                                    </Button>
+                                    {!readOnly && (
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8 hover:bg-red-500 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
+                                            onClick={() => updateGridCapacity(idx, -1)}
+                                            disabled={(col.capacity || 0) <= 0}
+                                            aria-label={`Decrease capacity for column ${idx}`}
+                                        >
+                                            <Minus className="h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </div>
                             ))}
                         </div>
 
                         {/* Main Grid Actions */}
                         <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-                            <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={removeExtremeColumns}
-                                    className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all"
-                                >
-                                    <Minus className="h-4 w-4" /> {t('common.reduce')}
-                                </Button>
-                                <div className="w-px h-4 bg-slate-100" />
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={addExtremeColumns}
-                                    className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
-                                >
-                                    <Plus className="h-4 w-4" /> {t('common.expand')}
-                                </Button>
-                            </div>
+                            {!readOnly && (
+                                <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={removeExtremeColumns}
+                                        className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all"
+                                    >
+                                        <Minus className="h-4 w-4" /> {t('common.reduce')}
+                                    </Button>
+                                    <div className="w-px h-4 bg-slate-100" />
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={addExtremeColumns}
+                                        className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                    >
+                                        <Plus className="h-4 w-4" /> {t('common.expand')}
+                                    </Button>
+                                </div>
+                            )}
 
-                            <Button
-                                size="sm"
-                                onClick={autoShapeGrid}
-                                className="h-11 px-6 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all font-bold gap-2"
-                            >
-                                <Wand2 className="h-4 w-4" />
-                                {t('admin.design.qsort.grid.auto_balance')}
-                            </Button>
+                            {!readOnly && (
+                                <Button
+                                    size="sm"
+                                    onClick={autoShapeGrid}
+                                    className="h-11 px-6 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all font-bold gap-2"
+                                >
+                                    <Wand2 className="h-4 w-4" />
+                                    {t('admin.design.qsort.grid.auto_balance')}
+                                </Button>
+                            )}
 
                             <div className="flex items-center gap-3 px-5 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
                                 <Switch
@@ -1098,6 +1121,7 @@ const QSortEditor = () => {
                                             d.symmetry_lock = checked;
                                         })
                                     }
+                                    disabled={readOnly}
                                 />
                                 <Label
                                     htmlFor="symmetry-lock"

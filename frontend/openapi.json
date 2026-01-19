@@ -1114,6 +1114,49 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/test-runs": {
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Clear Test Runs",
+        "description": "Delete all participants flagged as is_test_run for this study.",
+        "operationId": "clear_test_runs_api_admin_studies__slug__test_runs_delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -3908,6 +3951,11 @@
             "type": "boolean",
             "title": "Requires Password",
             "default": false
+          },
+          "participant_count": {
+            "type": "integer",
+            "title": "Participant Count",
+            "default": 0
           }
         },
         "type": "object",
@@ -3995,7 +4043,7 @@
           },
           "description": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "title": "Description",
             "default": ""
           },
@@ -4003,7 +4051,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 2000
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -4027,7 +4075,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 1000
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -4039,7 +4087,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 500
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -4051,7 +4099,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 500
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -4140,7 +4188,7 @@
           },
           "description": {
             "type": "string",
-            "maxLength": 2000,
+            "maxLength": 5000,
             "title": "Description",
             "default": ""
           },
@@ -4148,7 +4196,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 2000
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -4172,7 +4220,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 1000
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -4184,7 +4232,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 500
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -4196,7 +4244,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "maxLength": 500
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -4550,6 +4598,11 @@
               }
             ],
             "title": "Link Token"
+          },
+          "is_test_run": {
+            "type": "boolean",
+            "title": "Is Test Run",
+            "default": false
           }
         },
         "type": "object",

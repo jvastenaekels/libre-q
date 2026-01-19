@@ -47,4 +47,5 @@ export interface StudyRead {
     statements?: StatementRead[];
     recruitment_links?: RecruitmentLinkRead[];
     requires_password?: boolean;
+    participant_count?: number;
 }

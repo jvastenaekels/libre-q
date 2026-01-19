@@ -18,7 +18,7 @@ import QuestionBuilder from './QuestionBuilder';
 
 import { useTranslation } from 'react-i18next';
 
-const PostSortConfigEditor = () => {
+const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t, i18n } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
@@ -143,7 +143,7 @@ const PostSortConfigEditor = () => {
                                 <span className="text-sm text-slate-400 font-medium italic">
                                     {t('admin.design.postsort.extreme.no_columns')}
                                 </span>
-                                {availableScores.length >= 2 && (
+                                {availableScores.length >= 2 && !readOnly && (
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -164,19 +164,21 @@ const PostSortConfigEditor = () => {
                                 >
                                     {score > 0 ? '+' : ''}
                                     {score}
-                                    <button
-                                        type="button"
-                                        onClick={() => removeExtremeColumn(score)}
-                                        className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
-                                    >
-                                        <X className="h-3.5 w-3.5" />
-                                    </button>
+                                    {!readOnly && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeExtremeColumn(score)}
+                                            className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    )}
                                 </Badge>
                             ))
                         )}
                     </div>
 
-                    {unselectedScores.length > 0 && (
+                    {unselectedScores.length > 0 && !readOnly && (
                         <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
                             <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                 {t('admin.design.postsort.extreme.add_label')}
@@ -234,6 +236,7 @@ const PostSortConfigEditor = () => {
                                 placeholder={tStudy(
                                     'admin.design.postsort.extreme.prompt_placeholder'
                                 )}
+                                readOnly={readOnly}
                                 className="min-h-[80px] rounded-2xl border-green-100 focus:ring-green-500/20 focus:border-green-500 transition-all bg-green-50/10 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
@@ -257,6 +260,7 @@ const PostSortConfigEditor = () => {
                                 placeholder={tStudy(
                                     'admin.design.postsort.extreme.prompt_placeholder'
                                 )}
+                                readOnly={readOnly}
                                 className="min-h-[80px] rounded-2xl border-slate-200 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
@@ -280,6 +284,7 @@ const PostSortConfigEditor = () => {
                                 placeholder={tStudy(
                                     'admin.design.postsort.extreme.prompt_placeholder'
                                 )}
+                                readOnly={readOnly}
                                 className="min-h-[80px] rounded-2xl border-red-100 focus:ring-red-500/20 focus:border-red-500 transition-all bg-red-50/10 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
@@ -305,6 +310,7 @@ const PostSortConfigEditor = () => {
                                 if (checked === allowRandomComments) return;
                                 toggleAllowRandomComments(checked);
                             }}
+                            disabled={readOnly}
                         />
                     </div>
                 </CardHeader>
@@ -322,7 +328,7 @@ const PostSortConfigEditor = () => {
                     </div>
                 </CardHeader>
                 <CardContent className="pb-8">
-                    <QuestionBuilder type="post" />
+                    <QuestionBuilder type="post" readOnly={readOnly} />
                 </CardContent>
             </Card>
 
@@ -353,6 +359,7 @@ const PostSortConfigEditor = () => {
                             (d.postsort_config as any).email_collection_enabled = checked;
                         });
                     }}
+                    disabled={readOnly}
                 />
             </div>
             {config?.email_collection_enabled && (
@@ -375,6 +382,7 @@ const PostSortConfigEditor = () => {
                                             checked;
                                     });
                                 }}
+                                disabled={readOnly}
                             />
                         </div>
                         <p className="text-xs font-medium text-amber-700/80 leading-relaxed">
@@ -403,6 +411,7 @@ const PostSortConfigEditor = () => {
                                     (d.postsort_config as any).newsletter_consent_enabled = checked;
                                 });
                             }}
+                            disabled={readOnly}
                         />
                     </div>
                 </div>

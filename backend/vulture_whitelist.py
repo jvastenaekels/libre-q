@@ -40,6 +40,7 @@ recruitment_token
 start_count
 Invitation
 accepted_at
+participant_count
 
 # --- app/routers/ (FastAPI endpoints) ---
 # admin/exports.py
@@ -74,6 +75,7 @@ valid
 export_study_config
 validate_study_import
 import_study_config
+clear_test_runs
 
 # admin/users.py
 list_users

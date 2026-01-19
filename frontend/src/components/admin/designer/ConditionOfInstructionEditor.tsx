@@ -8,7 +8,7 @@ import { Target, RotateCcw } from 'lucide-react';
 import type React from 'react';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
-const ConditionOfInstructionEditor = () => {
+const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
@@ -63,17 +63,19 @@ const ConditionOfInstructionEditor = () => {
                                         'Instruction Text'
                                     )}
                                 </Label>
-                                <button
-                                    type="button"
-                                    onClick={resetPreInstruction}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                             font-black uppercase tracking-wider text-slate-500
-                                             hover:bg-slate-100 hover:text-indigo-600 transition-colors
-                                             shadow-sm border bg-white"
-                                >
-                                    <RotateCcw className="size-3" />
-                                    {t('common.reset_to_default')}
-                                </button>
+                                {!readOnly && (
+                                    <button
+                                        type="button"
+                                        onClick={resetPreInstruction}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
+                                                 font-black uppercase tracking-wider text-slate-500
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors
+                                                 shadow-sm border bg-white"
+                                    >
+                                        <RotateCcw className="size-3" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 id="pre_instruction"
@@ -86,6 +88,7 @@ const ConditionOfInstructionEditor = () => {
                                     'e.g. Based on your personal point of view...'
                                 )}
                                 className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
+                                disabled={readOnly}
                             />
                         </div>
                     </CardContent>
@@ -112,17 +115,19 @@ const ConditionOfInstructionEditor = () => {
                                 >
                                     {t('admin.design.condition.field_label', 'Instruction Text')}
                                 </Label>
-                                <button
-                                    type="button"
-                                    onClick={resetInstruction}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                             font-black uppercase tracking-wider text-slate-500
-                                             hover:bg-slate-100 hover:text-indigo-600 transition-colors
-                                             shadow-sm border bg-white"
-                                >
-                                    <RotateCcw className="size-3" />
-                                    {t('common.reset_to_default')}
-                                </button>
+                                {!readOnly && (
+                                    <button
+                                        type="button"
+                                        onClick={resetInstruction}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
+                                                 font-black uppercase tracking-wider text-slate-500
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors
+                                                 shadow-sm border bg-white"
+                                    >
+                                        <RotateCcw className="size-3" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 id="condition_of_instruction"
@@ -135,6 +140,7 @@ const ConditionOfInstructionEditor = () => {
                                     'e.g. Please rank the following statements...'
                                 )}
                                 className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
+                                disabled={readOnly}
                             />
                         </div>
                     </CardContent>

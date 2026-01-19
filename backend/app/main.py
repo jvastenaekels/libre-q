@@ -210,6 +210,14 @@ if os.path.exists(FRONTEND_DIST):
                     file_path, headers={"Cache-Control": "no-cache, must-revalidate"}
                 )
 
+        # 2b. Static 404 Fallback: Do not serve SPA for missing assets
+        if full_path.startswith("assets") or full_path.endswith(
+            (".js", ".css", ".png", ".jpg", ".jpeg", ".svg", ".ico", ".woff", ".woff2")
+        ):
+            raise StarletteHTTPException(
+                status_code=404, detail="Static file not found"
+            )
+
         # 3. Otherwise serve index.html for CSR navigation (never cache HTML)
         index_path = os.path.join(FRONTEND_DIST, "index.html")
         return FileResponse(

@@ -394,6 +394,7 @@ class StudyRead(StudyBase):
     statements: list[StatementRead] = []
     recruitment_links: list["RecruitmentLinkRead"] = []
     requires_password: bool = False
+    participant_count: int = 0
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -446,6 +447,7 @@ class SubmissionInput(BaseModel):
     qsort: list[QSortEntryInput]
     postsort_answers: dict[str, Any] | None = {}
     link_token: str | None = None
+    is_test_run: bool = False
 
     @field_validator("qsort")
     @classmethod

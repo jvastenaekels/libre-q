@@ -193,7 +193,7 @@ export function ParticipantDetailContent({
             )}
 
             {/* Q-Sort Reconstruction */}
-            {participant.scores && participant.scores.some((s) => s !== null) && (
+            {participant.scores?.some((s) => s !== null) && (
                 <div className="space-y-4">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2 border-b border-slate-100 pb-2">
                         <Eye className="w-4 h-4 text-indigo-500" />

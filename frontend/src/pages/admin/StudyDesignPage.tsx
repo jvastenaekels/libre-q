@@ -72,6 +72,7 @@ const StudyDesignPage = () => {
     const navigate = useNavigate();
     const {
         draft,
+        original,
         activeStep,
         activeLocale,
         setStudy,
@@ -99,7 +100,7 @@ const StudyDesignPage = () => {
             window.removeEventListener('resize', checkScroll);
             clearTimeout(timer);
         };
-    }, [activeStep]); // Re-check when step changes as it might auto-scroll
+    }, [checkScroll]); // Re-check when step changes as it might auto-scroll
 
     const scrollTabs = (direction: 'left' | 'right') => {
         if (tabsListRef.current) {
@@ -215,7 +216,8 @@ const StudyDesignPage = () => {
 
     // Permission States
     const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
-    const isStructureLocked = draft ? draft.state !== 'draft' : false; // active, paused, closed
+    const isStructureLocked =
+        (draft?.state !== 'draft' && !!draft) || (original?.participant_count ?? 0) > 0;
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;
@@ -792,15 +794,15 @@ const StudyDesignPage = () => {
                                         'Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.'
                                     )}
                                 />
-                                <IntroductionEditor />
+                                <IntroductionEditor readOnly={isStructureLocked} />
                             </TabsContent>
 
                             <TabsContent value="pre-sort" className="mt-0 outline-none">
-                                <QuestionBuilder type="pre" />
+                                <QuestionBuilder type="pre" readOnly={isStructureLocked} />
                             </TabsContent>
 
                             <TabsContent value="condition" className="mt-0 outline-none space-y-6">
-                                <ConditionOfInstructionEditor />
+                                <ConditionOfInstructionEditor readOnly={isStructureLocked} />
                             </TabsContent>
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
@@ -847,11 +849,11 @@ const StudyDesignPage = () => {
                                         'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
                                     )}
                                 />
-                                <QSortEditor />
+                                <QSortEditor readOnly={isStructureLocked} />
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">
-                                <PostSortConfigEditor />
+                                <PostSortConfigEditor readOnly={isStructureLocked} />
                             </TabsContent>
 
                             <TabsContent value="interface" className="mt-0 outline-none">

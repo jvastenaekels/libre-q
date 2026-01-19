@@ -32,7 +32,11 @@ export default defineConfig({
                         return 'vendor-lucide';
                     }
                     // Core framework
-                    if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+                    if (
+                        id.includes('node_modules/react') ||
+                        id.includes('node_modules/react-dom') ||
+                        id.includes('node_modules/react-router')
+                    ) {
                         return 'vendor-react';
                     }
                 },

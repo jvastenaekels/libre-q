@@ -114,7 +114,7 @@ const InterfaceEditor = () => {
     const resetStepHelp = (stepId: string) => {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
         updateTranslation(activeLocale, (t_trans: any) => {
-            if (t_trans.step_help && t_trans.step_help[stepId]) {
+            if (t_trans.step_help?.[stepId]) {
                 delete t_trans.step_help[stepId];
             }
         });

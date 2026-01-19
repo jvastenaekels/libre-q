@@ -35,18 +35,19 @@ import type { ProcessStep } from '@/api/model';
 import * as LucideIcons from 'lucide-react';
 import { RotateCcw } from 'lucide-react';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
-
 interface ProcessStepItemProps {
     id: string;
     step: ProcessStep;
     onUpdate: (data: ProcessStep) => void;
     onDelete: () => void;
+    readOnly?: boolean;
 }
 
-const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps) => {
+const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStepItemProps) => {
     const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id,
+        disabled: readOnly,
     });
 
     const style = {
@@ -68,13 +69,15 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
             )}
         >
             <div className="flex items-start p-4 gap-4">
-                <div
-                    {...attributes}
-                    {...listeners}
-                    className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 transition-colors"
-                >
-                    <GripVertical className="h-4 w-4" />
-                </div>
+                {!readOnly && (
+                    <div
+                        {...attributes}
+                        {...listeners}
+                        className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 transition-colors"
+                    >
+                        <GripVertical className="h-4 w-4" />
+                    </div>
+                )}
 
                 <div className="flex-1 min-w-0">
                     <Accordion type="single" collapsible className="w-full">
@@ -98,17 +101,19 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                     <AccordionTrigger className="py-2 hover:no-underline text-slate-400 hover:text-indigo-600">
                                         <span className="sr-only">Toggle</span>
                                     </AccordionTrigger>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onDelete();
-                                        }}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    {!readOnly && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDelete();
+                                            }}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
 
@@ -128,6 +133,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                                 placeholder={t(
                                                     'admin.design.intro.process_steps.fields.title'
                                                 )}
+                                                disabled={readOnly}
                                             />
                                         </div>
 
@@ -149,6 +155,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                                 placeholder={t(
                                                     'admin.design.intro.process_steps.fields.description'
                                                 )}
+                                                disabled={readOnly}
                                             />
                                         </div>
                                     </div>
@@ -161,6 +168,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                             <IconPicker
                                                 selectedIcon={step.icon}
                                                 onChange={(icon) => onUpdate({ ...step, icon })}
+                                                disabled={readOnly}
                                             />
                                         </div>
 
@@ -183,6 +191,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                                             })
                                                         }
                                                         className="w-14 h-12 p-1.5 rounded-xl border-slate-200 cursor-pointer shadow-sm transition-all hover:border-indigo-500"
+                                                        disabled={readOnly}
                                                     />
                                                 </div>
                                                 <Input
@@ -193,6 +202,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                                     }
                                                     placeholder="#000000"
                                                     className="font-mono text-xs h-12 rounded-xl border-slate-200 bg-slate-50/30 text-slate-500 focus:text-indigo-600 transition-all font-bold tracking-wider"
+                                                    readOnly={readOnly}
                                                 />
                                             </div>
                                         </div>
@@ -207,7 +217,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
     );
 };
 
-export function ProcessStepEditor() {
+export function ProcessStepEditor({ readOnly }: { readOnly?: boolean }) {
     const { t } = useTranslation();
     const {
         draft,
@@ -359,26 +369,28 @@ export function ProcessStepEditor() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-end gap-3">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={resetSteps}
-                    className="h-11 rounded-xl font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    {t('admin.design.intro.process_steps.reset.process_steps')}
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={addStep}
-                    className="h-11 rounded-xl border-dashed border-2 px-6 font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all shadow-sm active:scale-95"
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('admin.design.intro.process_steps.add_step')}
-                </Button>
-            </div>
+            {!readOnly && (
+                <div className="flex items-center justify-end gap-3">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetSteps}
+                        className="h-11 rounded-xl font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                    >
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        {t('admin.design.intro.process_steps.reset.process_steps')}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addStep}
+                        className="h-11 rounded-xl border-dashed border-2 px-6 font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all shadow-sm active:scale-95"
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t('admin.design.intro.process_steps.add_step')}
+                    </Button>
+                </div>
+            )}
 
             <DndContext
                 sensors={sensors}
@@ -410,6 +422,7 @@ export function ProcessStepEditor() {
                                     step={step}
                                     onUpdate={(data) => updateStep(index, data)}
                                     onDelete={() => deleteStep(index)}
+                                    readOnly={readOnly}
                                 />
                             ))}
                         </div>

@@ -35,17 +35,9 @@ def test_study_translation_validation():
     st = StudyTranslationBase(language_code="en", title="Valid Title")
     assert st.title == "Valid Title"
 
-    # Whitespace fields
-    with pytest.raises(ValidationError) as exc:
-        StudyTranslationBase(language_code="en", title="  ")
-    assert "String cannot be empty" in str(exc.value)
-
-    # Description is not strictly validated for non-empty because it defaults to ""
-    # and we want to allow empty strings.
-    # So "   " might be technically allowed by the schema if not validated,
-    # or stripped if we added a validator.
-    # For now, we just skip testing description failure.
-    pass
+    # Relaxed for drafts - empty/whitespace title now allowed in schema
+    st = StudyTranslationBase(language_code="en", title="  ")
+    assert st.title == "  "
 
     # None description (should be allowed via base validator if field allows None but schema validator logic handles it?)
     # description is field("", max_length=2000). The default is empty string.
@@ -81,8 +73,9 @@ def test_study_translation_validation():
 
 
 def test_statement_base_validation():
-    with pytest.raises(ValidationError):
-        StatementBase(code="   ")
+    # Relaxed for drafts
+    sb = StatementBase(code="   ")
+    assert sb.code == "   "
 
 
 def test_recruitment_link_validation():

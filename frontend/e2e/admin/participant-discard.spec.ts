@@ -43,17 +43,20 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         );
 
         // Discard p2 via API
-        const discardResp = await fetch(`${apiUrl}/api/admin/studies/participants/${p2.id}/discard`, {
-            method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                is_discarded: true,
-                discard_reason: 'Suspicious completion time',
-            }),
-        });
+        const discardResp = await fetch(
+            `${apiUrl}/api/admin/studies/participants/${p2.id}/discard`,
+            {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    is_discarded: true,
+                    discard_reason: 'Suspicious completion time',
+                }),
+            }
+        );
         if (!discardResp.ok) {
             throw new Error(`Failed to discard p2: ${await discardResp.text()}`);
         }

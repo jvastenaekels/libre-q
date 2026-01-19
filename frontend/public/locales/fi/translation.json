@@ -1,6 +1,7 @@
 {
     "common": {
         "add": "Lisää",
+        "delete": "Poista",
         "all": "Kaikki",
         "agree": "Jokseenkin samaa mieltä",
         "disagree": "Jokseenkin eri mieltä",
@@ -1149,8 +1150,16 @@
                 "interested": "kiinnostunutta"
             },
             "tabs": {
+                "live": "Live-osallistujat",
+                "test": "Testi-istunnot",
                 "browse": "Interaktiivinen näkymä",
-                "export": "Vie tiedot"
+                "export": "Tiedonvienti"
+            },
+            "actions": {
+                "clear_test_runs": "Puhdista testitiedot",
+                "clear_test_runs_confirm": "Poistetaanko kaikki testi-istunnot? Tätä toimintoa ei voi peruuttaa.",
+                "clear_test_runs_success": "Testitiedot puhdistettu onnistuneesti",
+                "clear_test_runs_error": "Testitietojen puhdistus epäonnistui"
             },
             "guide": {
                 "title": "Muoto-opas",
@@ -1168,18 +1177,24 @@
                 }
             },
             "table": {
+                "participant": "Osallistujan identiteetti",
                 "id_token": "ID / Tunniste",
                 "lang": "Kieli",
-                "flags": "Merkinnät",
-                "duration": "Kesto",
-                "actions": "Toiminnot"
+                "flags": "Tiedon laatu",
+                "duration": "Kesto / Vaiva",
+                "actions": "Tiedot",
+                "submitted": "Lähetetty",
+                "status": "Tila"
             },
             "tooltips": {
                 "suspect": "Epäilyttävä (Nopea suoritus)",
                 "has_comments": "Sisältää laadullisia kommentteja"
             },
             "filter": {
-                "show_discarded": "Näytä hylätyt ja testit"
+                "show_discarded": "Näytä hylätyt tietueet",
+                "all_states": "Kaikki tilat",
+                "only_active": "Vain aktiiviset",
+                "only_flagged": "Merkitty laatu"
             },
             "search": {
                 "placeholder": "Hae ID:llä...",

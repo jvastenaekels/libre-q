@@ -180,9 +180,10 @@ class StudyService:
         stmt = (
             select(Study)
             .where(Study.slug == slug)
-            .options(selectinload(Study.translations))
             .options(
-                selectinload(Study.statements).selectinload(Statement.translations)
+                selectinload(Study.translations),
+                selectinload(Study.statements).selectinload(Statement.translations),
+                selectinload(Study.participants),
             )
         )
         result = await db.execute(stmt)
@@ -607,7 +608,7 @@ class StudyService:
         # 2.5 Validation: Study State
         from ..models import StudyState
 
-        if study.state != StudyState.active:
+        if study.state != StudyState.active and not data.is_test_run:
             raise HTTPException(
                 status_code=400,
                 detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
@@ -689,6 +690,7 @@ class StudyService:
                     ip_address=hashed_ip,
                     user_agent=user_agent,
                     submitted_at=datetime.now(timezone.utc),
+                    is_test_run=data.is_test_run,
                 )
                 db.add(participant)
                 await db.flush()
@@ -754,6 +756,7 @@ class StudyService:
             participant.confirmation_code = confirmation_code
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
+            participant.is_test_run = data.is_test_run
             participant.submitted_at = datetime.now(timezone.utc)
 
             await db.flush()

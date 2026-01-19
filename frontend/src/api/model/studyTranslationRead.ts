@@ -26,7 +26,7 @@ export interface StudyTranslationRead {
     language_code: string;
     /** @maxLength 200 */
     title: string;
-    /** @maxLength 2000 */
+    /** @maxLength 5000 */
     description?: string;
     instructions?: StudyTranslationReadInstructions;
     subtitle?: StudyTranslationReadSubtitle;

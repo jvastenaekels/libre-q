@@ -191,8 +191,20 @@ async def get_study(
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Get study details."""
-    await db.refresh(study, attribute_names=["translations", "statements"])
-    return study
+    from app.models import Statement
+
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants),
+        )
+    )
+    res = await db.execute(stmt)
+    study_loaded = res.scalar_one()
+    return study_loaded
 
 
 @router.patch("/{slug}", response_model=StudyRead)
@@ -212,6 +224,7 @@ async def update_study(
         .options(
             selectinload(Study.translations),
             selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants),
         )
     )
     res = await db.execute(stmt)
@@ -233,7 +246,7 @@ async def update_study(
 
         if new_grid != current_grid:
             stmt_part = select(func.count(Participant.id)).where(
-                Participant.study_id == study.id
+                Participant.study_id == study.id, Participant.is_test_run.is_(False)
             )
             res_part = await db.execute(stmt_part)
             has_participants = (res_part.scalar() or 0) > 0
@@ -321,12 +334,20 @@ async def update_study(
             # Determine if we can do destructive changes (remove statements)
             # Structural changes are allowed in DRAFT or if NO participants exist
             stmt_count = select(func.count(Participant.id)).where(
-                Participant.study_id == study.id
+                Participant.study_id == study.id, Participant.is_test_run.is_(False)
             )
             res = await db.execute(stmt_count)
             has_participants = (cast(int, res.scalar()) or 0) > 0
 
-            can_sync_structure = study.state == StudyState.draft or not has_participants
+            can_sync_structure = not has_participants
+
+            if not can_sync_structure:
+                current_codes = {s.code for s in study.statements}
+                if updated_codes != current_codes:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Cannot modify statement structure because participants have already started the study.",
+                    )
 
             # A. Remove statements not in the update (only if allowed)
             if can_sync_structure:
@@ -381,6 +402,9 @@ async def update_study(
             status_code=status.HTTP_409_CONFLICT,
             detail="Database integrity check failed (possibly duplicate statement codes)",
         )
+    except HTTPException:
+        await db.rollback()
+        raise
     except Exception as e:
         await db.rollback()
         logger.error(f"Unexpected error during study update: {e}", exc_info=True)
@@ -943,3 +967,21 @@ async def import_study_config(
     return StudyImportResponse(
         slug=db_study.slug, message="Study imported successfully"
     )
+
+
+@router.delete("/{slug}/test-runs", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_test_runs(
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete all participants flagged as is_test_run for this study."""
+    from sqlalchemy import delete
+    from app.models import Participant
+
+    await db.execute(
+        delete(Participant).where(
+            Participant.study_id == study.id, Participant.is_test_run.is_(True)
+        )
+    )
+    await db.commit()
+    return None

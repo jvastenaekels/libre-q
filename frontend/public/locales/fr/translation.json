@@ -11,6 +11,7 @@
         "undo": "Annuler l'action",
         "back": "Retour",
         "cancel": "Annuler",
+        "delete": "Supprimer",
         "reduce": "Réduire",
         "expand": "Étendre",
         "next": "Étape suivante",
@@ -1137,19 +1138,27 @@
             }
         },
         "data": {
-            "title": "Analyses & Données",
-            "description": "Inspectez les performances des participants, les retours qualitatifs et exportez les jeux de données.",
+            "title": "Explorateur de Données",
+            "description": "Suivi de la participation en temps réel, analyse de la qualité et gestion des sessions.",
             "stats": {
-                "email_collection": "Collecte d'e-mails",
-                "participants": "participants",
-                "newsletter": "Consentement newsletter",
-                "opt_in": "acceptation",
-                "follow_up": "Entretien de suivi",
+                "email_collection": "Génération de Leads",
+                "participants": "au total",
+                "newsletter": "Opt-ins",
+                "opt_in": "conversion",
+                "follow_up": "Pistes de Recherche",
                 "interested": "intéressés"
             },
             "tabs": {
-                "browse": "Vue interactive",
-                "export": "Export des données"
+                "live": "Participants Directs",
+                "test": "Sessions de Test",
+                "browse": "Vue Interactive",
+                "export": "Hub d'Export"
+            },
+            "actions": {
+                "clear_test_runs": "Purger les Tests",
+                "clear_test_runs_confirm": "Supprimer toutes les sessions de test ? Cette action est irréversible et réservée à la maintenance.",
+                "clear_test_runs_success": "Pipeline nettoyé : données de test purgées",
+                "clear_test_runs_error": "Échec système : impossible de purger les tests"
             },
             "guide": {
                 "title": "Guide des formats",
@@ -1167,26 +1176,32 @@
                 }
             },
             "table": {
-                "id_token": "ID / Jeton",
-                "lang": "Langue",
-                "flags": "Indicateurs",
+                "participant": "Identité participant",
+                "id_token": "ID / jeton",
+                "lang": "Localisation",
+                "flags": "Qualité de donnée",
                 "duration": "Durée",
-                "actions": "Actions"
+                "actions": "Détails",
+                "submitted": "Soumis le",
+                "status": "État"
             },
             "tooltips": {
-                "suspect": "Suspect (Complétion rapide)",
-                "has_comments": "Contient des commentaires qualitatifs"
+                "suspect": "Suspect : Temps de complétion anormalement rapide",
+                "has_comments": "Contient des insights qualitatifs"
             },
             "filter": {
-                "show_discarded": "Afficher les rejets et tests"
+                "show_discarded": "Inclure les enregistrements rejetés",
+                "all_states": "Tous les états",
+                "only_active": "Actifs uniquement",
+                "only_flagged": "Qualité signalée"
             },
             "search": {
-                "placeholder": "Rechercher par ID...",
-                "records_found": "enregistrements trouvés",
-                "no_results": "Aucun résultat trouvé"
+                "placeholder": "Chercher par ID ou jeton...",
+                "records_found": "enregistrements détectés",
+                "no_results": "Aucun enregistrement ne correspond à votre requête"
             },
             "errors": {
-                "load_failed": "Échec du chargement des données. Veuillez actualiser la page."
+                "load_failed": "Synchronisation interrompue. Vérifiez votre connexion."
             },
             "detail": {
                 "title": "Vue de la participation",

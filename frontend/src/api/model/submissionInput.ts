@@ -26,4 +26,5 @@ export interface SubmissionInput {
     qsort: QSortEntryInput[];
     postsort_answers?: SubmissionInputPostsortAnswers;
     link_token?: SubmissionInputLinkToken;
+    is_test_run?: boolean;
 }

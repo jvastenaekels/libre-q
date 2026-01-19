@@ -33,11 +33,35 @@ import {
     Users,
     Trash2,
     Beaker,
+    Filter,
+    Calendar,
+    MousePointer2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useGetStudyDumpApiAdminStudiesSlugDumpGet } from '@/api/generated';
+import {
+    useGetStudyDumpApiAdminStudiesSlugDumpGet,
+    useClearTestRunsApiAdminStudiesSlugTestRunsDelete,
+    getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey,
+} from '@/api/generated';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 // Types representing the backend dump response structure
 export interface DumpStatement {
@@ -50,7 +74,7 @@ export interface DumpParticipant {
     id: string;
     db_id: number;
     duration_seconds: number | null;
-    scores: (number | null)[]; // Array index matches study.statements index
+    scores: (number | null)[];
     placements: Record<string, number>;
     // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
     presort: Record<string, any>;
@@ -61,12 +85,13 @@ export interface DumpParticipant {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
         questions_answers?: Record<string, any>;
         card_comments?: Record<string, string>;
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
     } & Record<string, any>;
     language: string;
     is_discarded: boolean;
     discard_reason: string | null;
     is_test_run: boolean;
+    submitted_at?: string;
+    recruitment_token?: string;
 }
 
 export interface DumpResponse {
@@ -79,7 +104,6 @@ export interface DumpResponse {
             email_collection_enabled?: boolean;
             newsletter_consent_enabled?: boolean;
             interview_consent_enabled?: boolean;
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
         } & Record<string, any>;
     };
     participants: DumpParticipant[];
@@ -88,25 +112,29 @@ export interface DumpResponse {
 
 interface InteractiveDataViewProps {
     slug: string;
-    participants?: ParticipantRead[]; // Optional: can be provided from loader
+    participants?: ParticipantRead[];
 }
 
-export default function InteractiveDataView(props: InteractiveDataViewProps) {
-    const { slug } = props;
+export default function InteractiveDataView({
+    slug,
+    participants: initialParticipants,
+}: InteractiveDataViewProps) {
     const { t } = useTranslation();
-    // Determine type usage for useGetStudyDumpApiAdminStudiesSlugDumpGet
-    // Casting broadly as we validated the structure manually
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);
-    // const data = rawData as unknown as DumpResponse;
 
-    const { participants } = props;
+    const [sorting, setSorting] = useState<SortingState>([{ id: 'submitted_at', desc: true }]);
+    const [globalFilter, setGlobalFilter] = useState('');
+    const [activeTab, setActiveTab] = useState<'live' | 'test'>('live');
+    const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
 
-    // effectiveParticipants logic to handle mapping from Input/List type to Dump type
     const effectiveParticipants = useMemo(() => {
         const dumpData = rawData as unknown as DumpResponse | null;
         if (dumpData?.participants) return dumpData.participants;
-        if (participants) {
-            return participants.map((p) => ({
+        if (initialParticipants) {
+            return initialParticipants.map((p) => ({
                 id: String(p.id).substring(0, 8),
                 db_id: p.id,
                 duration_seconds: (p as { duration_seconds?: number }).duration_seconds ?? null,
@@ -114,43 +142,54 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
                 placements: {},
                 presort: {},
                 postsort: {},
-                language: 'en',
+                language: p.language_used || 'en',
                 is_discarded: p.is_discarded,
                 is_test_run: p.is_test_run,
                 discard_reason: p.discard_reason,
+                submitted_at: p.submitted_at || p.created_at,
+                recruitment_token: p.recruitment_token,
             })) as DumpParticipant[];
         }
         return [];
-    }, [rawData, participants]);
+    }, [rawData, initialParticipants]);
 
     const data = useMemo(() => {
         if (rawData) return rawData as unknown as DumpResponse;
-        if (participants) {
-            return {
-                study: {
-                    slug,
-                    statements: [],
-                    translations: [],
-                    postsort_config: {},
-                },
-                participants: effectiveParticipants,
-                statement_id_to_index: {},
-            } as DumpResponse;
-        }
-        return null;
-    }, [rawData, participants, effectiveParticipants, slug]);
+        return {
+            study: { slug, statements: [], translations: [], postsort_config: {} },
+            participants: effectiveParticipants,
+            statement_id_to_index: {},
+        } as DumpResponse;
+    }, [rawData, effectiveParticipants, slug]);
 
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [globalFilter, setGlobalFilter] = useState('');
-    const [showDiscarded, setShowDiscarded] = useState(false);
+    const { mutate: clearTestRuns, isPending: isClearing } =
+        useClearTestRunsApiAdminStudiesSlugTestRunsDelete();
+
+    const handleClearTestRuns = useCallback(() => {
+        clearTestRuns(
+            { slug },
+            {
+                onSuccess: () => {
+                    toast.success(t('admin.data.actions.clear_test_runs_success'));
+                    queryClient.invalidateQueries({
+                        queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
+                    });
+                },
+                onError: () => toast.error(t('admin.data.actions.clear_test_runs_error')),
+            }
+        );
+    }, [clearTestRuns, slug, queryClient, t]);
 
     const filteredParticipants = useMemo(() => {
-        const parts = data?.participants || [];
-        if (showDiscarded) return parts;
-        return parts.filter((p) => !p.is_discarded && !p.is_test_run);
-    }, [data?.participants, showDiscarded]);
-
-    const navigate = useNavigate();
+        return effectiveParticipants.filter((p) => {
+            const matchesTab = activeTab === 'test' ? p.is_test_run : !p.is_test_run;
+            const matchesQuality =
+                qualityFilter === 'flagged'
+                    ? (p.duration_seconds !== null && p.duration_seconds < 120) || p.is_discarded
+                    : true;
+            return matchesTab && matchesQuality;
+        });
+    }, [effectiveParticipants, activeTab, qualityFilter]);
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
@@ -159,133 +198,162 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
         [navigate, slug]
     );
 
-    // --- Table Configuration ---
     const columnHelper = createColumnHelper<DumpParticipant>();
 
     const columns = useMemo(
         () => [
             columnHelper.accessor('id', {
-                header: ({ column }) => {
+                header: t('admin.data.table.participant'),
+                cell: (info) => {
+                    const p = info.row.original;
                     return (
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                            className="-ml-4 hover:bg-transparent hover:text-indigo-600"
-                        >
-                            {t('admin.data.table.id_token')}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                                    {info.getValue()}
+                                </span>
+                                {p.is_discarded && (
+                                    <Badge
+                                        variant="destructive"
+                                        className="h-4 text-[9px] uppercase px-1.5 font-black"
+                                    >
+                                        {t('admin.data.detail.discarded_badge')}
+                                    </Badge>
+                                )}
+                            </div>
+                            {p.recruitment_token && (
+                                <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                                    <Users className="w-3 h-3" />
+                                    {p.recruitment_token}
+                                </span>
+                            )}
+                        </div>
                     );
                 },
-                cell: (info) => (
-                    <div className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded w-fit">
-                        {info.getValue()}
-                    </div>
-                ),
             }),
             columnHelper.accessor('language', {
                 header: t('admin.data.table.lang'),
                 cell: (info) => (
-                    <div className="flex items-center gap-2">
-                        <Globe className="h-3 w-3 text-slate-400" />
-                        <span className="uppercase text-xs font-bold text-slate-600">
+                    <div className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Globe className="h-3.5 w-3.5 text-slate-300" />
+                        <span className="uppercase text-xs tracking-tight">
                             {info.getValue() === 'US' ? 'EN' : info.getValue()}
                         </span>
                     </div>
                 ),
-                meta: { className: 'hidden md:table-cell' },
             }),
             columnHelper.display({
-                id: 'flags',
+                id: 'quality',
                 header: t('admin.data.table.flags'),
                 cell: ({ row }) => {
                     const p = row.original;
                     const isSuspect = p.duration_seconds !== null && p.duration_seconds < 120;
-                    const hasComments = Object.keys(p.postsort).length > 0;
+                    const hasComments = Object.keys(p.postsort.card_comments || {}).length > 0;
 
                     return (
-                        <div className="flex items-center gap-1.5">
-                            {isSuspect && (
-                                <div
-                                    title={t('admin.data.tooltips.suspect')}
-                                    className="text-amber-500"
-                                >
-                                    <AlertTriangle className="h-3.5 w-3.5" />
-                                </div>
-                            )}
-                            {hasComments && (
-                                <div
-                                    title={t('admin.data.tooltips.has_comments')}
-                                    className="text-indigo-500"
-                                >
-                                    <MessageSquare className="h-3.5 w-3.5" />
-                                </div>
-                            )}
-                            {p.is_discarded && (
-                                <div
-                                    className="text-red-500"
-                                    title={t('admin.data.tooltips.discarded', 'Discarded')}
-                                    data-testid="row-discarded-indicator"
-                                >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                </div>
-                            )}
-                            {p.is_test_run && (
-                                <div
-                                    className="text-amber-500"
-                                    title={t('admin.data.tooltips.test_run', 'Test Run')}
-                                    data-testid="row-test-run-indicator"
-                                >
-                                    <Beaker className="h-3.5 w-3.5" />
-                                </div>
-                            )}
+                        <div className="flex items-center gap-2">
+                            <TooltipProvider>
+                                {isSuspect && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1.5 bg-amber-50 rounded-lg text-amber-500 border border-amber-100 shadow-sm transition-transform hover:scale-110">
+                                                <AlertTriangle className="h-3.5 w-3.5" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t('admin.data.tooltips.suspect')}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {hasComments && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-500 border border-indigo-100 shadow-sm transition-transform hover:scale-110">
+                                                <MessageSquare className="h-3.5 w-3.5" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t('admin.data.tooltips.has_comments')}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {!isSuspect && !hasComments && (
+                                    <span className="text-[10px] text-slate-300 font-medium">
+                                        —
+                                    </span>
+                                )}
+                            </TooltipProvider>
                         </div>
                     );
                 },
-                meta: { className: 'hidden md:table-cell' },
             }),
             columnHelper.accessor('duration_seconds', {
                 header: ({ column }) => (
-                    <div className="flex justify-end">
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                            className="hover:bg-transparent hover:text-indigo-600 pr-0"
-                        >
-                            {t('admin.data.table.duration')}
-                            <Clock className="ml-2 h-3 w-3" />
-                        </Button>
-                    </div>
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="h-8 text-xs font-bold p-0 hover:bg-transparent"
+                    >
+                        {t('admin.data.table.duration')}
+                        <ArrowUpDown className="ml-2 h-3 w-3" />
+                    </Button>
                 ),
                 cell: (info) => {
                     const seconds = info.getValue();
-                    if (seconds === null) return <span className="text-slate-300">-</span>;
-                    const absoluteSeconds = Math.abs(seconds);
-                    const mins = Math.floor(absoluteSeconds / 60);
-                    const secs = Math.round(absoluteSeconds % 60);
+                    if (seconds === null) return <span className="text-slate-300">—</span>;
+                    const mins = Math.floor(Math.abs(seconds) / 60);
+                    const secs = Math.round(Math.abs(seconds) % 60);
                     return (
-                        <div className="text-right font-mono text-xs text-slate-600">
-                            {seconds < 0 ? '-' : ''}
+                        <div className="flex items-center gap-1.5 font-mono text-xs text-slate-600">
+                            <Clock className="w-3 h-3 text-slate-400" />
                             {mins}m {secs.toString().padStart(2, '0')}s
                         </div>
                     );
                 },
-                meta: { className: 'hidden md:table-cell' },
+            }),
+            columnHelper.accessor('submitted_at', {
+                id: 'submitted_at',
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="h-8 text-xs font-bold p-0 hover:bg-transparent"
+                    >
+                        {t('admin.data.table.submitted')}
+                        <ArrowUpDown className="ml-2 h-3 w-3" />
+                    </Button>
+                ),
+                cell: (info) => {
+                    const val = info.getValue();
+                    if (!val) return <span className="text-slate-300">—</span>;
+                    return (
+                        <div className="flex flex-col text-[10px] text-slate-500 font-medium leading-none gap-1">
+                            <div className="flex items-center gap-1 text-slate-700">
+                                <Calendar className="w-3 h-3 text-slate-300" />
+                                {format(new Date(val), 'MMM dd, yyyy')}
+                            </div>
+                            <span className="pl-4 opacity-70">
+                                {format(new Date(val), 'HH:mm')}
+                            </span>
+                        </div>
+                    );
+                },
             }),
             columnHelper.display({
                 id: 'actions',
                 cell: ({ row }) => (
                     <div className="flex justify-end">
                         <Button
-                            variant="ghost"
+                            variant="default"
                             size="sm"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleViewParticipant(row.original);
                             }}
-                            className="h-8 w-8 p-0 rounded-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                            className="h-8 px-3 rounded-lg font-bold shadow-sm transition-all hover:translate-x-0.5"
                         >
-                            <ChevronRight className="h-4 w-4" />
+                            {t('admin.data.table.actions')}
+                            <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
                     </div>
                 ),
@@ -302,27 +370,20 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
         getFilteredRowModel: getFilteredRowModel(),
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
-        state: {
-            sorting,
-            globalFilter,
-        },
+        state: { sorting, globalFilter },
     });
 
     if (isLoading && !data) {
         return (
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <Skeleton className="h-9 w-64" />
-                    <Skeleton className="h-9 w-24" />
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+                    ))}
                 </div>
-                <div className="rounded-md border border-slate-100">
-                    <div className="p-4 space-y-4">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <div key={i} className="flex gap-4">
-                                <Skeleton className="h-10 w-full" />
-                            </div>
-                        ))}
-                    </div>
+                <div className="space-y-3">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-[400px] w-full rounded-xl" />
                 </div>
             </div>
         );
@@ -330,222 +391,264 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
 
     if ((error && !data) || (!data && !isLoading)) {
         return (
-            <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-center text-sm text-red-600">
-                {t('admin.data.errors.load_failed')}
+            <div className="rounded-2xl border-2 border-dashed border-red-100 bg-red-50/50 p-12 text-center">
+                <div className="inline-flex p-4 bg-red-100 text-red-600 rounded-full mb-4">
+                    <AlertTriangle className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg font-black text-red-900 mb-2">{t('common.error')}</h3>
+                <p className="text-red-600 font-medium max-w-xs mx-auto">
+                    {t('admin.data.errors.load_failed')}
+                </p>
+                <Button
+                    variant="outline"
+                    className="mt-6 border-red-200 text-red-700 hover:bg-red-100"
+                    onClick={() => window.location.reload()}
+                >
+                    {t('common.errors.retry')}
+                </Button>
             </div>
         );
     }
 
-    // TypeScript guard: ensure data is loaded
-    if (!data) {
-        return null;
-    }
+    const liveCount = effectiveParticipants.filter((p) => !p.is_test_run).length;
+    const testCount = effectiveParticipants.filter((p) => p.is_test_run).length;
 
     return (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Toolbar */}
-            <div className="flex flex-col gap-6">
-                {data.study.postsort_config?.email_collection_enabled && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 p-4 rounded-xl shadow-sm">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                                    <Mail className="w-4 h-4" />
-                                </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    {t('admin.data.stats.email_collection', 'Email Collection')}
-                                </span>
-                            </div>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-2xl font-black text-indigo-900">
-                                    {data.participants.filter((p) => p.postsort.email).length}
-                                </span>
-                                <span className="text-xs text-slate-400 font-medium">
-                                    / {data.participants.length}{' '}
-                                    {t('admin.data.stats.participants', 'participants')}
-                                </span>
-                            </div>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Summary Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <Mail className="w-5 h-5" />
                         </div>
-
-                        {data.study.postsort_config?.newsletter_consent_enabled !== false && (
-                            <div className="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 p-4 rounded-xl shadow-sm">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                                        <Bell className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t('admin.data.stats.newsletter', 'Newsletter Consent')}
-                                    </span>
-                                </div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-black text-emerald-900">
-                                        {
-                                            data.participants.filter(
-                                                (p) => p.postsort.newsletter_consent
-                                            ).length
-                                        }
-                                    </span>
-                                    <span className="text-xs text-slate-400 font-medium">
-                                        {Math.round(
-                                            (data.participants.filter(
-                                                (p) => p.postsort.newsletter_consent
-                                            ).length /
-                                                Math.max(1, data.participants.length)) *
-                                                100
-                                        )}
-                                        % {t('admin.data.stats.opt_in', 'opt-in')}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-
-                        {data.study.postsort_config?.interview_consent_enabled !== false && (
-                            <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-100 p-4 rounded-xl shadow-sm">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                                        <Users className="w-4 h-4" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t('admin.data.stats.follow_up', 'Follow-up Interview')}
-                                    </span>
-                                </div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-black text-amber-900">
-                                        {
-                                            data.participants.filter(
-                                                (p) => p.postsort.interview_consent
-                                            ).length
-                                        }
-                                    </span>
-                                    <span className="text-xs text-slate-400 font-medium">
-                                        {Math.round(
-                                            (data.participants.filter(
-                                                (p) => p.postsort.interview_consent
-                                            ).length /
-                                                Math.max(1, data.participants.length)) *
-                                                100
-                                        )}
-                                        % {t('admin.data.stats.interested', 'interested')}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
+                        <Badge variant="outline" className="bg-slate-50 font-bold border-slate-100">
+                            {Math.round(
+                                (data.participants.filter((p) => p.postsort.email).length /
+                                    Math.max(1, liveCount)) *
+                                    100
+                            )}
+                            % {t('admin.data.stats.opt_in')}
+                        </Badge>
                     </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1 w-full sm:w-auto">
-                        <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                            <Input
-                                placeholder={t('admin.data.search.placeholder')}
-                                value={globalFilter ?? ''}
-                                onChange={(e) => setGlobalFilter(e.target.value)}
-                                className="pl-9 bg-white border-slate-200 focus-visible:ring-indigo-500 rounded-lg shadow-sm font-mono text-sm"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="show-discarded"
-                                type="checkbox"
-                                checked={showDiscarded}
-                                onChange={(e) => setShowDiscarded(e.target.checked)}
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label
-                                htmlFor="show-discarded"
-                                className="text-sm text-slate-600 cursor-pointer select-none"
-                            >
-                                {t('admin.data.filter.show_discarded', 'Show test runs')}
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
-                        <span className="font-semibold text-slate-700">
-                            {table.getFilteredRowModel().rows.length}
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                        {t('admin.data.stats.email_collection')}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-slate-900 leading-none">
+                            {data.participants.filter((p) => p.postsort.email).length}
                         </span>
-                        <span>{t('admin.data.search.records_found', 'records found')}</span>
+                        <span className="text-sm text-slate-400 font-bold">
+                            / {liveCount} {t('admin.data.stats.participants')}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <Bell className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                        {t('admin.data.stats.newsletter')}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-slate-900 leading-none">
+                            {data.participants.filter((p) => p.postsort.newsletter_consent).length}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-200 hover:shadow-md transition-all">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                            <Users className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+                        {t('admin.data.stats.follow_up')}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-slate-900 leading-none">
+                            {data.participants.filter((p) => p.postsort.interview_consent).length}
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-                <Table>
-                    <TableHeader className="bg-slate-50/50">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow
-                                key={headerGroup.id}
-                                className="hover:bg-transparent border-slate-100"
-                            >
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead
-                                        key={header.id}
-                                        className={cn(
-                                            'h-10 text-xs font-bold uppercase tracking-wider text-slate-500',
-                                            // @ts-expect-error
-                                            header.column.columnDef.meta?.className
-                                        )}
-                                    >
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext()
-                                              )}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    className={cn(
-                                        'cursor-pointer hover:bg-indigo-50/30 transition-colors border-slate-50 group',
-                                        !!row.original.is_discarded &&
-                                            'opacity-50 bg-slate-50/50 italic grayscale-[0.5]'
-                                    )}
-                                    data-testid={
-                                        row.original.is_discarded || row.original.is_test_run
-                                            ? 'participant-row-discarded'
-                                            : 'participant-row-active'
-                                    }
-                                    onClick={() => handleViewParticipant(row.original)}
+            <Tabs
+                value={activeTab}
+                onValueChange={(v) => setActiveTab(v as 'live' | 'test')}
+                className="w-full"
+            >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <TabsList className="bg-slate-100/80 p-1 rounded-xl h-11 border border-slate-200/50">
+                        <TabsTrigger
+                            value="live"
+                            className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                {t('admin.data.tabs.live')}
+                                <Badge
+                                    variant="secondary"
+                                    className="ml-1.5 h-5 px-1.5 bg-slate-200/50 text-slate-600 border-none font-bold"
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className={cn(
-                                                'py-2.5',
-                                                // @ts-expect-error
-                                                cell.column.columnDef.meta?.className
-                                            )}
+                                    {liveCount}
+                                </Badge>
+                            </div>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="test"
+                            className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Beaker className="w-3.5 h-3.5" />
+                                {t('admin.data.tabs.test')}
+                                <span className="ml-1.5 text-slate-400 font-bold">{testCount}</span>
+                            </div>
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="relative group flex-1 sm:flex-initial">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                            <Input
+                                placeholder={t('admin.data.search.placeholder')}
+                                value={globalFilter ?? ''}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                className="pl-10 h-11 bg-white border-slate-200 focus-visible:ring-indigo-500 rounded-xl shadow-sm font-medium text-sm sm:w-80 group-hover:border-slate-300 transition-all"
+                            />
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                                setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
+                            }
+                            className={cn(
+                                'h-11 w-11 rounded-xl transition-all border-slate-200',
+                                qualityFilter === 'flagged'
+                                    ? 'bg-amber-50 border-amber-200 text-amber-600 shadow-inner'
+                                    : 'bg-white hover:bg-slate-50'
+                            )}
+                            title={t('admin.data.filter.only_flagged')}
+                        >
+                            <Filter className="h-4 w-4" />
+                        </Button>
+
+                        {activeTab === 'test' && testCount > 0 && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="h-11 rounded-xl border-red-100 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-200 font-bold gap-2 shadow-sm"
+                                        disabled={isClearing}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="hidden sm:inline">
+                                            {t('admin.data.actions.clear_test_runs')}
+                                        </span>
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                                            <div className="p-2 bg-red-100 text-red-600 rounded-xl">
+                                                <Trash2 className="w-5 h-5" />
+                                            </div>
+                                            {t('admin.data.actions.clear_test_runs')}
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                                            {t('admin.data.actions.clear_test_runs_confirm')}
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="gap-2">
+                                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                                            {t('common.cancel')}
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleClearTestRuns}
+                                            className="bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold h-12 shadow-lg shadow-red-200 border-none"
                                         >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
+                                            {t('common.delete')}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
+                    <Table>
+                        <TableHeader className="bg-slate-50/80">
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow
+                                    key={headerGroup.id}
+                                    className="hover:bg-transparent border-slate-100"
+                                >
+                                    {headerGroup.headers.map((header) => (
+                                        <TableHead
+                                            key={header.id}
+                                            className="h-14 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 px-6"
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef.header,
+                                                      header.getContext()
+                                                  )}
+                                        </TableHead>
                                     ))}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-32 text-center text-slate-400 text-sm"
-                                >
-                                    {t('admin.data.search.no_results')}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        className={cn(
+                                            'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                            !!row.original.is_discarded &&
+                                                'opacity-60 grayscale-[0.5]'
+                                        )}
+                                        onClick={() => handleViewParticipant(row.original)}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="px-6 py-5">
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-64 text-center"
+                                    >
+                                        <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                            <div className="p-4 bg-slate-50 rounded-full">
+                                                <MousePointer2 className="w-8 h-8 opacity-20" />
+                                            </div>
+                                            <p className="font-bold">
+                                                {t('admin.data.search.no_results')}
+                                            </p>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            </Tabs>
         </div>
     );
 }

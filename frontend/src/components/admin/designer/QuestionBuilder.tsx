@@ -73,12 +73,21 @@ interface QuestionItemProps {
     onUpdate: (data: QuestionConfig) => void;
     onDelete: () => void;
     activeLocale: string;
+    readOnly?: boolean;
 }
 
-const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: QuestionItemProps) => {
+const QuestionItem = ({
+    id,
+    question,
+    onUpdate,
+    onDelete,
+    activeLocale,
+    readOnly,
+}: QuestionItemProps) => {
     const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id,
+        disabled: readOnly,
     });
 
     const style = {
@@ -92,6 +101,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
             : question.label?.[activeLocale] || question.label?.en || '';
 
     const handleLabelChange = (val: string) => {
+        if (readOnly) return;
         onUpdate({
             ...question,
             label:
@@ -108,17 +118,20 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
             data-testid="question-item"
             className={cn(
                 'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
-                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20',
+                readOnly && 'opacity-80'
             )}
         >
             <div className="flex items-start p-4 gap-4">
-                <div
-                    {...attributes}
-                    {...listeners}
-                    className="mt-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
-                >
-                    <GripVertical className="h-5 w-5" />
-                </div>
+                {!readOnly && (
+                    <div
+                        {...attributes}
+                        {...listeners}
+                        className="mt-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
+                    >
+                        <GripVertical className="h-5 w-5" />
+                    </div>
+                )}
 
                 <div className="flex-1 min-w-0">
                     <Accordion type="single" collapsible className="w-full">
@@ -164,19 +177,21 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                         </span>
                                     </div>
                                 </AccordionTrigger>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onDelete();
-                                        }}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                {!readOnly && (
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDelete();
+                                            }}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
 
                             <AccordionContent className="pt-6 pb-2 space-y-6">
@@ -186,11 +201,15 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     </Label>
                                     <Input
                                         value={label}
+                                        readOnly={readOnly}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                             handleLabelChange(e.target.value)
                                         }
                                         placeholder={t('admin.design.questions.labels.placeholder')}
-                                        className="font-bold text-sm h-11 rounded-xl bg-slate-50/30"
+                                        className={cn(
+                                            'font-bold text-sm h-11 rounded-xl bg-slate-50/30',
+                                            readOnly && 'cursor-not-allowed opacity-70'
+                                        )}
                                     />
                                 </div>
 
@@ -198,6 +217,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     <div className="flex items-center gap-3">
                                         <Switch
                                             id={`req-${id}`}
+                                            disabled={readOnly}
                                             checked={question.required}
                                             onCheckedChange={(checked: boolean) =>
                                                 onUpdate({ ...question, required: checked })
@@ -238,7 +258,11 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                 >
                                                     <div className="size-1.5 rounded-full bg-slate-300 group-hover/opt:bg-indigo-400 transition-colors" />
                                                     <Input
-                                                        className="h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white"
+                                                        className={cn(
+                                                            'h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white',
+                                                            readOnly &&
+                                                                'cursor-not-allowed opacity-70'
+                                                        )}
                                                         value={
                                                             typeof opt === 'string'
                                                                 ? opt
@@ -246,9 +270,11 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                                   opt.label?.en ||
                                                                   ''
                                                         }
+                                                        readOnly={readOnly}
                                                         onChange={(
                                                             e: React.ChangeEvent<HTMLInputElement>
                                                         ) => {
+                                                            if (readOnly) return;
                                                             const newOpts = [
                                                                 ...(question.options || []),
                                                             ];
@@ -272,40 +298,46 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                             });
                                                         }}
                                                     />
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
-                                                        onClick={() => {
-                                                            const newOpts =
-                                                                question.options?.filter(
-                                                                    (_, i: number) => i !== idx
-                                                                );
-                                                            onUpdate({
-                                                                ...question,
-                                                                options: newOpts,
-                                                            } as QuestionConfig);
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    {!readOnly && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                                            onClick={() => {
+                                                                const newOpts =
+                                                                    question.options?.filter(
+                                                                        (_, i: number) => i !== idx
+                                                                    );
+                                                                onUpdate({
+                                                                    ...question,
+                                                                    options: newOpts,
+                                                                } as QuestionConfig);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             ))}
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full h-11 border-dashed border-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all font-bold"
-                                                onClick={() => {
-                                                    const newOpts = [
-                                                        ...(question.options || []),
-                                                        t('admin.design.questions.defaults.option'),
-                                                    ];
-                                                    onUpdate({ ...question, options: newOpts });
-                                                }}
-                                            >
-                                                <PlusCircle className="h-4 w-4 mr-2" />
-                                                {t('admin.design.questions.actions.add_option')}
-                                            </Button>
+                                            {!readOnly && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full h-11 border-dashed border-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all font-bold"
+                                                    onClick={() => {
+                                                        const newOpts = [
+                                                            ...(question.options || []),
+                                                            t(
+                                                                'admin.design.questions.defaults.option'
+                                                            ),
+                                                        ];
+                                                        onUpdate({ ...question, options: newOpts });
+                                                    }}
+                                                >
+                                                    <PlusCircle className="h-4 w-4 mr-2" />
+                                                    {t('admin.design.questions.actions.add_option')}
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -320,9 +352,10 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
 
 interface QuestionBuilderProps {
     type: 'pre' | 'post';
+    readOnly?: boolean;
 }
 
-const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
+const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
     const { t } = useTranslation();
     const { draft, updateDraft, activeLocale } = useStudyDesigner();
 
@@ -489,6 +522,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                             data-testid="presort-toggle"
                             checked={!!isPresortEnabled}
                             onCheckedChange={handlePresortToggle}
+                            disabled={readOnly}
                         />
                     </CardContent>
                 </Card>
@@ -498,64 +532,74 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
             {(type !== 'pre' || !!isPresortEnabled) && (
                 <>
                     <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
-                        <div className="flex items-center gap-2">
-                            <PlusCircle className="size-4 text-indigo-500" />
-                            <span className="text-sm font-bold text-slate-900 tracking-tight">
-                                {t('admin.design.questions.add_field')}
-                            </span>
-                        </div>
+                        {!readOnly && (
+                            <div className="flex items-center gap-2">
+                                <PlusCircle className="size-4 text-indigo-500" />
+                                <span className="text-sm font-bold text-slate-900 tracking-tight">
+                                    {t('admin.design.questions.add_field')}
+                                </span>
+                            </div>
+                        )}
 
-                        <div className="space-y-4">
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                {t('admin.design.questions.basic_fields')}
+                        {!readOnly && (
+                            <div className="space-y-4">
+                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    {t('admin.design.questions.basic_fields')}
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {[
+                                        { type: 'text', icon: Type, label: 'text' },
+                                        { type: 'textarea', icon: AlignLeft, label: 'long_text' },
+                                        { type: 'number', icon: Hash, label: 'number' },
+                                        { type: 'date', icon: Calendar, label: 'date' },
+                                        { type: 'email', icon: Mail, label: 'email' },
+                                    ].map((field) => (
+                                        <Button
+                                            key={field.type}
+                                            data-testid={`add-question-${field.type}`}
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addQuestion(field.type as QuestionType)}
+                                            className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                        >
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            {t(`admin.design.questions.types.${field.label}`)}
+                                        </Button>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="flex flex-wrap gap-3">
-                                {[
-                                    { type: 'text', icon: Type, label: 'text' },
-                                    { type: 'textarea', icon: AlignLeft, label: 'long_text' },
-                                    { type: 'number', icon: Hash, label: 'number' },
-                                    { type: 'date', icon: Calendar, label: 'date' },
-                                    { type: 'email', icon: Mail, label: 'email' },
-                                ].map((field) => (
-                                    <Button
-                                        key={field.type}
-                                        data-testid={`add-question-${field.type}`}
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => addQuestion(field.type as QuestionType)}
-                                        className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
-                                    >
-                                        <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
-                                        {t(`admin.design.questions.types.${field.label}`)}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
+                        )}
 
-                        <div className="space-y-4">
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                {t('admin.design.questions.choice_fields')}
+                        {!readOnly && (
+                            <div className="space-y-4">
+                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    {t('admin.design.questions.choice_fields')}
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {[
+                                        { type: 'select', icon: ListCircle, label: 'dropdown' },
+                                        { type: 'radio', icon: Circle, label: 'radio' },
+                                        {
+                                            type: 'checkbox',
+                                            icon: CheckSquare,
+                                            label: 'checkboxes',
+                                        },
+                                    ].map((field) => (
+                                        <Button
+                                            key={field.type}
+                                            data-testid={`add-question-${field.type}`}
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addQuestion(field.type as QuestionType)}
+                                            className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                        >
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            {t(`admin.design.questions.types.${field.label}`)}
+                                        </Button>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="flex flex-wrap gap-3">
-                                {[
-                                    { type: 'select', icon: ListCircle, label: 'dropdown' },
-                                    { type: 'radio', icon: Circle, label: 'radio' },
-                                    { type: 'checkbox', icon: CheckSquare, label: 'checkboxes' },
-                                ].map((field) => (
-                                    <Button
-                                        key={field.type}
-                                        data-testid={`add-question-${field.type}`}
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => addQuestion(field.type as QuestionType)}
-                                        className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
-                                    >
-                                        <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
-                                        {t(`admin.design.questions.types.${field.label}`)}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     <DndContext
@@ -587,6 +631,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                             id={q.id}
                                             question={q}
                                             activeLocale={activeLocale}
+                                            readOnly={readOnly}
                                             // biome-ignore lint/suspicious/noExplicitAny: dynamic question data
                                             onUpdate={(data: any) => {
                                                 // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update

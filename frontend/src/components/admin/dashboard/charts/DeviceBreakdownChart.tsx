@@ -112,7 +112,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                             {t(
-                                                'admin.dashboard.devices.types.' + item.key,
+                                                `admin.dashboard.devices.types.${item.key}`,
                                                 item.name
                                             )}
                                         </span>

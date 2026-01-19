@@ -25,6 +25,7 @@
         "step": "Step",
         "back": "Back",
         "cancel": "Cancel",
+        "delete": "Delete",
         "slots": "slots",
         "workspace_label": "Workspace",
         "reduce": "Reduce",
@@ -1138,19 +1139,27 @@
             }
         },
         "data": {
-            "title": "Analytics & Data",
-            "description": "Inspect participant performance, qualitative feedback, and export datasets.",
+            "title": "Data Explorer",
+            "description": "Monitor real-time participation, analyze data quality, and manage research sessions.",
             "stats": {
-                "email_collection": "Email Collection",
-                "participants": "participants",
-                "newsletter": "Newsletter Consent",
-                "opt_in": "opt-in",
-                "follow_up": "Follow-up Interview",
+                "email_collection": "Lead Generation",
+                "participants": "total",
+                "newsletter": "Opt-ins",
+                "opt_in": "conversion",
+                "follow_up": "Research Leads",
                 "interested": "interested"
             },
             "tabs": {
-                "browse": "Interactive view",
-                "export": "Export data"
+                "live": "Live Participants",
+                "test": "Test Sessions",
+                "browse": "Interactive View",
+                "export": "Export Hub"
+            },
+            "actions": {
+                "clear_test_runs": "Purge Test Data",
+                "clear_test_runs_confirm": "Delete all test sessions? This action is irreversible and for maintenance only.",
+                "clear_test_runs_success": "Pipeline cleaned: Test data purged",
+                "clear_test_runs_error": "System failure: Could not purge test data"
             },
             "guide": {
                 "title": "Format guide",
@@ -1168,26 +1177,32 @@
                 }
             },
             "table": {
+                "participant": "Participant Identity",
                 "id_token": "ID / Token",
-                "lang": "Lang",
-                "flags": "Flags",
-                "duration": "Duration",
-                "actions": "Actions"
+                "lang": "Locale",
+                "flags": "Data Quality",
+                "duration": "Effort / Duration",
+                "actions": "Details",
+                "submitted": "Submitted",
+                "status": "State"
             },
             "tooltips": {
-                "suspect": "Suspect (Fast completion)",
-                "has_comments": "Has Qualitative Comments"
+                "suspect": "Suspect: Completion time unusually fast",
+                "has_comments": "Contains qualitative insights"
             },
             "filter": {
-                "show_discarded": "Show discarded & test runs"
+                "show_discarded": "Include discarded records",
+                "all_states": "All States",
+                "only_active": "Only Active",
+                "only_flagged": "Flagged Quality"
             },
             "search": {
-                "placeholder": "Search IDs...",
-                "records_found": "records found",
-                "no_results": "No results found"
+                "placeholder": "Search by ID or recruitment token...",
+                "records_found": "records detected",
+                "no_results": "No records match your query"
             },
             "errors": {
-                "load_failed": "Failed to load dataset. Please try refreshing the page."
+                "load_failed": "Cloud sync interrupted. Please check your connection."
             },
             "detail": {
                 "title": "Participant Profile",

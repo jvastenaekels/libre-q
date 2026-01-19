@@ -13,6 +13,7 @@ interface MarkdownEditorProps {
     id?: string;
     placeholder?: string;
     className?: string;
+    readOnly?: boolean;
 }
 
 const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
@@ -22,6 +23,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     id,
     placeholder,
     className,
+    readOnly,
 }) => {
     const { t } = useTranslation();
     const [view, setView] = useState<'edit' | 'preview'>('edit');
@@ -74,7 +76,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             className="h-7 w-7"
                             onClick={() => insertText('**', '**')}
                             title={t('admin.components.markdown.bold')}
-                            disabled={view === 'preview'}
+                            disabled={view === 'preview' || readOnly}
                         >
                             <Bold className="h-3.5 w-3.5" />
                         </Button>
@@ -84,7 +86,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             className="h-7 w-7"
                             onClick={() => insertText('_', '_')}
                             title={t('admin.components.markdown.italic')}
-                            disabled={view === 'preview'}
+                            disabled={view === 'preview' || readOnly}
                         >
                             <Italic className="h-3.5 w-3.5" />
                         </Button>
@@ -94,7 +96,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             className="h-7 w-7"
                             onClick={() => insertText('\n- ')}
                             title={t('admin.components.markdown.list')}
-                            disabled={view === 'preview'}
+                            disabled={view === 'preview' || readOnly}
                         >
                             <List className="h-3.5 w-3.5" />
                         </Button>
@@ -104,7 +106,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             className="h-7 w-7"
                             onClick={() => insertText('[', '](url)')}
                             title={t('admin.components.markdown.link')}
-                            disabled={view === 'preview'}
+                            disabled={view === 'preview' || readOnly}
                         >
                             <Link className="h-3.5 w-3.5" />
                         </Button>
@@ -141,6 +143,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             onChange={(e) => onChange(e.target.value)}
                             placeholder={placeholder}
                             className="w-full h-full min-h-[120px] p-3 text-sm focus:outline-none resize-none border-none bg-transparent"
+                            readOnly={readOnly}
                         />
                     ) : (
                         <div className="p-4 prose prose-sm max-w-none prose-slate min-h-[120px] bg-slate-50/30">

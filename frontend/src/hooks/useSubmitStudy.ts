@@ -66,10 +66,20 @@ export const useSubmitStudy = () => {
                 };
 
                 if (isTestMode) {
-                    console.log('PILOT SUBMISSION (Simulated):', payload);
+                    // Send to backend anyway but with is_test_run: true
+                    const data = await submitStudyMutation({
+                        data: { ...payload, is_test_run: true },
+                    });
+
                     if (status === 'completed') {
                         setIsSuccess(true);
-                        const code = `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                        // biome-ignore lint/suspicious/noExplicitAny: API types
+                        const responseData = data as any;
+                        const code =
+                            responseData?.confirmation_code ||
+                            responseData?.data?.confirmation_code ||
+                            `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
                         setConfirmationCode(code);
                         session.completeSession(code);
                     }

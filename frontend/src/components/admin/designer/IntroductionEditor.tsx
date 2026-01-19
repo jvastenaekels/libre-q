@@ -12,7 +12,7 @@ import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 
-const IntroductionEditor = () => {
+const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
@@ -67,6 +67,7 @@ const IntroductionEditor = () => {
                                 }
                                 placeholder={t('admin.design.intro.fields.title_placeholder')}
                                 className="font-bold text-lg h-11 rounded-xl"
+                                disabled={readOnly}
                             />
                         </div>
                         <div className="grid gap-2.5">
@@ -84,6 +85,7 @@ const IntroductionEditor = () => {
                                 }
                                 placeholder={t('admin.design.intro.fields.subtitle_placeholder')}
                                 className="font-medium h-10 rounded-xl"
+                                disabled={readOnly}
                             />
                         </div>
                         <div className="grid gap-2.5">
@@ -93,6 +95,7 @@ const IntroductionEditor = () => {
                                 value={translation?.objective || ''}
                                 onChange={(val: string) => handleChange('objective', val)}
                                 placeholder={t('admin.design.intro.fields.objective_placeholder')}
+                                readOnly={readOnly}
                             />
                         </div>
                     </CardContent>
@@ -115,29 +118,32 @@ const IntroductionEditor = () => {
                                 <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                     {t('admin.design.intro.fields.task_overview')}
                                 </Label>
-                                <button
-                                    type="button"
-                                    onClick={resetInstructions}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                             font-black uppercase tracking-wider text-slate-500
-                                             hover:bg-slate-100 hover:text-indigo-600 transition-colors
-                                             shadow-sm border bg-white"
-                                >
-                                    <RotateCcw className="size-3" />
-                                    {t('common.reset_to_default')}
-                                </button>
+                                {!readOnly && (
+                                    <button
+                                        type="button"
+                                        onClick={resetInstructions}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
+                                                 font-black uppercase tracking-wider text-slate-500
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors
+                                                 shadow-sm border bg-white"
+                                    >
+                                        <RotateCcw className="size-3" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <MarkdownEditor
                                 id="instructions"
                                 value={translation?.instructions || ''}
                                 onChange={(val: string) => handleChange('instructions', val)}
                                 placeholder={t('admin.design.intro.fields.task_placeholder')}
+                                readOnly={readOnly}
                             />
                         </div>
                     </CardContent>
                 </Card>
 
-                <ProcessStepEditor />
+                <ProcessStepEditor readOnly={readOnly} />
             </section>
 
             {/* Consent Section (Mandatory) */}
@@ -162,15 +168,17 @@ const IntroductionEditor = () => {
                                     {t('admin.design.intro.consent_desc')}
                                 </CardDescription>
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={resetConsent}
-                                className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
-                            >
-                                <RotateCcw className="size-4 mr-2" />
-                                {t('admin.design.reset_defaults')}
-                            </Button>
+                            {!readOnly && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={resetConsent}
+                                    className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
+                                >
+                                    <RotateCcw className="size-4 mr-2" />
+                                    {t('admin.design.reset_defaults')}
+                                </Button>
+                            )}
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -188,6 +196,7 @@ const IntroductionEditor = () => {
                                     handleChange('consent_title', e.target.value)
                                 }
                                 className="font-bold text-sm h-10 rounded-xl"
+                                disabled={readOnly}
                             />
                         </div>
                         <div className="grid gap-2.5">
@@ -197,6 +206,7 @@ const IntroductionEditor = () => {
                                 value={translation?.consent_description || ''}
                                 onChange={(val: string) => handleChange('consent_description', val)}
                                 placeholder={t('admin.design.intro.fields.legal_placeholder')}
+                                readOnly={readOnly}
                             />
                         </div>
                     </CardContent>

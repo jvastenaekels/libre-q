@@ -2433,6 +2433,83 @@ export const useImportStudyConfigApiAdminStudiesImportPost = <
 };
 
 /**
+ * Delete all participants flagged as is_test_run for this study.
+ * @summary Clear Test Runs
+ */
+export const clearTestRunsApiAdminStudiesSlugTestRunsDelete = (slug: string) => {
+    return customInstance<void>({ url: `/api/admin/studies/${slug}/test-runs`, method: 'DELETE' });
+};
+
+export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['clearTestRunsApiAdminStudiesSlugTestRunsDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return clearTestRunsApiAdminStudiesSlugTestRunsDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>
+>;
+
+export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Clear Test Runs
+ */
+export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Export study results as CSV.
  * @summary Export Csv
  */
@@ -6240,12 +6317,12 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
             title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
                 undefined,
             ]),
             instructions: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
@@ -6259,21 +6336,21 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
             ]),
             objective: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
@@ -6388,6 +6465,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         undefined,
     ]),
     requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -6519,12 +6600,12 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                     language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
                     title: faker.string.alpha({ length: { min: 10, max: 200 } }),
                     description: faker.helpers.arrayElement([
-                        faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                        faker.string.alpha({ length: { min: 10, max: 5000 } }),
                         undefined,
                     ]),
                     instructions: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
                             null,
                         ]),
                         undefined,
@@ -6538,21 +6619,21 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                     ]),
                     objective: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
                             null,
                         ]),
                         undefined,
                     ]),
                     condition_of_instruction: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
                             null,
                         ]),
                         undefined,
                     ]),
                     pre_instruction: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
                             null,
                         ]),
                         undefined,
@@ -6675,6 +6756,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
             undefined,
         ]),
         requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        participant_count: faker.helpers.arrayElement([
+            faker.number.int({ min: undefined, max: undefined }),
+            undefined,
+        ]),
     }));
 
 export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
@@ -6801,12 +6886,12 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
             title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
                 undefined,
             ]),
             instructions: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
@@ -6820,21 +6905,21 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
             ]),
             objective: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
@@ -6949,6 +7034,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         undefined,
     ]),
     requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -7076,12 +7165,12 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
             title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
                 undefined,
             ]),
             instructions: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
@@ -7095,21 +7184,21 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
             ]),
             objective: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
@@ -7224,6 +7313,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         undefined,
     ]),
     requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -7354,12 +7447,12 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
             title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
                 undefined,
             ]),
             instructions: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
@@ -7373,21 +7466,21 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
             ]),
             objective: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
             ]),
             pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
                     null,
                 ]),
                 undefined,
@@ -7502,6 +7595,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         undefined,
     ]),
     requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -8475,6 +8572,24 @@ export const getImportStudyConfigApiAdminStudiesImportPostMockHandler = (
     );
 };
 
+export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug/test-runs',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -9195,6 +9310,7 @@ export const getOpenQAPIMock = () => [
     getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
     getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
     getImportStudyConfigApiAdminStudiesImportPostMockHandler(),
+    getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
