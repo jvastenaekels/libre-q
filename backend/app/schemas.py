@@ -191,10 +191,8 @@ class ProcessStep(BaseModel):
     @field_validator("title", "description", "icon")
     @classmethod
     def validate_strings(cls, v: str) -> str:
-        res = validate_non_empty_string(v)
-        if res is None:
-            raise ValueError("Field cannot be empty or whitespace only")
-        return res
+        # Relaxed for drafts. Activation validation handles empty strings.
+        return v
 
 
 class StudyTranslationBase(BaseModel):
@@ -228,13 +226,8 @@ class StudyTranslationBase(BaseModel):
     )
     @classmethod
     def validate_trans_strings(cls, v: str | None) -> str | None:
-        """Validate translation strings - strip whitespace and reject empty strings."""
-        if v is None:
-            return None
-        res = validate_non_empty_string(v)
-        if res is None:
-            raise ValueError("String cannot be empty or whitespace only")
-        return res
+        """Relax validation for drafts - allow empty strings."""
+        return v
 
 
 class StudyTranslationCreate(StudyTranslationBase):
