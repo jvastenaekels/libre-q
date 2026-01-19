@@ -232,7 +232,7 @@
         "default_text": "**Ymmärryksen vahvistaminen:** Rastittamalla alla olevan ruudun vahvistat lukeneesi tervetuloa-sivulla kuvatut tutkimuksen tavoitteet ja menettelyt. Ymmärrät, että tämä tehtävä sisältää väitteiden lajittelua henkilökohtaisen näkökulmasi mallintamiseksi ja että oikeita tai vääriä vastauksia ei ole.\n\n**Luottamuksellisuus ja tietosuoja:** Osallistumisesi on anonyymiä. Vastauksillesi annetaan koodi, eikä niitä yhdistetä henkilöllisyyteesi missään raporteissa tai julkaisuissa. Kerätyt tiedot analysoidaan yhdessä jaettujen näkökulmien (faktoreiden) tunnistamiseksi. Lajittelun jälkeisessä vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimettömästi näiden näkökantojen havainnollistamiseksi.\n\n**Vapaaehtoinen osallistuminen:** Osallistuminen on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ilman seuraamuksia. Jos keskeytät ennen lähettämistä, osittaisia tietojasi ei säilytetä."
     },
     "presort": {
-        "title": "Tietoa sinusta",
+        "title": "Ennen kuin aloitamme",
         "description": "Ole hyvä ja vastaa muutamaan kysymykseen auttaaksesi meitä ymmärtämään näkökulmaasi.",
         "submit": "Jatka lajitteluun",
         "select_placeholder": "Valitse...",

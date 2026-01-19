@@ -232,7 +232,7 @@
         "default_text": "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et la présentation de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à trier des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-tri pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de tri et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées."
     },
     "presort": {
-        "title": "À propos de vous",
+        "title": "Avant de commencer",
         "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
         "submit": "Continuer vers le tri",
         "select_placeholder": "Sélectionner...",

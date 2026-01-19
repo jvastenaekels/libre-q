@@ -232,7 +232,7 @@
         "default_text": "**Confirmation of understanding:** By checking the box below, you confirm that you have read the study objectives and procedure described on the welcome page. You understand that this task involves sorting statements to model your personal point of view and that there are no right or wrong answers.\n\n**Confidentiality and data protection:** Your participation is anonymous. Your responses will be assigned a code and will not be linked to your identity in any reports or publications. The data collected will be analyzed collectively to identify shared perspectives (factors). Any written comments provided during the post-sort phase may be quoted anonymously to illustrate these viewpoints.\n\n**Voluntary participation:** Participation is entirely voluntary. You reserve the right to stop the sorting process and close the browser at any time without penalty. If you withdraw before submission, your partial data will not be retained."
     },
     "presort": {
-        "title": "About You",
+        "title": "Before we start",
         "description": "Please answer a few questions to help us situate your viewpoint.",
         "submit": "Continue to Sorting",
         "select_placeholder": "Select...",
