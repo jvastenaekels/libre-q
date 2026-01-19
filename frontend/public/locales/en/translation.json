@@ -196,7 +196,7 @@
     "welcome": {
         "start": "Get Started",
         "consent": {
-            "label": "I have read the above information and agree to participate in this study.",
+            "label": "I confirm that I have read the above information and consent to the processing of my data for the purposes of this study.",
             "error": "Please accept the terms to continue."
         },
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
@@ -227,9 +227,9 @@
         }
     },
     "consent": {
-        "title": "Participation Consent",
+        "title": "Informed consent and data processing agreement",
         "subtitle": "Please read the following information carefully.",
-        "default_text": "**Confirmation of understanding:** By checking the box below, you confirm that you have read the study objectives and procedure described on the welcome page. You understand that this task involves sorting statements to model your personal point of view and that there are no right or wrong answers.\n\n**Confidentiality and data protection:** Your participation is anonymous. Your responses will be assigned a code and will not be linked to your identity in any reports or publications. The data collected will be analyzed collectively to identify shared perspectives (factors). Any written comments provided during the post-sort phase may be quoted anonymously to illustrate these viewpoints.\n\n**Voluntary participation:** Participation is entirely voluntary. You reserve the right to stop the sorting process and close the browser at any time without penalty. If you withdraw before submission, your partial data will not be retained."
+        "default_text": "1. Nature of the study and participant understanding\nBy checking the box below, you acknowledge that you have reviewed the study objectives outlined on the home page. You understand that this exercise employs Q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance)\n\nData collection: Your responses (the Q-sort configuration and post-sort explanations) will be assigned a unique alphanumeric code upon submission.\n\nDe-identification and retention:\n\nStandard procedure: Direct identifiers (such as IP addresses) are immediately converted into an anonymous code and are never stored in their original format. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: If you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: The final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw\nYour participation is strictly voluntary. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: If you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: Due to the statistical nature of Q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights\nIn accordance with the General Data Protection Regulation (GDPR), you retain the right to request access to, or rectification of, your personal data as long as it remains identifiable (i.e., prior to final anonymization)."
     },
     "presort": {
         "title": "Before we start",
