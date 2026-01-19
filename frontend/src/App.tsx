@@ -10,8 +10,8 @@
  * Sets up routing, global error handling, and lazy loading of pages.
  */
 
-import { lazy } from 'react';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { lazy, useEffect } from 'react';
+import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -79,6 +79,23 @@ const AdminIndex = () => {
     return <AdminDashboard />;
 };
 
+const AdminWorkspaceRoute = () => {
+    const { slug } = useParams();
+    const { workspaces, setCurrentWorkspace, currentWorkspace } = useAuthStore();
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: updates on mount or slug change
+    useEffect(() => {
+        if (slug && workspaces) {
+            const ws = workspaces.find((w) => w.slug === slug);
+            if (ws && ws.id !== currentWorkspace?.id) {
+                setCurrentWorkspace(ws);
+            }
+        }
+    }, [slug, workspaces]);
+
+    return <AdminDashboard />;
+};
+
 const router = createBrowserRouter([
     {
         path: '/',
@@ -102,6 +119,10 @@ const router = createBrowserRouter([
                     {
                         index: true,
                         element: <AdminIndex />,
+                    },
+                    {
+                        path: 'w/:slug',
+                        element: <AdminWorkspaceRoute />,
                     },
                     {
                         path: 'studies/:slug',
