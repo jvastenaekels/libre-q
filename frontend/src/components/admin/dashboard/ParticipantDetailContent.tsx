@@ -193,60 +193,64 @@ export function ParticipantDetailContent({
             )}
 
             {/* Q-Sort Reconstruction */}
-            <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2 border-b border-slate-100 pb-2">
-                    <Eye className="w-4 h-4 text-indigo-500" />
-                    {t('admin.data.detail.sort_config', 'Sort Re-construction')}
-                </h3>
+            {participant.scores && participant.scores.some((s) => s !== null) && (
+                <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <Eye className="w-4 h-4 text-indigo-500" />
+                        {t('admin.data.detail.sort_config', 'Sort Re-construction')}
+                    </h3>
 
-                <ParticipantGridView
-                    participant={participant}
-                    studyData={studyData}
-                    className="mb-8"
-                />
+                    <ParticipantGridView
+                        participant={participant}
+                        studyData={studyData}
+                        className="mb-8"
+                    />
 
-                <div className="space-y-6 relative before:absolute before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 before:-z-10">
-                    {getReconstructedQSort(participant, studyData).map((pile) => (
-                        <div key={pile.score} className="relative pl-10 group">
-                            {/* Score Indicator */}
-                            <div
-                                className={cn(
-                                    'absolute left-0 top-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm border-2 z-10 bg-white',
-                                    pile.score > 0
-                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                        : pile.score < 0
-                                          ? 'bg-red-50 text-red-700 border-red-200'
-                                          : 'bg-slate-50 text-slate-700 border-slate-200'
-                                )}
-                            >
-                                {pile.score > 0 ? `+${pile.score}` : pile.score}
+                    <div className="space-y-6 relative before:absolute before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 before:-z-10">
+                        {getReconstructedQSort(participant, studyData).map((pile) => (
+                            <div key={pile.score} className="relative pl-10 group">
+                                {/* Score Indicator */}
+                                <div
+                                    className={cn(
+                                        'absolute left-0 top-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-sm border-2 z-10 bg-white',
+                                        pile.score > 0
+                                            ? 'bg-green-50 text-green-700 border-green-200'
+                                            : pile.score < 0
+                                              ? 'bg-red-50 text-red-700 border-red-200'
+                                              : 'bg-slate-50 text-slate-700 border-slate-200'
+                                    )}
+                                >
+                                    {pile.score > 0 ? `+${pile.score}` : pile.score}
+                                </div>
+
+                                {/* Statements Pile */}
+                                <div className="space-y-2">
+                                    {pile.statements.map((statement) => (
+                                        <div
+                                            key={statement.id}
+                                            className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm text-sm text-slate-700 leading-relaxed hover:border-indigo-300 hover:shadow-md transition-all relative"
+                                        >
+                                            <span className="text-[10px] font-bold text-slate-400 absolute top-2 right-2 opacity-50 select-none">
+                                                #{statement.id}
+                                            </span>
+                                            {/* Assuming first translation is main language or checking lang */}
+                                            <div className="pr-8">
+                                                {statement.translations[0]?.text ||
+                                                    `[Statement ${statement.id}]`}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {pile.statements.length === 0 && (
+                                        <div className="text-xs text-slate-400 italic pl-1">
+                                            {t('admin.data.detail.empty_pile', 'Empty pile')}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-
-                            {/* Statements Pile */}
-                            <div className="space-y-2">
-                                {pile.statements.map((statement) => (
-                                    <div
-                                        key={statement.id}
-                                        className="bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-sm text-slate-700 leading-relaxed hover:border-indigo-300 hover:shadow-md transition-all relative"
-                                    >
-                                        <span className="text-[10px] font-bold text-slate-400 absolute top-1.5 right-2 opacity-50 select-none">
-                                            #{statement.id}
-                                        </span>
-                                        {/* Assuming first translation is main language or checking lang */}
-                                        {statement.translations[0]?.text ||
-                                            `[Statement ${statement.id}]`}
-                                    </div>
-                                ))}
-                                {pile.statements.length === 0 && (
-                                    <div className="text-xs text-slate-400 italic pl-1">
-                                        Empty pile
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Post-Sort / Debrief */}
             {participant.postsort && Object.keys(participant.postsort).length > 0 && (

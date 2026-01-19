@@ -1,5 +1,7 @@
 {
     "common": {
+        "add": "Add",
+        "all": "All",
         "agree": "Somewhat agree",
         "disagree": "Somewhat disagree",
         "neutral": "Neutral",
@@ -333,6 +335,13 @@
     },
     "admin": {
         "study": {
+            "save": {
+                "success": "Changes saved successfully",
+                "synced_warnings": "Synced with server. Kept your changes in: {{fields}}",
+                "synced_concurrent": "Synced with concurrent changes from another user",
+                "conflict": "Conflict detected. Some changes could not be merged.",
+                "error": "Failed to save changes"
+            },
             "state": {
                 "manage": "Manage Study Flow"
             }
@@ -374,6 +383,7 @@
             "study_management": "Study Management",
             "search": "Search...",
             "studies": "Studies",
+            "select_study": "Select Study",
             "select_study_msg": "Please select or create a study to begin.",
             "study": "Study"
         },
@@ -517,7 +527,23 @@
             "recent_description": "A list of your most recently updated studies.",
             "created": "Created",
             "no_studies": "No studies found. Create your first study to get started!",
-            "import_study": "Import Study"
+            "import_study": "Import Study",
+            "timeline": {
+                "title": "Submissions Timeline",
+                "subtitle": "Daily participation trends",
+                "started": "Started",
+                "completed": "Completed"
+            },
+            "devices": {
+                "title": "Device Distribution",
+                "subtitle": "How participants access your study",
+                "types": {
+                    "desktop": "Desktop",
+                    "mobile": "Mobile",
+                    "tablet": "Tablet",
+                    "unknown": "Unknown"
+                }
+            }
         },
         "export": {
             "config": "Export Configuration",
@@ -554,7 +580,26 @@
             "validation_failed": "Validation failed",
             "success": "Study imported successfully",
             "redirecting": "Opening study designer...",
-            "failed": "Import failed"
+            "failed": "Import failed",
+            "validation": {
+                "errors": {
+                    "missing_version": "Missing version field",
+                    "unsupported_version": "Unsupported version: {{version}}",
+                    "missing_field": "Missing required field: {{field}}",
+                    "no_translations": "At least one translation required",
+                    "missing_translation_field": "Translation {{index}} missing required field: {{field}}",
+                    "invalid_lang_code": "Invalid language code: {{lang}}",
+                    "no_statements": "At least one statement required",
+                    "duplicate_codes": "Duplicate statement codes: {{codes}}",
+                    "missing_stmt_translations": "Statement {{index}} missing translations",
+                    "invalid_grid_config": "Invalid grid_config: must be a list",
+                    "grid_capacity_mismatch": "Statement count ({{count}}) doesn't match grid capacity ({{capacity}})",
+                    "invalid_grid_structure": "Invalid grid_config structure: {{error}}"
+                },
+                "warnings": {
+                    "external_logo": "Logo URL references external resource - may not be accessible"
+                }
+            }
         },
         "dialogs": {
             "create_study": {
@@ -580,16 +625,21 @@
         "study_overview": {
             "title": "Overview",
             "subtitle": "Real-time analytics and participant overview for this study.",
+            "back_to_overview": "Back to Overview",
             "sample_size": "Sample Size (N)",
             "valid": "valid",
             "completion_rate": "Completion Rate",
             "active": "active",
             "mobile": "mobile",
             "median_duration": "Median Duration",
+            "suspect": "Suspect",
             "time_to_complete": "Time to complete",
             "recent_activity": "Recent Activity",
             "latest_submissions": "Latest submissions (last 5 of {{total}})",
             "recently_completed": "Recently Completed",
+            "in_progress": "In Progress",
+            "discarded": "Discarded",
+            "started": "Started",
             "view_all": "View all participants and data details",
             "no_participants": "No participants yet.",
             "view_data": "View",
@@ -694,6 +744,7 @@
                 "viewer": "Read-only access to all modules."
             }
         },
+
         "design": {
             "translation_needed": "Review required (Copy)",
             "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
@@ -754,7 +805,21 @@
             },
             "validation": {
                 "failed_title": "Configuration Incomplete",
-                "failed_desc": "Your study cannot be activated yet. Please fix the following issues:"
+                "failed_desc": "Your study cannot be activated yet. Please fix the following issues:",
+                "errors": {
+                    "no_statements": "Study must have at least one statement.",
+                    "no_grid": "Grid configuration is missing.",
+                    "capacity_mismatch": "Grid capacity ({{total}}) does not match statement count ({{count}}).",
+                    "no_translations": "Study must have at least one language translation.",
+                    "missing_default_lang": "Default language ({{lang}}) translation is missing.",
+                    "missing_title": "Title is missing for language '{{lang}}'.",
+                    "missing_consent_title": "Consent title is missing for language '{{lang}}'.",
+                    "missing_consent_description": "Consent description is missing for language '{{lang}}'.",
+                    "missing_grid_instructions": "Grid sort instructions are missing for language '{{lang}}'.",
+                    "missing_step_title": "Step {{index}} title is missing for language '{{lang}}'.",
+                    "missing_statement_translation": "Statement '{{code}}' is missing translations for: {{missing}}.",
+                    "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'."
+                }
             },
             "languages": {
                 "manage_title": "Manage Languages",
@@ -890,13 +955,22 @@
                 },
                 "bulk": {
                     "title": "Bulk editor (quick paste)",
-                    "desc": "One statement per line. Supports \"Code: Text\" format.",
+                    "desc": "One statement per line. Supports \"Code: Text\" and Excel copy-paste (multi-language).",
                     "replace_all": "Replace all",
                     "append": "Append to list",
-                    "placeholder": "Paste your statements here...\n1. First statement\n2. Second statement",
+                    "sync_by_code": "Sync/Merge by code",
+                    "placeholder": "Simple: \n1. My statement\n\nExpert (Excel paste with headers): \ncode\ten\tfr\ns1\tHello\tSalut",
                     "detected": "{{count}} statements detected",
                     "process_replace": "Process & replace statements",
-                    "process_append": "Process & append statements"
+                    "process_append": "Process & append statements",
+                    "process_sync": "Process & sync translations",
+                    "detected_format": {
+                        "excel": "Excel format detected (Tabs)",
+                        "list": "List format detected (Code: Text)",
+                        "simple": "Simple list detected (one per line)",
+                        "multi_lang": "Multi-language: {{langs}}",
+                        "with_codes": "With custom codes"
+                    }
                 },
                 "set": {
                     "title": "Q-set",
@@ -934,6 +1008,7 @@
                     "auto_balance": "Auto-Balance",
                     "auto_balance_desc": "Reshape grid to a balanced semi-normal distribution",
                     "reshaped": "Grid reshaped to a balanced distribution",
+                    "balanced": "Grid balanced to standard distribution",
                     "no_statements": "Add statements first to auto-shape the grid",
                     "statements": "statements",
                     "ideal_shape": "Ideal Shape",
@@ -955,13 +1030,14 @@
             },
             "postsort": {
                 "extreme": {
-                    "title": "Extreme columns",
+                    "title": "Targeted columns",
                     "desc": "Select columns that trigger follow-up questions.",
                     "no_columns": "No columns selected.",
                     "add_label": "Add column:",
-                    "prompt_label": "Prompt for extreme cards",
+                    "prompt_label": "Prompt for statements",
                     "prompt_placeholder": "Why did you place this statement here?",
                     "add": "Add",
+                    "add_defaults": "Add default extremes",
                     "select_placeholder": "Select..."
                 },
                 "random_comments": {
@@ -1101,6 +1177,9 @@
             "tooltips": {
                 "suspect": "Suspect (Fast completion)",
                 "has_comments": "Has Qualitative Comments"
+            },
+            "filter": {
+                "show_discarded": "Show discarded & test runs"
             },
             "search": {
                 "placeholder": "Search IDs...",

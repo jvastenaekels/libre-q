@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import type { StudyUpdate, StudyRead } from '@/api/model';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
  * manual persistence to the backend.
  */
 export function useStudyPersistence() {
+    const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
     const {
         draft,
@@ -134,7 +136,7 @@ export function useStudyPersistence() {
             // This also ensures last_updated_at matches the server's new timestamp
             setStudy(result);
 
-            toast.success('Changes saved successfully');
+            toast.success(t('admin.study.save.success'));
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
                 return;
@@ -161,10 +163,12 @@ export function useStudyPersistence() {
                     if (mergeResult.success && mergeResult.merged) {
                         if (mergeResult.warnings && mergeResult.warnings.length > 0) {
                             toast.info(
-                                `Synced with server. Kept your changes in: ${mergeResult.warnings.join(', ')}`
+                                t('admin.study.save.synced_warnings', {
+                                    fields: mergeResult.warnings.join(', '),
+                                })
                             );
                         } else {
-                            toast.info('Synced with concurrent changes from another user');
+                            toast.info(t('admin.study.save.synced_concurrent'));
                         }
 
                         // 1. Update Baseline (server state becomes new original)
@@ -189,7 +193,7 @@ export function useStudyPersistence() {
                         return;
                     } else {
                         // Hard Conflict
-                        toast.error('Conflict detected. Some changes could not be merged.');
+                        toast.error(t('admin.study.save.conflict'));
                         setSyncStatus('error');
                         return;
                     }
@@ -200,7 +204,7 @@ export function useStudyPersistence() {
             } else {
                 console.error('Save failed:', error);
                 setSyncStatus('error');
-                toast.error('Failed to save changes');
+                toast.error(t('admin.study.save.error'));
             }
         }
     }, [
@@ -214,6 +218,7 @@ export function useStudyPersistence() {
         original,
         updateDraft,
         updateOriginal,
+        t,
     ]);
 
     return {

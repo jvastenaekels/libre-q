@@ -1,16 +1,21 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    useGetStudyDumpApiAdminStudiesSlugDumpGet,
+    useGetStudyApiAdminStudiesSlugGet,
+    useGetParticipantApiAdminStudiesParticipantsParticipantIdGet,
     useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
 } from '@/api/generated';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, User } from 'lucide-react';
-import type { DumpResponse } from '@/components/admin/dashboard/InteractiveDataView';
+import type {
+    DumpResponse,
+    DumpParticipant,
+} from '@/components/admin/dashboard/InteractiveDataView';
 import { ParticipantDetailContent } from '@/components/admin/dashboard/ParticipantDetailContent';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { useMemo } from 'react';
 
 export default function ParticipantDetailsPage() {
     const { slug, participantId } = useParams<{
@@ -20,28 +25,108 @@ export default function ParticipantDetailsPage() {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    // Use the dump API for now as requested
+    // Fetch Study Info
+    const { data: study, isLoading: isStudyLoading } = useGetStudyApiAdminStudiesSlugGet(
+        slug || ''
+    );
+
+    // Fetch Individual Participant
     const {
-        data: rawData,
-        isLoading,
+        data: participant,
+        isLoading: isParticipantLoading,
         error,
         refetch,
-    } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug || '');
-    const studyData = rawData as unknown as DumpResponse;
+    } = useGetParticipantApiAdminStudiesParticipantsParticipantIdGet(Number(participantId), {
+        query: {
+            enabled: !!participantId && !Number.isNaN(Number(participantId)),
+            retry: 1,
+        },
+    });
 
     const discardMutation =
         useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
 
-    // Find the participant
-    const participant = studyData?.participants?.find(
-        (p) => String(p.db_id || p.id) === participantId
-    );
+    // Adapt data to Match Dump Format expected by ParticipantDetailContent
+    const { studyData, participantData } = useMemo(() => {
+        if (!study || !participant) return { studyData: null, participantData: null };
+
+        // 1. Adapt Study
+        // Sort statements by ID to ensure consistent order for scores array
+        const sortedStatements = [...(study.statements || [])].sort((a, b) => a.id - b.id);
+
+        const adaptedStudy: DumpResponse['study'] = {
+            slug: study.slug,
+            statements: sortedStatements.map((s) => ({
+                id: s.id,
+                code: s.code,
+                translations:
+                    s.translations?.map((tr) => ({
+                        lang: tr.language_code,
+                        text: tr.text,
+                    })) || [],
+            })),
+            translations:
+                study.translations?.map((tr) => ({
+                    lang: tr.language_code,
+                    title: tr.title || '',
+                })) || [],
+            // biome-ignore lint/suspicious/noExplicitAny: generic cast
+            grid_config: study.grid_config as any,
+            // biome-ignore lint/suspicious/noExplicitAny: generic cast
+            postsort_config: study.postsort_config as any,
+        };
+
+        const studyDump: DumpResponse = {
+            study: adaptedStudy,
+            participants: [], // Not needed for detail view context usually, or filled below
+            statement_id_to_index: sortedStatements.reduce(
+                (acc, s, idx) => {
+                    acc[s.id] = idx;
+                    return acc;
+                },
+                {} as Record<string, number>
+            ),
+        };
+
+        // 2. Adapt Participant
+        const placements: Record<string, number> = {};
+        participant.qsort_entries?.forEach((entry) => {
+            placements[entry.statement_id] = entry.grid_score;
+        });
+
+        const scores: (number | null)[] = sortedStatements.map((s) => {
+            return placements[s.id] !== undefined ? placements[s.id] : null;
+        });
+
+        const adaptedParticipant: DumpParticipant = {
+            id: participant.session_token,
+            db_id: participant.id,
+            duration_seconds:
+                participant.submitted_at && participant.created_at
+                    ? (new Date(participant.submitted_at).getTime() -
+                          new Date(participant.created_at).getTime()) /
+                      1000
+                    : null,
+            scores,
+            placements,
+            // biome-ignore lint/suspicious/noExplicitAny: generic cast
+            presort: (participant.presort_answers as any) || {},
+            // biome-ignore lint/suspicious/noExplicitAny: generic cast
+            postsort: (participant.postsort_answers as any) || {},
+            language: participant.language_used || 'en',
+            is_discarded: participant.is_discarded,
+            is_test_run: participant.is_test_run,
+            discard_reason: participant.discard_reason,
+        };
+
+        return { studyData: studyDump, participantData: adaptedParticipant };
+    }, [study, participant]);
 
     const handleToggleDiscard = async (isDiscarded: boolean) => {
         if (!participant) return;
         try {
             await discardMutation.mutateAsync({
-                participantId: Number(participantId) || Number(participant.id), // Try params first, then data
+                participantId: participant.id,
                 data: { is_discarded: isDiscarded },
             });
             await refetch();
@@ -53,6 +138,8 @@ export default function ParticipantDetailsPage() {
             toast.error(t('admin.data.toast.error'));
         }
     };
+
+    const isLoading = isStudyLoading || isParticipantLoading;
 
     if (isLoading) {
         return (
@@ -66,7 +153,7 @@ export default function ParticipantDetailsPage() {
         );
     }
 
-    if (error || !participant) {
+    if (error || !participant || !studyData || !participantData) {
         return (
             <div className="p-6 flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
                 <div className="bg-red-50 p-4 rounded-full">
@@ -94,13 +181,13 @@ export default function ParticipantDetailsPage() {
                     className="mb-4 text-slate-500 hover:text-slate-900 pl-0 hover:bg-transparent"
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t('admin.studies.back_to_overview', 'Back to Overview')}
+                    {t('admin.study_overview.back_to_overview', 'Back to Overview')}
                 </Button>
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.studies.study', 'Study')}: ${
-                        studyData.study.translations[0]?.title || studyData.study.slug
+                    description={`${t('admin.sidebar.study', 'Study')}: ${
+                        study?.translations?.[0]?.title || study?.slug
                     }`}
                     icon={User}
                 />
@@ -109,7 +196,7 @@ export default function ParticipantDetailsPage() {
             <div className="flex-1 overflow-y-auto px-6 pb-6">
                 <div className="bg-white rounded-2xl border-none shadow-sm max-w-5xl mx-auto min-h-[500px]">
                     <ParticipantDetailContent
-                        participant={participant}
+                        participant={participantData}
                         studyData={studyData}
                         onToggleDiscard={handleToggleDiscard}
                         isDiscardPending={discardMutation.isPending}

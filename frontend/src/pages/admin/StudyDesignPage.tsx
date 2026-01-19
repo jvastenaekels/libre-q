@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { StudyTranslationRead, StudyTranslationCreate } from '@/api/model';
 import {
@@ -15,6 +15,8 @@ import {
     Settings2,
     Rocket,
     ArrowRight,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +42,7 @@ import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButt
 import { customInstance } from '@/api/mutator';
 
 import { toast } from 'sonner';
+import { formatBackendError } from '@/utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
 import {
@@ -76,6 +79,37 @@ const StudyDesignPage = () => {
         setActiveLocale,
         syncStatus,
     } = useStudyDesigner();
+
+    const tabsListRef = useRef<HTMLDivElement>(null);
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
+
+    const checkScroll = () => {
+        if (tabsListRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
+            setShowLeftArrow(scrollLeft > 0);
+            setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 2);
+        }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(checkScroll, 100);
+        window.addEventListener('resize', checkScroll);
+        return () => {
+            window.removeEventListener('resize', checkScroll);
+            clearTimeout(timer);
+        };
+    }, [activeStep]); // Re-check when step changes as it might auto-scroll
+
+    const scrollTabs = (direction: 'left' | 'right') => {
+        if (tabsListRef.current) {
+            const scrollAmount = 300;
+            tabsListRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+    };
 
     // Enable manual persistence
     const { save } = useStudyPersistence();
@@ -542,7 +576,7 @@ const StudyDesignPage = () => {
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
                 {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
-                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
+                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-start justify-center p-4 sm:p-8 pt-24">
                         <div className="bg-white border-none shadow-2xl rounded-3xl p-10 max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
                             <div
                                 className={cn(
@@ -603,81 +637,109 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full lg:max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14">
-                            <TabsTrigger
-                                value="intro"
-                                data-testid="tab-intro"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100 text-slate-500 hover:text-slate-900"
+                        <div className="relative max-w-full lg:max-w-5xl mx-auto mb-12 group/tabs">
+                            {showLeftArrow && (
+                                <button
+                                    type="button"
+                                    onClick={() => scrollTabs('left')}
+                                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
+                                    aria-label="Scroll left"
+                                >
+                                    <ChevronLeft size={20} strokeWidth={3} />
+                                </button>
+                            )}
+
+                            <TabsList
+                                ref={tabsListRef}
+                                onScroll={checkScroll}
+                                className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full shadow-sm scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    👋
-                                </span>{' '}
-                                {t('admin.design.tabs.welcome')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="pre-sort"
-                                data-testid="tab-pre-sort"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    📋
-                                </span>{' '}
-                                {t('admin.design.tabs.presort')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="condition"
-                                data-testid="tab-condition"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    🎯
-                                </span>{' '}
-                                {t('admin.design.tabs.condition')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="q-sort"
-                                data-testid="tab-q-sort"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    🧩
-                                </span>{' '}
-                                {t('admin.design.tabs.qsort')}
-                                {isStructureLocked && (
-                                    <Lock size={12} className="text-slate-400 ml-1" />
-                                )}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="post-sort"
-                                data-testid="tab-post-sort"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    💬
-                                </span>{' '}
-                                {t('admin.design.tabs.postsort')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="branding"
-                                data-testid="tab-branding"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    🎨
-                                </span>{' '}
-                                {t('admin.design.tabs.theme')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="interface"
-                                data-testid="tab-interface"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-slate-100 text-slate-500 hover:text-slate-900"
-                            >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    ✨
-                                </span>{' '}
-                                {t('admin.design.tabs.interface')}
-                            </TabsTrigger>
-                        </TabsList>
+                                <TabsTrigger
+                                    value="intro"
+                                    data-testid="tab-intro"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        👋
+                                    </span>{' '}
+                                    {t('admin.design.tabs.welcome')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="pre-sort"
+                                    data-testid="tab-pre-sort"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        📋
+                                    </span>{' '}
+                                    {t('admin.design.tabs.presort')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="condition"
+                                    data-testid="tab-condition"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        🎯
+                                    </span>{' '}
+                                    {t('admin.design.tabs.condition')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="q-sort"
+                                    data-testid="tab-q-sort"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        🧩
+                                    </span>{' '}
+                                    {t('admin.design.tabs.qsort')}
+                                    {isStructureLocked && (
+                                        <Lock size={12} className="text-slate-400 ml-1" />
+                                    )}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="post-sort"
+                                    data-testid="tab-post-sort"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        💬
+                                    </span>{' '}
+                                    {t('admin.design.tabs.postsort')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="branding"
+                                    data-testid="tab-branding"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        🎨
+                                    </span>{' '}
+                                    {t('admin.design.tabs.theme')}
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="interface"
+                                    data-testid="tab-interface"
+                                    className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-slate-100 text-slate-500 hover:text-slate-900"
+                                >
+                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                        ✨
+                                    </span>{' '}
+                                    {t('admin.design.tabs.interface')}
+                                </TabsTrigger>
+                            </TabsList>
+
+                            {showRightArrow && (
+                                <button
+                                    type="button"
+                                    onClick={() => scrollTabs('right')}
+                                    className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
+                                    aria-label="Scroll right"
+                                >
+                                    <ChevronRight size={20} strokeWidth={3} />
+                                </button>
+                            )}
+                        </div>
 
                         {(() => {
                             const isCopy = (
@@ -975,7 +1037,7 @@ const StudyDesignPage = () => {
                                 className="flex gap-3 text-sm font-bold text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100"
                             >
                                 <div className="h-2 w-2 rounded-full bg-rose-400 mt-1.5 shrink-0" />
-                                <span>{err}</span>
+                                <span>{formatBackendError(err, t)}</span>
                             </div>
                         ))}
                     </div>

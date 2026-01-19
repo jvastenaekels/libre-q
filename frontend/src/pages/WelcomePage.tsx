@@ -15,7 +15,7 @@ import { ArrowRight, Target } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -30,18 +30,44 @@ interface WelcomePageProps {
 const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { t } = useTranslation();
 
     const config = useConfigStore((state) => state.config);
     const setStep = useSessionStore((state) => state.setStep);
+    const setPilotMode = useSessionStore((state) => state.setPilotMode);
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
 
-    // Set Step 1 on mount
+    // Set Step 1 on mount and sync Pilot Mode
     React.useEffect(() => {
         setStep(1);
-    }, [setStep]);
+
+        // Pilot Mode Logic: "Running a test run and then a normal run should not contaminate the normal run"
+        // We strictly sync the pilot state with the URL presence of 'mode=test' at the entry point (Welcome).
+        const params = new URLSearchParams(location.search);
+        const isUrlTest = params.get('mode') === 'test';
+
+        if (isUrlTest) {
+            if (!isPilotMode) {
+                setPilotMode(true);
+            }
+            if (sessionStorage.getItem('open-q-pilot-mode') !== 'true') {
+                sessionStorage.setItem('open-q-pilot-mode', 'true');
+            }
+        } else {
+            // If URL does not have mode=test, we ensure we are NOT in pilot mode.
+            // This cleans up any leftover state from previous test runs.
+            if (isPilotMode) {
+                setPilotMode(false);
+            }
+            if (sessionStorage.getItem('open-q-pilot-mode')) {
+                sessionStorage.removeItem('open-q-pilot-mode');
+            }
+        }
+    }, [setStep, setPilotMode, isPilotMode, location.search]);
 
     // Dynamic scaling logic for animation
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -100,9 +126,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     {study.description}
                 </p>
 
-                {/* Objective Frame */}
                 {study.objective && (
-                    <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-2xl mx-auto mt-8 text-left shadow-md relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 w-full mx-auto mt-8 text-left shadow-md relative overflow-hidden">
                         <div
                             className="absolute top-0 left-0 w-1 h-full"
                             style={{ backgroundColor: 'var(--brand-accent)' }}
@@ -116,10 +141,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         </div>
 
                         {/* Institutional Signature */}
-                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */}
                         {Array.isArray((study.branding as any)?.partners) &&
                             // biome-ignore lint/suspicious/noExplicitAny: dynamic branding
-                            (study.branding as any).partners.length > 0 && (
+                            (study.branding as any).partners.some((p: any) => !!p.logo_url) && (
                                 <div className="mt-10 pt-8 border-t border-slate-200">
                                     <div className="flex flex-wrap gap-8 items-center justify-start">
                                         {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}
@@ -178,7 +202,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         </div>
 
                         {study.instructions && (
-                            <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium mb-4">
+                            <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium mb-8">
                                 <SafeMarkdown>{study.instructions}</SafeMarkdown>
                             </div>
                         )}

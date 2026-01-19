@@ -22,6 +22,7 @@ import {
     type Modifier,
     MouseSensor,
     pointerWithin,
+    rectIntersection,
     TouchSensor,
     useSensor,
     useSensors,
@@ -236,40 +237,53 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     }, [selectedCardId]);
 
     // 7. Collision Strategy (Stable)
+    // 7. Collision Strategy (Stable)
     const collisionStrategy: CollisionDetection = useCallback(
         (args) => {
-            // 1. Priority: Direct hit via pointerWithin (uses cached rects, efficient)
+            // 1. Priority: Direct hit via pointerWithin (cursor is exactly over the element)
             const pointerCollisions = pointerWithin(args);
 
-            // Check for direct slot or deck hit
-            const targetContainer = pointerCollisions.find((c) => {
-                const idStr = String(c.id);
-                return idStr.startsWith('slot_') || idStr.startsWith('deck-');
-            });
+            if (pointerCollisions.length > 0) {
+                // Check for direct slot or deck hit
+                const targetContainer = pointerCollisions.find((c: any) => {
+                    const idStr = String(c.id);
+                    return idStr.startsWith('slot_') || idStr.startsWith('deck-');
+                });
 
-            if (targetContainer) return [targetContainer];
+                if (targetContainer) return [targetContainer];
 
-            // 2. Secondary: Hit on a placed card? Resolve to its slot.
-            const cardCollision = pointerCollisions.find((c) => {
-                // Check if it's a card ID (number)
-                return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
-            });
+                // Check for card hit -> resolve to slot
+                const cardCollision = pointerCollisions.find((c: any) => {
+                    return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
+                });
 
-            if (cardCollision) {
-                const cardId = Number(cardCollision.id);
-                const placed = qsort.find((p) => p.statementId === cardId);
-                if (placed) {
-                    // Return a synthetic collision with the slot ID
-                    return [
-                        {
-                            id: `slot_${placed.col}_${placed.row}`,
-                            data: cardCollision.data,
-                        },
-                    ];
+                if (cardCollision) {
+                    const cardId = Number(cardCollision.id);
+                    const placed = qsort.find((p) => p.statementId === cardId);
+                    if (placed) {
+                        return [
+                            {
+                                id: `slot_${placed.col}_${placed.row}`,
+                                data: cardCollision.data,
+                            },
+                        ];
+                    }
                 }
             }
 
-            // 3. Fallback to closest center
+            // 2. Secondary: Rect Intersection (if cursor isn't over it, but visual overlap is significant)
+            // This helps when the 'center' is far but overlap is high (large targets)
+            const rectCollisions = rectIntersection(args);
+            if (rectCollisions.length > 0) {
+                // Prioritize slots
+                const targetContainer = rectCollisions.find((c) => {
+                    const idStr = String(c.id);
+                    return idStr.startsWith('slot_');
+                });
+                if (targetContainer) return [targetContainer];
+            }
+
+            // 3. Fallback to closest center (good for gaps)
             return closestCenter(args);
         },
         [qsort]

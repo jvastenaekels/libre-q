@@ -2801,6 +2801,11 @@
             "maxLength": 5,
             "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
             "title": "Language Code"
+          },
+          "is_test_run": {
+            "type": "boolean",
+            "title": "Is Test Run",
+            "default": false
           }
         },
         "type": "object",
@@ -2989,6 +2994,10 @@
             "type": "boolean",
             "title": "Is Discarded"
           },
+          "is_test_run": {
+            "type": "boolean",
+            "title": "Is Test Run"
+          },
           "discard_reason": {
             "anyOf": [
               {
@@ -3050,6 +3059,7 @@
           "created_at",
           "submitted_at",
           "is_discarded",
+          "is_test_run",
           "discard_reason",
           "user_agent",
           "presort_answers",
@@ -3128,6 +3138,10 @@
             "type": "boolean",
             "title": "Is Discarded"
           },
+          "is_test_run": {
+            "type": "boolean",
+            "title": "Is Test Run"
+          },
           "discard_reason": {
             "anyOf": [
               {
@@ -3172,6 +3186,7 @@
           "created_at",
           "submitted_at",
           "is_discarded",
+          "is_test_run",
           "discard_reason",
           "user_agent"
         ],

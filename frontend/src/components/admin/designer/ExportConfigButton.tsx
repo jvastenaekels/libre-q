@@ -43,10 +43,11 @@ export function ExportConfigButton({
             window.URL.revokeObjectURL(url);
 
             toast.success(t('admin.export.config_success', 'Configuration exported successfully'));
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Export failed:', error);
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error';
             toast.error(t('admin.export.config_error', 'Failed to export configuration'), {
-                description: error.message,
+                description: errorMsg,
             });
         } finally {
             setIsExporting(false);

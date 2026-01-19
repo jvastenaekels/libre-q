@@ -228,11 +228,13 @@ class StudyTranslationBase(BaseModel):
     )
     @classmethod
     def validate_trans_strings(cls, v: str | None) -> str | None:
-        # Note: Description corresponds to "description" field which defaults to empty string
-        # But here we type hint as str | None because default could be None for others?
-        # Actually description is str = ""
-        # Let's rely on validate_non_empty_string logic
-        return validate_non_empty_string(v)
+        """Validate translation strings - strip whitespace and reject empty strings."""
+        if v is None:
+            return None
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("String cannot be empty or whitespace only")
+        return res
 
 
 class StudyTranslationCreate(StudyTranslationBase):
@@ -258,10 +260,8 @@ class StatementTranslationBase(BaseModel):
     @field_validator("text")
     @classmethod
     def validate_text(cls, v: str) -> str:
-        res = validate_non_empty_string(v)
-        if res is None:
-            raise ValueError("Statement text cannot be empty")
-        return res
+        # Relaxed for drafts. Activation validation handles empty strings.
+        return v
 
 
 class StatementTranslationCreate(StatementTranslationBase):
@@ -441,6 +441,7 @@ class ConsentInput(BaseModel):
     session_token: UUID
     consent_hash: str | None = None
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
+    is_test_run: bool = False
 
 
 class SubmissionInput(BaseModel):
@@ -521,6 +522,7 @@ class ParticipantRead(BaseModel):
     created_at: datetime
     submitted_at: datetime | None
     is_discarded: bool
+    is_test_run: bool
     discard_reason: str | None
     user_agent: str | None
     # We don't expose IP address directly to researchers usually, maybe masked or hash

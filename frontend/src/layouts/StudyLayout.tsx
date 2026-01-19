@@ -448,7 +448,7 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/* CENTER: Stepper (Desktop Only) */}
                 <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
-                    <div data-testid="stepper-container" className="flex items-center gap-1">
+                    <div data-testid="stepper-container" className="flex items-center gap-2">
                         {visibleSteps.map((step, index) => {
                             const status =
                                 currentStep === step.id
@@ -459,8 +459,18 @@ const StudyLayoutContent: React.FC = () => {
 
                             const isReachable = step.id <= maxReachedStep;
 
+                            // Dynamic Title Resolution
+                            let stepLabel = t(step.labelKey);
+                            if (step.id > 1 && config?.process_steps) {
+                                // Map IDs: 2->0, 3->1, 4->2, 5->3
+                                const pIndex = step.id - 2;
+                                if (config.process_steps[pIndex]?.title) {
+                                    stepLabel = config.process_steps[pIndex].title;
+                                }
+                            }
+
                             return (
-                                <div key={step.id} className="flex items-center">
+                                <div key={step.id} className="flex items-center group relative">
                                     {/* Connection Line */}
                                     {index > 0 && (
                                         <div
@@ -498,13 +508,14 @@ const StudyLayoutContent: React.FC = () => {
                                                     : undefined,
                                         }}
                                         className={`
-                                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 hover:scale-105
                                            ${
                                                status === 'upcoming' && !isReachable
                                                    ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
                                                    : 'cursor-pointer shadow-sm'
                                            }
                                        `}
+                                        title={stepLabel}
                                     >
                                         {status === 'completed' ? (
                                             <Check size={16} strokeWidth={3} />
@@ -526,12 +537,18 @@ const StudyLayoutContent: React.FC = () => {
                                         )}
                                     </button>
 
-                                    {/* Label (Current Only) */}
-                                    {status === 'current' && (
-                                        <span className="ml-3 font-bold text-slate-800 text-sm whitespace-nowrap animate-in fade-in slide-in-from-left-2">
-                                            {t(step.labelKey)}
-                                        </span>
-                                    )}
+                                    {/* Label (Always visible but styled) */}
+                                    <span
+                                        className={`ml-3 text-sm whitespace-nowrap transition-all duration-300 ${
+                                            status === 'current'
+                                                ? 'font-bold text-slate-800 opacity-100 max-w-full'
+                                                : status === 'completed'
+                                                  ? 'font-medium text-slate-500 opacity-100 hidden lg:block'
+                                                  : 'font-normal text-slate-300 opacity-100 hidden xl:block'
+                                        }`}
+                                    >
+                                        {stepLabel}
+                                    </span>
                                 </div>
                             );
                         })}
@@ -540,40 +557,48 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/* RIGHT: Actions + Language */}
                 <div className="flex items-center gap-3">
-                    {/* Language Selector (Globe Icon) */}
-                    <div className="relative" ref={langMenuRef}>
-                        <button
-                            type="button"
-                            onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                            className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-slate-100 text-slate-600 transition-colors touch-manipulation"
-                            title={t('layout.change_lang_title')}
-                        >
-                            <Globe size={20} />
-                        </button>
+                    <HelpOverlay />
 
-                        {/* Dropdown (Simplified) */}
-                        {isLangMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-dropdown animate-in fade-in zoom-in-95">
-                                {['en', 'fr', 'fi']
-                                    .filter(
-                                        (lang) =>
-                                            !config?.available_languages ||
-                                            config.available_languages.includes(lang)
-                                    )
-                                    .map((lang) => (
+                    {/* Language Selector (Globe Icon) */}
+                    {(!config?.available_languages || config.available_languages.length > 1) && (
+                        <div className="relative" ref={langMenuRef}>
+                            <button
+                                type="button"
+                                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                                className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-slate-100 text-slate-600 transition-colors touch-manipulation"
+                                title={t('layout.change_lang_title')}
+                            >
+                                <Globe size={20} />
+                            </button>
+
+                            {/* Dropdown (Simplified) */}
+                            {isLangMenuOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-dropdown animate-in fade-in zoom-in-95">
+                                    {(config?.available_languages &&
+                                    config.available_languages.length > 0
+                                        ? config.available_languages
+                                        : ['en', 'fr', 'fi']
+                                    ).map((lang) => (
                                         <button
                                             key={lang}
                                             type="button"
-                                            onClick={() => changeLanguage(lang)}
+                                            onClick={() => {
+                                                i18n.changeLanguage(lang); // Immediate UI update
+                                                changeLanguage(lang); // Persist and refetch
+                                            }}
                                             style={{
-                                                color: i18n.language.startsWith(lang)
+                                                color: i18n.language?.startsWith(lang)
                                                     ? 'var(--brand-accent)'
                                                     : undefined,
                                             }}
-                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'font-semibold' : 'text-slate-700'}`}
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${
+                                                i18n.language?.startsWith(lang)
+                                                    ? 'font-semibold'
+                                                    : 'text-slate-700'
+                                            }`}
                                         >
                                             <span className="uppercase">{lang}</span>
-                                            {i18n.language.startsWith(lang) && (
+                                            {i18n.language?.startsWith(lang) && (
                                                 <Check
                                                     size={14}
                                                     style={{ color: 'var(--brand-accent)' }}
@@ -581,9 +606,10 @@ const StudyLayoutContent: React.FC = () => {
                                             )}
                                         </button>
                                     ))}
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Primary Action (Desktop) */}
                     <div className="hidden md:block">{headerAction}</div>
@@ -624,9 +650,6 @@ const StudyLayoutContent: React.FC = () => {
                     {headerAction}
                 </div>
             )}
-
-            {/* Help Overlay (Floating) */}
-            <HelpOverlay />
         </div>
     );
 };

@@ -37,19 +37,31 @@ export const ParticipantGridView = ({
             placements[score].push(statements[index]);
         });
 
-        // Get unique sorted scores from config
-        const sortedColumnScores = Object.keys(gridConfig)
-            .map(Number)
-            .sort((a, b) => a - b);
+        // Normalize grid config (handle both Array and Record formats)
+        let columnsData: { score: number; capacity: number }[] = [];
+        if (Array.isArray(gridConfig)) {
+            // biome-ignore lint/suspicious/noExplicitAny: trust the shape if array
+            columnsData = gridConfig.map((c: any) => ({
+                score: c.score,
+                capacity: c.capacity,
+            }));
+        } else {
+            columnsData = Object.entries(gridConfig).map(([k, v]) => ({
+                score: Number(k),
+                capacity: Number(v),
+            }));
+        }
+
+        // Sort columns by score (negative to positive)
+        columnsData.sort((a, b) => a.score - b.score);
 
         return {
-            columns: sortedColumnScores.map((score) => ({
-                score,
-                statements: placements[score] || [],
-                maxAllowed: (gridConfig as Record<string, number>)[String(score)],
+            columns: columnsData.map((col) => ({
+                score: col.score,
+                statements: placements[col.score] || [],
+                maxAllowed: col.capacity,
             })),
-            // biome-ignore lint/suspicious/noExplicitAny: API type mismatch
-            maxHeight: Math.max(...Object.values(gridConfig as any).map((v) => Number(v))),
+            maxHeight: Math.max(...columnsData.map((c) => c.capacity)),
         };
     }, [participant, studyData]);
 

@@ -97,7 +97,7 @@ export function StudySwitcher() {
                                         {activeStudy
                                             ? activeStudy.translations?.[0]?.title ||
                                               activeStudy.slug
-                                            : 'Select Study'}
+                                            : t('admin.sidebar.select_study')}
                                     </span>
                                 </div>
                                 <ChevronsUpDown className="ml-auto size-4 text-slate-400" />

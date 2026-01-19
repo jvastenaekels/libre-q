@@ -163,7 +163,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                         <AlertDialogDescription>{config.desc}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => handleStateChange(targetState)}
                             className={cn(

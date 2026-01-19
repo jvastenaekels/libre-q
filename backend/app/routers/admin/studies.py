@@ -38,6 +38,7 @@ from app.schemas import (
 from pydantic import BaseModel, field_validator
 import re
 from datetime import datetime, timezone
+import json
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
@@ -713,12 +714,22 @@ async def validate_study_import(
     warnings = []
     errors = []
 
+    def add_error(key: str, **kwargs):
+        errors.append(
+            json.dumps({"key": f"admin.import.validation.errors.{key}", **kwargs})
+        )
+
+    def add_warning(key: str, **kwargs):
+        warnings.append(
+            json.dumps({"key": f"admin.import.validation.warnings.{key}", **kwargs})
+        )
+
     # Check version
     version = config.get("version")
     if not version:
-        errors.append("Missing version field")
+        add_error("missing_version")
     elif version != "1.0":
-        errors.append(f"Unsupported version: {version}")
+        add_error("unsupported_version", version=version)
 
     study_data = config.get("study", {})
 
@@ -726,12 +737,12 @@ async def validate_study_import(
     required = ["slug", "translations", "statements", "grid_config"]
     for field in required:
         if field not in study_data:
-            errors.append(f"Missing required field: {field}")
+            add_error("missing_field", field=field)
 
     # Check translations
     translations = study_data.get("translations", [])
     if not translations:
-        errors.append("At least one translation required")
+        add_error("no_translations")
 
     for i, trans in enumerate(translations):
         required_trans = [
@@ -743,36 +754,34 @@ async def validate_study_import(
         ]
         for field in required_trans:
             if field not in trans or not trans[field]:
-                errors.append(f"Translation {i + 1} missing required field: {field}")
+                add_error("missing_translation_field", index=i + 1, field=field)
 
         # Validate language code
         lang_code = trans.get("language_code", "")
         if lang_code and not re.match(r"^[a-z]{2}(-[A-Z]{2})?$", lang_code):
-            errors.append(
-                f"Invalid language code: {lang_code} (must be 2 lowercase letters, e.g. 'en', or with region, e.g. 'en-US')"
-            )
+            add_error("invalid_lang_code", lang=lang_code)
 
     # Check statements
     statements = study_data.get("statements", [])
     if not statements:
-        errors.append("At least one statement required")
+        add_error("no_statements")
 
     # Check for duplicate codes
     codes = [s.get("code") for s in statements if s.get("code")]
     duplicates = [code for code in codes if codes.count(code) > 1]
     if duplicates:
-        errors.append(f"Duplicate statement codes: {', '.join(set(duplicates))}")
+        add_error("duplicate_codes", codes=", ".join(set(duplicates)))
 
     # Check statement translations
     for i, stmt in enumerate(statements):
         if "translations" not in stmt or not stmt["translations"]:
-            errors.append(f"Statement {i + 1} missing translations")
+            add_error("missing_stmt_translations", index=i + 1)
 
     # Check statements vs grid capacity
     grid_config = study_data.get("grid_config", [])
     if grid_config:
         if not isinstance(grid_config, list):
-            errors.append("Invalid grid_config: must be a list")
+            add_error("invalid_grid_config")
         else:
             try:
                 grid_capacity = sum(
@@ -782,19 +791,19 @@ async def validate_study_import(
                 )
                 statement_count = len(statements)
                 if statement_count != grid_capacity:
-                    errors.append(
-                        f"Statement count ({statement_count}) doesn't match grid capacity ({grid_capacity})"
+                    add_error(
+                        "grid_capacity_mismatch",
+                        count=statement_count,
+                        capacity=grid_capacity,
                     )
             except (KeyError, TypeError, ValueError) as e:
-                errors.append(f"Invalid grid_config structure: {str(e)}")
+                add_error("invalid_grid_structure", error=str(e))
 
     # Check for external resources
     branding = study_data.get("branding", {})
     if branding:
         if branding.get("logo_url", "").startswith("http"):
-            warnings.append(
-                "Logo URL references external resource - may not be accessible"
-            )
+            add_warning("external_logo")
 
         partners = branding.get("partners", [])
         for partner in partners:

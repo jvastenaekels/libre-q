@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 const InterfaceEditor = () => {
     const { draft, activeLocale, updateTranslation, updateDraft, setActiveSubStep } =
@@ -67,7 +68,7 @@ const InterfaceEditor = () => {
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
-    const uiLabels = translation?.ui_labels || {};
+    const uiLabels = (translation?.ui_labels || {}) as Record<string, string>;
 
     // Helper to get translations in the active study locale (not the admin UI locale)
     // We force a key change/re-render when activeLocale changes to ensure placeholders update instantly
@@ -100,6 +101,38 @@ const InterfaceEditor = () => {
 
     const getLabel = (key: string) => (uiLabels[key] || tStudy(key)) as string;
 
+    const resetLabel = (key: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
+        updateTranslation(activeLocale, (t_trans: any) => {
+            if (t_trans.ui_labels) {
+                delete t_trans.ui_labels[key];
+            }
+        });
+        toast.success(t('common.reset_to_default_success'));
+    };
+
+    const resetStepHelp = (stepId: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
+        updateTranslation(activeLocale, (t_trans: any) => {
+            if (t_trans.step_help && t_trans.step_help[stepId]) {
+                delete t_trans.step_help[stepId];
+            }
+        });
+        toast.success(t('common.reset_to_default_success'));
+    };
+
+    const resetTerminologyGroup = (keys: string[]) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
+        updateTranslation(activeLocale, (t_trans: any) => {
+            if (t_trans.ui_labels) {
+                for (const key of keys) {
+                    delete t_trans.ui_labels[key];
+                }
+            }
+        });
+        toast.success(t('common.reset_to_default_success'));
+    };
+
     return (
         <div className="space-y-12 pb-12">
             <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
@@ -125,20 +158,35 @@ const InterfaceEditor = () => {
                 <CardContent className="space-y-6">
                     <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2.5">
-                            <div className="flex items-center gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.design.interface.nav.start')}
-                                </Label>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Info className="size-3 text-slate-400" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="text-[10px]">
-                                            {t('admin.design.interface.nav.tooltips.start')}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        {t('admin.design.interface.nav.start')}
+                                    </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="size-3 text-slate-400" />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-[10px]">
+                                                {t('admin.design.interface.nav.tooltips.start')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                {uiLabels['welcome.start'] && (
+                                    <button
+                                        type="button"
+                                        onClick={() => resetLabel('welcome.start')}
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
+                                                 font-black uppercase tracking-wider text-slate-400
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+                                        title={t('common.reset_to_default')}
+                                    >
+                                        <RotateCcw className="size-2.5" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 name="welcome.start"
@@ -150,20 +198,35 @@ const InterfaceEditor = () => {
                             />
                         </div>
                         <div className="space-y-2.5">
-                            <div className="flex items-center gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.design.interface.nav.next')}
-                                </Label>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Info className="size-3 text-slate-400" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="text-[10px]">
-                                            {t('admin.design.interface.nav.tooltips.next')}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        {t('admin.design.interface.nav.next')}
+                                    </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="size-3 text-slate-400" />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-[10px]">
+                                                {t('admin.design.interface.nav.tooltips.next')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                {uiLabels['common.next'] && (
+                                    <button
+                                        type="button"
+                                        onClick={() => resetLabel('common.next')}
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
+                                                 font-black uppercase tracking-wider text-slate-400
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+                                        title={t('common.reset_to_default')}
+                                    >
+                                        <RotateCcw className="size-2.5" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 name="common.next"
@@ -178,20 +241,35 @@ const InterfaceEditor = () => {
 
                     <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2.5">
-                            <div className="flex items-center gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.design.interface.nav.submit')}
-                                </Label>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Info className="size-3 text-slate-400" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="text-[10px]">
-                                            {t('admin.design.interface.nav.tooltips.submit')}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        {t('admin.design.interface.nav.submit')}
+                                    </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="size-3 text-slate-400" />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-[10px]">
+                                                {t('admin.design.interface.nav.tooltips.submit')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                {uiLabels['post.submit'] && (
+                                    <button
+                                        type="button"
+                                        onClick={() => resetLabel('post.submit')}
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
+                                                 font-black uppercase tracking-wider text-slate-400
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+                                        title={t('common.reset_to_default')}
+                                    >
+                                        <RotateCcw className="size-2.5" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 name="post.submit"
@@ -203,20 +281,35 @@ const InterfaceEditor = () => {
                             />
                         </div>
                         <div className="space-y-2.5">
-                            <div className="flex items-center gap-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.design.interface.nav.confirm')}
-                                </Label>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Info className="size-3 text-slate-400" />
-                                        </TooltipTrigger>
-                                        <TooltipContent className="text-[10px]">
-                                            {t('admin.design.interface.nav.tooltips.confirm')}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        {t('admin.design.interface.nav.confirm')}
+                                    </Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="size-3 text-slate-400" />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-[10px]">
+                                                {t('admin.design.interface.nav.tooltips.confirm')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                {uiLabels['fine.actions.validate'] && (
+                                    <button
+                                        type="button"
+                                        onClick={() => resetLabel('fine.actions.validate')}
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
+                                                 font-black uppercase tracking-wider text-slate-400
+                                                 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+                                        title={t('common.reset_to_default')}
+                                    >
+                                        <RotateCcw className="size-2.5" />
+                                        {t('common.reset_to_default')}
+                                    </button>
+                                )}
                             </div>
                             <Input
                                 name="fine.actions.validate"
@@ -248,10 +341,31 @@ const InterfaceEditor = () => {
                 </CardHeader>
                 <CardContent className="space-y-8">
                     <div className="space-y-6">
-                        <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
-                                {t('admin.design.interface.terms.rough')}
-                            </span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                    {t('admin.design.interface.terms.rough')}
+                                </span>
+                            </div>
+                            {(uiLabels['common.agree'] ||
+                                uiLabels['common.neutral'] ||
+                                uiLabels['common.disagree']) && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                        resetTerminologyGroup([
+                                            'common.agree',
+                                            'common.neutral',
+                                            'common.disagree',
+                                        ])
+                                    }
+                                    className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold h-8 text-xs"
+                                >
+                                    <RotateCcw className="size-3.5 mr-2" />
+                                    {t('common.reset_to_default')}
+                                </Button>
+                            )}
                         </div>
                         <div className="grid grid-cols-3 gap-6">
                             <div className="space-y-2.5">
@@ -298,10 +412,33 @@ const InterfaceEditor = () => {
                         <Separator className="bg-slate-100" />
 
                         <div className="space-y-6">
-                            <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
-                                    {t('admin.design.interface.terms.grid')}
-                                </span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                        {t('admin.design.interface.terms.grid')}
+                                    </span>
+                                </div>
+                                {!!(
+                                    uiLabels['fine.legend.agree'] ||
+                                    uiLabels['fine.legend.neutral'] ||
+                                    uiLabels['fine.legend.disagree']
+                                ) && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            resetTerminologyGroup([
+                                                'fine.legend.agree',
+                                                'fine.legend.neutral',
+                                                'fine.legend.disagree',
+                                            ])
+                                        }
+                                        className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold h-8 text-xs"
+                                    >
+                                        <RotateCcw className="size-3.5 mr-2" />
+                                        {t('common.reset_to_default')}
+                                    </Button>
+                                )}
                             </div>
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="space-y-2.5">
@@ -471,10 +608,24 @@ const InterfaceEditor = () => {
 
                         return (
                             <div key={step.id} className="space-y-6">
-                                <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-900">
-                                        {t('common.step', 'Step')} {index + 1}: {t(step.labelKey)}
-                                    </span>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-900">
+                                            {t('common.step', 'Step')} {index + 1}:{' '}
+                                            {t(step.labelKey)}
+                                        </span>
+                                    </div>
+                                    {translation?.step_help?.[step.id.toString()] && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => resetStepHelp(step.id.toString())}
+                                            className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold h-8 text-xs"
+                                        >
+                                            <RotateCcw className="size-3.5 mr-2" />
+                                            {t('common.reset_to_default')}
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pl-6 border-l-2 border-slate-100">
                                     <div className="space-y-2.5">

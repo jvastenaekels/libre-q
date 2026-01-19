@@ -262,7 +262,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             </div>
 
             {/* 2. Instruction Bar (Visual Synchronization with GridSort) */}
-            <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
+            <div className="relative flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
                 <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900 flex items-center gap-2">
                     <SafeMarkdown
@@ -314,7 +314,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
-            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 py-4 relative gap-2 sm:gap-8 md:gap-12">
+            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 pt-20 pb-4 relative gap-2 sm:gap-8 md:gap-12">
                 {/* FLOATING TIP REMOVED (Moved to Header) */}
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}

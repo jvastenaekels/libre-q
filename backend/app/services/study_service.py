@@ -8,6 +8,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
 import hashlib
+import json
 from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy import delete, select
@@ -201,6 +202,7 @@ class StudyService:
         consent_hash: str | None = None,
         ip_address: str | None = None,
         user_agent: str | None = None,
+        is_test_run: bool = False,
     ):
         """Records the exact time and version (hash) of consent."""
         # 1. Get Study
@@ -236,6 +238,8 @@ class StudyService:
                     ip_address=hashed_ip,
                     user_agent=user_agent,
                     status=ParticipantStatus.started,
+                    is_discarded=is_test_run,
+                    discard_reason="Test Run" if is_test_run else None,
                 )
                 db.add(participant)
                 await db.flush()
@@ -256,6 +260,9 @@ class StudyService:
             participant.language_used = language_code
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
+            if is_test_run:
+                participant.is_discarded = True
+                participant.discard_reason = "Test Run"
 
         await db.commit()
         return {"status": "recorded"}
@@ -379,8 +386,9 @@ class StudyService:
             "postsort_config": study.postsort_config,
             "grid_config": study.grid_config,
             "statements": statements_data,
-            "process_steps": getattr(translation, "process_steps", [])
-            or DEFAULT_PROCESS_STEPS.get(resolved_lang, DEFAULT_PROCESS_STEPS["en"]),
+            "process_steps": StudyService._get_effective_steps(
+                study, translation, resolved_lang
+            ),
             "consent": {
                 "title": get_t_attr("consent_title"),
                 "description": get_t_attr("consent_description"),
@@ -404,32 +412,63 @@ class StudyService:
         }
 
     @staticmethod
+    def _get_effective_steps(
+        study: Study, translation: StudyTranslation | None, lang: str
+    ) -> list[dict[str, Any]]:
+        """Determine process steps by combining custom translations with filtered system defaults."""
+        custom_steps = getattr(translation, "process_steps", [])
+        if custom_steps:
+            return custom_steps
+
+        # Fallback to filtered defaults
+        base_steps = DEFAULT_PROCESS_STEPS.get(lang, DEFAULT_PROCESS_STEPS["en"])
+
+        filtered = []
+        for step in base_steps:
+            if step["id"] == "profile":
+                if (study.presort_config or {}).get("enabled", True):
+                    filtered.append(step)
+            elif step["id"] == "post":
+                if (study.postsort_config or {}).get("enabled", True):
+                    filtered.append(step)
+            else:
+                filtered.append(step)
+        return filtered
+
+    @staticmethod
     def validate_for_activation(study: Study) -> list[str]:
         """
         Comprehensive check to see if a study is ready for research.
-        Returns a list of human-readable error messages.
+        Returns a list of human-readable error messages (JSON encoded for i18n).
         """
         errors = []
 
+        def add_error(key: str, **kwargs):
+            errors.append(
+                json.dumps({"key": f"admin.design.validation.errors.{key}", **kwargs})
+            )
+
         # 1. Statements Exist
         if not study.statements:
-            errors.append("Study must have at least one statement.")
+            add_error("no_statements")
 
         # 2. Grid Config exists and matches statements
         if not study.grid_config:
-            errors.append("Grid configuration is missing.")
+            add_error("no_grid")
         else:
             total_capacity = sum(
                 int(col.get("capacity", 0)) for col in study.grid_config
             )
             if len(study.statements) != total_capacity:
-                errors.append(
-                    f"Grid capacity ({total_capacity}) does not match statement count ({len(study.statements)})."
+                add_error(
+                    "capacity_mismatch",
+                    total=total_capacity,
+                    count=len(study.statements),
                 )
 
         # 3. Minimum Translations
         if not study.translations:
-            errors.append("Study must have at least one language translation.")
+            add_error("no_translations")
         else:
             # Check if default language has a translation
             default_lang = study.default_language or "en"
@@ -437,39 +476,31 @@ class StudyService:
                 t.language_code == default_lang for t in study.translations
             )
             if not has_default:
-                errors.append(
-                    f"Default language ({default_lang}) translation is missing."
-                )
+                add_error("missing_default_lang", lang=default_lang)
 
             # Check for missing titles in any translation
             for t in study.translations:
                 if not t.title or t.title.strip() == "":
-                    errors.append(f"Title is missing for language '{t.language_code}'.")
+                    add_error("missing_title", lang=t.language_code)
 
                 if not t.consent_title or t.consent_title.strip() == "":
-                    errors.append(
-                        f"Consent title is missing for language '{t.language_code}'."
-                    )
+                    add_error("missing_consent_title", lang=t.language_code)
 
                 if not t.consent_description or t.consent_description.strip() == "":
-                    errors.append(
-                        f"Consent description is missing for language '{t.language_code}'."
-                    )
+                    add_error("missing_consent_description", lang=t.language_code)
 
                 if (
                     not t.condition_of_instruction
                     or t.condition_of_instruction.strip() == ""
                 ):
-                    errors.append(
-                        f"Grid sort instructions are missing for language '{t.language_code}'."
-                    )
+                    add_error("missing_grid_instructions", lang=t.language_code)
 
                 # Check process steps
                 for i, step in enumerate(t.process_steps):
                     title = step.get("title")
                     if not title or title.strip() == "":
-                        errors.append(
-                            f"Step {i + 1} title is missing for language '{t.language_code}'."
+                        add_error(
+                            "missing_step_title", index=i + 1, lang=t.language_code
                         )
 
         # 4. Statements have translations for all study languages
@@ -478,15 +509,17 @@ class StudyService:
             s_langs = {st.language_code for st in s.translations}
             missing = study_langs - s_langs
             if missing:
-                errors.append(
-                    f"Statement '{s.code}' is missing translations for: {', '.join(missing)}."
+                add_error(
+                    "missing_statement_translation",
+                    code=s.code,
+                    missing=", ".join(missing),
                 )
 
             # Check for empty text in existing translations
             for st in s.translations:
                 if not st.text or st.text.strip() == "":
-                    errors.append(
-                        f"Statement '{s.code}' has empty text for language '{st.language_code}'."
+                    add_error(
+                        "empty_statement_text", code=s.code, lang=st.language_code
                     )
 
         return errors
@@ -793,7 +826,9 @@ class StudyService:
         """Calculates aggregated statistics for a study."""
         # 1. Get all participants for this study (excluding discarded)
         stmt = select(Participant).where(
-            Participant.study_id == study_id, Participant.is_discarded.is_(False)
+            Participant.study_id == study_id,
+            Participant.is_discarded.is_(False),
+            Participant.is_test_run.is_(False),
         )
         result = await db.execute(stmt)
         participants = result.scalars().all()
@@ -906,6 +941,7 @@ class StudyService:
                     "language": p.language_used,
                     "is_discarded": p.is_discarded,
                     "discard_reason": p.discard_reason,
+                    "is_test_run": p.is_test_run,
                 }
             )
 

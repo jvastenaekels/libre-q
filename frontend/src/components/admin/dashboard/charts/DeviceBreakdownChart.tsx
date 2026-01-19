@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Monitor, Smartphone, Tablet, HelpCircle } from 'lucide-react';
@@ -23,6 +24,7 @@ const ICON_MAP = {
 };
 
 export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreakdownChartProps) => {
+    const { t } = useTranslation();
     const data = useMemo(() => {
         if (!deviceBreakdown) return [];
 
@@ -45,8 +47,12 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
     return (
         <Card className={className}>
             <CardHeader className="pb-2">
-                <CardTitle className="text-base font-bold">Device Distribution</CardTitle>
-                <CardDescription>How participants access your study</CardDescription>
+                <CardTitle className="text-base font-bold">
+                    {t('admin.dashboard.devices.title', 'Device Distribution')}
+                </CardTitle>
+                <CardDescription>
+                    {t('admin.dashboard.devices.subtitle', 'How participants access your study')}
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col items-center">
@@ -105,13 +111,16 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                            {item.name}
+                                            {t(
+                                                'admin.dashboard.devices.types.' + item.key,
+                                                item.name
+                                            )}
                                         </span>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-sm font-bold text-slate-900">
                                                 {item.value}
                                             </span>
-                                            <span className="text-[10px] font-medium text-slate-400">
+                                            <span className="text-xs font-medium text-slate-400">
                                                 {percentage}%
                                             </span>
                                         </div>

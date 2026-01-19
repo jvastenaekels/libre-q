@@ -90,6 +90,7 @@ const ConsentPage: React.FC = () => {
                         session_token: token,
                         language_code: i18n.language,
                         consent_hash: consentHash,
+                        is_test_run: session.isPilotMode,
                     },
                 });
             } catch (err) {

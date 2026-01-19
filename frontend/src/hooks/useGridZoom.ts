@@ -55,7 +55,7 @@ export const useGridZoom = ({
         if (isMobile) {
             // Mobile: Fit Width primarily
             const widthScale = (wrapperW * 0.98) / contentW;
-            const heightScale = (wrapperH * 0.9) / contentH;
+            const heightScale = (wrapperH * 0.9) / contentH; // 90% height to ensure legend visibility
 
             // Allow slightly more zoom on mobile
             scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
@@ -69,8 +69,10 @@ export const useGridZoom = ({
         } else {
             // Desktop: Fit both, with padding to encompass Spectrum Bar
             const padding = 70; // Reduced to 70px to increase default zoom for better readability
+            const bottomLegendBuffer = 60; // Extra buffer for the bottom legend
             const availableW = wrapperW - padding;
-            const availableH = wrapperH - padding;
+            const availableH = wrapperH - padding - bottomLegendBuffer;
+
             const scaleX = availableW / contentW;
             const scaleY = availableH / contentH;
 
@@ -79,8 +81,12 @@ export const useGridZoom = ({
             // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
 
-            // Center Vertically
+            // Center Vertically, but bias upwards slightly to ensure bottom legend is safe
+            // Or just precise centering based on the calculated scale which now fits height
             y = (wrapperH - contentH * scale) / 2;
+
+            // Ensure we don't push it off top if we have space
+            if (y < 20) y = 20;
         }
 
         transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');

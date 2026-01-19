@@ -89,7 +89,7 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
+            const textarea = screen.getByPlaceholderText(/Simple:/i);
             await user.type(textarea, 'S1: New Statement 1\nS2: New Statement 2');
 
             const replaceButton = screen.getByRole('button', {
@@ -111,7 +111,7 @@ describe('QSortEditor', () => {
             const appendRadio = screen.getByLabelText('Append to list');
             await user.click(appendRadio);
 
-            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
+            const textarea = screen.getByPlaceholderText(/Simple:/i);
             await user.type(textarea, 'S2: Appended');
 
             const appendButton = screen.getByRole('button', {
@@ -130,7 +130,7 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const textarea = screen.getByPlaceholderText(/Paste your statements here/i);
+            const textarea = screen.getByPlaceholderText(/Simple:/i);
             await user.type(textarea, 'TSV1\tTab Separated Text');
 
             const replaceButton = screen.getByRole('button', {
@@ -145,9 +145,7 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const textarea = screen.getByPlaceholderText(
-                /Paste your statements here/i
-            ) as HTMLTextAreaElement;
+            const textarea = screen.getByPlaceholderText(/Simple:/i) as HTMLTextAreaElement;
             await user.type(textarea, 'S1: Test');
 
             const replaceButton = screen.getByRole('button', {

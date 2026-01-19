@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useLoginForAccessTokenApiTokenPost, useReadUsersMeApiMeGet } from '@/api/generated';
+import {
+    useLoginForAccessTokenApiTokenPost,
+    useReadUsersMeApiMeGet,
+    listWorkspacesApiAdminWorkspacesGet,
+} from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,8 +63,29 @@ const LoginPage = () => {
                 });
 
                 toast.success(t('auth.login.welcome_back'));
-                const redirect = searchParams.get('redirect') || '/admin';
-                navigate(redirect);
+
+                // Handle redirection: preference for 'redirect' param, then most recent workspace, then /admin
+                const explicitRedirect = searchParams.get('redirect');
+                if (explicitRedirect) {
+                    navigate(explicitRedirect);
+                    return;
+                }
+
+                try {
+                    const workspaces = await listWorkspacesApiAdminWorkspacesGet();
+                    if (workspaces && Array.isArray(workspaces) && workspaces.length > 0) {
+                        const sorted = [...workspaces].sort(
+                            (a, b) =>
+                                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                        );
+                        navigate(`/admin/w/${sorted[0].slug}`);
+                    } else {
+                        navigate('/admin');
+                    }
+                } catch (err) {
+                    console.error('Redirection error:', err);
+                    navigate('/admin');
+                }
             }
         } catch (error: unknown) {
             const message = parseApiErrorSync(error, t('auth.login.error_generic'));

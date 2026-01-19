@@ -48,7 +48,7 @@ export const AdminService = {
     /**
      * Validate study configuration for import
      */
-    validateStudyImport: async (config: any) => {
+    validateStudyImport: async (config: unknown) => {
         const response = await fetch('/api/admin/studies/validate-import', {
             method: 'POST',
             headers: {
@@ -65,7 +65,7 @@ export const AdminService = {
     /**
      * Import study configuration and create new study
      */
-    importStudyConfig: async (data: { config: any; new_slug: string }) => {
+    importStudyConfig: async (data: { config: unknown; new_slug: string }) => {
         const response = await fetch('/api/admin/studies/import', {
             method: 'POST',
             headers: {

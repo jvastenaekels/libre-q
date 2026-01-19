@@ -17,10 +17,12 @@ interface ResetOptions {
  * @returns A function that takes a field name and an optional transform function
  */
 export const createResetToDefaultHandler = (
+    // biome-ignore lint/suspicious/noExplicitAny: draft requires dynamic property access
     updateDraft: (fn: (draft: any) => void) => void,
     t: TFunction,
     options: ResetOptions = {}
 ) => {
+    // biome-ignore lint/suspicious/noExplicitAny: transform function needs to handle various value types
     return (field: string, transform?: (value: any) => any) => {
         const {
             confirmMessage,

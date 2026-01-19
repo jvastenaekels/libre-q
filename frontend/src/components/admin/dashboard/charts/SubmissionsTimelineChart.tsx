@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     LineChart,
     Line,
@@ -33,6 +34,7 @@ export const SubmissionsTimelineChart = ({
     participants,
     className,
 }: SubmissionsTimelineChartProps) => {
+    const { t } = useTranslation();
     const [range, setRange] = useState<TimeRange>('all');
 
     const chartData = useMemo(() => {
@@ -88,9 +90,11 @@ export const SubmissionsTimelineChart = ({
             <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-6">
                 <div className="space-y-1">
                     <CardTitle className="text-base font-bold flex items-center gap-2">
-                        Submissions Timeline
+                        {t('admin.dashboard.timeline.title', 'Submissions Timeline')}
                     </CardTitle>
-                    <CardDescription>Daily participation trends</CardDescription>
+                    <CardDescription>
+                        {t('admin.dashboard.timeline.subtitle', 'Daily participation trends')}
+                    </CardDescription>
                 </div>
                 <Tabs
                     value={range}
@@ -108,7 +112,7 @@ export const SubmissionsTimelineChart = ({
                             90d
                         </TabsTrigger>
                         <TabsTrigger value="all" className="text-xs">
-                            All
+                            {t('common.all', 'All')}
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -159,7 +163,7 @@ export const SubmissionsTimelineChart = ({
                             <Line
                                 type="monotone"
                                 dataKey="started"
-                                name="Started"
+                                name={t('admin.dashboard.timeline.started', 'Started')}
                                 stroke="#f59e0b"
                                 strokeWidth={3}
                                 dot={{
@@ -173,7 +177,7 @@ export const SubmissionsTimelineChart = ({
                             <Line
                                 type="monotone"
                                 dataKey="completed"
-                                name="Completed"
+                                name={t('admin.dashboard.timeline.completed', 'Completed')}
                                 stroke="#10b981"
                                 strokeWidth={3}
                                 dot={{

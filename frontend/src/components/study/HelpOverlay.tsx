@@ -53,10 +53,10 @@ const HelpOverlay: React.FC = () => {
             <DialogTrigger asChild>
                 <button
                     type="button"
-                    className="fixed top-20 left-6 z-40 size-10 rounded-full bg-white border border-slate-300 shadow-md flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-colors duration-200"
+                    className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-slate-100 text-slate-600 transition-colors touch-manipulation flex items-center justify-center"
                     aria-label={t('study.help.trigger')}
                 >
-                    <HelpCircle className="size-4" />
+                    <HelpCircle className="size-5" />
                 </button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl bg-white border-slate-200 shadow-xl rounded-lg p-0 overflow-hidden">

@@ -7535,6 +7535,7 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetRespons
         null,
     ]),
     is_discarded: faker.datatype.boolean(),
+    is_test_run: faker.datatype.boolean(),
     discard_reason: faker.helpers.arrayElement([
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         null,
@@ -7579,6 +7580,7 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
             null,
         ]),
         is_discarded: faker.datatype.boolean(),
+        is_test_run: faker.datatype.boolean(),
         discard_reason: faker.helpers.arrayElement([
             faker.string.alpha({ length: { min: 10, max: 20 } }),
             null,
@@ -7611,6 +7613,7 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseM
                 null,
             ]),
             is_discarded: faker.datatype.boolean(),
+            is_test_run: faker.datatype.boolean(),
             discard_reason: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 null,

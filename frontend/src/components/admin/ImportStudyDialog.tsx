@@ -22,6 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
+import { formatBackendError } from '@/utils/i18nHelpers';
 import { AdminService } from '@/api/admin';
 import { cn } from '@/lib/utils';
 
@@ -55,7 +56,7 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
     const queryClient = useQueryClient();
 
     const [step, setStep] = useState<Step>('upload');
-    const [config, setConfig] = useState<any>(null);
+    const [config, setConfig] = useState<unknown>(null);
     const [validation, setValidation] = useState<ValidationResult | null>(null);
     const [newSlug, setNewSlug] = useState('');
     const [uploadMethod, setUploadMethod] = useState<'file' | 'paste'>('file');
@@ -68,7 +69,8 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
                 setStep('validate');
                 setConfig(configData);
 
-                const result = await AdminService.validateStudyImport(configData);
+                // biome-ignore lint/suspicious/noExplicitAny: config is parsed from JSON and needs runtime validation
+                const result = await AdminService.validateStudyImport(configData as any);
                 setValidation(result.data);
 
                 // Suggest a slug based on original
@@ -151,8 +153,8 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
             // Close dialog and navigate
             onOpenChange(false);
             navigate(`/admin/studies/${result.data.slug}/design`);
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.detail || error.message;
+        } catch (error: unknown) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error';
             toast.error(t('admin.import.failed', 'Import failed'), {
                 description: typeof errorMsg === 'string' ? errorMsg : 'Unknown error',
             });
@@ -196,7 +198,10 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
                 {/* Step 1: Upload */}
                 {step === 'upload' && (
                     <div className="space-y-4">
-                        <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as any)}>
+                        <Tabs
+                            value={uploadMethod}
+                            onValueChange={(v) => setUploadMethod(v as 'file' | 'paste')}
+                        >
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="file">
                                     {t('admin.import.file_upload', 'File Upload')}
@@ -283,7 +288,7 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
                                     {validation.errors.map((error, i) => (
                                         <li key={i} className="text-red-600 flex items-start gap-2">
                                             <span className="mt-1">•</span>
-                                            <span>{error}</span>
+                                            <span>{formatBackendError(error, t)}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -303,7 +308,7 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
                                             className="text-amber-600 flex items-start gap-2"
                                         >
                                             <span className="mt-1">⚠</span>
-                                            <span>{warning}</span>
+                                            <span>{formatBackendError(warning, t)}</span>
                                         </li>
                                     ))}
                                 </ul>

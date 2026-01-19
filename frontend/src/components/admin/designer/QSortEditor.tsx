@@ -32,16 +32,100 @@ import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/
 type Statement = StatementRead;
 type Translation = StatementTranslationRead;
 
+/**
+ * Robust CSV/TSV parser that handles quoted fields and internal newlines.
+ */
+function parseCSVOrTSV(text: string, separator: string = '\t') {
+    const result: string[][] = [];
+    let row: string[] = [];
+    let currentField = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+
+        if (inQuotes) {
+            if (char === '"' && nextChar === '"') {
+                currentField += '"';
+                i++; // Skip next quote
+            } else if (char === '"') {
+                inQuotes = false;
+            } else {
+                currentField += char;
+            }
+        } else {
+            if (char === '"') {
+                inQuotes = true;
+            } else if (char === separator) {
+                row.push(currentField.trim());
+                currentField = '';
+            } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+                if (char === '\r') i++;
+                row.push(currentField.trim());
+                result.push(row);
+                row = [];
+                currentField = '';
+            } else if (char === '\r') {
+                row.push(currentField.trim());
+                result.push(row);
+                row = [];
+                currentField = '';
+            } else {
+                currentField += char;
+            }
+        }
+    }
+    if (row.length > 0 || currentField !== '') {
+        row.push(currentField.trim());
+        result.push(row);
+    }
+    return result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
+}
+
 const QSortEditor = () => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
     const [bulkText, setBulkText] = useState('');
+    const [detectedFormat, setDetectedFormat] = useState<{
+        type: 'excel' | 'list' | 'simple' | null;
+        langs: string[];
+        hasCode: boolean;
+    }>({ type: null, langs: [], hasCode: false });
+
     // Alias to keep existing logic working
     const activeSubTab = (activeSubStep as 'statements' | 'grid') || 'statements';
 
     // Helper to update store
     const setActiveSubTab = (v: 'statements' | 'grid') => setActiveSubStep(v);
+
+    // Auto-detect format on change
+    useEffect(() => {
+        if (!bulkText.trim()) {
+            setDetectedFormat({ type: null, langs: [], hasCode: false });
+            return;
+        }
+
+        const lines = bulkText.split('\n').filter((l) => l.trim() !== '');
+        const firstLine = lines[0];
+
+        if (firstLine.includes('\t')) {
+            const cells = firstLine.split('\t').map((c) => c.trim().toLowerCase());
+            const langs = cells.filter((c) =>
+                draft?.translations?.some((tr) => tr.language_code === c)
+            );
+            setDetectedFormat({
+                type: 'excel',
+                langs,
+                hasCode: cells.includes('code'),
+            });
+        } else if (lines.some((l) => /^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+/.test(l))) {
+            setDetectedFormat({ type: 'list', langs: [], hasCode: true });
+        } else {
+            setDetectedFormat({ type: 'simple', langs: [], hasCode: false });
+        }
+    }, [bulkText, draft?.translations]);
 
     // Auto-initialize grid if empty (-4 to +4) with bell curve (total 34)
     useEffect(() => {
@@ -62,7 +146,7 @@ const QSortEditor = () => {
         }
     }, [draft, updateDraft]);
 
-    const [importMode, setImportMode] = useState<'replace' | 'append'>('replace');
+    const [importMode, setImportMode] = useState<'replace' | 'append' | 'sync'>('replace');
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editingText, setEditingText] = useState('');
     const [editingCode, setEditingCode] = useState('');
@@ -79,57 +163,124 @@ const QSortEditor = () => {
     });
 
     const handleBulkSave = () => {
-        const lines = bulkText
-            .split('\n')
-            .map((l: string) => l.trim())
-            .filter((l: string) => l !== '');
+        if (!bulkText.trim()) return;
 
-        const parsedItems = lines.map((line: string) => {
-            // Check for TSV (Tab separated): "Code\tText"
-            if (line.includes('\t')) {
-                const parts = line.split('\t');
-                return {
-                    code: parts[0].trim(),
-                    text: parts.slice(1).join('\t').trim(),
-                };
+        let parsedItems: any[] = [];
+
+        if (detectedFormat.type === 'excel') {
+            const rows = parseCSVOrTSV(bulkText, '\t');
+            if (rows.length === 0) return;
+
+            const headers = rows[0].map((h) => h.toLowerCase());
+            const hasCodeHeader = headers.includes('code');
+            const langHeaders = headers.filter((h) =>
+                draft.translations?.some((t) => t.language_code === h)
+            );
+
+            if (hasCodeHeader || langHeaders.length > 0) {
+                // EXCEL HEADER MODE
+                parsedItems = rows.slice(1).map((cells) => {
+                    const item: any = { translations: [] };
+                    if (hasCodeHeader) {
+                        item.code = cells[headers.indexOf('code')]?.trim();
+                    }
+                    langHeaders.forEach((lang) => {
+                        const cellIdx = headers.indexOf(lang);
+                        if (cellIdx !== -1 && cells[cellIdx] !== undefined) {
+                            item.translations.push({ language_code: lang, text: cells[cellIdx] });
+                        }
+                    });
+                    return item;
+                });
+            } else {
+                // EXCEL SIMPLE MODE (No headers but has tabs)
+                parsedItems = rows.map((cells) => {
+                    return {
+                        code: cells[0]?.trim(),
+                        text: cells.slice(1).join(' ').trim(),
+                    };
+                });
             }
+        } else {
+            // CLASSIC MODE (One per line)
+            const lines = bulkText
+                .split('\n')
+                .map((l) => l.trim())
+                .filter((l) => l !== '');
+            parsedItems = lines.map((line) => {
+                // Check for CSV-like with quotes: "Code","Text"
+                const csvMatch = line.match(/^"([^"]+)"\s*,\s*"(.+)"$/);
+                if (csvMatch) {
+                    return { code: csvMatch[1], text: csvMatch[2] };
+                }
 
-            // Check for CSV-like with quotes: "Code","Text"
-            const csvMatch = line.match(/^"([^"]+)"\s*,\s*"(.+)"$/);
-            if (csvMatch) {
-                return { code: csvMatch[1], text: csvMatch[2] };
-            }
+                // Regex for common separators: "Code: Text" or "Code, Text" or "Code - Text"
+                const match = line.match(/^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+(.+)$/);
+                if (match) {
+                    return { code: match[1], text: match[2].trim() };
+                }
 
-            // Regex for common separators: "Code: Text" or "Code, Text" or "Code - Text"
-            const match = line.match(/^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+(.+)$/);
-            if (match) {
-                return { code: match[1], text: match[2].trim() };
-            }
-
-            // Fallback: remove leading numbering "1. ", "1) "
-            return { code: null, text: line.replace(/^\d+[.)\-\s]+/, '').trim() };
-        });
-
-        // biome-ignore lint/suspicious/noExplicitAny: complex state update
-        updateDraft((d: any) => {
-            const currentStatements = importMode === 'append' ? d.statements || [] : [];
-            const startingIndex = currentStatements.length;
-
-            const newStatements = parsedItems.map((item, idx) => {
-                const code = item.code || `s${startingIndex + idx + 1}`;
-
-                return {
-                    code,
-                    // biome-ignore lint/suspicious/noExplicitAny: complex types
-                    translations: (d.translations || []).map((t: any) => ({
-                        language_code: t.language_code,
-                        text: t.language_code === activeLocale ? item.text : '',
-                    })),
-                };
+                // Fallback: remove leading numbering "1. ", "1) "
+                return { code: null, text: line.replace(/^\d+[.)\-\s]+/, '').trim() };
             });
+        }
 
-            d.statements = [...currentStatements, ...newStatements];
+        updateDraft((d: any) => {
+            if (importMode === 'replace') {
+                d.statements = [];
+            }
+
+            const currentStatements = d.statements || [];
+
+            parsedItems.forEach((item) => {
+                let existing = null;
+                if (importMode === 'sync' && item.code) {
+                    existing = currentStatements.find((s: any) => s.code === item.code);
+                }
+
+                if (existing) {
+                    // Sync Traductions
+                    if (item.translations && item.translations.length > 0) {
+                        item.translations.forEach((newT: any) => {
+                            const tEntry = existing.translations.find(
+                                (t: any) => t.language_code === newT.language_code
+                            );
+                            if (tEntry) tEntry.text = newT.text;
+                            else existing.translations.push(newT);
+                        });
+                    } else if (item.text) {
+                        const tEntry = existing.translations.find(
+                            (t: any) => t.language_code === activeLocale
+                        );
+                        if (tEntry) tEntry.text = item.text;
+                        else
+                            existing.translations.push({
+                                language_code: activeLocale,
+                                text: item.text,
+                            });
+                    }
+                } else {
+                    // Add New
+                    const code = item.code || `s${currentStatements.length + 1}`;
+                    const translations = (d.translations || []).map((t: any) => {
+                        const headerT = item.translations?.find(
+                            (ht: any) => ht.language_code === t.language_code
+                        );
+                        return {
+                            language_code: t.language_code,
+                            text: headerT
+                                ? headerT.text
+                                : t.language_code === activeLocale
+                                  ? item.text || ''
+                                  : '',
+                        };
+                    });
+                    currentStatements.push({ code, translations });
+                }
+            });
+            d.statements = currentStatements;
         });
+
         setBulkText('');
         toast.success(t('admin.design.qsort.set.imported', { count: parsedItems.length }));
     };
@@ -244,41 +395,35 @@ const QSortEditor = () => {
 
             const numColumns = d.grid_config.length;
             const N = totalStatements;
+            const centerIdx = Math.floor(numColumns / 2);
+            const isOddCols = numColumns % 2 !== 0;
 
-            // Binomial coefficient helper
-            const getBinomial = (n: number, k: number): number => {
-                if (k < 0 || k > n) return 0;
-                if (k === 0 || k === n) return 1;
-                if (k > n / 2) k = n - k;
-                let res = 1;
-                for (let i = 1; i <= k; i++) res = (res * (n - i + 1)) / i;
-                return res;
-            };
-
+            // 1. Generate Target Weights
+            // Standard Q-sorts are "quasi-normal" but flatter than pure binomial.
+            // We use a Power curve which produces a more professional forced-choice distribution.
             const weights = [];
+            const maxDist = Math.max(centerIdx, numColumns - 1 - centerIdx);
+
             for (let i = 0; i < numColumns; i++) {
-                weights.push(getBinomial(numColumns - 1, i));
+                const dist = Math.abs(i - centerIdx);
+                // 1.4 is a sweet spot for reproducing common research tables
+                weights.push((maxDist - dist + 1) ** 1.4);
             }
 
             const totalWeight = weights.reduce((a, b) => a + b, 0);
             const idealCapacities = weights.map((w) => (w / totalWeight) * N);
 
-            // Start with minimum 1 per column (if N sufficient)
-            const newCapacities: number[] = new Array(numColumns)
-                .fill(0)
-                .map(() => (N >= numColumns ? 1 : 0));
+            // 2. Initial Distribution
+            // Start with minimum: 2 per col if N is large, 1 if medium, 0 if small
+            const minPerCol = N >= 40 ? 2 : N >= numColumns ? 1 : 0;
+            const newCapacities: number[] = new Array(numColumns).fill(minPerCol);
             let currentTotal = newCapacities.reduce((a, b) => a + b, 0);
 
-            // Iteratively distribute remaining slots to the column with the biggest "hunger" (ideal - current)
-            // while respecting symmetry constraints.
-            const centerIdx = Math.floor(numColumns / 2);
-            const isOddCols = numColumns % 2 !== 0;
-
+            // 3. Greedy distribution with symmetry
             while (currentTotal < N) {
                 let bestIdx = -1;
                 let maxDiff = -Infinity;
 
-                // Only scan first half + center
                 const limit = isOddCols ? centerIdx : centerIdx - 1;
 
                 for (let i = 0; i <= limit; i++) {
@@ -289,34 +434,23 @@ const QSortEditor = () => {
                     }
                 }
 
-                if (bestIdx === -1) break; // Should not happen
+                if (bestIdx === -1) break;
 
-                // Apply changes
                 if (isOddCols && bestIdx === centerIdx) {
                     newCapacities[centerIdx]++;
                     currentTotal++;
                 } else {
-                    // It's a side column pair
                     if (N - currentTotal >= 2) {
                         newCapacities[bestIdx]++;
                         newCapacities[numColumns - 1 - bestIdx]++;
                         currentTotal += 2;
+                    } else if (isOddCols) {
+                        newCapacities[centerIdx]++;
+                        currentTotal++;
                     } else {
-                        // Only 1 slot left, but we wanted to add to a pair.
-                        // We must dump it in the center to maintain symmetry (if possible)
-                        // If cols are even, we can't maintain symmetry with 1 slot left unless we break it.
-                        // But typically N parity matches grid structure for valid symmetric sorts.
-                        // If we are here with even columns and 1 slot left, it's an impossible symmetric state.
-                        // We'll dump it to one of the central-most columns or the center if odd.
-                        if (isOddCols) {
-                            newCapacities[centerIdx]++;
-                            currentTotal++;
-                        } else {
-                            // Even columns, 1 left. Break symmetry slightly or add to one of the middle ones?
-                            // Convention: add to left middle.
-                            newCapacities[centerIdx - 1]++;
-                            currentTotal++;
-                        }
+                        // Even columns parity break
+                        newCapacities[bestIdx]++;
+                        currentTotal++;
                     }
                 }
             }
@@ -329,7 +463,7 @@ const QSortEditor = () => {
             }
         });
         toast.success(
-            t('admin.design.qsort.grid.reshaped', 'Grid reshaped to a balanced distribution')
+            t('admin.design.qsort.grid.balanced', 'Grid balanced to standard distribution')
         );
     };
 
@@ -393,8 +527,10 @@ const QSortEditor = () => {
                             <RadioGroup
                                 defaultValue="replace"
                                 value={importMode}
-                                onValueChange={(v) => setImportMode(v as 'replace' | 'append')}
-                                className="flex gap-6"
+                                onValueChange={(v) =>
+                                    setImportMode(v as 'replace' | 'append' | 'sync')
+                                }
+                                className="flex flex-wrap gap-6"
                             >
                                 <div className="flex items-center space-x-2.5">
                                     <RadioGroupItem
@@ -422,15 +558,60 @@ const QSortEditor = () => {
                                         {t('admin.design.qsort.bulk.append')}
                                     </Label>
                                 </div>
+                                <div className="flex items-center space-x-2.5">
+                                    <RadioGroupItem
+                                        value="sync"
+                                        id="r3"
+                                        className="text-indigo-600"
+                                    />
+                                    <Label
+                                        htmlFor="r3"
+                                        className="text-sm font-bold text-slate-700 cursor-pointer"
+                                    >
+                                        {t('admin.design.qsort.bulk.sync_by_code')}
+                                    </Label>
+                                </div>
                             </RadioGroup>
-                            <Textarea
-                                placeholder={t('admin.design.qsort.bulk.placeholder')}
-                                className="min-h-[200px] font-serif text-base leading-relaxed rounded-xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30"
-                                value={bulkText}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    setBulkText(e.target.value)
-                                }
-                            />
+                            <div className="space-y-3">
+                                <Textarea
+                                    placeholder={t('admin.design.qsort.bulk.placeholder')}
+                                    className="min-h-[200px] font-serif text-base leading-relaxed rounded-xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30"
+                                    value={bulkText}
+                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                                        setBulkText(e.target.value)
+                                    }
+                                />
+                                {detectedFormat.type && (
+                                    <div className="flex flex-wrap gap-2 px-1">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            {t(
+                                                `admin.design.qsort.bulk.detected_format.${detectedFormat.type}`
+                                            )}
+                                        </span>
+                                        {detectedFormat.hasCode && (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                <Wand2 className="h-3 w-3" />
+                                                {t(
+                                                    'admin.design.qsort.bulk.detected_format.with_codes'
+                                                )}
+                                            </span>
+                                        )}
+                                        {detectedFormat.langs.length > 0 && (
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                {t(
+                                                    'admin.design.qsort.bulk.detected_format.multi_lang',
+                                                    {
+                                                        langs: detectedFormat.langs
+                                                            .join(', ')
+                                                            .toUpperCase(),
+                                                    }
+                                                )}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <p className="text-xs font-black uppercase tracking-widest text-slate-400 px-1">
                                     {t('admin.design.qsort.bulk.detected', {
@@ -446,7 +627,12 @@ const QSortEditor = () => {
                                 >
                                     {importMode === 'replace'
                                         ? t('admin.design.qsort.bulk.process_replace')
-                                        : t('admin.design.qsort.bulk.process_append')}
+                                        : importMode === 'append'
+                                          ? t('admin.design.qsort.bulk.process_append')
+                                          : t(
+                                                'admin.design.qsort.bulk.process_sync',
+                                                'Sync statements'
+                                            )}
                                 </Button>
                             </div>
                         </CardContent>
@@ -462,81 +648,86 @@ const QSortEditor = () => {
                                 ({statements.length})
                             </span>
                         </h3>
-                        {statements.length > 0 && (
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        updateDraft((d) => {
-                                            if (!d.statements) d.statements = [];
-                                            const newIdx = d.statements.length + 1;
-                                            d.statements.push({
-                                                code: `s${newIdx}`,
-                                                translations: (d.translations || []).map(
-                                                    (t: StudyTranslationCreate) => ({
-                                                        language_code: t.language_code,
-                                                        text: '',
-                                                    })
-                                                ),
-                                            });
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    updateDraft((d) => {
+                                        if (!d.statements) d.statements = [];
+                                        const newIdx = d.statements.length + 1;
+                                        d.statements.push({
+                                            code: `s${newIdx}`,
+                                            translations: (d.translations || []).map(
+                                                (t: StudyTranslationCreate) => ({
+                                                    language_code: t.language_code,
+                                                    text: '',
+                                                })
+                                            ),
                                         });
-                                        // Set editing state for the new statement
-                                        // We use the current length as the index for the new element
-                                        const newIdx = statements.length;
-                                        setEditingIndex(newIdx);
-                                        setEditingText('');
-                                        setEditingCode(`s${newIdx + 1}`);
-                                    }}
-                                    className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    {t('common.add', 'Add')}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        if (
-                                            confirm(
-                                                t(
-                                                    'admin.design.qsort.set.confirm_reset_codes',
-                                                    'Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?'
+                                    });
+                                    // Set editing state for the new statement
+                                    // We use the current length as the index for the new element
+                                    const newIdx = statements.length;
+                                    setEditingIndex(newIdx);
+                                    setEditingText('');
+                                    setEditingCode(`s${newIdx + 1}`);
+                                }}
+                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                            >
+                                <Plus className="h-4 w-4" />
+                                {t('common.add')}
+                            </Button>
+
+                            {statements.length > 0 && (
+                                <>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                            if (
+                                                confirm(
+                                                    t(
+                                                        'admin.design.qsort.set.confirm_reset_codes',
+                                                        'Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?'
+                                                    )
                                                 )
-                                            )
-                                        ) {
-                                            updateDraft((d) => {
-                                                if (d.statements) {
-                                                    // biome-ignore lint/suspicious/noExplicitAny: complex draft
-                                                    d.statements.forEach((s: any, idx: number) => {
-                                                        s.code = `s${idx + 1}`;
-                                                    });
-                                                }
-                                            });
-                                            toast.success(
-                                                t(
-                                                    'admin.design.qsort.set.codes_reset',
-                                                    'Statement codes re-sequenced'
-                                                )
-                                            );
-                                        }
-                                    }}
-                                    className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                    {t('admin.design.qsort.set.reset_codes', 'Reset Codes')}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleClearAll}
-                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                    {t('admin.design.qsort.set.clear')}
-                                </Button>
-                            </div>
-                        )}
+                                            ) {
+                                                updateDraft((d) => {
+                                                    if (d.statements) {
+                                                        // biome-ignore lint/suspicious/noExplicitAny: complex draft
+                                                        d.statements.forEach(
+                                                            (s: any, idx: number) => {
+                                                                s.code = `s${idx + 1}`;
+                                                            }
+                                                        );
+                                                    }
+                                                });
+                                                toast.success(
+                                                    t(
+                                                        'admin.design.qsort.set.codes_reset',
+                                                        'Statement codes re-sequenced'
+                                                    )
+                                                );
+                                            }
+                                        }}
+                                        className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                    >
+                                        <RotateCcw className="h-4 w-4" />
+                                        {t('admin.design.qsort.set.reset_codes', 'Reset Codes')}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleClearAll}
+                                        className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {t('admin.design.qsort.set.clear')}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3">
@@ -700,299 +891,277 @@ const QSortEditor = () => {
                 </TabsContent>
 
                 <TabsContent value="grid" className="space-y-8 pt-6">
-                    {/* Methodological Context */}
-                    <TooltipProvider>
-                        <div className="flex items-center gap-4 p-5 bg-indigo-50/50 border border-indigo-100/60 rounded-2xl shadow-sm">
-                            <div className="size-10 rounded-xl bg-white border border-indigo-100 flex items-center justify-center shadow-sm">
-                                <Grid3X3 className="h-5 w-5 text-indigo-600" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-sm font-bold text-indigo-950 tracking-tight">
-                                    {t('admin.design.qsort.grid.title')}
-                                </p>
-                                <p className="text-[13px] font-medium text-indigo-600 mt-0.5 leading-relaxed">
-                                    {t('admin.design.qsort.grid.desc')}
-                                </p>
-                            </div>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-9 w-9 text-indigo-400 hover:text-indigo-600 border-indigo-200/50 bg-white rounded-xl shadow-sm hover:bg-indigo-50"
-                                    >
-                                        <HelpCircle className="h-5 w-5" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent
-                                    className="max-w-xs text-xs p-3 rounded-xl border-indigo-100 shadow-xl"
-                                    side="left"
-                                >
-                                    <p className="font-bold text-indigo-950">
-                                        {t('admin.design.qsort.grid.tooltip_title')}
-                                    </p>
-                                    <p className="mt-1.5 text-indigo-800/80 leading-relaxed font-medium">
-                                        {t('admin.design.qsort.grid.tooltip_desc')}
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
-                    </TooltipProvider>
-
-                    {/* Distribution Visualizer (Mini Chart) */}
-                    <div className="flex items-end justify-center gap-1.5 h-16 mb-2 px-10">
-                        {grid.map((col, idx) => {
-                            const maxCapacity = Math.max(...grid.map((c) => c.capacity || 1));
-                            const heightPercentage = ((col.capacity || 0) / maxCapacity) * 100;
-                            return (
-                                <div
-                                    key={idx}
-                                    className="group/bar relative flex-1 flex flex-col items-center justify-end h-full"
-                                >
-                                    <div
-                                        className={cn(
-                                            'w-full rounded-t-sm transition-all duration-500 ease-out',
-                                            isValid
-                                                ? 'bg-indigo-400 group-hover/bar:bg-indigo-500'
-                                                : 'bg-slate-300 group-hover/bar:bg-slate-400'
-                                        )}
-                                        style={{ height: `${heightPercentage}%` }}
-                                    >
-                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-bold py-0.5 px-1.5 rounded pointer-events-none whitespace-nowrap z-10">
-                                            {col.capacity} {t('common.slots', 'slots')}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Shape Indicators */}
-                    <div className="flex items-center justify-center gap-6 py-2 px-6 bg-slate-50 border border-slate-100 rounded-2xl mb-8 mx-10">
-                        <div className="flex items-center gap-2">
-                            {isValid ? (
-                                <div className="size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-                            ) : (
-                                <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                            )}
-                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600">
-                                {totalStatements} {t('admin.design.qsort.grid.statements')} vs{' '}
-                                {totalSlots} {t('common.slots')}
-                            </span>
-                        </div>
-                        <div className="w-px h-3 bg-slate-200" />
-                        <div className="flex items-center gap-2">
-                            {isBellShaped ? (
-                                <span className="text-[11px] font-black uppercase tracking-widest text-indigo-600 flex items-center gap-1.5">
-                                    <CheckCircle2 className="h-3.5 w-3.5" />
-                                    {t('admin.design.qsort.grid.ideal_shape')}
-                                </span>
-                            ) : isSymmetric ? (
-                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                                    {t('admin.design.qsort.grid.symmetric')}
-                                </span>
-                            ) : (
-                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                                    {t('admin.design.qsort.grid.asymmetric')}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Visual Grid Representative */}
-                    <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center shadow-inner group/grid transition-all hover:bg-slate-50/80">
-                        <div className="flex items-end gap-2 mb-10 overflow-x-auto max-w-full pb-6 px-6 h-[280px]">
-                            {grid.map((col, idx) => (
-                                <div
-                                    key={idx}
-                                    className="flex flex-col items-center gap-3 relative group/col"
-                                >
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-7 w-7 hover:bg-indigo-600 hover:text-white rounded-lg shadow-sm border-slate-200 bg-white transition-all transform active:scale-95"
-                                        onClick={() => updateGridCapacity(idx, 1)}
-                                        aria-label={`Increase capacity for column ${idx}`}
-                                    >
-                                        <Plus className="h-3.5 w-3.5" />
-                                    </Button>
-
-                                    <div
-                                        className="flex flex-col-reverse gap-1.5 min-h-[40px]"
-                                        data-testid={`grid-column-${idx}-slots`}
-                                    >
-                                        {Array.from({ length: col.capacity || 0 }).map((_, i) => (
-                                            <div
-                                                key={i}
-                                                className={cn(
-                                                    'w-10 h-3.5 rounded-sm border shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all',
-                                                    isValid
-                                                        ? 'bg-indigo-500/20 border-indigo-500/30'
-                                                        : 'bg-slate-300 border-slate-400/30'
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    <div
-                                        className="mt-2 text-[11px] font-black w-9 h-9 rounded-xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter"
-                                        data-testid={`grid-column-${idx}-score`}
-                                    >
-                                        {col.score === Infinity || col.score === -Infinity
-                                            ? '?'
-                                            : col.score > 0
-                                              ? `+${col.score}`
-                                              : col.score}
-                                    </div>
-
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-7 w-7 hover:bg-red-500 hover:text-white rounded-lg shadow-sm border-slate-200 bg-white transition-all transform active:scale-95"
-                                        onClick={() => updateGridCapacity(idx, -1)}
-                                        disabled={(col.capacity || 0) <= 0}
-                                        aria-label={`Decrease capacity for column ${idx}`}
-                                    >
-                                        <Minus className="h-3.5 w-3.5" />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Symmetric Column Management Buttons */}
-                        <div className="flex items-center gap-6 mb-8">
+                    {/* Comparison Header (Inspired by reference image) */}
+                    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden relative group">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
                             <div className="flex items-center gap-4">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={removeExtremeColumns}
-                                    className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-bold gap-2"
-                                    title={t(
-                                        'admin.design.qsort.grid.remove_extreme_columns',
-                                        'Remove extreme columns'
-                                    )}
-                                    data-testid="reduce-grid-button"
-                                >
-                                    <Minus className="h-4 w-4" />
-                                    {t('common.reduce', 'Reduce')}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={addExtremeColumns}
-                                    className="h-10 px-6 rounded-2xl bg-white border-slate-200 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all font-bold gap-2"
-                                    title={t(
-                                        'admin.design.qsort.grid.add_extreme_columns',
-                                        'Add extreme columns'
-                                    )}
-                                    data-testid="expand-grid-button"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    {t('common.expand', 'Expand')}
-                                </Button>
+                                <div className="size-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
+                                    <Grid3X3 className="h-6 w-6 text-indigo-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                                        {t('admin.design.qsort.grid.title')}
+                                    </h3>
+                                    <p className="text-sm font-medium text-slate-500">
+                                        {t('admin.design.qsort.grid.desc')}
+                                    </p>
+                                </div>
                             </div>
-
-                            <div className="w-px h-8 bg-slate-200" />
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={autoShapeGrid}
-                                className="h-10 px-6 rounded-2xl bg-indigo-50 text-indigo-600 border-indigo-100 shadow-sm hover:bg-indigo-100 transition-all font-bold gap-2"
-                                title={t(
-                                    'admin.design.qsort.grid.auto_balance_desc',
-                                    'Reshape grid to a balanced semi-normal distribution'
-                                )}
-                                data-testid="auto-balance-button"
-                            >
-                                <Wand2 className="h-4 w-4" />
-                                {t('admin.design.qsort.grid.auto_balance', 'Auto-Balance')}
-                            </Button>
-
-                            <div className="w-px h-8 bg-slate-200" />
 
                             <div className="flex items-center gap-3">
-                                <Switch
-                                    id="symmetry-lock"
-                                    checked={draft.symmetry_lock ?? true}
-                                    onCheckedChange={(checked) => {
-                                        updateDraft((d) => {
-                                            d.symmetry_lock = checked;
-                                        });
-                                    }}
-                                />
-                                <Label
-                                    htmlFor="symmetry-lock"
-                                    className="text-xs font-bold text-slate-600 cursor-pointer"
-                                >
-                                    {t('admin.design.qsort.grid.symmetry_lock', 'Symmetry Lock')}
-                                </Label>
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <HelpCircle className="h-3.5 w-3.5 text-slate-400" />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-10 w-10 text-slate-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all"
+                                            >
+                                                <HelpCircle className="h-5 w-5" />
+                                            </Button>
                                         </TooltipTrigger>
-                                        <TooltipContent className="text-[10px] max-w-[200px]">
-                                            {t(
-                                                'admin.design.qsort.grid.symmetry_lock_desc',
-                                                'Automatically apply changes to opposite columns to maintain a balanced distribution.'
-                                            )}
+                                        <TooltipContent
+                                            className="max-w-xs p-3 rounded-2xl shadow-2xl border-indigo-50 bg-white"
+                                            side="left"
+                                        >
+                                            <p className="font-bold text-slate-900 mb-1">
+                                                {t('admin.design.qsort.grid.tooltip_title')}
+                                            </p>
+                                            <p className="text-xs text-slate-500 leading-relaxed">
+                                                {t('admin.design.qsort.grid.tooltip_desc')}
+                                            </p>
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
                             </div>
                         </div>
 
-                        {/* Validation Footer */}
+                        {/* Distribution Visualizer (Mini Chart) */}
+                        <div className="mt-8 flex items-end justify-center gap-2 h-20 px-4">
+                            {grid.map((col, idx) => {
+                                const maxCapacity = Math.max(...grid.map((c) => c.capacity || 1));
+                                const heightPercentage = ((col.capacity || 0) / maxCapacity) * 100;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="group/bar relative flex-1 flex flex-col items-center justify-end h-full"
+                                    >
+                                        <div
+                                            className={cn(
+                                                'w-full rounded-t-lg transition-all duration-700 ease-out shadow-sm',
+                                                isValid
+                                                    ? 'bg-indigo-500 group-hover/bar:bg-indigo-600'
+                                                    : 'bg-slate-300 group-hover/bar:bg-slate-400'
+                                            )}
+                                            style={{ height: `${heightPercentage}%` }}
+                                        />
+                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-all transform -translate-y-1 bg-slate-900 text-white text-[10px] font-bold py-1 px-2 rounded-lg pointer-events-none whitespace-nowrap z-20 shadow-xl">
+                                            {col.capacity} {t('common.slots')}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Status Pills */}
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 py-3 border-t border-slate-100">
+                            <div
+                                className={cn(
+                                    'flex items-center gap-2 px-4 py-1.5 rounded-full border shadow-sm transition-all',
+                                    isValid
+                                        ? 'bg-green-50 border-green-100 text-green-700'
+                                        : 'bg-amber-50 border-amber-100 text-amber-700'
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        'size-2 rounded-full',
+                                        isValid ? 'bg-green-500' : 'bg-amber-500 animate-pulse'
+                                    )}
+                                />
+                                <span className="text-[11px] font-black uppercase tracking-wider">
+                                    {totalStatements} {t('admin.design.qsort.grid.statements')} vs{' '}
+                                    {totalSlots} {t('common.slots')}
+                                </span>
+                            </div>
+
+                            {isBellShaped && (
+                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 shadow-sm animate-in zoom-in duration-300">
+                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                    <span className="text-[11px] font-black uppercase tracking-wider">
+                                        {t('admin.design.qsort.grid.ideal_shape')}
+                                    </span>
+                                </div>
+                            )}
+
+                            {isSymmetric && !isBellShaped && (
+                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-500 shadow-sm">
+                                    <span className="text-[11px] font-black uppercase tracking-wider">
+                                        {t('admin.design.qsort.grid.symmetric')}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Visual Grid Representative */}
+                    <div className="bg-slate-50/40 border border-slate-200 rounded-[32px] p-10 flex flex-col items-center shadow-inner relative overflow-hidden group/grid transition-all">
+                        {/* Interactive Grid Columns */}
+                        <div className="flex items-end gap-3 mb-12 overflow-x-auto max-w-full pb-8 px-8 min-h-[300px]">
+                            {grid.map((col, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex flex-col items-center gap-4 relative group/col"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8 hover:bg-slate-900 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
+                                        onClick={() => updateGridCapacity(idx, 1)}
+                                        aria-label={`Increase capacity for column ${idx}`}
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+
+                                    <div
+                                        className="flex flex-col-reverse gap-1.5 min-h-[40px] px-2 py-3 rounded-2xl transition-all group-hover/col:bg-indigo-50/50"
+                                        data-testid={`grid-column-${idx}-slots`}
+                                    >
+                                        {Array.from({ length: col.capacity || 0 }).map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className={cn(
+                                                    'w-12 h-4 rounded-md border shadow-sm transition-all duration-500',
+                                                    isValid
+                                                        ? 'bg-white border-indigo-200 group-hover/col:border-indigo-400 group-hover/col:shadow-indigo-100'
+                                                        : 'bg-white border-slate-200'
+                                                )}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="mt-2 text-[13px] font-black w-10 h-10 rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600">
+                                        {col.score > 0 ? `+${col.score}` : col.score}
+                                    </div>
+
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8 hover:bg-red-500 hover:text-white rounded-xl shadow-sm border-slate-200 bg-white transition-all transform active:scale-90"
+                                        onClick={() => updateGridCapacity(idx, -1)}
+                                        disabled={(col.capacity || 0) <= 0}
+                                        aria-label={`Decrease capacity for column ${idx}`}
+                                    >
+                                        <Minus className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Main Grid Actions */}
+                        <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+                            <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={removeExtremeColumns}
+                                    className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all"
+                                >
+                                    <Minus className="h-4 w-4" /> {t('common.reduce')}
+                                </Button>
+                                <div className="w-px h-4 bg-slate-100" />
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={addExtremeColumns}
+                                    className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                >
+                                    <Plus className="h-4 w-4" /> {t('common.expand')}
+                                </Button>
+                            </div>
+
+                            <Button
+                                size="sm"
+                                onClick={autoShapeGrid}
+                                className="h-11 px-6 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all font-bold gap-2"
+                            >
+                                <Wand2 className="h-4 w-4" />
+                                {t('admin.design.qsort.grid.auto_balance')}
+                            </Button>
+
+                            <div className="flex items-center gap-3 px-5 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                                <Switch
+                                    id="symmetry-lock"
+                                    checked={draft.symmetry_lock ?? true}
+                                    onCheckedChange={(checked) =>
+                                        updateDraft((d) => {
+                                            d.symmetry_lock = checked;
+                                        })
+                                    }
+                                />
+                                <Label
+                                    htmlFor="symmetry-lock"
+                                    className="text-xs font-bold text-slate-600 cursor-pointer"
+                                >
+                                    {t('admin.design.qsort.grid.symmetry_lock')}
+                                </Label>
+                            </div>
+                        </div>
+
+                        {/* Validation Bottom Bar */}
                         <div
                             className={cn(
-                                'flex items-center gap-6 px-8 py-4 rounded-3xl border shadow-xl transition-all duration-300 transform',
+                                'flex items-center gap-8 px-10 py-5 rounded-[28px] border-2 shadow-2xl transition-all duration-500 transform',
                                 isValid
-                                    ? 'bg-white border-green-200 ring-4 ring-green-500/5'
-                                    : 'bg-white border-amber-200 ring-4 ring-amber-500/5'
+                                    ? 'bg-white border-green-500/20 ring-8 ring-green-500/5 rotate-0'
+                                    : 'bg-white border-amber-500/20 ring-8 ring-amber-500/5'
                             )}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
-                                    <Quote className="h-4 w-4 text-slate-500" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <Quote className="h-5 w-5 text-slate-400" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                        Statements
-                                    </span>
-                                    <span className="text-sm font-bold text-slate-900">
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        {t('admin.design.qsort.grid.statements')}
+                                    </p>
+                                    <p className="text-xl font-black text-slate-900">
                                         {totalStatements}
-                                    </span>
+                                    </p>
                                 </div>
                             </div>
-                            <div className="w-px h-8 bg-slate-100" />
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
-                                    <Grid3X3 className="h-4 w-4 text-slate-500" />
+
+                            <div className="w-px h-10 bg-slate-100" />
+
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <Grid3X3 className="h-5 w-5 text-slate-400" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                        Grid slots
-                                    </span>
-                                    <span className="text-sm font-bold text-slate-900">
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        {t('common.slots')}
+                                    </p>
+                                    <p className="text-xl font-black text-slate-900">
                                         {totalSlots}
-                                    </span>
+                                    </p>
                                 </div>
                             </div>
-                            <div className="w-px h-8 bg-slate-100" />
+
+                            <div className="w-px h-10 bg-slate-100" />
+
                             <div className="flex items-center gap-4">
                                 {isValid ? (
-                                    <div className="size-9 rounded-full bg-green-50 border border-green-100 flex items-center justify-center">
-                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                    <div className="size-12 rounded-full bg-green-500 border-4 border-green-50 flex items-center justify-center shadow-lg shadow-green-200">
+                                        <CheckCircle2 className="h-6 w-6 text-white" />
                                     </div>
                                 ) : (
-                                    <div className="size-9 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
-                                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                                    <div className="size-12 rounded-full bg-amber-500 border-4 border-amber-50 flex items-center justify-center shadow-lg shadow-amber-200">
+                                        <AlertCircle className="h-6 w-6 text-white" />
                                     </div>
                                 )}
                                 <span
                                     className={cn(
-                                        'text-sm font-bold tracking-tight',
+                                        'text-base font-black tracking-tight',
                                         isValid ? 'text-green-600' : 'text-amber-600'
                                     )}
                                 >
@@ -1000,10 +1169,10 @@ const QSortEditor = () => {
                                         ? t('admin.design.qsort.grid.perfect')
                                         : totalStatements > totalSlots
                                           ? t('admin.design.qsort.grid.too_many', {
-                                                count: Math.abs(totalStatements - totalSlots),
+                                                count: totalStatements - totalSlots,
                                             })
                                           : t('admin.design.qsort.grid.too_few', {
-                                                count: Math.abs(totalStatements - totalSlots),
+                                                count: totalSlots - totalStatements,
                                             })}
                                 </span>
                             </div>

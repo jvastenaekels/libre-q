@@ -122,7 +122,12 @@ export function areStudiesEqual(a: StudyUpdate | null, b: StudyUpdate | null): b
     if (jsonA !== jsonB) {
         if (process.env.NODE_ENV === 'development') {
             console.log('[areStudiesEqual] Mismatch detected');
-            // Logic to log differences if needed
+            console.log('Draft:', jsonA);
+            console.log('Original:', jsonB);
+
+            // Helpful if you want to see where it breaks
+            // console.log('A:', processedA);
+            // console.log('B:', processedB);
         }
         return false;
     }

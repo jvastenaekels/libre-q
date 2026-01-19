@@ -1,5 +1,7 @@
 {
     "common": {
+        "add": "Ajouter",
+        "all": "Tout",
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
         "neutral": "Neutre",
@@ -333,6 +335,13 @@
     },
     "admin": {
         "study": {
+            "save": {
+                "success": "Modifications enregistrées avec succès",
+                "synced_warnings": "Synchronisé avec le serveur. Vos modifications ont été conservées pour : {{fields}}",
+                "synced_concurrent": "Synchronisé avec les modifications concurrentes d'un autre utilisateur",
+                "conflict": "Conflit détecté. Certaines modifications n'ont pas pu être fusionnées.",
+                "error": "Échec de l'enregistrement des modifications"
+            },
             "state": {
                 "manage": "Gérer le flux de l'étude"
             }
@@ -374,6 +383,7 @@
             "study_management": "Gestion",
             "search": "Chercher...",
             "studies": "Études",
+            "select_study": "Sélectionner une étude",
             "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer.",
             "study": "Étude"
         },
@@ -516,7 +526,23 @@
             "recent_description": "Une liste de vos études mises à jour récemment.",
             "created": "Créée",
             "no_studies": "Aucune étude trouvée. Créez votre première étude pour commencer !",
-            "import_study": "Importer une étude"
+            "import_study": "Importer une étude",
+            "timeline": {
+                "title": "Chronologie des participations",
+                "subtitle": "Tendances quotidiennes",
+                "started": "Commencé",
+                "completed": "Terminé"
+            },
+            "devices": {
+                "title": "Appareils utilisés",
+                "subtitle": "Répartition par type d'appareil",
+                "types": {
+                    "desktop": "Ordinateur",
+                    "mobile": "Mobile",
+                    "tablet": "Tablette",
+                    "unknown": "Inconnu"
+                }
+            }
         },
         "export": {
             "config": "Exporter la configuration",
@@ -553,7 +579,26 @@
             "validation_failed": "Échec de la validation",
             "success": "Étude importée avec succès",
             "redirecting": "Ouverture du concepteur d'étude...",
-            "failed": "L'import a échoué"
+            "failed": "L'import a échoué",
+            "validation": {
+                "errors": {
+                    "missing_version": "Le champ version est manquant",
+                    "unsupported_version": "Version non supportée : {{version}}",
+                    "missing_field": "Champ requis manquant : {{field}}",
+                    "no_translations": "Au moins une traduction est requise",
+                    "missing_translation_field": "La traduction {{index}} n'a pas le champ requis : {{field}}",
+                    "invalid_lang_code": "Code de langue invalide : {{lang}}",
+                    "no_statements": "Au moins un énoncé est requis",
+                    "duplicate_codes": "Codes d'énoncés en double : {{codes}}",
+                    "missing_stmt_translations": "L'énoncé {{index}} n'a pas de traduction",
+                    "invalid_grid_config": "Configuration de grille invalide : doit être une liste",
+                    "grid_capacity_mismatch": "La nombre d'énoncés ({{count}}) ne correspond pas à la capacité de la grille ({{capacity}})",
+                    "invalid_grid_structure": "Structure de grille invalide : {{error}}"
+                },
+                "warnings": {
+                    "external_logo": "L'URL du logo fait référence à une ressource externe - elle pourrait ne pas être accessible"
+                }
+            }
         },
         "dialogs": {
             "create_study": {
@@ -579,16 +624,21 @@
         "study_overview": {
             "title": "Tableau de bord",
             "subtitle": "Analyses en temps réel et aperçu des participants pour cette étude.",
+            "back_to_overview": "Retour à la vue d'ensemble",
             "sample_size": "Taille de l'échantillon (N)",
             "valid": "validé(s)",
             "completion_rate": "Taux de complétion",
             "active": "actifs",
             "mobile": "mobile",
             "median_duration": "Durée médiane",
+            "suspect": "Suspect",
             "time_to_complete": "Temps de complétion",
             "recent_activity": "Activité récente",
             "latest_submissions": "Dernières soumissions ({{count}} sur {{total}})",
             "recently_completed": "Récemment complété",
+            "in_progress": "En cours",
+            "discarded": "Écarté",
+            "started": "Commencé",
             "view_all": "Voir tous les participants et détails",
             "no_participants": "Aucun participant pour le moment.",
             "view_data": "Voir",
@@ -693,6 +743,7 @@
                 "viewer": "Accès en lecture seule à tous les modules."
             }
         },
+
         "design": {
             "translation_needed": "Révision requise (Copie)",
             "translation_needed_desc": "Ce contenu a été automatiquement copié d'une autre langue. Veuillez le réviser et le localiser.",
@@ -753,7 +804,21 @@
             },
             "validation": {
                 "failed_title": "Configuration incomplète",
-                "failed_desc": "Votre étude ne peut pas encore être activée. Veuillez corriger les problèmes suivants :"
+                "failed_desc": "Votre étude ne peut pas encore être activée. Veuillez corriger les problèmes suivants :",
+                "errors": {
+                    "no_statements": "L'étude doit contenir au moins un énoncé.",
+                    "no_grid": "La configuration de la grille est manquante.",
+                    "capacity_mismatch": "La capacité de la grille ({{total}}) ne correspond pas au nombre d'énoncés ({{count}}).",
+                    "no_translations": "L'étude doit avoir au moins une traduction.",
+                    "missing_default_lang": "La traduction pour la langue par défaut ({{lang}}) est manquante.",
+                    "missing_title": "Le titre est manquant pour la langue '{{lang}}'.",
+                    "missing_consent_title": "Le titre du consentement est manquant pour la langue '{{lang}}'.",
+                    "missing_consent_description": "La description du consentement est manquante pour la langue '{{lang}}'.",
+                    "missing_grid_instructions": "Les instructions de tri pour la grille sont manquantes pour la langue '{{lang}}'.",
+                    "missing_step_title": "Le titre de l'étape {{index}} est manquant pour la langue '{{lang}}'.",
+                    "missing_statement_translation": "L'énoncé '{{code}}' n'a pas de traduction pour : {{missing}}.",
+                    "empty_statement_text": "L'énoncé '{{code}}' a un texte vide pour la langue '{{lang}}'."
+                }
             },
             "languages": {
                 "manage_title": "Gérer les langues",
@@ -889,13 +954,22 @@
                 },
                 "bulk": {
                     "title": "Ajout en masse (copier-coller)",
-                    "desc": "Un énoncé par ligne. Supporte le format \"Code: Texte\".",
+                    "desc": "Un énoncé par ligne. Supporte le format \"Code: Texte\" et le copier-coller Excel (multi-langue).",
                     "replace_all": "Tout remplacer",
                     "append": "Ajouter à la liste",
-                    "placeholder": "Collez vos énoncés ici...\n1. Premier énoncé\n2. Second énoncé",
+                    "sync_by_code": "Fusionner par code (Multi-langue)",
+                    "placeholder": "Simple : \n1. Mon premier énoncé\n\nExpert (Copier Excel avec en-têtes) : \ncode\ten\tfr\ns1\tHello\tSalut",
                     "detected": "{{count}} énoncés détectés",
                     "process_replace": "Traiter et remplacer",
-                    "process_append": "Traiter et ajouter"
+                    "process_append": "Traiter et ajouter",
+                    "process_sync": "Traiter et synchroniser",
+                    "detected_format": {
+                        "excel": "Format Excel détecté (Tabulations)",
+                        "list": "Format Liste détecté (Code: Texte)",
+                        "simple": "Liste simple détectée (un par ligne)",
+                        "multi_lang": "Multi-langue : {{langs}}",
+                        "with_codes": "Avec codes personnalisés"
+                    }
                 },
                 "set": {
                     "title": "Jeu d'énoncés (Q-set)",
@@ -928,8 +1002,19 @@
                     "max_reached": "Portée maximale atteinte (±6)",
                     "remove_extreme_columns": "Supprimer les colonnes extrêmes",
                     "add_extreme_columns": "Ajouter des colonnes extrêmes",
-                    "tooltip_title": "Pourquoi une distribution forcée ?",
-                    "tooltip_desc": "La méthode Q utilise une distribution quasi-normale pour assurer que les participants effectuent des distinctions significatives.",
+                    "symmetry_lock": "Verrouillage de symétrie",
+                    "symmetry_lock_desc": "Appliquer automatiquement les changements aux colonnes opposées.",
+                    "auto_balance": "Auto-équilibrage",
+                    "auto_balance_desc": "Réorganiser la grille selon une distribution standard",
+                    "reshaped": "Grille réorganisée avec succès",
+                    "balanced": "Grille équilibrée selon les standards",
+                    "no_statements": "Ajoutez d'abord des énoncés pour auto-équilibrer la grille",
+                    "statements": "énoncés",
+                    "ideal_shape": "Forme Idéale",
+                    "symmetric": "Symétrique",
+                    "asymmetric": "Asymétrique",
+                    "tooltip_title": "Logique de distribution",
+                    "tooltip_desc": "Dans la méthode Q, une distribution forcée est généralement quasi-normale. Cela oblige le participant à faire des choix difficiles et à discriminer clairement entre les items.",
                     "locked": "Conception Verrouillée",
                     "locked_desc": "Cette étude n'est plus en mode brouillon. Les modifications sont restreintes pour préserver l'intégrité des données.",
                     "locked_active": "L'étude est active",
@@ -939,28 +1024,19 @@
                     "locked_closed": "L'étude est clôturée",
                     "locked_closed_desc": "Cette étude est terminée. La conception est archivée et ne peut plus être modifiée.",
                     "mismatch_title": "Erreur de configuration de la grille",
-                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
-                    "asymmetric": "Asymétrique",
-                    "auto_balance": "Auto-équilibrage",
-                    "auto_balance_desc": "Ajuster automatiquement la grille pour correspondre au nombre d'énoncés.",
-                    "ideal_shape": "Forme idéale",
-                    "no_statements": "Aucun énoncé",
-                    "reshaped": "Grille redimensionnée",
-                    "statements": "Énoncés",
-                    "symmetric": "Symétrique",
-                    "symmetry_lock": "Verrouillage de symétrie",
-                    "symmetry_lock_desc": "Maintenir la grille symétrique lors de l'ajout/suppression de colonnes."
+                    "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous."
                 }
             },
             "postsort": {
                 "extreme": {
-                    "title": "Colonnes extrêmes",
+                    "title": "Colonnes ciblées",
                     "desc": "Sélectionnez les colonnes qui déclenchent des questions de suivi.",
                     "no_columns": "Aucune colonne sélectionnée.",
                     "add_label": "Ajouter une colonne :",
-                    "prompt_label": "Question pour les cartes extrêmes",
+                    "prompt_label": "Question pour les énoncés",
                     "prompt_placeholder": "Pourquoi avez-vous placé cet énoncé ici ?",
                     "add": "Ajouter",
+                    "add_defaults": "Ajouter les extrêmes par défaut",
                     "select_placeholder": "Sélectionner..."
                 },
                 "random_comments": {
@@ -1100,6 +1176,9 @@
             "tooltips": {
                 "suspect": "Suspect (Complétion rapide)",
                 "has_comments": "Contient des commentaires qualitatifs"
+            },
+            "filter": {
+                "show_discarded": "Afficher les rejets et tests"
             },
             "search": {
                 "placeholder": "Rechercher par ID...",

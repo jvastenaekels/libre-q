@@ -184,8 +184,8 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
             },
         });
 
-        const positiveLabel = screen.getByText(/Prompt for extreme cards \(\+\)/);
-        const negativeLabel = screen.getByText(/Prompt for extreme cards \(-\)/);
+        const positiveLabel = screen.getByText(/Prompt for statements \(\+\)/);
+        const negativeLabel = screen.getByText(/Prompt for statements \(-\)/);
 
         expect(positiveLabel).toBeInTheDocument();
         expect(negativeLabel).toBeInTheDocument();
@@ -198,8 +198,8 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
             },
         });
 
-        const positiveInput = screen.getByLabelText(/Prompt for extreme cards \(\+\)/);
-        const negativeInput = screen.getByLabelText(/Prompt for extreme cards \(-\)/);
+        const positiveInput = screen.getByLabelText(/Prompt for statements \(\+\)/);
+        const negativeInput = screen.getByLabelText(/Prompt for statements \(-\)/);
 
         fireEvent.change(positiveInput, { target: { value: 'Why do you agree?' } });
         fireEvent.change(negativeInput, {
@@ -221,7 +221,7 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
             },
         });
 
-        expect(screen.getByText(/Prompt for extreme cards \(\+\)/)).toBeInTheDocument();
-        expect(screen.queryByText(/Prompt for extreme cards \(-\)/)).not.toBeInTheDocument();
+        expect(screen.getByText(/Prompt for statements \(\+\)/)).toBeInTheDocument();
+        expect(screen.queryByText(/Prompt for statements \(-\)/)).not.toBeInTheDocument();
     });
 });

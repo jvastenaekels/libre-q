@@ -22,7 +22,7 @@ import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
 import { SubmissionsTimelineChart } from '@/components/admin/dashboard/charts/SubmissionsTimelineChart';
-import { CompletionRateTrendChart } from '@/components/admin/dashboard/charts/CompletionRateTrendChart';
+
 import { DeviceBreakdownChart } from '@/components/admin/dashboard/charts/DeviceBreakdownChart';
 import { DurationHistogramChart } from '@/components/admin/dashboard/charts/DurationHistogramChart';
 import { cn } from '@/lib/utils';
@@ -53,7 +53,8 @@ const StudyOverviewPage = () => {
     };
     const currentLocale = dateLocales[i18n.language] || enUS;
 
-    const recentParticipants = (participants || []).slice(0, 5);
+    const validParticipants = participants?.filter((p) => !p.is_discarded && !p.is_test_run) || [];
+    const recentParticipants = validParticipants.slice(0, 5);
 
     // Helper: Generate consistent color from participant ID
     const getParticipantColor = (id: string) => {
@@ -217,28 +218,22 @@ const StudyOverviewPage = () => {
                             <div className="grid gap-6 md:grid-cols-12">
                                 <div className="col-span-12 md:col-span-8">
                                     <SubmissionsTimelineChart
-                                        participants={participants}
-                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                    />
-                                </div>
-                                <div className="col-span-12 md:col-span-4">
-                                    <CompletionRateTrendChart
-                                        participants={participants}
-                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid gap-6 md:grid-cols-12">
-                                <div className="col-span-12 md:col-span-8">
-                                    <DurationHistogramChart
-                                        participants={participants}
+                                        participants={validParticipants}
                                         className="border-none shadow-sm bg-white rounded-2xl h-full"
                                     />
                                 </div>
                                 <div className="col-span-12 md:col-span-4">
                                     <DeviceBreakdownChart
                                         deviceBreakdown={stats.device_breakdown}
+                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid gap-6 md:grid-cols-12">
+                                <div className="col-span-12">
+                                    <DurationHistogramChart
+                                        participants={validParticipants}
                                         className="border-none shadow-sm bg-white rounded-2xl h-full"
                                     />
                                 </div>
@@ -278,7 +273,8 @@ const StudyOverviewPage = () => {
                                     (p) => p.status === 'completed' && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                        <div className="flex items-center text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                            <CheckCircle2 className="w-3 h-3 mr-1.5" />
                                             {t(
                                                 'admin.study_overview.recently_completed',
                                                 'Recently Completed'
@@ -340,7 +336,10 @@ const StudyOverviewPage = () => {
                                                                                 p.session_token
                                                                             );
                                                                             toast.success(
-                                                                                'ID copied'
+                                                                                t(
+                                                                                    'common.copied',
+                                                                                    'ID copied'
+                                                                                )
                                                                             );
                                                                         }}
                                                                         className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
@@ -423,7 +422,8 @@ const StudyOverviewPage = () => {
                                     (p: any) => !p.completed && !p.is_discarded
                                 ).length > 0 && (
                                     <div className="p-3">
-                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                        <div className="flex items-center text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                            <Clock className="w-3 h-3 mr-1.5" />
                                             {t('admin.study_overview.in_progress', 'In Progress')} (
                                             {
                                                 recentParticipants.filter(
@@ -481,7 +481,10 @@ const StudyOverviewPage = () => {
                                                                                 p.session_token
                                                                             );
                                                                             toast.success(
-                                                                                'ID copied'
+                                                                                t(
+                                                                                    'common.copied',
+                                                                                    'ID copied'
+                                                                                )
                                                                             );
                                                                         }}
                                                                         className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"

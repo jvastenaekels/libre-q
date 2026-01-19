@@ -25,6 +25,7 @@ export interface ParticipantDetailRead {
     created_at: string;
     submitted_at: ParticipantDetailReadSubmittedAt;
     is_discarded: boolean;
+    is_test_run: boolean;
     discard_reason: ParticipantDetailReadDiscardReason;
     user_agent: ParticipantDetailReadUserAgent;
     recruitment_token?: ParticipantDetailReadRecruitmentToken;

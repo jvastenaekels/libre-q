@@ -1,5 +1,7 @@
 {
     "common": {
+        "add": "Lisää",
+        "all": "Kaikki",
         "agree": "Jokseenkin samaa mieltä",
         "disagree": "Jokseenkin eri mieltä",
         "neutral": "Neutraali",
@@ -333,6 +335,13 @@
     },
     "admin": {
         "study": {
+            "save": {
+                "success": "Muutokset tallennettu onnistuneesti",
+                "synced_warnings": "Synkronoitu palvelimen kanssa. Muutoksesi säilytettiin kentissä: {{fields}}",
+                "synced_concurrent": "Synkronoitu toisen käyttäjän samanaikaisten muutosten kanssa",
+                "conflict": "Ristiriita havaittu. Joitakin muutoksia ei voitu yhdistää.",
+                "error": "Muutosten tallentaminen epäonnistui"
+            },
             "state": {
                 "manage": "Hallitse tutkimuksen kulkua"
             }
@@ -374,6 +383,7 @@
             "study_management": "Tutkimuksen hallinta",
             "search": "Hae...",
             "studies": "Tutkimukset",
+            "select_study": "Valitse tutkimus",
             "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi.",
             "study": "Tutkimus"
         },
@@ -517,7 +527,23 @@
             "recent_description": "Luettelo viimeksi päivitetyistä tutkimuksistasi.",
             "created": "Luotu",
             "no_studies": "Ei tutkimuksia. Luo ensimmäinen tutkimuksesi aloittaaksesi!",
-            "import_study": "Tuo tutkimus"
+            "import_study": "Tuo tutkimus",
+            "timeline": {
+                "title": "Vastausten aikajana",
+                "subtitle": "Päivittäiset osallistumiset",
+                "started": "Aloitettu",
+                "completed": "Valmistunut"
+            },
+            "devices": {
+                "title": "Laitevalikoima",
+                "subtitle": "Miten osallistujat käyttävät tutkimustasi",
+                "types": {
+                    "desktop": "Työpöytä",
+                    "mobile": "Mobiili",
+                    "tablet": "Tabletti",
+                    "unknown": "Tuntematon"
+                }
+            }
         },
         "export": {
             "config": "Vie asetukset",
@@ -554,7 +580,26 @@
             "validation_failed": "Vahvistus epäonnistui",
             "success": "Tutkimus tuotu onnistuneesti",
             "redirecting": "Avataan tutkimussuunnittelija...",
-            "failed": "Tuonti epäonnistui"
+            "failed": "Tuonti epäonnistui",
+            "validation": {
+                "errors": {
+                    "missing_version": "Versio-kenttä puuttuu",
+                    "unsupported_version": "Versiota ei tueta: {{version}}",
+                    "missing_field": "Pakollinen kenttä puuttuu: {{field}}",
+                    "no_translations": "Vähintään yksi käännös vaaditaan",
+                    "missing_translation_field": "Käännöksestä {{index}} puuttuu pakollinen kenttä: {{field}}",
+                    "invalid_lang_code": "Virheellinen kielikoodi: {{lang}}",
+                    "no_statements": "Vähintään yksi väite vaaditaan",
+                    "duplicate_codes": "Väitteiden tunnisteissa on kaksoiskappaleita: {{codes}}",
+                    "missing_stmt_translations": "Väitteeltä {{index}} puuttuu käännökset",
+                    "invalid_grid_config": "Virheellinen grid_config: on oltava lista",
+                    "grid_capacity_mismatch": "Väitteiden määrä ({{count}}) ei vastaa ruudukon kapasiteettia ({{capacity}})",
+                    "invalid_grid_structure": "Virheellinen grid_config-rakenne: {{error}}"
+                },
+                "warnings": {
+                    "external_logo": "Logon URL viittaa ulkoiseen resurssiin - se ei ehkä ole saavutettavissa"
+                }
+            }
         },
         "dialogs": {
             "create_study": {
@@ -577,20 +622,26 @@
             "slug_min": "Tunnisteen on oltava vähintään 3 merkkiä",
             "slug_regex": "Tunniste saa sisältää vain pieniä kirjaimia, numeroita ja väliviivoja"
         },
+
         "study_overview": {
             "title": "Hallintapaneeli",
             "subtitle": "Reaaliaikainen analytiikka ja osallistujien esikatselu.",
+            "back_to_overview": "Takaisin yhteenvetoon",
             "sample_size": "Otoskoko (N)",
             "valid": "kelvollinen",
             "completion_rate": "Konversioprosentti",
             "active": "aktiivinen",
             "mobile": "mobiili",
-            "median_duration": "Mediaanikesto",
-            "time_to_complete": "Aika valmistua",
+            "median_duration": "Keston mediaani",
+            "suspect": "Epäilyttävä",
+            "time_to_complete": "Suoritusaika",
             "recent_activity": "Viimeaikainen toiminta",
-            "latest_submissions": "Viimeisimmät lähetykset (5 / {{total}})",
-            "recently_completed": "Äskettäin valmistuneet",
-            "view_all": "Näytä kaikki osallistujat ja tiedot",
+            "latest_submissions": "Viimeisimmät vastaukset ({{count}} / {{total}})",
+            "recently_completed": "Viimeksi valmistuneet",
+            "in_progress": "Keskeneräiset",
+            "discarded": "Hylätyt",
+            "started": "Aloitettu",
+            "view_all": "Näytä kaikki osallistujat",
             "no_participants": "Ei vielä osallistujia.",
             "view_data": "Näytä",
             "submitted": "Lähetetty",
@@ -754,7 +805,21 @@
             },
             "validation": {
                 "failed_title": "Määritys puutteellinen",
-                "failed_desc": "Tutkimustasi ei voida vielä aktivoida. Korjaa seuraavat ongelmat:"
+                "failed_desc": "Tutkimustasi ei voida vielä aktivoida. Korjaa seuraavat ongelmat:",
+                "errors": {
+                    "no_statements": "Tutkimuksessa on oltava vähintään yksi väite.",
+                    "no_grid": "Ruudukon määritykset puuttuvat.",
+                    "capacity_mismatch": "Ruudukon kapasiteetti ({{total}}) ei vastaa väitteiden määrää ({{count}}).",
+                    "no_translations": "Tutkimuksella on oltava vähintään yksi kielikäännös.",
+                    "missing_default_lang": "Oletuskielen ({{lang}}) käännös puuttuu.",
+                    "missing_title": "Otsikko puuttuu kieleltä '{{lang}}'.",
+                    "missing_consent_title": "Suostumuksen otsikko puuttuu kieleltä '{{lang}}'.",
+                    "missing_consent_description": "Suostumuksen kuvaus puuttuu kieleltä '{{lang}}'.",
+                    "missing_grid_instructions": "Ruudukon lajitteluohjeet puuttuvat kieleltä '{{lang}}'.",
+                    "missing_step_title": "Vaiheen {{index}} otsikko puuttuu kieleltä '{{lang}}'.",
+                    "missing_statement_translation": "Väitteeltä '{{code}}' puuttuu käännökset kielille: {{missing}}.",
+                    "empty_statement_text": "Väitteellä '{{code}}' on tyhjä teksti kielellä '{{lang}}'."
+                }
             },
             "languages": {
                 "manage_title": "Kielten hallinta",
@@ -890,13 +955,22 @@
                 },
                 "bulk": {
                     "title": "Massalisäys (pikaliittäminen)",
-                    "desc": "Yksi väittämä per rivi. Tukee \"Koodi: Teksti\" -muotoa.",
+                    "desc": "Yksi väittämä per rivi. Tukee \"Koodi: Teksti\" ja Excel-kopiointia (monikielinen).",
                     "replace_all": "Korvaa kaikki",
                     "append": "Lisää luetteloon",
-                    "placeholder": "Liitä väittämät tähän...\n1. Ensimmäinen väittämä\n2. Toinen väittämä",
+                    "sync_by_code": "Synkronoi koodin mukaan",
+                    "placeholder": "Yksinkertainen: \n1. Väittämäni\n\nAsiantuntija (Excel-liittäminen otsikoilla): \ncode\ten\tfi\ns1\tHello\tHei",
                     "detected": "{{count}} väittämää havaittu",
                     "process_replace": "Käsittele ja korvaa",
-                    "process_append": "Käsittele ja lisää"
+                    "process_append": "Käsittele ja lisää",
+                    "process_sync": "Käsittele ja synkronoi",
+                    "detected_format": {
+                        "excel": "Excel-muoto havaittu (Sarkaimet)",
+                        "list": "Luettelomuoto havaittu (Koodi: Teksti)",
+                        "simple": "Yksinkertainen luettelo havaittu",
+                        "multi_lang": "Monikielinen: {{langs}}",
+                        "with_codes": "Mukautetuilla koodeilla"
+                    }
                 },
                 "set": {
                     "title": "Väittämäjoukko",
@@ -929,8 +1003,19 @@
                     "max_reached": "Maksimiraja saavutettu (±6)",
                     "remove_extreme_columns": "Poista äärimmäiset sarakkeet",
                     "add_extreme_columns": "Lisää äärimmäisiä sarakkeita",
-                    "tooltip_title": "Miksi pakotettu jakauma?",
-                    "tooltip_desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja.",
+                    "symmetry_lock": "Symmetrialukitus",
+                    "symmetry_lock_desc": "Ota symmetrialukitus käyttöön.",
+                    "auto_balance": "Auto-tasapainotus",
+                    "auto_balance_desc": "Tasaa ruudukko standardijakauman mukaiseksi",
+                    "reshaped": "Ruudukko tasapainotettu onnistuneesti",
+                    "balanced": "Ruudukko tasapainotettu standardien mukaan",
+                    "no_statements": "Lisää väittämiä ensin tasapainottaaksesi ruudukon",
+                    "statements": "väitettä",
+                    "ideal_shape": "Ihanteellinen muoto",
+                    "symmetric": "Symmetrinen",
+                    "asymmetric": "Epäsymmetrinen",
+                    "tooltip_title": "Jakauman logiikka",
+                    "tooltip_desc": "Q-metodologiassa pakotettu jakauma on yleensä lähes normaali. Tämä pakottaa osallistujan tekemään vaikeita valintoja ja erottelemaan kohteet selkeästi.",
                     "locked": "Suunnittelu Lukittu",
                     "locked_desc": "Tämä tutkimus ei ole enää luonnostilassa. Muutoksia on rajoitettu tietojen eheyden säilyttämiseksi.",
                     "locked_active": "Tutkimus on Aktiivinen",
@@ -940,28 +1025,19 @@
                     "locked_closed": "Tutkimus on Suljettu",
                     "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
                     "mismatch_title": "Ruudukon konfiguraatiovirhe",
-                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
-                    "asymmetric": "Asymmetric",
-                    "auto_balance": "Auto-balance",
-                    "auto_balance_desc": "Automatically adjust grid to match statement count.",
-                    "ideal_shape": "Ideal Shape",
-                    "no_statements": "No statements",
-                    "reshaped": "Grid reshaped",
-                    "statements": "Statements",
-                    "symmetric": "Symmetric",
-                    "symmetry_lock": "Symmetry Lock",
-                    "symmetry_lock_desc": "Keep grid symmetric when adding/removing columns."
+                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla."
                 }
             },
             "postsort": {
                 "extreme": {
-                    "title": "Ääripäiden sarakkeet",
+                    "title": "Seurattavat sarakkeet",
                     "desc": "Valitse sarakkeet, jotka käynnistävät jatkokysymyksiä.",
                     "no_columns": "Ei valittuja sarakkeita.",
                     "add_label": "Lisää sarake:",
-                    "prompt_label": "Kysymys ääripään korteille",
+                    "prompt_label": "Kysymys väittämille",
                     "prompt_placeholder": "Miksi sijoitit tämän väittämän tähän?",
                     "add": "Lisää",
+                    "add_defaults": "Lisää oletusarvot (ääripäät)",
                     "select_placeholder": "Valitse..."
                 },
                 "random_comments": {
@@ -1101,6 +1177,9 @@
             "tooltips": {
                 "suspect": "Epäilyttävä (Nopea suoritus)",
                 "has_comments": "Sisältää laadullisia kommentteja"
+            },
+            "filter": {
+                "show_discarded": "Näytä hylätyt ja testit"
             },
             "search": {
                 "placeholder": "Hae ID:llä...",

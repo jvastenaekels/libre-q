@@ -32,6 +32,7 @@ import {
     Bell,
     Users,
     Trash2,
+    Beaker,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGetStudyDumpApiAdminStudiesSlugDumpGet } from '@/api/generated';
@@ -65,6 +66,7 @@ export interface DumpParticipant {
     language: string;
     is_discarded: boolean;
     discard_reason: string | null;
+    is_test_run: boolean;
 }
 
 export interface DumpResponse {
@@ -114,6 +116,7 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
                 postsort: {},
                 language: 'en',
                 is_discarded: p.is_discarded,
+                is_test_run: p.is_test_run,
                 discard_reason: p.discard_reason,
             })) as DumpParticipant[];
         }
@@ -139,6 +142,13 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
+    const [showDiscarded, setShowDiscarded] = useState(false);
+
+    const filteredParticipants = useMemo(() => {
+        const parts = data?.participants || [];
+        if (showDiscarded) return parts;
+        return parts.filter((p) => !p.is_discarded && !p.is_test_run);
+    }, [data?.participants, showDiscarded]);
 
     const navigate = useNavigate();
 
@@ -214,10 +224,19 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
                             {p.is_discarded && (
                                 <div
                                     className="text-red-500"
-                                    title="Discarded"
+                                    title={t('admin.data.tooltips.discarded', 'Discarded')}
                                     data-testid="row-discarded-indicator"
                                 >
                                     <Trash2 className="h-3.5 w-3.5" />
+                                </div>
+                            )}
+                            {p.is_test_run && (
+                                <div
+                                    className="text-amber-500"
+                                    title={t('admin.data.tooltips.test_run', 'Test Run')}
+                                    data-testid="row-test-run-indicator"
+                                >
+                                    <Beaker className="h-3.5 w-3.5" />
                                 </div>
                             )}
                         </div>
@@ -276,7 +295,7 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
     );
 
     const table = useReactTable({
-        data: data?.participants || [],
+        data: filteredParticipants,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -415,20 +434,38 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
                 )}
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
-                        <Input
-                            placeholder={t('admin.data.search.placeholder')}
-                            value={globalFilter ?? ''}
-                            onChange={(e) => setGlobalFilter(e.target.value)}
-                            className="pl-9 bg-white border-slate-200 focus-visible:ring-indigo-500 rounded-lg shadow-sm font-mono text-sm"
-                        />
+                    <div className="flex items-center gap-4 flex-1 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-72">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <Input
+                                placeholder={t('admin.data.search.placeholder')}
+                                value={globalFilter ?? ''}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                className="pl-9 bg-white border-slate-200 focus-visible:ring-indigo-500 rounded-lg shadow-sm font-mono text-sm"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="show-discarded"
+                                type="checkbox"
+                                checked={showDiscarded}
+                                onChange={(e) => setShowDiscarded(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label
+                                htmlFor="show-discarded"
+                                className="text-sm text-slate-600 cursor-pointer select-none"
+                            >
+                                {t('admin.data.filter.show_discarded', 'Show test runs')}
+                            </label>
+                        </div>
                     </div>
+
                     <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
                         <span className="font-semibold text-slate-700">
                             {table.getFilteredRowModel().rows.length}
                         </span>
-                        <span>{t('admin.data.search.records_found')}</span>
+                        <span>{t('admin.data.search.records_found', 'records found')}</span>
                     </div>
                 </div>
             </div>
@@ -473,7 +510,7 @@ export default function InteractiveDataView(props: InteractiveDataViewProps) {
                                             'opacity-50 bg-slate-50/50 italic grayscale-[0.5]'
                                     )}
                                     data-testid={
-                                        row.original.is_discarded
+                                        row.original.is_discarded || row.original.is_test_run
                                             ? 'participant-row-discarded'
                                             : 'participant-row-active'
                                     }

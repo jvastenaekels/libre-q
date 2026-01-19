@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Info, Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Select,
     SelectContent,
@@ -19,11 +19,21 @@ import QuestionBuilder from './QuestionBuilder';
 import { useTranslation } from 'react-i18next';
 
 const PostSortConfigEditor = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
 
+    // Ensure resources for the active editing language are loaded
+    useEffect(() => {
+        if (activeLocale && !i18n.hasResourceBundle(activeLocale, 'translation')) {
+            i18n.loadLanguages(activeLocale);
+        }
+    }, [activeLocale, i18n]);
+
     if (!draft) return null;
+
+    // Helper to get translations in the active study locale
+    const tStudy = (key: string) => i18n.t(key, { lng: activeLocale }) as string;
 
     // biome-ignore lint/suspicious/noExplicitAny: complex config object
     const config = draft.postsort_config as any;
@@ -92,9 +102,23 @@ const PostSortConfigEditor = () => {
         });
     };
 
+    const addDefaultExtremes = () => {
+        if (availableScores.length < 2) return;
+        const min = Math.min(...availableScores);
+        const max = Math.max(...availableScores);
+
+        updateDraft((d) => {
+            if (!d.postsort_config) d.postsort_config = {};
+            // biome-ignore lint/suspicious/noExplicitAny: cast to any
+            const ps = d.postsort_config as any;
+            ps.extreme_columns = [min, max].sort((a: number, b: number) => a - b);
+        });
+    };
+
     const unselectedScores = availableScores.filter((s) => !extremeColumns.includes(s));
     const positiveColumns = extremeColumns.filter((s: number) => s > 0);
     const negativeColumns = extremeColumns.filter((s: number) => s < 0);
+    const neutralColumns = extremeColumns.filter((s: number) => s === 0);
 
     return (
         <div className="space-y-6">
@@ -115,8 +139,21 @@ const PostSortConfigEditor = () => {
                 <CardContent className="space-y-6">
                     <div className="flex flex-wrap gap-3">
                         {extremeColumns.length === 0 ? (
-                            <div className="py-2 text-sm text-slate-400 font-medium italic">
-                                {t('admin.design.postsort.extreme.no_columns')}
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm text-slate-400 font-medium italic">
+                                    {t('admin.design.postsort.extreme.no_columns')}
+                                </span>
+                                {availableScores.length >= 2 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={addDefaultExtremes}
+                                        className="h-8 rounded-lg text-indigo-600 border-indigo-100 hover:bg-indigo-50"
+                                    >
+                                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                        {t('admin.design.postsort.extreme.add_defaults')}
+                                    </Button>
+                                )}
                             </div>
                         ) : (
                             extremeColumns.map((score: number) => (
@@ -189,13 +226,42 @@ const PostSortConfigEditor = () => {
                             </Label>
                             <Textarea
                                 id="extreme-prompt-positive"
-                                value={getPromptText('extreme_positive')}
+                                value={
+                                    getPromptText('extreme_positive') ||
+                                    tStudy('admin.design.postsort.extreme.prompt_placeholder')
+                                }
                                 onChange={(e) => setPromptText('extreme_positive', e.target.value)}
-                                placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
+                                placeholder={tStudy(
+                                    'admin.design.postsort.extreme.prompt_placeholder'
+                                )}
                                 className="min-h-[80px] rounded-2xl border-green-100 focus:ring-green-500/20 focus:border-green-500 transition-all bg-green-50/10 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
                     )}
+
+                    {neutralColumns.length > 0 && (
+                        <div className="pt-6 border-t border-slate-100 space-y-4">
+                            <Label
+                                htmlFor="extreme-prompt-neutral"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-600"
+                            >
+                                {t('admin.design.postsort.extreme.prompt_label')} (0)
+                            </Label>
+                            <Textarea
+                                id="extreme-prompt-neutral"
+                                value={
+                                    getPromptText('extreme_neutral') ||
+                                    tStudy('admin.design.postsort.extreme.prompt_placeholder')
+                                }
+                                onChange={(e) => setPromptText('extreme_neutral', e.target.value)}
+                                placeholder={tStudy(
+                                    'admin.design.postsort.extreme.prompt_placeholder'
+                                )}
+                                className="min-h-[80px] rounded-2xl border-slate-200 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
+                            />
+                        </div>
+                    )}
+
                     {negativeColumns.length > 0 && (
                         <div className="pt-6 border-t border-slate-100 space-y-4">
                             <Label
@@ -206,9 +272,14 @@ const PostSortConfigEditor = () => {
                             </Label>
                             <Textarea
                                 id="extreme-prompt-negative"
-                                value={getPromptText('extreme_negative')}
+                                value={
+                                    getPromptText('extreme_negative') ||
+                                    tStudy('admin.design.postsort.extreme.prompt_placeholder')
+                                }
                                 onChange={(e) => setPromptText('extreme_negative', e.target.value)}
-                                placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
+                                placeholder={tStudy(
+                                    'admin.design.postsort.extreme.prompt_placeholder'
+                                )}
                                 className="min-h-[80px] rounded-2xl border-red-100 focus:ring-red-500/20 focus:border-red-500 transition-all bg-red-50/10 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
