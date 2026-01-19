@@ -111,7 +111,7 @@ export function StudySwitcher() {
                             side={isMobile ? 'bottom' : 'right'}
                             sideOffset={4}
                         >
-                            <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
+                            <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
                                 {t('admin.sidebar.studies')}
                             </DropdownMenuLabel>
                             <div className="space-y-1 my-1">
@@ -171,7 +171,7 @@ export function StudySwitcher() {
                                     <span className="text-sm font-bold">
                                         {t('admin.sidebar.add_study')}
                                     </span>
-                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                    <span className="text-xs font-semibold text-slate-400">
                                         {t('admin.sidebar.create_project')}
                                     </span>
                                 </div>

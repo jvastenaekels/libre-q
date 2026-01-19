@@ -62,7 +62,7 @@ function NavLanguage() {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40 rounded-lg">
-                        <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground/70">
                             {t('layout.change_lang_title')}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />

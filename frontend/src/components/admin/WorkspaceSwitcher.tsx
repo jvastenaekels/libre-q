@@ -97,7 +97,7 @@ export function WorkspaceSwitcher() {
                                     {currentWorkspace ? currentWorkspace.title : 'Select Workspace'}
                                 </span>
                                 {currentWorkspace && (
-                                    <span className="truncate text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                    <span className="truncate text-xs font-semibold text-slate-400">
                                         {studies?.filter(
                                             (s) => s.workspace_id === currentWorkspace.id
                                         ).length || 0}{' '}
@@ -122,8 +122,8 @@ export function WorkspaceSwitcher() {
                         side={isMobile ? 'bottom' : 'right'}
                         sideOffset={4}
                     >
-                        <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
-                            {t('admin.command_menu.switch_workspace', 'WORKSPACES')}
+                        <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
+                            {t('admin.command_menu.switch_workspace', 'Workspaces')}
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
                             {workspaces?.map((workspace) => {
@@ -186,8 +186,8 @@ export function WorkspaceSwitcher() {
                                         {isActive && (
                                             <div className="ml-auto flex items-center gap-1 bg-indigo-100/50 px-1.5 py-0.5 rounded-full ring-1 ring-indigo-500/20">
                                                 <div className="size-1 rounded-full bg-indigo-500 animate-pulse" />
-                                                <span className="text-[9px] font-black uppercase tracking-tighter">
-                                                    {t('admin.command_menu.active', 'ACTIVE')}
+                                                <span className="text-[10px] font-semibold">
+                                                    {t('admin.command_menu.active', 'Active')}
                                                 </span>
                                             </div>
                                         )}
