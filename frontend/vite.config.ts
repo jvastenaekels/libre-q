@@ -22,7 +22,20 @@ export default defineConfig({
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
             output: {
-// manualChunks removed to prevent circular dependency issues in production builds
+                manualChunks: (id) => {
+                    // Force Recharts into a single chunk to prevent circular dependency warnings/errors
+                    if (id.includes('node_modules/recharts')) {
+                        return 'vendor-recharts';
+                    }
+                    // Isolate Lucide to prevent interaction issues
+                    if (id.includes('node_modules/lucide-react')) {
+                        return 'vendor-lucide';
+                    }
+                    // Core framework
+                    if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+                        return 'vendor-react';
+                    }
+                },
             },
         },
     },
