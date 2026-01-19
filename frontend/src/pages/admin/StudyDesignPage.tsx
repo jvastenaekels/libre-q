@@ -219,9 +219,8 @@ const StudyDesignPage = () => {
     const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
 
     // isStructureLocked: Critical structural elements ARE BLOCKED (Grid, Statement codes/add/remove, Question add/remove)
-    // Locked if not in draft OR if there is real data.
-    const isStructureLocked =
-        (draft?.state !== 'draft' && !!draft) || (original?.participant_count ?? 0) > 0;
+    // Locked if not in draft.
+    const isStructureLocked = draft?.state !== 'draft' && !!draft;
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;

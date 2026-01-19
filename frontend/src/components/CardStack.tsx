@@ -46,9 +46,9 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
 
     // Dynamic Typography
     const textLength = statement.text.length;
-    let fontSizeClass = 'text-xl @sm:text-2xl';
-    if (textLength > 150) fontSizeClass = 'text-sm @sm:text-base';
-    else if (textLength > 80) fontSizeClass = 'text-lg @sm:text-xl';
+    let fontSizeClass = 'text-2xl @sm:text-3xl';
+    if (textLength > 150) fontSizeClass = 'text-base @sm:text-lg';
+    else if (textLength > 80) fontSizeClass = 'text-xl @sm:text-2xl';
 
     // Overflow Detection
     useEffect(() => {
