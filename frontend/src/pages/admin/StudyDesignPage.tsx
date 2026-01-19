@@ -550,7 +550,7 @@ const StudyDesignPage = () => {
                         ) : (
                             <CheckCircle className="h-3.5 w-3.5 mr-2 opacity-50" />
                         )}
-                        <span className="text-xs uppercase tracking-wide font-bold">
+                        <span className="hidden xl:inline text-xs uppercase tracking-wide font-bold">
                             {syncStatus === 'saving'
                                 ? t('admin.design.sync.saving')
                                 : syncStatus === 'synced'
