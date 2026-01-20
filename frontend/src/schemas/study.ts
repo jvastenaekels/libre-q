@@ -45,6 +45,12 @@ export const StatementSchema = z.object({
     code: z.string().optional(),
 });
 
+export const VisibilityConditionSchema = z.object({
+    depends_on: z.string(),
+    operator: z.enum(['equals', 'not_equals', 'contains', 'greater_than', 'less_than']),
+    value: z.any(),
+});
+
 export const PreSortFieldSchema = z.object({
     type: z.enum(['text', 'number', 'select', 'checkbox', 'radio', 'date', 'email', 'textarea']),
     label: z.union([z.string(), z.record(z.string())]),
@@ -66,6 +72,7 @@ export const PreSortFieldSchema = z.object({
     minLength: z.number().optional(),
     maxLength: z.number().optional(),
     rows: z.number().optional(),
+    visibility_condition: VisibilityConditionSchema.optional(),
 });
 
 export const StudyConfigSchema = z.object({

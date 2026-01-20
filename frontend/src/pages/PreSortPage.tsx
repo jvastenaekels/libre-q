@@ -4,7 +4,6 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,6 +16,8 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
+
+import { evaluateVisibilityCondition } from '../utils/visibilityEvaluator';
 
 interface PreSortPageProps {
     highlightKey?: string | null;
@@ -43,11 +44,29 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         return config.presort_config as Record<string, PreSortField>;
     }, [config?.presort_config]);
 
-    // Generate Dynamic Zod Schema based on config
+    const {
+        register,
+        handleSubmit,
+        watch,
+        control: _control,
+        formState: { errors, isValid },
+        trigger,
+    } = useForm({
+        mode: 'onChange',
+        defaultValues: presortResponse,
+    });
+
+    const currentValues = watch();
+
+    // Generate Dynamic Zod Schema based on config and visibility
     const dynamicSchema = useMemo(() => {
         const shape: Record<string, z.ZodTypeAny> = {};
 
         Object.entries(presortFields).forEach(([key, field]) => {
+            const isVisible = evaluateVisibilityCondition(
+                field.visibility_condition,
+                currentValues
+            );
             let fieldSchema: z.ZodTypeAny;
 
             if (field.type === 'number') {
@@ -65,12 +84,10 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
             } else if (field.type === 'email') {
                 fieldSchema = z.string().email('Please enter a valid email address');
             } else if (field.type === 'date') {
-                fieldSchema = z.string(); // HTML date input returns string
+                fieldSchema = z.string();
             } else if (field.type === 'checkbox') {
-                // Checkbox group returns array of strings
                 fieldSchema = z.array(z.string());
             } else {
-                // text, textarea, radio, select
                 fieldSchema = z.string();
                 if (field.minLength !== undefined) {
                     fieldSchema = (fieldSchema as z.ZodString).min(
@@ -86,7 +103,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                 }
             }
 
-            if (field.required) {
+            if (field.required && isVisible) {
                 if (field.type === 'checkbox') {
                     fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
                         1,
@@ -103,27 +120,26 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         });
 
         return z.object(shape);
-    }, [presortFields, t]);
+    }, [presortFields, t, currentValues]);
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors, isValid },
-    } = useForm({
-        resolver: zodResolver(dynamicSchema),
-        mode: 'onChange',
-        defaultValues: presortResponse,
-    });
+    // Manual validation when values change because the schema is dynamic
+    React.useEffect(() => {
+        const validate = async () => {
+            await dynamicSchema.safeParseAsync(currentValues);
+            // We don't necessarily need to set errors manually if we use the resolver,
+            // but since we want the resolver to change, we'll re-trigger it.
+            trigger();
+        };
+        validate();
+    }, [currentValues, dynamicSchema, trigger]);
 
-    // Auto-save form data to store using subscription to avoid render loops
+    // Auto-save form data to store
     React.useEffect(() => {
         const subscription = watch((value) => {
-            console.log('FORM UPDATE:', { value, isValid, errors });
             setPresortResponse(value as Record<string, string | number | boolean>);
         });
         return () => subscription.unsubscribe();
-    }, [watch, setPresortResponse, isValid, errors]);
+    }, [watch, setPresortResponse]);
 
     // Set Step 2 on mount
     React.useEffect(() => {
@@ -145,7 +161,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
     const onSubmit = (data: Record<string, string | number | boolean>) => {
         setPresortResponse(data);
-        setStep(3); // Setup Q-Sort (Next Step)
+        setStep(3);
         navigate(`/study/${slug}/rough-sort`);
     };
 
@@ -168,27 +184,42 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
             >
-                {Object.entries(presortFields).map(([key, fieldConfig]) => (
-                    <div key={key}>
-                        <label htmlFor={key} className="block text-sm font-medium text-gray-700">
-                            {getLocalizedText(fieldConfig.label)}
-                            {fieldConfig.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <SurveyField
-                            id={key}
-                            fieldConfig={fieldConfig as PreSortField}
-                            register={register}
-                        />
-                        {errors[key] && (
-                            <p
-                                className="text-red-500 text-sm mt-1"
-                                data-testid="presort-field-error"
+                {Object.entries(presortFields).map(([key, fieldConfig]) => {
+                    const isVisible = evaluateVisibilityCondition(
+                        fieldConfig.visibility_condition,
+                        currentValues
+                    );
+
+                    if (!isVisible) return null;
+
+                    return (
+                        <div key={key}>
+                            <label
+                                htmlFor={key}
+                                className="block text-sm font-medium text-gray-700"
                             >
-                                {(errors[key]?.message as string) || t('presort.error_required')}
-                            </p>
-                        )}
-                    </div>
-                ))}
+                                {getLocalizedText(fieldConfig.label)}
+                                {fieldConfig.required && (
+                                    <span className="text-red-500 ml-1">*</span>
+                                )}
+                            </label>
+                            <SurveyField
+                                id={key}
+                                fieldConfig={fieldConfig as PreSortField}
+                                register={register}
+                            />
+                            {errors[key] && (
+                                <p
+                                    className="text-red-500 text-sm mt-1"
+                                    data-testid="presort-field-error"
+                                >
+                                    {(errors[key]?.message as string) ||
+                                        t('presort.error_required')}
+                                </p>
+                            )}
+                        </div>
+                    );
+                })}
 
                 <div className="pt-4 flex justify-end w-full">
                     <button

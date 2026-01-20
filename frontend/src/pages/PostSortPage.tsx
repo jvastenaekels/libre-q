@@ -20,10 +20,11 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
 import { SurveyField } from '../components/survey/SurveyField';
+
+import { evaluateVisibilityCondition } from '../utils/visibilityEvaluator';
 
 interface PostSortPageProps {
     highlightKey?: string | null;
@@ -73,12 +74,28 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             | undefined;
     }, [config]);
 
+    const {
+        register,
+        trigger: triggerFormValidation,
+        watch,
+        formState: { errors: formErrors },
+    } = useForm({
+        mode: 'onChange',
+        defaultValues: responses.postsort.questions_answers,
+    });
+
+    const currentValues = watch();
+
     const dynamicSchema = useMemo(() => {
         if (!questions) return z.object({});
 
         const shape: Record<string, z.ZodTypeAny> = {};
 
         Object.entries(questions).forEach(([key, field]) => {
+            const isVisible = evaluateVisibilityCondition(
+                field.visibility_condition,
+                currentValues
+            );
             let fieldSchema: z.ZodTypeAny;
 
             if (field.type === 'number') {
@@ -115,7 +132,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 }
             }
 
-            if (field.required) {
+            if (field.required && isVisible) {
                 if (field.type === 'checkbox') {
                     fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
                         1,
@@ -132,26 +149,20 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         });
 
         return z.object(shape);
-    }, [questions, t]);
+    }, [questions, t, currentValues]);
 
-    const {
-        register,
-        trigger: triggerFormValidation,
-        watch,
-        formState: { errors: formErrors },
-    } = useForm({
-        resolver: zodResolver(dynamicSchema),
-        mode: 'onChange',
-        defaultValues: responses.postsort.questions_answers,
-    });
+    // Re-validate when schema changes
+    // biome-ignore lint/correctness/useExhaustiveDependencies: We want to re-validate when schema changes
+    React.useEffect(() => {
+        triggerFormValidation();
+    }, [dynamicSchema, triggerFormValidation]);
 
     // Auto-save form data to store
     React.useEffect(() => {
         const subscription = watch((value) => {
             setPostSortResponse(
                 'questions_answers',
-                // biome-ignore lint/suspicious/noExplicitAny: complex dynamic type
-                value as any
+                value as Record<string, unknown>
             );
         });
         return () => subscription.unsubscribe();
@@ -190,11 +201,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             const keyList = Array.isArray(keys) ? keys : [keys];
 
             for (const key of keyList) {
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic key access
-                const promptConfig = (prompts as any)[key];
+                const promptConfig = (prompts as Record<string, unknown>)[key];
                 if (promptConfig) {
                     if (typeof promptConfig === 'string') return promptConfig;
-                    const text = promptConfig[currentLang] || promptConfig.en;
+                    const text = (promptConfig as Record<string, string>)[currentLang] || (promptConfig as Record<string, string>).en;
                     if (text) return text;
                 }
             }
@@ -228,8 +238,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     const defaultExtremes = [-4, 4];
     const extremeCols = config?.postsort_config?.extreme_columns || defaultExtremes;
-    // biome-ignore lint/suspicious/noExplicitAny: config structure
-    const allowRandomComments = (config?.postsort_config as any)?.allow_random_comments ?? true;
+    const allowRandomComments = (config?.postsort_config as unknown)?.allow_random_comments ?? true;
 
     const extremeCards = responses.qsort.filter((p) => {
         const colDef = gridColumns[p.col];
@@ -597,36 +606,45 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 {/* 3. CUSTOM QUESTIONS */}
                 {questions && Object.keys(questions).length > 0 && (
                     <div className="space-y-6">
-                        {Object.entries(questions).map(([key, fieldConfig]) => (
-                            <div
-                                key={key}
-                                className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm"
-                            >
-                                <label
-                                    htmlFor={key}
-                                    className="block text-sm font-bold text-slate-800 mb-2"
+                        {Object.entries(questions).map(([key, fieldConfig]) => {
+                            const isVisible = evaluateVisibilityCondition(
+                                fieldConfig.visibility_condition,
+                                currentValues
+                            );
+
+                            if (!isVisible) return null;
+
+                            return (
+                                <div
+                                    key={key}
+                                    className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm"
                                 >
-                                    {getLocalizedText(fieldConfig.label)}
-                                    {fieldConfig.required && (
-                                        <span className="text-red-500 ml-1">*</span>
-                                    )}
-                                </label>
-                                <SurveyField
-                                    id={key}
-                                    fieldConfig={fieldConfig}
-                                    register={register}
-                                />
-                                {formErrors[key] && (
-                                    <p
-                                        className="text-red-500 text-sm mt-1"
-                                        data-testid="postsort-field-error"
+                                    <label
+                                        htmlFor={key}
+                                        className="block text-sm font-bold text-slate-800 mb-2"
                                     >
-                                        {(formErrors[key]?.message as string) ||
-                                            t('presort.error_required')}
-                                    </p>
-                                )}
-                            </div>
-                        ))}
+                                        {getLocalizedText(fieldConfig.label)}
+                                        {fieldConfig.required && (
+                                            <span className="text-red-500 ml-1">*</span>
+                                        )}
+                                    </label>
+                                    <SurveyField
+                                        id={key}
+                                        fieldConfig={fieldConfig}
+                                        register={register}
+                                    />
+                                    {formErrors[key] && (
+                                        <p
+                                            className="text-red-500 text-sm mt-1"
+                                            data-testid="postsort-field-error"
+                                        >
+                                            {(formErrors[key]?.message as string) ||
+                                                t('presort.error_required')}
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        })}
                         <hr className="border-slate-200 my-8" />
                     </div>
                 )}

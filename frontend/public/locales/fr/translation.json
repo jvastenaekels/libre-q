@@ -971,6 +971,21 @@
                 },
                 "actions": {
                     "add_option": "Ajouter une option"
+                },
+                "logic": {
+                    "title": "Logique d'affichage",
+                    "enable": "Ajouter une condition de visibilité",
+                    "depends_on": "Afficher cette question uniquement si...",
+                    "select_placeholder": "Sélectionner une question parente",
+                    "operator": "Opérateur",
+                    "value": "Valeur de comparaison",
+                    "operators": {
+                        "equals": "Est égal à",
+                        "not_equals": "N'est pas égal à",
+                        "contains": "Contient",
+                        "greater_than": "Est supérieur à",
+                        "less_than": "Est inférieur à"
+                    }
                 }
             },
             "qsort": {

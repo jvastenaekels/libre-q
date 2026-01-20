@@ -490,9 +490,11 @@ class StudyService:
                     missing=", ".join(missing),
                 )
 
-            # Check for empty text in existing translations
+            # Check for empty text in translations (only for active languages)
             for st in s.translations:
-                if not st.text or st.text.strip() == "":
+                if st.language_code in study_langs and (
+                    not st.text or st.text.strip() == ""
+                ):
                     add_error(
                         "empty_statement_text", code=s.code, lang=st.language_code
                     )
