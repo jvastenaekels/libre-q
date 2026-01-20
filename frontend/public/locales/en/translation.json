@@ -369,6 +369,57 @@
             "logout": "Log out",
             "profile": "Profile"
         },
+        "profile": {
+            "title": "Profile & Security",
+            "description": "Manage your personal information and security settings.",
+            "personal": {
+                "title": "Personal Information",
+                "description": "Your account details and contact information.",
+                "email": "Email Address",
+                "email_locked": "Email cannot be changed directly. Contact admin.",
+                "name": "Full Name",
+                "save": "Save Changes",
+                "saving": "Saving...",
+                "success": "Profile updated successfully",
+                "error": "Failed to update profile",
+                "cannot_remove_self": "You cannot remove yourself"
+            },
+            "security": {
+                "title": "Security & 2FA",
+                "description": "Secure your account with two-factor authentication.",
+                "enabled": "Enabled",
+                "status_active": "Your account is secured with two-factor authentication.",
+                "status_inactive": "Account security is low",
+                "setup_cta": "Setup 2FA Now",
+                "configure_title": "Configure Authenticator App",
+                "scan_desc": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+                "enter_code": "Enter 6-digit code",
+                "enable_btn": "Enable 2FA",
+                "active_msg": "2FA is active",
+                "disable_btn": "Disable 2FA",
+                "confirm_disable": "Confirm Disable",
+                "confirm_password_label": "Confirm with your password",
+                "verifying": "Verifying...",
+                "cancel": "Cancel",
+                "enabled_success": "Two-factor authentication enabled",
+                "disabled_success": "Two-factor authentication disabled",
+                "secret_copied": "Secret copied"
+            },
+            "password": {
+                "title": "Password Management",
+                "description": "Update your password to keep your account secure.",
+                "current": "Current Password",
+                "new": "New Password",
+                "change_btn": "Change Password",
+                "updating": "Updating...",
+                "success": "Password changed successfully",
+                "error": "Failed to change password. check current password.",
+                "validation": {
+                    "required": "Required",
+                    "min_length": "Min 8 characters"
+                }
+            }
+        },
         "sidebar": {
             "home": "Dashboard",
             "add_study": "Add Study",
@@ -485,6 +536,12 @@
                 "public": "Public",
                 "individual": "Individual",
                 "limited": "Limited"
+            },
+            "toasts": {
+                "created": "Recruitment links created successfully",
+                "failed": "Failed to create links",
+                "revoked": "Link revoked",
+                "copied": "Copied to clipboard"
             }
         },
         "analytics": {
@@ -897,7 +954,8 @@
                     "fields": {
                         "title": "Step title",
                         "description": "Short description",
-                        "icon": "Icon"
+                        "icon": "Icon",
+                        "toggle": "Toggle"
                     },
                     "defaults": {
                         "new_step": "New study step",

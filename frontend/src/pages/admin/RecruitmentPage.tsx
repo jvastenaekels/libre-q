@@ -70,14 +70,16 @@ const RecruitmentPage = () => {
     const createMutation = useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost({
         mutation: {
             onSuccess: () => {
-                toast.success('Recruitment links created successfully');
+                toast.success(
+                    t('admin.recruitment.toasts.created', 'Recruitment links created successfully')
+                );
                 setIsCreateModalOpen(false);
                 revalidator.revalidate(); // Refresh RR7 loader data
                 setNewLinkName('');
                 setNewLinkCount(1);
             },
             onError: () => {
-                toast.error('Failed to create links');
+                toast.error(t('admin.recruitment.toasts.failed', 'Failed to create links'));
             },
         },
     });
@@ -85,7 +87,7 @@ const RecruitmentPage = () => {
     const revokeMutation = useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete({
         mutation: {
             onSuccess: () => {
-                toast.success('Link revoked');
+                toast.success(t('admin.recruitment.toasts.revoked', 'Link revoked'));
                 revalidator.revalidate(); // Refresh RR7 loader data
             },
         },
@@ -106,7 +108,7 @@ const RecruitmentPage = () => {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        toast.success('Copied to clipboard');
+        toast.success(t('admin.recruitment.toasts.copied', 'Copied to clipboard'));
     };
 
     const getFullUrl = (token: string) => {

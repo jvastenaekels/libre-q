@@ -166,7 +166,9 @@ export default function WorkspaceSettingsPage() {
 
     const handleRemoveMember = async (userId: number) => {
         if (userId === currentUser?.id) {
-            toast.error('You cannot remove yourself');
+            toast.error(
+                t('admin.profile.personal.cannot_remove_self', 'You cannot remove yourself')
+            );
             return;
         }
         if (!confirm(t('admin.workspaces.settings.team.remove_confirm'))) return;

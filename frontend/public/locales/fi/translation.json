@@ -369,6 +369,57 @@
             "logout": "Kirjaudu ulos",
             "profile": "Profiili"
         },
+        "profile": {
+            "title": "Profiili & Turvallisuus",
+            "description": "Hallitse henkilökohtaisia tietojasi ja turvallisuusasetuksia.",
+            "personal": {
+                "title": "Henkilökohtaiset tiedot",
+                "description": "Tilisi tiedot ja yhteystiedot.",
+                "email": "Sähköpostiosoite",
+                "email_locked": "Sähköpostia ei voi muuttaa suoraan. Ota yhteys ylläpitoon.",
+                "name": "Koko nimi",
+                "save": "Tallenna muutokset",
+                "saving": "Tallennetaan...",
+                "success": "Profiili päivitetty onnistuneesti",
+                "error": "Profiilin päivitys epäonnistui",
+                "cannot_remove_self": "Et voi poistaa itseäsi"
+            },
+            "security": {
+                "title": "Turvallisuus & 2FA",
+                "description": "Suojaa tilisi kaksivaiheisella todennuksella.",
+                "enabled": "Käytössä",
+                "status_active": "Tilisi on suojattu kaksivaiheisella todennuksella.",
+                "status_inactive": "Tilin turvallisuus on alhainen",
+                "setup_cta": "Ota 2FA käyttöön",
+                "configure_title": "Määritä todennussovellus",
+                "scan_desc": "Skannaa tämä QR-koodi todennussovelluksellasi (Google Authenticator, Authy, jne.)",
+                "enter_code": "Syötä 6-numeroinen koodi",
+                "enable_btn": "Ota 2FA käyttöön",
+                "active_msg": "2FA on aktiivinen",
+                "disable_btn": "Poista 2FA käytöstä",
+                "confirm_disable": "Vahvista poistaminen",
+                "confirm_password_label": "Vahvista salasanalla",
+                "verifying": "Vahvistetaan...",
+                "cancel": "Peruuta",
+                "enabled_success": "Kaksivaiheinen todennus otettu käyttöön",
+                "disabled_success": "Kaksivaiheinen todennus poistettu käytöstä",
+                "secret_copied": "Salaisuus kopioitu"
+            },
+            "password": {
+                "title": "Salasanan hallinta",
+                "description": "Päivitä salasanasi pitääksesi tilisi turvassa.",
+                "current": "Nykyinen salasana",
+                "new": "Uusi salasana",
+                "change_btn": "Vaihda salasana",
+                "updating": "Päivitetään...",
+                "success": "Salasana vaihdettu onnistuneesti",
+                "error": "Salasanan vaihto epäonnistui. Tarkista nykyinen salasana.",
+                "validation": {
+                    "required": "Pakollinen",
+                    "min_length": "Väh. 8 merkkiä"
+                }
+            }
+        },
         "sidebar": {
             "home": "Hallintapaneeli",
             "add_study": "Lisää tutkimus",
@@ -485,6 +536,12 @@
                 "public": "Julkinen",
                 "individual": "Yksilöllinen",
                 "limited": "Rajoitettu"
+            },
+            "toasts": {
+                "created": "Rekrytointilinkit luotu onnistuneesti",
+                "failed": "Linkkien luominen epäonnistui",
+                "revoked": "Linkki peruutettu",
+                "copied": "Kopioitu leikepöydälle"
             }
         },
         "analytics": {
@@ -898,7 +955,8 @@
                     "fields": {
                         "title": "Step title",
                         "description": "Short description",
-                        "icon": "Icon"
+                        "icon": "Icon",
+                        "toggle": "Vaihda"
                     },
                     "defaults": {
                         "new_step": "New study step",

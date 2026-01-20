@@ -24,6 +24,7 @@ import { Shield, ShieldCheck, ShieldAlert, Key, Copy, AlertCircle } from 'lucide
 import { Badge } from '@/components/ui/badge';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 // Define types manually since generation might lag
 interface UserUpdate {
@@ -38,6 +39,7 @@ interface PasswordChange {
 
 const ProfilePage = () => {
     const { user, refetch: refetchUser } = useAuth();
+    const { t } = useTranslation();
     const [isUpdating, setIsUpdating] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
@@ -56,7 +58,9 @@ const ProfilePage = () => {
     const enableMutation = useEnableTotpApiMe2faEnablePost({
         mutation: {
             onSuccess: () => {
-                toast.success('Two-factor authentication enabled');
+                toast.success(
+                    t('admin.profile.security.enabled_success', 'Two-factor authentication enabled')
+                );
                 setIs2FASetupMode(false);
                 setTotpToken('');
                 refetchUser();
@@ -71,7 +75,12 @@ const ProfilePage = () => {
     const disableMutation = useDisableTotpApiMe2faDisablePost({
         mutation: {
             onSuccess: () => {
-                toast.success('Two-factor authentication disabled');
+                toast.success(
+                    t(
+                        'admin.profile.security.disabled_success',
+                        'Two-factor authentication disabled'
+                    )
+                );
                 setShowDisableConfirm(false);
                 setConfirmPassword('');
                 refetchUser();
@@ -106,11 +115,11 @@ const ProfilePage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 data,
             });
-            toast.success('Profile updated successfully');
+            toast.success(t('admin.profile.personal.success', 'Profile updated successfully'));
             // Force reload or re-fetch user would be ideal here
             window.location.reload();
         } catch (error) {
-            toast.error('Failed to update profile');
+            toast.error(t('admin.profile.personal.error', 'Failed to update profile'));
             console.error(error);
         } finally {
             setIsUpdating(false);
@@ -126,10 +135,15 @@ const ProfilePage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 data,
             });
-            toast.success('Password changed successfully');
+            toast.success(t('admin.profile.password.success', 'Password changed successfully'));
             resetPassword();
         } catch (error) {
-            toast.error('Failed to change password. check current password.');
+            toast.error(
+                t(
+                    'admin.profile.password.error',
+                    'Failed to change password. check current password.'
+                )
+            );
             console.error(error);
         } finally {
             setIsChangingPassword(false);
@@ -139,8 +153,11 @@ const ProfilePage = () => {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title="Profile & Security"
-                description="Manage your personal information and account security."
+                title={t('admin.profile.title', 'Profile & Security')}
+                description={t(
+                    'admin.profile.description',
+                    'Manage your personal information and account security.'
+                )}
                 icon={Shield}
             />
 
@@ -150,10 +167,13 @@ const ProfilePage = () => {
                     <CardHeader className="border-b border-slate-50 pb-4">
                         <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                             <Key className="size-5 text-indigo-500" />
-                            Personal Information
+                            {t('admin.profile.personal.title', 'Personal Information')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500">
-                            Update your name and contact details.
+                            {t(
+                                'admin.profile.personal.description',
+                                'Update your name and contact details.'
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <form onSubmit={handleProfileSubmit(onProfileSubmit)}>
@@ -172,7 +192,10 @@ const ProfilePage = () => {
                                     className="h-11 rounded-xl bg-slate-50 border-slate-200"
                                 />
                                 <p className="text-[10px] text-slate-400 italic">
-                                    Email cannot be changed directly. Contact admin.
+                                    {t(
+                                        'admin.profile.personal.email_locked',
+                                        'Email cannot be changed directly. Contact admin.'
+                                    )}
                                 </p>
                             </div>
                             <div className="grid gap-2">
@@ -196,7 +219,9 @@ const ProfilePage = () => {
                                 disabled={isUpdating}
                                 className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                             >
-                                {isUpdating ? 'Saving...' : 'Save Changes'}
+                                {isUpdating
+                                    ? t('admin.profile.personal.saving', 'Saving...')
+                                    : t('admin.profile.personal.save', 'Save Changes')}
                             </Button>
                         </CardFooter>
                     </form>
@@ -214,15 +239,18 @@ const ProfilePage = () => {
                             <div className="space-y-1">
                                 <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                                     <ShieldCheck className="size-5 text-indigo-500" />
-                                    Security & 2FA
+                                    {t('admin.profile.security.title', 'Security & 2FA')}
                                     {user?.is_totp_enabled && (
                                         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px] font-black uppercase tracking-wider">
-                                            Enabled
+                                            {t('admin.profile.security.enabled', 'Enabled')}
                                         </Badge>
                                     )}
                                 </CardTitle>
                                 <CardDescription className="text-sm font-medium text-slate-500">
-                                    Add an extra layer of security using TOTP.
+                                    {t(
+                                        'admin.profile.security.description',
+                                        'Add an extra layer of security using TOTP.'
+                                    )}
                                 </CardDescription>
                             </div>
                         </div>
@@ -236,7 +264,10 @@ const ProfilePage = () => {
                                     </div>
                                     <div className="space-y-1">
                                         <h4 className="font-bold text-slate-900">
-                                            Account security is low
+                                            {t(
+                                                'admin.profile.security.status_inactive',
+                                                'Account security is low'
+                                            )}
                                         </h4>
                                         <p className="text-sm text-slate-500 font-medium">
                                             Enable two-factor authentication to protect your
@@ -248,7 +279,7 @@ const ProfilePage = () => {
                                     onClick={() => setIs2FASetupMode(true)}
                                     className="h-11 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                 >
-                                    Setup 2FA Now
+                                    {t('admin.profile.security.setup_cta', 'Setup 2FA Now')}
                                 </Button>
                             </div>
                         )}
@@ -258,21 +289,27 @@ const ProfilePage = () => {
                                 <header className="flex items-center justify-between pb-4 border-b">
                                     <h4 className="font-bold text-slate-900 flex items-center gap-2">
                                         <Key size={18} className="text-indigo-600" />
-                                        Configure Authenticator App
+                                        {t(
+                                            'admin.profile.security.configure_title',
+                                            'Configure Authenticator App'
+                                        )}
                                     </h4>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setIs2FASetupMode(false)}
                                     >
-                                        Cancel
+                                        {t('admin.profile.security.cancel', 'Cancel')}
                                     </Button>
                                 </header>
 
                                 <div className="grid md:grid-cols-2 gap-8 items-center">
                                     <div className="space-y-4">
                                         <p className="text-sm text-slate-600 leading-relaxed">
-                                            1. Scan this QR code with an authenticator app.
+                                            {t(
+                                                'admin.profile.security.scan_desc',
+                                                '1. Scan this QR code with an authenticator app.'
+                                            )}
                                         </p>
                                         <div className="p-3 bg-slate-50 rounded-lg border font-mono text-xs flex items-center justify-between select-all group">
                                             {isSetupLoading ? 'Generating...' : totpSetup?.secret}
@@ -283,7 +320,12 @@ const ProfilePage = () => {
                                                     navigator.clipboard.writeText(
                                                         totpSetup?.secret || ''
                                                     );
-                                                    toast.success('Secret copied');
+                                                    toast.success(
+                                                        t(
+                                                            'admin.profile.security.secret_copied',
+                                                            'Secret copied'
+                                                        )
+                                                    );
                                                 }}
                                             >
                                                 <Copy size={14} className="text-slate-500" />
@@ -310,7 +352,10 @@ const ProfilePage = () => {
                                         htmlFor="2fa-token"
                                         className="text-sm font-bold text-slate-700"
                                     >
-                                        2. Enter the 6-digit code
+                                        {t(
+                                            'admin.profile.security.enter_code',
+                                            '2. Enter the 6-digit code'
+                                        )}
                                     </Label>
                                     <div className="flex gap-3">
                                         <Input
@@ -333,8 +378,14 @@ const ProfilePage = () => {
                                             }
                                         >
                                             {enableMutation.isPending
-                                                ? 'Verifying...'
-                                                : 'Enable 2FA'}
+                                                ? t(
+                                                      'admin.profile.security.verifying',
+                                                      'Verifying...'
+                                                  )
+                                                : t(
+                                                      'admin.profile.security.enable_btn',
+                                                      'Enable 2FA'
+                                                  )}
                                         </Button>
                                     </div>
                                 </div>
@@ -347,7 +398,10 @@ const ProfilePage = () => {
                                     <ShieldCheck size={20} className="text-green-600 mt-1" />
                                     <div className="space-y-1">
                                         <h4 className="font-semibold text-green-900">
-                                            2FA is active
+                                            {t(
+                                                'admin.profile.security.active_msg',
+                                                '2FA is active'
+                                            )}
                                         </h4>
                                         <p className="text-sm text-green-700/80">
                                             Your account is protected.
@@ -361,12 +415,15 @@ const ProfilePage = () => {
                                         className="text-red-600 border-red-200"
                                         onClick={() => setShowDisableConfirm(true)}
                                     >
-                                        Disable 2FA
+                                        {t('admin.profile.security.disable_btn', 'Disable 2FA')}
                                     </Button>
                                 ) : (
                                     <div className="p-4 border border-red-100 bg-red-50/20 rounded-xl space-y-4">
                                         <Label htmlFor="disable-password">
-                                            Confirm with your password
+                                            {t(
+                                                'admin.profile.security.confirm_password_label',
+                                                'Confirm with your password'
+                                            )}
                                         </Label>
                                         <div className="flex gap-3">
                                             <Input
@@ -387,13 +444,16 @@ const ProfilePage = () => {
                                                     })
                                                 }
                                             >
-                                                Confirm Disable
+                                                {t(
+                                                    'admin.profile.security.confirm_disable',
+                                                    'Confirm Disable'
+                                                )}
                                             </Button>
                                             <Button
                                                 variant="ghost"
                                                 onClick={() => setShowDisableConfirm(false)}
                                             >
-                                                Cancel
+                                                {t('admin.profile.security.cancel', 'Cancel')}
                                             </Button>
                                         </div>
                                     </div>
@@ -430,7 +490,12 @@ const ProfilePage = () => {
                                     className="h-11 rounded-xl"
                                 />
                                 {passwordErrors.current_password && (
-                                    <span className="text-red-500 text-xs">Required</span>
+                                    <span className="text-red-500 text-xs">
+                                        {t(
+                                            'admin.profile.password.validation.required',
+                                            'Required'
+                                        )}
+                                    </span>
                                 )}
                             </div>
                             <div className="grid gap-2">
@@ -451,7 +516,10 @@ const ProfilePage = () => {
                                 />
                                 {passwordErrors.new_password && (
                                     <span className="text-red-500 text-xs">
-                                        Min 8 characters required
+                                        {t(
+                                            'admin.profile.password.validation.min_length',
+                                            'Min 8 characters required'
+                                        )}
                                     </span>
                                 )}
                             </div>
@@ -462,7 +530,9 @@ const ProfilePage = () => {
                                 disabled={isChangingPassword}
                                 className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                             >
-                                {isChangingPassword ? 'Updating...' : 'Change Password'}
+                                {isChangingPassword
+                                    ? t('admin.profile.password.updating', 'Updating...')
+                                    : t('admin.profile.password.change_btn', 'Change Password')}
                             </Button>
                         </CardFooter>
                     </form>

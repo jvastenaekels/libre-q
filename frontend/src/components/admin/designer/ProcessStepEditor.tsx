@@ -99,7 +99,9 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                 </div>
                                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                     <AccordionTrigger className="py-2 hover:no-underline text-slate-400 hover:text-indigo-600">
-                                        <span className="sr-only">Toggle</span>
+                                        <span className="sr-only">
+                                            {t('admin.design.intro.process_steps.fields.toggle')}
+                                        </span>
                                     </AccordionTrigger>
                                     {!readOnly && (
                                         <Button
