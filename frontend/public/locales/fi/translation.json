@@ -331,7 +331,8 @@
             "email_placeholder": "esimerkki@email.com",
             "interview_consent": "Suostun siihen, että tutkija ottaa minuun tarvittaessa yhteyttä jatkotoimenpiteitä varten.",
             "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
-            "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
+            "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sen ilmoittaminen takaa pseudonymisoinnin: tietosi ovat tunnistettavissa vain tutkijan toimesta tutkimustarkoituksiin.",
+            "pseudonymization_note": "Yhteydenottoon suostuminen tarkoittaa, että tutkija voi yhdistää näkökulmasi sähköpostiosoitteeseesi (pseudonymisointi) tätä nimenomaista jatkokontaktia varten."
         }
     },
     "admin": {
