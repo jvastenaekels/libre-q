@@ -810,6 +810,7 @@
                 "discard": "Discard unsaved changes",
                 "test_run": "Test run",
                 "save": "Save",
+                "saved": "Saved",
                 "closed": "Closed",
                 "back_to_study": "Back to Study",
                 "editing_language": "Editing language",

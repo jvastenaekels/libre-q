@@ -17,6 +17,7 @@ import {
     ArrowRight,
     ChevronLeft,
     ChevronRight,
+    Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -533,26 +534,33 @@ const StudyDesignPage = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={save}
-                                title={t('admin.design.toolbar.save_changes')}
+                                title={t('admin.design.toolbar.save_changes', 'Save Changes')}
                                 disabled={
                                     syncStatus === 'synced' ||
                                     syncStatus === 'saving' ||
                                     isFullyReadOnly
                                 }
                                 className={cn(
-                                    'h-9 w-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 p-0',
+                                    'h-9 px-2 sm:px-3 font-bold rounded-lg shadow-sm transition-all active:scale-95 gap-2',
                                     syncStatus === 'modified'
                                         ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
-                                        : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600'
+                                        : 'bg-white text-slate-400 border-slate-200'
                                 )}
                             >
                                 {syncStatus === 'saving' ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : syncStatus === 'modified' ? (
-                                    <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                    <Save className="h-4 w-4" />
                                 ) : (
                                     <CheckCircle className="h-4 w-4 text-emerald-500 opacity-80" />
                                 )}
+                                <span className="hidden md:inline">
+                                    {syncStatus === 'saving'
+                                        ? t('admin.sync.saving', 'Saving...')
+                                        : syncStatus === 'modified'
+                                          ? t('admin.design.toolbar.save', 'Save')
+                                          : t('admin.design.toolbar.saved', 'Saved')}
+                                </span>
                             </Button>
 
                             <ExportConfigButton
