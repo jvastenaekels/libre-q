@@ -46,9 +46,10 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
 
     // Dynamic Typography
     const textLength = statement.text.length;
-    let fontSizeClass = 'text-5xl @sm:text-6xl';
-    if (textLength > 150) fontSizeClass = 'text-2xl @sm:text-3xl';
-    else if (textLength > 80) fontSizeClass = 'text-4xl @sm:text-5xl';
+    let fontSizeClass = 'text-5xl @sm:text-6xl @md:text-7xl';
+    if (textLength > 200) fontSizeClass = 'text-xl @sm:text-2xl @md:text-3xl';
+    else if (textLength > 120) fontSizeClass = 'text-3xl @sm:text-4xl @md:text-5xl';
+    else if (textLength > 60) fontSizeClass = 'text-4xl @sm:text-5xl @md:text-6xl';
 
     // Overflow Detection
     useEffect(() => {
@@ -142,7 +143,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                 animate={controls}
                 style={{ x, y, rotate }}
                 data-testid={`card-${statement.id}`}
-                className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-pointer active:cursor-grabbing touch-none overflow-hidden"
+                className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 cursor-pointer active:cursor-grabbing touch-none overflow-hidden"
             >
                 {/* Color Overlays */}
                 <motion.div

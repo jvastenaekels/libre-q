@@ -331,7 +331,8 @@
             "email_placeholder": "exemple@email.com",
             "interview_consent": "J'accepte d'être recontacté(e) par le chercheur.",
             "newsletter_consent": "Je souhaite être tenu(e) au courant des résultats de l'étude.",
-            "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Il est stocké uniquement pour les finalités cochées ci-dessus."
+            "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Le fournir garantit la pseudonymisation : vos données restent identifiables uniquement par le chercheur pour les besoins de l'étude.",
+            "pseudonymization_note": "Accepter d'être recontacté implique que le chercheur peut lier votre perspective à votre email (pseudonymisation) pour ce suivi spécifique."
         }
     },
     "admin": {

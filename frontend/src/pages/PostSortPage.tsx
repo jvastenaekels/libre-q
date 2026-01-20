@@ -706,6 +706,11 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                         >
                                             {t('post.contact.interview_consent')}
                                         </Label>
+                                        {responses.postsort.interview_consent && (
+                                            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-tight max-w-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                {t('post.contact.pseudonymization_note')}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
