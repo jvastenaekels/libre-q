@@ -218,11 +218,11 @@
                 "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
             },
             "fine": {
-                "title": "Näkökulmasi",
+                "title": "Ruudukkoasettelu",
                 "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat."
             },
             "post": {
-                "title": "Miksi",
+                "title": "Melkein valmista!",
                 "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
             }
         }
@@ -305,6 +305,8 @@
     "post": {
         "title": "Näkökulmasi ja palautteesi",
         "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
+        "step2_title": "Melkein valmista!",
+        "step2_description": "Vastaa vielä näihin viimeisiin kysymyksiin viimeistelläksesi tutkimuksen.",
         "extreme": {
             "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
@@ -1167,7 +1169,7 @@
                 },
                 "steps": {
                     "step1": "Vaihe 1: Palaute",
-                    "step2": "Melkein valmista!"
+                    "step2": "Vaihe 2: Kysymykset"
                 },
                 "email": {
                     "title": "Osallistujan seuranta",

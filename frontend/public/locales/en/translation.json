@@ -207,7 +207,7 @@
         "how_it_works": "Process",
         "objective_label": "Study Objective",
         "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Your perspective:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Why:** a few words to explain your most significant choices.",
+        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Grid Sorting:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Almost done!:** a few words to explain your most significant choices.",
         "steps": {
             "profile": {
                 "title": "Let's meet",
@@ -218,11 +218,11 @@
                 "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree)."
             },
             "fine": {
-                "title": "Your perspective",
+                "title": "Grid Sorting",
                 "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
             },
             "post": {
-                "title": "Why",
+                "title": "Almost done!",
                 "description": "A few words to explain your most significant choices."
             }
         }
@@ -305,6 +305,8 @@
     "post": {
         "title": "Your Perspective & Feedback",
         "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
+        "step2_title": "Almost done!",
+        "step2_description": "Please answer these final questions to complete the study.",
         "extreme": {
             "why": "Why did you choose to place this statement here? How is it significant to you?",
             "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
@@ -1167,7 +1169,7 @@
                 },
                 "steps": {
                     "step1": "Step 1: Feedback",
-                    "step2": "Almost done!"
+                    "step2": "Step 2: Questions"
                 },
                 "email": {
                     "title": "Participant Follow-up",

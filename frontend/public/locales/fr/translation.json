@@ -207,7 +207,7 @@
         "conducted_by": "Mené par",
         "instructions_label": "Déroulement",
         "how_it_works": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants.",
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Placement sur la grille :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Presque fini ! :** quelques mots pour nous expliquer vos choix les plus importants.",
         "steps": {
             "profile": {
                 "title": "Quelques questions",
@@ -218,11 +218,11 @@
                 "description": "Découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord)."
             },
             "fine": {
-                "title": "Votre perspective",
+                "title": "Placement sur la grille",
                 "description": "Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
             },
             "post": {
-                "title": "Pourquoi",
+                "title": "Presque fini !",
                 "description": "Quelques mots pour expliquer vos choix les plus significatifs."
             }
         }
@@ -305,6 +305,8 @@
     "post": {
         "title": "Votre perspective & retours",
         "description": "Nous y sommes presque ! Vos explications sur les énoncés les plus significatifs sont précieuses pour l'analyse.",
+        "step2_title": "Presque fini !",
+        "step2_description": "Veuillez répondre à ces dernières questions pour terminer l'étude.",
         "extreme": {
             "why": "Pourquoi avez-vous choisi de placer cet énoncé ici ? En quoi est-il significatif pour vous ?",
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
@@ -1166,7 +1168,7 @@
                 },
                 "steps": {
                     "step1": "Étape 1 : Retours",
-                    "step2": "Presque fini !"
+                    "step2": "Étape 2 : Questions"
                 },
                 "email": {
                     "title": "Suivi des participants",
