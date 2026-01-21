@@ -16,10 +16,37 @@ class ExportService:
         output = io.StringIO()
         writer = csv.writer(output)
 
-        # 1. Header
-        # Get all statement codes for the header, sorted by ID for consistency
+        # Helper to get human label for a question ID from config
+        def get_label(config_dict: dict, q_id: str, lang: str = "en") -> str:
+            q_config = config_dict.get(q_id, {})
+            label_obj = q_config.get("label", q_id)
+            if isinstance(label_obj, dict):
+                return str(
+                    label_obj.get(lang)
+                    or label_obj.get("en")
+                    or next(iter(label_obj.values()), q_id)
+                )
+            return str(label_obj)
+
+        # 1. Resolve Configs
+        presort_fields = {}
+        if study.presort_config:
+            if "fields" in study.presort_config:
+                presort_fields = study.presort_config.get("fields", {})
+            elif "enabled" not in study.presort_config:
+                presort_fields = study.presort_config
+
+        postsort_fields = {}
+        if study.postsort_config:
+            if "questions" in study.postsort_config:
+                postsort_fields = study.postsort_config.get("questions", {})
+            elif "extreme_columns" not in study.postsort_config:
+                postsort_fields = study.postsort_config
+
+        # 2. Header Construction
         sorted_statements = sorted(study.statements, key=lambda s: s.id)
         statement_codes = [s.code for s in sorted_statements]
+
         header = [
             "Participant_UID",
             "Confirmation_Code",
@@ -29,22 +56,30 @@ class ExportService:
             "IP_Hash",
         ]
 
-        # Add Presort questions
-        presort_keys = list(study.presort_config.keys()) if study.presort_config else []
-        header.extend([f"Pre_{k}" for k in presort_keys])
+        # Use study's default language for headers if available, else English
+        header_lang = study.default_language or "en"
+
+        # Add Presort questions with labels
+        presort_keys = list(presort_fields.keys())
+        header.extend(
+            [f"Pre_{get_label(presort_fields, k, header_lang)}" for k in presort_keys]
+        )
 
         # Add Statement Scores
         header.extend(statement_codes)
 
-        # Add Postsort questions
-        postsort_keys = (
-            list(study.postsort_config.keys()) if study.postsort_config else []
+        # Add Postsort questions with labels
+        postsort_keys = list(postsort_fields.keys())
+        header.extend(
+            [
+                f"Post_{get_label(postsort_fields, k, header_lang)}"
+                for k in postsort_keys
+            ]
         )
-        header.extend([f"Post_{k}" for k in postsort_keys])
 
         writer.writerow(header)
 
-        # 2. Rows
+        # 3. Rows
         for p in participants:
             row = [
                 str(p.session_token),
@@ -60,7 +95,6 @@ class ExportService:
                 row.append(p.presort_answers.get(k, ""))
 
             # Q-Sort Scores
-            # Map statement_id -> grid_score for this participant
             scores_map = {
                 entry.statement_id: entry.grid_score for entry in p.qsort_entries
             }
@@ -86,7 +120,7 @@ class ExportService:
 
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             # 1. Generate .sta (Statements)
-            sta_content = ExportService._generate_sta(sorted_statements)
+            sta_content = ExportService._generate_sta(study, sorted_statements)
             zip_file.writestr(f"{study.slug}.sta", sta_content)
 
             # 2. Generate .dat (Data Matrix)
@@ -118,18 +152,23 @@ class ExportService:
         return zip_buffer.getvalue()
 
     @staticmethod
-    def _generate_sta(statements: list[Statement]) -> str:
+    def _generate_sta(study: Study, statements: list[Statement]) -> str:
         """Generates .sta file content (Statement list)."""
         lines = []
+        lang = study.default_language or "en"
         for s in statements:
             # PQMethod expects one statement per line
             text = s.code
             if s.translations:
-                # Use first translation or better: use English if available
-                text = s.translations[0].text
+                # Find translation for study's default language
+                translation = next(
+                    (t for t in s.translations if t.language_code == lang),
+                    s.translations[0],
+                )
+                text = translation.text
             # Clean text of newlines for stability
             clean_text = text.replace("\n", " ").replace("\r", " ").strip()
-            lines.append(clean_text)
+            lines.append(clean_text[:80])  # PQMethod limit is often 80 chars
         return "\n".join(lines)
 
     @staticmethod

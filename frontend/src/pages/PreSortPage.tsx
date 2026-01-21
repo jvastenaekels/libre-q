@@ -73,7 +73,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                             t('common.errors.max', { max: field.max })
                         );
                 } else if (field.type === 'email') {
-                    fieldSchema = z.string().email('Please enter a valid email address');
+                    fieldSchema = z.string().email(t('common.errors.email'));
                 } else if (field.type === 'date') {
                     fieldSchema = z.string();
                 } else if (field.type === 'checkbox') {
@@ -83,13 +83,13 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                     if (field.minLength !== undefined) {
                         fieldSchema = (fieldSchema as z.ZodString).min(
                             field.minLength,
-                            `Minimum ${field.minLength} characters required`
+                            t('common.errors.min_length', { count: field.minLength })
                         );
                     }
                     if (field.maxLength !== undefined) {
                         fieldSchema = (fieldSchema as z.ZodString).max(
                             field.maxLength,
-                            `Maximum ${field.maxLength} characters allowed`
+                            t('common.errors.max_length', { count: field.maxLength })
                         );
                     }
                 }

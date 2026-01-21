@@ -38,6 +38,9 @@
             "retry": "Retry",
             "min": "Value must be at least {{min}}",
             "max": "Value must be at most {{max}}",
+            "email": "Please enter a valid email address",
+            "min_length": "Minimum {{count}} characters required",
+            "max_length": "Maximum {{count}} characters allowed",
             "404": {
                 "title": "Page Not Found",
                 "message": "The page or study you are looking for does not exist."

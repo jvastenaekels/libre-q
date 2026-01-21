@@ -478,8 +478,68 @@ class StudyService:
                             "missing_step_title", index=i + 1, lang=t.language_code
                         )
 
-        # 4. Statements have translations for all study languages
+        # 4. Questions (Pre/Post) have labels for all study languages
+        def check_questions(config: dict, section: str):
+            fields = {}
+            if section == "presort":
+                if "fields" in config:
+                    fields = config["fields"]
+                elif "enabled" not in config:
+                    fields = config
+            else:  # postsort
+                fields = config.get("questions", {})
+
+            for q_id, q_config in fields.items():
+                label = q_config.get("label")
+                for lang in study_langs:
+                    lang_label = None
+                    if isinstance(label, dict):
+                        lang_label = label.get(lang)
+                    elif lang == "en":  # Legacy string fallback to en
+                        lang_label = label
+
+                    if not lang_label or (
+                        isinstance(lang_label, str) and lang_label.strip() == ""
+                    ):
+                        add_error(
+                            "missing_question_label",
+                            id=q_id,
+                            lang=lang,
+                            section=section,
+                        )
+
+                    # Check options
+                    options = q_config.get("options", [])
+                    if options:
+                        for i, opt in enumerate(options):
+                            opt_label = None
+                            if isinstance(opt, dict):
+                                opt_label_obj = opt.get("label")
+                                if isinstance(opt_label_obj, dict):
+                                    opt_label = opt_label_obj.get(lang)
+                                elif lang == "en":
+                                    opt_label = opt_label_obj
+                            elif lang == "en":  # Legacy string
+                                opt_label = opt
+
+                            if not opt_label or (
+                                isinstance(opt_label, str) and opt_label.strip() == ""
+                            ):
+                                add_error(
+                                    "missing_option_label",
+                                    id=q_id,
+                                    index=i + 1,
+                                    lang=lang,
+                                    section=section,
+                                )
+
         study_langs = {t.language_code for t in study.translations}
+        if study.presort_config:
+            check_questions(study.presort_config, "presort")
+        if study.postsort_config:
+            check_questions(study.postsort_config, "postsort")
+
+        # 5. Statements have translations for all study languages
         for s in study.statements:
             s_langs = {st.language_code for st in s.translations}
             missing = study_langs - s_langs

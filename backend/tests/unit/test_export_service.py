@@ -64,6 +64,7 @@ class MockStudy:
         self.statements = statements
         self.presort_config: dict[str, Any] = {}
         self.postsort_config: dict[str, Any] = {}
+        self.default_language = "en"
         self.grid_config = [
             {"score": -1, "capacity": 1},
             {"score": 0, "capacity": 2},
@@ -148,10 +149,11 @@ class TestRosettaStone:
             MockStatement(id=50, code="S_FIRST", text="First statement"),
             MockStatement(id=200, code="S_LAST", text="Last statement"),
         ]
+        study = MockStudy(statements)
 
         # Act
         sorted_statements = sorted(statements, key=lambda s: s.id)
-        sta_content = ExportService._generate_sta(sorted_statements)
+        sta_content = ExportService._generate_sta(study, sorted_statements)
 
         # Assert: Lines should be in ID order
         lines = sta_content.strip().split("\n")

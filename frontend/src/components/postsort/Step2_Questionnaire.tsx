@@ -22,7 +22,7 @@ interface Step2Props {
 }
 
 export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, isLoading }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const config = useConfigStore((state) => state.config);
     const { postsort } = useResponseStore((state) => ({ postsort: state.postsort }));
     const setPostSortResponse = useResponseStore((state) => state.setPostSortResponse);
@@ -59,23 +59,29 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     if (field.min !== undefined)
                         fieldSchema = (fieldSchema as z.ZodNumber).min(
                             field.min,
-                            `Min: ${field.min}`
+                            t('common.errors.min', { min: field.min })
                         );
                     if (field.max !== undefined)
                         fieldSchema = (fieldSchema as z.ZodNumber).max(
                             field.max,
-                            `Max: ${field.max}`
+                            t('common.errors.max', { max: field.max })
                         );
                 } else if (field.type === 'email') {
-                    fieldSchema = z.string().email('Invalid email');
+                    fieldSchema = z.string().email(t('common.errors.email'));
                 } else if (field.type === 'checkbox') {
                     fieldSchema = z.array(z.string());
                 } else {
                     fieldSchema = z.string();
                     if (field.minLength)
-                        fieldSchema = (fieldSchema as z.ZodString).min(field.minLength);
+                        fieldSchema = (fieldSchema as z.ZodString).min(
+                            field.minLength,
+                            t('common.errors.min_length', { count: field.minLength })
+                        );
                     if (field.maxLength)
-                        fieldSchema = (fieldSchema as z.ZodString).max(field.maxLength);
+                        fieldSchema = (fieldSchema as z.ZodString).max(
+                            field.maxLength,
+                            t('common.errors.max_length', { count: field.maxLength })
+                        );
                 }
 
                 if (field.required) {
@@ -144,6 +150,12 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                         );
                         if (!isVisible) return null;
 
+                        const getLocalizedText = (obj: string | Record<string, string>) => {
+                            if (typeof obj === 'string') return obj;
+                            if (!obj) return '';
+                            return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
+                        };
+
                         return (
                             <div
                                 key={key}
@@ -153,10 +165,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                     htmlFor={key}
                                     className="block text-sm font-bold text-slate-800 mb-2"
                                 >
-                                    {fieldConfig.label &&
-                                        (typeof fieldConfig.label === 'string'
-                                            ? fieldConfig.label
-                                            : fieldConfig.label[Object.keys(fieldConfig.label)[0]])}
+                                    {getLocalizedText(fieldConfig.label)}
                                     {fieldConfig.required && (
                                         <span className="text-red-500 ml-1">*</span>
                                     )}

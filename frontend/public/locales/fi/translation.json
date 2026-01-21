@@ -1,151 +1,154 @@
 {
     "common": {
-        "add": "Add",
-        "all": "All",
-        "agree": "Somewhat agree",
-        "disagree": "Somewhat disagree",
-        "neutral": "Neutral",
-        "reset_to_default": "Reset to Default",
-        "reset_to_default_success": "Restored to default",
-        "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
-        "undo": "Undo",
-        "next": "Next step",
-        "submit": "Share my perspective",
-        "continue": "Continue",
-        "loading": "Loading...",
-        "lang_code": "en",
-        "attention": "Attention",
-        "error": "Error",
-        "submitting": "Submitting...",
-        "cards": "statements",
-        "close": "Close",
-        "optional": "Optional",
-        "processing": "Processing...",
-        "statement": "Statement",
-        "step": "Step",
-        "back": "Back",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "slots": "slots",
-        "workspace_label": "Workspace",
-        "reduce": "Reduce",
-        "expand": "Expand",
+        "add": "Lisää",
+        "all": "Kaikki",
+        "agree": "Jokseenkin samaa mieltä",
+        "disagree": "Jokseenkin eri mieltä",
+        "neutral": "Neutraali",
+        "reset_to_default": "Palauta oletukset",
+        "reset_to_default_success": "Oletukset palautettu",
+        "reset_to_default_confirm": "Haluatko varmasti palauttaa tämän kentän oletusarvon? Kaikki mukautetut muutokset menetetään.",
+        "undo": "Kumoa",
+        "next": "Seuraava vaihe",
+        "submit": "Lähetä vastaukset",
+        "continue": "Jatka",
+        "loading": "Ladataan...",
+        "lang_code": "fi",
+        "attention": "Huomio",
+        "error": "Virhe",
+        "submitting": "Lähetetään...",
+        "cards": "väitteet",
+        "close": "Sulje",
+        "optional": "Valinnainen",
+        "processing": "Käsitellään...",
+        "statement": "Väite",
+        "step": "Vaihe",
+        "back": "Takaisin",
+        "cancel": "Peruuta",
+        "delete": "Poista",
+        "slots": "paikkaa",
+        "workspace_label": "Työtila",
+        "reduce": "Pienennä",
+        "expand": "Laajenna",
         "errors": {
-            "network": "Network connection error. Please check your internet connection.",
-            "not_found": "Study not found.",
-            "validation": "System error: Data validation failed.",
-            "unknown": "An unexpected error occurred.",
-            "retry": "Retry",
-            "min": "Value must be at least {{min}}",
-            "max": "Value must be at most {{max}}",
+            "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
+            "not_found": "Tutkimusta ei löytynyt.",
+            "validation": "Järjestelmävirhe: Tietojen vahvistus epäonnistui.",
+            "unknown": "Odottamaton virhe tapahtui.",
+            "retry": "Yritä uudelleen",
+            "min": "Arvon on oltava vähintään {{min}}",
+            "max": "Arvon on oltava enintään {{max}}",
+            "email": "Syötä voimallinen sähköpostiosoite",
+            "min_length": "Vähintään {{count}} merkkiä",
+            "max_length": "Enintään {{count}} merkkiä",
             "404": {
-                "title": "Page Not Found",
-                "message": "The page or study you are looking for does not exist."
+                "title": "Sivua ei löytynyt",
+                "message": "Etsimääsi sivua tai tutkimusta ei ole olemassa."
             },
             "429": {
-                "title": "Too Many Requests",
-                "message": "You are doing that too fast. Please wait a moment."
+                "title": "Liikaa pyyntöjä",
+                "message": "Teet tuota liian nopeasti. Odota hetki."
             },
             "500": {
-                "title": "Server Error",
-                "message": "Our servers encountered an issue. Please try again later."
+                "title": "Palvelinvirhe",
+                "message": "Palvelimellamme ilmeni ongelma. Yritä myöhemmin uudelleen."
             },
-            "network_title": "Connection Lost",
-            "home": "Go to Home",
-            "reset": "Reset Session",
-            "default_title": "Oops! Something went wrong.",
+            "network_title": "Yhteys katkesi",
+            "home": "Siirry kotisivulle",
+            "reset": "Nollaa istunto",
+            "default_title": "Hups! Jotain meni vikaan.",
             "study_not_found": {
-                "title": "Study Not Found",
-                "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
-                "action": "Go to Home"
+                "title": "Tutkimusta ei löytynyt",
+                "message": "Emme löytäneet tutkimusta kyseisellä nimellä. Tarkista URL tai ota yhteyttä tutkijaan.",
+                "action": "Siirry kotisivulle"
             }
         },
         "status": {
             "draft": {
-                "title": "Study Under Preparation",
-                "message": "This study is not available for participation yet. Please check back later.",
-                "action": "Back to Home"
+                "title": "Tutkimus valmistelussa",
+                "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Tarkista tilanne myöhemmin.",
+                "action": "Takaisin kotisivulle"
             },
             "steps": {
                 "draft": {
-                    "label": "Draft",
-                    "description": "Configuration & design"
+                    "label": "Luonnos",
+                    "description": "Konfigurointi ja suunnittelu"
                 },
                 "active": {
-                    "label": "Active",
-                    "description": "Collecting responses"
+                    "label": "Aktiivinen",
+                    "description": "Kerätään vastauksia"
                 },
                 "paused": {
-                    "label": "Paused",
-                    "description": "On hold"
+                    "label": "Tauolla",
+                    "description": "Odottaa"
                 },
                 "closed": {
-                    "label": "Closed",
-                    "description": "Analysis & export"
+                    "label": "Suljettu",
+                    "description": "Analyysi ja haku"
                 }
             },
             "paused": {
-                "title": "Maintenance in Progress",
-                "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
-                "action": "Retry"
+                "title": "Ylläpito käynnissä",
+                "message": "Tiedonkeruu on tilapäisestitauolla ylläpidon vuoksi. Palaamme pian.",
+                "action": "Yritä uudelleen"
             },
             "closed": {
-                "title": "Data Collection Closed",
-                "message": "This study is now closed. Participation is no longer possible.",
-                "action": "Back to Home"
+                "title": "Tiedonkeruu päättynyt",
+                "message": "Tämä tutkimus on nyt suljettu. Osallistuminen ei ole enää mahdollista.",
+                "action": "Takaisin kotisivulle"
             }
         }
     },
     "layout": {
         "title": "Open-Q",
-        "preparing": "Preparing your study session...",
-        "pilot_mode": "Pilot Mode: Changes are temporary & data will not be saved",
-        "default_study_title": "Q-Method Study",
-        "loading_content": "Loading study content...",
-        "change_lang_title": "Change language",
+        "preparing": "Valmistellaan istuntoa...",
+        "pilot_mode": "Pilot-tila: Muutokset ovat tilapäisiä eikä tietoja tallenneta",
+        "default_study_title": "Q-tutkimus",
+        "loading_content": "Ladataan tutkimuksen sisältöä...",
+        "change_lang_title": "Vaihda kieltä",
         "steps": {
-            "welcome": "Welcome",
-            "presort": "Pre-sort",
-            "rough": "Rough Sort",
-            "fine": "Fine Sort",
-            "review": "Post-sort"
+            "welcome": "Tervetuloa",
+            "presort": "Esikysely",
+            "rough": "Alustava lajittelu",
+            "fine": "Ruudukko",
+            "review": "Jälkikysely"
         },
-        "mobile_step": "Step",
-        "navigation": "Navigation",
-        "language": "English"
+        "mobile_step": "Vaihe",
+        "navigation": "Navigointi",
+        "language": "Suomi"
     },
     "study": {
         "help": {
-            "title": "Help & Information",
-            "trigger": "Help",
-            "what": "What we ask",
-            "why": "Why it matters",
+            "title": "Ohje ja tiedot",
+            "trigger": "Ohje",
+            "what": "Mitä kysymme",
+            "why": "Miksi se on tärkeää",
             "step_welcome": {
-                "what": "Read the research objectives and the specific instructions for participation.",
-                "why": "Beyond standard ethical consent, this ensures you grasp the specific 'condition of instruction'—the precise lens or scenario you must adopt to evaluate the statements—which is essential for data validity."
+                "what": "Lue tutkimuksen tavoitteet ja osallistumista koskevat ohjeet.",
+                "why": "Eettisen suostumuksen lisäksi tämä varmistaa, että ymmärrät 'ohjeistusehdon' — eli sen näkökulman, jota sinun tulee käyttää väitteitä arvioidessasi."
             },
             "step_presort": {
-                "what": "Provide background information to help characterize your participant profile.",
-                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group."
+                "what": "Anna taustatietoja, jotka auttavat meitä hahmottamaan osallistujaprofiilisi.",
+                "why": "Tämä auttaa tutkimusryhmää analysoimaan, miten eri näkökulmat saattavat korreloida taustamuuttujien kanssa."
             },
             "step_rough": {
-                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
-                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins."
+                "what": "Lajittele väitteet kolmeen pinoon ensivaikutelmasi perusteella.",
+                "why": "Tämä vähentää kognitiivista kuormitusta ja auttaa sinua tutustumaan väitteisiin ennen tarkempaa sijoittelua."
             },
             "step_fine": {
-                "what": "Place the statements onto the grid structure, moving from the extremes toward the center.",
-                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system."
+                "what": "Sijoita väitteet ruudukkoon liikkuen ääripäistä kohti keskustaa.",
+                "why": "Ruudukon rakenne pakottaa tekemään valintoja, mikä mallintaa väitteiden suhteellista merkitystä sinulle."
             },
             "step_post": {
-                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
-                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices."
+                "what": "Vahvista sijoittelusi ja lisää kommentteja merkittävimmistä valinnoistasi.",
+                "why": "Kommenttisi ovat kriittisiä tilastollisen analyysin validoimiseksi ja auttavat meitä tulkitsemaan dataa sinun logiikkasi kautta."
             }
         },
         "steps": {
-            "presort": "Pre-sort Survey",
-            "rough": "Preliminary Sort",
-            "fine": "Grid Placement",
-            "post": "Post-sort Stage"
+            "presort": "Esikysely",
+            "rough": "Alustava lajittelu",
+            "fine": "Ruudukko",
+            "post": "Jälkikysely"
         }
     },
     "auth": {
@@ -195,146 +198,146 @@
         }
     },
     "welcome": {
-        "start": "Get Started",
+        "start": "Aloita",
         "consent": {
-            "label": "I confirm that I have read the above information and consent to the processing of my data for the purposes of this study.",
-            "error": "Please accept the terms to continue."
+            "label": "Vahvistan, että olen lukenut yllä olevat tiedot ja suostun tietojeni käsittelyyn tämän tutkimuksen tarkoituksiin.",
+            "error": "Hyväksy ehdot jatkaaksesi."
         },
-        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-        "restart": "Start a new session",
-        "preview_title": "Preview",
-        "conducted_by": "Conducted by",
-        "how_it_works": "Process",
-        "objective_label": "Study Objective",
-        "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Grid Sorting:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Almost done!:** a few words to explain your most significant choices.",
+        "reset_confirm": "Haluatko varmasti aloittaa uuden istunnon? Tämä tyhjentää nykyisen edistymisesi.",
+        "restart": "Aloita uusi istunto",
+        "preview_title": "Esikatselu",
+        "conducted_by": "Yhteistyössä",
+        "how_it_works": "Prosessi",
+        "objective_label": "Tutkimuksen tavoite",
+        "instructions_label": "Ohjeet",
+        "default_instructions": "1. **Tapaaminen:** muutama nopea kysymys taustasi ymmärtämiseksi.\n2. **Ensivaikutelma:** tutustu väitteisiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Lajittelu ruudukkoon:** tarkenna näkökulmaasi sijoittamalla jokainen väite ruudukkoon.\n4. **Melkein valmista!:** muutama sana merkittävimpien valintojesi selittämiseksi.",
         "steps": {
             "profile": {
-                "title": "Let's meet",
-                "description": "A few quick questions to better understand your background."
+                "title": "Tapaaminen",
+                "description": "Muutama nopea kysymys taustasi ymmärtämiseksi."
             },
             "rough": {
-                "title": "First impressions",
-                "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree)."
+                "title": "Ensivaikutelma",
+                "description": "Tutustu väitteisiin ja anna välitön reaktiosi."
             },
             "fine": {
-                "title": "Grid Sorting",
-                "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
+                "title": "Lajittelu ruudukkoon",
+                "description": "Sijoita väitteet ruudukkoon näkökulmasi täydentämiseksi."
             },
             "post": {
-                "title": "Almost done!",
-                "description": "A few words to explain your most significant choices."
+                "title": "Melkein valmista!",
+                "description": "Muutama sana merkittävimpien valintojesi selittämiseksi."
             }
         }
     },
     "consent": {
-        "title": "Informed consent and data processing agreement",
-        "subtitle": "Please read the following information carefully.",
-        "default_text": "1. Nature of the study and participant understanding\nBy checking the box below, you acknowledge that you have reviewed the study objectives outlined on the home page. You understand that this exercise employs Q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance)\n\nData collection: Your responses (the Q-sort configuration and post-sort explanations) will be assigned a unique alphanumeric code upon submission.\n\nDe-identification and retention:\n\nStandard procedure: Direct identifiers (such as IP addresses) are immediately converted into an anonymous code and are never stored in their original format. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: If you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: The final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw\nYour participation is strictly voluntary. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: If you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: Due to the statistical nature of Q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights\nIn accordance with the General Data Protection Regulation (GDPR), you retain the right to request access to, or rectification of, your personal data as long as it remains identifiable (i.e., prior to final anonymization)."
+        "title": "Tietoinen suostumus ja tietojenkäsittelysopimus",
+        "subtitle": "Lue seuraavat tiedot huolellisesti.",
+        "default_text": "1. Tutkimuksen luonne ja osallistujan ymmärrys\nHyväksymällä alla olevan valintaruudun vahvistat, että olet tutustunut kotisivulla esitettyihin tutkimuksen tavoitteisiin. Ymmärrät, että tämä harjoitus käyttää Q-metodologiaa, tutkimustekniikkaa, joka on suunniteltu mallintamaan subjektiivisia näkökulmia. Tehtävä edellyttää, että lajittelet väitteet niiden merkityksen mukaan suhteessa omaan henkilökohtaiseen näkökulmaasi; siksi objektiivisia \"oikeita\" tai \"vääriä\" vastauksia ei ole.\n\n2. Tietojen käsittely ja pseudonymisointi (GDPR-vaatimustenmukaisuus)\n\nTiedonkeruu: Vastauksesi (Q-lajittelun kokoonpano ja jälkilajittelun selitykset) varustetaan yksilöllisellä aakkosnumeerisella koodilla lähetyksen yhteydessä.\n\nTunnisteiden poistaminen ja säilyttäminen:\n\nVakiomenetely: Suorat tunnisteet (kuten IP-osoitteet) muunnetaan välittömästi anonyymiksi koodiksi, eikä niitä koskaan tallenneta alkuperäisessä muodossaan. Tämä tekninen prosessi varmistaa, että digitaalista jalanjälkeäsi ei voida käyttää tunnistamiseesi istunnon päätyttyä.\n\nPoikkeus seurantaa varten: Jos annat vapaaehtoisesti yhteystietosi tutkimuksen lopussa seurantaa varten, yhteys henkilöllisyytesi (sähköposti) ja vastauksesi välillä säilytetään tiukasti vain kyseisen seurantavaiheen ajan.\n\nRaportointi: Lopulliset tulokset esitetään anonymisoidussa muodossa. Tiedot aggregoidaan jaettujen sosiaalisten näkökulmien (faktoreiden) paljastamiseksi. Kvalitatiivisia kommentteja voidaan lainata faktoreiden asiayhteyden selventämiseksi, mutta niistä poistetaan paljastavat tiedot.\n\n3. Vapaaehtoinen osallistuminen ja oikeus peruuttaa osallistuminen\nOsallistumisesi on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selaimesi milloin tahansa ennen lähettämistä ilman seuraamuksia.\n\nEnnen lähettämistä: Jos keskeytät osallistumisesi ennen lajittelun viimeistelyä, osittaisia tietoja ei säilytetä.\n\nLähettämisen jälkeen: Q-metodologian tilastollisen luonteen (faktorianalyysi) vuoksi yksittäisen osallistumisen peruuttaminen ei välttämättä ole mahdollista sen jälkeen, kun tiedot on lähetetty ja sisällytetty aineistoon.\n\n4. Tietojen säilyttäminen ja oikeudet\nYleisen tietosuoja-asetuksen (GDPR) mukaisesti sinulla on oikeus pyytää pääsyä henkilötietoihisi tai niiden oikaisemista niin kauan kuin ne ovat tunnistettavissa (eli ennen lopullista anonymisointia)."
     },
     "presort": {
-        "title": "Before we start",
-        "description": "Please answer a few questions to help us situate your viewpoint.",
-        "submit": "Continue to Sorting",
-        "select_placeholder": "Select...",
-        "error_required": "Please answer this question."
+        "title": "Ennen kuin aloitamme",
+        "description": "Vastaa muutamaan kysymykseen, jotka auttavat meitä ymmärtämään näkökulmaasi.",
+        "submit": "Jatka lajitteluun",
+        "select_placeholder": "Valitse...",
+        "error_required": "Vastaa tähän kysymykseen."
     },
     "rough": {
         "header": {
-            "subtitle": "Swipe **left** to Disagree, **right** to Agree, or **down** to be Neutral.",
-            "hint": "This is spontaneous — you can change your mind right after."
+            "subtitle": "Pyyhkäise **vasemmalle** (eri mieltä), **oikealle** (samaa mieltä) tai **alas** (neutraali).",
+            "hint": "Tämä on spontaania — voit muuttaa mieltäsi heti perään."
         },
         "complete": {
-            "title": "First Step Complete",
-            "subtitle": "We will now refine the nuances.",
-            "button": "Continue to Fine Sort"
+            "title": "Ensimmäinen vaihe valmis",
+            "subtitle": "Nyt tarkennamme vivahteita.",
+            "button": "Jatka ruudukkoon"
         },
         "instructions": {
-            "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
+            "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
         }
     },
     "fine": {
         "deck": {
-            "title": "Available Statements",
-            "all_placed": "All statements in this pile are sorted"
+            "title": "Käytettävissä olevat väitteet",
+            "all_placed": "Kaikki tämän pinon väitteet on lajiteltu"
         },
         "toolbar": {
-            "preview": "Statement Preview",
-            "zoom_in": "Zoom In",
-            "zoom_out": "Zoom Out",
-            "fit_screen": "Fit to Screen",
-            "label": "Grid controls"
+            "preview": "Väitteen esikatselu",
+            "zoom_in": "Lähennä",
+            "zoom_out": "Loitonna",
+            "fit_screen": "Sovita näyttöön",
+            "label": "Ruudukon hallinta"
         },
         "grid": {
-            "label": "Sorting Grid",
-            "column": "Column",
-            "slot": "Slot",
-            "in_column": "in column"
+            "label": "Lajitteluruudukko",
+            "column": "Sarake",
+            "slot": "Paikka",
+            "in_column": "sarakkeessa"
         },
         "legend": {
-            "disagree": "Most Disagree",
-            "neutral": "Neutral",
-            "agree": "Most Agree",
-            "label": "Spectrum legend"
+            "disagree": "Vahvasti eri mieltä",
+            "neutral": "Neutraali",
+            "agree": "Vahvasti samaa mieltä",
+            "label": "Asteikon selite"
         },
         "actions": {
-            "validate": "Confirm Sort",
-            "finish": "Finish sorting",
-            "ready": "Review overview",
-            "not_ready": "Place all statements to continue"
+            "validate": "Vahvista lajittelu",
+            "finish": "Lopeta lajittelu",
+            "ready": "Tarkastele yleiskuvaa",
+            "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
         },
         "header": {
-            "title": "Place statements on the grid"
+            "title": "Sijoita väitteet ruudukkoon"
         },
         "workbench": {
-            "active_card": "Active Statement",
-            "place_on_grid": "Tap Grid to Place",
-            "drag_or_tap": "Drag to grid or tap slot",
-            "initial_instruction": "Drag or Tap Statement",
-            "help": "How does it work?",
+            "active_card": "Aktiivinen väite",
+            "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
+            "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
+            "initial_instruction": "Vedä tai napauta väitettä",
+            "help": "Miten se toimii?",
             "methodology": {
-                "extremes": "Tip: Start with what is most obvious to you (the extremes).",
-                "vertical": "In the same column, the order from top to bottom doesn't matter.",
-                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
-                "relative": "Reminder: items are sorted relative to each other (relative agreement).",
-                "zoom": "Feel free to zoom in on different parts of the grid for better visibility.",
-                "flexibility": "Nothing is final: you can move cards or put them back in the deck at any time."
+                "extremes": "Vinkki: Aloita siitä, mikä on sinulle ilmeisintä (ääripäät).",
+                "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
+                "constraint": "Kaikkien on mahduttava! Se voi olla palapeli, mutta juuri siten asetamme valinnat tärkeysjärjestykseen.",
+                "relative": "Muistutus: asiat lajitellaan suhteessa toisiinsa (suhteellinen suostumus).",
+                "zoom": "Voit vapaasti lähentää ruudukon eri osia nähdäksesi paremmin.",
+                "flexibility": "Mikään ei ole lopullista: voit siirtää kortteja tai laittaa ne takaisin pakkaan milloin tahansa."
             }
         }
     },
     "post": {
-        "title": "Your Perspective & Feedback",
-        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
-        "step2_title": "Almost done!",
-        "step2_description": "Please answer these final questions to complete the study.",
+        "title": "Näkökulmasi ja palautteesi",
+        "description": "Melkein valmista! Kommenttisi merkittävimmistä väitteistä ovat tärkeitä analyysillemme.",
+        "step2_title": "Melkein valmista!",
+        "step2_description": "Vastaa näihin viimeisiin kysymyksiin viimeistelläksesi tutkimuksen.",
         "extreme": {
-            "why": "Why did you choose to place this statement here? How is it significant to you?",
-            "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
-            "min_chars": "A few words are enough to help us understand the context.",
-            "label_agree": "Strongest Agreement",
-            "label_disagree": "Strongest Disagreement"
+            "why": "Miksi valitsit tämän väitteän tähän kohtaan? Mikä siinä on sinulle merkityksellistä?",
+            "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
+            "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään asiayhteyden.",
+            "label_agree": "Vahvin samaa mieltä oleminen",
+            "label_disagree": "Vahvin eri mieltä oleminen"
         },
         "optional": {
-            "title": "Additional Comments (optional)",
-            "description": "Feel free to add comments to any other statement if you wish to elaborate on your choices.",
-            "select_placeholder": "Select a statement to comment...",
-            "placeholder": "Your comment here..."
+            "title": "Lisäkommentit (valinnainen)",
+            "description": "Voit vapaasti lisätä kommentteja muihin väitteisiin, jos haluat tarkentaa valintojasi.",
+            "select_placeholder": "Valitse väite kommentoitavaksi...",
+            "placeholder": "Kommenttisi tähän..."
         },
-        "submit": "Share my perspective",
-        "validation_error": "Please fill in all required fields.",
+        "submit": "Jaa näkökulmani",
+        "validation_error": "Täytä kaikki pakolliset kentät.",
         "success": {
-            "title": "Thank you for your participation!",
-            "message": "Your contribution to the study has been saved.",
-            "id_label": "Confirmation code"
+            "title": "Kiitos osallistumisestasi!",
+            "message": "Vastauksesi on tallennettu.",
+            "id_label": "Vahvistuskoodi"
         },
         "contact": {
-            "title": "Results & Contact",
-            "email_label": "Your email address (Optional)",
-            "email_placeholder": "example@email.com",
-            "interview_consent": "I agree to be contacted by the researcher for follow-up.",
-            "newsletter_consent": "I wish to be informed about the study results.",
-            "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
-            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up."
+            "title": "Tulokset ja yhteydenotto",
+            "email_label": "Sähköpostiosoitteesi (Valinnainen)",
+            "email_placeholder": "esimerkki@email.fi",
+            "interview_consent": "Suostun siihen, että tutkija ottaa minuun yhteyttä seurantaa varten.",
+            "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
+            "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sen antaminen varmistaa pseudonymisoinnin: tietosi ovat tunnistettavissa vain tutkijalle tutkimustarkoituksiin.",
+            "pseudonymization_note": "Suostumus yhteydenottoon tarkoittaa, että tutkija voi yhdistää näkökulmasi sähköpostiisi (pseudonymisointi) tätä nimenomaista seurantaa varten."
         }
     },
     "admin": {
