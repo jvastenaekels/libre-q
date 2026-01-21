@@ -13,7 +13,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useOutletContext } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -129,7 +129,7 @@ export default function AdminLayout() {
                             : 'overflow-hidden max-w-full'
                     )}
                 >
-                    <Outlet />
+                    <Outlet context={useOutletContext()} />
                 </div>
             </SidebarInset>
         </SidebarProvider>

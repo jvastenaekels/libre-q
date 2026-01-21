@@ -13,13 +13,12 @@
         "src/styles/**",
         "e2e/**"
     ],
-    "ignoreBinaries": ["playwright", "python3"],
+    "ignoreBinaries": ["python3"],
     "ignoreDependencies": [
         "@fontsource/google-sans-flex",
         "@dnd-kit/modifiers",
         "@radix-ui/react-collapsible",
         "next-themes",
-        "recharts",
         "vaul",
         "@types/dompurify"
     ]

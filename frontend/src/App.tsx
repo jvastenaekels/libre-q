@@ -67,6 +67,7 @@ const AdminDashboard = lazy(() =>
         default: module.AdminDashboard,
     }))
 );
+import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 
 const router = createBrowserRouter([
     {
@@ -125,11 +126,13 @@ const router = createBrowserRouter([
                                 path: 'team',
                                 element: <TeamManagementPage />,
                                 loader: teamManagementPageLoader,
+                                HydrateFallback: DesignerSkeleton,
                             },
                             {
                                 path: 'settings',
                                 element: <WorkspaceSettingsPage />,
                                 loader: workspaceSettingsPageLoader,
+                                HydrateFallback: DesignerSkeleton,
                             },
                             {
                                 path: 'profile',
@@ -149,6 +152,7 @@ const router = createBrowserRouter([
                                         index: true,
                                         element: <StudyOverviewPage />,
                                         loader: studyOverviewPageLoader,
+                                        HydrateFallback: DesignerSkeleton,
                                     },
                                     {
                                         path: 'design',
@@ -158,16 +162,19 @@ const router = createBrowserRouter([
                                         path: 'recruitment',
                                         element: <RecruitmentPage />,
                                         loader: recruitmentPageLoader,
+                                        HydrateFallback: DesignerSkeleton,
                                     },
                                     {
                                         path: 'data',
                                         element: <DataExportsPage />,
                                         loader: dataExportsPageLoader,
+                                        HydrateFallback: DesignerSkeleton,
                                     },
                                     {
                                         path: 'settings',
                                         element: <GeneralSettingsPage />,
                                         loader: generalSettingsPageLoader,
+                                        HydrateFallback: DesignerSkeleton,
                                     },
                                     {
                                         path: 'participants/:participantId',
@@ -206,6 +213,7 @@ const router = createBrowserRouter([
         path: '/study/:slug',
         element: <StudyLayout />,
         loader: studyLayoutLoader,
+        HydrateFallback: DesignerSkeleton,
         errorElement: <RouteErrorBoundary />,
         children: [
             { path: 'welcome', element: <WelcomePage /> },
