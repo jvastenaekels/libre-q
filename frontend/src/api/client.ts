@@ -190,7 +190,7 @@ async function request(
             }
         }
 
-        if (response.status === 401) {
+        if (response.status === 401 && !url.includes('/api/token')) {
             // Handle session expiry for manual fetches too
             useAuthStore.getState().logout();
             if (!window.location.pathname.includes('/login')) {

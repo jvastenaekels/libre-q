@@ -78,13 +78,13 @@ const LoginPage = () => {
                             (a, b) =>
                                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                         );
-                        navigate(`/admin/w/${sorted[0].slug}`);
+                        navigate(`/app/${sorted[0].slug}/dashboard`);
                     } else {
-                        navigate('/admin');
+                        navigate('/hub');
                     }
                 } catch (err) {
                     console.error('Redirection error:', err);
-                    navigate('/admin');
+                    navigate('/hub');
                 }
             }
         } catch (error: unknown) {
