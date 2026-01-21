@@ -135,9 +135,7 @@ export const CommandMenu = () => {
                                     <Command.Item
                                         value={`workspace settings manage ${ws.title}`}
                                         onSelect={() =>
-                                            runCommand(() =>
-                                                navigate(`/admin/workspaces/${ws.slug}/settings`)
-                                            )
+                                            runCommand(() => navigate(`/app/${ws.slug}/settings`))
                                         }
                                         className="flex items-center gap-3 px-9 py-1.5 rounded-lg cursor-pointer transition-colors aria-selected:bg-slate-50 aria-selected:text-slate-900 text-slate-500"
                                     >
@@ -163,7 +161,12 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() => {
                                         setActiveStudy(study.slug);
-                                        navigate(`/admin/studies/${study.slug}`);
+                                        const ws = workspaces?.find(
+                                            (w) => w.id === study.workspace_id
+                                        );
+                                        if (ws) {
+                                            navigate(`/app/${ws.slug}/studies/${study.slug}`);
+                                        }
                                     })
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
@@ -196,7 +199,11 @@ export const CommandMenu = () => {
                             <Command.Item
                                 value="overview dashboard"
                                 onSelect={() =>
-                                    runCommand(() => navigate(`/admin/studies/${activeStudyId}`))
+                                    runCommand(() =>
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}`
+                                        )
+                                    )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
@@ -209,7 +216,9 @@ export const CommandMenu = () => {
                                 value="design study"
                                 onSelect={() =>
                                     runCommand(() =>
-                                        navigate(`/admin/studies/${activeStudyId}/design`)
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/design`
+                                        )
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
@@ -223,7 +232,9 @@ export const CommandMenu = () => {
                                 value="recruit recruitment"
                                 onSelect={() =>
                                     runCommand(() =>
-                                        navigate(`/admin/studies/${activeStudyId}/recruitment`)
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/recruitment`
+                                        )
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
@@ -237,7 +248,9 @@ export const CommandMenu = () => {
                                 value="data exports stats analytics"
                                 onSelect={() =>
                                     runCommand(() =>
-                                        navigate(`/admin/studies/${activeStudyId}/exports`)
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/exports`
+                                        )
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
@@ -251,7 +264,9 @@ export const CommandMenu = () => {
                                 value="team management collaborators"
                                 onSelect={() =>
                                     runCommand(() =>
-                                        navigate(`/admin/studies/${activeStudyId}/team`)
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/team`
+                                        )
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
@@ -265,7 +280,9 @@ export const CommandMenu = () => {
                                 value="settings configuration"
                                 onSelect={() =>
                                     runCommand(() =>
-                                        navigate(`/admin/studies/${activeStudyId}/settings`)
+                                        navigate(
+                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/settings`
+                                        )
                                     )
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"

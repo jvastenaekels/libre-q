@@ -421,7 +421,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuItem>
                             <SidebarMenuButton
                                 className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                                onClick={() => navigate('/admin/workspaces/new')}
+                                onClick={() => navigate('/app/workspaces/new')}
                             >
                                 <Plus className="size-4" />
                                 <span>{t('admin.workspace.switcher.new_workspace')}</span>
@@ -495,7 +495,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                            onClick={() => navigate('/admin/workspaces/new')}
+                            onClick={() => navigate('/app/workspaces/new')}
                         >
                             <Plus className="size-4" />
                             <span>{t('admin.workspace.switcher.new_workspace')}</span>

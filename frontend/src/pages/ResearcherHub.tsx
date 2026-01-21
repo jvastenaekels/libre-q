@@ -55,7 +55,7 @@ export default function ResearcherHub() {
                                 <span className="font-semibold">{user?.email}</span>
                             </p>
                         </div>
-                        <Button onClick={() => navigate('/admin/workspaces/new')}>
+                        <Button onClick={() => navigate('/app/workspaces/new')}>
                             <Plus className="h-4 w-4 mr-2" />
                             {t('admin.hub.new_workspace', 'New Workspace')}
                         </Button>

@@ -10,19 +10,11 @@
  * Sets up routing, global error handling, and lazy loading of pages.
  */
 
-import { lazy, useEffect } from 'react';
-import {
-    createBrowserRouter,
-    RouterProvider,
-    Navigate,
-    useParams,
-    useLocation,
-} from 'react-router-dom';
+import { lazy } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 
-import { useAuthStore } from './store/useAuthStore';
-import { useAdminStore } from './store/useAdminStore';
 import StudyLayout from './layouts/StudyLayout';
 import ConsentPage from './pages/ConsentPage';
 import ErrorPage from './pages/ErrorPage';
@@ -67,6 +59,7 @@ import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loade
 import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
 import { workspaceSettingsPageLoader } from './pages/admin/WorkspaceSettingsPage.loader';
+import { LegacyRedirect } from './components/admin/LegacyRedirect';
 
 // Lazy load Admin Dashboard to prevent heavy libs leak
 const AdminDashboard = lazy(() =>
@@ -74,42 +67,6 @@ const AdminDashboard = lazy(() =>
         default: module.AdminDashboard,
     }))
 );
-
-const AdminIndex = () => {
-    const { user, workspaces } = useAuthStore();
-    const { lastVisitedStudySlug } = useAdminStore();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-
-    // If superuser has no workspaces, redirect to create workspace page
-    if (user?.is_superuser && (!workspaces || workspaces.length === 0)) {
-        return <Navigate to="/admin/workspaces/new" replace />;
-    }
-
-    // Auto-redirect to last study if available, unless forced to dashboard
-    if (lastVisitedStudySlug && !searchParams.has('dashboard')) {
-        return <Navigate to={`/admin/studies/${lastVisitedStudySlug}`} replace />;
-    }
-
-    return <AdminDashboard />;
-};
-
-const AdminWorkspaceRoute = () => {
-    const { slug } = useParams();
-    const { workspaces, setCurrentWorkspace, currentWorkspace } = useAuthStore();
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: updates on mount or slug change
-    useEffect(() => {
-        if (slug && workspaces) {
-            const ws = workspaces.find((w) => w.slug === slug);
-            if (ws && ws.id !== currentWorkspace?.id) {
-                setCurrentWorkspace(ws);
-            }
-        }
-    }, [slug, workspaces]);
-
-    return <AdminDashboard />;
-};
 
 const router = createBrowserRouter([
     {
@@ -139,68 +96,12 @@ const router = createBrowserRouter([
         element: <RequireAdmin />,
         children: [
             {
-                element: <AdminLayout />,
-                children: [
-                    {
-                        index: true,
-                        element: <AdminIndex />,
-                    },
-                    // Legacy routes for backwards compatibility
-                    {
-                        path: 'w/:slug',
-                        element: <AdminWorkspaceRoute />,
-                    },
-                    {
-                        path: 'studies/:slug',
-                        element: <StudyOverviewPage />,
-                        loader: studyOverviewPageLoader,
-                    },
-                    {
-                        path: 'studies/:slug/participants/:participantId',
-                        element: <ParticipantDetailsPage />,
-                    },
-                    {
-                        path: 'studies/:slug/design',
-                        element: <StudyDesignPage />,
-                    },
-                    {
-                        path: 'studies/:slug/settings',
-                        element: <GeneralSettingsPage />,
-                        loader: generalSettingsPageLoader,
-                    },
-                    {
-                        path: 'studies/:slug/team',
-                        element: <TeamManagementPage />,
-                        loader: teamManagementPageLoader,
-                    },
-                    {
-                        path: 'studies/:slug/recruitment',
-                        element: <RecruitmentPage />,
-                        loader: recruitmentPageLoader,
-                    },
-                    {
-                        path: 'studies/:slug/exports',
-                        element: <DataExportsPage />,
-                        loader: dataExportsPageLoader,
-                    },
-                    {
-                        path: 'workspaces/:slug/settings',
-                        element: <WorkspaceSettingsPage />,
-                        loader: workspaceSettingsPageLoader,
-                    },
-                    {
-                        path: 'workspaces/new',
-                        element: <CreateWorkspacePage />,
-                    },
-                    {
-                        path: 'profile',
-                        element: <ProfilePage />,
-                    },
-                ],
+                index: true,
+                element: <LegacyRedirect />,
             },
             {
-                path: 'studies/:slug/design/preview',
-                element: <DesignerPreviewPage />,
+                path: '*',
+                element: <LegacyRedirect />,
             },
         ],
     },
@@ -229,6 +130,10 @@ const router = createBrowserRouter([
                                 path: 'settings',
                                 element: <WorkspaceSettingsPage />,
                                 loader: workspaceSettingsPageLoader,
+                            },
+                            {
+                                path: 'profile',
+                                element: <ProfilePage />,
                             },
                         ],
                     },
@@ -275,6 +180,22 @@ const router = createBrowserRouter([
                                 element: <DesignerPreviewPage />,
                             },
                         ],
+                    },
+                ],
+            },
+        ],
+    },
+    // Global actions in App scope
+    {
+        path: '/app',
+        element: <RequireAdmin />,
+        children: [
+            {
+                element: <AdminLayout />,
+                children: [
+                    {
+                        path: 'workspaces/new',
+                        element: <CreateWorkspacePage />,
                     },
                 ],
             },
