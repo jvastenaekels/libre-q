@@ -6,7 +6,7 @@ import { queryClient } from '@/lib/queryClient';
 import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const generalSettingsPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const { slug } = params;
+    const slug = params.slug || params.studySlug;
     if (!slug) throw new Error('Slug is required');
 
     try {
