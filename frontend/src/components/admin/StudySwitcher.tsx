@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CreateStudyDialog } from './CreateStudyDialog';
 
@@ -28,6 +29,7 @@ export function StudySwitcher() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
+    const { currentWorkspace } = useAuthStore();
     const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet({
         query: { enabled: !!activeWorkspaceId },
     });
@@ -35,6 +37,14 @@ export function StudySwitcher() {
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
     const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
+
+    const handleStudySelect = (studySlug: string) => {
+        if (currentWorkspace?.slug) {
+            navigate(`/app/${currentWorkspace.slug}/studies/${studySlug}`);
+        } else {
+            setActiveStudy(studySlug);
+        }
+    };
 
     const _getStatusColor = (state: string) => {
         switch (state) {
@@ -122,7 +132,7 @@ export function StudySwitcher() {
                                     return (
                                         <DropdownMenuItem
                                             key={study.id}
-                                            onClick={() => setActiveStudy(study.slug)}
+                                            onClick={() => handleStudySelect(study.slug)}
                                             className={cn(
                                                 'flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer transition-all duration-200 outline-none',
                                                 isActive
@@ -151,7 +161,13 @@ export function StudySwitcher() {
                             <DropdownMenuSeparator className="bg-slate-100 my-1" />
                             <DropdownMenuItem
                                 className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
-                                onClick={() => navigate('/admin?dashboard=true')}
+                                onClick={() => {
+                                    if (currentWorkspace?.slug) {
+                                        navigate(`/app/${currentWorkspace.slug}/dashboard`);
+                                    } else {
+                                        navigate('/admin?dashboard=true');
+                                    }
+                                }}
                             >
                                 <div className="flex size-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300 group-hover:bg-white shadow-sm">
                                     <LayoutGrid className="size-4" />

@@ -247,16 +247,18 @@ const QSortEditor = ({
                 if (existing) {
                     // Sync Traductions
                     if (item.translations && item.translations.length > 0) {
-                        item.translations.forEach((newT: any) => {
-                            const tEntry = existing.translations.find(
-                                (t: any) => t.language_code === newT.language_code
-                            );
-                            if (tEntry) tEntry.text = newT.text;
-                            else existing.translations.push(newT);
-                        });
+                        item.translations.forEach(
+                            (newT: { language_code: string; text: string }) => {
+                                const tEntry = existing.translations.find(
+                                    (t: Translation) => t.language_code === newT.language_code
+                                );
+                                if (tEntry) tEntry.text = newT.text;
+                                else existing.translations.push(newT);
+                            }
+                        );
                     } else if (item.text) {
                         const tEntry = existing.translations.find(
-                            (t: any) => t.language_code === activeLocale
+                            (t: Translation) => t.language_code === activeLocale
                         );
                         if (tEntry) tEntry.text = item.text;
                         else
@@ -268,19 +270,22 @@ const QSortEditor = ({
                 } else {
                     // Add New
                     const code = item.code || `s${currentStatements.length + 1}`;
-                    const translations = (d.translations || []).map((t: any) => {
-                        const headerT = item.translations?.find(
-                            (ht: any) => ht.language_code === t.language_code
-                        );
-                        return {
-                            language_code: t.language_code,
-                            text: headerT
-                                ? headerT.text
-                                : t.language_code === activeLocale
-                                  ? item.text || ''
-                                  : '',
-                        };
-                    });
+                    const translations = (d.translations || []).map(
+                        (t: { language_code: string }) => {
+                            const headerT = item.translations?.find(
+                                (ht: { language_code: string; text: string }) =>
+                                    ht.language_code === t.language_code
+                            );
+                            return {
+                                language_code: t.language_code,
+                                text: headerT
+                                    ? headerT.text
+                                    : t.language_code === activeLocale
+                                      ? item.text || ''
+                                      : '',
+                            };
+                        }
+                    );
                     currentStatements.push({ code, translations });
                 }
             });

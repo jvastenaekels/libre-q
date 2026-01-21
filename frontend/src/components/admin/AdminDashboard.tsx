@@ -41,9 +41,15 @@ export function AdminDashboard() {
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length || 0;
     const _totalStudies = studies?.length || 0;
 
-    const handleOpenStudy = (slug: string) => {
-        setActiveStudy(slug);
-        navigate(`/admin/studies/${slug}`);
+    const handleOpenStudy = (studySlug: string) => {
+        if (currentWorkspace?.slug) {
+            setActiveStudy(studySlug);
+            navigate(`/app/${currentWorkspace.slug}/studies/${studySlug}`);
+        } else {
+            // Fallback for legacy support if workspace context is missing
+            setActiveStudy(studySlug);
+            navigate(`/admin/studies/${studySlug}`);
+        }
     };
 
     if (isLoading) {

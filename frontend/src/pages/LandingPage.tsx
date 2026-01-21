@@ -4,22 +4,43 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-// import { useTranslation } from 'react-i18next';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowRight, Search, Briefcase } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
+import { Button } from '@/components/ui/button';
 
 const LandingPage: React.FC = () => {
     const [slug, setSlug] = useState('');
     const navigate = useNavigate();
-    // const { t } = useTranslation(); // Unused for now
+    const { isAuthenticated } = useAuth();
+    const { workspaces } = useAuthStore();
+
+    // Smart redirect for authenticated users
+    useEffect(() => {
+        if (isAuthenticated && workspaces) {
+            if (workspaces.length === 0) {
+                // No workspaces: redirect to create workspace
+                navigate('/admin/workspaces/new', { replace: true });
+            } else if (workspaces.length === 1) {
+                // Single workspace: redirect directly to workspace dashboard
+                navigate(`/app/${workspaces[0].slug}/dashboard`, { replace: true });
+            }
+            // Multiple workspaces: stay on landing, show hub shortcut
+        }
+    }, [isAuthenticated, workspaces, navigate]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (slug.trim()) {
             navigate(`/study/${slug.trim()}/welcome`);
         }
+    };
+
+    const handleGoToHub = () => {
+        navigate('/hub');
     };
 
     return (
@@ -65,6 +86,29 @@ const LandingPage: React.FC = () => {
                         Go to Study <ArrowRight size={16} />
                     </button>
                 </form>
+
+                {/* Show Researcher Hub shortcut for multi-workspace users */}
+                {isAuthenticated && workspaces && workspaces.length > 1 && (
+                    <>
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-200" />
+                            </div>
+                            <div className="relative flex justify-center text-xs">
+                                <span className="bg-white px-2 text-gray-500">Or</span>
+                            </div>
+                        </div>
+
+                        <Button
+                            onClick={handleGoToHub}
+                            variant="outline"
+                            className="w-full flex items-center justify-center gap-2"
+                        >
+                            <Briefcase className="h-4 w-4" />
+                            Go to Researcher Hub
+                        </Button>
+                    </>
+                )}
             </div>
         </div>
     );

@@ -42,10 +42,10 @@ const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
 import LoginPage from './pages/LoginPage';
 
 // Admin imports
-// Admins imports
 import RequireAdmin from './components/auth/RequireAdmin';
-// const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 import AdminLayout from './layouts/AdminLayout';
+import WorkspaceLayout from './layouts/WorkspaceLayout';
+import StudyFocusLayout from './layouts/StudyFocusLayout';
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
@@ -58,6 +58,7 @@ const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
 const CreateWorkspacePage = lazy(() => import('./pages/admin/CreateWorkspacePage'));
+const ResearcherHub = lazy(() => import('./pages/ResearcherHub'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 
 import { studyLayoutLoader } from './layouts/StudyLayout.loader';
@@ -124,6 +125,16 @@ const router = createBrowserRouter([
         element: <RegistrationPage />,
     },
     {
+        path: '/hub',
+        element: <RequireAdmin />,
+        children: [
+            {
+                index: true,
+                element: <ResearcherHub />,
+            },
+        ],
+    },
+    {
         path: '/admin',
         element: <RequireAdmin />,
         children: [
@@ -134,6 +145,7 @@ const router = createBrowserRouter([
                         index: true,
                         element: <AdminIndex />,
                     },
+                    // Legacy routes for backwards compatibility
                     {
                         path: 'w/:slug',
                         element: <AdminWorkspaceRoute />,
@@ -166,7 +178,6 @@ const router = createBrowserRouter([
                         element: <RecruitmentPage />,
                         loader: recruitmentPageLoader,
                     },
-
                     {
                         path: 'studies/:slug/exports',
                         element: <DataExportsPage />,
@@ -193,6 +204,83 @@ const router = createBrowserRouter([
             },
         ],
     },
+    // New Workspace-First Architecture
+    {
+        path: '/app/:workspaceSlug',
+        element: <RequireAdmin />,
+        children: [
+            {
+                element: <WorkspaceLayout />,
+                children: [
+                    {
+                        element: <AdminLayout />,
+                        children: [
+                            // Workspace-level routes
+                            {
+                                path: 'dashboard',
+                                element: <AdminDashboard />,
+                            },
+                            {
+                                path: 'team',
+                                element: <TeamManagementPage />,
+                                loader: teamManagementPageLoader,
+                            },
+                            {
+                                path: 'settings',
+                                element: <WorkspaceSettingsPage />,
+                                loader: workspaceSettingsPageLoader,
+                            },
+                        ],
+                    },
+                    // Study-level routes (Focus Mode)
+                    {
+                        path: 'studies/:studySlug',
+                        element: <StudyFocusLayout />,
+                        children: [
+                            {
+                                element: <AdminLayout />,
+                                children: [
+                                    {
+                                        index: true,
+                                        element: <StudyOverviewPage />,
+                                        loader: studyOverviewPageLoader,
+                                    },
+                                    {
+                                        path: 'design',
+                                        element: <StudyDesignPage />,
+                                    },
+                                    {
+                                        path: 'recruitment',
+                                        element: <RecruitmentPage />,
+                                        loader: recruitmentPageLoader,
+                                    },
+                                    {
+                                        path: 'data',
+                                        element: <DataExportsPage />,
+                                        loader: dataExportsPageLoader,
+                                    },
+                                    {
+                                        path: 'settings',
+                                        element: <GeneralSettingsPage />,
+                                        loader: generalSettingsPageLoader,
+                                    },
+                                    {
+                                        path: 'participants/:participantId',
+                                        element: <ParticipantDetailsPage />,
+                                    },
+                                ],
+                            },
+                            {
+                                path: 'design/preview',
+                                element: <DesignerPreviewPage />,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    // Participant routes
     {
         path: '/study/:slug',
         element: <StudyLayout />,

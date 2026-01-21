@@ -57,7 +57,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Polyfill scrollTo
-// Mocks removed
+window.scrollTo = vi.fn();
 window.confirm = vi.fn();
 
 // MSW Server Setup

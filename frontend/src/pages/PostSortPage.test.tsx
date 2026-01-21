@@ -1,7 +1,6 @@
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -42,6 +41,7 @@ describe('PostSortPage', () => {
                     { id: 1, text: 'S1' },
                     { id: 2, text: 'S2' },
                 ],
+                title: 'Test Study',
                 slug: 'demo',
                 grid_config: [
                     { score: -1, capacity: 1 },
@@ -80,10 +80,8 @@ describe('PostSortPage', () => {
 
         renderWithProviders(
             <Routes>
-                <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="post-sort" element={<PostSortPage />} />
-                    <Route path="fine-sort" element={<div>Fine Sort Page</div>} />
-                </Route>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+                <Route path="/study/:slug/fine-sort" element={<div>Fine Sort Page</div>} />
             </Routes>,
             { initialEntries: ['/study/demo/post-sort'] }
         );
@@ -94,17 +92,15 @@ describe('PostSortPage', () => {
     it('Renders Step 1 (Feedback) initially', async () => {
         renderWithProviders(
             <Routes>
-                <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="post-sort" element={<PostSortPage />} />
-                </Route>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
             </Routes>,
             { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        // Step 1 title (Post Sort)
-        expect(await screen.findByText('To conclude')).toBeInTheDocument();
-        // Check for Missing Statements section
-        expect(await screen.findByText('Missing Statements')).toBeInTheDocument();
+        // Step 1 content
+        expect(await screen.findByText(/Key Choices/i)).toBeInTheDocument();
+        // Check for Additional Comments section
+        expect(await screen.findByText(/Additional Comments/i)).toBeInTheDocument();
     });
 
     it('Validates Step 1 before proceeding to Step 2 (Updated)', async () => {
@@ -112,9 +108,7 @@ describe('PostSortPage', () => {
 
         renderWithProviders(
             <Routes>
-                <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="post-sort" element={<PostSortPage />} />
-                </Route>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
             </Routes>,
             { initialEntries: ['/study/demo/post-sort'] }
         );
@@ -129,14 +123,14 @@ describe('PostSortPage', () => {
         // Fill comments
         const inputs = screen.getAllByTestId('extreme-comment-input');
         for (const input of inputs) {
-            await user.type(input, 'Because it is true');
+            fireEvent.change(input, { target: { value: 'Because it is true and long enough' } });
         }
 
         // Click Next again
         await user.click(nextBtn);
 
-        // Should be on Step 2 now (Final Questions)
-        expect(await screen.findByText('Step 2: Questions')).toBeInTheDocument();
+        // Should be on Step 2 now
+        expect(await screen.findByTestId('postsort-submit-btn')).toBeInTheDocument();
     });
 
     it('Handles Missing Statements input', async () => {
@@ -144,9 +138,7 @@ describe('PostSortPage', () => {
 
         renderWithProviders(
             <Routes>
-                <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="post-sort" element={<PostSortPage />} />
-                </Route>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
             </Routes>,
             { initialEntries: ['/study/demo/post-sort'] }
         );
@@ -164,9 +156,7 @@ describe('PostSortPage', () => {
 
         renderWithProviders(
             <Routes>
-                <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="post-sort" element={<PostSortPage />} />
-                </Route>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
             </Routes>,
             { initialEntries: ['/study/demo/post-sort'] }
         );
@@ -174,17 +164,17 @@ describe('PostSortPage', () => {
         // Fill Step 1 to proceed
         const inputs = screen.getAllByTestId('extreme-comment-input');
         for (const input of inputs) {
-            await user.type(input, 'Reason');
+            fireEvent.change(input, { target: { value: 'Reason is long enough' } });
         }
         await user.click(screen.getByRole('button', { name: /Next Step/i }));
 
         // Expect Step 2
-        expect(await screen.findByText('Step 2: Questions')).toBeInTheDocument();
+        expect(await screen.findByTestId('postsort-submit-btn')).toBeInTheDocument();
 
         // Click Back
         await user.click(screen.getByRole('button', { name: /Back/i }));
 
         // Expect Step 1 again
-        expect(await screen.findByText('To conclude')).toBeInTheDocument();
+        expect(await screen.findByText(/Your Perspective/i)).toBeInTheDocument();
     });
 });

@@ -145,7 +145,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 </div>
 
                 <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-                    {wizardStep === 1 ? t('post.title') : t('post.step2_title', 'Almost done!')}
+                    {wizardStep === 1
+                        ? t('post.title', 'Your Perspective & Feedback')
+                        : t('post.step2_title', 'Almost done!')}
                 </h1>
                 <p className="text-slate-600 max-w-lg mx-auto leading-relaxed">
                     {wizardStep === 1

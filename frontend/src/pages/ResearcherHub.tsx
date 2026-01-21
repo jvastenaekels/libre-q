@@ -1,0 +1,171 @@
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
+import { Briefcase, Plus, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useAdminStore } from '@/store/useAdminStore';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+
+/**
+ * ResearcherHub
+ *
+ * Multi-workspace landing page for researchers with access to multiple workspaces.
+ * Shows all workspaces and recent studies across them.
+ */
+export default function ResearcherHub() {
+    const { workspaces, user } = useAuthStore();
+    const { setActiveStudy, setActiveWorkspace } = useAdminStore();
+    const navigate = useNavigate();
+
+    const { data: allStudies } = useListStudiesApiAdminStudiesGet();
+
+    const handleWorkspaceClick = (workspaceSlug: string, workspaceId: number) => {
+        setActiveWorkspace(workspaceId);
+        navigate(`/app/${workspaceSlug}/dashboard`);
+    };
+
+    const handleStudyClick = (workspaceSlug: string, studySlug: string) => {
+        setActiveStudy(studySlug);
+        navigate(`/app/${workspaceSlug}/studies/${studySlug}`);
+    };
+
+    const recentStudies = allStudies?.slice(0, 5) || [];
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-black text-slate-900">Researcher Hub</h1>
+                            <p className="text-sm text-slate-500 mt-1">
+                                Welcome back, <span className="font-semibold">{user?.email}</span>
+                            </p>
+                        </div>
+                        <Button onClick={() => navigate('/admin/workspaces/new')}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            New Workspace
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Workspaces Section */}
+                <section className="mb-12">
+                    <h2 className="text-xl font-bold text-slate-900 mb-4">Your Workspaces</h2>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {workspaces?.map((workspace) => (
+                            <Card
+                                key={workspace.id}
+                                className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                                onClick={() => handleWorkspaceClick(workspace.slug, workspace.id)}
+                            >
+                                <CardHeader>
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold">
+                                                <Briefcase className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-lg">
+                                                    {workspace.title}
+                                                </CardTitle>
+                                                <CardDescription className="text-xs">
+                                                    <span
+                                                        className={cn(
+                                                            'uppercase px-1.5 py-0.5 rounded text-[10px] font-semibold',
+                                                            workspace.user_role === 'owner'
+                                                                ? 'bg-amber-100 text-amber-700'
+                                                                : 'bg-blue-100 text-blue-700'
+                                                        )}
+                                                    >
+                                                        {workspace.user_role}
+                                                    </span>
+                                                </CardDescription>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <TrendingUp className="h-4 w-4" />
+                                        <span>
+                                            {allStudies?.filter(
+                                                (s) => s.workspace_id === workspace.id
+                                            ).length || 0}{' '}
+                                            studies
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Recent Studies */}
+                {recentStudies.length > 0 && (
+                    <section>
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Studies</h2>
+                        <div className="bg-white rounded-lg shadow">
+                            {recentStudies.map((study, index) => {
+                                const workspace = workspaces?.find(
+                                    (w) => w.id === study.workspace_id
+                                );
+                                return (
+                                    <div
+                                        key={study.id}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                workspace &&
+                                                    handleStudyClick(workspace.slug, study.slug);
+                                            }
+                                        }}
+                                        className={cn(
+                                            'flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors',
+                                            index !== recentStudies.length - 1 && 'border-b'
+                                        )}
+                                        onClick={() =>
+                                            workspace &&
+                                            handleStudyClick(workspace.slug, study.slug)
+                                        }
+                                    >
+                                        <div>
+                                            <p className="font-semibold text-slate-900">
+                                                {study.translations?.[0]?.title || study.slug}
+                                            </p>
+                                            <p className="text-sm text-slate-500">
+                                                {workspace?.title}
+                                            </p>
+                                        </div>
+                                        <div
+                                            className={cn(
+                                                'px-2 py-1 rounded text-xs font-semibold',
+                                                study.state === 'active'
+                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                    : 'bg-slate-100 text-slate-600'
+                                            )}
+                                        >
+                                            {study.state}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+            </div>
+        </div>
+    );
+}

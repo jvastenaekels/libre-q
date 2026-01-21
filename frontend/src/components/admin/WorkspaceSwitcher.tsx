@@ -29,7 +29,7 @@ export function WorkspaceSwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { setActiveWorkspace, setActiveStudy } = useAdminStore();
+    const { setActiveWorkspace } = useAdminStore();
 
     // Fetch data using generated hook (React Query)
     const { data: workspacesData, isLoading: isWorkspacesLoading } =
@@ -37,7 +37,7 @@ export function WorkspaceSwitcher() {
     // Cast to our type including role
     const workspaces = workspacesData as WorkspaceWithRole[] | undefined;
     // Use Auth Store for global state
-    const { currentWorkspace, setCurrentWorkspace, setWorkspaces } = useAuthStore();
+    const { currentWorkspace, setWorkspaces } = useAuthStore();
 
     // Sync React Query data to Zustand Store
     React.useEffect(() => {
@@ -53,18 +53,7 @@ export function WorkspaceSwitcher() {
         }
     }, [currentWorkspace, setActiveWorkspace]);
 
-    const isLoading = isWorkspacesLoading;
-
-    // Auto-select first workspace if none selected and data loaded
-    React.useEffect(() => {
-        if (!currentWorkspace && workspaces && workspaces.length > 0) {
-            const first = workspaces[0];
-            setCurrentWorkspace(first);
-            setActiveWorkspace(first.id);
-        }
-    }, [currentWorkspace, workspaces, setCurrentWorkspace, setActiveWorkspace]);
-
-    if (isLoading) {
+    if (isWorkspacesLoading) {
         return (
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -111,9 +100,7 @@ export function WorkspaceSwitcher() {
                                         key={workspace.id}
                                         onClick={() => {
                                             if (workspace.id !== currentWorkspace?.id) {
-                                                setCurrentWorkspace(workspace);
-                                                setActiveWorkspace(workspace.id);
-                                                setActiveStudy(null);
+                                                navigate(`/app/${workspace.slug}/dashboard`);
                                             }
                                         }}
                                         className={cn(
@@ -173,7 +160,7 @@ export function WorkspaceSwitcher() {
                             <DropdownMenuItem
                                 className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 transition-all duration-200"
                                 onClick={() => {
-                                    navigate(`/admin/workspaces/${currentWorkspace.slug}/settings`);
+                                    navigate(`/app/${currentWorkspace.slug}/settings`);
                                 }}
                             >
                                 <div className="flex size-7 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">

@@ -9,6 +9,9 @@ import {
     Settings,
     UserPlus,
     Download,
+    Users,
+    ArrowLeft,
+    Settings2,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -21,6 +24,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarGroup,
+    SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import {
     DropdownMenu,
@@ -33,10 +37,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { usePermission } from '@/hooks/usePermission';
 
 function NavLanguage() {
     const { i18n, t } = useTranslation();
@@ -164,25 +170,99 @@ import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { activeStudyId, activeWorkspaceId } = useAdminStore();
+    const { currentWorkspace } = useAuthStore();
     const { user } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
     const { t } = useTranslation();
+    const params = useParams<{ workspaceSlug?: string; studySlug?: string }>();
+
+    // Detect if we're in the new Workspace-First architecture
+    const isNewArchitecture = location.pathname.startsWith('/app/');
+    const isFocusMode = isNewArchitecture && !!params.studySlug;
+    const workspaceSlug = params.workspaceSlug || currentWorkspace?.slug;
 
     const { data: studies } = useListStudiesApiAdminStudiesGet({
         query: {
             enabled: !!activeWorkspaceId,
         },
     });
+
+    const { can } = usePermission();
+
+    // For legacy routes
     const isValidStudy =
         activeStudyId &&
         studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId);
 
+    // Workspace-level navigation (always visible in new architecture)
+    const workspaceNav = workspaceSlug
+        ? [
+              {
+                  title: t('admin.sidebar.dashboard', 'Dashboard'),
+                  url: `/app/${workspaceSlug}/dashboard`,
+                  icon: LayoutDashboard,
+                  show: true,
+              },
+              {
+                  title: t('admin.sidebar.team', 'Team'),
+                  url: `/app/${workspaceSlug}/team`,
+                  icon: Users,
+                  show: can('workspace:manage_team'),
+              },
+              {
+                  title: t('admin.sidebar.workspace_settings', 'Settings'),
+                  url: `/app/${workspaceSlug}/settings`,
+                  icon: Settings2,
+                  show: can('workspace:settings'),
+              },
+          ].filter((item) => item.show)
+        : [];
+
+    // Study-level navigation (Focus Mode only)
+    const studyNav =
+        isFocusMode && params.studySlug
+            ? [
+                  {
+                      title: t('admin.sidebar.dashboard'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}`,
+                      icon: LayoutDashboard,
+                      show: true,
+                  },
+                  {
+                      title: t('admin.sidebar.design'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/design`,
+                      icon: PencilRuler,
+                      show: can('study:edit_design'),
+                  },
+                  {
+                      title: t('admin.sidebar.recruit'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/recruitment`,
+                      icon: UserPlus,
+                      show: can('study:launch_recruitment'),
+                  },
+                  {
+                      title: t('admin.sidebar.data'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/data`,
+                      icon: Download,
+                      show: can('study:view_data'),
+                  },
+                  {
+                      title: t('admin.sidebar.settings'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/settings`,
+                      icon: Settings,
+                      show: can('study:edit_settings'),
+                  },
+              ].filter((item) => item.show)
+            : [];
+
+    // Legacy navigation for backward compatibility
     const navMain = isValidStudy
         ? [
               {
                   title: 'Navigation',
                   url: '#',
-                  isActive: true, // We don't use the icon/active state of the group itself anymore
+                  isActive: true,
                   items: [
                       {
                           title: t('admin.sidebar.dashboard'),
@@ -214,6 +294,112 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ]
         : [];
 
+    // Render new architecture sidebar
+    if (isNewArchitecture) {
+        return (
+            <Sidebar variant="inset" {...props}>
+                <SidebarHeader>
+                    {isFocusMode ? (
+                        // Focus Mode: Show back button and study context
+                        <div className="flex flex-col gap-2">
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/app/${workspaceSlug}/dashboard`)}
+                                className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                <span>{currentWorkspace?.title || 'Workspace'}</span>
+                            </button>
+                            <div className="px-2">
+                                <Badge variant="outline" className="font-semibold">
+                                    {params.studySlug}
+                                </Badge>
+                            </div>
+                        </div>
+                    ) : (
+                        // Workspace View: Show workspace switcher
+                        <WorkspaceSwitcher />
+                    )}
+                </SidebarHeader>
+                <SidebarContent>
+                    {isFocusMode ? (
+                        // Focus Mode: Study navigation
+                        <SidebarGroup>
+                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
+                                {t('admin.sidebar.study_tools', 'Study Tools')}
+                            </SidebarGroupLabel>
+                            <SidebarMenu>
+                                {studyNav.map((item) => (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={location.pathname === item.url}
+                                        >
+                                            <Link to={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroup>
+                    ) : (
+                        // Workspace View: Workspace navigation
+                        <>
+                            <SidebarGroup>
+                                <SidebarMenu>
+                                    <SidebarMenuItem className="px-2 mb-4">
+                                        <SidebarMenuButton
+                                            size="sm"
+                                            className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                            onClick={() => {
+                                                window.dispatchEvent(
+                                                    new CustomEvent('open-command-menu')
+                                                );
+                                            }}
+                                        >
+                                            <Search className="size-3.5 mr-2" />
+                                            <span className="text-xs">
+                                                {t('admin.sidebar.search')}
+                                            </span>
+                                            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                                <span className="text-xs">⌘</span>K
+                                            </kbd>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                </SidebarMenu>
+                                <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
+                                    {t('admin.sidebar.workspace', 'Workspace')}
+                                </SidebarGroupLabel>
+                                <SidebarMenu>
+                                    {workspaceNav.map((item) => (
+                                        <SidebarMenuItem key={item.title}>
+                                            <SidebarMenuButton
+                                                asChild
+                                                isActive={location.pathname === item.url}
+                                            >
+                                                <Link to={item.url}>
+                                                    <item.icon />
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroup>
+                        </>
+                    )}
+                </SidebarContent>
+                <SidebarFooter className="gap-2">
+                    <NavLanguage />
+                    <NavUser user={user} />
+                </SidebarFooter>
+            </Sidebar>
+        );
+    }
+
+    // Legacy sidebar for backward compatibility
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
@@ -241,10 +427,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenuItem>
                         </SidebarMenu>
 
-                        {/* Remove redundant 'Gestion' label as per plan 5.1 */}
-                        {/* <SidebarGroupLabel className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-2">
-                            {t('admin.sidebar.study_management')}
-                        </SidebarGroupLabel> */}
                         <SidebarMenu>
                             {navMain.map((group) =>
                                 group.items.map((item) => (

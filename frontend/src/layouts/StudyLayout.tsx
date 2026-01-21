@@ -152,13 +152,8 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync loader data to config store
     useEffect(() => {
-        console.log('[StudyLayout] Loader data type:', typeof study, Array.isArray(study));
-        console.log('[StudyLayout] Loader data keys:', study ? Object.keys(study) : 'null');
         if (study) {
-            console.log('[StudyLayout] Setting config', study);
             setConfig(study);
-        } else {
-            console.error('[StudyLayout] Loader data is falsy!');
         }
     }, [study, setConfig]);
 
