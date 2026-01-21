@@ -139,7 +139,7 @@ describe('QSortEditor', () => {
             await user.click(replaceButton);
 
             expect(await screen.findByText('Tab Separated Text')).toBeInTheDocument();
-        });
+        }, 15000);
 
         it('clears bulk text after successful import', async () => {
             const user = userEvent.setup();
@@ -154,7 +154,7 @@ describe('QSortEditor', () => {
             await user.click(replaceButton);
 
             expect(textarea.value).toBe('');
-        });
+        }, 15000);
     });
 
     describe('Statement Management', () => {

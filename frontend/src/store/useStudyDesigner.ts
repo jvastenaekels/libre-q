@@ -32,6 +32,7 @@ export interface StudyDesignerState {
     setSyncStatus: (status: 'synced' | 'saving' | 'error' | 'modified') => void;
     setLastSavedAt: (date: Date) => void;
     updateOriginal: (study: StudyRead) => void;
+    importConfig: (config: any) => void;
 }
 
 /**
@@ -48,6 +49,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
         default_language: study.default_language,
         show_statement_codes: study.show_statement_codes,
         randomize_statement_order: study.randomize_statement_order,
+        symmetry_lock: study.symmetry_lock,
         branding: study.branding,
 
         translations: (study.translations || []).map((t) => ({
@@ -194,4 +196,69 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     setSyncStatus: (status) => set({ syncStatus: status }),
     setLastSavedAt: (date) => set({ lastSavedAt: date }),
     updateOriginal: (study) => set({ original: study }),
+    importConfig: (config: any) =>
+        set(
+            produce((state: StudyDesignerState) => {
+                if (!state.draft) return;
+
+                // Handle both wrapped and unwrapped configs
+                const studyData = config.study || config;
+
+                // --- Top-level simple fields ---
+                if (studyData.default_language)
+                    state.draft.default_language = studyData.default_language;
+                if (studyData.show_statement_codes !== undefined)
+                    state.draft.show_statement_codes = studyData.show_statement_codes;
+                if (studyData.randomize_statement_order !== undefined)
+                    state.draft.randomize_statement_order = studyData.randomize_statement_order;
+                if (studyData.symmetry_lock !== undefined)
+                    state.draft.symmetry_lock = studyData.symmetry_lock;
+
+                // --- Structural fields (Replace entirely) ---
+                if (studyData.grid_config) state.draft.grid_config = studyData.grid_config;
+                if (studyData.statements) state.draft.statements = studyData.statements;
+
+                // --- Config Objects (Merge) ---
+                if (studyData.branding) {
+                    state.draft.branding = {
+                        ...(state.draft.branding || {}),
+                        ...studyData.branding,
+                    };
+                }
+                if (studyData.presort_config) {
+                    state.draft.presort_config = {
+                        ...(state.draft.presort_config || {}),
+                        ...studyData.presort_config,
+                    };
+                }
+                if (studyData.postsort_config) {
+                    state.draft.postsort_config = {
+                        ...(state.draft.postsort_config || {}),
+                        ...studyData.postsort_config,
+                    };
+                }
+
+                if (Array.isArray(studyData.translations)) {
+                    if (!state.draft.translations) state.draft.translations = [];
+                    for (const tIn of studyData.translations) {
+                        const existingIdx = state.draft.translations.findIndex(
+                            (tr) => tr.language_code === tIn.language_code
+                        );
+
+                        if (existingIdx !== -1) {
+                            // Merge into existing translation
+                            state.draft.translations[existingIdx] = {
+                                ...state.draft.translations[existingIdx],
+                                ...tIn,
+                            };
+                        } else {
+                            // Add new translation
+                            state.draft.translations.push(tIn);
+                        }
+                    }
+                }
+
+                state.syncStatus = 'modified';
+            })
+        ),
 }));

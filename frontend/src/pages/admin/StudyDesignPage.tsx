@@ -40,6 +40,7 @@ import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionO
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
+import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';
 import { customInstance } from '@/api/mutator';
 import { UnsavedChangesDialog } from '@/components/admin/designer/UnsavedChangesDialog';
 
@@ -572,6 +573,12 @@ const StudyDesignPage = () => {
                                           : t('admin.design.toolbar.saved', 'Saved')}
                                 </span>
                             </Button>
+
+                            <ImportConfigButton
+                                showText={false}
+                                disabled={isFullyReadOnly}
+                                className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
+                            />
 
                             <ExportConfigButton
                                 studySlug={slug || ''}
