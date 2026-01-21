@@ -162,7 +162,7 @@ const RegistrationPage = () => {
                     <CardFooter>
                         <Button
                             className="w-full h-12 text-lg font-semibold"
-                            onClick={() => navigate('/admin')}
+                            onClick={() => navigate('/hub')}
                         >
                             {t('auth.register.success_cta')}
                         </Button>

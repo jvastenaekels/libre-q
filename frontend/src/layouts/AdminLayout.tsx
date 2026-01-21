@@ -32,12 +32,12 @@ export default function AdminLayout() {
     });
 
     useEffect(() => {
-        const match = location.pathname.match(/\/admin\/studies\/([^/]+)/);
+        const match = location.pathname.match(/\/app\/[^/]+\/studies\/([^/]+)/);
         if (match) {
             if (match[1] !== activeStudyId) {
                 setActiveStudy(match[1]);
             }
-        } else if (activeStudyId && !location.pathname.startsWith('/admin/studies')) {
+        } else if (activeStudyId && !location.pathname.includes('/studies/')) {
             setActiveStudy(null);
         }
     }, [location.pathname, activeStudyId, setActiveStudy]);
@@ -86,7 +86,7 @@ export default function AdminLayout() {
                                     <>
                                         <BreadcrumbItem className="hidden md:block shrink-0">
                                             <BreadcrumbLink
-                                                href="/admin"
+                                                href={`/app/${currentWorkspace.slug}/dashboard`}
                                                 className="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors"
                                             >
                                                 {currentWorkspace.title}
@@ -101,7 +101,7 @@ export default function AdminLayout() {
                                     <>
                                         <BreadcrumbItem className="hidden md:block min-w-0 flex-1 max-w-[200px] lg:max-w-[400px]">
                                             <BreadcrumbLink
-                                                href={`/admin/studies/${activeStudyId}`}
+                                                href={`/app/${currentWorkspace?.slug}/studies/${activeStudyId}`}
                                                 className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors truncate block"
                                             >
                                                 {study.translations?.[0]?.title || activeStudyId}
