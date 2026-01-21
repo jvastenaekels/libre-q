@@ -13,7 +13,8 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
-import { Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useAdminContext } from '@/hooks/useAdminContext';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -63,6 +64,8 @@ export default function AdminLayout() {
 
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);
     };
+
+    const { workspace: adminWorkspace, study: adminStudy } = useAdminContext();
 
     return (
         <SidebarProvider>
@@ -129,7 +132,12 @@ export default function AdminLayout() {
                             : 'overflow-hidden max-w-full'
                     )}
                 >
-                    <Outlet context={useOutletContext()} />
+                    <Outlet
+                        context={{
+                            workspace: adminWorkspace,
+                            study: adminStudy || study, // Use context study if available, else re-fetched study
+                        }}
+                    />
                 </div>
             </SidebarInset>
         </SidebarProvider>

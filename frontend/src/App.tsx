@@ -113,6 +113,7 @@ const router = createBrowserRouter([
         children: [
             {
                 element: <WorkspaceLayout />,
+                HydrateFallback: DesignerSkeleton,
                 children: [
                     {
                         element: <AdminLayout />,
@@ -144,6 +145,7 @@ const router = createBrowserRouter([
                     {
                         path: 'studies/:studySlug',
                         element: <StudyFocusLayout />,
+                        HydrateFallback: DesignerSkeleton,
                         children: [
                             {
                                 element: <AdminLayout />,

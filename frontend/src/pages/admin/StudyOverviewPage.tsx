@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useOutletContext, useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
-import type { WorkspaceWithRole } from '@/types/backend';
+import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
+
 import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import { AdminService } from '@/api/admin';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
@@ -46,6 +46,7 @@ import { enUS, fr, fi } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import { useAdminContext } from '@/hooks/useAdminContext';
 
 interface LoaderData {
     stats: StudyStatsRead;
@@ -56,7 +57,14 @@ interface LoaderData {
 
 const StudyOverviewPage = () => {
     const { stats, participants, study, slug } = useLoaderData() as LoaderData;
-    const { workspace } = useOutletContext<{ workspace: WorkspaceWithRole }>();
+    const { workspace } = useAdminContext();
+
+    if (!workspace) {
+        // This should not happen if RequireAdmin and WorkspaceLayout are doing their jobs,
+        // but it's better to fail gracefully than crash.
+        console.error('No workspace context found in StudyOverviewPage');
+    }
+
     const revalidator = useRevalidator();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
@@ -422,7 +430,7 @@ const StudyOverviewPage = () => {
                                                                     className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                                                     onClick={() =>
                                                                         navigate(
-                                                                            `/app/${workspace.slug}/studies/${slug}/participants/${p.id}`
+                                                                            `/app/${workspace?.slug}/studies/${slug}/participants/${p.id}`
                                                                         )
                                                                     }
                                                                 >
@@ -577,7 +585,7 @@ const StudyOverviewPage = () => {
                                                                     className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                                                     onClick={() =>
                                                                         navigate(
-                                                                            `/app/${workspace.slug}/studies/${slug}/participants/${p.id}`
+                                                                            `/app/${workspace?.slug}/studies/${slug}/participants/${p.id}`
                                                                         )
                                                                     }
                                                                 >
@@ -648,7 +656,7 @@ const StudyOverviewPage = () => {
                                 )}
                                 <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
                                     <Link
-                                        to={`/app/${workspace.slug}/studies/${slug}/data`}
+                                        to={`/app/${workspace?.slug}/studies/${slug}/data`}
                                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                                     >
                                         <TableIcon className="w-3 h-3" />

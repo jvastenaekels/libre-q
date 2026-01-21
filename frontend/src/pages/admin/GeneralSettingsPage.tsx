@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
+import { useAdminContext } from '@/hooks/useAdminContext';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -60,7 +61,8 @@ export default function GeneralSettingsPage() {
         workspaceSlug?: string;
         studySlug?: string;
     }>();
-    const { user, currentWorkspace } = useAuthStore();
+    const { workspace: currentWorkspace } = useAdminContext();
+    const { user } = useAuthStore();
     const workspaceSlug = paramWorkspaceSlug || currentWorkspace?.slug;
     const { t } = useTranslation();
     const queryClient = useQueryClient();

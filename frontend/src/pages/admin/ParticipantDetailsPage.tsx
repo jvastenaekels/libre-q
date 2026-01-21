@@ -16,10 +16,10 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useMemo } from 'react';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAdminContext } from '@/hooks/useAdminContext';
 
 export default function ParticipantDetailsPage() {
-    const { currentWorkspace } = useAuthStore();
+    const { workspace: currentWorkspace } = useAdminContext();
     const { studySlug, participantId } = useParams<{
         slug: string;
         studySlug: string;

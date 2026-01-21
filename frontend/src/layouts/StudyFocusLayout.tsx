@@ -4,18 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { Outlet, useParams, useOutletContext, Navigate } from 'react-router-dom';
+import { Outlet, useParams, Navigate } from 'react-router-dom';
 import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
 import { Skeleton } from '@/components/ui/skeleton';
 import ErrorPage from '@/pages/ErrorPage';
 import { ApiError } from '@/api/client';
-import type { WorkspaceWithRole } from '@/types/backend';
 import { useEffect } from 'react';
 import { useAdminStore } from '@/store/useAdminStore';
-
-type WorkspaceContext = {
-    workspace: WorkspaceWithRole;
-};
+import { useAdminContext } from '@/hooks/useAdminContext';
 
 /**
  * StudyFocusLayout
@@ -25,7 +21,7 @@ type WorkspaceContext = {
  */
 export default function StudyFocusLayout() {
     const { studySlug } = useParams<{ studySlug: string }>();
-    const { workspace } = useOutletContext<WorkspaceContext>();
+    const { workspace } = useAdminContext();
     const { setActiveStudy } = useAdminStore();
 
     const {
@@ -66,7 +62,7 @@ export default function StudyFocusLayout() {
     }
 
     // Validate that the study belongs to the current workspace
-    if (study.workspace_id !== workspace.id) {
+    if (workspace && study.workspace_id !== workspace.id) {
         return <Navigate to={`/app/${workspace.slug}/dashboard`} replace />;
     }
 
