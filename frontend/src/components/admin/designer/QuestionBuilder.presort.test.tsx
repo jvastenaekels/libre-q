@@ -68,7 +68,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         // Should NOT show question builder content (fields)
         expect(screen.queryByText('Hidden Question')).not.toBeInTheDocument();
         // Should show enable toggle
-        expect(screen.getByText('Enable Pre-sort Survey')).toBeInTheDocument();
+        expect(screen.getByText('Enable pre-sort survey')).toBeInTheDocument();
     });
 
     it('migrates from legacy to new structure when toggling presort', async () => {
@@ -173,6 +173,6 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         };
 
         renderBuilder({ draft: newDraft });
-        expect(screen.getByText('Enable Pre-sort Survey')).toBeInTheDocument();
+        expect(screen.getByText('Enable pre-sort survey')).toBeInTheDocument();
     });
 });

@@ -65,7 +65,7 @@ describe('RoughSortPage', () => {
             </Routes>,
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
-        expect(screen.getByText('First Step Complete')).toBeTruthy();
+        expect(screen.getByText('First step complete')).toBeTruthy();
     });
 
     it('sets the current step to 3 on mount', () => {
@@ -128,7 +128,7 @@ describe('RoughSortPage', () => {
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
-        expect(screen.getByText('First Step Complete')).toBeTruthy();
+        expect(screen.getByText('First step complete')).toBeTruthy();
         expect(screen.getByText('Next step')).toBeTruthy();
     });
 

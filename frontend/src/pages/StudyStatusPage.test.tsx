@@ -24,7 +24,7 @@ describe('StudyStatusPage', () => {
         renderWithProviders(<StudyStatusPage />);
         // Check for default message key (mocked or actual if i18n setup)
         // Since i18n might return keys in test env without setup, assuming keys or partials
-        expect(screen.getByText('Study Not Found')).toBeTruthy();
+        expect(screen.getByText('Study not found')).toBeTruthy();
         expect(screen.getByTestId('icon-search-x')).toBeTruthy();
         const link = screen.getByRole('link');
         expect(link.getAttribute('href')).toBe('/');
@@ -42,7 +42,7 @@ describe('StudyStatusPage', () => {
 
     it('renders draft state correctly', () => {
         renderWithProviders(<StudyStatusPage type="draft" />);
-        expect(screen.getByText('Study Under Preparation')).toBeTruthy();
+        expect(screen.getByText('Study under preparation')).toBeTruthy();
         expect(screen.getByTestId('icon-clipboard')).toBeTruthy();
     });
 
@@ -64,7 +64,7 @@ describe('StudyStatusPage', () => {
         const handleRetry = vi.fn();
         renderWithProviders(<StudyStatusPage type="paused" onRetry={handleRetry} />);
 
-        expect(screen.getByText('Maintenance in Progress')).toBeTruthy();
+        expect(screen.getByText('Maintenance in progress')).toBeTruthy();
         expect(screen.getByTestId('icon-construction')).toBeTruthy();
 
         const button = screen.getByRole('button');
@@ -74,7 +74,7 @@ describe('StudyStatusPage', () => {
 
     it('renders closed state correctly', () => {
         renderWithProviders(<StudyStatusPage type="closed" />);
-        expect(screen.getByText('Data Collection Closed')).toBeTruthy();
+        expect(screen.getByText('Data collection closed')).toBeTruthy();
         expect(screen.getByTestId('icon-lock')).toBeTruthy();
     });
 

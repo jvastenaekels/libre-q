@@ -35,22 +35,22 @@ describe('ConditionOfInstructionEditor', () => {
     it('renders instruction input', () => {
         renderEditor();
 
-        // Check for Grid Sort Instruction
-        expect(screen.getByText('Grid Sort Instruction')).toBeInTheDocument();
+        // Check for Grid sort instruction
+        expect(screen.getByText('Grid sort instruction')).toBeInTheDocument();
 
-        // Check for Preliminary Sort Instruction
-        expect(screen.getByText('Preliminary Sort Instruction')).toBeInTheDocument();
+        // Check for Preliminary sort instruction
+        expect(screen.getByText('Preliminary sort instruction')).toBeInTheDocument();
 
         // There are two "Instruction Text" labels now (one for each section)
-        const labels = screen.getAllByText('Instruction Text');
+        const labels = screen.getAllByText('Instruction text');
         expect(labels).toHaveLength(2);
     });
 
     it('updates grid sort instruction field', () => {
         renderEditor();
 
-        // Since there are multiple inputs with label "Instruction Text"
-        const inputs = screen.getAllByLabelText('Instruction Text');
+        // Since there are multiple inputs with label "Instruction text"
+        const inputs = screen.getAllByLabelText('Instruction text');
         const gridInput = inputs[1]; // Grid Sort is the second card
 
         fireEvent.change(gridInput, { target: { value: 'Test grid instruction' } });
@@ -65,7 +65,7 @@ describe('ConditionOfInstructionEditor', () => {
     it('updates preliminary sort instruction field', () => {
         renderEditor();
 
-        const inputs = screen.getAllByLabelText('Instruction Text');
+        const inputs = screen.getAllByLabelText('Instruction text');
         const preInput = inputs[0]; // Pre-Sort is the first card
 
         fireEvent.change(preInput, { target: { value: 'Test pre instruction' } });
@@ -90,7 +90,7 @@ describe('ConditionOfInstructionEditor', () => {
             },
         });
 
-        const inputs = screen.getAllByLabelText('Instruction Text') as HTMLInputElement[];
+        const inputs = screen.getAllByLabelText('Instruction text') as HTMLInputElement[];
         expect(inputs[0].value).toBe('Existing pre instruction');
         expect(inputs[1].value).toBe('Existing grid instruction');
     });
@@ -100,6 +100,6 @@ describe('ConditionOfInstructionEditor', () => {
             initialState: { draft: null },
         });
 
-        expect(screen.queryByText('Condition of Instruction (Grid Sort)')).not.toBeInTheDocument();
+        expect(screen.queryByText('Condition of instruction (grid sort)')).not.toBeInTheDocument();
     });
 });

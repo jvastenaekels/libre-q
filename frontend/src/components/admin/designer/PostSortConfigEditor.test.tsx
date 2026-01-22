@@ -28,8 +28,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
     // biome-ignore lint/suspicious/noExplicitAny: testing user utilities mock
     const switchToStep2 = async (user: any) => {
-        await user.click(screen.getByText('Step 2: Questions'));
-        await screen.findByText('Participant Follow-up');
+        await user.click(screen.getByText('Step 2: questions'));
+        await screen.findByText('Participant follow-up');
     };
 
     it('renders email collection toggle', async () => {
@@ -37,7 +37,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         renderEditor({ draft: { postsort_config: {}, grid_config: [] } });
         await switchToStep2(user);
 
-        expect(screen.getByText('Participant Follow-up')).toBeInTheDocument();
+        expect(screen.getByText('Participant follow-up')).toBeInTheDocument();
     });
 
     it('shows sub-toggles when email collection is enabled', async () => {
@@ -84,7 +84,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const emailToggle = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Participant Follow-up')
+            s.closest('.flex')?.textContent?.includes('Participant follow-up')
         );
 
         expect(emailToggle).toBeDefined();

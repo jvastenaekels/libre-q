@@ -43,16 +43,16 @@ describe('InterfaceEditor', () => {
         // If it returns null, we can check container is empty.
         // We can't access container easily from here without destructuring.
         // Let's use a query that should NOT be there.
-        expect(screen.queryByText('Start Button')).not.toBeInTheDocument();
+        expect(screen.queryByText('Start button')).not.toBeInTheDocument();
     });
 
     it('renders navigation button configuration', () => {
         renderEditor();
 
         // Check for labels
-        expect(screen.getByText('Start Button')).toBeInTheDocument();
-        expect(screen.getByText('Next Step Button')).toBeInTheDocument();
-        expect(screen.getByText('Submit Button')).toBeInTheDocument();
+        expect(screen.getByText('Start button')).toBeInTheDocument();
+        expect(screen.getByText('Next step button')).toBeInTheDocument();
+        expect(screen.getByText('Submit button')).toBeInTheDocument();
 
         // Check for existing value from draft
         expect(screen.getByDisplayValue('Custom Start')).toBeInTheDocument();
@@ -61,8 +61,8 @@ describe('InterfaceEditor', () => {
     it('renders sorting terminology configuration', () => {
         renderEditor();
 
-        expect(screen.getByText('Most Agree')).toBeInTheDocument();
-        expect(screen.getByText('Most Disagree')).toBeInTheDocument();
+        expect(screen.getByText('Most agree')).toBeInTheDocument();
+        expect(screen.getByText('Most disagree')).toBeInTheDocument();
         expect(screen.getAllByText('Neutral').length).toBeGreaterThanOrEqual(1);
     });
 

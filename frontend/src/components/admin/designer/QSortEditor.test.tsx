@@ -213,7 +213,7 @@ describe('QSortEditor', () => {
             expect(screen.getByText('custom-1')).toBeInTheDocument();
             expect(screen.getByText('gap-5')).toBeInTheDocument();
 
-            const resetButton = screen.getByText('Reset Codes');
+            const resetButton = screen.getByText('Reset codes');
             await user.click(resetButton);
 
             expect(screen.getByText('s1')).toBeInTheDocument();
