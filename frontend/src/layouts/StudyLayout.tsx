@@ -152,10 +152,10 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync loader data to config store
     useEffect(() => {
-        if (study) {
+        if (study && !isPilotMode) {
             setConfig(study);
         }
-    }, [study, setConfig]);
+    }, [study, setConfig, isPilotMode]);
 
     useEffect(() => {
         console.log('[StudyLayout] ConfigStore:', config);

@@ -55,7 +55,9 @@ export const useStudyConfig = () => {
 
     // --- Effect: Handle Test Mode Loading (Config) ---
     useEffect(() => {
-        if (isTestMode && slug) {
+        if (!isTestMode || !slug) return;
+
+        const loadFromStorage = () => {
             // Check if we need a fresh start (set by StudyDesignPage)
             if (localStorage.getItem(`open-q-pilot-reset-${slug}`)) {
                 resetSession();
@@ -98,19 +100,25 @@ export const useStudyConfig = () => {
 
                     setConfigError(null);
                     setConfigLoading(false);
-                    console.log(
-                        'Loaded study config from localStorage (Test Mode)',
-                        draftJson ? '(Full Draft)' : '(Legacy)'
-                    );
                 } catch (e) {
                     console.error('Failed to parse test config from localStorage', e);
                     setConfigError('common.errors.validation');
                 }
-            } else {
-                // If no local data, we could fallback to API or show error
-                // For now, let's just trigger the normal loading if its enabled
             }
-        }
+        };
+
+        // Initial load
+        loadFromStorage();
+
+        // Listen for changes from other tabs (Designer)
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === `open-q-test-draft-${slug}` || e.key === `open-q-pilot-reset-${slug}`) {
+                loadFromStorage();
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
     }, [
         isTestMode,
         slug,

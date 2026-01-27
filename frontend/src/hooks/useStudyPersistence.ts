@@ -95,6 +95,8 @@ export function useStudyPersistence() {
                     `open-q-draft-backup-${effectiveSlug}`,
                     JSON.stringify(backupData)
                 );
+                // Also update the test draft key so open test tabs can react via 'storage' event
+                localStorage.setItem(`open-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
             }
         }, 1000); // Debounce backup
 
@@ -129,6 +131,9 @@ export function useStudyPersistence() {
             // Sync original and draft immediately to reflect server state
             // This also ensures last_updated_at matches the server's new timestamp
             setStudy(result);
+
+            // Ensure test draft is synced on successful save
+            localStorage.setItem(`open-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
 
             toast.success(t('admin.study.save.success'));
         } catch (error) {
