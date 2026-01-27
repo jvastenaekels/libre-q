@@ -21,7 +21,10 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
     return {
         ...actual,
-        useParams: vi.fn(() => ({ slug: 'test-study-designer' })),
+        useParams: vi.fn(() => ({
+            studySlug: 'test-study-designer',
+            workspaceSlug: 'test-workspace',
+        })),
         useNavigate: vi.fn(() => vi.fn()),
         MemoryRouter: ({ children }: { children: React.ReactNode }) => children,
         useBlocker: vi

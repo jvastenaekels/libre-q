@@ -116,4 +116,40 @@ describe('useStudyConfig', () => {
             expect(cfg).toBeNull();
         });
     });
+
+    it('Pilot Mode: Falls back to server when local draft is missing', async () => {
+        // Mock URL to be in test mode
+        vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) => {
+            if (key === 'mode') return 'test';
+            return null;
+        });
+
+        // Ensure no local draft
+        localStorage.clear();
+
+        const mockServerData = {
+            slug: 'test-study',
+            title: 'Server Fallback Title',
+            language: 'en',
+            presort_config: {},
+            statements: [],
+        };
+
+        const refetchMock = vi.fn().mockResolvedValue({ data: mockServerData });
+
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: null,
+            refetch: refetchMock,
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        } as any);
+
+        renderHook(() => useStudyConfig());
+
+        await waitFor(() => {
+            expect(refetchMock).toHaveBeenCalled();
+            expect(useConfigStore.getState().config?.title).toBe('Server Fallback Title');
+        });
+    });
 });

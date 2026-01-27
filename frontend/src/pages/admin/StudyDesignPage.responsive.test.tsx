@@ -19,7 +19,10 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
     return {
         ...actual,
-        useParams: vi.fn(() => ({ slug: 'test-study-responsive' })),
+        useParams: vi.fn(() => ({
+            studySlug: 'test-study-responsive',
+            workspaceSlug: 'test-workspace',
+        })),
         useNavigate: vi.fn(() => vi.fn()),
         // Mock MemoryRouter to avoid nested router in preview
         MemoryRouter: ({ children }: { children: React.ReactNode }) => children,

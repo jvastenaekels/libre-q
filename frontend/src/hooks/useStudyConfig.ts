@@ -125,9 +125,40 @@ export const useStudyConfig = () => {
                     setConfigLoading(false);
                 }
             } else {
-                console.warn(`[useStudyConfig] No draft found in localStorage for ${slug}`);
-                setConfigError('common.errors.not_found');
-                setConfigLoading(false);
+                console.warn(
+                    `[useStudyConfig] No draft found in localStorage for ${slug}. Attempting server fallback.`
+                );
+                try {
+                    // Fallback to server data (Collaborative Pilot Mode)
+                    // This allows colleagues to test the "last saved" version without a local draft
+                    const { data: serverData } = await refetch();
+
+                    if (serverData) {
+                        console.log('[useStudyConfig] Server fallback successful');
+
+                        if (serverData.ui_labels) {
+                            applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
+                        }
+
+                        if (
+                            !sessionLanguage ||
+                            (serverData.language && sessionLanguage !== serverData.language)
+                        ) {
+                            await i18n.changeLanguage(serverData.language || 'en');
+                            setLanguage(serverData.language || 'en');
+                        }
+
+                        setConfig(serverData);
+                        setConfigError(null);
+                    } else {
+                        throw new Error('Server returned no data');
+                    }
+                } catch (err) {
+                    console.error('[useStudyConfig] Server fallback failed', err);
+                    setConfigError('common.errors.not_found');
+                } finally {
+                    setConfigLoading(false);
+                }
             }
         };
 
@@ -153,6 +184,8 @@ export const useStudyConfig = () => {
         setConfigLoading,
         resetSession,
         resetResponses,
+        resetConfig,
+        refetch,
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---

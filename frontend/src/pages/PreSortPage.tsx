@@ -83,7 +83,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                         fieldSchema = z.preprocess((val) => {
                             if (val === '' || val === null || val === undefined) return undefined;
                             const num = Number(val);
-                            return isNaN(num) ? val : num;
+                            return Number.isNaN(num) ? val : num;
                         }, numSchema);
                     } else {
                         const isTextual = ['text', 'textarea', 'email'].includes(field.type);
@@ -119,7 +119,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                         fieldSchema = z.preprocess((val) => {
                             if (val === '' || val === null || val === undefined) return null;
                             const num = Number(val);
-                            return isNaN(num) ? val : num;
+                            return Number.isNaN(num) ? val : num;
                         }, z.number().optional().nullable());
                     } else if (field.type === 'email') {
                         fieldSchema = z.preprocess(

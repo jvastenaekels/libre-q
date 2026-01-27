@@ -719,7 +719,7 @@ const StudyOverviewPage = () => {
                             ) : (
                                 <Trash2 className="w-4 h-4 mr-2" />
                             )}
-                            {t('common.reset', 'Reset Data')}
+                            {t('admin.study_overview.reset_participants', 'Reset Data')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

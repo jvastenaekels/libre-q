@@ -13,6 +13,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import StudyLayout from './StudyLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const mocks = vi.hoisted(() => ({
     changeLanguage: vi.fn(),
@@ -52,6 +53,14 @@ vi.mock('../hooks/useStudyConfig', () => ({
         error: null,
         retry: mocks.retry,
     })),
+}));
+
+vi.mock('../hooks/useNetworkStatus', () => ({
+    useNetworkStatus: vi.fn(() => ({ isOnline: true })),
+}));
+
+vi.mock('../hooks/useLayout', () => ({
+    useLayoutState: vi.fn(() => ({ headerAction: null })),
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -359,5 +368,123 @@ describe('Layout Route Protection', () => {
         // Within the stepper, we expect 4 buttons (steps 1, 3, 4, 5)
         const stepButtons = within(stepper).getAllByRole('button');
         expect(stepButtons).toHaveLength(4);
+    });
+});
+
+describe('Pilot Mode Logic', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useConfigStore.setState({
+            config: null,
+            isLoading: false,
+            error: null,
+        });
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() } as any);
+        // Default not in pilot mode
+        useSessionStore.setState({ isPilotMode: false });
+        sessionStorage.removeItem('open-q-pilot-mode');
+    });
+
+    it('Renders hard loading state when in pilot mode and config is missing', () => {
+        // Simulate Pilot Mode via persistence
+        useSessionStore.setState({ isPilotMode: true });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome?mode=test'],
+        });
+
+        // Should see loading spinner
+        expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+        expect(screen.getByText('layout.preparing')).toBeInTheDocument();
+    });
+
+    it('Renders "Study Not Found" when config error is not_found', () => {
+        useConfigStore.setState({
+            error: 'common.errors.not_found',
+            config: null,
+        });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
+    });
+
+    it('Displays Pilot Mode banner', () => {
+        useSessionStore.setState({ isPilotMode: true });
+        useConfigStore.setState({
+            config: { slug: 'test', state: 'active' } as any,
+        });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        expect(screen.getByText('layout.pilot_mode')).toBeInTheDocument();
+    });
+
+    it('Restricts language list to available_languages', async () => {
+        useSessionStore.setState({ isPilotMode: true });
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                available_languages: ['fi', 'en'],
+            } as any,
+        });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        // Open Lang Menu
+        const globeBtn = screen.getByTitle('layout.change_lang_title');
+        fireEvent.click(globeBtn);
+
+        // Should see 'fi' and 'en'
+        expect(screen.getByText('fi')).toBeInTheDocument();
+        expect(screen.getByText('en')).toBeInTheDocument();
+
+        // Should NOT see 'fr'
+        expect(screen.queryByText('fr')).not.toBeInTheDocument();
+    });
+});
+
+describe('Network & Password Features', () => {
+    beforeEach(() => {
+        useConfigStore.setState({
+            config: { slug: 'test' } as any,
+            isLoading: false,
+            error: null,
+        });
+    });
+
+    it('Shows offline banner when network is offline', () => {
+        vi.mocked(useNetworkStatus).mockReturnValue({ isOnline: false });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        expect(screen.getByText('common.status.offline')).toBeInTheDocument();
+    });
+
+    it('Shows Password Gate when requires_password is true', () => {
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                requires_password: true,
+                title: 'Secret Study',
+            } as any,
+        });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        // Should show gate title
+        expect(screen.getByText('Secret Study')).toBeInTheDocument();
+        expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
     });
 });
