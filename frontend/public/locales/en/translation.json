@@ -315,7 +315,8 @@
             "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "A few words are enough to help us understand the context.",
             "label_agree": "Strongest agreement",
-            "label_disagree": "Strongest disagreement"
+            "label_disagree": "Strongest disagreement",
+            "label_neutral": "Neutral"
         },
         "optional": {
             "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
@@ -330,6 +331,8 @@
             "message": "Your contribution to the study has been saved.",
             "id_label": "Confirmation code"
         },
+        "score": "Score",
+        "back": "Back to sort",
         "contact": {
             "title": "Results & contact",
             "email_label": "Your email address (optional)",

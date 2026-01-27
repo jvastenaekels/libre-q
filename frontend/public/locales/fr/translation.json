@@ -315,7 +315,8 @@
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
             "label_agree": "Le plus en accord",
-            "label_disagree": "Le plus en désaccord"
+            "label_disagree": "Le plus en désaccord",
+            "label_neutral": "Neutre"
         },
         "optional": {
             "title": "Certains énoncés vous ont-ils semblé particulièrement surprenants, ambigus ou déroutants ? Si oui, pourquoi ?",
@@ -330,6 +331,8 @@
             "message": "Votre contribution à l'étude a bien été enregistrée.",
             "id_label": "Code de confirmation"
         },
+        "score": "Score",
+        "back": "Retour au classement",
         "contact": {
             "title": "Restitutions & Contact",
             "email_label": "Votre adresse email (optionnel)",

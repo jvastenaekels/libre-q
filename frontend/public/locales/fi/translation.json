@@ -315,7 +315,8 @@
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",
-            "label_disagree": "Vahvimmin eri mieltä"
+            "label_disagree": "Vahvin eri mieltä oleminen",
+            "label_neutral": "Neutraali"
         },
         "optional": {
             "title": "Tuntuivatko jotkin väitteet erityisen yllättäviltä, epäselviltä tai hämmentäviltä? Jos kyllä, miksi?",
@@ -330,6 +331,8 @@
             "message": "Vastauksesi tutkimukseen on tallennettu.",
             "id_label": "Vahvistuskoodi"
         },
+        "score": "Pisteet",
+        "back": "Takaisin lajitteluun",
         "contact": {
             "title": "Tulokset ja yhteystiedot",
             "email_label": "Sähköpostiosoitteesi (valinnainen)",
