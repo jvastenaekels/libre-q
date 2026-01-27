@@ -36,8 +36,9 @@ export function localizeStudy(draft: StudyUpdate, lang: string): any {
         methodology_tips: t?.methodology_tips || [],
         step_help: t?.step_help || {},
         available_languages:
-            draft.translations?.map((tr: any) => tr.language_code) ||
-            (draft.default_language ? [draft.default_language] : ['en']),
+            draft.translations && draft.translations.length > 0
+                ? draft.translations.map((tr: any) => tr.language_code)
+                : [draft.default_language || 'en'],
         language: lang,
 
         statements: (draft.statements || []).map((s: any, index: number) => {

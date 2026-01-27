@@ -58,12 +58,15 @@ export const useStudyConfig = () => {
         if (!isTestMode || !slug) return;
 
         const loadFromStorage = () => {
+            resetConfig(); // Clear previous study config
             setConfigLoading(true);
+
             // Check if we need a fresh start (set by StudyDesignPage)
-            if (localStorage.getItem(`open-q-pilot-reset-${slug}`)) {
+            const resetKey = `open-q-pilot-reset-${slug}`;
+            if (localStorage.getItem(resetKey)) {
                 resetSession();
                 resetResponses();
-                localStorage.removeItem(`open-q-pilot-reset-${slug}`);
+                localStorage.removeItem(resetKey);
             }
 
             const draftKey = `open-q-test-draft-${slug}`;
@@ -77,6 +80,11 @@ export const useStudyConfig = () => {
                     let config: any;
                     if (draftJson) {
                         const fullDraft = JSON.parse(draftJson);
+                        console.log(
+                            '[useStudyConfig] Loaded draft with',
+                            fullDraft.translations?.length,
+                            'translations'
+                        );
                         // Dynamically localize based on current session language
                         config = localizeStudy(
                             fullDraft,
@@ -86,6 +94,10 @@ export const useStudyConfig = () => {
                         config = JSON.parse(legacyJson!);
                     }
 
+                    console.log(
+                        '[useStudyConfig] Configured languages:',
+                        config.available_languages
+                    );
                     setConfig(config);
 
                     if (config.ui_labels) {
