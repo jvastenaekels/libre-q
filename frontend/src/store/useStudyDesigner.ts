@@ -130,7 +130,9 @@ function normalizeLocalizedField(
     } else if (field && typeof field === 'object') {
         const sourceVal = field[defaultLang] || Object.values(field)[0] || '';
         for (const lang of availableLanguages) {
-            result[lang] = field[lang] !== undefined ? field[lang] : sourceVal;
+            // Treat empty strings as missing and fallback to source
+            const val = field[lang];
+            result[lang] = val ? val : sourceVal;
         }
     } else {
         // Empty case
