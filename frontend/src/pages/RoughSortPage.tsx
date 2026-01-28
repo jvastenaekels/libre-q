@@ -5,7 +5,7 @@
  */
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
+import { ArrowRight, Check, Frown, Keyboard, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -314,7 +314,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
-            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 pt-20 pb-4 relative gap-2 sm:gap-8 md:gap-12">
+            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 pt-12 pb-4 relative gap-2 sm:gap-8 md:gap-12">
                 {/* FLOATING TIP REMOVED (Moved to Header) */}
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
@@ -400,6 +400,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
                                 →
                             </kbd>
+                            <Keyboard size={14} className="text-slate-400" />
                         </div>
                     </div>
                 </div>
