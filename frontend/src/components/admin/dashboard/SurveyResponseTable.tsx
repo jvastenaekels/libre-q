@@ -22,7 +22,7 @@ export function SurveyResponseTable({
     const { t } = useTranslation();
 
     // Extract questions from config
-    const config = type === 'presort' ? study.presort_config : study.postsort_config;
+    const config = (type === 'presort' ? study.presort_config : study.postsort_config) || {};
     // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
     const questions = (config as any)?.questions || (config as any)?.fields || [];
 

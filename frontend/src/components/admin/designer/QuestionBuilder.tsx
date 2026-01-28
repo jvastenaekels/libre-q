@@ -674,8 +674,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
         if (type === 'pre') {
             const config = draft.presort_config || {};
             if ('fields' in config) return (config.fields as Record<string, QuestionConfig>) || {};
-            // Legacy check: if it has 'enabled' key but no fields? unlikely given schema.
-            // If it's a record of fields (legacy):
+            // Legacy support for un-normalized state
             if (!('enabled' in config)) return config as Record<string, QuestionConfig>;
             return {};
         }
@@ -684,10 +683,10 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
     };
 
     const isPresortEnabled =
-        type === 'pre' &&
-        (draft.presort_config && 'enabled' in draft.presort_config
-            ? draft.presort_config.enabled
-            : true);
+        type !== 'pre' ||
+        !draft.presort_config ||
+        !('enabled' in draft.presort_config) ||
+        draft.presort_config.enabled;
 
     const questions = Object.entries(getQuestionsMap()).map(([key, value]) => ({
         id: key,

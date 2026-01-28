@@ -157,7 +157,14 @@ function normalizeStudyData(draft: StudyUpdate) {
 
     // --- Normalize Pre-Sort ---
     if (draft.presort_config) {
-        // biome-ignore lint/suspicious/noExplicitAny: config traversal
+        // If it's a legacy structure (no 'enabled' flag), migrate it
+        if (!('enabled' in draft.presort_config)) {
+            draft.presort_config = {
+                enabled: true,
+                fields: draft.presort_config as any,
+            };
+        }
+
         const fields = (draft.presort_config as any).fields || {};
         for (const qId in fields) {
             const q = fields[qId];
@@ -278,8 +285,10 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     updateDraft: (fn: (d: StudyUpdate) => void) =>
         set((state: StudyDesignerState) => {
             if (!state.draft) return state;
-            const newDraft = produce(state.draft, fn);
-            normalizeStudyData(newDraft);
+            const newDraft = produce(state.draft, (d) => {
+                fn(d);
+                normalizeStudyData(d);
+            });
             return { draft: newDraft };
         }),
 

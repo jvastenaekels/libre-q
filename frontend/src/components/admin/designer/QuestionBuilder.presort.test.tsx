@@ -1,4 +1,5 @@
-import { screen, fireEvent, within } from '@testing-library/react';
+import { screen, fireEvent, within, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import QuestionBuilder from './QuestionBuilder';
 import { renderWithStore } from '@/test-utils/renderWithStore';
@@ -72,7 +73,9 @@ describe('QuestionBuilder - Presort Config Migration', () => {
     });
 
     it('migrates from legacy to new structure when toggling presort', async () => {
+        const user = userEvent.setup();
         const legacyDraft = {
+            translations: [{ language_code: 'en' }],
             presort_config: {
                 q1: { type: 'text', label: 'Name', required: true },
             },
@@ -81,24 +84,33 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         renderBuilder({ draft: legacyDraft });
 
         const toggle = screen.getByRole('switch');
+        // Legacy starts ON
+        expect(toggle).toBeChecked();
 
         // Turn OFF
-        fireEvent.click(toggle);
+        await user.click(toggle);
 
         // Verify state
-        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
-        let currentDraft: any = useStudyDesigner.getState().draft;
-        expect(currentDraft.presort_config.enabled).toBe(false);
-        expect(Object.keys(currentDraft.presort_config.fields)).toContain('q1');
+        await waitFor(() => {
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const currentDraft: any = useStudyDesigner.getState().draft;
+            expect(currentDraft.presort_config.enabled).toBe(false);
+            expect(Object.keys(currentDraft.presort_config.fields)).toContain('q1');
+        });
 
         // Turn ON
-        fireEvent.click(toggle);
-        currentDraft = useStudyDesigner.getState().draft;
-        expect(currentDraft.presort_config.enabled).toBe(true);
+        await user.click(toggle);
+        await waitFor(() => {
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const currentDraft: any = useStudyDesigner.getState().draft;
+            expect(currentDraft.presort_config.enabled).toBe(true);
+        });
     });
 
     it('updates fields in new structure', async () => {
+        const user = userEvent.setup();
         const newDraft = {
+            translations: [{ language_code: 'en' }],
             presort_config: {
                 enabled: true,
                 fields: {
@@ -110,26 +122,29 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         renderBuilder({ draft: newDraft });
 
         // Find toggle button and click it
-        const toggleBtn = screen.getByTestId('question-accordion-trigger');
-        fireEvent.click(toggleBtn);
+        const toggleBtn = await screen.findByTestId('question-accordion-trigger');
+        await user.click(toggleBtn);
 
-        // Wait for input to appear and change it
+        // Wait for input to appear
         const input = await screen.findByDisplayValue('Old Name');
-        fireEvent.change(input, { target: { value: 'New Name' } });
+        await user.clear(input);
+        await user.type(input, 'New Name');
 
-        // Check store
+        // Verify DOM updated
+        await screen.findByDisplayValue('New Name');
+
+        // Check store with proper wait
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
-        const currentDraft: any = useStudyDesigner.getState().draft;
-        // Depending on logic, it might have converted to localized object or stayed string
-        // The component logic handles string -> string or object -> object.
-        // If it started as string, it stays string (based on QuestionItem logic).
-        // Let's check both possibilities.
-        const label = currentDraft.presort_config.fields.q1.label;
-        if (typeof label === 'string') {
-            expect(label).toBe('New Name');
-        } else {
-            expect(label.en).toBe('New Name');
-        }
+        await waitFor(() => {
+            const currentDraft: any = useStudyDesigner.getState().draft;
+            const label = currentDraft.presort_config.fields.q1.label;
+
+            if (typeof label === 'string') {
+                expect(label).toBe('New Name');
+            } else {
+                expect(label.en).toBe('New Name');
+            }
+        });
     });
 
     it('deletes fields correctly', async () => {
