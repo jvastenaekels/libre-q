@@ -57,7 +57,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
             <CardContent>
                 <div className="flex flex-col items-center">
                     <div className="h-[200px] w-full mt-2">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <PieChart>
                                 <Pie
                                     data={data}

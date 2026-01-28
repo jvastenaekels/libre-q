@@ -24,7 +24,13 @@ export function SurveyResponseTable({
     // Extract questions from config
     const config = (type === 'presort' ? study.presort_config : study.postsort_config) || {};
     // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
-    const questions = (config as any)?.questions || (config as any)?.fields || [];
+    const rawQuestions = (config as any)?.questions || (config as any)?.fields || [];
+    const questions = Array.isArray(rawQuestions)
+        ? rawQuestions
+        : Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
+              id,
+              ...(q as any),
+          }));
 
     // If questions is an object (legacy/simple), convert to array-like entries
     // based on the answers keys to ensure everything is shown even if missing in config

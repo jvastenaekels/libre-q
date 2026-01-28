@@ -264,10 +264,10 @@ export function ParticipantDetailContent({
                                                             ID:{statement.id}
                                                         </span>
                                                         <div className="font-medium pr-8">
-                                                            {statement.translations.find(
+                                                            {statement.translations?.find(
                                                                 (t) => t.lang === language
                                                             )?.text ||
-                                                                statement.translations[0]?.text ||
+                                                                statement.translations?.[0]?.text ||
                                                                 `[Statement ${statement.id}]`}
                                                         </div>
 
