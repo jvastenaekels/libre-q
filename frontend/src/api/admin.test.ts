@@ -47,4 +47,30 @@ describe('AdminService', () => {
             'Failed to export participant CSV'
         );
     });
+
+    it('exportParticipantJSON should call the correct endpoint', async () => {
+        fetchMock.mockResolvedValue(createMockResponse());
+
+        const slug = 'test-study';
+        const participantId = 123;
+        const result = await AdminService.exportParticipantJSON(slug, participantId);
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            `/api/admin/studies/${slug}/participants/${participantId}/export/json`,
+            expect.objectContaining({
+                headers: {
+                    Authorization: 'Bearer test-token',
+                },
+            })
+        );
+        expect(result).toEqual({});
+    });
+
+    it('exportParticipantJSON should throw error on failure', async () => {
+        fetchMock.mockResolvedValue(createMockResponse({ ok: false }));
+
+        await expect(AdminService.exportParticipantJSON('slug', 1)).rejects.toThrow(
+            'Failed to export participant JSON'
+        );
+    });
 });

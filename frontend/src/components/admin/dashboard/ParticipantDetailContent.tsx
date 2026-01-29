@@ -91,6 +91,35 @@ export function ParticipantDetailContent({
         }
     };
 
+    const handleExportJSON = async () => {
+        if (!studySlug || !participant.db_id) return;
+
+        setIsExporting(true);
+        try {
+            const data = await AdminService.exportParticipantJSON(
+                studySlug,
+                participant.db_id as number
+            );
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+                type: 'application/json',
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${studySlug}_participant_${participant.db_id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            toast.success(t('admin.export.success', 'Export successful'));
+        } catch (err) {
+            console.error(err);
+            toast.error(t('admin.export.error', 'Export failed'));
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     const recruitmentToken =
         // biome-ignore lint/suspicious/noExplicitAny: accessing dynamic presort data
         participant.recruitment_token || (participant.presort as any)?._recruitment_token;
@@ -159,6 +188,17 @@ export function ParticipantDetailContent({
                         >
                             <Download className="w-3.5 h-3.5 mr-2" />
                             {t('admin.study_overview.export_csv', 'Download CSV')}
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 rounded-xl font-black border-2 border-slate-200 hover:bg-slate-50 transition-all"
+                            onClick={handleExportJSON}
+                            disabled={isExporting}
+                        >
+                            <Download className="w-3.5 h-3.5 mr-2" />
+                            {t('admin.study_overview.export_json', 'Download JSON')}
                         </Button>
                     </div>
                 </div>

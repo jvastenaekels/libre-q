@@ -772,6 +772,7 @@
             "submitted": "Soumis",
             "edit_design": "Modifier la conception",
             "export_csv": "Télécharger CSV",
+            "export_json": "Télécharger JSON",
             "steps": {
                 "welcome": "Bienvenue",
                 "consent": "Consentement",

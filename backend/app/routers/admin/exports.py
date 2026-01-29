@@ -180,3 +180,33 @@ async def export_participant_csv(
             "Content-Disposition": f"attachment; filename={slug}_participant_{participant_id}.csv"
         },
     )
+
+
+@router.get("/{slug}/participants/{participant_id}/export/json")
+async def export_participant_json(
+    participant_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Export single participant results as JSON."""
+    from ...services.study_service import StudyService
+
+    # Use the existing full dump logic but we'll filter it for the single participant
+    # This ensures consistency with the data format researchers expect from the full dump.
+    full_dump = await StudyService.get_study_full_dump(db, study.id)
+
+    # Filter participants
+    participant = next(
+        (p for p in full_dump["participants"] if p["db_id"] == participant_id), None
+    )
+
+    if not participant:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="Participant not found")
+
+    return {
+        "study": full_dump["study"],
+        "participant": participant,
+        "statement_id_to_index": full_dump["statement_id_to_index"],
+    }

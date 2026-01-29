@@ -772,6 +772,7 @@
             "submitted": "Lähetetty",
             "edit_design": "Muokkaa suunnittelua",
             "export_csv": "Lataa CSV",
+            "export_json": "Lataa JSON",
             "steps": {
                 "welcome": "Tervetuloa",
                 "consent": "Suostumus",

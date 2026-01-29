@@ -3,6 +3,7 @@
 import csv
 import io
 import zipfile
+from typing import Any
 
 from ..models import Participant, Study, Statement
 
@@ -16,7 +17,10 @@ class ExportService:
         output = io.StringIO()
         writer = csv.writer(output)
 
-        # Helper to get human label for a question ID from config
+        # Use study's default language for headers/labels if available, else English
+        header_lang = study.default_language or "en"
+
+        # Helper to get human label for a question ID or option value from config
         def get_label(config_dict: dict, q_id: str, lang: str = "en") -> str:
             q_config = config_dict.get(q_id, {})
             label_obj = q_config.get("label", q_id)
@@ -27,6 +31,33 @@ class ExportService:
                     or next(iter(label_obj.values()), q_id)
                 )
             return str(label_obj)
+
+        def get_value_label(
+            config_dict: dict, q_id: str, value: Any, lang: str = "en"
+        ) -> str:
+            """Resolves internal value (like 'm') to its label (like 'Male')."""
+            if value is None or value == "":
+                return ""
+
+            q_config = config_dict.get(q_id, {})
+            options = q_config.get("options", [])
+            if not options:
+                return str(value)
+
+            # Look for option by 'value' or 'id'
+            for opt in options:
+                if str(opt.get("value")) == str(value) or str(opt.get("id")) == str(
+                    value
+                ):
+                    label_obj = opt.get("label", value)
+                    if isinstance(label_obj, dict):
+                        return str(
+                            label_obj.get(lang)
+                            or label_obj.get("en")
+                            or next(iter(label_obj.values()), value)
+                        )
+                    return str(label_obj)
+            return str(value)
 
         # 1. Resolve Configs
         presort_fields = {}
@@ -53,11 +84,13 @@ class ExportService:
             "Language",
             "Status",
             "Submitted_At",
+            "Duration_Seconds",
             "IP_Hash",
+            "User_Agent",
+            "Is_Discarded",
+            "Discard_Reason",
+            "Is_Test_Run",
         ]
-
-        # Use study's default language for headers if available, else English
-        header_lang = study.default_language or "en"
 
         # Add Presort questions with labels
         presort_keys = list(presort_fields.keys())
@@ -81,18 +114,28 @@ class ExportService:
 
         # 3. Rows
         for p in participants:
+            duration = None
+            if p.submitted_at and p.consented_at:
+                duration = int((p.submitted_at - p.consented_at).total_seconds())
+
             row = [
                 str(p.session_token),
                 p.confirmation_code or "",
                 p.language_used,
                 p.status.value,
                 p.submitted_at.isoformat() if p.submitted_at else "",
+                str(duration) if duration is not None else "",
                 p.ip_address or "",
+                p.user_agent or "",
+                "True" if p.is_discarded else "False",
+                p.discard_reason or "",
+                "True" if p.is_test_run else "False",
             ]
 
             # Presort
             for k in presort_keys:
-                row.append(p.presort_answers.get(k, ""))
+                val = p.presort_answers.get(k)
+                row.append(get_value_label(presort_fields, k, val, header_lang))
 
             # Q-Sort Scores
             scores_map = {
@@ -104,7 +147,8 @@ class ExportService:
 
             # Postsort
             for k in postsort_keys:
-                row.append(p.postsort_answers.get(k, ""))
+                val = p.postsort_answers.get(k)
+                row.append(get_value_label(postsort_fields, k, val, header_lang))
 
             writer.writerow(row)
 

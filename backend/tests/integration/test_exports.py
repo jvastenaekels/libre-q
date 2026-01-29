@@ -149,11 +149,74 @@ class TestExports:
         auth_token_factory,
         db,
     ):
-        """Test that single participant CSV export works and contains correct data."""
+        """Test that single participant CSV export works and contains correct data with labels."""
+        # 1. Setup Study with options
+        ws = await workspace_factory(owner=test_user)
+        study = await study_factory(workspace=ws, owner=test_user)
+        study.presort_config = {
+            "gender": {
+                "type": "select",
+                "label": "Gender",
+                "options": [
+                    {"id": "m", "label": "Male"},
+                    {"id": "f", "label": "Female"},
+                ],
+            }
+        }
+        db.add(study)
+        await db.commit()
+        await db.refresh(study)
+
+        # 2. Add a participant with "m"
+        test_token = uuid.uuid4()
+        p = Participant(
+            study_id=study.id,
+            session_token=test_token,
+            status=ParticipantStatus.completed,
+            language_used="en",
+            presort_answers={"gender": "m"},
+            consented_at=datetime.now(timezone.utc),
+            submitted_at=datetime.now(timezone.utc),
+            ip_address="127.0.0.1",
+        )
+        db.add(p)
+        await db.commit()
+        await db.refresh(p)
+
+        headers = auth_token_factory(test_user)
+
+        # 3. Export Participant CSV
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/participants/{p.id}/export/csv",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        assert "text/csv" in response.headers["content-type"]
+        content = response.text
+
+        # 4. Verify Content
+        assert str(test_token) in content
+        # Check Label resolution
+        assert "Male" in content
+        # We don't check for "m" absence globally because it's in headers like "Confirmation_Code"
+
+        # Check metadata
+        assert "127.0.0.1" in content
+        assert "Duration_Seconds" in content
+
+    async def test_export_participant_json_success(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        workspace_factory,
+        study_factory,
+        auth_token_factory,
+        db,
+    ):
+        """Test that single participant JSON export works."""
         # 1. Setup Study
         ws = await workspace_factory(owner=test_user)
         study = await study_factory(workspace=ws, owner=test_user)
-        study.presort_config = {"age": {"type": "number", "label": "Age"}}
         db.add(study)
         await db.commit()
         await db.refresh(study)
@@ -175,18 +238,18 @@ class TestExports:
 
         headers = auth_token_factory(test_user)
 
-        # 3. Export Participant CSV
+        # 3. Export Participant JSON
         response = await client.get(
-            f"/api/admin/studies/{study.slug}/participants/{p.id}/export/csv",
+            f"/api/admin/studies/{study.slug}/participants/{p.id}/export/json",
             headers=headers,
         )
         assert response.status_code == 200
-        assert "text/csv" in response.headers["content-type"]
-        content = response.text
+        data = response.json()
 
         # 4. Verify Content
-        assert str(test_token) in content
-        assert "25" in content
+        assert data["participant"]["presort"]["age"] == 25
+        assert data["study"]["slug"] == study.slug
+        assert "statement_id_to_index" in data
 
     async def test_export_participant_csv_not_found(
         self,
