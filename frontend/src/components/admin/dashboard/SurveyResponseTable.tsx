@@ -28,9 +28,9 @@ export function SurveyResponseTable({
     const questions = Array.isArray(rawQuestions)
         ? rawQuestions
         : Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
-              id,
-              ...(q as any),
-          }));
+            id,
+            ...(q as any),
+        }));
 
     // If questions is an object (legacy/simple), convert to array-like entries
     // based on the answers keys to ensure everything is shown even if missing in config
@@ -58,19 +58,26 @@ export function SurveyResponseTable({
     const resolveLabel = (key: string) => {
         // 1. Try to find in questions array
         // biome-ignore lint/suspicious/noExplicitAny: dynamic question structure
-        const q = questions.find((q: any) => q.id === key);
-        if (q?.text) {
-            return q.text[language] || q.text.en || key;
-        }
-        if (q?.label) {
-            return typeof q.label === 'object' ? q.label[language] || q.label.en || key : q.label;
+        const q = questions.find((qIdx: any) => qIdx.id === key || String(qIdx.id) === String(key));
+        if (q) {
+            // Handle new structure where label is an object
+            if (q.label && typeof q.label === 'object') {
+                return q.label[language] || q.label.en || Object.values(q.label)[0] || key;
+            }
+            // Handle legacy structure where text or label is a string/object
+            if (q.text) {
+                return typeof q.text === 'object' ? q.text[language] || q.text.en || key : q.text;
+            }
+            if (q.label) return q.label;
         }
 
         // 2. Try to find directly in config object (if it's a map)
         // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
-        const directQ = (config as any)[key];
+        const directQ = (config as any)[key] || (config as any).fields?.[key];
         if (directQ?.label) {
-            return directQ.label[language] || directQ.label.en || key;
+            return typeof directQ.label === 'object'
+                ? directQ.label[language] || directQ.label.en || key
+                : directQ.label;
         }
 
         // 3. Special cases for hardcoded post-sort fields

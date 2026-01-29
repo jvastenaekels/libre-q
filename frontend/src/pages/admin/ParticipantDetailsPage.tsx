@@ -76,6 +76,8 @@ export default function ParticipantDetailsPage() {
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
             grid_config: study.grid_config as any,
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
+            presort_config: study.presort_config as any,
+            // biome-ignore lint/suspicious/noExplicitAny: generic cast
             postsort_config: study.postsort_config as any,
             state: study.state || 'draft',
         };
@@ -112,10 +114,10 @@ export default function ParticipantDetailsPage() {
             duration_seconds:
                 participant.submitted_at && participant.created_at
                     ? Math.floor(
-                          (new Date(participant.submitted_at).getTime() -
-                              new Date(participant.created_at).getTime()) /
-                              1000
-                      )
+                        (new Date(participant.submitted_at).getTime() -
+                            new Date(participant.created_at).getTime()) /
+                        1000
+                    )
                     : null,
             scores,
             placements,
@@ -214,9 +216,8 @@ export default function ParticipantDetailsPage() {
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.sidebar.study', 'Study')}: ${
-                        study?.translations?.[0]?.title || study?.slug
-                    }`}
+                    description={`${t('admin.sidebar.study', 'Study')}: ${study?.translations?.[0]?.title || study?.slug
+                        }`}
                     icon={User}
                 />
             </div>
