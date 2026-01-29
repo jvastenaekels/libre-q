@@ -20,6 +20,7 @@
         "submitting": "Lähetetään...",
         "cards": "väitettä",
         "close": "Sulje",
+        "unknown_card": "Tuntematon kortti",
         "optional": "Valinnainen",
         "processing": "Käsitellään...",
         "statement": "Väite",
@@ -349,6 +350,7 @@
         "study": {
             "save": {
                 "success": "Muutokset tallennettu onnistuneesti",
+                "save_success": "Tallennettu onnistuneesti",
                 "synced_warnings": "Synkronoitu palvelimen kanssa. Muutoksesi säilytettiin kentissä: {{fields}}",
                 "synced_concurrent": "Synkronoitu toisen käyttäjän samanaikaisten muutosten kanssa",
                 "conflict": "Ristiriita havaittu. Joitakin muutoksia ei voitu yhdistää.",
@@ -356,6 +358,12 @@
             },
             "state": {
                 "manage": "Hallitse tutkimuksen kulkua"
+            },
+            "postsort": {
+                "missing": {
+                    "title": "Puuttuvat väittämät",
+                    "desc": "Oliko väittämien joukossa mielestäsi puuttuvia ideoita tai näkökulmia?"
+                }
             }
         },
         "components": {

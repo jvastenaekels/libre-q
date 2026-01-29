@@ -379,6 +379,7 @@ describe('Pilot Mode Logic', () => {
             isLoading: false,
             error: null,
         });
+        // biome-ignore lint/suspicious/noExplicitAny: mock return
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() } as any);
         // Default not in pilot mode
         useSessionStore.setState({ isPilotMode: false });
@@ -415,6 +416,7 @@ describe('Pilot Mode Logic', () => {
     it('Displays Pilot Mode banner', () => {
         useSessionStore.setState({ isPilotMode: true });
         useConfigStore.setState({
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
             config: { slug: 'test', state: 'active' } as any,
         });
 
@@ -431,6 +433,7 @@ describe('Pilot Mode Logic', () => {
             config: {
                 slug: 'test',
                 available_languages: ['fi', 'en'],
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
         });
 
@@ -454,6 +457,7 @@ describe('Pilot Mode Logic', () => {
 describe('Network & Password Features', () => {
     beforeEach(() => {
         useConfigStore.setState({
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
             config: { slug: 'test' } as any,
             isLoading: false,
             error: null,
@@ -476,6 +480,7 @@ describe('Network & Password Features', () => {
                 slug: 'test',
                 requires_password: true,
                 title: 'Secret Study',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
         });
 

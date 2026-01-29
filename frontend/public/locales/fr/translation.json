@@ -24,6 +24,7 @@
         "submitting": "Envoi en cours...",
         "cards": "énoncés",
         "close": "Fermer",
+        "unknown_card": "Carte inconnue",
         "optional": "Optionnel",
         "processing": "Traitement en cours...",
         "statement": "Énoncé",
@@ -349,6 +350,7 @@
         "study": {
             "save": {
                 "success": "Modifications enregistrées avec succès",
+                "save_success": "Enregistré avec succès",
                 "synced_warnings": "Synchronisé avec le serveur. Vos modifications ont été conservées pour : {{fields}}",
                 "synced_concurrent": "Synchronisé avec les modifications concurrentes d'un autre utilisateur",
                 "conflict": "Conflit détecté. Certaines modifications n'ont pas pu être fusionnées.",
@@ -356,6 +358,12 @@
             },
             "state": {
                 "manage": "Gérer le flux de l'étude"
+            },
+            "postsort": {
+                "missing": {
+                    "title": "Énoncés manquants",
+                    "desc": "Y a-t-il des idées ou des perspectives qui vous ont semblé manquer dans le jeu d'énoncés ?"
+                }
             }
         },
         "components": {

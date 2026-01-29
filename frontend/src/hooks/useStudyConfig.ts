@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
+import type { StudyUpdate } from '../api/model';
+import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -87,20 +89,20 @@ export const useStudyConfig = () => {
 
             if (draftJson || legacyJson) {
                 try {
-                    let config: any;
+                    let config: StudyConfig;
                     if (draftJson) {
-                        const fullDraft = JSON.parse(draftJson);
+                        const fullDraft = JSON.parse(draftJson) as StudyUpdate;
                         console.log(
                             '[useStudyConfig] Found test draft. Translations:',
-                            fullDraft.translations?.map((tr: any) => tr.language_code)
+                            fullDraft.translations?.map((tr) => tr.language_code)
                         );
                         // Dynamically localize based on current session language
                         config = localizeStudy(
                             fullDraft,
-                            sessionLanguage || fullDraft.language || 'en'
-                        );
+                            sessionLanguage || fullDraft.default_language || 'en'
+                        ) as StudyConfig;
                     } else {
-                        config = JSON.parse(legacyJson!);
+                        config = JSON.parse(legacyJson as string);
                     }
 
                     console.log(

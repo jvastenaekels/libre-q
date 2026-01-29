@@ -201,6 +201,7 @@ describe('PostSortPage', () => {
                     extreme_columns: [-1, 1],
                     allow_random_comments: true,
                 },
+                // biome-ignore lint/suspicious/noExplicitAny: mock
             } as any,
         });
 
@@ -210,6 +211,7 @@ describe('PostSortPage', () => {
                 { statementId: 2, col: 2, row: 0 },
                 { statementId: 3, col: 1, row: 0 },
             ],
+            // biome-ignore lint/suspicious/noExplicitAny: mock
             postsort: { card_comments: {} } as any,
         });
 

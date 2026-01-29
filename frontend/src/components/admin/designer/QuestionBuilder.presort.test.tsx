@@ -134,8 +134,8 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         await screen.findByDisplayValue('New Name');
 
         // Check store with proper wait
-        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         await waitFor(() => {
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const currentDraft: any = useStudyDesigner.getState().draft;
             const label = currentDraft.presort_config.fields.q1.label;
 

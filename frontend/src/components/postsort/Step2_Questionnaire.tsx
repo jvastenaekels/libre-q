@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { SurveyField } from '@/components/survey/SurveyField';
 
 import { evaluateVisibilityCondition } from '@/utils/visibilityEvaluator';
+import { getLocalizedText } from '@/utils/localization';
 
 interface Step2Props {
     onBack: () => void;
@@ -81,7 +82,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                         shape[key] = z.preprocess((val) => {
                             if (val === '' || val === null || val === undefined) return undefined;
                             const num = Number(val);
-                            return isNaN(num) ? val : num;
+                            return Number.isNaN(num) ? val : num;
                         }, numSchema);
                     } else {
                         // Text-based required fields
@@ -115,7 +116,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                         shape[key] = z.preprocess((val) => {
                             if (val === '' || val === null || val === undefined) return null;
                             const num = Number(val);
-                            return isNaN(num) ? val : num;
+                            return Number.isNaN(num) ? val : num;
                         }, z.number().optional().nullable());
                     } else {
                         let s = z.string();
@@ -193,12 +194,6 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                         );
                         if (!isVisible) return null;
 
-                        const getLocalizedText = (obj: string | Record<string, string>) => {
-                            if (typeof obj === 'string') return obj;
-                            if (!obj) return '';
-                            return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
-                        };
-
                         return (
                             <div
                                 key={key}
@@ -208,7 +203,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                     htmlFor={key}
                                     className="block text-sm font-bold text-slate-800 mb-2"
                                 >
-                                    {getLocalizedText(fieldConfig.label)}
+                                    {getLocalizedText(fieldConfig.label, i18n.language)}
                                     {fieldConfig.required && (
                                         <span className="text-red-500 ml-1">*</span>
                                     )}

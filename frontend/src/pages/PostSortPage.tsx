@@ -100,15 +100,15 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     className="text-3xl font-bold text-slate-800 mb-4"
                     data-testid="thank-you-message"
                 >
-                    {t('post.success.title', 'Thank You!')}
+                    {t('post.success.title')}
                 </h1>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                    {t('post.success.message', 'Your responses have been successfully submitted.')}
+                    {t('post.success.message')}
                 </p>
                 {finalConfirmationCode && (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm">
                         <span className="text-xs font-semibold text-slate-400 block uppercase tracking-widest mb-2">
-                            {t('post.success.id_label', 'Confirmation Code')}
+                            {t('post.success.id_label')}
                         </span>
                         <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all">
                             {finalConfirmationCode}
@@ -128,7 +128,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                         <Loader2 size={48} />
                     </div>
                     <p className="text-xl font-semibold text-slate-700 animate-pulse">
-                        {t('common.submitting', 'Submitting...')}
+                        {t('common.submitting')}
                     </p>
                 </div>
             )}
@@ -145,17 +145,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 </div>
 
                 <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-                    {wizardStep === 1
-                        ? t('post.title', 'Your Perspective & Feedback')
-                        : t('post.step2_title', 'Almost done!')}
+                    {wizardStep === 1 ? t('post.title') : t('post.step2_title')}
                 </h1>
                 <p className="text-slate-600 max-w-lg mx-auto leading-relaxed">
-                    {wizardStep === 1
-                        ? t('post.description')
-                        : t(
-                              'post.step2_description',
-                              'Please answer these final questions to complete the study.'
-                          )}
+                    {wizardStep === 1 ? t('post.description') : t('post.step2_description')}
                 </p>
             </header>
 

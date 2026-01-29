@@ -19,6 +19,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
 
 import { evaluateVisibilityCondition } from '../utils/visibilityEvaluator';
+import { getLocalizedText } from '@/utils/localization';
 
 interface PreSortPageProps {
     highlightKey?: string | null;
@@ -192,11 +193,11 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     };
 
     // Helper for multilingual strings
-    const getLocalizedText = (obj: string | Record<string, string>) => {
-        if (typeof obj === 'string') return obj;
-        if (!obj) return '';
-        return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
-    };
+    // const getLocalizedText = (obj: string | Record<string, string>) => {
+    //     if (typeof obj === 'string') return obj;
+    //     if (!obj) return '';
+    //     return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
+    // };
 
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">
@@ -224,7 +225,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                                 htmlFor={key}
                                 className="block text-sm font-medium text-gray-700"
                             >
-                                {getLocalizedText(fieldConfig.label)}
+                                {getLocalizedText(fieldConfig.label, i18n.language)}
                                 {fieldConfig.required && (
                                     <span className="text-red-500 ml-1">*</span>
                                 )}

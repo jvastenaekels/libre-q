@@ -53,7 +53,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     // --- Helpers ---
     const getCardText = (id: number) =>
-        config?.statements.find((s) => s.id === id)?.text || 'Unknown Card';
+        config?.statements.find((s) => s.id === id)?.text || t('common.unknown_card');
 
     const getPrompt = (keys: string | string[], defaultTextKey: string) => {
         const prompts = config?.postsort_config?.prompts;

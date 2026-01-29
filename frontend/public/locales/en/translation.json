@@ -19,6 +19,7 @@
         "submitting": "Submitting...",
         "cards": "statements",
         "close": "Close",
+        "unknown_card": "Unknown Card",
         "optional": "Optional",
         "processing": "Processing...",
         "statement": "Statement",
@@ -357,10 +358,17 @@
         "study": {
             "save": {
                 "success": "Changes saved successfully",
+                "save_success": "Saved successfully",
                 "synced_warnings": "Synced with server. Kept your changes in: {{fields}}",
                 "synced_concurrent": "Synced with concurrent changes from another user",
                 "conflict": "Conflict detected. Some changes could not be merged.",
                 "error": "Failed to save changes"
+            },
+            "postsort": {
+                "missing": {
+                    "title": "Missing statements",
+                    "desc": "Are there any ideas or perspectives that you felt were missing from the set of statements?"
+                }
             },
             "state": {
                 "manage": "Manage study flow"

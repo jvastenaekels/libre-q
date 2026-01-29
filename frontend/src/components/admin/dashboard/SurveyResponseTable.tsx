@@ -27,8 +27,10 @@ export function SurveyResponseTable({
     const rawQuestions = (config as any)?.questions || (config as any)?.fields || [];
     const questions = Array.isArray(rawQuestions)
         ? rawQuestions
-        : Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
+        : // biome-ignore lint/suspicious/noExplicitAny: legacy map
+          Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
               id,
+              // biome-ignore lint/suspicious/noExplicitAny: legacy map
               ...(q as any),
           }));
 

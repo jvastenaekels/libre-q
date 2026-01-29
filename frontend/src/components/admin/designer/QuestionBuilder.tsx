@@ -628,7 +628,8 @@ const QuestionItem = ({
                                                         const newOpts = [
                                                             ...(question.options || []),
                                                             t(
-                                                                'admin.design.questions.defaults.option'
+                                                                'admin.design.questions.defaults.option',
+                                                                { lng: activeLocale }
                                                             ),
                                                         ];
                                                         onUpdate({ ...question, options: newOpts });
@@ -760,7 +761,9 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
         const newQuestion: QuestionConfig = {
             type: qType,
             label: {
-                [activeLocale]: t('admin.design.questions.defaults.new_question'),
+                [activeLocale]: t('admin.design.questions.defaults.new_question', {
+                    lng: activeLocale,
+                }),
             },
             required: false,
             options:
@@ -768,17 +771,17 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                     ? [
                           {
                               label: {
-                                  [activeLocale]: `${t(
-                                      'admin.design.questions.defaults.option'
-                                  )} 1`,
+                                  [activeLocale]: `${t('admin.design.questions.defaults.option', {
+                                      lng: activeLocale,
+                                  })} 1`,
                               },
                               value: 'opt_1',
                           },
                           {
                               label: {
-                                  [activeLocale]: `${t(
-                                      'admin.design.questions.defaults.option'
-                                  )} 2`,
+                                  [activeLocale]: `${t('admin.design.questions.defaults.option', {
+                                      lng: activeLocale,
+                                  })} 2`,
                               },
                               value: 'opt_2',
                           },
@@ -787,7 +790,9 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
             placeholder:
                 qType === 'text' || qType === 'email' || qType === 'textarea'
                     ? {
-                          [activeLocale]: t('admin.design.questions.defaults.enter_answer'),
+                          [activeLocale]: t('admin.design.questions.defaults.enter_answer', {
+                              lng: activeLocale,
+                          }),
                       }
                     : undefined,
             rows: qType === 'textarea' ? 4 : undefined,

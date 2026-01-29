@@ -130,14 +130,18 @@ const StudyLayoutContent: React.FC = () => {
 
         if (urlLang && availableLangs.includes(urlLang) && urlLang !== sessionLanguage) {
             // Apply language immediately
-            changeLanguage(urlLang);
+            i18n.changeLanguage(urlLang);
+            useSessionStore.getState().setLanguage(urlLang);
         }
     }, [location.search, config?.available_languages, sessionLanguage]);
 
-    // Sync i18n with Store
+    // Sync i18n and HTML lang with Store
     useEffect(() => {
-        if (sessionLanguage && sessionLanguage !== i18n.language) {
-            i18n.changeLanguage(sessionLanguage);
+        if (sessionLanguage) {
+            if (sessionLanguage !== i18n.language) {
+                i18n.changeLanguage(sessionLanguage);
+            }
+            document.documentElement.lang = sessionLanguage;
         }
     }, [sessionLanguage]);
 

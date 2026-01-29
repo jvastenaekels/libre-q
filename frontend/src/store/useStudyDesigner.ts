@@ -161,10 +161,12 @@ function normalizeStudyData(draft: StudyUpdate) {
         if (!('enabled' in draft.presort_config)) {
             draft.presort_config = {
                 enabled: true,
+                // biome-ignore lint/suspicious/noExplicitAny: legacy migration
                 fields: draft.presort_config as any,
             };
         }
 
+        // biome-ignore lint/suspicious/noExplicitAny: legacy migration
         const fields = (draft.presort_config as any).fields || {};
         for (const qId in fields) {
             const q = fields[qId];

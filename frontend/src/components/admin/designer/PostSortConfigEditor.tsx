@@ -487,10 +487,10 @@ const PostSortConfigEditor = ({
                                             if (checked === currentValue) return;
                                             updateDraft((d) => {
                                                 if (!d.postsort_config) d.postsort_config = {};
+
                                                 // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                                (
-                                                    d.postsort_config as any
-                                                ).interview_consent_enabled = checked;
+                                                const config: any = d.postsort_config;
+                                                config.interview_consent_enabled = checked;
                                             });
                                         }}
                                         disabled={readOnly}

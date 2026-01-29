@@ -1,4 +1,10 @@
-import type { StudyUpdate, StudyTranslationRead } from '../api/model';
+import type {
+    StudyUpdate,
+    StudyTranslationRead,
+    StudyTranslationCreate,
+    StatementUpdate,
+    StatementTranslationCreate,
+} from '../api/model';
 
 /**
  * Projects a full study draft (StudyUpdate) into a localized configuration object
@@ -37,14 +43,18 @@ export function localizeStudy(draft: StudyUpdate, lang: string): any {
         step_help: t?.step_help || {},
         available_languages:
             draft.translations && draft.translations.length > 0
-                ? draft.translations.map((tr: any) => tr.language_code)
+                ? draft.translations.map((tr: StudyTranslationCreate) => tr.language_code)
                 : [draft.default_language || 'en'],
         language: lang,
 
-        statements: (draft.statements || []).map((s: any, index: number) => {
+        statements: (draft.statements || []).map((s: StatementUpdate, index: number) => {
             const st =
-                s.translations?.find((st: any) => st.language_code === lang) ||
-                s.translations?.find((st: any) => st.language_code === 'en') ||
+                s.translations?.find(
+                    (st: StatementTranslationCreate) => st.language_code === lang
+                ) ||
+                s.translations?.find(
+                    (st: StatementTranslationCreate) => st.language_code === 'en'
+                ) ||
                 s.translations?.[0];
             return {
                 id: index + 1, // Stable numerical ID for study flow
