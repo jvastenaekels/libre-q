@@ -92,4 +92,43 @@ export const AdminService = {
         }
         return { data: await response.json() };
     },
+
+    /**
+     * Export data as CSV
+     */
+    exportCSV: async (slug: string) => {
+        const response = await fetch(`/api/admin/studies/${slug}/export/csv`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+        });
+        if (!response.ok) throw new Error('Failed to export CSV');
+        return response.blob();
+    },
+
+    /**
+     * Export data as PQMethod (ZIP)
+     */
+    exportPQMethod: async (slug: string) => {
+        const response = await fetch(`/api/admin/studies/${slug}/export/pqmethod`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+        });
+        if (!response.ok) throw new Error('Failed to export PQMethod data');
+        return response.blob();
+    },
+
+    /**
+     * Export data as R-Kit (ZIP)
+     */
+    exportRKit: async (slug: string) => {
+        const response = await fetch(`/api/admin/studies/${slug}/export/r-kit`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+        });
+        if (!response.ok) throw new Error('Failed to export R-Kit data');
+        return response.blob();
+    },
 };

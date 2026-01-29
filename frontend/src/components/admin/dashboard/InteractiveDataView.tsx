@@ -36,7 +36,15 @@ import {
     Filter,
     Calendar,
     MousePointer2,
+    Download,
 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { AdminService } from '@/api/admin';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetStudyDumpApiAdminStudiesSlugDumpGet,
@@ -578,6 +586,88 @@ export default function InteractiveDataView({
                         >
                             <Filter className="h-4 w-4" />
                         </Button>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="h-11 rounded-xl border-slate-200 bg-white font-bold gap-2 shadow-sm whitespace-nowrap"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    <span className="hidden sm:inline">
+                                        {t('admin.export.label', 'Export')}
+                                    </span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        try {
+                                            const blob = await AdminService.exportCSV(slug);
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${slug}_data.csv`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success(
+                                                t('admin.export.success', 'Export successful')
+                                            );
+                                        } catch (_e) {
+                                            toast.error(t('admin.export.error', 'Export failed'));
+                                        }
+                                    }}
+                                    className="font-medium cursor-pointer"
+                                >
+                                    {t('admin.export.formats.csv', 'CSV')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        try {
+                                            const blob = await AdminService.exportPQMethod(slug);
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${slug}_pqmethod.zip`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success(
+                                                t('admin.export.success', 'Export successful')
+                                            );
+                                        } catch (_e) {
+                                            toast.error(t('admin.export.error', 'Export failed'));
+                                        }
+                                    }}
+                                    className="font-medium cursor-pointer"
+                                >
+                                    {t('admin.export.formats.pqmethod', 'PQMethod (ZIP)')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        try {
+                                            const blob = await AdminService.exportRKit(slug);
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${slug}_r_kit.zip`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success(
+                                                t('admin.export.success', 'Export successful')
+                                            );
+                                        } catch (_e) {
+                                            toast.error(t('admin.export.error', 'Export failed'));
+                                        }
+                                    }}
+                                    className="font-medium cursor-pointer"
+                                >
+                                    {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
                         {activeTab === 'test' && testCount > 0 && (
                             <AlertDialog>

@@ -1,6 +1,8 @@
 {
     "common": {
-        "placeholders": { "text_response": "Kirjoita vastauksesi..." },
+        "placeholders": {
+            "text_response": "Kirjoita vastauksesi..."
+        },
         "add": "Lisää",
         "delete": "Poista",
         "all": "Kaikki",
@@ -661,7 +663,15 @@
             "config": "Vie asetukset",
             "exporting": "Viedään...",
             "config_success": "Asetukset viety onnistuneesti",
-            "config_error": "Asetusten vienti epäonnistui"
+            "config_error": "Asetusten vienti epäonnistui",
+            "label": "Vie tiedot",
+            "success": "Vienti onnistui",
+            "error": "Vienti epäonnistui",
+            "formats": {
+                "csv": "CSV",
+                "pqmethod": "PQMethod (ZIP)",
+                "rkit": "R-Kit (ZIP)"
+            }
         },
         "import": {
             "title": "Tuo tutkimusasetukset",

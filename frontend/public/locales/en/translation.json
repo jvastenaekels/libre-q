@@ -1,6 +1,8 @@
 {
     "common": {
-        "placeholders": { "text_response": "Enter your answer..." },
+        "placeholders": {
+            "text_response": "Enter your answer..."
+        },
         "add": "Add",
         "all": "All",
         "agree": "Somewhat agree",
@@ -669,7 +671,15 @@
             "config": "Export configuration",
             "exporting": "Exporting...",
             "config_success": "Configuration exported successfully",
-            "config_error": "Failed to export configuration"
+            "config_error": "Failed to export configuration",
+            "label": "Export data",
+            "success": "Export successful",
+            "error": "Export failed",
+            "formats": {
+                "csv": "CSV",
+                "pqmethod": "PQMethod (ZIP)",
+                "rkit": "R-Kit (ZIP)"
+            }
         },
         "import": {
             "title": "Import study configuration",
