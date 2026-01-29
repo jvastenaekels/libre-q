@@ -144,7 +144,61 @@ async def test_activate_study_missing_default_fails(
     # BUT, if I want to be STRICT about the SELECTED default language, I should kept it.
     # The user "désélectionnée" it in the designer.
     # Usually, the designer should also update the `default_language` field if they deselect it.
-    # If the UI doesn't do it, the backend should be helpful.
-
-    # Let's see. If I want to verify that it PASSES even if default is wrong:
+    # If the UI doesn't do it, the backend    # So actually, it's fine.
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_create_study_auto_default_language(
+    client: AsyncClient,
+    test_user: User,
+    test_workspace: Workspace,
+    auth_token_factory,
+    db: AsyncSession,
+):
+    """Verify that creating a study without default_language picks the first translation's language."""
+    headers = {
+        **auth_token_factory(test_user),
+        "X-Workspace-ID": str(test_workspace.id),
+    }
+
+    payload = {
+        "slug": "auto-lang-study",
+        "translations": [
+            {
+                "language_code": "fi",  # Finnish first
+                "title": "Otsikko",
+                "description": "Kuvaus",
+                "instructions": "Ohjeet",
+                "consent_title": "Suostumus",
+                "consent_description": "Kuvaus",
+                "condition_of_instruction": "Järjestä",
+            },
+            {
+                "language_code": "fr",
+                "title": "Titre",
+                "description": "Desc",
+                "instructions": "Instr",
+                "consent_title": "Cons",
+                "consent_description": "Desc",
+                "condition_of_instruction": "Classez",
+            },
+        ],
+        "grid_config": [{"score": 0, "capacity": 1}],
+        "statements": [
+            {
+                "code": "S1",
+                "translations": [
+                    {"language_code": "fi", "text": "T1"},
+                    {"language_code": "fr", "text": "T1"},
+                ],
+            }
+        ],
+        "presort_config": {},
+        "postsort_config": {},
+    }
+
+    response = await client.post("/api/admin/studies", json=payload, headers=headers)
+    assert response.status_code == 201
+    # Should be "fi" because it's the first in the list
+    assert response.json()["default_language"] == "fi"

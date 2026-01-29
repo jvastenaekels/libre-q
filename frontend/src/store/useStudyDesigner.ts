@@ -149,7 +149,7 @@ function normalizeLocalizedField(
  */
 function normalizeStudyData(draft: StudyUpdate) {
     const availableLanguages = (draft.translations || []).map((t) => t.language_code);
-    const defaultLang = draft.default_language || 'en';
+    const defaultLang = draft.default_language || draft.translations?.[0]?.language_code || 'en';
 
     if (!availableLanguages.includes(defaultLang)) {
         availableLanguages.push(defaultLang);
@@ -276,9 +276,11 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     setStudy: (study: StudyRead) => {
         const draft = projectStudyToUpdate(study);
         normalizeStudyData(draft);
+        const firstLang = study.default_language || study.translations?.[0]?.language_code || 'en';
         set({
             original: study,
             draft,
+            activeLocale: firstLang,
         });
     },
 

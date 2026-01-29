@@ -86,7 +86,8 @@ async def create_study(
             grid_config=[col.model_dump() for col in study.grid_config],
             presort_config=study.presort_config,
             postsort_config=study.postsort_config,
-            default_language=study.default_language or "en",
+            default_language=study.default_language
+            or (study.translations[0].language_code if study.translations else "en"),
             show_statement_codes=study.show_statement_codes,
             branding=study.branding.model_dump() if study.branding else None,
             start_date=study.start_date,

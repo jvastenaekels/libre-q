@@ -91,6 +91,11 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
         updateDraft((d) => {
             // Remove the translation object entirely to disable the language
             d.translations = (d.translations || []).filter((t) => t.language_code !== langCode);
+
+            // If we removed the default language, pick a new one
+            if (d.default_language === langCode) {
+                d.default_language = d.translations[0]?.language_code || null;
+            }
         });
     };
 

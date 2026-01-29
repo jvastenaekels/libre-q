@@ -64,7 +64,11 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 {t('admin.design.intro.fields.default_lang')}
                             </Label>
                             <Select
-                                value={draft.default_language || 'en'}
+                                value={
+                                    draft.default_language ||
+                                    draft.translations?.[0]?.language_code ||
+                                    'en'
+                                }
                                 onValueChange={(val) =>
                                     updateDraft((d) => {
                                         d.default_language = val;
