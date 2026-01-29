@@ -771,6 +771,7 @@
             "view_data": "Näytä",
             "submitted": "Lähetetty",
             "edit_design": "Muokkaa suunnittelua",
+            "export_csv": "Lataa CSV",
             "steps": {
                 "welcome": "Tervetuloa",
                 "consent": "Suostumus",

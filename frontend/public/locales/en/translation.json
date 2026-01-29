@@ -779,6 +779,7 @@
             "view_data": "View",
             "submitted": "Submitted",
             "edit_design": "Edit design",
+            "export_csv": "Download CSV",
             "steps": {
                 "welcome": "Welcome",
                 "consent": "Consent",

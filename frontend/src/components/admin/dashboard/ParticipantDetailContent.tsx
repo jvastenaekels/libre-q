@@ -5,7 +5,7 @@ import type {
 } from '@/components/admin/dashboard/InteractiveDataView';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Link as LinkIcon, MessageSquare, ClipboardType } from 'lucide-react';
+import { Trash2, Link as LinkIcon, MessageSquare, ClipboardType, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { ParticipantGridView } from './charts/ParticipantGridView';
@@ -13,6 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ParticipantMetadataCard } from './ParticipantMetadataCard';
 import { SurveyResponseTable } from './SurveyResponseTable';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AdminService } from '@/api/admin';
+import { useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 // Helper to reconstruct Q-Sort
 const getReconstructedQSort = (participant: DumpParticipant, studyData: DumpResponse) => {
@@ -58,6 +62,34 @@ export function ParticipantDetailContent({
     isDiscardPending,
 }: ParticipantDetailContentProps) {
     const { t } = useTranslation();
+    const { studySlug } = useParams<{ studySlug: string }>();
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExportCSV = async () => {
+        if (!studySlug || !participant.db_id) return;
+
+        setIsExporting(true);
+        try {
+            const blob = await AdminService.exportParticipantCSV(
+                studySlug,
+                participant.db_id as number
+            );
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${studySlug}_participant_${participant.db_id}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            toast.success(t('admin.export.success', 'Export successful'));
+        } catch (err) {
+            console.error(err);
+            toast.error(t('admin.export.error', 'Export failed'));
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     const recruitmentToken =
         // biome-ignore lint/suspicious/noExplicitAny: accessing dynamic presort data
@@ -116,6 +148,17 @@ export function ParticipantDetailContent({
                             {participant.is_discarded
                                 ? t('admin.data.detail.actions.restore', 'Restore')
                                 : t('admin.data.detail.actions.discard', 'Discard')}
+                        </Button>
+
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="h-9 rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                            onClick={handleExportCSV}
+                            disabled={isExporting}
+                        >
+                            <Download className="w-3.5 h-3.5 mr-2" />
+                            {t('admin.study_overview.export_csv', 'Download CSV')}
                         </Button>
                     </div>
                 </div>

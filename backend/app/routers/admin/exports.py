@@ -134,3 +134,49 @@ async def get_study_dump(
     from ...services.study_service import StudyService
 
     return await StudyService.get_study_full_dump(db, study.id)
+
+
+@router.get("/{slug}/participants/{participant_id}/export/csv")
+async def export_participant_csv(
+    participant_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Export single participant results as CSV."""
+    slug = study.slug
+
+    # Fetch participant with qsort entries
+    query = (
+        select(Participant)
+        .where(
+            Participant.id == participant_id,
+            Participant.study_id == study.id,
+        )
+        .options(selectinload(Participant.qsort_entries))
+    )
+    participant_res = await db.execute(query)
+    participant = participant_res.scalar_one_or_none()
+
+    if not participant:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="Participant not found")
+
+    # Ensure study.statements are loaded
+    study_query = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(selectinload(Study.statements))
+    )
+    study_res = await db.execute(study_query)
+    study = study_res.scalar_one()
+
+    csv_content = ExportService.generate_csv(study, [participant])
+
+    return StreamingResponse(
+        io.StringIO(csv_content),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename={slug}_participant_{participant_id}.csv"
+        },
+    )

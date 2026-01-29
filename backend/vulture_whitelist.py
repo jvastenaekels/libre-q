@@ -48,6 +48,7 @@ export_csv
 export_pqmethod
 export_r_kit
 get_study_dump
+export_participant_csv
 
 # admin/invitations.py
 verify_invitation

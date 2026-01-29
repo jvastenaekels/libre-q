@@ -3270,6 +3270,253 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 }
 
 /**
+ * Export single participant results as CSV.
+ * @summary Export Participant Csv
+ */
+export const exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet = (
+    slug: string,
+    participantId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/participants/${participantId}/export/csv`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryKey =
+    (slug?: string, participantId?: number) => {
+        return [`/api/admin/studies/${slug}/participants/${participantId}/export/csv`] as const;
+    };
+
+export const getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryOptions =
+    <
+        TData = Awaited<
+            ReturnType<
+                typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+            >
+        >,
+        TError = HTTPValidationError,
+    >(
+        slug: string,
+        participantId: number,
+        options?: {
+            query?: Partial<
+                UseQueryOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                        >
+                    >,
+                    TError,
+                    TData
+                >
+            >;
+        }
+    ) => {
+        const { query: queryOptions } = options ?? {};
+
+        const queryKey =
+            queryOptions?.queryKey ??
+            getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryKey(
+                slug,
+                participantId
+            );
+
+        const queryFn: QueryFunction<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                >
+            >
+        > = ({ signal }) =>
+            exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet(
+                slug,
+                participantId,
+                signal
+            );
+
+        return {
+            queryKey,
+            queryFn,
+            enabled: !!(slug && participantId),
+            ...queryOptions,
+        } as UseQueryOptions<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                >
+            >,
+            TError,
+            TData
+        > & { queryKey: DataTag<QueryKey, TData, TError> };
+    };
+
+export type ExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<
+                typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+            >
+        >
+    >;
+export type ExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryError =
+    HTTPValidationError;
+
+export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Participant Csv
+ */
+
+export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetQueryOptions(
+            slug,
+            participantId,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Verify an invitation token and return details including workspace name.
  * @summary Verify Invitation
  */
@@ -8864,6 +9111,25 @@ export const getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler = (
     );
 };
 
+export const getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetMockHandler =
+    (
+        overrideResponse?:
+            | unknown
+            | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.get(
+            '*/api/admin/studies/:slug/participants/:participantId/export/csv',
+            async (info) => {
+                if (typeof overrideResponse === 'function') {
+                    await overrideResponse(info);
+                }
+                return new HttpResponse(null, { status: 200 });
+            },
+            options
+        );
+    };
+
 export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -9519,6 +9785,7 @@ export const getOpenQAPIMock = () => [
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
     getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler(),
+    getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetMockHandler(),
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
     getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
     getListUsersApiAdminUsersGetMockHandler(),

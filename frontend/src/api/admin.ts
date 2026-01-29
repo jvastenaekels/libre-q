@@ -131,4 +131,20 @@ export const AdminService = {
         if (!response.ok) throw new Error('Failed to export R-Kit data');
         return response.blob();
     },
+
+    /**
+     * Export single participant results as CSV
+     */
+    exportParticipantCSV: async (slug: string, participantId: number) => {
+        const response = await fetch(
+            `/api/admin/studies/${slug}/participants/${participantId}/export/csv`,
+            {
+                headers: {
+                    Authorization: `Bearer ${useAuthStore.getState().token}`,
+                },
+            }
+        );
+        if (!response.ok) throw new Error('Failed to export participant CSV');
+        return response.blob();
+    },
 };

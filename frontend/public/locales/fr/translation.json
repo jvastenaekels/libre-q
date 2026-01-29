@@ -771,6 +771,7 @@
             "view_data": "Voir",
             "submitted": "Soumis",
             "edit_design": "Modifier la conception",
+            "export_csv": "Télécharger CSV",
             "steps": {
                 "welcome": "Bienvenue",
                 "consent": "Consentement",

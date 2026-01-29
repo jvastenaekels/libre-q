@@ -140,6 +140,69 @@ class TestExports:
         assert "Participant_UID" in content
         assert f"statement_{s1.code}" in content or f"{s1.code}" in content
 
+    async def test_export_participant_csv_success(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        workspace_factory,
+        study_factory,
+        auth_token_factory,
+        db,
+    ):
+        """Test that single participant CSV export works and contains correct data."""
+        # 1. Setup Study
+        ws = await workspace_factory(owner=test_user)
+        study = await study_factory(workspace=ws, owner=test_user)
+        study.presort_config = {"age": {"type": "number", "label": "Age"}}
+        db.add(study)
+        await db.commit()
+        await db.refresh(study)
+
+        # 2. Add a participant
+        test_token = uuid.uuid4()
+        p = Participant(
+            study_id=study.id,
+            session_token=test_token,
+            status=ParticipantStatus.completed,
+            language_used="en",
+            presort_answers={"age": 25},
+            consented_at=datetime.now(timezone.utc),
+            submitted_at=datetime.now(timezone.utc),
+        )
+        db.add(p)
+        await db.commit()
+        await db.refresh(p)
+
+        headers = auth_token_factory(test_user)
+
+        # 3. Export Participant CSV
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/participants/{p.id}/export/csv",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        assert "text/csv" in response.headers["content-type"]
+        content = response.text
+
+        # 4. Verify Content
+        assert str(test_token) in content
+        assert "25" in content
+
+    async def test_export_participant_csv_not_found(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+    ):
+        """Test that exporting a non-existent participant returns 404."""
+        headers = auth_token_factory(test_user)
+        response = await client.get(
+            f"/api/admin/studies/{seed_study.slug}/participants/99999/export/csv",
+            headers=headers,
+        )
+        assert response.status_code == 404
+
     async def test_export_cross_workspace_forbidden(
         self,
         client: AsyncClient,
