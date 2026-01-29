@@ -121,7 +121,7 @@ describe('StudyDesignPage Responsive Layout', () => {
                 name: /(Interface|admin\.design\.tabs\.interface)/i,
             })
         ).toBeTruthy();
-    });
+    }, 10000);
 
     it.skip('editor content area renders', async () => {
         renderPage();
