@@ -236,8 +236,13 @@ async def get_research_package(
     result = await db.execute(stmt)
     full_study = result.scalar_one()
 
+    # Get the official JSON dump for inclusion in the package
+    from ...services.study_service import StudyService
+
+    full_dump = await StudyService.get_study_full_dump(db, study.id)
+
     zip_content = ExportService.generate_research_package(
-        full_study, full_study.participants
+        full_study, full_study.participants, full_dump=full_dump
     )
 
     return StreamingResponse(

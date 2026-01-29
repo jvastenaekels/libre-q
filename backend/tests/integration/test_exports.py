@@ -304,6 +304,7 @@ class TestExports:
         with zipfile.ZipFile(zip_content, "r") as z:
             filenames = z.namelist()
             assert "data_all.csv" in filenames
+            assert "data_all.json" in filenames
             assert "codebook.txt" in filenames
             assert "statements.csv" in filenames
             assert f"pqmethod/{study.slug}.sta" in filenames

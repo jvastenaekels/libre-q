@@ -198,7 +198,9 @@ class ExportService:
 
     @staticmethod
     def generate_research_package(
-        study: Study, participants: list[Participant]
+        study: Study,
+        participants: list[Participant],
+        full_dump: dict[str, Any] | None = None,
     ) -> bytes:
         """Generates a ZIP containing the complete research data package."""
         zip_buffer = io.BytesIO()
@@ -212,11 +214,10 @@ class ExportService:
             zip_file.writestr("data_all.csv", csv_content)
 
             # 2. JSON Dump
-            # Note: We need a db session for StudyService.get_study_full_dump, but here we only have objects.
-            # Since StudyService.get_study_full_dump is async and we are sync here (ExportService methods are sync),
-            # we might need to handle this differently or make ExportService async.
-            # Actually, most generate_* are sync. Let's provide a simplified JSON or handle it in the router.
-            # For now, let's keep it simple and focus on the other files.
+            if full_dump:
+                import json
+
+                zip_file.writestr("data_all.json", json.dumps(full_dump, indent=2))
 
             # 3. Codebook (Text)
             codebook = ExportService.generate_codebook(study)
