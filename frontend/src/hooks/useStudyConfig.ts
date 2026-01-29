@@ -229,6 +229,7 @@ export const useStudyConfig = () => {
 
             if (!sessionLanguage || (data.language && sessionLanguage !== data.language)) {
                 setLanguage(data.language || 'en');
+                i18n.changeLanguage(data.language || 'en');
             }
             // Clear error on success
             setConfigError(null);

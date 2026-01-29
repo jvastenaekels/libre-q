@@ -136,10 +136,10 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync i18n with Store
     useEffect(() => {
-        if (sessionLanguage && sessionLanguage !== i18n.language && !configLoading) {
+        if (sessionLanguage && sessionLanguage !== i18n.language) {
             i18n.changeLanguage(sessionLanguage);
         }
-    }, [sessionLanguage, configLoading]);
+    }, [sessionLanguage]);
 
     // Browser Tab Title Management
     useEffect(() => {
