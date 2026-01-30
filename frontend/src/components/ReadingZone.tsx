@@ -113,7 +113,9 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                     ref={textRef}
                     className={cn(
                         'transition-opacity duration-300 absolute inset-0 p-3 overflow-y-auto custom-scrollbar',
-                        displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                        displayCard
+                            ? 'opacity-100 z-10'
+                            : 'opacity-0 z-0 pointer-events-none invisible'
                     )}
                     aria-hidden={!displayCard}
                 >
@@ -140,7 +142,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                         'transition-opacity duration-500 absolute inset-0 p-3 flex items-center justify-center',
                         !displayCard
                             ? 'opacity-100 z-10 delay-100'
-                            : 'opacity-0 z-0 pointer-events-none'
+                            : 'opacity-0 z-0 pointer-events-none invisible'
                     )}
                     aria-hidden={!!displayCard}
                 >
@@ -159,7 +161,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 ref={textRef}
                 className={cn(
                     'transition-opacity duration-300 absolute inset-0 p-4 overflow-y-auto custom-scrollbar',
-                    displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                    displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none invisible'
                 )}
                 aria-hidden={!displayCard}
             >
@@ -183,7 +185,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                     'transition-opacity duration-500 absolute inset-0',
                     !displayCard
                         ? 'opacity-100 z-10 delay-100'
-                        : 'opacity-0 z-0 pointer-events-none'
+                        : 'opacity-0 z-0 pointer-events-none invisible'
                 )}
             >
                 <MethodologyTips variant="desktop" />
