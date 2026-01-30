@@ -9,6 +9,7 @@ import PostSortPage from '@/pages/PostSortPage';
 import { Smartphone, Monitor, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import i18n from '@/i18n';
 
 const DesignerPreviewPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -26,6 +27,9 @@ const DesignerPreviewPage = () => {
             if (type === 'SYNC_DRAFT') {
                 setConfig(payload.config);
                 setActiveStep(payload.activeStep);
+                if (payload.activeLocale) {
+                    i18n.changeLanguage(payload.activeLocale);
+                }
             }
         };
 
@@ -35,6 +39,9 @@ const DesignerPreviewPage = () => {
             const data = JSON.parse(initial);
             setConfig(data.config);
             setActiveStep(data.activeStep);
+            if (data.activeLocale) {
+                i18n.changeLanguage(data.activeLocale);
+            }
         }
 
         return () => bc.close();

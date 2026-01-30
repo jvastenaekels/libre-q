@@ -68,9 +68,9 @@ class TestStudyPublic:
         response = await client.get(f"/api/study/{study.slug}?lang=fi")
         assert response.json()["title"] == "Title FI"
 
-        # Case 2: No request lang (Defaults to EN)
+        # Case 2: No request lang (Defaults to Study Default: FR)
         response = await client.get(f"/api/study/{study.slug}")
-        assert response.json()["title"] == "Title EN"
+        assert response.json()["title"] == "Title FR"
 
         # Case 3: Study Default (FR)
         slug = study.slug

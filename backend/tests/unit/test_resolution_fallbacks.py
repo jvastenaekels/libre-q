@@ -117,3 +117,28 @@ async def test_resolved_config_no_translation_uses_default_language_content():
 
     assert config["language"] == "en"
     assert config["instructions"] == DEFAULT_TRANSLATION_CONTENT["en"]["instructions"]
+
+
+@pytest.mark.asyncio
+async def test_resolved_config_none_lang_uses_study_default():
+    # Setup: Study with fi and en translations, default is fi
+    t_fi = StudyTranslation(language_code="fi", title="Suomi")
+    t_en = StudyTranslation(language_code="en", title="English")
+    study = Study(
+        slug="none-test",
+        state=StudyState.draft,
+        translations=[t_fi, t_en],
+        default_language="fi",
+        grid_config=[],
+        presort_config={},
+        postsort_config={},
+        statements=[],
+    )
+
+    # Calling with lang=None (as if Query(None))
+    config = await StudyService.get_resolved_study_config(
+        study, lang=None, session_token=uuid4()
+    )
+
+    assert config["language"] == "fi"
+    assert config["title"] == "Suomi"

@@ -336,7 +336,7 @@ class StudyService:
 
     @staticmethod
     def resolve_translation(
-        study: Study, requested_lang: str
+        study: Study, requested_lang: str | None
     ) -> tuple[str, StudyTranslation | None]:
         """Logic: Requested Lang -> Default (Study) -> English -> First Available."""
         # 1. Requested
@@ -374,9 +374,38 @@ class StudyService:
         return resolved_lang, translation
 
     @staticmethod
+    def get_basic_metadata(study: Study, lang: str | None = None) -> dict[str, Any]:
+        """Returns minimal robust metadata (title, description) for locked screens."""
+        resolved_lang, translation = StudyService.resolve_translation(study, lang)
+
+        # Robust title fallback
+        title = getattr(translation, "title", "")
+        if not title:
+            # Fallback to English title, then first available, then slug
+            _, eng_trans = StudyService.resolve_translation(study, "en")
+            title = getattr(eng_trans, "title", "")
+            if not title and study.translations:
+                title = getattr(study.translations[0], "title", "")
+            if not title:
+                title = study.slug
+
+        # Robust description fallback
+        description = getattr(translation, "description", "")
+        if not description:
+            _, eng_trans = StudyService.resolve_translation(study, "en")
+            description = getattr(eng_trans, "description", "")
+
+        return {
+            "slug": study.slug,
+            "title": title,
+            "description": description,
+            "language": resolved_lang,
+        }
+
+    @staticmethod
     async def get_resolved_study_config(
         study: Study,
-        lang: str = "en",
+        lang: str | None = None,
         session_token: UUID | None = None,
     ) -> dict[str, Any]:
         """Resolves study configuration including translations, randomization, and state."""

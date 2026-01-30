@@ -63,7 +63,11 @@ export const useSessionStore = create<SessionState>()(
                     currentStep: step,
                     maxReachedStep: Math.max(state.maxReachedStep, step),
                 })),
-            setLanguage: (language) => set({ language }),
+            setLanguage: (language) =>
+                set((state) => {
+                    if (state.language === language) return state;
+                    return { language };
+                }),
             completeSession: (confirmationCode) => set({ isCompleted: true, confirmationCode }),
             setSaving: (isSaving) => set({ isSaving }),
             setPilotMode: (isPilotMode) => set({ isPilotMode }),

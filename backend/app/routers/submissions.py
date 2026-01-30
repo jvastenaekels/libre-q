@@ -61,7 +61,7 @@ async def submit_study(
 async def get_study(
     request: Request,
     slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
-    lang: str = Query("en", pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
+    lang: str | None = Query(None, pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
     session_token: UUID | None = Query(
         None, description="Participant session token for deterministic randomization"
     ),
@@ -96,14 +96,9 @@ async def get_study(
         password or "", study.access_password
     ):
         # Return only basic metadata if password is not provided or incorrect
-        resolved_lang, translation = StudyService.resolve_translation(study, lang)
-        return {
-            "slug": study.slug,
-            "title": getattr(translation, "title", study.slug),
-            "description": getattr(translation, "description", ""),
-            "requires_password": True,
-            "language": resolved_lang,
-        }
+        metadata = StudyService.get_basic_metadata(study, lang)
+        metadata["requires_password"] = True
+        return metadata
 
     # Delegate complex resolution and transformation to service layer
     return await StudyService.get_resolved_study_config(

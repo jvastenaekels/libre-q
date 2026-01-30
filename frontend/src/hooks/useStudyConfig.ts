@@ -10,6 +10,8 @@ import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { localizeStudy } from '../utils/studyLocalization';
 import { useGetStudyConfig } from './useGetStudyConfig';
+import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
+import { queryClient } from '@/lib/queryClient';
 import i18n from '../i18n';
 
 export const useStudyConfig = () => {
@@ -32,12 +34,13 @@ export const useStudyConfig = () => {
     const resetSession = useSessionStore((state) => state.resetSession);
     const resetResponses = useResponseStore((state) => state.resetResponses);
 
-    // Determine language to request
-    const langToRequest = sessionLanguage ?? window.navigator.language.substring(0, 2);
-
     // --- Query Hook ---
     const searchParams = new URLSearchParams(window.location.search);
     const isTestMode = searchParams.get('mode') === 'test';
+
+    // Determine language to request
+    // Priority: sessionLanguage (persisted) -> URL parameter -> null (let backend decide)
+    const langToRequest = sessionLanguage || searchParams.get('lang') || undefined;
 
     const { data, isLoading, error, refetch } = useGetStudyConfig(
         slug,
@@ -110,8 +113,12 @@ export const useStudyConfig = () => {
                         config.available_languages
                     );
                     if (config.language) {
-                        await i18n.changeLanguage(config.language);
-                        setLanguage(config.language);
+                        if (i18n.language !== config.language) {
+                            await i18n.changeLanguage(config.language);
+                        }
+                        if (sessionLanguage !== config.language) {
+                            setLanguage(config.language);
+                        }
                     }
 
                     if (config.ui_labels) {
@@ -191,11 +198,17 @@ export const useStudyConfig = () => {
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---
+    // This is the "Slug Guard" - it ensures clean slate when switching studies
     useEffect(() => {
         if (slug && config && config.slug !== slug) {
+            console.log(
+                `[useStudyConfig] Slug mismatch detected (stored: ${config.slug}, URL: ${slug}). Resetting session.`
+            );
             resetSession();
             resetConfig();
             resetResponses();
+            // Force a hard query reset to avoid mixing data
+            queryClient.clear();
         }
     }, [slug, config, resetSession, resetConfig, resetResponses]);
 
@@ -209,7 +222,9 @@ export const useStudyConfig = () => {
     // --- Effect: Reset Pilot Language on Mode Change ---
     useEffect(() => {
         if (isTestMode && !sessionLanguage && config?.language) {
-            setLanguage(config.language);
+            if (sessionLanguage !== config.language) {
+                setLanguage(config.language);
+            }
         }
     }, [isTestMode, sessionLanguage, config?.language, setLanguage]);
 
@@ -230,8 +245,30 @@ export const useStudyConfig = () => {
             }
 
             if (!sessionLanguage || (data.language && sessionLanguage !== data.language)) {
-                setLanguage(data.language || 'en');
-                i18n.changeLanguage(data.language || 'en');
+                const newLang = data.language || 'en';
+
+                // Seed the cache for the resolved language to prevent double-fetch on first visit
+                // Only if the current sessionLanguage is null (first detection)
+                if (!sessionLanguage && slug) {
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const linkToken = searchParams.get('token') || undefined;
+                    const queryParams = {
+                        lang: newLang,
+                        link_token: linkToken,
+                        password: password,
+                    };
+                    queryClient.setQueryData(
+                        getGetStudyApiStudySlugGetQueryKey(slug, queryParams),
+                        data
+                    );
+                }
+
+                if (sessionLanguage !== newLang) {
+                    setLanguage(newLang);
+                }
+                if (i18n.language !== newLang) {
+                    i18n.changeLanguage(newLang);
+                }
             }
             // Clear error on success
             setConfigError(null);
@@ -243,7 +280,7 @@ export const useStudyConfig = () => {
                 setPasswordError(false);
             }
         }
-    }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode, password]);
+    }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode, password, slug]);
 
     // --- Effect: Sync Error ---
     useEffect(() => {

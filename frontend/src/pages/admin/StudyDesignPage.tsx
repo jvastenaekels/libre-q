@@ -18,6 +18,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Save,
+    Monitor,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,7 @@ import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
+import { useDesignerPreviewSync } from '@/hooks/useDesignerPreviewSync';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';
 import { customInstance } from '@/api/mutator';
@@ -118,6 +120,9 @@ const StudyDesignPage = () => {
 
     // Enable manual persistence
     const { save, blocker } = useStudyPersistence();
+
+    // Enable real-time synchronization with Live Preview
+    useDesignerPreviewSync();
 
     // Support Ctrl+S / Cmd+S
     useEffect(() => {
@@ -547,6 +552,21 @@ const StudyDesignPage = () => {
                                 <span className="hidden md:inline">
                                     {t('admin.design.toolbar.test_run')}
                                 </span>
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                    window.open(
+                                        `/app/${workspaceSlug}/studies/${studySlug}/design/preview`,
+                                        'open-q-preview'
+                                    )
+                                }
+                                className="gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3 bg-white border-slate-200 hover:border-emerald-300 hover:text-emerald-600"
+                            >
+                                <Monitor className="h-4 w-4 text-emerald-500" />
+                                <span className="hidden lg:inline">Live Preview</span>
                             </Button>
                         </div>
 

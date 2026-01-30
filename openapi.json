@@ -2509,10 +2509,16 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
-              "maxLength": 5,
-              "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
-              "default": "en",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 5,
+                  "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Lang"
             }
           },
