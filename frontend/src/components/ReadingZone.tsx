@@ -33,20 +33,28 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
           : 'fine.workbench.active_card';
 
     // Scroll indicator logic
-    const scrollRef = React.useRef<HTMLDivElement>(null);
+    // Scroll indicator logic
+    const textRef = React.useRef<HTMLDivElement>(null);
     const [hasOverflow, setHasOverflow] = React.useState(false);
 
     React.useEffect(() => {
         const checkOverflow = () => {
-            if (scrollRef.current) {
-                const { scrollHeight, clientHeight } = scrollRef.current;
+            if (textRef.current) {
+                const { scrollHeight, clientHeight } = textRef.current;
                 setHasOverflow(scrollHeight > clientHeight + 2);
             }
         };
+        // Check overflow when content changes or during transitions
         checkOverflow();
+        // Also set up a mutation observer or simpler timeout loop to catch transition ends
+        const timer = setTimeout(checkOverflow, 350);
+
         window.addEventListener('resize', checkOverflow);
-        return () => window.removeEventListener('resize', checkOverflow);
-    }, []); // Re-run when content changes
+        return () => {
+            window.removeEventListener('resize', checkOverflow);
+            clearTimeout(timer);
+        };
+    }, [displayCard?.text]); // Re-run when text changes
 
     const ScrollIndicator = () => (
         <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">
@@ -99,9 +107,17 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
 
     if (variant === 'mobile') {
         return (
-            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden">
-                <div ref={scrollRef} className="p-3 h-20 overflow-y-auto custom-scrollbar relative">
-                    {displayCard ? (
+            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-20">
+                {/* Card Content Layer */}
+                <div
+                    ref={textRef}
+                    className={cn(
+                        'transition-opacity duration-300 absolute inset-0 p-3 overflow-y-auto custom-scrollbar',
+                        displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                    )}
+                    aria-hidden={!displayCard}
+                >
+                    {displayCard && (
                         <div className="animate-in fade-in slide-in-from-top-1 duration-300 pb-2">
                             <CardHeader
                                 label={t(labelKey)}
@@ -115,10 +131,22 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                                 </p>
                             </div>
                         </div>
-                    ) : (
-                        <MethodologyTips variant="mobile" />
                     )}
                 </div>
+
+                {/* Tips Layer */}
+                <div
+                    className={cn(
+                        'transition-opacity duration-500 absolute inset-0 p-3 flex items-center justify-center',
+                        !displayCard
+                            ? 'opacity-100 z-10 delay-100'
+                            : 'opacity-0 z-0 pointer-events-none'
+                    )}
+                    aria-hidden={!!displayCard}
+                >
+                    <MethodologyTips variant="mobile" />
+                </div>
+
                 {hasOverflow && displayCard && <ScrollIndicator />}
             </div>
         );
@@ -126,41 +154,39 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
 
     return (
         <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-40 relative group overflow-hidden">
+            {/* Card Content Layer */}
             <div
-                ref={scrollRef}
-                className="w-full h-full p-4 overflow-y-auto custom-scrollbar relative"
+                ref={textRef}
+                className={cn(
+                    'transition-opacity duration-300 absolute inset-0 p-4 overflow-y-auto custom-scrollbar',
+                    displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                )}
+                aria-hidden={!displayCard}
             >
-                <div
-                    className={cn(
-                        'transition-opacity duration-300 absolute inset-0 p-4 overflow-y-auto custom-scrollbar',
-                        displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                    )}
-                >
-                    {displayCard && (
-                        <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
-                            <CardHeader
-                                label={t(labelKey)}
-                                code={displayCard.code}
-                                className="text-xs mb-1.5 gap-2"
-                                iconSize={14}
-                            />
-                            <p className="text-slate-800 text-base font-medium leading-relaxed">
-                                {displayCard.text}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                {displayCard && (
+                    <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
+                        <CardHeader
+                            label={t(labelKey)}
+                            code={displayCard.code}
+                            className="text-xs mb-1.5 gap-2"
+                            iconSize={14}
+                        />
+                        <p className="text-slate-800 text-base font-medium leading-relaxed">
+                            {displayCard.text}
+                        </p>
+                    </div>
+                )}
+            </div>
 
-                <div
-                    className={cn(
-                        'transition-opacity duration-500 absolute inset-0',
-                        !displayCard
-                            ? 'opacity-100 z-10 delay-100'
-                            : 'opacity-0 z-0 pointer-events-none'
-                    )}
-                >
-                    <MethodologyTips variant="desktop" />
-                </div>
+            <div
+                className={cn(
+                    'transition-opacity duration-500 absolute inset-0',
+                    !displayCard
+                        ? 'opacity-100 z-10 delay-100'
+                        : 'opacity-0 z-0 pointer-events-none'
+                )}
+            >
+                <MethodologyTips variant="desktop" />
             </div>
             {hasOverflow && displayCard && <ScrollIndicator />}
         </div>
