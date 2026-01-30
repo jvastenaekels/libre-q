@@ -130,21 +130,37 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 ref={scrollRef}
                 className="w-full h-full p-4 overflow-y-auto custom-scrollbar relative"
             >
-                {displayCard ? (
-                    <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
-                        <CardHeader
-                            label={t(labelKey)}
-                            code={displayCard.code}
-                            className="text-xs mb-1.5 gap-2"
-                            iconSize={14}
-                        />
-                        <p className="text-slate-800 text-base font-medium leading-relaxed">
-                            {displayCard.text}
-                        </p>
-                    </div>
-                ) : (
+                <div
+                    className={cn(
+                        'transition-opacity duration-300 absolute inset-0 p-4 overflow-y-auto custom-scrollbar',
+                        displayCard ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                    )}
+                >
+                    {displayCard && (
+                        <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
+                            <CardHeader
+                                label={t(labelKey)}
+                                code={displayCard.code}
+                                className="text-xs mb-1.5 gap-2"
+                                iconSize={14}
+                            />
+                            <p className="text-slate-800 text-base font-medium leading-relaxed">
+                                {displayCard.text}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <div
+                    className={cn(
+                        'transition-opacity duration-500 absolute inset-0',
+                        !displayCard
+                            ? 'opacity-100 z-10 delay-100'
+                            : 'opacity-0 z-0 pointer-events-none'
+                    )}
+                >
                     <MethodologyTips variant="desktop" />
-                )}
+                </div>
             </div>
             {hasOverflow && displayCard && <ScrollIndicator />}
         </div>
