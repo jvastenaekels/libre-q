@@ -1,5 +1,5 @@
 /*
- * Open-Q - Open-source platform for conducting Q-methodology research
+ * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -55,8 +55,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             if (!isPilotMode) {
                 setPilotMode(true);
             }
-            if (sessionStorage.getItem('open-q-pilot-mode') !== 'true') {
-                sessionStorage.setItem('open-q-pilot-mode', 'true');
+            if (sessionStorage.getItem('libre-q-pilot-mode') !== 'true') {
+                sessionStorage.setItem('libre-q-pilot-mode', 'true');
             }
         } else {
             // If URL does not have mode=test, we ensure we are NOT in pilot mode.
@@ -64,8 +64,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             if (isPilotMode) {
                 setPilotMode(false);
             }
-            if (sessionStorage.getItem('open-q-pilot-mode')) {
-                sessionStorage.removeItem('open-q-pilot-mode');
+            if (sessionStorage.getItem('libre-q-pilot-mode')) {
+                sessionStorage.removeItem('libre-q-pilot-mode');
             }
         }
     }, [setStep, setPilotMode, isPilotMode, location.search]);

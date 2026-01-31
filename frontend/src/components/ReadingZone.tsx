@@ -145,6 +145,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                             : 'opacity-0 z-0 pointer-events-none invisible'
                     )}
                     aria-hidden={!!displayCard}
+                    data-testid="reading-zone-tips"
                 >
                     <MethodologyTips variant="mobile" />
                 </div>
@@ -187,6 +188,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                         ? 'opacity-100 z-10 delay-100'
                         : 'opacity-0 z-0 pointer-events-none invisible'
                 )}
+                data-testid="reading-zone-tips"
             >
                 <MethodologyTips variant="desktop" />
             </div>

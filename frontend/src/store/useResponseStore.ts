@@ -70,10 +70,10 @@ const isPilot = () => {
     try {
         const params = new URLSearchParams(window.location.search);
         if (params.get('mode') === 'test') {
-            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            sessionStorage.setItem('libre-q-pilot-mode', 'true');
             return true;
         }
-        return sessionStorage.getItem('open-q-pilot-mode') === 'true';
+        return sessionStorage.getItem('libre-q-pilot-mode') === 'true';
     } catch {
         return false;
     }
@@ -237,7 +237,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             resetResponses: () => set(initialResponses),
         }),
         {
-            name: isPilot() ? 'open-q-pilot-responses' : 'open-q-responses',
+            name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',
             version: 1,
         }
     )

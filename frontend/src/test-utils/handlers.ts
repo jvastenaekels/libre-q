@@ -1,7 +1,7 @@
 import {
     getGetStudyApiAdminStudiesSlugGetMockHandler,
     getGetStudyApiStudySlugGetMockHandler,
-    getOpenQAPIMock,
+    getLibreQAPIMock,
 } from '../api/generated';
 import type { StudyRead } from '../api/model';
 
@@ -56,5 +56,5 @@ export const handlers = [
     getGetStudyApiStudySlugGetMockHandler(demoStudy),
 
     // Fallback to auto-generated mocks for everything else
-    ...getOpenQAPIMock(),
+    ...getLibreQAPIMock(),
 ];

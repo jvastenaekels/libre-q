@@ -1,5 +1,5 @@
 {
-  "name": "open-q-root",
+  "name": "libre-q-root",
   "private": true,
   "scripts": {
     "build": "cd frontend && npm install --include=dev && npm run build",

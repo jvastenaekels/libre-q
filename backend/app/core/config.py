@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Application configuration."""
 
     API_V1_STR: str = "/api"
-    PROJECT_NAME: str = "Open-Q API"
+    PROJECT_NAME: str = "Libre-Q API"
     ENVIRONMENT: str = "development"
 
     # Security
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
         if not v:
             # For static analysis, OpenAPI generation, and CI checks that don't need a real DB,
             # we provide a dummy PostgreSQL URL. Connection will fail later if actually needed.
-            return "postgresql+asyncpg://localhost/open_q_dummy"
+            return "postgresql+asyncpg://localhost/libre_q_dummy"
 
         # 1. Handle postgres/postgresql prefix for asyncpg
         if v.startswith("postgres://"):

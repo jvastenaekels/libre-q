@@ -57,7 +57,7 @@ describe('ReadingZone', () => {
         expect(screen.getByText(/Hovered Statement Content/)).toBeInTheDocument();
         expect(screen.getByText(/S1/)).toBeInTheDocument();
         // Should NOT show tips
-        expect(screen.queryByText('fine.workbench.methodology.extremes')).not.toBeInTheDocument();
+        expect(screen.getByTestId('reading-zone-tips')).toHaveClass('invisible');
     });
 
     it('shows selected card text when a card is selected', () => {

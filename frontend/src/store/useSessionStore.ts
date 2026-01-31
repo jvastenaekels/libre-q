@@ -34,10 +34,10 @@ const isPilot = () => {
     try {
         const params = new URLSearchParams(window.location.search);
         if (params.get('mode') === 'test') {
-            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            sessionStorage.setItem('libre-q-pilot-mode', 'true');
             return true;
         }
-        return sessionStorage.getItem('open-q-pilot-mode') === 'true';
+        return sessionStorage.getItem('libre-q-pilot-mode') === 'true';
     } catch {
         return false;
     }
@@ -87,7 +87,7 @@ export const useSessionStore = create<SessionState>()(
             },
         }),
         {
-            name: isPilot() ? 'open-q-pilot-session' : 'open-q-session',
+            name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
             version: 1,
         }
     )

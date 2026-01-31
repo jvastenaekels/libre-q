@@ -79,8 +79,8 @@ export async function injectParticipantSession(page: Page, options: InjectSessio
 
     await page.addInitScript(
         ({ responses, session }) => {
-            window.localStorage.setItem('open-q-responses', JSON.stringify(responses));
-            window.localStorage.setItem('open-q-session', JSON.stringify(session));
+            window.localStorage.setItem('libre-q-responses', JSON.stringify(responses));
+            window.localStorage.setItem('libre-q-session', JSON.stringify(session));
         },
         { responses, session }
     );

@@ -1,6 +1,6 @@
-# Open-Q Backend
+# Libre-Q Backend
 
-The Open-Q backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**. It uses **bcrypt** for password hashing and **PyJWT** for secure token handling.
+The Libre-Q backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**. It uses **bcrypt** for password hashing and **PyJWT** for secure token handling.
 
 ## 📁 Directory Structure
 

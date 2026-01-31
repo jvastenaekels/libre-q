@@ -196,7 +196,13 @@ test.describe('Study Configurations', () => {
         const postSort = new PostSortPage(page);
         await postSort.waitForLoad();
 
-        // Verify Email Input
+        // Verify Email Input (on Step 2)
+        // Check if we are on Step 1 (Feedback) and click Next/Continue
+        const continueBtn = page.getByRole('button', { name: /Continue|Next/i });
+        if (await continueBtn.isVisible()) {
+            await continueBtn.click();
+        }
+
         await expect(page.getByLabel('Email', { exact: false })).toBeVisible();
     });
 
@@ -239,6 +245,12 @@ test.describe('Study Configurations', () => {
         // Verify Consent Checkbox
         // Label usually contains "interview" or similar text from translations
         // Default text?
+        // Verify Consent Checkbox (on Step 2)
+        const continueBtn = page.getByRole('button', { name: /Continue|Next/i });
+        if (await continueBtn.isVisible()) {
+            await continueBtn.click();
+        }
+
         await expect(page.getByText('contacted', { exact: false })).toBeVisible();
     });
 });

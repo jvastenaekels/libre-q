@@ -1,7 +1,7 @@
 [project]
-name = "open-q-backend"
+name = "libre-q-backend"
 version = "0.1.0"
-description = "Backend for Open-Q"
+description = "Backend for Libre-Q"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

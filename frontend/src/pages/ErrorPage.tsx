@@ -1,5 +1,5 @@
 /*
- * Open-Q - Open-source platform for conducting Q-methodology research
+ * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -35,8 +35,8 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         useSessionStore.getState().resetSession();
         useConfigStore.getState().resetConfig();
         useResponseStore.getState().resetResponses();
-        localStorage.removeItem('open-q-session');
-        localStorage.removeItem('open-q-responses');
+        localStorage.removeItem('libre-q-session');
+        localStorage.removeItem('libre-q-responses');
         window.location.href = '/';
     };
 

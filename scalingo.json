@@ -1,5 +1,5 @@
 {
-  "name": "Open-Q",
+  "name": "Libre-Q",
   "scripts": {
     "postdeploy": "cd backend && python3 scripts/postdeploy.py"
   }

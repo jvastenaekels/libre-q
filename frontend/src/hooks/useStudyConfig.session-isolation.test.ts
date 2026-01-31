@@ -226,7 +226,7 @@ describe('Session Isolation Tests', () => {
             useSessionStore.getState().setToken('persistent-token');
             useSessionStore.getState().setStep(3);
 
-            const stored = localStorage.getItem('open-q-session');
+            const stored = localStorage.getItem('libre-q-session');
             expect(stored).toContain('persistent-token');
             expect(stored).toContain('"currentStep":3');
         });
@@ -235,7 +235,7 @@ describe('Session Isolation Tests', () => {
             useResponseStore.getState().categorizeCard(1, 'agree');
             useResponseStore.getState().categorizeCard(2, 'disagree');
 
-            const stored = localStorage.getItem('open-q-responses');
+            const stored = localStorage.getItem('libre-q-responses');
             expect(stored).toContain('"agree":[1]');
             expect(stored).toContain('"disagree":[2]');
         });
@@ -271,13 +271,13 @@ describe('Session Isolation Tests', () => {
             useResponseStore.getState().categorizeCard(1, 'agree');
 
             // Set the reset flag (as StudyDesignPage does)
-            localStorage.setItem(`open-q-pilot-reset-${slug}`, 'true');
+            localStorage.setItem(`libre-q-pilot-reset-${slug}`, 'true');
 
             // Simulate the test mode loading effect in useStudyConfig
-            if (localStorage.getItem(`open-q-pilot-reset-${slug}`)) {
+            if (localStorage.getItem(`libre-q-pilot-reset-${slug}`)) {
                 useSessionStore.getState().resetSession();
                 useResponseStore.getState().resetResponses();
-                localStorage.removeItem(`open-q-pilot-reset-${slug}`);
+                localStorage.removeItem(`libre-q-pilot-reset-${slug}`);
             }
 
             // Verify session was reset
@@ -285,7 +285,7 @@ describe('Session Isolation Tests', () => {
             expect(useResponseStore.getState().rough.agree).toEqual([]);
 
             // Verify flag was removed
-            expect(localStorage.getItem(`open-q-pilot-reset-${slug}`)).toBeNull();
+            expect(localStorage.getItem(`libre-q-pilot-reset-${slug}`)).toBeNull();
         });
     });
 

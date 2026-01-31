@@ -233,6 +233,10 @@ describe('PostSortPage', () => {
         expect(useResponseStore.getState().postsort.card_comments?.[3]).toBe('');
 
         // Now check the document
+        // Verify the card block appeared (check for Remove button first)
+        expect(await screen.findByTitle(/Remove/i)).toBeInTheDocument();
+
+        // Then check content
         expect(await screen.findByText(/S3 text content/i)).toBeInTheDocument();
     });
 });

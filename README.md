@@ -1,11 +1,11 @@
-# Open-Q
+# Libre-Q
 
-**Open-Q** is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform Q-sorts and for researchers to collect and analyze subjective viewpoints.
+**Libre-Q** is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform Q-sorts and for researchers to collect and analyze subjective viewpoints.
 
 **Mission:** We seek to contribute to **Open Science** by providing a transparent, reproducible, and accessible tool for subjectivity research, ensuring that data ownership remains with the researcher.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![CI](https://github.com/jvastenaekels/open-q/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/open-q/actions/workflows/ci.yml)
+[![CI](https://github.com/jvastenaekels/libre-q/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/libre-q/actions/workflows/ci.yml)
 
 ---
 
@@ -29,9 +29,9 @@ The documentation is organized using the **Diátaxis** framework:
   - [Architecture Overview](docs/explanation/architecture.md)
   - [Mobile UX Decisions](docs/explanation/design-decisions/mobile-ux.md)
 
-## ✨ Why Open-Q?
+## ✨ Why Libre-Q?
 
-Open-Q is designed to address specific pain points of modern Q-methodology research.
+Libre-Q is designed to address specific pain points of modern Q-methodology research.
 
 ### 1. Designed for the Modern Participant (UX)
 
@@ -70,7 +70,7 @@ _Built for global, cross-cultural research from day one._
 
 ## 🤝 Contributing & Standards
 
-We welcome contributions! Open-Q follows an **"Agent-First"** development philosophy, prioritizing strict typing and explicit contracts to facilitate AI-assisted coding.
+We welcome contributions! Libre-Q follows an **"Agent-First"** development philosophy, prioritizing strict typing and explicit contracts to facilitate AI-assisted coding.
 
 Please read our guidelines before submitting a PR:
 
@@ -86,8 +86,8 @@ Please read our guidelines before submitting a PR:
 2. **Clone & Install**:
 
    ```bash
-   git clone https://github.com/jvastenaekels/open-q.git
-   cd open-q
+   git clone https://github.com/jvastenaekels/libre-q.git
+   cd libre-q
    make install
    ```
 

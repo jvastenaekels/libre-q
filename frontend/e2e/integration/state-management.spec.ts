@@ -120,11 +120,12 @@ test.describe('State Management Flow Tests', () => {
             const participantPage = await context.newPage();
 
             // Admin: Login and navigate directly to study
+            const workspaceSlug = testDb.getWorkspaceSlug();
             await testDb.loginToAdminUI(adminPage);
-            await adminPage.goto(`/admin/studies/${study.slug}`);
+            await adminPage.goto(`/app/${workspaceSlug}/studies/${study.slug}`);
             // Wait for study page to load by checking h1 (Title is "Overview" + Badge)
             await expect(adminPage.locator('h1')).toContainText('Overview');
-            await expect(adminPage).toHaveURL(new RegExp(`/admin/studies/${study.slug}`));
+            await expect(adminPage).toHaveURL(new RegExp(`/app/${workspaceSlug}/studies/${study.slug}`));
 
             // Participant: Access study
             await participantPage.goto(`/study/${study.slug}`);
@@ -393,13 +394,13 @@ test.describe('State Management Flow Tests', () => {
             const submitButton = page.getByRole('button', {
                 name: /Submit|Finish|Share my perspective/i,
             });
-            const continueButton = page.getByRole('button', { name: /Continue/i });
+            const continueButton = page.getByRole('button', { name: /Continue|Next/i });
 
             if (await submitButton.isVisible()) {
                 await submitButton.click();
             } else if (await continueButton.isVisible()) {
                 await continueButton.click();
-                await page.getByRole('button', { name: /Submit/i }).click();
+                await submitButton.click();
             }
 
             // Verify completion page
