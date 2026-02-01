@@ -107,7 +107,10 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             onNext();
         } else {
             setValidationError(t('post.validation_error', 'Please fill in all required fields.'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const el = document.getElementById('main-scroll-container');
+            if (el && typeof el.scrollTo === 'function') {
+                el.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     };
 

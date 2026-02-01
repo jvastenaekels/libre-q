@@ -175,7 +175,10 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
             onSubmit();
         } else {
             // Scroll to error
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const el = document.getElementById('main-scroll-container');
+            if (el && typeof el.scrollTo === 'function') {
+                el.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     };
 

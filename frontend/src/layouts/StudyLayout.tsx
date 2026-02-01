@@ -176,6 +176,15 @@ const StudyLayoutContent: React.FC = () => {
         console.log('[StudyLayout] ConfigStore:', config);
     }, [config]);
 
+    const mainRef = useRef<HTMLElement>(null);
+
+    // Scroll to top on route change
+    useEffect(() => {
+        if (mainRef.current && typeof mainRef.current.scrollTo === 'function') {
+            mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+        }
+    }, [location.pathname]);
+
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
         // Special Case: Study Not Found (404) -> Custom User Friendly Page
@@ -637,6 +646,8 @@ const StudyLayoutContent: React.FC = () => {
 
             {/* Main Content */}
             <main
+                id="main-scroll-container"
+                ref={mainRef}
                 className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/fine-sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
                 {/* Transition Overlay / Dimming */}

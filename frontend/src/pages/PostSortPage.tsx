@@ -155,7 +155,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             {wizardStep === 1 && (
                 <Step1_Feedback
                     onNext={() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        document
+                            .getElementById('main-scroll-container')
+                            ?.scrollTo({ top: 0, behavior: 'smooth' });
                         setWizardStep(2);
                     }}
                 />
@@ -164,7 +166,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             {wizardStep === 2 && (
                 <Step2_Questionnaire
                     onBack={() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        document
+                            .getElementById('main-scroll-container')
+                            ?.scrollTo({ top: 0, behavior: 'smooth' });
                         setWizardStep(1);
                     }}
                     onSubmit={() => submit()} // Trigger actual submission
