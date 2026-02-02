@@ -340,7 +340,7 @@ const PostSortConfigEditor = ({
 
                     {/* Random Comments Section */}
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                        <CardHeader>
+                        <CardHeader className={allowRandomComments ? 'pb-4' : ''}>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
@@ -361,6 +361,31 @@ const PostSortConfigEditor = ({
                                 />
                             </div>
                         </CardHeader>
+                        {allowRandomComments && (
+                            <CardContent className="pt-0">
+                                <div className="space-y-4">
+                                    <Label
+                                        htmlFor="random-comments-prompt"
+                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                    >
+                                        {t('admin.design.postsort.missing.prompt_label')}
+                                    </Label>
+                                    <Textarea
+                                        id="random-comments-prompt"
+                                        value={
+                                            getPromptText('random_comments_label') ||
+                                            tStudy('post.optional.title')
+                                        }
+                                        onChange={(e) =>
+                                            setPromptText('random_comments_label', e.target.value)
+                                        }
+                                        placeholder={tStudy('post.optional.title')}
+                                        readOnly={readOnly}
+                                        className="min-h-[80px] rounded-2xl border-slate-300 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
+                                    />
+                                </div>
+                            </CardContent>
+                        )}
                     </Card>
 
                     {/* Missing Statements Section (NEW) */}
@@ -398,17 +423,16 @@ const PostSortConfigEditor = ({
                                     <Textarea
                                         id="missing-prompt"
                                         value={
-                                            getPromptText('missing_statements') ||
-                                            tStudy(
-                                                'admin.design.postsort.missing.prompt_placeholder'
-                                            )
+                                            getPromptText('missing_statements_label') ||
+                                            tStudy('admin.design.postsort.missing.title')
                                         }
                                         onChange={(e) =>
-                                            setPromptText('missing_statements', e.target.value)
+                                            setPromptText(
+                                                'missing_statements_label',
+                                                e.target.value
+                                            )
                                         }
-                                        placeholder={tStudy(
-                                            'admin.design.postsort.missing.prompt_placeholder'
-                                        )}
+                                        placeholder={tStudy('admin.design.postsort.missing.title')}
                                         readOnly={readOnly}
                                         className="min-h-[80px] rounded-2xl border-slate-300 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                                     />

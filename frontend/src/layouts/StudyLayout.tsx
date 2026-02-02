@@ -179,7 +179,6 @@ const StudyLayoutContent: React.FC = () => {
         if (mainRef.current && typeof mainRef.current.scrollTo === 'function') {
             mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
         }
-        // biome-ignore lint/correctness/useExhaustiveDependencies: Re-run on route change to scroll to top
     }, [location.pathname]);
 
     // Full Page Error State (if we have no config at all)

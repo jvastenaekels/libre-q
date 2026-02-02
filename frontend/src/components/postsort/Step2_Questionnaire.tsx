@@ -48,7 +48,11 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
 
             const shape: Record<string, z.ZodTypeAny> = {};
             Object.entries(questions).forEach(([key, field]) => {
-                const isVisible = evaluateVisibilityCondition(field.visibility_condition, data);
+                const isVisible = evaluateVisibilityCondition(
+                    field.visibility_condition,
+                    data,
+                    questions
+                );
                 if (!isVisible) {
                     shape[key] = z.any().optional();
                     return;
@@ -193,7 +197,8 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     {Object.entries(questions).map(([key, fieldConfig]) => {
                         const isVisible = evaluateVisibilityCondition(
                             fieldConfig.visibility_condition,
-                            currentValues
+                            currentValues,
+                            questions
                         );
                         if (!isVisible) return null;
 

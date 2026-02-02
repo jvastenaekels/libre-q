@@ -55,7 +55,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const getCardText = (id: number) =>
         config?.statements.find((s) => s.id === id)?.text || t('common.unknown_card');
 
-    const getPrompt = (keys: string | string[], defaultTextKey: string) => {
+    const getPrompt = (keys: string | string[], defaultTextKey: string, defaultValue?: string) => {
         const prompts = config?.postsort_config?.prompts;
         const currentLang = i18n.language || 'en';
 
@@ -72,7 +72,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 }
             }
         }
-        return t(defaultTextKey);
+        return t(defaultTextKey, { defaultValue });
     };
 
     const handleCommentChange = (id: number, val: string) => {
@@ -247,7 +247,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 <div className="space-y-6">
                     <div className="space-y-1">
                         <h2 className="text-xl font-bold text-slate-800">
-                            {t(
+                            {getPrompt(
+                                'random_comments_label',
                                 'post.optional.title',
                                 'Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?'
                             )}
@@ -376,7 +377,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             htmlFor="missing-statements"
                             className="text-xl font-bold text-slate-800 block"
                         >
-                            {t(
+                            {getPrompt(
+                                'missing_statements_label',
                                 'admin.design.postsort.missing.title',
                                 'Were there any important perspectives, issues, or statements that you felt were missing from this set?'
                             )}

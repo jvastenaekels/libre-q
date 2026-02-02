@@ -193,12 +193,24 @@ const StudyDesignPage = () => {
                 setStudy(studyWithDefaults);
             } else {
                 // Background update (e.g., after state change in dashboard)
+
+                // FORCE SYNC STATE: If server state changed (e.g. via "Manage Flow"),
+                // update draft state immediately so the UI unlocks/locks correctly.
+                if (currentDraft.state !== study.state) {
+                    useStudyDesigner.setState((state) => ({
+                        draft: state.draft ? { ...state.draft, state: study.state } : null,
+                    }));
+                }
+
                 // Update original first
                 useStudyDesigner.getState().updateOriginal(study);
 
+                // Re-fetch draft in case we just updated it
+                const updatedDraft = useStudyDesigner.getState().draft;
+
                 // Check if draft has unsaved changes
                 const projectedUpdate = projectStudyToUpdate(study);
-                const draftHasChanges = !areStudiesEqual(currentDraft, projectedUpdate);
+                const draftHasChanges = !areStudiesEqual(updatedDraft, projectedUpdate);
 
                 // If draft has no real changes, sync it with the new data
                 // This prevents false "unsaved changes" warnings

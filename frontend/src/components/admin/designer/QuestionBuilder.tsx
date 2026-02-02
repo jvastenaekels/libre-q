@@ -578,7 +578,7 @@ const QuestionItem = ({
                                                                         [activeLocale]:
                                                                             e.target.value,
                                                                     },
-                                                                    value: e.target.value,
+                                                                    value: opt, // Preserve original value
                                                                 };
                                                             } else {
                                                                 newOpts[idx] = {

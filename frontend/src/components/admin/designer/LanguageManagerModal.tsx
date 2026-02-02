@@ -47,11 +47,12 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
         if (existingTranslation) {
             updateDraft((d) => {
                 // 1. Restore translation object
-                // biome-ignore lint/suspicious/noExplicitAny: internal flag injection
+                // 1. Restore translation object
                 d.translations?.push({
                     ...existingTranslation,
                     // Ensure we reset any copy flag if it existed
                     _is_copy: false,
+                    // biome-ignore lint/suspicious/noExplicitAny: explicit bypass for draft update
                 } as any);
 
                 // 2. Restore statement translations
