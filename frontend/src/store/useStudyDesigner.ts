@@ -188,11 +188,14 @@ function normalizeStudyData(draft: StudyUpdate) {
                         };
                     }
                     if (opt?.label) {
-                        opt.label = normalizeLocalizedField(
-                            opt.label,
-                            availableLanguages,
-                            defaultLang
-                        );
+                        return {
+                            ...opt,
+                            label: normalizeLocalizedField(
+                                opt.label,
+                                availableLanguages,
+                                defaultLang
+                            ),
+                        };
                     }
                     return opt;
                 });
@@ -224,11 +227,14 @@ function normalizeStudyData(draft: StudyUpdate) {
                         };
                     }
                     if (opt?.label) {
-                        opt.label = normalizeLocalizedField(
-                            opt.label,
-                            availableLanguages,
-                            defaultLang
-                        );
+                        return {
+                            ...opt,
+                            label: normalizeLocalizedField(
+                                opt.label,
+                                availableLanguages,
+                                defaultLang
+                            ),
+                        };
                     }
                     return opt;
                 });
