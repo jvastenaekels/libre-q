@@ -813,7 +813,6 @@ async def validate_study_import(
         required_trans = [
             "language_code",
             "title",
-            "description",
         ]
         for field in required_trans:
             if field not in trans or not trans[field]:
@@ -1013,6 +1012,9 @@ async def import_study_config(
 
         # Translations
         for t_data in study_data.get("translations", []):
+            # Ensure required non-nullable fields have defaults
+            if "description" not in t_data or t_data["description"] is None:
+                t_data["description"] = ""
             db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
         # Statements
