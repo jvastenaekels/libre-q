@@ -33,7 +33,8 @@ i18n
         },
 
         detection: {
-            order: ['navigator', 'htmlTag', 'path', 'subdomain'],
+            order: ['querystring', 'navigator', 'htmlTag', 'path', 'subdomain'],
+            lookupQuerystring: 'lang',
             caches: ['localStorage'],
         },
     });
