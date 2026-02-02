@@ -878,13 +878,17 @@ async def validate_study_import(
     # Check for external resources
     branding = study_data.get("branding") or {}
     if isinstance(branding, dict):
-        if branding.get("logo_url", "").startswith("http"):
+        logo_url = branding.get("logo_url")
+        if logo_url and logo_url.startswith("http"):
             add_warning("external_logo")
 
         partners = branding.get("partners") or []
         for partner in partners:
-            if isinstance(partner, dict) and partner.get("logo_url", "").startswith(
-                "http"
+            partner_logo = partner.get("logo_url")
+            if (
+                isinstance(partner, dict)
+                and partner_logo
+                and partner_logo.startswith("http")
             ):
                 warnings.append(
                     f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
