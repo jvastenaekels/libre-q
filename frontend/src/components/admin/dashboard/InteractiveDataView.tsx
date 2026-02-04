@@ -430,7 +430,7 @@ export default function InteractiveDataView({
                 ),
             }),
         ],
-        [columnHelper, t, handleViewParticipant]
+        [columnHelper, t, handleViewParticipant, currentLocale]
     );
 
     const table = useReactTable({

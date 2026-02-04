@@ -176,7 +176,11 @@ const StudyLayoutContent: React.FC = () => {
 
     // Scroll to top on route change
     useEffect(() => {
-        if (mainRef.current && typeof mainRef.current.scrollTo === 'function') {
+        if (
+            location.pathname &&
+            mainRef.current &&
+            typeof mainRef.current.scrollTo === 'function'
+        ) {
             mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
         }
     }, [location.pathname]);

@@ -6,13 +6,13 @@ export interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
     activeStep:
-    | 'intro'
-    | 'pre-sort'
-    | 'condition'
-    | 'q-sort'
-    | 'post-sort'
-    | 'interface'
-    | 'branding';
+        | 'intro'
+        | 'pre-sort'
+        | 'condition'
+        | 'q-sort'
+        | 'post-sort'
+        | 'interface'
+        | 'branding';
     activeSubStep?: string;
     activeLocale: string;
     syncStatus: 'synced' | 'saving' | 'error' | 'modified';

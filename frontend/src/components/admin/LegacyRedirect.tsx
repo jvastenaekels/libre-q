@@ -26,7 +26,7 @@ export const LegacyRedirect = () => {
 
     useEffect(() => {
         // Redirection effect
-    }, [location]);
+    }, []);
 
     if (isLoading) {
         return (

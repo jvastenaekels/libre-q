@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
-import type { StudyUpdate } from '../api/model';
 import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
-import { localizeStudy } from '../utils/studyLocalization';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
@@ -85,7 +83,7 @@ export const useStudyConfig = () => {
                 try {
                     let config: StudyConfig;
                     if (draftJson) {
-                        const fullDraft = JSON.parse(draftJson) as StudyUpdate;
+                        config = JSON.parse(draftJson) as StudyConfig;
                     } else {
                         config = JSON.parse(legacyJson as string);
                     }
@@ -120,7 +118,6 @@ export const useStudyConfig = () => {
                     const { data: serverData } = await refetch();
 
                     if (serverData) {
-
                         if (serverData.ui_labels) {
                             applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
                         }

@@ -449,17 +449,17 @@ const StudyDesignPage = () => {
                                 draft.state === 'active'
                                     ? 'bg-green-50 text-green-700 border-green-200'
                                     : draft.state === 'closed'
-                                        ? 'bg-red-50 text-red-700 border-red-200'
-                                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                                      ? 'bg-red-50 text-red-700 border-red-200'
+                                      : 'bg-amber-50 text-amber-700 border-amber-200'
                             )}
                         >
                             {draft.state === 'active'
                                 ? t('admin.status.active')
                                 : draft.state === 'closed'
-                                    ? t('admin.status.closed')
-                                    : draft.state === 'paused'
-                                        ? t('admin.status.paused')
-                                        : t('admin.status.draft')}
+                                  ? t('admin.status.closed')
+                                  : draft.state === 'paused'
+                                    ? t('admin.status.paused')
+                                    : t('admin.status.draft')}
                         </div>
                     </div>
 
@@ -589,8 +589,8 @@ const StudyDesignPage = () => {
                                     {syncStatus === 'saving'
                                         ? t('admin.sync.saving', 'Saving...')
                                         : syncStatus === 'modified'
-                                            ? t('admin.design.toolbar.save', 'Save')
-                                            : t('admin.design.toolbar.saved', 'Saved')}
+                                          ? t('admin.design.toolbar.save', 'Save')
+                                          : t('admin.design.toolbar.saved', 'Saved')}
                                 </span>
                             </Button>
 
@@ -653,8 +653,8 @@ const StudyDesignPage = () => {
                                     draft.state === 'active'
                                         ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
                                         : draft.state === 'paused'
-                                            ? 'bg-amber-50 border-amber-100 text-amber-600'
-                                            : 'bg-rose-50 border-rose-100 text-rose-600'
+                                          ? 'bg-amber-50 border-amber-100 text-amber-600'
+                                          : 'bg-rose-50 border-rose-100 text-rose-600'
                                 )}
                             >
                                 {draft.state === 'active' ? (
@@ -667,15 +667,15 @@ const StudyDesignPage = () => {
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active')
                                     : draft.state === 'paused'
-                                        ? t('admin.design.qsort.grid.locked_paused')
-                                        : t('admin.design.qsort.grid.locked_closed')}
+                                      ? t('admin.design.qsort.grid.locked_paused')
+                                      : t('admin.design.qsort.grid.locked_closed')}
                             </h3>
                             <p className="text-base font-medium text-slate-500 mt-4 mb-8 text-pretty leading-relaxed">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active_desc')
                                     : draft.state === 'paused'
-                                        ? t('admin.design.qsort.grid.locked_paused_desc')
-                                        : t('admin.design.qsort.grid.locked_closed_desc')}
+                                      ? t('admin.design.qsort.grid.locked_paused_desc')
+                                      : t('admin.design.qsort.grid.locked_closed_desc')}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Button
@@ -957,13 +957,13 @@ const StudyDesignPage = () => {
                                         onClick={() =>
                                             setActiveStep(
                                                 prevStep.id as
-                                                | 'intro'
-                                                | 'pre-sort'
-                                                | 'condition'
-                                                | 'q-sort'
-                                                | 'post-sort'
-                                                | 'interface'
-                                                | 'branding'
+                                                    | 'intro'
+                                                    | 'pre-sort'
+                                                    | 'condition'
+                                                    | 'q-sort'
+                                                    | 'post-sort'
+                                                    | 'interface'
+                                                    | 'branding'
                                             )
                                         }
                                         className="gap-2 h-12 px-6 rounded-xl font-bold text-slate-500 hover:text-slate-900 group"
@@ -981,13 +981,13 @@ const StudyDesignPage = () => {
                                         onClick={() =>
                                             setActiveStep(
                                                 nextStep.id as
-                                                | 'intro'
-                                                | 'pre-sort'
-                                                | 'condition'
-                                                | 'q-sort'
-                                                | 'post-sort'
-                                                | 'interface'
-                                                | 'branding'
+                                                    | 'intro'
+                                                    | 'pre-sort'
+                                                    | 'condition'
+                                                    | 'q-sort'
+                                                    | 'post-sort'
+                                                    | 'interface'
+                                                    | 'branding'
                                             )
                                         }
                                         className="gap-2 h-12 px-8 rounded-xl font-bold bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-md group"

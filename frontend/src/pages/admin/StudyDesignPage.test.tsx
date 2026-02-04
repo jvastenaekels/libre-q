@@ -1,6 +1,5 @@
 import { renderWithProviders, screen, waitFor, fireEvent } from '@/test-utils/test-utils';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { useParams } from 'react-router-dom';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test-utils/server';
 import StudyDesignPage from './StudyDesignPage';
@@ -37,9 +36,9 @@ vi.mock('react-router-dom', async () => {
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-    observe() { }
-    unobserve() { }
-    disconnect() { }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
 };
 
 describe('StudyDesignPage Feature Tests', () => {
@@ -164,5 +163,4 @@ describe('StudyDesignPage Feature Tests', () => {
             expect(screen.getByText(/👋/)).toBeInTheDocument();
         });
     });
-
 });
