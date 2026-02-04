@@ -109,7 +109,7 @@ export default function GeneralSettingsPage() {
             if (data.slug !== slug) {
                 const targetUrl = workspaceSlug
                     ? `/app/${workspaceSlug}/studies/${data.slug}/settings`
-                    : `/admin/studies/${data.slug}/settings`;
+                    : `/app/${currentWorkspace?.slug}/studies/${data.slug}/settings`;
                 navigate(targetUrl);
             } else {
                 navigate('.', { replace: true });
@@ -162,7 +162,9 @@ export default function GeneralSettingsPage() {
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });
-            const targetHome = workspaceSlug ? `/app/${workspaceSlug}/dashboard` : '/hub';
+            const targetHome = workspaceSlug
+                ? `/app/${workspaceSlug}/dashboard`
+                : `/app/${currentWorkspace?.slug}/dashboard`;
             navigate(targetHome);
         } catch (error) {
             const message = parseApiErrorSync(error, t('admin.settings.delete_error'));

@@ -13,6 +13,8 @@ import {
     ArrowLeft,
     Settings2,
     Plus,
+    Wand2,
+    Table,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -258,6 +260,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               ].filter((item) => item.show)
             : [];
 
+    const activeStudy = studies?.find(
+        (s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId
+    );
+
     // Legacy navigation for backward compatibility
     const navMain = isValidStudy
         ? [
@@ -267,28 +273,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   isActive: true,
                   items: [
                       {
-                          title: t('admin.sidebar.dashboard'),
-                          url: `/admin/studies/${activeStudyId}`,
+                          title: t('admin.sidebar.overview', 'Overview'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}`
+                                    : `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
                       },
                       {
-                          title: t('admin.sidebar.design'),
-                          url: `/admin/studies/${activeStudyId}/design`,
-                          icon: PencilRuler,
+                          title: t('admin.sidebar.design', 'Design'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/design`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/design`
+                                    : `/admin/studies/${activeStudyId}/design`,
+                          icon: Wand2,
                       },
                       {
-                          title: t('admin.sidebar.recruit'),
-                          url: `/admin/studies/${activeStudyId}/recruitment`,
-                          icon: UserPlus,
+                          title: t('admin.sidebar.recruitment', 'Recruitment'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/recruitment`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/recruitment`
+                                    : `/admin/studies/${activeStudyId}/recruitment`,
+                          icon: Users,
                       },
                       {
-                          title: t('admin.sidebar.data'),
-                          url: `/admin/studies/${activeStudyId}/exports`,
-                          icon: Download,
+                          title: t('admin.sidebar.data_exports', 'Data & Exports'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/data`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/data`
+                                    : `/admin/studies/${activeStudyId}/exports`,
+                          icon: Table,
                       },
                       {
-                          title: t('admin.sidebar.settings'),
-                          url: `/admin/studies/${activeStudyId}/settings`,
+                          title: t('admin.sidebar.settings', 'Settings'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/settings`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/settings`
+                                    : `/admin/studies/${activeStudyId}/settings`,
                           icon: Settings,
                       },
                   ],

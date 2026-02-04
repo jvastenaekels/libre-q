@@ -681,7 +681,16 @@ const StudyDesignPage = () => {
                                 <Button
                                     variant="default"
                                     className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700"
-                                    onClick={() => navigate(`/admin/studies/${draft.slug}`)}
+                                    onClick={() => {
+                                        const ws = workspaceSlug || original?.workspace?.slug;
+                                        const s = draft?.slug || original?.slug;
+                                        if (ws && s) {
+                                            navigate(`/app/${ws}/studies/${s}`);
+                                        } else {
+                                            // Fallback to hub if we truly have no context
+                                            navigate('/hub');
+                                        }
+                                    }}
                                 >
                                     {t('admin.study.state.manage', 'Go to Dashboard')}
                                 </Button>

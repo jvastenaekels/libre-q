@@ -176,10 +176,10 @@ async def list_studies(
     workspace, _ = workspace_ctx
 
     # Simple filter by workspace. Isolation secured.
-    # Simple filter by workspace. Isolation secured by get_current_workspace dependency.
     query = (
         select(Study)
         .where(Study.workspace_id == workspace.id)
+        .options(selectinload(Study.workspace))
         .order_by(Study.created_at.desc())
     )
     result = await db.execute(query)
