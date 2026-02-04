@@ -139,7 +139,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 {/* Tips Layer */}
                 <div
                     className={cn(
-                        'transition-opacity duration-500 absolute inset-0 px-12 py-3 flex items-center justify-center',
+                        'transition-opacity duration-500 absolute inset-0 p-3 flex items-center justify-center',
                         !displayCard
                             ? 'opacity-100 z-10 delay-100'
                             : 'opacity-0 z-0 pointer-events-none invisible'
