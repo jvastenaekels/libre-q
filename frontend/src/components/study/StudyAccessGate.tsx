@@ -106,7 +106,7 @@ export const StudyAccessGate: React.FC<StudyAccessGateProps> = ({
 
             <p className="mt-8 text-slate-400 text-xs font-medium uppercase tracking-widest flex items-center gap-2">
                 <span className="w-8 h-px bg-slate-200" />
-                Powered by Open-Q
+                Powered by Libre-Q
                 <span className="w-8 h-px bg-slate-200" />
             </p>
         </div>

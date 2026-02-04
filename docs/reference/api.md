@@ -68,24 +68,17 @@ Submit participant data after completing the study.
 ```json
 {
   "study_slug": "example-study",
-  "presort_data": {
+  "session_token": "123e4567-e89b-12d3-a456-426614174000",
+  "language_used": "en",
+  "presort_answers": {
     "age": 25,
     "gender": "female"
   },
-  "rough_data": {
-    "agree": [1, 3, 5],
-    "disagree": [2, 4],
-    "neutral": [6, 7]
-  },
-  "qsort_data": [
-    { "statement_id": 1, "column_score": 3, "row_position": 0 },
-    { "statement_id": 2, "column_score": -2, "row_position": 1 }
+  "qsort": [
+    { "statement_id": 1, "grid_score": 3, "card_comment": "Resonates strongly" },
+    { "statement_id": 2, "grid_score": -2, "card_comment": null }
   ],
-  "postsort_data": {
-    "card_comments": {
-      "1": "This statement resonates because...",
-      "2": "I disagree because..."
-    },
+  "postsort_answers": {
     "missing_statement": "",
     "general_comment": "Overall feedback..."
   }

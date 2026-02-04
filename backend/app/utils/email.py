@@ -41,7 +41,7 @@ def send_invitation_email(
         logger.warning(f"To: {email_to}")
         logger.warning(f"Subject: {subject}")
         logger.warning(f"Content: {invite_url}")
-        print(
+        logger.info(
             f"\n--- MOCK EMAIL ---\nTo: {email_to}\nSubject: {subject}\nLink: {invite_url}\n------------------\n"
         )
         return

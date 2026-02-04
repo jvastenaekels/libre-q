@@ -424,7 +424,7 @@ class ExportService:
     @staticmethod
     def _generate_r_script(study: Study) -> str:
         """Generates a dynamic R script for qmethod package."""
-        return f"""# Open-Q Automatic Analysis Script
+        return f"""# Libre-Q Automatic Analysis Script
 # Required: install.packages("qmethod")
 
 library(qmethod)

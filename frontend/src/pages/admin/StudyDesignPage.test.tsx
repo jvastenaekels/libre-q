@@ -1,5 +1,6 @@
 import { renderWithProviders, screen, waitFor, fireEvent } from '@/test-utils/test-utils';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { useParams } from 'react-router-dom';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test-utils/server';
 import StudyDesignPage from './StudyDesignPage';
@@ -36,9 +37,9 @@ vi.mock('react-router-dom', async () => {
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    observe() { }
+    unobserve() { }
+    disconnect() { }
 };
 
 describe('StudyDesignPage Feature Tests', () => {
@@ -75,7 +76,7 @@ describe('StudyDesignPage Feature Tests', () => {
 
     beforeEach(() => {
         useAuthStore.setState({
-            user: { id: 1, email: 'admin@open-q.dev' },
+            user: { id: 1, email: 'admin@libre-q.dev' },
             isAuthenticated: true,
         });
         useStudyDesigner.getState().resetDraft();
@@ -91,9 +92,9 @@ describe('StudyDesignPage Feature Tests', () => {
         server.resetHandlers();
     });
 
-    const renderPage = () => {
+    const renderPage = (slug = 'test-study-designer') => {
         return renderWithProviders(<StudyDesignPage />, {
-            initialEntries: ['/admin/studies/test-study-designer/design'],
+            initialEntries: [`/admin/studies/${slug}/design`],
         });
     };
 
@@ -163,4 +164,5 @@ describe('StudyDesignPage Feature Tests', () => {
             expect(screen.getByText(/👋/)).toBeInTheDocument();
         });
     });
+
 });

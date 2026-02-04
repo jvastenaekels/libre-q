@@ -1,8 +1,8 @@
-# Open-Q AI-First Development Guidelines
+# Libre-Q AI-First Development Guidelines
 
 ## 1. Philosophy: The Agent-First Paradigm
 
-**Open-Q is an "Agent-First" project.** This means the codebase is optimized for generation, reading, and refactoring by Large Language Models (LLMs) under human supervision.
+**Libre-Q is an "Agent-First" project.** This means the codebase is optimized for generation, reading, and refactoring by Large Language Models (LLMs) under human supervision.
 
 Unlike traditional development where code is optimized for human brevity, here **we prioritize explicitness, strict typing, and deductive logic.** We avoid "magic" behavior, implicit state, or dynamic metaprogramming that creates hallucinations in AI reasoning.
 
@@ -26,9 +26,8 @@ We use **Python 3.13+** with strict adherence to type hinting.
 
 ### 2.2 SQLAlchemy & Database
 
-- **Asynchronous Core:** We use `ext.asyncio` with `AsyncSession` for high-concurrency performance.
+- **Synchronous Core:** We currently use synchronous SQLAlchemy patterns for stability and easier debugging by agents.
 - **Explicit Relationships:** Define foreign keys and relationships explicitly in models. Avoid implicit joins.
-- **Async-Safe Loading:** Mandatory usage of `lazy="selectin"` for all relationships in models, or `selectinload()` in queries, to prevent synchronous I/O errors during async serialization.
 
 ### 2.3 Style & Structure
 
@@ -54,7 +53,7 @@ We use **React 19+** with **TypeScript** in strict mode.
 
 ### 3.2 Component Philosophy
 
-- **Logic Extraction:** Complex logic (sorting algorithms, matrix validation) must be extracted into custom hooks (`useGridCalculation.ts`) and tested in isolation via Vitest.
+- **Logic Extraction:** Complex logic (sorting algorithms, matrix sizing) must be extracted into custom hooks (`useGridCalculations.ts`) and tested in isolation via Vitest.
 - **Dumb Components:** UI components should receive data via props and emit events. They should contain minimal business logic.
 - **Tailwind CSS:** Use utility classes. Avoid CSS-in-JS complexities unless necessary for dynamic values.
 
@@ -80,7 +79,7 @@ When contributing a new feature, follow this sequence to minimize hallucination:
 ## 5. Domain Knowledge: Q-Methodology
 
 _Context for the Agent:_
-Open-Q implements **Q-Methodology**, a research method used in psychology and social sciences to study human subjectivity. Unlike standard surveys (R-methodology) that treat people as variables, Q-methodology treats _items_ as variables and people as the correlation matrix (Inverted Factor Analysis).
+Libre-Q implements **Q-Methodology**, a research method used in psychology and social sciences to study human subjectivity. Unlike standard surveys (R-methodology) that treat people as variables, Q-methodology treats _items_ as variables and people as the correlation matrix (Inverted Factor Analysis).
 
 ### 5.1 The Core Mechanism: Forced Distribution
 
@@ -113,16 +112,16 @@ We strictly adhere to the **Diátaxis Framework**. All documentation must fall i
 
 ### 6.1 Structure & Location
 
-- **Tutorials (`docs/tutorials/`):** Lesson-oriented. Learning by doing.
+- **Tutorials (`../tutorials/`):** Lesson-oriented. Learning by doing.
   - _Goal:_ Guide the user through a specific project to achieve a tangible result.
   - _Tone:_ Instructional, hand-holding. "Let's build X."
-- **How-To Guides (`docs/guides/`):** Problem-oriented. Steps to solve a specific problem.
+- **How-To Guides (`../guides/`):** Problem-oriented. Steps to solve a specific problem.
   - _Goal:_ Show how to perform a specific task (e.g., "How to export data to CSV").
   - _Tone:_ Practical, concise. "Run command Y."
-- **Reference (`docs/reference/`):** Information-oriented. Technical descriptions.
+- **Reference (`../reference/`):** Information-oriented. Technical descriptions.
   - _Goal:_ Describe the machinery (API Endpoints, Component Props, Configuration variables).
   - _Tone:_ Dry, accurate, exhaustive.
-- **Explanation (`docs/explanation/`):** Understanding-oriented. Theoretical background.
+- **Explanation (`../explanation/`):** Understanding-oriented. Theoretical background.
   - _Goal:_ Explain _why_ things are the way they are (Architecture decisions, Q-Methodology theory).
   - _Tone:_ Discursive, clarifying.
 

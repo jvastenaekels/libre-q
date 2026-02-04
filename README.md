@@ -78,6 +78,7 @@ Please read our guidelines before submitting a PR:
 - **[Frontend Guidelines](docs/contributing/frontend-guidelines.md)**: React 19, Tailwind, and Mobile-First UX.
 - **[Backend Guidelines](docs/contributing/backend-guidelines.md)**: Python 3.13, Pydantic, and Inverse TDD.
 - **[Prompting Strategy](docs/contributing/prompting-strategy.md)**: How to effectively pair-program with AI on this codebase.
+- **[AI Agent Instructions](docs/contributing/agent-instructions.md)**: Detailed context for AI assistants.
 
 ## 🚀 Quick Start
 

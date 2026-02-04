@@ -1,5 +1,5 @@
 /*
- * Open-Q - Open-source platform for conducting Q-methodology research
+ * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -383,7 +383,7 @@ describe('Pilot Mode Logic', () => {
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() } as any);
         // Default not in pilot mode
         useSessionStore.setState({ isPilotMode: false });
-        sessionStorage.removeItem('open-q-pilot-mode');
+        sessionStorage.removeItem('libre-q-pilot-mode');
     });
 
     it('Renders hard loading state when in pilot mode and config is missing', () => {

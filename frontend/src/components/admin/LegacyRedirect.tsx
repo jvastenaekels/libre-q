@@ -1,5 +1,5 @@
 /*
- * Open-Q - Open-source platform for conducting Q-methodology research
+ * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -25,8 +25,7 @@ export const LegacyRedirect = () => {
     const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet();
 
     useEffect(() => {
-        // Log redirection for debugging if needed
-        console.log(`LegacyRedirect: Intercepted ${location.pathname}`);
+        // Redirection effect
     }, [location]);
 
     if (isLoading) {

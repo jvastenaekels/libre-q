@@ -54,7 +54,7 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (slug && isTestMode && !isPilotMode) {
             // Set flag for storage isolation in this tab
-            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            sessionStorage.setItem('libre-q-pilot-mode', 'true');
             setPilotMode(true);
         }
     }, [isTestMode, slug, isPilotMode, setPilotMode]);
@@ -68,50 +68,27 @@ export const useStudyConfig = () => {
             setConfigLoading(true);
 
             // Check if we need a fresh start (set by StudyDesignPage)
-            const resetKey = `open-q-pilot-reset-${slug}`;
+            const resetKey = `libre-q-pilot-reset-${slug}`;
             if (localStorage.getItem(resetKey)) {
                 resetSession();
                 resetResponses();
                 localStorage.removeItem(resetKey);
             }
 
-            const draftKey = `open-q-test-draft-${slug}`;
-            const legacyKey = `open-q-test-config-${slug}`;
+            const draftKey = `libre-q-test-draft-${slug}`;
+            const legacyKey = `libre-q-test-config-${slug}`;
 
             const draftJson = localStorage.getItem(draftKey);
             const legacyJson = localStorage.getItem(legacyKey);
-
-            console.log(`[useStudyConfig] Participant tab slug: ${slug}`);
-            console.log(
-                `[useStudyConfig] Keys in localStorage:`,
-                Object.keys(localStorage).filter((k) => k.startsWith('open-q-test-'))
-            );
-            console.log(
-                `[useStudyConfig] draftJson: ${draftJson ? 'found' : 'null'}, legacyJson: ${legacyJson ? 'found' : 'null'}`
-            );
 
             if (draftJson || legacyJson) {
                 try {
                     let config: StudyConfig;
                     if (draftJson) {
                         const fullDraft = JSON.parse(draftJson) as StudyUpdate;
-                        console.log(
-                            '[useStudyConfig] Found test draft. Translations:',
-                            fullDraft.translations?.map((tr) => tr.language_code)
-                        );
-                        // Dynamically localize based on current session language
-                        config = localizeStudy(
-                            fullDraft,
-                            sessionLanguage || fullDraft.default_language || 'en'
-                        ) as StudyConfig;
                     } else {
                         config = JSON.parse(legacyJson as string);
                     }
-
-                    console.log(
-                        '[useStudyConfig] Localized Config Languages:',
-                        config.available_languages
-                    );
                     if (config.language) {
                         if (i18n.language !== config.language) {
                             await i18n.changeLanguage(config.language);
@@ -143,7 +120,6 @@ export const useStudyConfig = () => {
                     const { data: serverData } = await refetch();
 
                     if (serverData) {
-                        console.log('[useStudyConfig] Server fallback successful');
 
                         if (serverData.ui_labels) {
                             applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
@@ -176,7 +152,7 @@ export const useStudyConfig = () => {
 
         // Listen for changes from other tabs (Designer)
         const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === `open-q-test-draft-${slug}` || e.key === `open-q-pilot-reset-${slug}`) {
+            if (e.key === `libre-q-test-draft-${slug}` || e.key === `libre-q-pilot-reset-${slug}`) {
                 loadFromStorage();
             }
         };
@@ -201,9 +177,6 @@ export const useStudyConfig = () => {
     // This is the "Slug Guard" - it ensures clean slate when switching studies
     useEffect(() => {
         if (slug && config && config.slug !== slug) {
-            console.log(
-                `[useStudyConfig] Slug mismatch detected (stored: ${config.slug}, URL: ${slug}). Resetting session.`
-            );
             resetSession();
             resetConfig();
             resetResponses();

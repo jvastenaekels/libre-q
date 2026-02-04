@@ -77,7 +77,7 @@ describe('StudyDesignPage Responsive Layout', () => {
         });
 
         useAuthStore.setState({
-            user: { id: 1, email: 'admin@open-q.dev' },
+            user: { id: 1, email: 'admin@libre-q.dev' },
             isAuthenticated: true,
         });
         useStudyDesigner.getState().resetDraft();

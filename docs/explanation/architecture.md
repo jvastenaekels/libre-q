@@ -218,8 +218,8 @@ erDiagram
         int study_id FK
         string confirmation_code
         string status
-        json presort_data
-        json postsort_data
+        json presort_answers
+        json postsort_answers
     }
 
     QSORT_ENTRY {

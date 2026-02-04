@@ -1,14 +1,14 @@
 # Responsiveness and Layout Robustness Analysis
 
 **Date:** 2026-01-14
-**Project:** Open-Q Platform
+**Project:** Libre-Q Platform
 **Scope:** Frontend responsiveness, layout robustness, and mobile UX
 
 ---
 
 ## Executive Summary
 
-Open-Q demonstrates **strong mobile-first design principles** with sophisticated responsive patterns, particularly in the core Q-sort interfaces (RoughSort, FineSort). Recent fixes (commit c4fe249) addressed critical mobile UX issues including dialog overflow, sidebar width, and touch thresholds.
+Libre-Q demonstrates **strong mobile-first design principles** with sophisticated responsive patterns, particularly in the core Q-sort interfaces (RoughSort, FineSort). Recent fixes (commit c4fe249) addressed critical mobile UX issues including dialog overflow, sidebar width, and touch thresholds.
 
 However, several **systematic improvements** can enhance consistency, maintainability, and cross-device reliability:
 

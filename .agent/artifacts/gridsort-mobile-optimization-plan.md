@@ -37,7 +37,7 @@ Optimize the GridSort mobile deck layout by reducing excessive empty space while
 
 ### Architecture Overview
 
-**Location:** `/home/julien/open-q/frontend/src/components/GridSort.tsx` (849 lines)
+**Location:** `/home/julien/libre-q/frontend/src/components/GridSort.tsx` (849 lines)
 
 **Integration:** Used by `FineSortPage.tsx` for the Fine Sort phase (Step 4)
 
@@ -409,22 +409,22 @@ p-3 lg:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-[calc(1rem+env(s
 
 **Component:**
 
-- `/home/julien/open-q/frontend/src/components/GridSort.tsx`
+- `/home/julien/libre-q/frontend/src/components/GridSort.tsx`
 
 **Tests:**
 
-- `/home/julien/open-q/frontend/src/components/GridSort.pedagogy.test.tsx`
-- `/home/julien/open-q/frontend/src/components/GridSort.mobile-layout.test.tsx`
-- `/home/julien/open-q/frontend/src/components/GridSort.interactions.test.tsx`
-- `/home/julien/open-q/frontend/src/components/GridSort.layout.test.tsx`
+- `/home/julien/libre-q/frontend/src/components/GridSort.pedagogy.test.tsx`
+- `/home/julien/libre-q/frontend/src/components/GridSort.mobile-layout.test.tsx`
+- `/home/julien/libre-q/frontend/src/components/GridSort.interactions.test.tsx`
+- `/home/julien/libre-q/frontend/src/components/GridSort.layout.test.tsx`
 
 **Integration:**
 
-- `/home/julien/open-q/frontend/src/pages/FineSortPage.tsx`
+- `/home/julien/libre-q/frontend/src/pages/FineSortPage.tsx`
 
 **Documentation:**
 
-- `/home/julien/open-q/docs/reference/components.md`
+- `/home/julien/libre-q/docs/reference/components.md`
 
 ### Testing Commands
 

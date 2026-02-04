@@ -8,7 +8,7 @@ import httpx
 
 
 class APIClient:
-    """Helper to interact with the Open-Q Admin API."""
+    """Helper to interact with the Libre-Q Admin API."""
 
     def __init__(
         self, base_url: str | None = None, client: httpx.AsyncClient | None = None

@@ -6,13 +6,13 @@ export interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
     activeStep:
-        | 'intro'
-        | 'pre-sort'
-        | 'condition'
-        | 'q-sort'
-        | 'post-sort'
-        | 'interface'
-        | 'branding';
+    | 'intro'
+    | 'pre-sort'
+    | 'condition'
+    | 'q-sort'
+    | 'post-sort'
+    | 'interface'
+    | 'branding';
     activeSubStep?: string;
     activeLocale: string;
     syncStatus: 'synced' | 'saving' | 'error' | 'modified';
@@ -258,15 +258,6 @@ export function areStudiesEqual(a: StudyUpdate | null, b: StudyUpdate | null): b
     const jsonB = JSON.stringify(processedB);
 
     if (jsonA !== jsonB) {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('[areStudiesEqual] Mismatch detected');
-            console.log('Draft:', jsonA);
-            console.log('Original:', jsonB);
-
-            // Helpful if you want to see where it breaks
-            // console.log('A:', processedA);
-            // console.log('B:', processedB);
-        }
         return false;
     }
     return true;

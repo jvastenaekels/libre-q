@@ -181,7 +181,7 @@ const LoginPage = () => {
                 </Card>
 
                 <p className="text-center text-[10px] text-slate-400 mt-12 font-medium uppercase tracking-widest opacity-50">
-                    Open-Q
+                    Libre-Q
                 </p>
             </motion.div>
         </div>

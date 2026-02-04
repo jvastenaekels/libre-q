@@ -2,7 +2,7 @@
 
 ## Overview
 
-Open-Q is a Q-methodology application where participants sort statements along a distribution grid. Currently, statements are presented in **database ID order** (ascending). This plan adds an **optional** randomization feature that:
+Libre-Q is a Q-methodology application where participants sort statements along a distribution grid. Currently, statements are presented in **database ID order** (ascending). This plan adds an **optional** randomization feature that:
 
 - ✅ Maintains per-participant consistency (same order throughout their session)
 - ✅ Preserves export compatibility (exports remain in ID order)

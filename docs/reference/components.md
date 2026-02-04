@@ -94,17 +94,18 @@ The main Q-grid component with zoom/pan support for Fine Sort.
 
 ### Props
 
-| Prop                | Type                                 | Description                      |
-| ------------------- | ------------------------------------ | -------------------------------- |
-| `agreeCards`        | `Card[]`                             | Cards from "agree" pile          |
-| `disagreeCards`     | `Card[]`                             | Cards from "disagree" pile       |
-| `neutralCards`      | `Card[]`                             | Cards from "neutral" pile        |
-| `gridColumns`       | `GridColumn[]`                       | Grid configuration               |
-| `renderSlotContent` | `(col, row) => ReactNode`            | Render function for slot content |
-| `forcedTipsClosed`  | `boolean`                            | Hide instructional tips          |
-| `selectedCardId`    | `number \| null`                     | Currently selected card          |
-| `onCardClick`       | `(id: number) => void`               | Card selection handler           |
-| `onSlotClick`       | `(col: number, row: number) => void` | Slot click handler               |
+| Prop               | Type                                 | Description                                           |
+| :----------------- | :----------------------------------- | :---------------------------------------------------- |
+| `agreeCards`       | `Card[]`                             | List of cards for the "Agree" pile                    |
+| `disagreeCards`    | `Card[]`                             | List of cards for the "Disagree" pile                 |
+| `neutralCards`     | `Card[]`                             | List of cards for the "Neutral" pile                  |
+| `gridColumns`      | `Column[]`                           | Configuration for the pyramid layout                  |
+| `isAllPlaced`      | `boolean`                            | Whether all cards have been placed (enables validation) |
+| `disableHoverZoom` | `boolean`                            | If true, disables the heavy hover magnification (useful for mobile) |
+| `forcedTipsClosed` | `boolean`                            | Hide instructional tips                               |
+| `selectedCardId`   | `number \| null`                     | Currently selected card                               |
+| `onCardClick`      | `(id: number) => void`               | Card selection handler                                |
+| `onSlotClick`      | `(col: number, row: number) => void` | Slot click handler                                    |
 
 ### Features
 
@@ -178,19 +179,19 @@ Displays a stack of cards in a pile with count badge.
 
 ### ParticipantDetailContent
 
-**Location:** `src/components/admin/exports/ParticipantDetailContent.tsx`
+**Location:** `src/components/admin/dashboard/ParticipantDetailContent.tsx`
 
 The primary container for inspecting a participant session. Organizes content into three tabs: **Visual Sort**, **Responses**, and **Environment**.
 
 ### SurveyResponseTable
 
-**Location:** `src/components/admin/exports/SurveyResponseTable.tsx`
+**Location:** `src/components/admin/dashboard/SurveyResponseTable.tsx`
 
 A dynamic table that displays Pre-sort and Post-sort data. It handles heterogeneous key-value pairs and applies automatic label mapping via i18n keys if available.
 
 ### ParticipantMetadataCard
 
-**Location:** `src/components/admin/exports/ParticipantMetadataCard.tsx`
+**Location:** `src/components/admin/dashboard/ParticipantMetadataCard.tsx`
 
 Displays technical session details including OS, Browser (v), IP, and duration. It uses `ua-parser-js` (via backend) to provide human-readable device information.
 

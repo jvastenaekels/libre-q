@@ -1,5 +1,5 @@
 /*
- * Open-Q - Open-source platform for conducting Q-methodology research
+ * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  * Licensed under the GNU Affero General Public License v3.0 or later.
@@ -212,7 +212,7 @@ const StudyLayoutContent: React.FC = () => {
     const isPilotModePersistent =
         isPilotMode ||
         new URLSearchParams(location.search).get('mode') === 'test' ||
-        sessionStorage.getItem('open-q-pilot-mode') === 'true';
+        sessionStorage.getItem('libre-q-pilot-mode') === 'true';
 
     // Hard Loading State (Initial Fetch)
     // In pilot mode, treat missing config as loading to prevent flash of raw keys
@@ -385,7 +385,7 @@ const StudyLayoutContent: React.FC = () => {
                             !(branding?.partners && branding.partners.length > 0) &&
                             (currentStep === 1 ? (
                                 <img
-                                    src="/open-q-logo.svg"
+                                    src="/libre-q-logo.svg"
                                     alt={t('layout.title')}
                                     className="h-8 w-auto object-contain"
                                 />

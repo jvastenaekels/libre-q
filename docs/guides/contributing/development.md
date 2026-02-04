@@ -41,7 +41,7 @@ cd backend && uv run python init_db.py
 ```
 
 > [!IMPORTANT]
-> Ensure your `DATABASE_URL` is set in `backend/.env` before running this. See [Configuration Reference](../reference/configuration.md).
+> Ensure your `DATABASE_URL` is set in `backend/.env` before running this. See [**Configuration options**](../../reference/configuration.md) defined in `backend/app/schemas.py`.
 
 ## 🚀 Running Locally
 

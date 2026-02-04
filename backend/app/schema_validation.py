@@ -120,5 +120,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(validate_schema())
     except Exception as e:
-        print(e)
+        # We need to set up basic logging if not already done, just in case
+        if not logging.getLogger().handlers:
+            logging.basicConfig(level=logging.INFO)
+        logging.getLogger(__name__).error(e)
         sys.exit(1)

@@ -31,7 +31,7 @@ export const BREAKPOINTS = {
 
     /**
      * Extra large desktop devices (1400px+).
-     * Custom breakpoint for Open-Q.
+     * Custom breakpoint for Libre-Q.
      */
     '2XL': 1400,
 } as const;
