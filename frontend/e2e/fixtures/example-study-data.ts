@@ -148,7 +148,7 @@ export const exampleStudyData = {
     },
     translations: {
         en: {
-            title: 'Discover Open-Q',
+            title: 'Discover Libre-Q',
             subtitle: 'Experience Q-Methodology Simple and Easy',
             objective:
                 'Welcome!\n\nThe goal of this study is to capture the nuance of your opinion, going beyond simple "yes" or "no" answers.\n\nBy ranking statements relative to one another, you allow us to map your unique perspective in detail. This approach is designed to respect the complexity of your point of view, rather than forcing it into rigid boxes.',
@@ -193,7 +193,7 @@ export const exampleStudyData = {
             step_help: {},
         },
         fr: {
-            title: "Découverte d'Open-Q",
+            title: "Découverte d'Libre-Q",
             subtitle: 'La méthodologie Q en toute simplicité',
             objective:
                 'Bienvenue !\n\nL\'objectif de cette étude est de saisir toute la nuance de votre opinion, au-delà des simples réponses "oui" ou "non".\n\nEn classant les énoncés les uns par rapport aux autres, vous nous permettez de cartographier votre perspective unique. Cette approche est conçue pour respecter la complexité de votre point de vue, plutôt que de le forcer dans des cases rigides.',
@@ -238,7 +238,7 @@ export const exampleStudyData = {
             step_help: {},
         },
         fi: {
-            title: 'Tutustu Open-Q-alustaan',
+            title: 'Tutustu Libre-Q-alustaan',
             subtitle: 'Q-metodologia helposti ja sujuvasti',
             objective:
                 'Tervetuloa!\n\nTämän tutkimuksen tavoitteena on tavoittaa mielipiteesi vivahteet, ylittäen pelkät "kyllä" tai "ei" -vastaukset.\n\nJärjestämällä väittämät suhteessa toisiinsa autat meitä kartoittamaan ainutlaatuisen näkökulmasi. Tämä menetelmä on suunniteltu kunnioittamaan näkemyksesi monimuotoisuutta sen sijaan, että se pakotettaisiin valmiisiin raameihin.',

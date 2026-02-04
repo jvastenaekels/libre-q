@@ -1,4 +1,4 @@
-name: Open-Q CI
+name: Libre-Q CI
 
 on:
   workflow_dispatch:
