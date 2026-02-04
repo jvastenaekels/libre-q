@@ -409,7 +409,10 @@ const ValidationFooter: React.FC<{
     };
     highlightKey?: string | null;
 }> = React.memo(({ isAllPlaced, selectedCardId, onValidate, labels, highlightKey }) => (
-    <div className="w-full lg:w-[360px] p-3 lg:p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[88px] lg:min-h-[100px] flex-none pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+    <div
+        data-testid="validation-footer"
+        className="w-full lg:w-[360px] p-2 lg:p-4 border-t border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[72px] lg:min-h-[100px] flex-none pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+    >
         {isAllPlaced ? (
             <button
                 type="button"
@@ -417,7 +420,7 @@ const ValidationFooter: React.FC<{
                 onClick={onValidate}
                 style={{ backgroundColor: 'var(--brand-accent)' }}
                 className={cn(
-                    'w-full flex items-center justify-center gap-2 py-4 text-white rounded-full font-bold text-base shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
+                    'w-full flex items-center justify-center gap-2 py-3 lg:py-4 text-white rounded-full font-bold text-base shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
                     highlightKey === 'fine.actions.validate' &&
                         'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
                 )}
@@ -425,7 +428,7 @@ const ValidationFooter: React.FC<{
                 {labels.validate} <Check size={18} strokeWidth={3} />
             </button>
         ) : (
-            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
+            <div className="flex items-center justify-center min-h-[44px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
                 <div className="flex items-center gap-3 text-slate-500">
                     {selectedCardId ? (
                         <>

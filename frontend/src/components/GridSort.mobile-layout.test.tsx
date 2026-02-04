@@ -121,15 +121,12 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
             </DndContext>
         );
 
-        // Find the specific instruction text
-        const instruction = screen.getByText('fine.workbench.initial_instruction');
-
-        // Traverse up to find the footer container (min-h-[88px])
-        const footer = instruction.closest('.min-h-\\[88px\\]');
+        // Find the footer container by test-id
+        const footer = screen.getByTestId('validation-footer');
 
         expect(footer).toBeInTheDocument();
-        expect(footer?.className).toContain('flex-none');
-        expect(footer?.className).toContain('z-[100]');
+        expect(footer.className).toContain('flex-none');
+        expect(footer.className).toContain('z-[100]');
     });
 
     // NEW TESTS: Instruction Overlay & Toggle
