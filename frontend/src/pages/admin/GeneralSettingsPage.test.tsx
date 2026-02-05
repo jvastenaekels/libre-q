@@ -19,6 +19,7 @@ vi.mock('@/api/admin', () => ({
         updateStudy: vi.fn(),
         updateStudyState: vi.fn(),
         deleteStudy: vi.fn(),
+        resetStudyParticipants: vi.fn(),
     },
 }));
 
@@ -31,6 +32,7 @@ vi.mock('react-router-dom', async () => {
         useLoaderData: vi.fn(),
         useNavigate: () => mockNavigate,
         useParams: vi.fn(),
+        useRevalidator: vi.fn(() => ({ revalidate: vi.fn() })),
     };
 });
 
@@ -63,6 +65,7 @@ describe('GeneralSettingsPage', () => {
         vi.mocked(AdminService.updateStudy).mockClear();
         vi.mocked(AdminService.updateStudyState).mockClear();
         vi.mocked(AdminService.deleteStudy).mockClear();
+        vi.mocked(AdminService.resetStudyParticipants).mockClear();
     });
 
     afterEach(() => {
@@ -179,5 +182,24 @@ describe('GeneralSettingsPage', () => {
         renderPage();
 
         expect(screen.queryByRole('button', { name: /Delete Study/i })).not.toBeInTheDocument();
+    });
+    it('allows resetting participant data', async () => {
+        const user = userEvent.setup();
+        vi.mocked(AdminService.resetStudyParticipants).mockResolvedValue({} as never);
+        renderPage();
+        const resetBlock = screen.getByText(/Reset Data/i, { selector: 'div' });
+        expect(resetBlock).toBeInTheDocument();
+        const resetButton = screen.getByRole('button', { name: /Reset Data/i });
+        await user.click(resetButton);
+        // Verify AlertDialog appears
+        expect(screen.getByText(/Reset all participations\?/i)).toBeInTheDocument();
+        const confirmButton = screen.getByRole('button', {
+            name: /Reset Data/i,
+            className: /bg-red-600/,
+        });
+        await user.click(confirmButton);
+        await waitFor(() => {
+            expect(AdminService.resetStudyParticipants).toHaveBeenCalledWith('test-study');
+        });
     });
 });

@@ -1,21 +1,8 @@
-import { useState } from 'react';
 import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
 
 import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import { ParticipantStatus } from '@/api/model/participantStatus';
-import { AdminService } from '@/api/admin';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,8 +19,6 @@ import {
     Copy,
     Eye,
     Link as LinkIcon,
-    Trash2,
-    Loader2,
 } from 'lucide-react';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
@@ -69,8 +54,6 @@ const StudyOverviewPage = () => {
     const revalidator = useRevalidator();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
-    const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-    const [isResetLoading, setIsResetLoading] = useState(false);
 
     // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
     const dateLocales: Record<string, any> = {
@@ -107,22 +90,6 @@ const StudyOverviewPage = () => {
         return t(`admin.status.${state}`, state.charAt(0).toUpperCase() + state.slice(1));
     };
 
-    const handleResetParticipants = async () => {
-        setIsResetLoading(true);
-        try {
-            await AdminService.resetStudyParticipants(slug);
-            toast.success(
-                t('admin.study_overview.reset_success', 'Participants reset successfully')
-            );
-            setIsResetDialogOpen(false);
-            revalidator.revalidate();
-        } catch (_error) {
-            toast.error(t('admin.study_overview.reset_error', 'Failed to reset participants'));
-        } finally {
-            setIsResetLoading(false);
-        }
-    };
-
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 pt-2">
             <StudyPageHeader
@@ -150,19 +117,7 @@ const StudyOverviewPage = () => {
                         {getStatusLabel(study?.state || 'draft')}
                     </Badge>
                 }
-                actions={
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setIsResetDialogOpen(true)}
-                            className="bg-red-50 text-red-600 hover:bg-red-100 border-red-200 border shadow-sm"
-                        >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {t('admin.study_overview.reset_participants', 'Reset Data')}
-                        </Button>
-                    </div>
-                }
+                actions={null}
             />
 
             {/* Key Metrics Dashboard + Study Status */}
@@ -700,37 +655,6 @@ const StudyOverviewPage = () => {
                     )}
                 </>
             )}
-
-            <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {t('admin.study_overview.reset_title', 'Reset all participations?')}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {t(
-                                'admin.study_overview.reset_description',
-                                'This action cannot be undone. This will permanently delete all participant data and Q-sort submissions for this study.'
-                            )}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleResetParticipants}
-                            disabled={isResetLoading}
-                            className="bg-red-600 hover:bg-red-700"
-                        >
-                            {isResetLoading ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <Trash2 className="w-4 h-4 mr-2" />
-                            )}
-                            {t('admin.study_overview.reset_participants', 'Reset Data')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 };
