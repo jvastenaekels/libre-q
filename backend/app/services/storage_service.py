@@ -94,6 +94,7 @@ class StorageService:
                     Bucket=self.bucket_name,
                     Key=s3_key,
                     Body=content,
+                    ContentLength=file_size,
                     ContentType=content_type,
                     Metadata={
                         "study": study_slug,

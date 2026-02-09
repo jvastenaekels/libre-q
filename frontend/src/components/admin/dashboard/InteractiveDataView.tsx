@@ -694,7 +694,7 @@ export default function InteractiveDataView({
     if (isLoading && !data) {
         return (
             <div className="space-y-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[1, 2, 3, 4, 5].map((i) => (
                         <Skeleton key={i} className="h-32 w-full rounded-2xl" />
                     ))}
@@ -742,8 +742,8 @@ export default function InteractiveDataView({
                             setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
                         }
                         className={cn(
-                            'col-span-1 md:col-span-6 lg:col-span-1',
-                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            'col-span-1',
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'completed'
                                 ? 'border-emerald-500 ring-4 ring-emerald-50/50'
                                 : 'border-slate-100 hover:border-emerald-200'
@@ -771,7 +771,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {completedCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -795,8 +795,8 @@ export default function InteractiveDataView({
                             )
                         }
                         className={cn(
-                            'col-span-1 md:col-span-6 lg:col-span-1',
-                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            'col-span-1',
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'in_progress'
                                 ? 'border-sky-500 ring-4 ring-sky-50/50'
                                 : 'border-slate-100 hover:border-sky-200'
@@ -824,7 +824,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {inProgressCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -870,8 +870,8 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('interview')}
                         className={cn(
-                            'col-span-1 md:col-span-6 lg:col-span-1',
-                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            'col-span-1',
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('interview')
                                 ? 'border-amber-500 ring-4 ring-amber-50/50'
                                 : 'border-slate-100 hover:border-amber-200'
@@ -902,7 +902,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {interviewCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -922,8 +922,8 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('newsletter')}
                         className={cn(
-                            'col-span-1 md:col-span-6 lg:col-span-1',
-                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            'col-span-1',
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('newsletter')
                                 ? 'border-indigo-500 ring-4 ring-indigo-50/50'
                                 : 'border-slate-100 hover:border-indigo-200'
@@ -954,7 +954,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {newsletterCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -1131,8 +1131,10 @@ export default function InteractiveDataView({
                         )}
                         title={t('admin.data.filter.only_flagged')}
                     >
-                        <AlertTriangle className="h-3.5 w-3.5 mr-2" />
-                        {t('admin.data.filters.flagged', 'Flagged')}
+                        <AlertTriangle className="h-3.5 w-3.5 sm:mr-2" />
+                        <span className="hidden sm:inline">
+                            {t('admin.data.filters.flagged', 'Flagged')}
+                        </span>
                     </Button>
 
                     {/* Status Filter Dropdown */}
@@ -1148,9 +1150,11 @@ export default function InteractiveDataView({
                                 )}
                             >
                                 <Sparkles className="h-3.5 w-3.5" />
-                                {statusFilter === 'all'
-                                    ? t('admin.data.table.status', 'Status')
-                                    : t(`admin.data.status.${statusFilter}`, statusFilter)}
+                                <span className="hidden sm:inline">
+                                    {statusFilter === 'all'
+                                        ? t('admin.data.table.status', 'Status')
+                                        : t(`admin.data.status.${statusFilter}`, statusFilter)}
+                                </span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
@@ -1373,7 +1377,7 @@ export default function InteractiveDataView({
                 </AlertDialogContent>
             </AlertDialog>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100">
                 <Table>
                     <TableHeader className="bg-slate-50/80">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -1384,7 +1388,7 @@ export default function InteractiveDataView({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="h-14 text-xs font-semibold text-slate-600 px-6"
+                                        className="h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6"
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -1409,7 +1413,7 @@ export default function InteractiveDataView({
                                     onClick={() => handleViewParticipant(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="px-6 py-5">
+                                        <TableCell key={cell.id} className="px-3 sm:px-6 py-5">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

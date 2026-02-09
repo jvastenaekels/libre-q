@@ -286,7 +286,7 @@ export function ParticipantDetailContent({
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
-                    <TabsList className="h-14 bg-transparent p-0 gap-6">
+                    <TabsList className="h-14 bg-transparent p-0 gap-2 sm:gap-6">
                         {['session', 'presort', 'grid', 'postsort'].map((tab) => (
                             <TabsTrigger
                                 key={tab}
@@ -300,16 +300,18 @@ export function ParticipantDetailContent({
                                     {tab === 'postsort' && (
                                         <MessageSquare className="w-3.5 h-3.5" />
                                     )}
-                                    {t(
-                                        `admin.participant.tabs.${tab}`,
-                                        tab === 'presort'
-                                            ? 'Pre-Sort'
-                                            : tab === 'grid'
-                                              ? 'Q-Sort Grid'
-                                              : tab === 'session'
-                                                ? 'Session Metadata'
-                                                : 'Post-Sort'
-                                    )}
+                                    <span className="hidden sm:inline">
+                                        {t(
+                                            `admin.participant.tabs.${tab}`,
+                                            tab === 'presort'
+                                                ? 'Pre-Sort'
+                                                : tab === 'grid'
+                                                  ? 'Q-Sort Grid'
+                                                  : tab === 'session'
+                                                    ? 'Session Metadata'
+                                                    : 'Post-Sort'
+                                        )}
+                                    </span>
                                 </div>
                             </TabsTrigger>
                         ))}
@@ -383,7 +385,10 @@ export function ParticipantDetailContent({
                             </motion.div>
                         </TabsContent>
 
-                        <TabsContent value="grid" className="h-[800px] mt-0 outline-none">
+                        <TabsContent
+                            value="grid"
+                            className="h-[60vh] sm:h-[70vh] lg:h-[800px] mt-0 outline-none"
+                        >
                             {/* Grid View fixed height for canvas scroll */}
                             <GridSort
                                 agreeCards={[]}

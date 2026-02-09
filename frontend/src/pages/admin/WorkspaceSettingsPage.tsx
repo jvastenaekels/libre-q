@@ -205,9 +205,9 @@ export default function WorkspaceSettingsPage() {
                 icon={Briefcase}
             />
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Workspace Profile */}
-                <div className="xl:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6">
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="border-b border-slate-50 pb-4">
                             <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
