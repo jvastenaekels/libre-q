@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     AUDIO_MAX_FILE_SIZE_MB: int = 10
     AUDIO_MAX_DURATION_SECONDS: int = 300  # 5 minutes
     AUDIO_ALLOWED_MIME_TYPES: list[str] = Field(
-        default=["audio/webm", "audio/mp4", "audio/mpeg"]
+        default=["audio/webm", "video/webm", "audio/mp4", "audio/mpeg"]
     )
 
     @field_validator("DATABASE_URL", mode="before")

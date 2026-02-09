@@ -185,6 +185,7 @@ class StorageService:
         """
         mapping = {
             "audio/webm": ".webm",
+            "video/webm": ".webm",
             "audio/mp4": ".m4a",
             "audio/mpeg": ".mp3",
             "audio/ogg": ".ogg",
