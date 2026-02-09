@@ -5,6 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { AlertCircle, ArrowRight, Mic } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
@@ -41,6 +51,24 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [validationError, setValidationError] = useState<string | null>(null);
+
+    // Tab state for controlled tabs
+    const [activeTabs, setActiveTabs] = useState<Record<string, 'text' | 'audio'>>({});
+
+    // Confirmation dialog state
+    const [confirmDialog, setConfirmDialog] = useState<{
+        open: boolean;
+        questionKey: string;
+        blob: Blob | null;
+        duration: number;
+        existingContent: string;
+    }>({
+        open: false,
+        questionKey: '',
+        blob: null,
+        duration: 0,
+        existingContent: '',
+    });
 
     // --- Configuration Handling ---
     const gridColumns = config?.grid_config || [];
@@ -99,11 +127,41 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             return;
         }
 
+        // Check if text exists and needs confirmation
+        let existingText = '';
+        if (questionKey.startsWith('card_')) {
+            const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
+            existingText = postsort.card_comments?.[statementId] || '';
+        } else if (questionKey === 'missing_statement') {
+            existingText = postsort.missing_statement || '';
+        }
+
+        // Show confirmation dialog if text exists (length >= 2)
+        if (existingText.length >= 2) {
+            setConfirmDialog({
+                open: true,
+                questionKey,
+                blob,
+                duration,
+                existingContent: existingText,
+            });
+            return; // Wait for confirmation
+        }
+
+        // No text exists or user confirmed, proceed with upload
+        await performAudioUpload(questionKey, blob, duration);
+    };
+
+    const performAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
         try {
             // Create File from Blob (orval expects File, not Blob)
             const file = new File([blob], `recording_${Date.now()}.webm`, {
                 type: blob.type,
             });
+
+            if (!token) {
+                throw new Error('Session token missing');
+            }
 
             const response = await uploadAudioApiAudioUploadPost({
                 file,
@@ -131,10 +189,38 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             } else if (questionKey === 'missing_statement') {
                 setPostSortResponse('missing_statement', '');
             }
+
+            toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
         } catch (error) {
             console.error('Audio upload failed:', error);
             throw error; // Let AudioRecorder handle the error display
         }
+    };
+
+    const handleConfirmReplace = async () => {
+        const { questionKey, blob, duration } = confirmDialog;
+        setConfirmDialog({
+            open: false,
+            questionKey: '',
+            blob: null,
+            duration: 0,
+            existingContent: '',
+        });
+
+        if (blob) {
+            await performAudioUpload(questionKey, blob, duration);
+        }
+    };
+
+    const handleCancelReplace = () => {
+        setConfirmDialog({
+            open: false,
+            questionKey: '',
+            blob: null,
+            duration: 0,
+            existingContent: '',
+        });
+        toast.info(t('audio.upload_cancelled', 'Recording cancelled'));
     };
 
     const handleAudioDelete = async (questionKey: string) => {
@@ -163,6 +249,35 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         const hasText = comment.length >= 2;
         const hasAudio = !!getAudioRecording(`card_${id}`);
         return hasText || hasAudio; // Valid if either text OR audio exists
+    };
+
+    // Helper to get active tab with smart default
+    const getActiveTab = (questionKey: string): 'text' | 'audio' => {
+        // If tab explicitly set, use it
+        if (activeTabs[questionKey]) {
+            return activeTabs[questionKey];
+        }
+
+        // Smart default: audio if recording exists, otherwise text
+        const hasAudio = !!getAudioRecording(questionKey);
+        return hasAudio ? 'audio' : 'text';
+    };
+
+    // Helper to check if content exists for visual indicators
+    const hasTextContent = (questionKey: string): boolean => {
+        if (questionKey.startsWith('card_')) {
+            const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
+            const text = postsort.card_comments?.[statementId] || '';
+            return text.length >= 2;
+        }
+        if (questionKey === 'missing_statement') {
+            return (postsort.missing_statement || '').length >= 2;
+        }
+        return false;
+    };
+
+    const hasAudioContent = (questionKey: string): boolean => {
+        return !!getAudioRecording(questionKey);
     };
 
     const validateStep1 = () => {
@@ -282,22 +397,55 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                 </Label>
 
                                 <Tabs
-                                    defaultValue="text"
-                                    className="w-full"
-                                    onValueChange={() =>
+                                    value={getActiveTab(`card_${card.statementId}`)}
+                                    onValueChange={(value) => {
+                                        setActiveTabs((prev) => ({
+                                            ...prev,
+                                            [`card_${card.statementId}`]: value as 'text' | 'audio',
+                                        }));
                                         setTouched((prev) => ({
                                             ...prev,
                                             [card.statementId]: true,
-                                        }))
-                                    }
+                                        }));
+                                    }}
+                                    className="w-full"
                                 >
                                     <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="text">
+                                        <TabsTrigger
+                                            value="text"
+                                            className="relative"
+                                            title={
+                                                hasTextContent(`card_${card.statementId}`)
+                                                    ? t(
+                                                          'post.content.has_text',
+                                                          'Has text response'
+                                                      )
+                                                    : undefined
+                                            }
+                                        >
                                             {t('post.response_type.text', 'Text')}
+                                            {hasTextContent(`card_${card.statementId}`) && (
+                                                <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                            )}
                                         </TabsTrigger>
-                                        <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                        <TabsTrigger
+                                            value="audio"
+                                            disabled={!isAudioEnabled}
+                                            className="relative"
+                                            title={
+                                                hasAudioContent(`card_${card.statementId}`)
+                                                    ? t(
+                                                          'post.content.has_audio',
+                                                          'Has audio response'
+                                                      )
+                                                    : undefined
+                                            }
+                                        >
                                             <Mic className="w-4 h-4 mr-1" />
                                             {t('post.response_type.audio', 'Audio')}
+                                            {hasAudioContent(`card_${card.statementId}`) && (
+                                                <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                            )}
                                         </TabsTrigger>
                                     </TabsList>
 
@@ -491,14 +639,52 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         </SafeMarkdown>
                                     </blockquote>
 
-                                    <Tabs defaultValue="text" className="w-full">
+                                    <Tabs
+                                        value={getActiveTab(`card_${id}`)}
+                                        onValueChange={(value) => {
+                                            setActiveTabs((prev) => ({
+                                                ...prev,
+                                                [`card_${id}`]: value as 'text' | 'audio',
+                                            }));
+                                        }}
+                                        className="w-full"
+                                    >
                                         <TabsList className="grid w-full grid-cols-2">
-                                            <TabsTrigger value="text">
+                                            <TabsTrigger
+                                                value="text"
+                                                className="relative"
+                                                title={
+                                                    hasTextContent(`card_${id}`)
+                                                        ? t(
+                                                              'post.content.has_text',
+                                                              'Has text response'
+                                                          )
+                                                        : undefined
+                                                }
+                                            >
                                                 {t('post.response_type.text', 'Text')}
+                                                {hasTextContent(`card_${id}`) && (
+                                                    <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                                )}
                                             </TabsTrigger>
-                                            <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                            <TabsTrigger
+                                                value="audio"
+                                                disabled={!isAudioEnabled}
+                                                className="relative"
+                                                title={
+                                                    hasAudioContent(`card_${id}`)
+                                                        ? t(
+                                                              'post.content.has_audio',
+                                                              'Has audio response'
+                                                          )
+                                                        : undefined
+                                                }
+                                            >
                                                 <Mic className="w-4 h-4 mr-1" />
                                                 {t('post.response_type.audio', 'Audio')}
+                                                {hasAudioContent(`card_${id}`) && (
+                                                    <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                                )}
                                             </TabsTrigger>
                                         </TabsList>
 
@@ -567,14 +753,46 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             )}
                         </p>
 
-                        <Tabs defaultValue="text" className="w-full">
+                        <Tabs
+                            value={getActiveTab('missing_statement')}
+                            onValueChange={(value) => {
+                                setActiveTabs((prev) => ({
+                                    ...prev,
+                                    missing_statement: value as 'text' | 'audio',
+                                }));
+                            }}
+                            className="w-full"
+                        >
                             <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="text">
+                                <TabsTrigger
+                                    value="text"
+                                    className="relative"
+                                    title={
+                                        hasTextContent('missing_statement')
+                                            ? t('post.content.has_text', 'Has text response')
+                                            : undefined
+                                    }
+                                >
                                     {t('post.response_type.text', 'Text')}
+                                    {hasTextContent('missing_statement') && (
+                                        <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                    )}
                                 </TabsTrigger>
-                                <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                <TabsTrigger
+                                    value="audio"
+                                    disabled={!isAudioEnabled}
+                                    className="relative"
+                                    title={
+                                        hasAudioContent('missing_statement')
+                                            ? t('post.content.has_audio', 'Has audio response')
+                                            : undefined
+                                    }
+                                >
                                     <Mic className="w-4 h-4 mr-1" />
                                     {t('post.response_type.audio', 'Audio')}
+                                    {hasAudioContent('missing_statement') && (
+                                        <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
+                                    )}
                                 </TabsTrigger>
                             </TabsList>
 
@@ -640,6 +858,53 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                     {t('common.next', 'Next Step')} <ArrowRight size={18} className="ml-2" />
                 </Button>
             </div>
+
+            {/* Confirmation Dialog */}
+            <AlertDialog
+                open={confirmDialog.open}
+                onOpenChange={(open) => !open && handleCancelReplace()}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {t('post.audio.replace_title', 'Replace text with audio?')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-3">
+                            <p>
+                                {t(
+                                    'post.audio.replace_description',
+                                    'You have already written a text response for this question. Recording audio will replace your text.'
+                                )}
+                            </p>
+                            <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                <p className="text-sm font-medium text-amber-900 mb-1">
+                                    {t('post.audio.existing_text', 'Your existing text:')}
+                                </p>
+                                <p className="text-sm text-amber-800 italic line-clamp-3">
+                                    "{confirmDialog.existingContent}"
+                                </p>
+                            </div>
+                            <p className="text-sm text-slate-600">
+                                {t(
+                                    'post.audio.replace_warning',
+                                    'This action cannot be undone. You can delete the audio later to write text again.'
+                                )}
+                            </p>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleCancelReplace}>
+                            {t('common.cancel', 'Cancel')}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmReplace}
+                            className="bg-indigo-600 hover:bg-indigo-700"
+                        >
+                            {t('post.audio.confirm_replace', 'Record Audio')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };
