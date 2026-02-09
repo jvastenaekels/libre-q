@@ -40,3 +40,10 @@ backend/htmlcov/
 frontend/coverage/
 .coverage
 *coverage*.txt
+
+# Temporary debug/verification files
+ci_logs.txt
+test_out*.txt
+pre_commit_output*.txt
+*_VERIFICATION*.md
+*_SUMMARY.md

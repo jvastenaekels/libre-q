@@ -1,13 +1,20 @@
-# Description
+## Summary
 
-<!-- What changes does this PR introduce? -->
+<!-- Brief description of what this PR does and why. -->
 
-# Checklist
+## Changes
 
-- [ ] Tests covering changes
-- [ ] Documentation updated (if applicable)
-- [ ] Architectural rules respected
+<!-- Bullet list of key changes. -->
 
-# Related Issue
+-
+
+## Checklist
+
+- [ ] `make ci` passes locally
+- [ ] Tests cover new/changed behavior
+- [ ] Translation keys added to all locales (en, fr, fi)
+- [ ] API client regenerated if backend schemas changed (`make generate-api`)
+
+## Related Issue
 
 <!-- Closes #123 -->

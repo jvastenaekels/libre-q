@@ -38,7 +38,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const [state, setState] = useState<RecorderState>('idle');
     const [duration, setDuration] = useState(0);
-    const [_audioBlob, setAudioBlob] = useState<Blob | null>(null);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -78,8 +77,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     // Fallback: assume 1 hour from NOW (not created_at)
                     setUrlExpiresAt(Date.now() + 3600 * 1000);
                 }
-
-                console.log('Presigned URL refreshed successfully');
             }
         } catch (error) {
             console.error('Failed to refresh presigned URL:', error);
@@ -281,8 +278,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     streamRef.current = null;
                     return; // Don't upload
                 }
-
-                setAudioBlob(blob);
 
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
@@ -521,7 +516,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             await onRecordingDeleted();
 
             // Reset state
-            setAudioBlob(null);
             if (audioUrl && !existingRecording) {
                 URL.revokeObjectURL(audioUrl);
             }
