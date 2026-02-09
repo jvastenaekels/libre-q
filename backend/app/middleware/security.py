@@ -43,7 +43,7 @@ class SecurityHeadersMiddleware:
                     (b"Referrer-Policy", b"strict-origin-when-cross-origin"),
                     (
                         b"Permissions-Policy",
-                        b"camera=(), microphone=(), geolocation=(), interest-cohort=()",
+                        b"camera=(), microphone=(self), geolocation=(), interest-cohort=()",
                     ),
                 ]
 
