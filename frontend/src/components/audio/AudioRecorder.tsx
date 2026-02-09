@@ -51,6 +51,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
+    const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
 
     // Function to refresh presigned URL (must be defined before useEffect)
     const refreshPresignedUrl = useCallback(async () => {
@@ -287,8 +288,46 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         const audio = new Audio(audioUrl);
         audioPlayerRef.current = audio;
 
+        // Set playback speed
+        audio.playbackRate = playbackSpeed;
+
+        // Setup Web Audio API for playback waveform
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audio);
+
+        // Connect: source -> analyser -> destination (speakers)
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        analyser.fftSize = 32;
+
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+
+        // Animate waveform during playback
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const updateWaveform = () => {
+            if (analyserRef.current && state === 'playing') {
+                analyserRef.current.getByteFrequencyData(dataArray);
+                setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                animationFrameRef.current = requestAnimationFrame(updateWaveform);
+            }
+        };
+        updateWaveform();
+
         audio.onended = () => {
             setState('stopped');
+            setAudioLevels([0, 0, 0, 0, 0]);
+
+            // Cleanup Web Audio API
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+                audioContextRef.current = null;
+            }
         };
 
         audio.play();
@@ -299,6 +338,17 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         if (audioPlayerRef.current) {
             audioPlayerRef.current.pause();
             setState('stopped');
+            setAudioLevels([0, 0, 0, 0, 0]);
+
+            // Stop waveform animation
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+                audioContextRef.current = null;
+            }
         }
     };
 
@@ -369,13 +419,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     </span>
                 </div>
 
-                {/* Waveform Visualization during recording */}
-                {state === 'recording' ? (
+                {/* Waveform Visualization during recording and playback */}
+                {state === 'recording' || state === 'playing' ? (
                     <div className="flex items-center justify-center gap-1 h-12 bg-slate-100 rounded-md">
                         {audioLevels.map((level, i) => (
                             <div
                                 key={i}
-                                className="w-1.5 bg-red-500 rounded-full transition-all duration-100"
+                                className={`w-1.5 rounded-full transition-all duration-100 ${
+                                    state === 'recording' ? 'bg-red-500' : 'bg-blue-500'
+                                }`}
                                 style={{
                                     height: `${Math.max(4, (level / 255) * 48)}px`,
                                 }}
@@ -431,6 +483,31 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                                 </>
                             )}
                         </Button>
+
+                        {/* Playback Speed Control */}
+                        <div className="flex items-center gap-1 border border-slate-300 rounded-md bg-white">
+                            {[1.0, 1.5, 2.0].map((speed) => (
+                                <Button
+                                    key={speed}
+                                    onClick={() => {
+                                        setPlaybackSpeed(speed);
+                                        // Update speed on current player if playing
+                                        if (audioPlayerRef.current && state === 'playing') {
+                                            audioPlayerRef.current.playbackRate = speed;
+                                        }
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`px-2 py-1 h-auto text-xs font-medium ${
+                                        playbackSpeed === speed
+                                            ? 'bg-slate-100 text-slate-900'
+                                            : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                >
+                                    {speed}x
+                                </Button>
+                            ))}
+                        </div>
 
                         <Button
                             onClick={deleteRecording}
