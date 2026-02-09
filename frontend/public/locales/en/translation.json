@@ -1203,7 +1203,7 @@
                     "desc": "Add custom questions to the post-sort survey."
                 },
                 "missing": {
-                    "title": "Were there any important perspectives, issues, or statements that you felt were missing from this set?",
+                    "title": "Ask about missing statements",
                     "desc": "If yes, please describe them briefly.",
                     "prompt_label": "Prompt text",
                     "prompt_placeholder": "Please feel free to suggest and explain."
@@ -1219,6 +1219,16 @@
                     "results": "Offer to subscribe to a mailing list about study outcomes",
                     "interview_warning": "Note: agreeing to be contacted lifts anonymity for the researcher.",
                     "results_hint": "Email solely for results, anonymity preserved."
+                },
+                "audio": {
+                    "title": "Audio Recording",
+                    "desc": "Allow participants to record audio responses instead of text.",
+                    "max_duration": "Maximum Duration",
+                    "seconds": "seconds",
+                    "max_duration_help": "Maximum recording time per question (30–600 seconds).",
+                    "storage_quota": "Storage Quota",
+                    "storage_quota_help": "Maximum total audio storage per study (in MB).",
+                    "participant_choice_info": "Participants can choose to respond with either text or audio for each question, but not both."
                 }
             },
             "interface": {

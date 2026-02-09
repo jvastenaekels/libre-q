@@ -1194,7 +1194,7 @@
                     "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
                 },
                 "missing": {
-                    "title": "Oliko mielestäsi tärkeitä näkökulmia, asioita tai väitteitä, jotka puuttuivat tästä joukosta?",
+                    "title": "Kysy puuttuvista väittämistä",
                     "desc": "Jos kyllä, kuvaile ne lyhyesti.",
                     "prompt_label": "Kehotteen teksti",
                     "prompt_placeholder": "Kerro tähän vapaasti, mitä jäit kaipaamaan ja miksi."
@@ -1210,6 +1210,16 @@
                     "results": "Tarjoa mahdollisuutta liittyä postituslistalle tutkimuksen tuloksista",
                     "interview_warning": "Huom: Suostumus yhteydenottoon poistaa anonymiteetin tutkijalta.",
                     "results_hint": "Sähköpostia käytetään vain tulosten lähettämiseen, anonymiteetti säilyy."
+                },
+                "audio": {
+                    "title": "Äänitallenne",
+                    "desc": "Salli osallistujien tallentaa äänivastayksia tekstin sijaan.",
+                    "max_duration": "Enimmäiskesto",
+                    "seconds": "sekuntia",
+                    "max_duration_help": "Tallennuksen enimmäiskesto per kysymys (30–600 sekuntia).",
+                    "storage_quota": "Tallennustilakiintiö",
+                    "storage_quota_help": "Enimmäisäänisäilytystila per tutkimus (Mt).",
+                    "participant_choice_info": "Osallistujat voivat valita vastaavansa tekstillä tai äänellä kuhunkin kysymykseen, mutta eivät molemmilla."
                 }
             },
             "interface": {

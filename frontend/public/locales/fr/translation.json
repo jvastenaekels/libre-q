@@ -1232,7 +1232,7 @@
                     "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
                 },
                 "missing": {
-                    "title": "Y a-t-il des perspectives, enjeux ou énoncés importants qui vous ont semblé faire défaut dans cet ensemble ?",
+                    "title": "Demander ce qu'il manquerait parmi les énoncés",
                     "desc": "Si oui, veuillez les décrire brièvement.",
                     "prompt_label": "Texte de l'invite",
                     "prompt_placeholder": "N'hésitez pas à nous en faire part et à expliquer pourquoi."
@@ -1248,6 +1248,16 @@
                     "results": "Proposer l'inscription à une liste de diffusion concernant les suites de l'étude",
                     "interview_warning": "Note : L'accord pour un recontact lève l'anonymat vis-à-vis du chercheur.",
                     "results_hint": "L'e-mail ne sera utilisé que pour l'envoi des résultats, préservant l'anonymat."
+                },
+                "audio": {
+                    "title": "Enregistrement audio",
+                    "desc": "Permettre aux participants d'enregistrer des réponses audio au lieu du texte.",
+                    "max_duration": "Durée maximale",
+                    "seconds": "secondes",
+                    "max_duration_help": "Durée maximale d'enregistrement par question (30–600 secondes).",
+                    "storage_quota": "Quota de stockage",
+                    "storage_quota_help": "Espace de stockage audio maximal par étude (en Mo).",
+                    "participant_choice_info": "Les participants peuvent choisir de répondre par texte ou par audio pour chaque question, mais pas les deux."
                 }
             },
             "interface": {

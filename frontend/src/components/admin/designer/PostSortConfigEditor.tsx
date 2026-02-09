@@ -531,7 +531,7 @@ const PostSortConfigEditor = ({
                                             }
                                         });
                                     }}
-                                    disabled={readOnly || structureLocked}
+                                    disabled={readOnly}
                                 />
                             </div>
                         </CardHeader>
