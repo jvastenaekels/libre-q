@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, Square, Play, Pause, Trash2, Loader2, RefreshCw } from 'lucide-react';
+import { AudioLines, Square, Play, Pause, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
@@ -629,26 +629,18 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     return (
         <div>
-            {/* Idle: single clickable row */}
+            {/* Idle: subtle inline link */}
             {state === 'idle' && (
                 <button
                     type="button"
                     onClick={startRecording}
                     disabled={disabled}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 hover:bg-white hover:border-slate-400 hover:shadow-sm transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-indigo-600 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <div className="p-2 rounded-lg bg-white text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-colors shadow-sm border border-slate-100 group-hover:border-indigo-100">
-                        <Mic className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors flex-1 text-left">
-                        {t('audio.start_recording', 'Start recording')}
+                    <AudioLines className="w-4 h-4" />
+                    <span className="group-hover:underline underline-offset-2">
+                        {t('audio.record_prompt', 'Record audio response')}
                     </span>
-                    <span className="text-xs text-slate-400 font-mono tabular-nums">
-                        {formatTime(maxDurationSeconds)}
-                    </span>
-                    <kbd className="hidden sm:inline-flex text-[10px] text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono">
-                        Space
-                    </kbd>
                 </button>
             )}
 
@@ -658,6 +650,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     <button
                         type="button"
                         onClick={stopRecording}
+                        aria-label={t('audio.stop', 'Stop')}
                         className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shrink-0 shadow-sm"
                     >
                         <Square className="w-3.5 h-3.5" />
@@ -703,6 +696,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         <button
                             type="button"
                             onClick={state === 'playing' ? pausePlayback : playRecording}
+                            aria-label={
+                                state === 'playing'
+                                    ? t('audio.pause', 'Pause')
+                                    : t('audio.play', 'Play')
+                            }
                             className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors shrink-0"
                         >
                             {state === 'playing' ? (
@@ -774,6 +772,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         <button
                             type="button"
                             onClick={deleteRecording}
+                            aria-label={t('audio.delete', 'Delete')}
                             className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0"
                         >
                             <Trash2 className="w-3.5 h-3.5" />

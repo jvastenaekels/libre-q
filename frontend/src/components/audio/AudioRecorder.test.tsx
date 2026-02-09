@@ -148,16 +148,16 @@ describe('AudioRecorder', () => {
 
     // ── Helpers ──────────────────────────────────────────────────────
 
-    /** Click "Start Recording" and wait for the recording state. */
+    /** Click "Record audio response" and wait for the recording state. */
     async function startRecordingFlow(
         props: Parameters<typeof AudioRecorder>[0] = defaultProps as Parameters<
             typeof AudioRecorder
         >[0]
     ) {
         const result = render(<AudioRecorder {...props} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
         return result;
     }
@@ -182,24 +182,12 @@ describe('AudioRecorder', () => {
 
     it('renders with idle state initially', () => {
         render(<AudioRecorder {...defaultProps} />);
-        expect(screen.getByText('Ready to record')).toBeInTheDocument();
-        expect(screen.getByText('Start Recording')).toBeInTheDocument();
-        expect(screen.getByText('0:00 / 3:00')).toBeInTheDocument();
-    });
-
-    it('shows space shortcut hint in idle state', () => {
-        render(<AudioRecorder {...defaultProps} />);
-        expect(screen.getByText('or press Space')).toBeInTheDocument();
-    });
-
-    it('formats time correctly', () => {
-        render(<AudioRecorder {...defaultProps} maxDurationSeconds={125} />);
-        expect(screen.getByText('0:00 / 2:05')).toBeInTheDocument();
+        expect(screen.getByText('Record audio response')).toBeInTheDocument();
     });
 
     it('disables start button when disabled prop is true', () => {
         render(<AudioRecorder {...defaultProps} disabled={true} />);
-        const btn = screen.getByText('Start Recording').closest('button');
+        const btn = screen.getByText('Record audio response').closest('button');
         expect(btn).toBeDisabled();
     });
 
@@ -210,14 +198,14 @@ describe('AudioRecorder', () => {
                 existingRecording={{ ...existingRecordingFixture, file_size_bytes: 2048 }}
             />
         );
-        expect(screen.getByText(/File size.*2\.0 KB/i)).toBeInTheDocument();
+        expect(screen.getByText(/2\.0 KB/)).toBeInTheDocument();
     });
 
     // ── RECORDING FLOW ──────────────────────────────────────────────
 
     it('requests microphone permission when recording starts', async () => {
         render(<AudioRecorder {...defaultProps} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
             expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true });
         });
@@ -225,8 +213,8 @@ describe('AudioRecorder', () => {
 
     it('transitions to recording state after starting', async () => {
         await startRecordingFlow();
-        expect(screen.getByText('Recording...')).toBeInTheDocument();
-        expect(screen.getByText('Stop')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Stop' })).toBeInTheDocument();
         expect(capturedMediaRecorder?.start).toHaveBeenCalled();
     });
 
@@ -236,10 +224,10 @@ describe('AudioRecorder', () => {
 
         // Click start and flush async getUserMedia promise
         await act(async () => {
-            fireEvent.click(screen.getByText('Start Recording'));
+            fireEvent.click(screen.getByText('Record audio response'));
             await vi.advanceTimersByTimeAsync(0);
         });
-        expect(screen.getByText('Recording...')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
 
         await act(async () => {
             await vi.advanceTimersByTimeAsync(5000);
@@ -252,10 +240,10 @@ describe('AudioRecorder', () => {
         render(<AudioRecorder {...defaultProps} maxDurationSeconds={10} />);
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Start Recording'));
+            fireEvent.click(screen.getByText('Record audio response'));
             await vi.advanceTimersByTimeAsync(0);
         });
-        expect(screen.getByText('Recording...')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
 
         await act(async () => {
             await vi.advanceTimersByTimeAsync(10000);
@@ -267,12 +255,12 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockResolvedValue(undefined);
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
@@ -283,11 +271,11 @@ describe('AudioRecorder', () => {
     it('transitions to stopped state after recording completes', async () => {
         await startRecordingFlow();
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Recorded')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
         });
     });
 
@@ -295,7 +283,7 @@ describe('AudioRecorder', () => {
 
     it('prefers WebM codec when supported', async () => {
         render(<AudioRecorder {...defaultProps} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
 
         await waitFor(() => {
             expect(capturedMediaRecorder).not.toBeNull();
@@ -309,7 +297,7 @@ describe('AudioRecorder', () => {
         ).isTypeSupported = vi.fn(() => false);
 
         render(<AudioRecorder {...defaultProps} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
 
         await waitFor(() => {
             expect(capturedMediaRecorder).not.toBeNull();
@@ -322,33 +310,32 @@ describe('AudioRecorder', () => {
     it('displays play and delete buttons when recording exists', () => {
         render(<AudioRecorder {...defaultProps} existingRecording={existingRecordingFixture} />);
 
-        expect(screen.getByText('Recorded')).toBeInTheDocument();
-        expect(screen.getByText('Play')).toBeInTheDocument();
-        expect(screen.getByText('Delete')).toBeInTheDocument();
-        expect(screen.getByText('0:45 / 3:00')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+        expect(screen.getByText('0:45')).toBeInTheDocument();
     });
 
     it('plays audio when play button is clicked', async () => {
         render(<AudioRecorder {...defaultProps} existingRecording={existingRecordingFixture} />);
 
-        fireEvent.click(screen.getByText('Play'));
+        fireEvent.click(screen.getByRole('button', { name: 'Play' }));
 
         await waitFor(() => {
-            expect(screen.getByText('Pause')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
         });
     });
 
     it('pauses audio when pause button is clicked', async () => {
         render(<AudioRecorder {...defaultProps} existingRecording={existingRecordingFixture} />);
 
-        fireEvent.click(screen.getByText('Play'));
+        fireEvent.click(screen.getByRole('button', { name: 'Play' }));
         await waitFor(() => {
-            expect(screen.getByText('Pause')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Pause'));
+        fireEvent.click(screen.getByRole('button', { name: 'Pause' }));
         await waitFor(() => {
-            expect(screen.getByText('Play')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
         });
     });
 
@@ -372,7 +359,7 @@ describe('AudioRecorder', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
         await waitFor(() => {
             expect(onDelete).toHaveBeenCalled();
         });
@@ -388,12 +375,10 @@ describe('AudioRecorder', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
         await waitFor(() => {
-            expect(screen.getByText('Ready to record')).toBeInTheDocument();
-            expect(screen.getByText('Start Recording')).toBeInTheDocument();
-            expect(screen.getByText('0:00 / 3:00')).toBeInTheDocument();
+            expect(screen.getByText('Record audio response')).toBeInTheDocument();
         });
     });
 
@@ -407,12 +392,12 @@ describe('AudioRecorder', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
         await waitFor(() => {
             // State should be restored
-            expect(screen.getByText('Recorded')).toBeInTheDocument();
-            expect(screen.getByText('0:45 / 3:00')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+            expect(screen.getByText('0:45')).toBeInTheDocument();
         });
         expect(mockToast.error).toHaveBeenCalledWith('Delete failed');
     });
@@ -434,7 +419,7 @@ describe('AudioRecorder', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
         // Use selector to target status label (not the button which also contains "Uploading...")
         await waitFor(() => {
@@ -451,17 +436,17 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockRejectedValue(new Error('Network error'));
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         // Should stay in stopped (not revert to idle)
         await waitFor(() => {
-            expect(screen.getByText('Recorded')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
         });
     });
 
@@ -469,16 +454,16 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockRejectedValue(new Error('Network error'));
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
     });
 
@@ -490,18 +475,18 @@ describe('AudioRecorder', () => {
 
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry Upload'));
+        fireEvent.click(screen.getByText('Retry upload'));
 
         await waitFor(() => {
             expect(onComplete).toHaveBeenCalledTimes(2);
@@ -522,18 +507,18 @@ describe('AudioRecorder', () => {
 
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry Upload'));
+        fireEvent.click(screen.getByText('Retry upload'));
 
         // Use selector to target status label (not the button which also contains "Uploading...")
         await waitFor(() => {
@@ -551,21 +536,21 @@ describe('AudioRecorder', () => {
 
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry Upload'));
+        fireEvent.click(screen.getByText('Retry upload'));
 
         await waitFor(() => {
-            expect(screen.queryByText('Retry Upload')).not.toBeInTheDocument();
+            expect(screen.queryByText('Retry upload')).not.toBeInTheDocument();
         });
     });
 
@@ -577,23 +562,23 @@ describe('AudioRecorder', () => {
 
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry Upload'));
+        fireEvent.click(screen.getByText('Retry upload'));
 
         // After second failure, retry button should reappear
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
-            expect(screen.getByText('Recorded')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
         });
     });
 
@@ -609,23 +594,23 @@ describe('AudioRecorder', () => {
             />
         );
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
         // Delete should clear everything
-        fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
         await waitFor(() => {
-            expect(screen.getByText('Ready to record')).toBeInTheDocument();
-            expect(screen.queryByText('Retry Upload')).not.toBeInTheDocument();
+            expect(screen.getByText('Record audio response')).toBeInTheDocument();
+            expect(screen.queryByText('Retry upload')).not.toBeInTheDocument();
         });
     });
 
@@ -635,12 +620,12 @@ describe('AudioRecorder', () => {
         const onError = vi.fn();
         render(<AudioRecorder {...defaultProps} onError={onError} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
 
         // Trigger onstop WITHOUT ondataavailable → empty blob
         if (capturedMediaRecorder?.onstop) {
@@ -659,12 +644,12 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockResolvedValue(undefined);
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete('x'); // 1-byte blob
 
         await waitFor(() => {
@@ -680,7 +665,7 @@ describe('AudioRecorder', () => {
         );
 
         render(<AudioRecorder {...defaultProps} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
 
         await waitFor(() => {
             expect(mockToast.error).toHaveBeenCalledWith(
@@ -696,7 +681,7 @@ describe('AudioRecorder', () => {
         );
 
         render(<AudioRecorder {...defaultProps} onError={onError} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
 
         await waitFor(() => {
             expect(onError).toHaveBeenCalledWith('mic_denied');
@@ -715,7 +700,7 @@ describe('AudioRecorder', () => {
         });
 
         render(<AudioRecorder {...defaultProps} onError={onError} />);
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
 
         await waitFor(() => {
             expect(onError).toHaveBeenCalledWith('unsupported');
@@ -729,7 +714,7 @@ describe('AudioRecorder', () => {
         const onError = vi.fn();
         render(<AudioRecorder {...defaultProps} onError={onError} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
             expect(capturedMediaRecorder).not.toBeNull();
         });
@@ -750,7 +735,7 @@ describe('AudioRecorder', () => {
         const onError = vi.fn();
         render(<AudioRecorder {...defaultProps} onError={onError} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
             expect(capturedMediaRecorder).not.toBeNull();
         });
@@ -767,7 +752,7 @@ describe('AudioRecorder', () => {
     it('shows generic error for unknown MediaRecorder errors', async () => {
         render(<AudioRecorder {...defaultProps} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
             expect(capturedMediaRecorder).not.toBeNull();
         });
@@ -788,19 +773,19 @@ describe('AudioRecorder', () => {
         render(<AudioRecorder {...defaultProps} maxDurationSeconds={20} />);
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Start Recording'));
+            fireEvent.click(screen.getByText('Record audio response'));
             await vi.advanceTimersByTimeAsync(0);
         });
-        expect(screen.getByText('Recording...')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
 
         // Advance to 6s elapsed → 14s remaining ≤ 15
         await act(async () => {
             await vi.advanceTimersByTimeAsync(6000);
         });
 
-        const statusLabel = screen.getByText('Recording...');
-        expect(statusLabel.className).toContain('text-amber-600');
-        expect(statusLabel.className).toContain('animate-pulse');
+        const timeDisplay = screen.getByText('0:06 / 0:20');
+        expect(timeDisplay.className).toContain('text-amber-600');
+        expect(timeDisplay.className).toContain('animate-pulse');
     });
 
     it('timer counter turns amber+bold when ≤15s remaining', async () => {
@@ -808,10 +793,10 @@ describe('AudioRecorder', () => {
         render(<AudioRecorder {...defaultProps} maxDurationSeconds={20} />);
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Start Recording'));
+            fireEvent.click(screen.getByText('Record audio response'));
             await vi.advanceTimersByTimeAsync(0);
         });
-        expect(screen.getByText('Recording...')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
 
         await act(async () => {
             await vi.advanceTimersByTimeAsync(6000);
@@ -827,9 +812,9 @@ describe('AudioRecorder', () => {
     it('waveform has accessible role and label during recording', async () => {
         render(<AudioRecorder {...defaultProps} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
         const waveform = screen.getByRole('img');
@@ -886,12 +871,12 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockRejectedValue(new Error('Network error'));
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         await waitFor(() => {
@@ -904,17 +889,17 @@ describe('AudioRecorder', () => {
         const onComplete = vi.fn().mockRejectedValue(apiError);
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Stop'));
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
         await simulateRecordingComplete();
 
         // Wait for failure to be processed
         await waitFor(() => {
-            expect(screen.getByText('Retry Upload')).toBeInTheDocument();
+            expect(screen.getByText('Retry upload')).toBeInTheDocument();
         });
 
         // Should NOT have shown generic "Upload failed" toast
@@ -926,9 +911,9 @@ describe('AudioRecorder', () => {
     it('cleans up media stream on unmount', async () => {
         const { unmount } = render(<AudioRecorder {...defaultProps} />);
 
-        fireEvent.click(screen.getByText('Start Recording'));
+        fireEvent.click(screen.getByText('Record audio response'));
         await waitFor(() => {
-            expect(screen.getByText('Recording...')).toBeInTheDocument();
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
         });
 
         unmount();

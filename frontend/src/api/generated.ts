@@ -6420,7 +6420,6 @@ export const uploadAudioApiAudioUploadPost = (
     return customInstance<AudioUploadResponse>({
         url: `/api/audio/upload`,
         method: 'POST',
-        headers: { 'Content-Type': 'multipart/form-data' },
         data: formData,
         signal,
     });

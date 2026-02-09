@@ -38,7 +38,7 @@ class SecurityHeadersMiddleware:
                     (b"X-XSS-Protection", b"1; mode=block"),
                     (
                         b"Content-Security-Policy",
-                        b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https: https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none'; upgrade-insecure-requests;",
+                        b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https: https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self' blob:; frame-ancestors 'none'; upgrade-insecure-requests;",
                     ),
                     (b"Referrer-Policy", b"strict-origin-when-cross-origin"),
                     (

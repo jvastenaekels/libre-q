@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowRight, Info, Mic } from 'lucide-react';
+import { AlertCircle, ArrowRight, Info } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
@@ -402,38 +402,25 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     />
 
                                     {showAudioSection(`card_${card.statementId}`) && (
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2">
-                                                <Mic className="w-4 h-4 text-slate-500" />
-                                                <span className="text-sm font-medium text-slate-600">
-                                                    {t(
-                                                        'post.audio.section_label',
-                                                        'Audio response (optional)'
-                                                    )}
-                                                </span>
-                                            </div>
-                                            <AudioRecorder
-                                                questionKey={`card_${card.statementId}`}
-                                                maxDurationSeconds={maxDurationSeconds}
-                                                onRecordingComplete={async (blob, duration) => {
-                                                    await handleAudioUpload(
-                                                        `card_${card.statementId}`,
-                                                        blob,
-                                                        duration
-                                                    );
-                                                }}
-                                                onRecordingDeleted={async () => {
-                                                    await handleAudioDelete(
-                                                        `card_${card.statementId}`
-                                                    );
-                                                }}
-                                                existingRecording={getAudioRecording(
-                                                    `card_${card.statementId}`
-                                                )}
-                                                sessionToken={token || undefined}
-                                                onError={handleAudioError}
-                                            />
-                                        </div>
+                                        <AudioRecorder
+                                            questionKey={`card_${card.statementId}`}
+                                            maxDurationSeconds={maxDurationSeconds}
+                                            onRecordingComplete={async (blob, duration) => {
+                                                await handleAudioUpload(
+                                                    `card_${card.statementId}`,
+                                                    blob,
+                                                    duration
+                                                );
+                                            }}
+                                            onRecordingDeleted={async () => {
+                                                await handleAudioDelete(`card_${card.statementId}`);
+                                            }}
+                                            existingRecording={getAudioRecording(
+                                                `card_${card.statementId}`
+                                            )}
+                                            sessionToken={token || undefined}
+                                            onError={handleAudioError}
+                                        />
                                     )}
                                 </div>
 
@@ -580,36 +567,23 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         />
 
                                         {showAudioSection(`card_${id}`) && (
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Mic className="w-4 h-4 text-slate-500" />
-                                                    <span className="text-sm font-medium text-slate-600">
-                                                        {t(
-                                                            'post.audio.section_label',
-                                                            'Audio response (optional)'
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <AudioRecorder
-                                                    questionKey={`card_${id}`}
-                                                    maxDurationSeconds={maxDurationSeconds}
-                                                    onRecordingComplete={async (blob, duration) => {
-                                                        await handleAudioUpload(
-                                                            `card_${id}`,
-                                                            blob,
-                                                            duration
-                                                        );
-                                                    }}
-                                                    onRecordingDeleted={async () => {
-                                                        await handleAudioDelete(`card_${id}`);
-                                                    }}
-                                                    existingRecording={getAudioRecording(
-                                                        `card_${id}`
-                                                    )}
-                                                    sessionToken={token || undefined}
-                                                    onError={handleAudioError}
-                                                />
-                                            </div>
+                                            <AudioRecorder
+                                                questionKey={`card_${id}`}
+                                                maxDurationSeconds={maxDurationSeconds}
+                                                onRecordingComplete={async (blob, duration) => {
+                                                    await handleAudioUpload(
+                                                        `card_${id}`,
+                                                        blob,
+                                                        duration
+                                                    );
+                                                }}
+                                                onRecordingDeleted={async () => {
+                                                    await handleAudioDelete(`card_${id}`);
+                                                }}
+                                                existingRecording={getAudioRecording(`card_${id}`)}
+                                                sessionToken={token || undefined}
+                                                onError={handleAudioError}
+                                            />
                                         )}
                                     </div>
                                 </div>
@@ -653,34 +627,23 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             />
 
                             {showAudioSection('missing_statement') && (
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <Mic className="w-4 h-4 text-slate-500" />
-                                        <span className="text-sm font-medium text-slate-600">
-                                            {t(
-                                                'post.audio.section_label',
-                                                'Audio response (optional)'
-                                            )}
-                                        </span>
-                                    </div>
-                                    <AudioRecorder
-                                        questionKey="missing_statement"
-                                        maxDurationSeconds={maxDurationSeconds}
-                                        onRecordingComplete={async (blob, duration) => {
-                                            await handleAudioUpload(
-                                                'missing_statement',
-                                                blob,
-                                                duration
-                                            );
-                                        }}
-                                        onRecordingDeleted={async () => {
-                                            await handleAudioDelete('missing_statement');
-                                        }}
-                                        existingRecording={getAudioRecording('missing_statement')}
-                                        sessionToken={token || undefined}
-                                        onError={handleAudioError}
-                                    />
-                                </div>
+                                <AudioRecorder
+                                    questionKey="missing_statement"
+                                    maxDurationSeconds={maxDurationSeconds}
+                                    onRecordingComplete={async (blob, duration) => {
+                                        await handleAudioUpload(
+                                            'missing_statement',
+                                            blob,
+                                            duration
+                                        );
+                                    }}
+                                    onRecordingDeleted={async () => {
+                                        await handleAudioDelete('missing_statement');
+                                    }}
+                                    existingRecording={getAudioRecording('missing_statement')}
+                                    sessionToken={token || undefined}
+                                    onError={handleAudioError}
+                                />
                             )}
                         </div>
                     </div>
