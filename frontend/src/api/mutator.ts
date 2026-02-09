@@ -56,19 +56,16 @@ export const customInstance = async <T>({
     }
 
     try {
+        const isFormData = data instanceof URLSearchParams;
         const response = await fetch(fullUrl, {
             method,
             headers: {
-                'Content-Type': 'application/json',
+                ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
                 ...(headers as Record<string, string>),
             },
-            body: data
-                ? data instanceof URLSearchParams
-                    ? data
-                    : JSON.stringify(data)
-                : undefined,
+            body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
             signal: controller.signal,
         });
 
