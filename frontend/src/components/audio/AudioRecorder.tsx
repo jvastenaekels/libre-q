@@ -42,6 +42,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const analyserRef = useRef<AnalyserNode | null>(null);
+    const animationFrameRef = useRef<number | null>(null);
+
+    const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
 
     // Initialize with existing recording
     useEffect(() => {
@@ -56,6 +61,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     useEffect(() => {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
+            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+            }
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach((track) => {
                     track.stop();
@@ -81,6 +90,27 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             const mediaRecorder = new MediaRecorder(stream, { mimeType });
             mediaRecorderRef.current = mediaRecorder;
             audioChunksRef.current = [];
+
+            // Setup Web Audio API for waveform visualization
+            const audioContext = new AudioContext();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            analyser.fftSize = 32;
+
+            audioContextRef.current = audioContext;
+            analyserRef.current = analyser;
+
+            // Animate waveform
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const updateWaveform = () => {
+                if (analyserRef.current) {
+                    analyserRef.current.getByteFrequencyData(dataArray);
+                    setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    animationFrameRef.current = requestAnimationFrame(updateWaveform);
+                }
+            };
+            updateWaveform();
 
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -147,6 +177,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 clearInterval(timerRef.current);
                 timerRef.current = null;
             }
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+                audioContextRef.current = null;
+            }
+            setAudioLevels([0, 0, 0, 0, 0]);
         }
     };
 
@@ -173,6 +212,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const deleteRecording = async () => {
         if (timerRef.current) clearInterval(timerRef.current);
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = null;
+        }
+        if (audioContextRef.current) {
+            audioContextRef.current.close();
+            audioContextRef.current = null;
+        }
 
         setState('uploading');
 
@@ -186,6 +233,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
             setAudioUrl(null);
             setDuration(0);
+            setAudioLevels([0, 0, 0, 0, 0]);
             setState('idle');
 
             toast.success(t('audio.deleted', 'Audio deleted'));
@@ -207,19 +255,44 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             {/* Timer/Progress */}
             <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-slate-700">
-                        {state === 'recording' && t('audio.recording', 'Recording...')}
-                        {state === 'stopped' && t('audio.recorded', 'Recorded')}
-                        {state === 'playing' && t('audio.playing', 'Playing...')}
-                        {state === 'uploading' && t('audio.uploading', 'Uploading...')}
-                        {state === 'idle' && t('audio.ready', 'Ready to record')}
-                    </span>
+                    <div className="flex items-center gap-2">
+                        {state === 'recording' && (
+                            <span className="relative flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                            </span>
+                        )}
+                        <span
+                            className={`text-sm font-medium ${state === 'recording' ? 'text-red-600' : 'text-slate-700'}`}
+                        >
+                            {state === 'recording' && t('audio.recording', 'Recording...')}
+                            {state === 'stopped' && t('audio.recorded', 'Recorded')}
+                            {state === 'playing' && t('audio.playing', 'Playing...')}
+                            {state === 'uploading' && t('audio.uploading', 'Uploading...')}
+                            {state === 'idle' && t('audio.ready', 'Ready to record')}
+                        </span>
+                    </div>
                     <span className="text-sm font-mono text-slate-600">
                         {formatTime(duration)} / {formatTime(maxDurationSeconds)}
                     </span>
                 </div>
 
-                <Progress value={(duration / maxDurationSeconds) * 100} className="h-2" />
+                {/* Waveform Visualization during recording */}
+                {state === 'recording' ? (
+                    <div className="flex items-center justify-center gap-1 h-12 bg-slate-100 rounded-md">
+                        {audioLevels.map((level, i) => (
+                            <div
+                                key={i}
+                                className="w-1.5 bg-red-500 rounded-full transition-all duration-100"
+                                style={{
+                                    height: `${Math.max(4, (level / 255) * 48)}px`,
+                                }}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <Progress value={(duration / maxDurationSeconds) * 100} className="h-2" />
+                )}
             </div>
 
             {/* Controls */}

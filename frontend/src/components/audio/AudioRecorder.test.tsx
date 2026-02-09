@@ -29,6 +29,33 @@ describe('AudioRecorder', () => {
     let mockAudio: HTMLAudioElement;
 
     beforeEach(() => {
+        // Mock requestAnimationFrame to not call callback (prevents infinite loop)
+        let frameId = 0;
+        global.requestAnimationFrame = vi.fn(() => ++frameId);
+        global.cancelAnimationFrame = vi.fn();
+
+        // Mock AudioContext and AnalyserNode
+        const mockAnalyser = {
+            fftSize: 0,
+            frequencyBinCount: 16,
+            getByteFrequencyData: vi.fn((array: Uint8Array) => {
+                // Fill with mock data (don't loop)
+                for (let i = 0; i < Math.min(5, array.length); i++) {
+                    array[i] = Math.floor(Math.random() * 255);
+                }
+            }),
+        } as unknown as AnalyserNode;
+
+        const mockSource = {
+            connect: vi.fn(),
+        } as unknown as MediaStreamAudioSourceNode;
+
+        global.AudioContext = class {
+            createAnalyser = vi.fn(() => mockAnalyser);
+            createMediaStreamSource = vi.fn(() => mockSource);
+            close = vi.fn().mockResolvedValue(undefined);
+        } as unknown as typeof AudioContext;
+
         // Mock MediaStream
         mockMediaStream = {
             getTracks: vi.fn(() => [
@@ -74,7 +101,9 @@ describe('AudioRecorder', () => {
             pause: vi.fn(),
             onended: null,
         } as unknown as HTMLAudioElement;
-        global.Audio = vi.fn().mockImplementation(() => mockAudio);
+        global.Audio = vi.fn(function (this: HTMLAudioElement) {
+            return mockAudio;
+        }) as unknown as typeof Audio;
 
         // Mock URL.createObjectURL and revokeObjectURL
         global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
