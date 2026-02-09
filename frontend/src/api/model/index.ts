@@ -8,6 +8,7 @@
 export * from './audioRecordingRead';
 export * from './audioRecordingReadDurationSeconds';
 export * from './audioRecordingReadPresignedUrl';
+export * from './audioRecordingReadUrlExpiresAt';
 export * from './audioUploadResponse';
 export * from './bodyLoginForAccessTokenApiTokenPost';
 export * from './bodyLoginForAccessTokenApiTokenPostClientId';

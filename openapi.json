@@ -3204,6 +3204,18 @@
               }
             ],
             "title": "Presigned Url"
+          },
+          "url_expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url Expires At"
           }
         },
         "type": "object",
@@ -3671,6 +3683,14 @@
             },
             "type": "array",
             "title": "Qsort Entries"
+          },
+          "audio_recordings": {
+            "items": {
+              "$ref": "#/components/schemas/AudioRecordingRead"
+            },
+            "type": "array",
+            "title": "Audio Recordings",
+            "default": []
           }
         },
         "type": "object",

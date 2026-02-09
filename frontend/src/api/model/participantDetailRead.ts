@@ -12,6 +12,7 @@ import type { ParticipantDetailReadRecruitmentToken } from './participantDetailR
 import type { ParticipantDetailReadPresortAnswers } from './participantDetailReadPresortAnswers';
 import type { ParticipantDetailReadPostsortAnswers } from './participantDetailReadPostsortAnswers';
 import type { QSortEntryRead } from './qSortEntryRead';
+import type { AudioRecordingRead } from './audioRecordingRead';
 
 /**
  * Schema for detailed participant view including responses.
@@ -32,4 +33,5 @@ export interface ParticipantDetailRead {
     presort_answers: ParticipantDetailReadPresortAnswers;
     postsort_answers: ParticipantDetailReadPostsortAnswers;
     qsort_entries: QSortEntryRead[];
+    audio_recordings?: AudioRecordingRead[];
 }

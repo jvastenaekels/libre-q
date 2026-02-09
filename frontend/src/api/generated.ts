@@ -9032,6 +9032,38 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetRespons
         ]),
         statement_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
     })),
+    audio_recordings: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            question_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            mime_type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            file_size_bytes: faker.number.int({ min: undefined, max: undefined }),
+            duration_seconds: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            s3_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            presigned_url: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            url_expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -9457,6 +9489,10 @@ export const getGetAudioUrlApiAudioRecordingIdUrlGetResponseMock = (
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     presigned_url: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    url_expires_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
     ...overrideResponse,
