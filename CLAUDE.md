@@ -19,7 +19,7 @@ frontend/       # React SPA
   public/locales/  # i18n translation files (en, fr, fi)
 ```
 
-## Key Commands
+## Key Commands (from project root)
 
 ```bash
 make install          # Install all dependencies
@@ -32,13 +32,6 @@ make generate-api     # Regenerate frontend API client from OpenAPI spec
 make migrate          # Run database migrations
 make migration-new    # Create a new Alembic migration
 ```
-
-## Development Workflow
-
-1. Create a branch: `git checkout -b [type]/[short-description]` (types: `feature`, `fix`, `refactor`, `chore`)
-2. Implement changes and update/add tests
-3. Run `make ci` before pushing — fix all errors before push
-4. Push branch, open PR, monitor CI with `gh run watch`
 
 ## Coding Standards
 
