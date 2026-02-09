@@ -732,7 +732,7 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Primary Metrics: Completed & In Progress */}
 
                     {/* Completed Card */}
@@ -742,7 +742,7 @@ export default function InteractiveDataView({
                             setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
                         }
                         className={cn(
-                            'col-span-1 md:col-span-6 lg:col-span-3',
+                            'col-span-1 md:col-span-6 lg:col-span-1',
                             'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
                             statusFilter === 'completed'
                                 ? 'border-emerald-500 ring-4 ring-emerald-50/50'
@@ -797,7 +797,7 @@ export default function InteractiveDataView({
                             )
                         }
                         className={cn(
-                            'col-span-1 md:col-span-2',
+                            'col-span-1 md:col-span-6 lg:col-span-1',
                             'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
                             statusFilter === 'in_progress'
                                 ? 'border-sky-500 ring-4 ring-sky-50/50'
@@ -864,6 +864,107 @@ export default function InteractiveDataView({
                                     <ArrowRight className="w-3 h-3" />
                                 </div>
                             )}
+                        </div>
+                    </button>
+
+                    {/* Interview Consent Card */}
+                    <button
+                        type="button"
+                        onClick={() => toggleConsent('interview')}
+                        className={cn(
+                            'col-span-1 md:col-span-6 lg:col-span-1',
+                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            consentFilters.has('interview')
+                                ? 'border-amber-500 ring-4 ring-amber-50/50'
+                                : 'border-slate-100 hover:border-amber-200'
+                        )}
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Briefcase className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        consentFilters.has('interview')
+                                            ? 'bg-amber-100 text-amber-700'
+                                            : 'bg-amber-50 text-amber-600'
+                                    )}
+                                >
+                                    <Briefcase className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.interview', 'Accepted follow-up')}
+                                </span>
+                            </div>
+
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                    {interviewCount}
+                                </span>
+                                <span className="text-sm font-semibold text-slate-400">
+                                    / {liveCount}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
+                        </div>
+                    </button>
+
+                    {/* Newsletter Consent Card */}
+                    <button
+                        type="button"
+                        onClick={() => toggleConsent('newsletter')}
+                        className={cn(
+                            'col-span-1 md:col-span-6 lg:col-span-1',
+                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
+                            consentFilters.has('newsletter')
+                                ? 'border-indigo-500 ring-4 ring-indigo-50/50'
+                                : 'border-slate-100 hover:border-indigo-200'
+                        )}
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        consentFilters.has('newsletter')
+                                            ? 'bg-indigo-100 text-indigo-700'
+                                            : 'bg-indigo-50 text-indigo-600'
+                                    )}
+                                >
+                                    <Bell className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t(
+                                        'admin.data.stats.newsletter_interested',
+                                        'Newsletter interest'
+                                    )}
+                                </span>
+                            </div>
+
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                    {newsletterCount}
+                                </span>
+                                <span className="text-sm font-semibold text-slate-400">
+                                    / {liveCount}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
                         </div>
                     </button>
                 </div>
@@ -1092,7 +1193,6 @@ export default function InteractiveDataView({
                                 )}
                             >
                                 <Mail className="h-3.5 w-3.5" />
-                                {t('admin.data.filter.consent', 'Consent')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
@@ -1216,57 +1316,6 @@ export default function InteractiveDataView({
                             >
                                 <FileCode className="h-4 w-4" />
                                 {t('admin.export.formats.json', 'JSON Dump')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Consent Filter Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                    'h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
-                                    consentFilters.size > 0 &&
-                                        'bg-indigo-50 text-indigo-700 border-indigo-100'
-                                )}
-                            >
-                                <Mail className="h-3.5 w-3.5" />
-                                {t('admin.data.filter.consent', 'Consent')}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => setConsentFilters(new Set())}>
-                                {t('admin.data.filters.all_consents', 'All')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('email')}
-                                className={cn(
-                                    consentFilters.has('email') && 'bg-indigo-50 text-indigo-700'
-                                )}
-                            >
-                                <Mail className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.email', 'Emails')} ({emailCount})
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('newsletter')}
-                                className={cn(
-                                    consentFilters.has('newsletter') &&
-                                        'bg-emerald-50 text-emerald-700'
-                                )}
-                            >
-                                <Bell className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.newsletter', 'Newsletter')} ({newsletterCount})
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('interview')}
-                                className={cn(
-                                    consentFilters.has('interview') && 'bg-amber-50 text-amber-700'
-                                )}
-                            >
-                                <Briefcase className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.interview', 'Interviews')} ({interviewCount})
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
