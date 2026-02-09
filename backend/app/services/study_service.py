@@ -879,7 +879,9 @@ class StudyService:
                     confirmation_code=confirmation_code,
                     ip_address=hashed_ip,
                     user_agent=user_agent,
-                    submitted_at=datetime.now(timezone.utc),
+                    submitted_at=datetime.now(timezone.utc)
+                    if data.status == ParticipantStatus.completed
+                    else None,
                     is_test_run=data.is_test_run,
                 )
                 db.add(participant)
@@ -947,7 +949,8 @@ class StudyService:
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
             participant.is_test_run = data.is_test_run
-            participant.submitted_at = datetime.now(timezone.utc)
+            if data.status == ParticipantStatus.completed:
+                participant.submitted_at = datetime.now(timezone.utc)
 
             await db.flush()
 
