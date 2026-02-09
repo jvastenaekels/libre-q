@@ -1064,13 +1064,16 @@ class StudyService:
         if not study:
             raise HTTPException(status_code=404, detail="Study not found")
 
-        # 2. Get all non-discarded completed participants with their Q-sort entries
+        # 2. Get all non-discarded completed participants with their Q-sort entries and audio
         p_stmt = (
             select(Participant)
             .where(
                 Participant.study_id == study_id,
             )
-            .options(selectinload(Participant.qsort_entries))
+            .options(
+                selectinload(Participant.qsort_entries),
+                selectinload(Participant.audio_recordings),
+            )
         )
         p_result = await db.execute(p_stmt)
         participants = p_result.scalars().all()
@@ -1097,6 +1100,30 @@ class StudyService:
             presort = p.presort_answers if p.presort_answers is not None else {}
             postsort = p.postsort_answers if p.postsort_answers is not None else {}
 
+            # Build audio recordings map with presigned URLs
+            audio_recordings = {}
+            from ..services.storage_service import storage_service
+
+            for audio_rec in p.audio_recordings:
+                try:
+                    # Generate fresh presigned URL (24h expiration for exports)
+                    presigned_url = storage_service.generate_presigned_url(
+                        audio_rec.s3_key, expiration=86400
+                    )
+                    audio_recordings[audio_rec.question_key] = {
+                        "id": audio_rec.id,
+                        "duration_seconds": audio_rec.duration_seconds,
+                        "file_size_bytes": audio_rec.file_size_bytes,
+                        "mime_type": audio_rec.mime_type,
+                        "created_at": audio_rec.created_at.isoformat(),
+                        "presigned_url": presigned_url,
+                    }
+                except Exception as e:
+                    # Log but don't fail export
+                    print(
+                        f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}"
+                    )
+
             participant_data.append(
                 {
                     "id": str(p.session_token)[:8].upper(),
@@ -1111,6 +1138,7 @@ class StudyService:
                     "placements": placements,
                     "presort": presort,
                     "postsort": postsort,
+                    "audio_recordings": audio_recordings,
                     "language": p.language_used,
                     "is_discarded": p.is_discarded,
                     "discard_reason": p.discard_reason,
