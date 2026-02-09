@@ -170,7 +170,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 duration_seconds: duration,
             });
 
-            // Store metadata in Zustand
+            // Store metadata in Zustand with expiration timestamp
             setAudioRecording(questionKey, {
                 id: response.recording_id,
                 question_key: questionKey,
@@ -178,6 +178,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 duration_seconds: duration,
                 presigned_url: response.presigned_url,
                 created_at: new Date().toISOString(),
+                url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
             });
 
             // Clear text comment (exclusive choice)

@@ -19,4 +19,5 @@ export interface AudioRecordingRead {
     s3_key: string;
     created_at: string;
     presigned_url?: AudioRecordingReadPresignedUrl;
+    url_expires_at?: string;
 }

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, R
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from uuid import UUID
+from datetime import datetime, timedelta, UTC
 import magic
 
 from app.database import get_db
@@ -277,11 +278,12 @@ async def get_audio_url(
     if participant.session_token != session_token:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Generate presigned URL
+    # Generate presigned URL (valid for 1 hour)
     presigned_url = storage_service.generate_presigned_url(recording.s3_key)
 
-    # Build response
+    # Build response with expiration timestamp
     recording_data = AudioRecordingRead.model_validate(recording)
     recording_data.presigned_url = presigned_url
+    recording_data.url_expires_at = datetime.now(UTC) + timedelta(hours=1)
 
     return recording_data

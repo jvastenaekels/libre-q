@@ -10,6 +10,7 @@ interface AudioRecordingMetadata {
     duration_seconds: number;
     presigned_url: string;
     created_at: string;
+    url_expires_at?: string;
 }
 
 interface Responses {

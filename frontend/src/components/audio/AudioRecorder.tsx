@@ -17,6 +17,7 @@ interface AudioRecorderProps {
         duration_seconds: number;
         file_size_bytes: number;
         created_at: string;
+        url_expires_at?: string;
     } | null;
     disabled?: boolean;
     sessionToken?: string; // For refreshing presigned URLs
@@ -68,16 +69,20 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             if (response.presigned_url) {
                 setAudioUrl(response.presigned_url);
 
-                // Update expiration time
-                const now = Date.now();
-                const newExpiresAt = now + 3600 * 1000; // 1 hour from now
-                setUrlExpiresAt(newExpiresAt);
+                // Use backend-provided expiration time, or fallback to Date.now() + 1 hour
+                if (response.url_expires_at) {
+                    const expiresAt = new Date(response.url_expires_at).getTime();
+                    setUrlExpiresAt(expiresAt);
+                } else {
+                    // Fallback: assume 1 hour from NOW (not created_at)
+                    setUrlExpiresAt(Date.now() + 3600 * 1000);
+                }
 
                 console.log('Presigned URL refreshed successfully');
             }
         } catch (error) {
             console.error('Failed to refresh presigned URL:', error);
-            // Don't show error toast - it's a background operation
+            throw error; // Propagate error for caller to handle
         }
     }, [existingRecording, sessionToken]);
 
@@ -88,24 +93,31 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setDuration(Math.round(existingRecording.duration_seconds));
             setState('stopped');
 
-            // Calculate expiration time (presigned URLs are valid for 1 hour)
-            const createdAt = new Date(existingRecording.created_at).getTime();
-            const expiresAt = createdAt + 3600 * 1000; // 1 hour from creation
-            setUrlExpiresAt(expiresAt);
+            // Use backend-provided expiration time if available
+            if (existingRecording.url_expires_at) {
+                const expiresAt = new Date(existingRecording.url_expires_at).getTime();
+                setUrlExpiresAt(expiresAt);
+            } else {
+                // Fallback: assume URL is fresh (generated now), expires in 1 hour
+                setUrlExpiresAt(Date.now() + 3600 * 1000);
+            }
         }
     }, [existingRecording]);
 
-    // Check URL expiration and refresh if needed
+    // Check URL expiration and refresh if needed (removed state restriction)
     useEffect(() => {
-        if (!existingRecording || !urlExpiresAt || state !== 'stopped') return;
+        if (!existingRecording || !urlExpiresAt) return;
 
         const checkExpiration = () => {
             const now = Date.now();
             const timeUntilExpiry = urlExpiresAt - now;
 
-            // Refresh URL if it expires in less than 5 minutes (buffer time)
-            if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > 0) {
-                refreshPresignedUrl();
+            // Refresh if expires soon (<5 min) OR already expired (up to 24h old)
+            // This allows recovery from expired URLs when user returns after long absence
+            if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > -24 * 60 * 60 * 1000) {
+                refreshPresignedUrl().catch((error) => {
+                    console.error('Background URL refresh failed:', error);
+                });
             }
         };
 
@@ -116,26 +128,55 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         const interval = setInterval(checkExpiration, 60 * 1000);
 
         return () => clearInterval(interval);
-    }, [existingRecording, urlExpiresAt, state, refreshPresignedUrl]);
+    }, [existingRecording, urlExpiresAt, refreshPresignedUrl]);
 
-    // Cleanup on unmount
+    // Handle visibility change and window focus (user returns after being away)
+    useEffect(() => {
+        if (!existingRecording || !urlExpiresAt) return;
+
+        const handleVisibilityOrFocus = () => {
+            // User returned - check if URL expired while they were away
+            if (!document.hidden) {
+                const now = Date.now();
+                const timeUntilExpiry = urlExpiresAt - now;
+
+                // If expired or expiring soon, refresh proactively
+                if (timeUntilExpiry < 5 * 60 * 1000) {
+                    refreshPresignedUrl().catch((error) => {
+                        console.error('URL refresh on return failed:', error);
+                    });
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+        window.addEventListener('focus', handleVisibilityOrFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+            window.removeEventListener('focus', handleVisibilityOrFocus);
+        };
+    }, [existingRecording, urlExpiresAt, refreshPresignedUrl]);
+
+    // Cleanup on unmount (fixed dependencies)
     useEffect(() => {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
             if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
+            if (audioContextRef.current?.state !== 'closed') {
+                audioContextRef.current?.close();
             }
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach((track) => {
                     track.stop();
                 });
             }
-            if (audioUrl && !existingRecording) {
-                URL.revokeObjectURL(audioUrl);
+            // Only revoke blob URLs (not presigned URLs)
+            if (audioPlayerRef.current?.src?.startsWith('blob:')) {
+                URL.revokeObjectURL(audioPlayerRef.current.src);
             }
         };
-    }, [audioUrl, existingRecording]);
+    }, []); // Empty deps - only run on mount/unmount
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -282,8 +323,22 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         }
     };
 
-    const playRecording = () => {
+    const playRecording = async () => {
         if (!audioUrl) return;
+
+        // Proactively check if URL might be expired before playing
+        if (urlExpiresAt && Date.now() > urlExpiresAt - 60 * 1000) {
+            try {
+                await refreshPresignedUrl();
+                // URL refreshed, audioUrl state will update and trigger re-render
+                // Wait a tick for state update
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (error) {
+                console.error('Failed to refresh URL before playback:', error);
+                toast.error(t('audio.refresh_failed', 'Failed to refresh audio URL'));
+                return;
+            }
+        }
 
         const audio = new Audio(audioUrl);
         audioPlayerRef.current = audio;
@@ -314,6 +369,31 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
         };
         updateWaveform();
+
+        // Error handler for expired URLs or network issues
+        audio.onerror = async () => {
+            console.error('Audio playback error - attempting URL refresh');
+
+            // Try refreshing URL and retrying once
+            if (existingRecording && sessionToken) {
+                toast.info(t('audio.refreshing', 'Refreshing audio...'));
+                try {
+                    await refreshPresignedUrl();
+                    // Retry playback with new URL (recursive call, but only once)
+                    if (!audioUrl.startsWith('blob:')) {
+                        playRecording();
+                    }
+                } catch {
+                    toast.error(t('audio.playback_failed', 'Failed to play audio'));
+                    setState('stopped');
+                    setAudioLevels([0, 0, 0, 0, 0]);
+                }
+            } else {
+                toast.error(t('audio.playback_failed', 'Failed to play audio'));
+                setState('stopped');
+                setAudioLevels([0, 0, 0, 0, 0]);
+            }
+        };
 
         audio.onended = () => {
             setState('stopped');

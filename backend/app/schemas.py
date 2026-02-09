@@ -575,6 +575,7 @@ class AudioRecordingRead(AudioRecordingBase):
     s3_key: str
     created_at: datetime
     presigned_url: str | None = None
+    url_expires_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
