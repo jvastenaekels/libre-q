@@ -718,10 +718,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             onClick={startRecording}
                             disabled={disabled}
                             className="flex items-center gap-2"
-                            variant="default"
+                            variant="outline"
                         >
                             <Mic className="w-4 h-4" />
-                            {t('audio.start_recording', 'Start Recording')}
+                            {t('audio.start_recording', 'Start recording')}
                         </Button>
                         <span className="text-xs text-slate-400 hidden sm:inline">
                             {t('audio.space_shortcut', 'or press Space')}
@@ -803,7 +803,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         variant="default"
                     >
                         <RefreshCw className="w-4 h-4" />
-                        {t('audio.retry_upload', 'Retry Upload')}
+                        {t('audio.retry_upload', 'Retry upload')}
                     </Button>
                 )}
 

@@ -1,10 +1,10 @@
 import type React from 'react';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, AlertTriangle, ArrowRight, Info, Mic } from 'lucide-react';
+import { AlertCircle, ArrowRight, Info, Mic } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
@@ -56,42 +56,19 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const isAudioEnabled = audioConfig?.enabled ?? false;
     const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
 
-    // Audio fallback: auto-switch to text-only after persistent errors
-    const AUDIO_FALLBACK_THRESHOLD = 2;
-    const [audioFallbackActive, setAudioFallbackActive] = useState(false);
-    const audioFailureCountRef = useRef(0);
-    const isAudioEffectivelyEnabled = isAudioEnabled && !audioFallbackActive;
-
-    const activateAudioFallback = useCallback(() => {
-        if (audioFallbackActive) return;
-        setAudioFallbackActive(true);
-        toast.warning(
-            t(
-                'audio.fallback.toast',
-                'Audio has been disabled due to repeated errors. Please use text.'
-            )
-        );
-    }, [audioFallbackActive, t]);
-
-    const resetAudioFallback = useCallback(() => {
-        setAudioFallbackActive(false);
-        audioFailureCountRef.current = 0;
-    }, []);
+    // Audio unsupported detection (browser lacks MediaRecorder / getUserMedia)
+    const [audioUnsupported, setAudioUnsupported] = useState(false);
+    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported;
 
     const handleAudioError = useCallback(
         (type: 'mic_denied' | 'mic_revoked' | 'recorder_error' | 'empty_blob' | 'unsupported') => {
-            // Unsupported browser → immediate fallback (no recovery possible)
+            // Only disable audio for truly unsupported browsers (no recovery possible)
             if (type === 'unsupported') {
-                activateAudioFallback();
-                return;
+                setAudioUnsupported(true);
             }
-            // All other errors (including mic_denied) → count toward threshold
-            audioFailureCountRef.current += 1;
-            if (audioFailureCountRef.current >= AUDIO_FALLBACK_THRESHOLD) {
-                activateAudioFallback();
-            }
+            // All other errors: toast is already shown by AudioRecorder, user can retry
         },
-        [activateAudioFallback]
+        []
     );
 
     // --- Data Preparation ---
@@ -188,7 +165,6 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
             });
 
-            audioFailureCountRef.current = 0; // Reset on success
             toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
         } catch (error) {
             console.error('Audio upload failed:', error);
@@ -217,12 +193,6 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 } else {
                     toast.error(t('audio.upload_failed', 'Upload failed'));
                 }
-            }
-
-            // Track consecutive upload failures for fallback threshold
-            audioFailureCountRef.current += 1;
-            if (audioFailureCountRef.current >= AUDIO_FALLBACK_THRESHOLD) {
-                activateAudioFallback();
             }
 
             throw error; // Let AudioRecorder reset its state
@@ -327,7 +297,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 </div>
             )}
 
-            {isAudioEnabled && !audioFallbackActive && (
+            {isAudioEffectivelyEnabled && (
                 <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center gap-3 text-indigo-800">
                     <Info size={20} className="shrink-0" />
                     <p className="text-sm">
@@ -336,31 +306,6 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             'For each question, you can respond with text, an audio recording, or both.'
                         )}
                     </p>
-                </div>
-            )}
-
-            {audioFallbackActive && (
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3 text-amber-800">
-                    <AlertTriangle size={20} className="shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                        <p className="font-semibold text-sm">
-                            {t('audio.fallback.banner_title', 'Audio unavailable')}
-                        </p>
-                        <p className="text-sm">
-                            {t(
-                                'audio.fallback.banner_description',
-                                'Audio recording encountered repeated errors. You can continue with text responses.'
-                            )}
-                        </p>
-                    </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={resetAudioFallback}
-                        className="shrink-0 text-amber-800 border-amber-300 hover:bg-amber-100"
-                    >
-                        {t('audio.fallback.try_again', 'Try again')}
-                    </Button>
                 </div>
             )}
 
@@ -467,38 +412,27 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                                     )}
                                                 </span>
                                             </div>
-                                            {audioFallbackActive &&
-                                            !getAudioRecording(`card_${card.statementId}`) ? (
-                                                <p className="text-sm text-amber-700 italic">
-                                                    {t(
-                                                        'audio.fallback.inline',
-                                                        'Audio temporarily unavailable.'
-                                                    )}
-                                                </p>
-                                            ) : (
-                                                <AudioRecorder
-                                                    questionKey={`card_${card.statementId}`}
-                                                    maxDurationSeconds={maxDurationSeconds}
-                                                    disabled={audioFallbackActive}
-                                                    onRecordingComplete={async (blob, duration) => {
-                                                        await handleAudioUpload(
-                                                            `card_${card.statementId}`,
-                                                            blob,
-                                                            duration
-                                                        );
-                                                    }}
-                                                    onRecordingDeleted={async () => {
-                                                        await handleAudioDelete(
-                                                            `card_${card.statementId}`
-                                                        );
-                                                    }}
-                                                    existingRecording={getAudioRecording(
+                                            <AudioRecorder
+                                                questionKey={`card_${card.statementId}`}
+                                                maxDurationSeconds={maxDurationSeconds}
+                                                onRecordingComplete={async (blob, duration) => {
+                                                    await handleAudioUpload(
+                                                        `card_${card.statementId}`,
+                                                        blob,
+                                                        duration
+                                                    );
+                                                }}
+                                                onRecordingDeleted={async () => {
+                                                    await handleAudioDelete(
                                                         `card_${card.statementId}`
-                                                    )}
-                                                    sessionToken={token || undefined}
-                                                    onError={handleAudioError}
-                                                />
-                                            )}
+                                                    );
+                                                }}
+                                                existingRecording={getAudioRecording(
+                                                    `card_${card.statementId}`
+                                                )}
+                                                sessionToken={token || undefined}
+                                                onError={handleAudioError}
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -656,39 +590,25 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                                         )}
                                                     </span>
                                                 </div>
-                                                {audioFallbackActive &&
-                                                !getAudioRecording(`card_${id}`) ? (
-                                                    <p className="text-sm text-amber-700 italic">
-                                                        {t(
-                                                            'audio.fallback.inline',
-                                                            'Audio temporarily unavailable.'
-                                                        )}
-                                                    </p>
-                                                ) : (
-                                                    <AudioRecorder
-                                                        questionKey={`card_${id}`}
-                                                        maxDurationSeconds={maxDurationSeconds}
-                                                        disabled={audioFallbackActive}
-                                                        onRecordingComplete={async (
+                                                <AudioRecorder
+                                                    questionKey={`card_${id}`}
+                                                    maxDurationSeconds={maxDurationSeconds}
+                                                    onRecordingComplete={async (blob, duration) => {
+                                                        await handleAudioUpload(
+                                                            `card_${id}`,
                                                             blob,
                                                             duration
-                                                        ) => {
-                                                            await handleAudioUpload(
-                                                                `card_${id}`,
-                                                                blob,
-                                                                duration
-                                                            );
-                                                        }}
-                                                        onRecordingDeleted={async () => {
-                                                            await handleAudioDelete(`card_${id}`);
-                                                        }}
-                                                        existingRecording={getAudioRecording(
-                                                            `card_${id}`
-                                                        )}
-                                                        sessionToken={token || undefined}
-                                                        onError={handleAudioError}
-                                                    />
-                                                )}
+                                                        );
+                                                    }}
+                                                    onRecordingDeleted={async () => {
+                                                        await handleAudioDelete(`card_${id}`);
+                                                    }}
+                                                    existingRecording={getAudioRecording(
+                                                        `card_${id}`
+                                                    )}
+                                                    sessionToken={token || undefined}
+                                                    onError={handleAudioError}
+                                                />
                                             </div>
                                         )}
                                     </div>
@@ -743,36 +663,23 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                             )}
                                         </span>
                                     </div>
-                                    {audioFallbackActive &&
-                                    !getAudioRecording('missing_statement') ? (
-                                        <p className="text-sm text-amber-700 italic">
-                                            {t(
-                                                'audio.fallback.inline',
-                                                'Audio temporarily unavailable.'
-                                            )}
-                                        </p>
-                                    ) : (
-                                        <AudioRecorder
-                                            questionKey="missing_statement"
-                                            maxDurationSeconds={maxDurationSeconds}
-                                            disabled={audioFallbackActive}
-                                            onRecordingComplete={async (blob, duration) => {
-                                                await handleAudioUpload(
-                                                    'missing_statement',
-                                                    blob,
-                                                    duration
-                                                );
-                                            }}
-                                            onRecordingDeleted={async () => {
-                                                await handleAudioDelete('missing_statement');
-                                            }}
-                                            existingRecording={getAudioRecording(
-                                                'missing_statement'
-                                            )}
-                                            sessionToken={token || undefined}
-                                            onError={handleAudioError}
-                                        />
-                                    )}
+                                    <AudioRecorder
+                                        questionKey="missing_statement"
+                                        maxDurationSeconds={maxDurationSeconds}
+                                        onRecordingComplete={async (blob, duration) => {
+                                            await handleAudioUpload(
+                                                'missing_statement',
+                                                blob,
+                                                duration
+                                            );
+                                        }}
+                                        onRecordingDeleted={async () => {
+                                            await handleAudioDelete('missing_statement');
+                                        }}
+                                        existingRecording={getAudioRecording('missing_statement')}
+                                        sessionToken={token || undefined}
+                                        onError={handleAudioError}
+                                    />
                                 </div>
                             )}
                         </div>

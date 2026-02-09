@@ -369,7 +369,7 @@
         "playing": "Playing...",
         "uploading": "Uploading...",
         "ready": "Ready to record",
-        "start_recording": "Start Recording",
+        "start_recording": "Start recording",
         "stop_recording": "Stop",
         "pause": "Pause",
         "play": "Play",
@@ -405,7 +405,7 @@
             "inline": "Audio temporarily unavailable."
         },
         "permission_denied_with_guidance": "Microphone permission denied. Check your browser settings to allow microphone access, then try again.",
-        "retry_upload": "Retry Upload",
+        "retry_upload": "Retry upload",
         "space_shortcut": "or press Space",
         "waveform": {
             "recording": "Audio waveform - recording in progress",
