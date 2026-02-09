@@ -41,6 +41,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const { t } = useTranslation();
 
     const [state, setState] = useState<RecorderState>('idle');
+    const stateRef = useRef<RecorderState>('idle');
     const [duration, setDuration] = useState(0);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
@@ -60,6 +61,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const [playbackPosition, setPlaybackPosition] = useState(0);
     const [uploadFailed, setUploadFailed] = useState(false);
     const pendingBlobRef = useRef<Blob | null>(null);
+
+    // Keep stateRef in sync so callbacks in stale closures read current state
+    stateRef.current = state;
 
     // Function to refresh presigned URL (must be defined before useEffect)
     const refreshPresignedUrl = useCallback(async () => {
@@ -421,7 +425,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const stopRecording = () => {
-        if (mediaRecorderRef.current && state === 'recording') {
+        if (mediaRecorderRef.current && stateRef.current === 'recording') {
             mediaRecorderRef.current.stop();
             if (timerRef.current) {
                 clearInterval(timerRef.current);

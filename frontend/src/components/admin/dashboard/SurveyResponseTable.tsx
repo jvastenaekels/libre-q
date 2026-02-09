@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { getLocalizedText } from '@/utils/localization';
+import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
 
 interface SurveyResponseTableProps {
     study: StudyRead;
@@ -156,18 +157,33 @@ export function SurveyResponseTable({
         id: string;
         title: string;
         icon: React.ReactNode;
-        items: { key: string; label: string; value: React.ReactNode; id?: string }[];
+        items: {
+            key: string;
+            label: string;
+            value: React.ReactNode;
+            id?: string;
+            rawTranslations?: Record<string, string> | { language_code: string; text?: string }[];
+        }[];
     }[] = [];
 
     // biome-ignore lint/suspicious/noExplicitAny: generic value
     const addItem = (groupId: string, key: string, val: any) => {
         const group = groups.find((g) => g.id === groupId);
         if (group) {
+            // Extract raw multilingual label for translation overlay
+            const q = questionsMap[key];
+            const rawLabel = q?.label || q?.text;
+            const rawTranslations =
+                rawLabel && typeof rawLabel === 'object' && !Array.isArray(rawLabel)
+                    ? rawLabel
+                    : undefined;
+
             group.items.push({
                 key,
                 label: getResolvedLabel(key),
                 value: getResolvedValue(key, val),
                 id: key,
+                rawTranslations,
             });
         }
     };
@@ -225,6 +241,12 @@ export function SurveyResponseTable({
                           statement.code
                         : `${t('admin.participant.metadata.id', 'ID')}: ${sId}`;
 
+                    // Build translations array for MultiLangFieldIcon
+                    const stmtTranslations = statement?.translations?.map((tr) => ({
+                        language_code: tr.language_code,
+                        text: tr.text,
+                    }));
+
                     commentsContainer.items.push({
                         key: sIdStr,
                         label: statementText,
@@ -234,6 +256,7 @@ export function SurveyResponseTable({
                             </p>
                         ),
                         id: sIdStr,
+                        rawTranslations: stmtTranslations,
                     });
                 }
             }
@@ -300,9 +323,18 @@ export function SurveyResponseTable({
                                         className="px-6 py-4 flex flex-col md:flex-row md:items-start gap-4 hover:bg-slate-50/30 transition-colors"
                                     >
                                         <div className="md:w-1/2">
-                                            <p className="text-sm font-bold text-slate-800 leading-snug">
-                                                {item.label}
-                                            </p>
+                                            <div className="flex items-start gap-1.5">
+                                                <p className="text-sm font-bold text-slate-800 leading-snug flex-1">
+                                                    {item.label}
+                                                </p>
+                                                {item.rawTranslations && (
+                                                    <MultiLangFieldIcon
+                                                        translations={item.rawTranslations}
+                                                        activeLocale={language}
+                                                        className="shrink-0 mt-0.5"
+                                                    />
+                                                )}
+                                            </div>
                                             <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
                                                 {t('admin.participant.metadata.id', 'ID')}:{' '}
                                                 {item.id || item.key}

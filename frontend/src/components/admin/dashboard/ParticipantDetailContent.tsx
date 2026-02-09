@@ -22,10 +22,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdminService } from '@/api/admin';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import GridSort from '@/components/GridSort';
 import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
+import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
+import type { InteractionUtils } from '@/types/grid';
 
 interface ParticipantDetailContentProps {
     participant: DumpParticipant;
@@ -44,6 +46,16 @@ export function ParticipantDetailContent({
     const { studySlug } = useParams<{ studySlug: string }>();
     const [isExporting, setIsExporting] = useState(false);
     const [detailStatementId, setDetailStatementId] = useState<number | null>(null);
+    const [activeTab, setActiveTab] = useState('session');
+    const gridUtilsRef = useRef<InteractionUtils | null>(null);
+
+    // Auto-fit grid when tab activates
+    useEffect(() => {
+        if (activeTab === 'grid' && gridUtilsRef.current) {
+            const timer = setTimeout(() => gridUtilsRef.current?.performAutoFit(), 150);
+            return () => clearTimeout(timer);
+        }
+    }, [activeTab]);
 
     const handleExportCSV = async () => {
         if (!studySlug || !participant.db_id) return;
@@ -178,9 +190,19 @@ export function ParticipantDetailContent({
                                     </span>
                                 </span>
                             </div>
-                            <div className="text-lg font-medium text-slate-800 leading-relaxed border-l-4 border-indigo-500 pl-4 py-1">
-                                {detailStatement.translations.find((tr) => tr.lang === language)
-                                    ?.text || detailStatement.translations[0]?.text}
+                            <div className="flex items-start gap-2">
+                                <div className="text-lg font-medium text-slate-800 leading-relaxed border-l-4 border-indigo-500 pl-4 py-1 flex-1">
+                                    {detailStatement.translations.find((tr) => tr.lang === language)
+                                        ?.text || detailStatement.translations[0]?.text}
+                                </div>
+                                <MultiLangFieldIcon
+                                    translations={detailStatement.translations.map((tr) => ({
+                                        language_code: tr.lang,
+                                        text: tr.text,
+                                    }))}
+                                    activeLocale={language}
+                                    className="mt-1 shrink-0"
+                                />
                             </div>
                         </div>
 
@@ -262,7 +284,7 @@ export function ParticipantDetailContent({
             {/* Header / Identity is handled by Page Header usually, keeping simplified actions or removing */}
             {/* Note: User requested enriched header, we can rely on Page header or add detail here. */}
 
-            <Tabs defaultValue="session" className="flex-1 flex flex-col">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
                     <TabsList className="h-14 bg-transparent p-0 gap-6">
                         {['session', 'presort', 'grid', 'postsort'].map((tab) => (
@@ -374,6 +396,9 @@ export function ParticipantDetailContent({
                                     'Viewer Mode'
                                 )}
                                 sidebarContent={sidebarContent}
+                                onInteractionUtils={(utils) => {
+                                    gridUtilsRef.current = utils;
+                                }}
                                 renderSlotContent={(colIdx, rowIdx, dims) => {
                                     const sId = cellContentMap[`${colIdx}-${rowIdx}`];
                                     if (!sId) return null;

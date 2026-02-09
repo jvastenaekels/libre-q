@@ -36,7 +36,6 @@ import {
     Bell,
     Users,
     Trash2,
-    Beaker,
     Calendar,
     Download,
     X,
@@ -65,7 +64,6 @@ import { AdminService } from '@/api/admin';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetStudyDumpApiAdminStudiesSlugDumpGet,
-    useClearTestRunsApiAdminStudiesSlugTestRunsDelete,
     getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey,
 } from '@/api/generated';
 import { customInstance } from '@/api/mutator';
@@ -83,7 +81,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
@@ -174,12 +171,10 @@ export default function InteractiveDataView({
 
     const [sorting, setSorting] = useState<SortingState>([{ id: 'submitted_at', desc: true }]);
     const [globalFilter, setGlobalFilter] = useState('');
-    const [activeTab, setActiveTab] = useState<'live' | 'test'>('live');
     const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
     const [consentFilter, setConsentFilter] = useState<ConsentFilter>(null);
     const [isExportLoading, setIsExportLoading] = useState(false);
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: PAGE_SIZE });
-    const [clearTestDialogOpen, setClearTestDialogOpen] = useState(false);
     const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
 
     const effectiveParticipants = useMemo(() => {
@@ -215,23 +210,6 @@ export default function InteractiveDataView({
         } as DumpResponse;
     }, [rawData, effectiveParticipants, slug]);
 
-    const { mutate: clearTestRuns, isPending: isClearing } =
-        useClearTestRunsApiAdminStudiesSlugTestRunsDelete();
-    const handleClearTestRuns = useCallback(() => {
-        clearTestRuns(
-            { slug },
-            {
-                onSuccess: () => {
-                    toast.success(t('admin.data.actions.clear_test_runs_success'));
-                    queryClient.invalidateQueries({
-                        queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
-                    });
-                },
-                onError: () => toast.error(t('admin.data.actions.clear_test_runs_error')),
-            }
-        );
-    }, [clearTestRuns, slug, queryClient, t]);
-
     const handleClearAllParticipants = useCallback(async () => {
         try {
             await customInstance({
@@ -256,18 +234,15 @@ export default function InteractiveDataView({
     );
 
     const liveCount = liveParticipants.length;
-    const testCount = effectiveParticipants.filter((p) => p.is_test_run).length;
     const emailCount = liveParticipants.filter((p) => p.postsort.email).length;
     const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
     const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
 
-    const hasParticipantsForTab = activeTab === 'live' ? liveCount > 0 : testCount > 0;
     const hasActiveFilters =
         consentFilter !== null || qualityFilter === 'flagged' || globalFilter !== '';
 
     const filteredParticipants = useMemo(() => {
-        return effectiveParticipants.filter((p) => {
-            const matchesTab = activeTab === 'test' ? p.is_test_run : !p.is_test_run;
+        return liveParticipants.filter((p) => {
             const matchesQuality =
                 qualityFilter === 'flagged'
                     ? (p.duration_seconds !== null &&
@@ -284,9 +259,9 @@ export default function InteractiveDataView({
                 matchesConsent = !!p.postsort.interview_consent;
             }
 
-            return matchesTab && matchesQuality && matchesConsent;
+            return matchesQuality && matchesConsent;
         });
-    }, [effectiveParticipants, activeTab, qualityFilter, consentFilter]);
+    }, [liveParticipants, qualityFilter, consentFilter]);
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
@@ -922,44 +897,20 @@ export default function InteractiveDataView({
                 </div>
             )}
 
-            <Tabs
-                value={activeTab}
-                onValueChange={(v) => setActiveTab(v as 'live' | 'test')}
-                className="w-full"
-            >
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
-                    <TabsList className="bg-slate-100/80 p-1 rounded-xl h-11 border border-slate-200/50">
-                        <TabsTrigger
-                            value="live"
-                            className="rounded-lg px-4 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            <div className="w-full space-y-4">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5 h-11 px-4 rounded-xl bg-white border border-slate-200/50 shadow-sm">
+                        <Users className="w-4 h-4 text-slate-400" />
+                        <span className="text-sm font-semibold text-slate-700">
+                            {t('admin.data.tabs.live')}
+                        </span>
+                        <Badge
+                            variant="secondary"
+                            className="h-5 px-1.5 bg-slate-100 text-slate-600 border-none font-semibold"
                         >
-                            <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                {t('admin.data.tabs.live')}
-                                <Badge
-                                    variant="secondary"
-                                    className="ml-1.5 h-5 px-1.5 bg-slate-200/50 text-slate-600 border-none font-semibold"
-                                >
-                                    {liveCount}
-                                </Badge>
-                            </div>
-                        </TabsTrigger>
-                        {/* Only show test tab if there are test runs */}
-                        {testCount > 0 && (
-                            <TabsTrigger
-                                value="test"
-                                className="rounded-lg px-4 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Beaker className="w-3.5 h-3.5" />
-                                    {t('admin.data.tabs.test')}
-                                    <span className="ml-1.5 text-slate-400 font-semibold">
-                                        {testCount}
-                                    </span>
-                                </div>
-                            </TabsTrigger>
-                        )}
-                    </TabsList>
+                            {liveCount}
+                        </Badge>
+                    </div>
 
                     <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
                         <div className="relative group flex-1 sm:flex-initial">
@@ -1081,10 +1032,7 @@ export default function InteractiveDataView({
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {((activeTab === 'test' && testCount > 0) ||
-                            (activeTab === 'live' &&
-                                liveCount > 0 &&
-                                data.study.state === 'draft')) && (
+                        {liveCount > 0 && data.study.state === 'draft' && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
@@ -1096,61 +1044,16 @@ export default function InteractiveDataView({
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-52 rounded-xl">
-                                    {activeTab === 'test' && testCount > 0 && (
-                                        <DropdownMenuItem
-                                            disabled={isClearing}
-                                            onClick={() => setClearTestDialogOpen(true)}
-                                            className="font-semibold cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                            {t('admin.data.actions.clear_test_runs')}
-                                        </DropdownMenuItem>
-                                    )}
-                                    {activeTab === 'live' &&
-                                        liveCount > 0 &&
-                                        data.study.state === 'draft' && (
-                                            <DropdownMenuItem
-                                                onClick={() => setClearAllDialogOpen(true)}
-                                                className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                                {t('admin.data.actions.clear_all')}
-                                            </DropdownMenuItem>
-                                        )}
+                                    <DropdownMenuItem
+                                        onClick={() => setClearAllDialogOpen(true)}
+                                        className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {t('admin.data.actions.clear_all')}
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         )}
-
-                        {/* Controlled confirmation dialogs */}
-                        <AlertDialog
-                            open={clearTestDialogOpen}
-                            onOpenChange={setClearTestDialogOpen}
-                        >
-                            <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                        <div className="p-2 bg-red-100 text-red-600 rounded-xl">
-                                            <Trash2 className="w-5 h-5" />
-                                        </div>
-                                        {t('admin.data.actions.clear_test_runs')}
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
-                                        {t('admin.data.actions.clear_test_runs_confirm')}
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter className="gap-2">
-                                    <AlertDialogCancel className="rounded-2xl font-bold h-12">
-                                        {t('common.cancel')}
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleClearTestRuns}
-                                        className="rounded-2xl font-bold h-12 bg-red-600 hover:bg-red-700"
-                                    >
-                                        {t('common.confirm_delete')}
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
 
                         <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
                             <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
@@ -1233,7 +1136,7 @@ export default function InteractiveDataView({
                                         colSpan={columns.length}
                                         className="h-64 text-center"
                                     >
-                                        {!hasParticipantsForTab ? (
+                                        {liveCount === 0 ? (
                                             <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
                                                 <div className="p-4 bg-slate-50 rounded-full">
                                                     <Inbox className="w-8 h-8 opacity-30" />
@@ -1329,7 +1232,7 @@ export default function InteractiveDataView({
                         </div>
                     )}
                 </div>
-            </Tabs>
+            </div>
         </div>
     );
 }

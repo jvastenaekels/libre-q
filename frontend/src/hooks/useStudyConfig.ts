@@ -83,7 +83,48 @@ export const useStudyConfig = () => {
                 try {
                     let config: StudyConfig;
                     if (draftJson) {
-                        config = JSON.parse(draftJson) as StudyConfig;
+                        const raw = JSON.parse(draftJson);
+                        // Raw drafts have a translations array — resolve into flat fields
+                        if (raw.translations && Array.isArray(raw.translations)) {
+                            const lang =
+                                sessionLanguage || raw.translations[0]?.language_code || 'en';
+                            const tr =
+                                // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+                                raw.translations.find((t: any) => t.language_code === lang) ||
+                                raw.translations[0];
+                            config = {
+                                ...raw,
+                                title: tr?.title || 'No Title',
+                                subtitle: tr?.subtitle,
+                                description: tr?.description,
+                                objective: tr?.objective,
+                                instructions: tr?.instructions,
+                                consent: {
+                                    title: tr?.consent_title,
+                                    description: tr?.consent_description,
+                                },
+                                pre_instruction: tr?.pre_instruction,
+                                condition_of_instruction: tr?.condition_of_instruction,
+                                ui_labels: tr?.ui_labels || {},
+                                process_steps: tr?.process_steps || [],
+                                language: lang,
+                                // biome-ignore lint/suspicious/noExplicitAny: draft statement type
+                                statements: (raw.statements || []).map((s: any, index: number) => {
+                                    const st = s.translations?.find(
+                                        // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+                                        (t: any) => t.language_code === lang
+                                    );
+                                    return {
+                                        id: index + 1,
+                                        code: s.code,
+                                        text: st?.text || '',
+                                    };
+                                }),
+                            } as StudyConfig;
+                        } else {
+                            // Already a resolved synthetic config
+                            config = raw as StudyConfig;
+                        }
                     } else {
                         config = JSON.parse(legacyJson as string);
                     }
