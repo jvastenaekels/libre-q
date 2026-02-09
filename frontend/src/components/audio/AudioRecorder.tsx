@@ -628,199 +628,188 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     return (
-        <div className="border border-slate-300 rounded-lg p-4 bg-slate-50">
-            {/* Timer/Progress */}
-            <div className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                        {state === 'recording' && (
-                            <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
-                            </span>
+        <div>
+            {/* Idle: single clickable row */}
+            {state === 'idle' && (
+                <button
+                    type="button"
+                    onClick={startRecording}
+                    disabled={disabled}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 hover:bg-white hover:border-slate-400 hover:shadow-sm transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <div className="p-2 rounded-lg bg-white text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-colors shadow-sm border border-slate-100 group-hover:border-indigo-100">
+                        <Mic className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors flex-1 text-left">
+                        {t('audio.start_recording', 'Start recording')}
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono tabular-nums">
+                        {formatTime(maxDurationSeconds)}
+                    </span>
+                    <kbd className="hidden sm:inline-flex text-[10px] text-slate-400 bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono">
+                        Space
+                    </kbd>
+                </button>
+            )}
+
+            {/* Recording: horizontal bar */}
+            {state === 'recording' && (
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-red-200 bg-red-50/30">
+                    <button
+                        type="button"
+                        onClick={stopRecording}
+                        className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shrink-0 shadow-sm"
+                    >
+                        <Square className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                    </span>
+                    <div
+                        className="flex items-center justify-center gap-[3px] h-8 flex-1"
+                        role="img"
+                        aria-label={t(
+                            'audio.waveform.recording',
+                            'Audio waveform - recording in progress'
                         )}
-                        <span
-                            className={`text-sm font-medium ${
-                                state === 'recording' && maxDurationSeconds - duration <= 15
-                                    ? 'text-amber-600 animate-pulse'
-                                    : state === 'recording'
-                                      ? 'text-red-600'
-                                      : 'text-slate-700'
-                            }`}
-                        >
-                            {state === 'recording' && t('audio.recording', 'Recording...')}
-                            {state === 'stopped' && t('audio.recorded', 'Recorded')}
-                            {state === 'playing' && t('audio.playing', 'Playing...')}
-                            {state === 'uploading' && t('audio.uploading', 'Uploading...')}
-                            {state === 'idle' && t('audio.ready', 'Ready to record')}
-                        </span>
+                    >
+                        {audioLevels.map((level, i) => (
+                            <div
+                                key={i}
+                                className="w-1 rounded-full bg-red-400/80 transition-all duration-100"
+                                style={{
+                                    height: `${Math.max(4, (level / 255) * 32)}px`,
+                                }}
+                            />
+                        ))}
                     </div>
                     <span
-                        className={`text-sm font-mono ${
-                            state === 'recording' && maxDurationSeconds - duration <= 15
-                                ? 'text-amber-600 font-bold'
-                                : 'text-slate-600'
+                        className={`text-xs font-mono shrink-0 tabular-nums ${
+                            maxDurationSeconds - duration <= 15
+                                ? 'text-amber-600 font-bold animate-pulse'
+                                : 'text-red-600/70'
                         }`}
                     >
-                        {state === 'playing'
-                            ? `${formatTime(Math.floor(playbackPosition))} / ${formatTime(duration)}`
-                            : `${formatTime(duration)} / ${formatTime(maxDurationSeconds)}`}
+                        {formatTime(duration)} / {formatTime(maxDurationSeconds)}
                     </span>
                 </div>
+            )}
 
-                {/* Waveform Visualization during recording and playback */}
-                {state === 'recording' || state === 'playing' ? (
-                    <div className="space-y-1">
-                        <div
-                            className="flex items-center justify-center gap-1 h-12 bg-slate-100 rounded-md"
-                            role="img"
-                            aria-label={
-                                state === 'recording'
-                                    ? t(
-                                          'audio.waveform.recording',
-                                          'Audio waveform - recording in progress'
-                                      )
-                                    : t(
-                                          'audio.waveform.playing',
-                                          'Audio waveform - playing back recording'
-                                      )
-                            }
-                        >
-                            {audioLevels.map((level, i) => (
-                                <div
-                                    key={i}
-                                    className={`w-1.5 rounded-full transition-all duration-100 ${
-                                        state === 'recording' ? 'bg-red-500' : 'bg-blue-500'
-                                    }`}
-                                    style={{
-                                        height: `${Math.max(4, (level / 255) * 48)}px`,
-                                    }}
-                                />
-                            ))}
-                        </div>
-                        {state === 'playing' && duration > 0 && (
-                            <Progress
-                                value={(playbackPosition / duration) * 100}
-                                className="h-1.5"
-                            />
-                        )}
-                    </div>
-                ) : (
-                    <Progress value={(duration / maxDurationSeconds) * 100} className="h-2" />
-                )}
-            </div>
-
-            {/* Controls */}
-            <div className="flex gap-2 justify-center items-center flex-wrap">
-                {state === 'idle' && (
-                    <>
-                        <Button
-                            onClick={startRecording}
-                            disabled={disabled}
-                            className="flex items-center gap-2"
-                            variant="outline"
-                        >
-                            <Mic className="w-4 h-4" />
-                            {t('audio.start_recording', 'Start recording')}
-                        </Button>
-                        <span className="text-xs text-slate-400 hidden sm:inline">
-                            {t('audio.space_shortcut', 'or press Space')}
-                        </span>
-                    </>
-                )}
-
-                {state === 'recording' && (
-                    <Button
-                        onClick={stopRecording}
-                        className="flex items-center gap-2"
-                        variant="destructive"
-                    >
-                        <Square className="w-4 h-4" />
-                        {t('audio.stop_recording', 'Stop')}
-                    </Button>
-                )}
-
-                {(state === 'stopped' || state === 'playing') && (
-                    <>
-                        <Button
+            {/* Stopped / Playing: compact player bar */}
+            {(state === 'stopped' || state === 'playing') && (
+                <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <button
+                            type="button"
                             onClick={state === 'playing' ? pausePlayback : playRecording}
-                            className="flex items-center gap-2"
-                            variant="secondary"
+                            className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors shrink-0"
                         >
                             {state === 'playing' ? (
-                                <>
-                                    <Pause className="w-4 h-4" />
-                                    {t('audio.pause', 'Pause')}
-                                </>
+                                <Pause className="w-4 h-4" />
                             ) : (
-                                <>
-                                    <Play className="w-4 h-4" />
-                                    {t('audio.play', 'Play')}
-                                </>
+                                <Play className="w-4 h-4" />
                             )}
-                        </Button>
+                        </button>
 
-                        {/* Playback Speed Control */}
-                        <div className="flex items-center gap-1 border border-slate-300 rounded-md bg-white">
+                        <div className="flex-1 min-w-0">
+                            {state === 'playing' ? (
+                                <div>
+                                    <div
+                                        className="flex items-center justify-center gap-[3px] h-6"
+                                        role="img"
+                                        aria-label={t(
+                                            'audio.waveform.playing',
+                                            'Audio waveform - playing back recording'
+                                        )}
+                                    >
+                                        {audioLevels.map((level, i) => (
+                                            <div
+                                                key={i}
+                                                className="w-1 rounded-full bg-indigo-400 transition-all duration-100"
+                                                style={{
+                                                    height: `${Math.max(3, (level / 255) * 24)}px`,
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <Progress
+                                        value={(playbackPosition / duration) * 100}
+                                        className="h-1"
+                                    />
+                                </div>
+                            ) : (
+                                <Progress value={100} className="h-1" />
+                            )}
+                        </div>
+
+                        <span className="text-[11px] font-mono text-slate-400 shrink-0 tabular-nums">
+                            {state === 'playing'
+                                ? `${formatTime(Math.floor(playbackPosition))} / ${formatTime(duration)}`
+                                : formatTime(duration)}
+                        </span>
+
+                        <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden shrink-0">
                             {[1.0, 1.5, 2.0].map((speed) => (
-                                <Button
+                                <button
+                                    type="button"
                                     key={speed}
                                     onClick={() => {
                                         setPlaybackSpeed(speed);
-                                        // Update speed on current player if playing
                                         if (audioPlayerRef.current && state === 'playing') {
                                             audioPlayerRef.current.playbackRate = speed;
                                         }
                                     }}
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`px-2 py-1 h-auto text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
+                                    className={`px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
                                         playbackSpeed === speed
-                                            ? 'bg-slate-100 text-slate-900'
-                                            : 'text-slate-600 hover:text-slate-900'
+                                            ? 'bg-slate-100 text-slate-800'
+                                            : 'text-slate-400 hover:text-slate-600'
                                     }`}
                                 >
                                     {speed}x
-                                </Button>
+                                </button>
                             ))}
                         </div>
 
-                        <Button
+                        <button
+                            type="button"
                             onClick={deleteRecording}
-                            className="flex items-center gap-2"
-                            variant="outline"
+                            className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0"
                         >
-                            <Trash2 className="w-4 h-4" />
-                            {t('audio.delete', 'Delete')}
-                        </Button>
-                    </>
-                )}
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
 
-                {uploadFailed && state === 'stopped' && (
-                    <Button
-                        onClick={retryUpload}
-                        className="flex items-center gap-2"
-                        variant="default"
-                    >
-                        <RefreshCw className="w-4 h-4" />
-                        {t('audio.retry_upload', 'Retry upload')}
-                    </Button>
-                )}
+                    {uploadFailed && (
+                        <div className="flex justify-center">
+                            <Button
+                                onClick={retryUpload}
+                                size="sm"
+                                variant="default"
+                                className="h-7 text-xs gap-1.5"
+                            >
+                                <RefreshCw className="w-3 h-3" />
+                                {t('audio.retry_upload', 'Retry upload')}
+                            </Button>
+                        </div>
+                    )}
 
-                {state === 'uploading' && (
-                    <Button disabled className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                    {existingRecording && (
+                        <p className="text-[10px] text-slate-400 text-right px-1">
+                            {(existingRecording.file_size_bytes / 1024).toFixed(1)} KB
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* Uploading */}
+            {state === 'uploading' && (
+                <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white">
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                    <span className="text-sm text-slate-500 font-medium">
                         {t('audio.uploading', 'Uploading...')}
-                    </Button>
-                )}
-            </div>
-
-            {/* File size info */}
-            {existingRecording && (
-                <p className="text-xs text-slate-500 text-center mt-2">
-                    {t('audio.file_size', 'File size')}:{' '}
-                    {(existingRecording.file_size_bytes / 1024).toFixed(1)} KB
-                </p>
+                    </span>
+                </div>
             )}
         </div>
     );
