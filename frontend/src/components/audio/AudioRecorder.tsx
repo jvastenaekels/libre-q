@@ -54,6 +54,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const animationFrameRef = useRef<number | null>(null);
     const permissionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+    const durationRef = useRef(0);
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
@@ -65,8 +66,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const playbackRetryRef = useRef(false);
     const refreshFailCountRef = useRef(0);
 
-    // Keep stateRef in sync so callbacks in stale closures read current state
+    // Keep refs in sync so callbacks in stale closures read current values
     stateRef.current = state;
+    durationRef.current = duration;
 
     // Function to refresh presigned URL (must be defined before useEffect)
     const refreshPresignedUrl = useCallback(async () => {
@@ -345,8 +347,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 setState('stopped');
                 setUploadStatus('uploading');
 
-                // Upload in background
-                onRecordingComplete(blob, duration)
+                // Upload in background (use ref to avoid stale closure over duration)
+                onRecordingComplete(blob, durationRef.current)
                     .then(() => {
                         pendingBlobRef.current = null;
                         setUploadStatus('success');
@@ -490,6 +492,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         // cross-origin audio unless the server sends CORS headers.
         const isBlobUrl = audioUrl.startsWith('blob:');
 
+        // Set playing state synchronously BEFORE starting waveform animation,
+        // so the animation loop's stateRef check passes on the first frame.
+        stateRef.current = 'playing';
+        setState('playing');
+
         if (isBlobUrl) {
             const audioContext = new AudioContext();
             const analyser = audioContext.createAnalyser();
@@ -588,7 +595,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setState('stopped');
             setAudioLevels([0, 0, 0, 0, 0]);
         });
-        setState('playing');
     };
 
     const pausePlayback = () => {
