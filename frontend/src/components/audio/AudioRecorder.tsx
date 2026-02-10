@@ -95,6 +95,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 }
             }
         } catch (error) {
+            // On 403/404 the recording belongs to another session — stop all retries
+            const status = (error as { status?: number }).status;
+            if (status === 403 || status === 404) {
+                refreshFailCountRef.current = 999;
+            }
             console.error('Failed to refresh presigned URL:', error);
             throw error; // Propagate error for caller to handle
         }
@@ -167,8 +172,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 const now = Date.now();
                 const timeUntilExpiry = urlExpiresAt - now;
 
-                // If expired or expiring soon, refresh proactively
-                if (timeUntilExpiry < 5 * 60 * 1000) {
+                // If expired or expiring soon, refresh proactively (skip if permanently failed)
+                if (timeUntilExpiry < 5 * 60 * 1000 && refreshFailCountRef.current < 3) {
                     refreshPresignedUrl().catch((error) => {
                         console.error('URL refresh on return failed:', error);
                     });

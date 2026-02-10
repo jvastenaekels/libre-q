@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { reportBug } from '../api/client';
 import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 
 const consentSchema = z.object({
@@ -75,6 +76,8 @@ const ConsentPage: React.FC = () => {
             setConsent(true);
             const token = session.token || crypto.randomUUID();
             if (!session.token) {
+                // New session — clear any stale response data (e.g. audio recordings from a prior session)
+                useResponseStore.getState().resetResponses();
                 setToken(token);
             }
 

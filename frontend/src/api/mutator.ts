@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 import { ApiError, reportBug } from './client';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Re-using the logic from client.ts but adaptable for Orval's signature
 const getBaseUrl = () => {
@@ -117,6 +118,7 @@ export const customInstance = async <T>({
 
                 useAuthStore.getState().logout();
                 useSessionStore.getState().resetSession();
+                useResponseStore.getState().resetResponses();
                 // Optional: Redirect to login if not already there
                 if (!window.location.pathname.includes('/login')) {
                     window.location.href = '/login?reason=session_expired';
