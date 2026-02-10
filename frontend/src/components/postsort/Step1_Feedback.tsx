@@ -17,7 +17,6 @@ import {
     deleteAudioRecordingApiAudioRecordingIdDelete,
 } from '@/api/generated';
 import { toast } from 'sonner';
-import { ApiError } from '@/api/client';
 
 interface Step1Props {
     onNext: () => void;
@@ -170,38 +169,9 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 created_at: new Date().toISOString(),
                 url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
             });
-
-            toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
         } catch (error) {
             console.error('Audio upload failed:', error);
-
-            // Show specific error messages for known failure modes
-            if (error instanceof ApiError) {
-                if (error.status === 507) {
-                    toast.error(
-                        t(
-                            'audio.error.quota_exceeded',
-                            'Storage quota exceeded. Please delete an existing recording or use text instead.'
-                        )
-                    );
-                    // Don't activate fallback — user can free quota by deleting recordings
-                } else if (error.status === 413) {
-                    toast.error(
-                        t(
-                            'audio.error.file_too_large',
-                            'Recording file is too large. Try a shorter recording.'
-                        )
-                    );
-                } else if (error.status >= 500) {
-                    toast.error(
-                        t('audio.error.server_error', 'Server error. Please try again in a moment.')
-                    );
-                } else {
-                    toast.error(t('audio.upload_failed', 'Upload failed'));
-                }
-            }
-
-            throw error; // Let AudioRecorder reset its state
+            throw error; // Let AudioRecorder show inline status icon
         } finally {
             setUploadingKeys((prev) => {
                 const next = new Set(prev);

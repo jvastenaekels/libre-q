@@ -1,7 +1,6 @@
 import type React from 'react';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { AudioLines, Square, Play, Pause, Trash2, Loader2, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AudioLines, Square, Play, Pause, Trash2, Loader2, Check, X } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +58,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
     const [playbackPosition, setPlaybackPosition] = useState(0);
-    const [uploadFailed, setUploadFailed] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'failed'>(
+        'idle'
+    );
     const pendingBlobRef = useRef<Blob | null>(null);
     const playbackRetryRef = useRef(false);
     const refreshFailCountRef = useRef(0);
@@ -342,24 +343,18 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
                 // Immediately transition to stopped state (don't block UI)
                 setState('stopped');
+                setUploadStatus('uploading');
 
                 // Upload in background
                 onRecordingComplete(blob, duration)
                     .then(() => {
-                        // Upload succeeded — clear pending blob
                         pendingBlobRef.current = null;
-                        setUploadFailed(false);
+                        setUploadStatus('success');
                     })
                     .catch((error) => {
                         console.error('Upload failed:', error);
-                        // Only show generic toast if parent didn't already show a specific one
-                        // (ApiError instances with status >= 400 are handled by the parent)
-                        if (!error?.status) {
-                            toast.error(t('audio.upload_failed', 'Upload failed'));
-                        }
-                        // Keep blob URL and duration for retry — don't revert to idle
                         setState('stopped');
-                        setUploadFailed(true);
+                        setUploadStatus('failed');
                     });
 
                 // Stop all tracks
@@ -372,7 +367,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             mediaRecorder.start();
             setState('recording');
             setDuration(0);
-            setUploadFailed(false);
+            setUploadStatus('idle');
             pendingBlobRef.current = null;
 
             // Monitor stream tracks for ended event (permission revoked or mic disconnected)
@@ -517,9 +512,23 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             };
             updateWaveform();
         } else {
-            // No Web Audio API — audio plays directly through HTMLAudioElement
+            // No Web Audio API for cross-origin URLs — simulate waveform animation
             audioContextRef.current = null;
             analyserRef.current = null;
+
+            const updateSimulatedWaveform = () => {
+                if (stateRef.current === 'playing') {
+                    const now = Date.now();
+                    const levels = Array.from({ length: 5 }, (_, i) => {
+                        return Math.round(
+                            80 + Math.sin(now / 200 + i * 1.5) * 60 + Math.sin(now / 350 + i) * 40
+                        );
+                    });
+                    setAudioLevels(levels);
+                    animationFrameRef.current = requestAnimationFrame(updateSimulatedWaveform);
+                }
+            };
+            updateSimulatedWaveform();
         }
 
         // Error handler for expired URLs or network issues
@@ -602,19 +611,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const retryUpload = async () => {
         if (!pendingBlobRef.current) return;
-        setUploadFailed(false);
-        setState('uploading');
+        setUploadStatus('uploading');
         try {
             await onRecordingComplete(pendingBlobRef.current, duration);
             pendingBlobRef.current = null;
-            toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
+            setUploadStatus('success');
         } catch (error) {
             console.error('Retry upload failed:', error);
-            if (!(error as { status?: number })?.status) {
-                toast.error(t('audio.upload_failed', 'Upload failed'));
-            }
-            setState('stopped');
-            setUploadFailed(true);
+            setUploadStatus('failed');
         }
     };
 
@@ -649,7 +653,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setDuration(0);
             setAudioLevels([0, 0, 0, 0, 0]);
             setState('idle');
-            setUploadFailed(false);
+            setUploadStatus('idle');
             pendingBlobRef.current = null;
 
             toast.success(t('audio.deleted', 'Audio deleted'));
@@ -818,6 +822,30 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             ))}
                         </div>
 
+                        {/* Upload status indicator */}
+                        {uploadStatus === 'uploading' && (
+                            <Loader2
+                                className="w-3.5 h-3.5 animate-spin text-slate-400 shrink-0"
+                                aria-label={t('audio.uploading', 'Uploading...')}
+                            />
+                        )}
+                        {uploadStatus === 'success' && (
+                            <Check
+                                className="w-3.5 h-3.5 text-emerald-500 shrink-0"
+                                aria-label={t('audio.upload_success', 'Uploaded')}
+                            />
+                        )}
+                        {uploadStatus === 'failed' && (
+                            <button
+                                type="button"
+                                onClick={retryUpload}
+                                aria-label={t('audio.retry_upload', 'Retry upload')}
+                                className="p-1 rounded-lg text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+
                         <button
                             type="button"
                             onClick={deleteRecording}
@@ -827,20 +855,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             <Trash2 className="w-3.5 h-3.5" />
                         </button>
                     </div>
-
-                    {uploadFailed && (
-                        <div className="flex justify-center">
-                            <Button
-                                onClick={retryUpload}
-                                size="sm"
-                                variant="default"
-                                className="h-7 text-xs gap-1.5"
-                            >
-                                <RefreshCw className="w-3 h-3" />
-                                {t('audio.retry_upload', 'Retry upload')}
-                            </Button>
-                        </div>
-                    )}
 
                     {existingRecording && (
                         <p className="text-[10px] text-slate-400 text-right px-1">

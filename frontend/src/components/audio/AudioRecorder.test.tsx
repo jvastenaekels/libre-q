@@ -463,7 +463,7 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
     });
 
@@ -483,10 +483,10 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry upload'));
+        fireEvent.click(screen.getByRole('button', { name: 'Retry upload' }));
 
         await waitFor(() => {
             expect(onComplete).toHaveBeenCalledTimes(2);
@@ -515,14 +515,14 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry upload'));
+        fireEvent.click(screen.getByRole('button', { name: 'Retry upload' }));
 
-        // Use selector to target status label (not the button which also contains "Uploading...")
+        // Upload status is now shown as an inline icon with aria-label
         await waitFor(() => {
-            expect(screen.getByText('Uploading...', { selector: 'span' })).toBeInTheDocument();
+            expect(screen.getByLabelText('Uploading...')).toBeInTheDocument();
         });
 
         await act(async () => resolveUpload());
@@ -544,13 +544,13 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry upload'));
+        fireEvent.click(screen.getByRole('button', { name: 'Retry upload' }));
 
         await waitFor(() => {
-            expect(screen.queryByText('Retry upload')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Retry upload' })).not.toBeInTheDocument();
         });
     });
 
@@ -570,14 +570,14 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Retry upload'));
+        fireEvent.click(screen.getByRole('button', { name: 'Retry upload' }));
 
         // After second failure, retry button should reappear
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
         });
     });
@@ -602,7 +602,7 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
         // Delete should clear everything
@@ -610,7 +610,7 @@ describe('AudioRecorder', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Record audio response')).toBeInTheDocument();
-            expect(screen.queryByText('Retry upload')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Retry upload' })).not.toBeInTheDocument();
         });
     });
 
@@ -865,9 +865,52 @@ describe('AudioRecorder', () => {
         expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled();
     });
 
-    // ── TOAST BEHAVIOR ──────────────────────────────────────────────
+    // ── UPLOAD STATUS ICONS ─────────────────────────────────────────
 
-    it('shows generic toast on upload failure without status code', async () => {
+    it('shows uploading icon during upload', async () => {
+        let resolveUpload!: () => void;
+        const onComplete = vi.fn(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolveUpload = resolve;
+                })
+        );
+
+        render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
+
+        fireEvent.click(screen.getByText('Record audio response'));
+        await waitFor(() => {
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+        await simulateRecordingComplete();
+
+        await waitFor(() => {
+            expect(screen.getByLabelText('Uploading...')).toBeInTheDocument();
+        });
+
+        await act(async () => resolveUpload());
+    });
+
+    it('shows success icon after successful upload', async () => {
+        const onComplete = vi.fn().mockResolvedValue(undefined);
+        render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
+
+        fireEvent.click(screen.getByText('Record audio response'));
+        await waitFor(() => {
+            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+        await simulateRecordingComplete();
+
+        await waitFor(() => {
+            expect(screen.getByLabelText('Uploaded')).toBeInTheDocument();
+        });
+    });
+
+    it('shows failure icon on upload error (no toast)', async () => {
         const onComplete = vi.fn().mockRejectedValue(new Error('Network error'));
         render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
 
@@ -880,30 +923,11 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(mockToast.error).toHaveBeenCalledWith('Upload failed');
-        });
-    });
-
-    it('does not show generic toast when upload error has status code', async () => {
-        const apiError = Object.assign(new Error('Bad Request'), { status: 400 });
-        const onComplete = vi.fn().mockRejectedValue(apiError);
-        render(<AudioRecorder {...defaultProps} onRecordingComplete={onComplete} />);
-
-        fireEvent.click(screen.getByText('Record audio response'));
-        await waitFor(() => {
-            expect(screen.getByRole('img', { name: /recording in progress/ })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Retry upload' })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
-        await simulateRecordingComplete();
-
-        // Wait for failure to be processed
-        await waitFor(() => {
-            expect(screen.getByText('Retry upload')).toBeInTheDocument();
-        });
-
-        // Should NOT have shown generic "Upload failed" toast
-        expect(mockToast.error).not.toHaveBeenCalledWith('Upload failed');
+        // Upload failure uses inline icon, not toast
+        expect(mockToast.error).not.toHaveBeenCalled();
     });
 
     // ── CLEANUP ─────────────────────────────────────────────────────
