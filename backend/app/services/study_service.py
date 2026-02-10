@@ -1117,7 +1117,7 @@ class StudyService:
         # 3. Build Export Structure
         # PQMethod and others need a fixed reference for statement order.
         # We sort by original statement ID.
-        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
         statement_id_to_index = {s.id: i for i, s in enumerate(sorted_statements)}
 
         participant_data = []
@@ -1183,6 +1183,7 @@ class StudyService:
                     "is_test_run": p.is_test_run,
                     "status": p.status.value,
                     "recruitment_token": getattr(p, "recruitment_token", None),
+                    "ip_address": p.ip_address,
                 }
             )
 

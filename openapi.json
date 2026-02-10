@@ -4249,6 +4249,11 @@
             "type": "integer",
             "title": "Id"
           },
+          "display_order": {
+            "type": "integer",
+            "title": "Display Order",
+            "default": 0
+          },
           "translations": {
             "items": {
               "$ref": "#/components/schemas/StatementTranslationRead"

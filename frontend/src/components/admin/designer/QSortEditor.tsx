@@ -17,6 +17,7 @@ import {
     HelpCircle,
     RotateCcw,
     Wand2,
+    GripVertical,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -26,12 +27,195 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
 
 // Define basic types for clarity
 type Statement = StatementRead;
 type Translation = StatementTranslationRead;
+
+interface SortableStatementItemProps {
+    item: { code: string; text: string };
+    idx: number;
+    statement: Statement;
+    isEditing: boolean;
+    editingCode: string;
+    editingText: string;
+    setEditingIndex: (idx: number | null) => void;
+    setEditingCode: (code: string) => void;
+    setEditingText: (text: string) => void;
+    handleSaveStatement: () => void;
+    readOnly?: boolean;
+    structureLocked?: boolean;
+    activeLocale: string;
+    // biome-ignore lint/suspicious/noExplicitAny: complex draft type
+    updateDraft: (fn: (d: any) => void) => void;
+}
+
+function SortableStatementItem({
+    item,
+    idx,
+    statement,
+    isEditing,
+    editingCode,
+    editingText,
+    setEditingIndex,
+    setEditingCode,
+    setEditingText,
+    handleSaveStatement,
+    readOnly,
+    structureLocked,
+    activeLocale,
+    updateDraft,
+}: SortableStatementItemProps) {
+    const { t } = useTranslation();
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: item.code,
+        disabled: readOnly || structureLocked || isEditing,
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={cn(
+                'flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100',
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
+            )}
+        >
+            {!readOnly && !structureLocked && !isEditing && (
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
+                >
+                    <GripVertical className="h-4 w-4" />
+                </div>
+            )}
+
+            {isEditing && !readOnly && !structureLocked ? (
+                <Input
+                    value={editingCode}
+                    onChange={(e) => setEditingCode(e.target.value)}
+                    className="w-16 h-8 text-[10px] font-black font-mono text-center p-0 rounded-lg border-indigo-200 focus:ring-indigo-500/20"
+                />
+            ) : (
+                <div className="flex items-center gap-1">
+                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
+                        {item.code}
+                    </span>
+                    <MultiLangFieldIcon
+                        activeLocale={activeLocale}
+                        translations={statement.translations || []}
+                    />
+                </div>
+            )}
+
+            {isEditing ? (
+                <>
+                    <Input
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        className="flex-1 font-medium rounded-xl h-10"
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSaveStatement();
+                            } else if (e.key === 'Escape') {
+                                setEditingIndex(null);
+                            }
+                        }}
+                    />
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleSaveStatement}
+                            className="h-8 w-8 text-green-600 hover:bg-green-50 rounded-lg"
+                        >
+                            <CheckCircle2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingIndex(null)}
+                            className="h-8 w-8 text-slate-400 hover:bg-slate-50 rounded-lg"
+                        >
+                            <AlertCircle className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className={cn(
+                            'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed',
+                            !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
+                        )}
+                        onClick={() => {
+                            if (readOnly) return;
+                            setEditingIndex(idx);
+                            setEditingText(item.text);
+                            setEditingCode(item.code);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                setEditingIndex(idx);
+                                setEditingText(item.text);
+                                setEditingCode(item.code);
+                                e.preventDefault();
+                            }
+                        }}
+                        title={t('admin.components.click_to_edit')}
+                    >
+                        {item.text}
+                    </div>
+                    {!readOnly && !structureLocked && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
+                                updateDraft((d: any) => {
+                                    if (d.statements) {
+                                        d.statements.splice(idx, 1);
+                                    }
+                                });
+                            }}
+                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
+                </>
+            )}
+        </div>
+    );
+}
 
 /**
  * Robust CSV/TSV parser that handles quoted fields and internal newlines.
@@ -158,6 +342,11 @@ const QSortEditor = ({
     const [editingText, setEditingText] = useState('');
     const [editingCode, setEditingCode] = useState('');
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
     if (!draft) return null;
 
     // --- Statements Logic ---
@@ -168,6 +357,20 @@ const QSortEditor = ({
         );
         return { code: s.code, text: t?.text || '' };
     });
+
+    const handleStatementDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = localizedStatements.findIndex((s) => s.code === active.id);
+            const newIndex = localizedStatements.findIndex((s) => s.code === over.id);
+            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
+            updateDraft((d: any) => {
+                if (d.statements) {
+                    d.statements = arrayMove(d.statements, oldIndex, newIndex);
+                }
+            });
+        }
+    };
 
     const handleBulkSave = () => {
         if (!bulkText.trim()) return;
@@ -751,119 +954,38 @@ const QSortEditor = ({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3">
-                        {localizedStatements.map((item, idx) => {
-                            const isEditing = editingIndex === idx;
-
-                            return (
-                                <div
-                                    key={idx}
-                                    className="flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100"
-                                >
-                                    {isEditing && !readOnly && !structureLocked ? (
-                                        <Input
-                                            value={editingCode}
-                                            onChange={(e) => setEditingCode(e.target.value)}
-                                            className="w-16 h-8 text-[10px] font-black font-mono text-center p-0 rounded-lg border-indigo-200 focus:ring-indigo-500/20"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
-                                                {item.code}
-                                            </span>
-                                            <MultiLangFieldIcon
-                                                activeLocale={activeLocale}
-                                                translations={statements[idx].translations || []}
-                                            />
-                                        </div>
-                                    )}
-
-                                    {isEditing ? (
-                                        <>
-                                            <Input
-                                                value={editingText}
-                                                onChange={(e) => setEditingText(e.target.value)}
-                                                className="flex-1 font-medium rounded-xl h-10"
-                                                autoFocus
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        handleSaveStatement();
-                                                    } else if (e.key === 'Escape') {
-                                                        setEditingIndex(null);
-                                                    }
-                                                }}
-                                            />
-                                            <div className="flex items-center gap-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={handleSaveStatement}
-                                                    className="h-8 w-8 text-green-600 hover:bg-green-50 rounded-lg"
-                                                >
-                                                    <CheckCircle2 className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => setEditingIndex(null)}
-                                                    className="h-8 w-8 text-slate-400 hover:bg-slate-50 rounded-lg"
-                                                >
-                                                    <AlertCircle className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div
-                                                role="button"
-                                                tabIndex={0}
-                                                className={cn(
-                                                    'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed',
-                                                    !readOnly
-                                                        ? 'cursor-text hover:bg-slate-50'
-                                                        : 'cursor-default'
-                                                )}
-                                                onClick={() => {
-                                                    if (readOnly) return;
-                                                    setEditingIndex(idx);
-                                                    setEditingText(item.text);
-                                                    setEditingCode(item.code);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ') {
-                                                        setEditingIndex(idx);
-                                                        setEditingText(item.text);
-                                                        setEditingCode(item.code);
-                                                        e.preventDefault();
-                                                    }
-                                                }}
-                                                title={t('admin.components.click_to_edit')}
-                                            >
-                                                {item.text}
-                                            </div>
-                                            {!readOnly && !structureLocked && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => {
-                                                        // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-                                                        updateDraft((d: any) => {
-                                                            if (d.statements) {
-                                                                d.statements.splice(idx, 1);
-                                                            }
-                                                        });
-                                                    }}
-                                                    className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleStatementDragEnd}
+                    >
+                        <SortableContext
+                            items={localizedStatements.map((s) => s.code)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="grid grid-cols-1 gap-3">
+                                {localizedStatements.map((item, idx) => (
+                                    <SortableStatementItem
+                                        key={item.code}
+                                        item={item}
+                                        idx={idx}
+                                        statement={statements[idx]}
+                                        isEditing={editingIndex === idx}
+                                        editingCode={editingCode}
+                                        editingText={editingText}
+                                        setEditingIndex={setEditingIndex}
+                                        setEditingCode={setEditingCode}
+                                        setEditingText={setEditingText}
+                                        handleSaveStatement={handleSaveStatement}
+                                        readOnly={readOnly}
+                                        structureLocked={structureLocked}
+                                        activeLocale={activeLocale}
+                                        updateDraft={updateDraft}
+                                    />
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
 
                     {/* Research Settings */}
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-10">

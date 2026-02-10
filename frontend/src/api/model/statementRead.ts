@@ -13,5 +13,6 @@ export interface StatementRead {
     /** @maxLength 50 */
     code: string;
     id: number;
+    display_order?: number;
     translations?: StatementTranslationRead[];
 }

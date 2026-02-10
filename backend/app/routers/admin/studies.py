@@ -130,8 +130,8 @@ async def create_study(
             db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
         # 3. Add Statements and their translations
-        for s_in in study.statements:
-            stmt = Statement(study_id=db_study.id, code=s_in.code)
+        for idx, s_in in enumerate(study.statements):
+            stmt = Statement(study_id=db_study.id, code=s_in.code, display_order=idx)
             db.add(stmt)
             await db.flush()  # get stmt ID
             for st_in in s_in.translations:
@@ -365,10 +365,11 @@ async def update_study(
                         del current_statements[code]
 
             # B. Sync existing and add new
-            for s_up in study_update.statements:
+            for idx, s_up in enumerate(study_update.statements):
                 if s_up.code in current_statements:
                     # Update existing
                     target_s = current_statements[s_up.code]
+                    target_s.display_order = idx
                     curr_s_trans = {t.language_code: t for t in target_s.translations}
                     new_s_trans_list = []
                     for st_in in s_up.translations:
@@ -385,7 +386,9 @@ async def update_study(
                     target_s.translations = new_s_trans_list
                 elif can_sync_structure:
                     # Add new
-                    new_s = Statement(study_id=study.id, code=s_up.code)
+                    new_s = Statement(
+                        study_id=study.id, code=s_up.code, display_order=idx
+                    )
                     db.add(new_s)
                     # Link to study relationships so re-fetch/serialization see it
                     study.statements.append(new_s)
@@ -773,7 +776,7 @@ async def export_study_config(
                         for st in s.translations
                     ],
                 }
-                for s in study.statements
+                for s in sorted(study.statements, key=lambda s: s.display_order)
             ],
             "recruitment_links": [
                 {
@@ -1064,8 +1067,10 @@ async def import_study_config(
             db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
         # Statements
-        for s_data in study_data.get("statements", []):
-            stmt = Statement(study_id=db_study.id, code=s_data.get("code"))
+        for idx, s_data in enumerate(study_data.get("statements", [])):
+            stmt = Statement(
+                study_id=db_study.id, code=s_data.get("code"), display_order=idx
+            )
             db.add(stmt)
             await db.flush()
             for st_data in s_data.get("translations", []):

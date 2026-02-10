@@ -301,6 +301,7 @@ class StatementRead(StatementBase):
     """Schema for reading a statement."""
 
     id: int
+    display_order: int = 0
     translations: list[StatementTranslationRead] = []
     model_config = ConfigDict(from_attributes=True)
 

@@ -80,7 +80,7 @@ class ExportService:
                 postsort_fields = study.postsort_config
 
         # 2. Header Construction
-        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
 
         header = [
             "Participant_UID",
@@ -244,7 +244,7 @@ class ExportService:
         zip_buffer = io.BytesIO()
 
         # Sort statements for consistency across all files
-        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
 
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             # 1. Generate .sta (Statements)
@@ -289,7 +289,7 @@ class ExportService:
         zip_buffer = io.BytesIO()
 
         # Sort statements for consistency
-        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
 
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
             # 1. Main Data CSV
@@ -391,7 +391,7 @@ class ExportService:
                     lines.append("")
 
         lines.append("3. STATEMENTS REFERENCE")
-        for s in sorted(study.statements, key=lambda x: x.id):
+        for s in sorted(study.statements, key=lambda x: x.display_order):
             lines.append(f"Code: {s.code}")
             for t in s.translations:
                 lines.append(f"  [{t.language_code}] {t.text.replace('\n', ' ')}")
@@ -419,7 +419,7 @@ class ExportService:
         header = ["Statement_Code"] + [f"Text_{lang_code}" for lang_code in langs]
         writer.writerow(header)
 
-        for statement in sorted(study.statements, key=lambda x: x.id):
+        for statement in sorted(study.statements, key=lambda x: x.display_order):
             row = [statement.code]
             trans_map = {
                 trans.language_code: trans.text.replace("\n", " ")

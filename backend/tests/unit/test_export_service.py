@@ -27,9 +27,10 @@ class MockStatementTranslation:
 class MockStatement:
     """Mock Statement with controllable ID for testing order."""
 
-    def __init__(self, id: int, code: str, text: str = ""):
+    def __init__(self, id: int, code: str, text: str = "", display_order: int = 0):
         self.id = id
         self.code = code
+        self.display_order = display_order
         self.translations = [MockStatementTranslation(text or code)]
 
 
@@ -95,9 +96,15 @@ class TestRosettaStone:
         # Arrange: Create statements with non-sequential IDs
         # Definition order by ID: 50 -> 100 -> 200
         statements = [
-            MockStatement(id=100, code="S_MIDDLE", text="Middle statement"),
-            MockStatement(id=50, code="S_FIRST", text="First statement"),
-            MockStatement(id=200, code="S_LAST", text="Last statement"),
+            MockStatement(
+                id=100, code="S_MIDDLE", text="Middle statement", display_order=1
+            ),
+            MockStatement(
+                id=50, code="S_FIRST", text="First statement", display_order=0
+            ),
+            MockStatement(
+                id=200, code="S_LAST", text="Last statement", display_order=2
+            ),
         ]
 
         # Participant placed statements with scores
@@ -112,7 +119,7 @@ class TestRosettaStone:
         study = MockStudy(statements)
 
         # Act: Generate .dat file
-        sorted_statements = sorted(statements, key=lambda s: s.id)
+        sorted_statements = sorted(statements, key=lambda s: s.display_order)
         dat_content = ExportService._generate_dat(
             study, [participant], sorted_statements
         )
@@ -152,14 +159,20 @@ class TestRosettaStone:
         """
         # Arrange
         statements = [
-            MockStatement(id=100, code="S_MIDDLE", text="Middle statement"),
-            MockStatement(id=50, code="S_FIRST", text="First statement"),
-            MockStatement(id=200, code="S_LAST", text="Last statement"),
+            MockStatement(
+                id=100, code="S_MIDDLE", text="Middle statement", display_order=1
+            ),
+            MockStatement(
+                id=50, code="S_FIRST", text="First statement", display_order=0
+            ),
+            MockStatement(
+                id=200, code="S_LAST", text="Last statement", display_order=2
+            ),
         ]
         study = MockStudy(statements)
 
         # Act
-        sorted_statements = sorted(statements, key=lambda s: s.id)
+        sorted_statements = sorted(statements, key=lambda s: s.display_order)
         sta_content = ExportService._generate_sta(study, sorted_statements)
 
         # Assert: Lines should be in ID order
@@ -220,9 +233,9 @@ class TestSymmetry:
         """
         # Arrange: 3 statements but only 2 entries
         statements = [
-            MockStatement(id=1, code="S1"),
-            MockStatement(id=2, code="S2"),
-            MockStatement(id=3, code="S3"),
+            MockStatement(id=1, code="S1", display_order=0),
+            MockStatement(id=2, code="S2", display_order=1),
+            MockStatement(id=3, code="S3", display_order=2),
         ]
 
         entries = [
@@ -253,8 +266,8 @@ class TestSymmetry:
         """
         # Arrange
         statements = [
-            MockStatement(id=1, code="S1", text="Statement 1"),
-            MockStatement(id=2, code="S2", text="Statement 2"),
+            MockStatement(id=1, code="S1", text="Statement 1", display_order=0),
+            MockStatement(id=2, code="S2", text="Statement 2", display_order=1),
         ]
 
         entries = [

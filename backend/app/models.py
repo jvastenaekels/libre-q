@@ -268,6 +268,7 @@ class Statement(Base):
         ForeignKey("studies.id", ondelete="CASCADE"), index=True
     )
     code: Mapped[str] = mapped_column(String)  # "S1", "S2"...
+    display_order: Mapped[int] = mapped_column(default=0)
 
     study: Mapped["Study"] = relationship(back_populates="statements", lazy="raise")
     translations: Mapped[list["StatementTranslation"]] = relationship(

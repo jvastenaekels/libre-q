@@ -8005,6 +8005,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             code: faker.string.alpha({ length: { min: 10, max: 50 } }),
             id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
             translations: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
@@ -8267,6 +8271,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                 () => ({
                     code: faker.string.alpha({ length: { min: 10, max: 50 } }),
                     id: faker.number.int({ min: undefined, max: undefined }),
+                    display_order: faker.helpers.arrayElement([
+                        faker.number.int({ min: undefined, max: undefined }),
+                        undefined,
+                    ]),
                     translations: faker.helpers.arrayElement([
                         Array.from(
                             { length: faker.number.int({ min: 1, max: 10 }) },
@@ -8524,6 +8532,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             code: faker.string.alpha({ length: { min: 10, max: 50 } }),
             id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
             translations: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
@@ -8778,6 +8790,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             code: faker.string.alpha({ length: { min: 10, max: 50 } }),
             id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
             translations: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
@@ -9035,6 +9051,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             code: faker.string.alpha({ length: { min: 10, max: 50 } }),
             id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
             translations: faker.helpers.arrayElement([
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
