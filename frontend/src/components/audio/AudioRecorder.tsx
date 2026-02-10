@@ -486,29 +486,37 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             audioContextRef.current?.close();
         }
 
-        // Setup Web Audio API for playback waveform
-        const audioContext = new AudioContext();
-        const analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaElementSource(audio);
+        // Only use Web Audio API for blob URLs (local recordings).
+        // Presigned S3 URLs are cross-origin; createMediaElementSource silences
+        // cross-origin audio unless the server sends CORS headers.
+        const isBlobUrl = audioUrl.startsWith('blob:');
 
-        // Connect: source -> analyser -> destination (speakers)
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        analyser.fftSize = 32;
+        if (isBlobUrl) {
+            const audioContext = new AudioContext();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(audio);
 
-        audioContextRef.current = audioContext;
-        analyserRef.current = analyser;
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            analyser.fftSize = 32;
 
-        // Animate waveform during playback
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const updateWaveform = () => {
-            if (analyserRef.current && stateRef.current === 'playing') {
-                analyserRef.current.getByteFrequencyData(dataArray);
-                setAudioLevels(Array.from(dataArray.slice(0, 5)));
-                animationFrameRef.current = requestAnimationFrame(updateWaveform);
-            }
-        };
-        updateWaveform();
+            audioContextRef.current = audioContext;
+            analyserRef.current = analyser;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const updateWaveform = () => {
+                if (analyserRef.current && stateRef.current === 'playing') {
+                    analyserRef.current.getByteFrequencyData(dataArray);
+                    setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    animationFrameRef.current = requestAnimationFrame(updateWaveform);
+                }
+            };
+            updateWaveform();
+        } else {
+            // No Web Audio API — audio plays directly through HTMLAudioElement
+            audioContextRef.current = null;
+            analyserRef.current = null;
+        }
 
         // Error handler for expired URLs or network issues
         audio.onerror = async () => {
