@@ -106,6 +106,8 @@ describe('useSubmitStudy', () => {
                 general_comment: 'Good study',
                 questions_answers: {},
             },
+            link_token: undefined,
+            is_test_run: false,
         });
     });
 

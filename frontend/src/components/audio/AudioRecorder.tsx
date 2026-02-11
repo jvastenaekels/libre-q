@@ -43,6 +43,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const stateRef = useRef<RecorderState>('idle');
     const [duration, setDuration] = useState(0);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const audioUrlRef = useRef<string | null>(null);
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
@@ -69,6 +70,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     // Keep refs in sync so callbacks in stale closures read current values
     stateRef.current = state;
     durationRef.current = duration;
+    audioUrlRef.current = audioUrl;
 
     // Function to refresh presigned URL (must be defined before useEffect)
     const refreshPresignedUrl = useCallback(async () => {
@@ -465,7 +467,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const playRecording = async () => {
-        if (!audioUrl) return;
+        // Use ref to always read the latest URL (avoids stale closure after refresh)
+        const currentUrl = audioUrlRef.current;
+        if (!currentUrl) return;
 
         // Proactively check if URL might be expired before playing
         if (urlExpiresAt && Date.now() > urlExpiresAt - 60 * 1000) {
@@ -481,7 +485,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
         }
 
-        const audio = new Audio(audioUrl);
+        // Re-read ref after potential refresh
+        const urlToPlay = audioUrlRef.current || currentUrl;
+        const audio = new Audio(urlToPlay);
         audioPlayerRef.current = audio;
 
         // Set playback speed
@@ -495,7 +501,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         // Only use Web Audio API for blob URLs (local recordings).
         // Presigned S3 URLs are cross-origin; createMediaElementSource silences
         // cross-origin audio unless the server sends CORS headers.
-        const isBlobUrl = audioUrl.startsWith('blob:');
+        const isBlobUrl = urlToPlay.startsWith('blob:');
 
         // Set playing state synchronously BEFORE starting waveform animation,
         // so the animation loop's stateRef check passes on the first frame.

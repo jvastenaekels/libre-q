@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useSubmitStudyApiSubmitPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -21,9 +21,14 @@ export const useSubmitStudy = () => {
     const responses = useResponseStore();
 
     const { mutateAsync: submitStudyMutation } = useSubmitStudyApiSubmitPost();
+    const isSubmittingRef = useRef(false);
 
     const submit = useCallback(
         async (status: 'started' | 'completed' = 'completed', options?: { silent?: boolean }) => {
+            // Guard against concurrent submissions
+            if (isSubmittingRef.current && status === 'completed') return;
+            if (status === 'completed') isSubmittingRef.current = true;
+
             if (!options?.silent) {
                 setIsLoading(true);
             }
@@ -34,6 +39,7 @@ export const useSubmitStudy = () => {
 
                 const searchParams = new URLSearchParams(window.location.search);
                 const isTestMode = searchParams.get('mode') === 'test' || session.isPilotMode;
+                const linkToken = searchParams.get('token') || undefined;
 
                 if (!isTestMode && !session.token) throw new Error('No session token');
 
@@ -63,6 +69,8 @@ export const useSubmitStudy = () => {
                     postsort_answers: {
                         ...responses.postsort,
                     },
+                    link_token: linkToken,
+                    is_test_run: isTestMode,
                 };
 
                 if (isTestMode) {
@@ -97,6 +105,7 @@ export const useSubmitStudy = () => {
             } catch (err: unknown) {
                 console.error(err);
                 setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+                isSubmittingRef.current = false; // Allow retry after failure
             } finally {
                 if (!options?.silent) {
                     setIsLoading(false);

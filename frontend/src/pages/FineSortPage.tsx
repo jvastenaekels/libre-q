@@ -180,6 +180,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         handleDragStart,
         handleDragMove,
         handleDragEnd,
+        handleDragCancel,
         handleCardClick,
         handleSlotClick,
     } = useFineSortDrag({
@@ -192,10 +193,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         actions,
     });
 
-    const handleDragCancel = useCallback(() => {
-        // No-op for now as hook doesn't expose cancel handler
-        // Ideally we should reset activeId in hook
-    }, []);
+    // handleDragCancel is now provided by useFineSortDrag
 
     // RECONCILIATION: Recover missing cards into Neutral deck
     useEffect(() => {

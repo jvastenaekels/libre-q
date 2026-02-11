@@ -111,7 +111,11 @@ export const customInstance = async <T>({
 
             // 401 Unauthorized: Clear session and redirect to login
             // Skip this for the token endpoint itself to avoid recursion/noisy side effects on login failure
-            if (response.status === 401 && !url.includes('/api/token')) {
+            if (
+                response.status === 401 &&
+                !url.includes('/api/token') &&
+                !url.includes('/api/study/')
+            ) {
                 // Set flag to prevent unsaved changes dialog
                 // biome-ignore lint/suspicious/noExplicitAny: window hack
                 (window as any).__isAutoLogout = true;

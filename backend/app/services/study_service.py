@@ -808,6 +808,23 @@ class StudyService:
                 detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
             )
 
+        # 2.5b Validation: Date-based closure (DB state stays 'active' past end_date)
+        if study.state == StudyState.active and not data.is_test_run:
+            from datetime import datetime, timezone
+
+            now = datetime.now(timezone.utc)
+            if study.end_date:
+                end_dt = study.end_date
+                if end_dt.tzinfo is None:
+                    closed = now.replace(tzinfo=None) > end_dt
+                else:
+                    closed = now > end_dt
+                if closed:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Study has ended. Submissions are no longer accepted.",
+                    )
+
         # 2.6 Validation: Recruitment Link
         link = None
         if data.link_token:

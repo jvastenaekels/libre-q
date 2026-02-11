@@ -107,7 +107,9 @@ async def get_study(
 
 
 @router.post("/study/{slug}/unlock")
+@limiter.limit("10/minute")
 async def unlock_study(
+    request: Request,
     password: str = Query(...),
     slug: str = Path(..., pattern="^[a-z0-9-]+$"),
     db: AsyncSession = Depends(get_db),
@@ -123,4 +125,4 @@ async def unlock_study(
     if verify_password(password, study.access_password):
         return {"status": "unlocked"}
 
-    raise HTTPException(status_code=401, detail="Incorrect password")
+    raise HTTPException(status_code=403, detail="Incorrect password")

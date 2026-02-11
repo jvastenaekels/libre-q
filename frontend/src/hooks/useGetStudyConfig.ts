@@ -1,5 +1,6 @@
 import { useGetStudyApiStudySlugGet } from '../api/generated';
 import type { StudyConfig } from '../schemas/study';
+import { useSessionStore } from '../store/useSessionStore';
 
 export const useGetStudyConfig = (
     slug?: string,
@@ -10,6 +11,7 @@ export const useGetStudyConfig = (
 ) => {
     const searchParams = new URLSearchParams(window.location.search);
     const linkToken = searchParams.get('token') || undefined;
+    const sessionToken = useSessionStore((s) => s.token);
 
     return useGetStudyApiStudySlugGet<StudyConfig>(
         slug || '',
@@ -17,6 +19,7 @@ export const useGetStudyConfig = (
             lang: language,
             link_token: linkToken,
             password: password,
+            session_token: sessionToken || undefined,
         },
         {
             query: {

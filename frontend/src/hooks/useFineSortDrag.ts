@@ -185,6 +185,11 @@ export const useFineSortDrag = ({
         [responses.qsort, handlePlacement, cleanupInteraction, actions]
     );
 
+    const handleDragCancel = useCallback(() => {
+        setActiveId(null);
+        cleanupInteraction();
+    }, [cleanupInteraction]);
+
     const handleCardClick = useCallback(
         (id: number) => {
             onSelectionChange?.(id === selectedId ? null : id);
@@ -206,6 +211,7 @@ export const useFineSortDrag = ({
         handleDragStart,
         handleDragMove,
         handleDragEnd,
+        handleDragCancel,
         findClosestEmptyRow,
         handleCardClick,
         handleSlotClick,
