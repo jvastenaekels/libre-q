@@ -96,13 +96,13 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
     };
 
     return (
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4 space-y-3">
             {/* Hidden audio element */}
             {/* biome-ignore lint/a11y/useMediaCaption: admin playback of participant audio responses */}
             <audio ref={audioRef} src={url} preload="metadata" />
 
             {/* Player Controls */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
                 <Button
                     onClick={togglePlay}
                     size="sm"
@@ -135,7 +135,7 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
                     onClick={handleDownload}
                     size="sm"
                     variant="ghost"
-                    className="h-8 w-8 text-slate-600 hover:text-indigo-700"
+                    className="h-9 w-9 text-slate-600 hover:text-indigo-700"
                     title={t('admin.audio.download', 'Download audio')}
                 >
                     <Download className="w-4 h-4" />

@@ -203,7 +203,7 @@ export function ParticipantDetailContent({
                     {t('admin.participant.grid.detail_view', 'Card Details')}
                 </h3>
             </div>
-            <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 p-3 sm:p-6 overflow-y-auto custom-scrollbar">
                 {detailStatement ? (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
                         <div className="space-y-2">
@@ -237,12 +237,14 @@ export function ParticipantDetailContent({
 
                         {/* Text Comment */}
                         {detailComment && (
-                            <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50 space-y-2">
+                            <div className="bg-indigo-50/50 p-3 sm:p-4 rounded-xl border border-indigo-100/50 space-y-2">
                                 <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
                                     <MessageSquare className="w-3.5 h-3.5" />
                                     {t('common.comment', 'Comment')}
                                 </div>
-                                <p className="text-sm text-slate-700 italic">"{detailComment}"</p>
+                                <p className="text-xs sm:text-sm text-slate-700 italic break-words">
+                                    "{detailComment}"
+                                </p>
                             </div>
                         )}
 
@@ -314,13 +316,13 @@ export function ParticipantDetailContent({
             {/* Note: User requested enriched header, we can rely on Page header or add detail here. */}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <div className="flex items-center justify-between px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
-                    <TabsList className="h-14 bg-transparent p-0 gap-2 sm:gap-6">
+                <div className="flex items-center justify-between px-3 sm:px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
+                    <TabsList className="h-12 sm:h-14 bg-transparent p-0 gap-1.5 sm:gap-6 overflow-x-auto">
                         {['session', 'presort', 'grid', 'postsort'].map((tab) => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="h-14 rounded-none border-b-2 border-transparent px-0 text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
+                                className="h-12 sm:h-14 rounded-none border-b-2 border-transparent px-0 text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
                                 <div className="flex items-center gap-2">
                                     {tab === 'session' && <Fingerprint className="w-3.5 h-3.5" />}
@@ -345,13 +347,13 @@ export function ParticipantDetailContent({
                             </TabsTrigger>
                         ))}
                     </TabsList>
-                    <div className="flex items-center gap-2 ml-auto">
+                    <div className="flex items-center gap-1 sm:gap-2 ml-auto">
                         <Button
                             variant="ghost"
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportCSV}
-                            className="text-slate-400 hover:text-indigo-600"
+                            className="h-9 w-9 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.csv', 'Export CSV')}
                         >
                             <FileSpreadsheet className="w-4 h-4" />
@@ -361,7 +363,7 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportJSON}
-                            className="text-slate-400 hover:text-indigo-600"
+                            className="h-9 w-9 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.json', 'Export JSON')}
                         >
                             <FileJson className="w-4 h-4" />
@@ -383,7 +385,10 @@ export function ParticipantDetailContent({
 
                 <div className="flex-1 overflow-y-auto bg-slate-50/30">
                     <AnimatePresence mode="wait">
-                        <TabsContent value="session" className="h-full mt-0 outline-none p-6">
+                        <TabsContent
+                            value="session"
+                            className="h-full mt-0 outline-none p-3 sm:p-6"
+                        >
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -402,7 +407,10 @@ export function ParticipantDetailContent({
                             </motion.div>
                         </TabsContent>
 
-                        <TabsContent value="presort" className="h-full mt-0 outline-none p-6">
+                        <TabsContent
+                            value="presort"
+                            className="h-full mt-0 outline-none p-3 sm:p-6"
+                        >
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -428,7 +436,7 @@ export function ParticipantDetailContent({
 
                         <TabsContent
                             value="grid"
-                            className="h-[60vh] sm:h-[70vh] lg:h-[800px] mt-0 outline-none"
+                            className="h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[800px] min-h-[350px] mt-0 outline-none"
                         >
                             {/* Grid View fixed height for canvas scroll */}
                             <GridSort
@@ -482,7 +490,10 @@ export function ParticipantDetailContent({
                             />
                         </TabsContent>
 
-                        <TabsContent value="postsort" className="h-full mt-0 outline-none p-6">
+                        <TabsContent
+                            value="postsort"
+                            className="h-full mt-0 outline-none p-3 sm:p-6"
+                        >
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}

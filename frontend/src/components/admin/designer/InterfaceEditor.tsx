@@ -156,7 +156,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -376,7 +376,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </Button>
                             )}
                         </div>
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                             <div className="space-y-2.5">
                                 <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                     {t('admin.design.interface.terms.agree')}
@@ -453,7 +453,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     </Button>
                                 )}
                             </div>
-                            <div className="grid grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                                 <div className="space-y-2.5">
                                     <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                         {t('admin.design.interface.terms.most_agree')}

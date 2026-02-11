@@ -320,7 +320,7 @@ export function SurveyResponseTable({
                                 {group.items.map((item) => (
                                     <div
                                         key={item.key}
-                                        className="px-6 py-4 flex flex-col md:flex-row md:items-start gap-4 hover:bg-slate-50/30 transition-colors"
+                                        className="px-3 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row md:items-start gap-2 sm:gap-4 hover:bg-slate-50/30 transition-colors"
                                     >
                                         <div className="md:w-1/2">
                                             <div className="flex items-start gap-1.5">

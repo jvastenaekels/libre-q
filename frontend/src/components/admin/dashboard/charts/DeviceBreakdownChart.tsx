@@ -92,7 +92,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 w-full mt-4">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full mt-4">
                         {data.map((item) => {
                             const Icon = ICON_MAP[item.key as keyof typeof ICON_MAP] || HelpCircle;
                             const percentage = Math.round((item.value / total) * 100);

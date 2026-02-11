@@ -1096,7 +1096,7 @@ const QSortEditor = ({
                         </div>
 
                         {/* Distribution Visualizer (Mini Chart) */}
-                        <div className="mt-8 flex items-end justify-center gap-2 h-20 px-4">
+                        <div className="mt-6 sm:mt-8 flex items-end justify-center gap-1 sm:gap-2 h-16 sm:h-20 px-2 sm:px-4">
                             {grid.map((col, idx) => {
                                 const maxCapacity = Math.max(...grid.map((c) => c.capacity || 1));
                                 const heightPercentage = ((col.capacity || 0) / maxCapacity) * 100;
@@ -1123,7 +1123,7 @@ const QSortEditor = ({
                         </div>
 
                         {/* Status Pills */}
-                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 py-3 border-t border-slate-100">
+                        <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-4 py-3 border-t border-slate-100">
                             <div
                                 className={cn(
                                     'flex items-center gap-2 px-4 py-1.5 rounded-full border shadow-sm transition-all',
@@ -1164,9 +1164,9 @@ const QSortEditor = ({
                     </div>
 
                     {/* Visual Grid Representative */}
-                    <div className="bg-slate-50/40 border border-slate-200 rounded-[32px] p-10 flex flex-col items-center shadow-inner relative overflow-hidden group/grid transition-all">
+                    <div className="bg-slate-50/40 border border-slate-200 rounded-[32px] p-4 sm:p-6 md:p-10 flex flex-col items-center shadow-inner relative overflow-hidden group/grid transition-all">
                         {/* Interactive Grid Columns */}
-                        <div className="flex items-end gap-3 mb-12 overflow-x-auto max-w-full pb-8 px-8 min-h-[300px]">
+                        <div className="flex items-end gap-1.5 sm:gap-2 md:gap-3 mb-8 md:mb-12 overflow-x-auto max-w-full pb-8 px-2 sm:px-4 md:px-8 min-h-[200px] sm:min-h-[300px]">
                             {grid.map((col, idx) => (
                                 <div
                                     key={idx}
@@ -1192,7 +1192,7 @@ const QSortEditor = ({
                                             <div
                                                 key={i}
                                                 className={cn(
-                                                    'w-12 h-4 rounded-md border shadow-sm transition-all duration-500',
+                                                    'w-8 sm:w-10 md:w-12 h-3 sm:h-4 rounded-md border shadow-sm transition-all duration-500',
                                                     isValid
                                                         ? 'bg-white border-indigo-200 group-hover/col:border-indigo-400 group-hover/col:shadow-indigo-100'
                                                         : 'bg-white border-slate-200'
@@ -1202,7 +1202,7 @@ const QSortEditor = ({
                                     </div>
 
                                     <div
-                                        className="mt-2 text-[13px] font-black w-10 h-10 rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600"
+                                        className="mt-2 text-[11px] sm:text-[13px] font-black w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600"
                                         data-testid={`grid-column-${idx}-score`}
                                     >
                                         {col.score > 0 ? `+${col.score}` : col.score}
@@ -1284,7 +1284,7 @@ const QSortEditor = ({
                         {/* Validation Bottom Bar */}
                         <div
                             className={cn(
-                                'flex items-center gap-8 px-10 py-5 rounded-[28px] border-2 shadow-2xl transition-all duration-500 transform',
+                                'flex flex-col sm:flex-row items-center gap-4 sm:gap-8 px-4 sm:px-10 py-4 sm:py-5 rounded-2xl sm:rounded-[28px] border-2 shadow-2xl transition-all duration-500 transform',
                                 isValid
                                     ? 'bg-white border-green-500/20 ring-8 ring-green-500/5 rotate-0'
                                     : 'bg-white border-amber-500/20 ring-8 ring-amber-500/5'
@@ -1304,7 +1304,7 @@ const QSortEditor = ({
                                 </div>
                             </div>
 
-                            <div className="w-px h-10 bg-slate-100" />
+                            <div className="hidden sm:block w-px h-10 bg-slate-100" />
 
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
@@ -1320,7 +1320,7 @@ const QSortEditor = ({
                                 </div>
                             </div>
 
-                            <div className="w-px h-10 bg-slate-100" />
+                            <div className="hidden sm:block w-px h-10 bg-slate-100" />
 
                             <div className="flex items-center gap-4">
                                 {isValid ? (

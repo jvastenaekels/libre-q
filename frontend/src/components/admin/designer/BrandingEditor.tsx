@@ -123,7 +123,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-8 gap-2 pt-2">
+                            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-2 pt-2">
                                 {[
                                     '#4f46e5',
                                     '#7c3aed',
@@ -245,7 +245,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     (partner: PartnerLogo, index: number) => (
                                         <div
                                             key={partner.id || index}
-                                            className="flex gap-4 items-start p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
+                                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start p-3 sm:p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
                                         >
                                             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-100 shrink-0 shadow-sm">
                                                 {partner.logo_url ? (

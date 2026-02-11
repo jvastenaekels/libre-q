@@ -77,15 +77,15 @@ export function ParticipantMetadataCard({
             className={cn('border-none shadow-sm bg-white rounded-2xl overflow-hidden', className)}
         >
             <CardHeader className="border-b border-slate-50 pb-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                         <Fingerprint className="h-5 w-5 text-indigo-500" />
-                        <CardTitle className="text-lg font-black text-slate-900">
+                        <CardTitle className="text-base sm:text-lg font-black text-slate-900">
                             {t('admin.participant.metadata.title', 'Session Metadata')}
                         </CardTitle>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                         {onToggleDiscard && (
                             <Button
                                 variant="ghost"
@@ -137,7 +137,7 @@ export function ParticipantMetadataCard({
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Tech Info */}
                 <div className="space-y-4">
                     <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">

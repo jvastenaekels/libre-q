@@ -646,7 +646,7 @@ const StudyDesignPage = () => {
                 {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
                     <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-start justify-center p-4 sm:p-8 pt-24">
-                        <div className="bg-white border-none shadow-2xl rounded-3xl p-10 max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
+                        <div className="bg-white border-none shadow-2xl rounded-3xl p-6 sm:p-10 max-w-sm sm:max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
                             <div
                                 className={cn(
                                     'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner border',
@@ -1023,7 +1023,7 @@ const StudyDesignPage = () => {
 
                 {/* Design Checklist Sidebar/Widget */}
                 {/* Hidden on smaller screens for responsiveness */}
-                <div className="hidden xl:block w-64 shrink-0 border-l bg-white p-4 overflow-y-auto">
+                <div className="hidden lg:block w-56 xl:w-64 shrink-0 border-l bg-white p-4 overflow-y-auto">
                     <div className="sticky top-0 space-y-6">
                         <div>
                             <div className="flex items-center gap-3 mb-6">

@@ -712,7 +712,7 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     {/* Primary Metrics: Completed & In Progress */}
 
                     {/* Completed Card */}
@@ -1078,9 +1078,9 @@ export default function InteractiveDataView({
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 lg:gap-4 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
                 {/* Left Group: Search & Total */}
-                <div className="flex items-center gap-3 w-full lg:w-auto flex-1 lg:max-w-2xl px-2">
+                <div className="flex items-center gap-3 w-full lg:w-auto flex-1 lg:max-w-2xl px-1 sm:px-2">
                     <div className="relative group w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                         <Input
@@ -1099,7 +1099,7 @@ export default function InteractiveDataView({
                     </div>
                 </div>
                 {/* Right Group: Filters & Actions */}
-                <div className="flex items-center gap-2 w-full lg:w-auto justify-end px-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto justify-end px-1 sm:px-2 overflow-x-auto">
                     {/* Flagged Filter Toggle */}
                     <Button
                         variant="ghost"
@@ -1460,7 +1460,7 @@ export default function InteractiveDataView({
 
                 {/* Pagination */}
                 {table.getPageCount() > 1 && (
-                    <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between px-3 sm:px-6 py-3 border-t border-slate-100">
                         <p className="text-xs text-slate-500 font-medium">
                             {t(
                                 'admin.data.pagination.showing',
