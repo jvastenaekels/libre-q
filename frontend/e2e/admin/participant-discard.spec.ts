@@ -66,7 +66,7 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         await page.goto(`/admin/studies/${studySlug}/exports`);
 
         // Check URL
-        await expect(page).toHaveURL(new RegExp(`/admin/studies/${studySlug}/exports`));
+        await expect(page).toHaveURL(new RegExp(`/studies/${studySlug}/(exports|data)`));
 
         // Wait for table to load
         await expect(page.locator('table')).toBeVisible({ timeout: 15000 });

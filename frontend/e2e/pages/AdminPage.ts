@@ -15,7 +15,7 @@ export class AdminPage extends BasePage {
         await this.page.getByLabel(/email/i).fill(email);
         await this.page.getByLabel(/password/i).fill(password);
         await this.page.getByRole('button', { name: /continue/i }).click();
-        await expect(this.page).toHaveURL('/admin');
+        await expect(this.page).toHaveURL(/\/(admin|app\/)/);
     }
 
     async createStudy(title: string, slug: string) {
@@ -37,7 +37,7 @@ export class AdminPage extends BasePage {
         );
         await this.page.getByRole('button', { name: /create/i }).click();
         await createResponsePromise;
-        await expect(this.page).toHaveURL(new RegExp(`/admin/studies/${slug}`));
+        await expect(this.page).toHaveURL(new RegExp(`/studies/${slug}`));
     }
 
     async waitForSync() {

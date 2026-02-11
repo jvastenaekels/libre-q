@@ -1201,7 +1201,10 @@ const QSortEditor = ({
                                         ))}
                                     </div>
 
-                                    <div className="mt-2 text-[13px] font-black w-10 h-10 rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600">
+                                    <div
+                                        className="mt-2 text-[13px] font-black w-10 h-10 rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600"
+                                        data-testid={`grid-column-${idx}-score`}
+                                    >
                                         {col.score > 0 ? `+${col.score}` : col.score}
                                     </div>
 
@@ -1230,6 +1233,7 @@ const QSortEditor = ({
                                         size="sm"
                                         onClick={removeExtremeColumns}
                                         className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all"
+                                        data-testid="reduce-grid-button"
                                     >
                                         <Minus className="h-4 w-4" /> {t('common.reduce')}
                                     </Button>
@@ -1239,6 +1243,7 @@ const QSortEditor = ({
                                         size="sm"
                                         onClick={addExtremeColumns}
                                         className="h-9 px-4 rounded-xl font-bold gap-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                        data-testid="expand-grid-button"
                                     >
                                         <Plus className="h-4 w-4" /> {t('common.expand')}
                                     </Button>

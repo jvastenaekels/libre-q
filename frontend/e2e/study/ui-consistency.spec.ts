@@ -73,8 +73,8 @@ test.describe('UI Consistency & Logic Verification', () => {
         // 6. Should reach post-sort
         await expect(page).toHaveURL(/.*\/post-sort/);
 
-        // Verify post-sort page UI
-        await expect(page.getByRole('button', { name: /share|submit/i })).toBeVisible({
+        // Verify post-sort page UI (step 1 heading)
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
             timeout: 10000,
         });
     });
@@ -126,8 +126,8 @@ test.describe('UI Consistency & Logic Verification', () => {
         // 6. Should reach post-sort
         await expect(page).toHaveURL(/.*\/post-sort/);
 
-        // Verify post-sort page UI
-        await expect(page.getByRole('button', { name: /share|submit/i })).toBeVisible({
+        // Verify post-sort page UI (step 1 heading)
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
             timeout: 10000,
         });
     });

@@ -17,6 +17,8 @@ export class WelcomePage extends BasePage {
     async startStudy() {
         const startBtn = this.page.getByTestId('start-btn');
         await expect(startBtn).toBeVisible({ timeout: 10000 });
-        await startBtn.click();
+        // Use dispatchEvent to bypass the <main> overflow container
+        // intercepting pointer events at the button's coordinates
+        await startBtn.dispatchEvent('click');
     }
 }

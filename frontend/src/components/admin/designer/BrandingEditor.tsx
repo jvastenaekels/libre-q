@@ -101,6 +101,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         />
                                         <Input
                                             type="text"
+                                            name="accentColor"
                                             value={branding.accent_color || '#4f46e5'}
                                             onChange={(e) =>
                                                 updateBranding('accent_color', e.target.value)
@@ -178,6 +179,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <CardContent className="space-y-6">
                             <ImageUploadInput
                                 id="logo-url"
+                                name="logoUrl"
                                 value={branding.logo_url || ''}
                                 onChange={(value) => updateBranding('logo_url', value)}
                                 label={t('admin.design.theme.logo.label')}
@@ -265,6 +267,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                         )}
                                                     </Label>
                                                     <Input
+                                                        name="partnerName"
                                                         value={partner.name}
                                                         onChange={(e) => {
                                                             const newPartners = [
@@ -282,6 +285,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                     />
                                                 </div>
                                                 <ImageUploadInput
+                                                    name="partnerLogoUrl"
                                                     value={partner.logo_url}
                                                     onChange={(value) => {
                                                         const newPartners = [

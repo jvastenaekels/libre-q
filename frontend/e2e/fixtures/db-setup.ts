@@ -65,7 +65,7 @@ export class TestDatabase {
 
         await page.addInitScript(
             ({ token, user, workspace }) => {
-                window.localStorage.setItem(
+                window.sessionStorage.setItem(
                     'admin-auth-storage',
                     JSON.stringify({
                         state: {
@@ -94,8 +94,8 @@ export class TestDatabase {
             }
         );
 
-        await page.goto('/admin');
-        await page.waitForURL(/\/admin/);
+        await page.goto(`/app/${this.currentWorkspaceSlug}/dashboard`);
+        await page.waitForURL(/\/app\//);
     }
 
     /**

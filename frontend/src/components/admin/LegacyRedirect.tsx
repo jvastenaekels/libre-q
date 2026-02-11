@@ -5,7 +5,7 @@
  */
 
 import { useEffect } from 'react';
-import { Navigate, useParams, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -18,7 +18,6 @@ import { useAdminStore } from '@/store/useAdminStore';
  * This ensures that bookmarks and old links continue to work seamlessly.
  */
 export const LegacyRedirect = () => {
-    const { slug } = useParams();
     const location = useLocation();
     const { workspaces } = useAuthStore();
     const { setActiveStudy, setActiveWorkspace, lastVisitedStudySlug } = useAdminStore();
@@ -40,7 +39,10 @@ export const LegacyRedirect = () => {
         );
     }
 
+    // Extract slug from path parts since this is a catch-all route (useParams has no :slug)
     const pathParts = location.pathname.split('/').filter(Boolean);
+    const slug = pathParts[2]; // Third segment is typically the slug
+
     // /admin
     if (pathParts.length === 1 && pathParts[0] === 'admin') {
         // If we have a last visited study, redirect to it in its workspace
@@ -114,8 +116,6 @@ export const LegacyRedirect = () => {
     if (pathParts[0] === 'admin' && pathParts[1] === 'profile') {
         const firstWs = workspaces?.[0];
         if (firstWs) {
-            // Profile is still global but we scope it under /app/:ws for layout consistency if needed,
-            // but let's see if we should have a global /app/profile
             return <Navigate to={`/app/${firstWs.slug}/profile`} replace />;
         }
         return <Navigate to="/hub" replace />;

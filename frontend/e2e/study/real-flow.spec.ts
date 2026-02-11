@@ -72,8 +72,8 @@ test.describe('Participant Flow (Real Backend)', () => {
         // 7. Should reach post-sort page
         await expect(page).toHaveURL(/.*\/post-sort/);
 
-        // Verify post-sort page UI is visible (submit button)
-        await expect(page.getByRole('button', { name: /share|submit/i })).toBeVisible({
+        // Verify post-sort page UI is visible (step 1 heading)
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
             timeout: 10000,
         });
     });

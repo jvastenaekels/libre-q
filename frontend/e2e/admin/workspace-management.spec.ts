@@ -15,21 +15,12 @@ test.describe('Workspace Management E2E Tests (Real Backend)', () => {
         workspaceSlug = testDb.getWorkspaceSlug();
     });
 
-    test('should navigate to workspace settings via switcher', async ({ page }) => {
-        // Open workspace switcher
-        await page.getByTestId('workspace-switcher').click();
-
-        // Screenshot dropdown
-        // await visual.captureElement('[role="menu"]', 'workspace-switcher-dropdown');
-
-        // Click workspace settings
-        await page.getByRole('menuitem', { name: /workspace settings/i }).click();
+    test('should navigate to workspace settings via sidebar', async ({ page }) => {
+        // Navigate to workspace settings via sidebar link
+        await page.getByRole('link', { name: /settings/i }).last().click();
 
         // Wait for navigation
-        await expect(page).toHaveURL(new RegExp(`/admin/workspaces/${workspaceSlug}/settings`));
-
-        // Capture workspace settings page
-        // await visual.compareScreenshot('workspace-settings-page', { fullPage: true });
+        await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}/settings`));
     });
 
     test('should update workspace title and slug', async ({ page }) => {
@@ -56,7 +47,7 @@ test.describe('Workspace Management E2E Tests (Real Backend)', () => {
         await expect(page.getByText(/workspace updated/i)).toBeVisible();
 
         // Verify URL changed
-        await expect(page).toHaveURL(/admin\/workspaces\/updated-.*\/settings/);
+        await expect(page).toHaveURL(/\/updated-.*\/settings/);
     });
 
     test('should display team members table', async ({ page }) => {

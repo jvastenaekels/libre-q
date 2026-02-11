@@ -13,6 +13,7 @@ interface ImageUploadInputProps {
     recommendedSize?: string;
     maxFileSize?: number; // in bytes, default 500KB
     id?: string;
+    name?: string;
 }
 
 const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
@@ -22,6 +23,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
     recommendedSize = '200x50px',
     maxFileSize = 500 * 1024, // 500KB default
     id,
+    name,
 }) => {
     const { t } = useTranslation();
     const [mode, setMode] = useState<'url' | 'upload'>('url');
@@ -164,6 +166,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
             {mode === 'url' && (
                 <Input
                     id={id}
+                    name={name}
                     value={isBase64 ? '' : value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder="https://example.com/logo.png"

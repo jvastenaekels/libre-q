@@ -648,6 +648,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                     onClick={handleNext}
                     disabled={isUploadInProgress}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px] shadow-md shadow-indigo-200"
+                    data-testid="postsort-step1-next-btn"
                 >
                     {isUploadInProgress
                         ? t('audio.uploading', 'Uploading...')

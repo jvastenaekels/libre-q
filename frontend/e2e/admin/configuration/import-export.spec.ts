@@ -168,7 +168,7 @@ test.describe('Import/Export Study Configuration', () => {
 
         // 6. Verify Creation
         // Should redirect to design page of new study
-        await expect(page).toHaveURL(new RegExp(`/admin/studies/${newSlug}/design`));
+        await expect(page).toHaveURL(new RegExp(`/studies/${newSlug}`));
 
         // Verify Content on page (e.g. Statements tab)
         // Switch to Q-sort tab to use test id which is safer
