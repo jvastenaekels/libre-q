@@ -40,6 +40,7 @@ interface ParticipantMetadataCardProps {
         duration_seconds?: number | null;
         language_used?: string;
         is_test_run?: boolean;
+        is_discarded?: boolean;
     };
     className?: string;
     onToggleDiscard?: (discarded: boolean) => void;
@@ -55,7 +56,7 @@ export function ParticipantMetadataCard({
     const { t, i18n } = useTranslation();
     const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
     const uaInfo = parseUA(participant.user_agent || '');
-    const isDiscarded = participant.status === 'discarded';
+    const isDiscarded = !!participant.is_discarded;
 
     // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
     const dateLocales: Record<string, any> = {
@@ -102,6 +103,14 @@ export function ParticipantMetadataCard({
                                     ? t('admin.data.actions.restore', 'Restore')
                                     : t('admin.data.actions.discard', 'Discard')}
                             </Button>
+                        )}
+                        {isDiscarded && (
+                            <Badge
+                                variant="outline"
+                                className="bg-rose-50 text-rose-600 border-rose-200 font-black uppercase text-[10px]"
+                            >
+                                {t('admin.data.detail.discarded_badge', 'Discarded')}
+                            </Badge>
                         )}
                         {participant.is_test_run && (
                             <Badge

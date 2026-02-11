@@ -177,11 +177,13 @@ export default function ParticipantDetailsPage() {
             });
             await refetch();
             toast.success(
-                isDiscarded ? t('admin.data.toast.discarded') : t('admin.data.toast.restored')
+                isDiscarded
+                    ? t('admin.data.toast.discarded', 'Participant discarded')
+                    : t('admin.data.toast.restored', 'Participant restored')
             );
         } catch (err) {
             console.error(err);
-            toast.error(t('admin.data.toast.error'));
+            toast.error(t('admin.data.toast.error', 'Failed to update participant'));
         }
     };
 

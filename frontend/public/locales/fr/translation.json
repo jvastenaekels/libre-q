@@ -346,6 +346,10 @@
             "message": "Votre contribution à l'étude a bien été enregistrée.",
             "id_label": "Code de confirmation"
         },
+        "submit_error": {
+            "title": "Échec de l'envoi",
+            "message": "Vérifiez votre connexion et réessayez."
+        },
         "score": "Score",
         "back": "Retour au classement",
         "contact": {
@@ -955,6 +959,10 @@
             "translation_needed": "Révision requise (Copie)",
             "translation_needed_desc": "Ce contenu a été automatiquement copié d'une autre langue. Veuillez le réviser et le localiser.",
             "reset_defaults": "Réinitialiser par défaut",
+            "multilang": {
+                "view_others": "Voir dans d'autres langues",
+                "other_formulations": "Autres formulations"
+            },
             "guidance": {
                 "intro_title": "Configurons l'étude dans les moindres détails",
                 "intro_desc": "Commencez par définir l'objectif de votre étude. Ces informations seront présentées aux participants avant qu'ils ne débutent le processus de tri.",
@@ -1487,6 +1495,11 @@
                 "email_provided": "Email fourni",
                 "newsletter_consent": "Souhaite recevoir les résultats",
                 "interview_consent": "Ouvert à un entretien de suivi"
+            },
+            "toast": {
+                "discarded": "Participant écarté",
+                "restored": "Participant restauré",
+                "error": "Échec de la mise à jour du participant"
             },
             "detail": {
                 "participant": "Participant",

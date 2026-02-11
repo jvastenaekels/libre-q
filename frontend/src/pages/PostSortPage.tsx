@@ -4,8 +4,8 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { Check, Loader2 } from 'lucide-react';
-import React, { useState } from 'react';
+import { AlertTriangle, Check, Loader2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
@@ -47,11 +47,15 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         submit,
         isLoading,
         isSuccess: isSubmitSuccess,
+        error: submitError,
         confirmationCode: submitConfirmationCode,
     } = useSubmitStudy();
 
     const isSuccess = isSubmitSuccess || session.isCompleted;
     const finalConfirmationCode = session.confirmationCode || submitConfirmationCode;
+
+    // Ref to prevent the 'started' silent submit from re-firing when submit identity changes
+    const startedSentRef = useRef(false);
 
     // --- Effects ---
 
@@ -70,9 +74,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
         if (config && responses.qsort.length !== config.statements.length) {
             navigate(`/study/${slug}/fine-sort`, { replace: true });
-        } else {
-            // Optional: trigger a silent 'started' status update if not already
-            // Using a timer to avoid conflicts
+        } else if (!startedSentRef.current) {
+            // Send a single silent 'started' status update on first mount
+            startedSentRef.current = true;
             const timer = setTimeout(() => {
                 submit('started', { silent: true });
             }, 1000);
@@ -130,6 +134,24 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     <p className="text-xl font-semibold text-slate-700 animate-pulse">
                         {t('common.submitting')}
                     </p>
+                </div>
+            )}
+
+            {/* Submission Error */}
+            {submitError && !isLoading && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                        <p className="text-sm font-semibold text-red-800">
+                            {t('post.submit_error.title', 'Submission failed')}
+                        </p>
+                        <p className="text-sm text-red-600 mt-1">
+                            {t(
+                                'post.submit_error.message',
+                                'Please check your connection and try again.'
+                            )}
+                        </p>
+                    </div>
                 </div>
             )}
 

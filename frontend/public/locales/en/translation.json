@@ -346,6 +346,10 @@
             "message": "Your contribution to the study has been saved.",
             "id_label": "Confirmation code"
         },
+        "submit_error": {
+            "title": "Submission failed",
+            "message": "Please check your connection and try again."
+        },
         "score": "Score",
         "back": "Back to sort",
         "contact": {
@@ -926,6 +930,10 @@
             "translation_needed": "Review required (copy)",
             "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
             "reset_defaults": "Reset to defaults",
+            "multilang": {
+                "view_others": "View in other languages",
+                "other_formulations": "Other Formulations"
+            },
             "guidance": {
                 "title": "Design guidance",
                 "intro_title": "Welcome to the studio",
@@ -1457,6 +1465,11 @@
                 "email_provided": "Email provided",
                 "newsletter_consent": "Wants to receive results",
                 "interview_consent": "Open to follow-up interview"
+            },
+            "toast": {
+                "discarded": "Participant discarded",
+                "restored": "Participant restored",
+                "error": "Failed to update participant"
             },
             "detail": {
                 "participant": "Participant",

@@ -927,7 +927,7 @@ export default function InteractiveDataView({
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t(
-                                        'admin.data.badges.newsletter_consent',
+                                        'admin.data.tooltips.newsletter_consent',
                                         'Wants to receive results'
                                     )}
                                 </span>

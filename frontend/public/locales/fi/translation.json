@@ -346,6 +346,10 @@
             "message": "Vastauksesi tutkimukseen on tallennettu.",
             "id_label": "Vahvistuskoodi"
         },
+        "submit_error": {
+            "title": "Lähetys epäonnistui",
+            "message": "Tarkista yhteytesi ja yritä uudelleen."
+        },
         "score": "Pisteet",
         "back": "Takaisin lajitteluun",
         "contact": {
@@ -917,6 +921,10 @@
             "translation_needed": "Tarkistus vaaditaan (Kopio)",
             "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
             "reset_defaults": "Palauta oletukset",
+            "multilang": {
+                "view_others": "Näytä muilla kielillä",
+                "other_formulations": "Muut muotoilut"
+            },
             "guidance": {
                 "intro_title": "Tervetuloa Studioon",
                 "intro_desc": "Aloita määrittelemällä tutkimuksesi tarkoitus. Nämä tiedot näytetään osallistujille ennen lajitteluprosessin aloittamista.",
@@ -1449,6 +1457,11 @@
                 "email_provided": "Sähköposti annettu",
                 "newsletter_consent": "Haluaa saada tulokset",
                 "interview_consent": "Avoin jatkohaastattelulle"
+            },
+            "toast": {
+                "discarded": "Osallistuja hylätty",
+                "restored": "Osallistuja palautettu",
+                "error": "Osallistujan päivitys epäonnistui"
             },
             "detail": {
                 "participant": "Osallistuja",
