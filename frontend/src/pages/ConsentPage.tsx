@@ -123,7 +123,7 @@ const ConsentPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-500">
+        <div className="max-w-2xl mx-auto py-6 sm:py-12 px-4 animate-in fade-in duration-500">
             <div className="mb-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {t('consent.title', 'Consent to Participate')}
@@ -136,7 +136,7 @@ const ConsentPage: React.FC = () => {
             <form
                 id="consent-form"
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
+                className="bg-white p-5 sm:p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
             >
                 {/* Consent Description/Legal Text */}
                 {/* Consent Description/Legal Text */}

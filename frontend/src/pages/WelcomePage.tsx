@@ -122,18 +122,18 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         {study.title}
                     </h1>
                     {study.subtitle && (
-                        <h2 className="text-xl text-slate-600 font-normal mt-3">
+                        <h2 className="text-lg sm:text-xl text-slate-600 font-normal mt-3">
                             {study.subtitle}
                         </h2>
                     )}
                 </div>
 
-                <p className="text-xl text-gray-800 leading-relaxed font-medium">
+                <p className="text-base sm:text-xl text-gray-800 leading-relaxed font-medium">
                     {study.description}
                 </p>
 
                 {study.objective && (
-                    <div className="bg-white border border-slate-200 rounded-xl p-6 w-full mx-auto mt-8 text-left shadow-md relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 w-full mx-auto mt-8 text-left shadow-md relative overflow-hidden">
                         <div
                             className="absolute top-0 left-0 w-1 h-full"
                             style={{ backgroundColor: 'var(--brand-accent)' }}
@@ -188,7 +188,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                 <div className="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                     {/* Instructions Column */}
                     <div
-                        className="md:col-span-12 lg:col-span-7 p-8 md:px-10 md:pt-10 md:pb-6 flex flex-col justify-start"
+                        className="md:col-span-12 lg:col-span-7 p-4 sm:p-8 md:px-10 md:pt-10 md:pb-6 flex flex-col justify-start"
                         style={{
                             backgroundColor:
                                 'color-mix(in srgb, var(--brand-accent), transparent 95%)',
@@ -204,7 +204,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             </div>
                         )}
 
-                        <div className="flex flex-col gap-8 mt-2">
+                        <div className="flex flex-col gap-4 sm:gap-8 mt-2">
                             {/* biome-ignore lint/suspicious/noExplicitAny: step data */}
                             {steps.map((step: any, index: number) => (
                                 <div
@@ -249,7 +249,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     </div>
 
                     {/* Visual Column */}
-                    <div className="md:col-span-12 lg:col-span-5 p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
+                    <div className="md:col-span-12 lg:col-span-5 p-4 sm:p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[250px] sm:min-h-[350px] md:min-h-[500px] relative overflow-hidden">
                         <div className="uppercase tracking-wider text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm mb-4">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>

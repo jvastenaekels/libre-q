@@ -782,7 +782,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             {/* Stopped / Playing: compact player bar */}
             {(state === 'stopped' || state === 'playing') && (
                 <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex flex-wrap items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
                         <button
                             type="button"
                             onClick={
@@ -855,7 +855,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                                             audioPlayerRef.current.playbackRate = speed;
                                         }
                                     }}
-                                    className={`px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                                    className={`px-2 py-1 text-xs font-medium transition-colors ${
                                         playbackSpeed === speed
                                             ? 'bg-slate-100 text-slate-800'
                                             : 'text-slate-400 hover:text-slate-600'

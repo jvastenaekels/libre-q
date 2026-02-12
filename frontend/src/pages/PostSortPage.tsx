@@ -90,7 +90,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     if (isSuccess) {
         return (
-            <div className="max-w-xl mx-auto px-4 py-24 text-center animate-in zoom-in-50 duration-500">
+            <div className="max-w-xl mx-auto px-4 py-12 sm:py-24 text-center animate-in zoom-in-50 duration-500">
                 <div
                     className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-100"
                     style={{
@@ -101,7 +101,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     <Check size={40} strokeWidth={3} />
                 </div>
                 <h1
-                    className="text-3xl font-bold text-slate-800 mb-4"
+                    className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4"
                     data-testid="thank-you-message"
                 >
                     {t('post.success.title')}
@@ -110,11 +110,11 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     {t('post.success.message')}
                 </p>
                 {finalConfirmationCode && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm max-w-full">
                         <span className="text-xs font-semibold text-slate-400 block uppercase tracking-widest mb-2">
                             {t('post.success.id_label')}
                         </span>
-                        <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all">
+                        <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all break-all">
                             {finalConfirmationCode}
                         </span>
                     </div>

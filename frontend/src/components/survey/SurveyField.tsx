@@ -23,7 +23,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
     };
 
     const commonClasses =
-        'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
+        'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
 
     const placeholderText = t('common.placeholders.text_response');
 
@@ -96,7 +96,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                         return (
                             <label
                                 key={optValue}
-                                className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
+                                className="flex items-start space-x-3 p-3 hover:bg-gray-50 active:bg-gray-100 rounded-md cursor-pointer"
                             >
                                 <input
                                     type="radio"
@@ -104,7 +104,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                                     value={optValue}
                                     // biome-ignore lint/suspicious/noExplicitAny: style override
                                     style={{ accentColor: 'var(--brand-accent)' } as any}
-                                    className="h-4 w-4"
+                                    className="h-5 w-5 mt-0.5"
                                 />
                                 <span className="text-base">{optLabel}</span>
                             </label>
@@ -125,7 +125,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                         return (
                             <label
                                 key={optValue}
-                                className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
+                                className="flex items-start space-x-3 p-3 hover:bg-gray-50 active:bg-gray-100 rounded-md cursor-pointer"
                             >
                                 <input
                                     type="checkbox"
@@ -133,7 +133,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                                     value={optValue}
                                     // biome-ignore lint/suspicious/noExplicitAny: style override
                                     style={{ accentColor: 'var(--brand-accent)' } as any}
-                                    className="h-4 w-4 rounded"
+                                    className="h-5 w-5 rounded mt-0.5"
                                 />
                                 <span className="text-base">{optLabel}</span>
                             </label>

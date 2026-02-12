@@ -640,7 +640,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             )}
 
             {/* NAVIGATION ACTIONS */}
-            <div className="flex justify-end gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
                 <Button variant="outline" onClick={() => navigate('../fine-sort')}>
                     ← {t('post.back', 'Back to sort')}
                 </Button>

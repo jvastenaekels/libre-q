@@ -200,7 +200,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     // };
 
     return (
-        <div className="max-w-3xl mx-auto py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">
+        <div className="max-w-3xl mx-auto py-6 sm:py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">{t('presort.title')}</h1>
                 <p className="text-gray-600">{t('presort.description')}</p>
@@ -209,7 +209,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
             <form
                 id="presort-form"
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
+                className="space-y-6 bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm"
             >
                 {Object.entries(presortFields).map(([key, fieldConfig]) => {
                     const isVisible = evaluateVisibilityCondition(

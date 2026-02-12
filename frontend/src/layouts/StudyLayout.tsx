@@ -448,7 +448,7 @@ const StudyLayoutContent: React.FC = () => {
                                                     : undefined,
                                             }}
                                             className={`
-                                                w-full px-3 py-2.5 flex items-center justify-between text-left transition-colors
+                                                w-full px-3 py-3 flex items-center justify-between text-left transition-colors
                                                 ${
                                                     isCurrent
                                                         ? 'font-semibold'
