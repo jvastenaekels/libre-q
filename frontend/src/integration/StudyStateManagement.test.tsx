@@ -281,6 +281,50 @@ describe('Study State Management Integration Tests', () => {
         });
     });
 
+    describe('Active → Draft Transition (Design Page)', () => {
+        it('successfully transitions study from active to draft', async () => {
+            let studyState = 'active';
+
+            server.use(
+                http.post('/api/admin/studies/test-study/state', async ({ request }) => {
+                    const url = new URL(request.url);
+                    const newState = url.searchParams.get('new_state');
+
+                    if (newState === 'draft' && studyState === 'active') {
+                        studyState = 'draft';
+                        return HttpResponse.json({ state: 'draft' });
+                    }
+
+                    return HttpResponse.json({ error: 'Invalid state' }, { status: 400 });
+                })
+            );
+
+            expect(studyState).toBe('active');
+
+            const response = await fetch('/api/admin/studies/test-study/state?new_state=draft', {
+                method: 'POST',
+            });
+
+            expect(response.ok).toBe(true);
+            expect(studyState).toBe('draft');
+        });
+
+        it('shows error when switching to draft fails', async () => {
+            server.use(
+                http.post('/api/admin/studies/test-study/state', () => {
+                    return HttpResponse.json({ detail: 'Cannot revert to draft' }, { status: 400 });
+                })
+            );
+
+            const response = await fetch('/api/admin/studies/test-study/state?new_state=draft', {
+                method: 'POST',
+            });
+
+            expect(response.ok).toBe(false);
+            expect(response.status).toBe(400);
+        });
+    });
+
     describe('Complete State Lifecycle', () => {
         it('transitions through full lifecycle: draft → active → closed → archived', async () => {
             let currentState = 'draft';
@@ -293,7 +337,7 @@ describe('Study State Management Integration Tests', () => {
                     // Validate state transitions
                     const validTransitions: Record<string, string[]> = {
                         draft: ['active'],
-                        active: ['closed'],
+                        active: ['draft', 'closed'],
                         closed: ['archived', 'active'], // Can reopen
                         archived: [], // Terminal state
                     };

@@ -922,6 +922,7 @@
             },
             "state": {
                 "activate": "Aktivoi tutkimus",
+                "switch_to_draft": "Luonnostila",
                 "manage": "Hallitse tilaa"
             }
         },
@@ -1240,7 +1241,7 @@
                     "locked": "Suunnittelu lukittu",
                     "locked_desc": "Rakenteelliset muutokset (väittämäkoodit, ruudukko) on poistettu käytöstä, koska tutkimus on kerännyt aineistoa tai se ei ole enää luonnostilassa. Voit silti muokata käännöksiä.",
                     "locked_active": "Tutkimus on aktiivinen",
-                    "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan (varoitus: tämä voi mitätöidä olemassa olevat tulokset).",
+                    "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan.",
                     "locked_paused": "Tutkimus on keskeytetty",
                     "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
                     "locked_closed": "Tutkimus on suljettu",

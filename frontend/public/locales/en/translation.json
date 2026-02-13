@@ -920,6 +920,7 @@
             },
             "state": {
                 "activate": "Activate study",
+                "switch_to_draft": "Draft Mode",
                 "manage": "Manage status"
             },
             "notifications": {
@@ -1249,7 +1250,7 @@
                     "locked": "Design locked",
                     "locked_desc": "Structural changes (statement codes, grid) are disabled because the study has collected data or is no longer in draft mode. You can still edit text translations.",
                     "locked_active": "Study is active",
-                    "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode (warning: this may invalidate existing results).",
+                    "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode.",
                     "locked_paused": "Study is paused",
                     "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
                     "locked_closed": "Study is closed",

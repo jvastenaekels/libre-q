@@ -225,6 +225,7 @@ const StudyDesignPage = () => {
         }
     }, [study, setStudy]);
 
+    const [isSwitchingToDraft, setIsSwitchingToDraft] = useState(false);
     const [isActivating, setIsActivating] = useState(false);
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
     const [isValidationErrorOpen, setIsValidationErrorOpen] = useState(false);
@@ -288,6 +289,24 @@ const StudyDesignPage = () => {
             console.error(error);
         } finally {
             setIsActivating(false);
+        }
+    };
+
+    const handleSwitchToDraft = async () => {
+        if (!effectiveSlug) return;
+        setIsSwitchingToDraft(true);
+        try {
+            await customInstance({
+                url: `/api/admin/studies/${effectiveSlug}/state`,
+                method: 'POST',
+                params: { new_state: 'draft' },
+            });
+            window.location.reload();
+        } catch (error) {
+            toast.error(t('admin.study_status.error') || 'Failed to change study state');
+            console.error(error);
+        } finally {
+            setIsSwitchingToDraft(false);
         }
     };
 
@@ -677,24 +696,24 @@ const StudyDesignPage = () => {
                                       ? t('admin.design.qsort.grid.locked_paused_desc')
                                       : t('admin.design.qsort.grid.locked_closed_desc')}
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <Button
-                                    variant="default"
-                                    className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700"
-                                    onClick={() => {
-                                        const ws = workspaceSlug || original?.workspace?.slug;
-                                        const s = draft?.slug || original?.slug;
-                                        if (ws && s) {
-                                            navigate(`/app/${ws}/studies/${s}`);
-                                        } else {
-                                            // Fallback to hub if we truly have no context
-                                            navigate('/hub');
-                                        }
-                                    }}
-                                >
-                                    {t('admin.study.state.manage', 'Go to Dashboard')}
-                                </Button>
-                            </div>
+                            {draft.state === 'active' && (
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <Button
+                                        variant="default"
+                                        disabled={isSwitchingToDraft}
+                                        className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-amber-200 bg-amber-500 hover:bg-amber-600 text-white"
+                                        onClick={handleSwitchToDraft}
+                                    >
+                                        {isSwitchingToDraft && (
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        )}
+                                        {t(
+                                            'admin.study_status.state.switch_to_draft',
+                                            'Draft Mode'
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

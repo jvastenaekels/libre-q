@@ -139,6 +139,33 @@ describe('StudyDesignPage Feature Tests', () => {
         );
     });
 
+    it('shows draft mode button when study is active', async () => {
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        const draftButton = await screen.findByRole('button', { name: /Draft Mode/i });
+        expect(draftButton).toBeInTheDocument();
+    });
+
+    it('does not show draft mode button when study is paused', async () => {
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'paused' });
+            })
+        );
+
+        renderPage();
+
+        // Wait for the overlay to render (status badge appears)
+        await screen.findByTestId('study-status');
+        expect(screen.queryByRole('button', { name: /Draft Mode/i })).not.toBeInTheDocument();
+    });
+
     it('enables sequential navigation between steps', async () => {
         renderPage();
 

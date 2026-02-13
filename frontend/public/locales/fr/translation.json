@@ -922,6 +922,7 @@
             },
             "state": {
                 "activate": "Activer l'étude",
+                "switch_to_draft": "Mode brouillon",
                 "manage": "Gérer le statut"
             }
         },
@@ -1278,7 +1279,7 @@
                     "locked": "Conception verrouillée",
                     "locked_desc": "Les changements structurels (codes des énoncés, grille) sont désactivés car l'étude a recueilli des données ou n'est plus en mode brouillon. Vous pouvez toujours modifier les textes des traductions.",
                     "locked_active": "L'étude est active",
-                    "locked_active_desc": "L'étude collecte actuellement des données. Pour modifier la conception, vous devez d'abord la repasser en brouillon (attention : cela peut invalider les résultats existants).",
+                    "locked_active_desc": "L'étude collecte actuellement des données. Pour modifier la conception, vous devez d'abord la repasser en brouillon.",
                     "locked_paused": "L'étude est en pause",
                     "locked_paused_desc": "L'étude est actuellement en pause. La conception reste verrouillée pour protéger les données existantes.",
                     "locked_closed": "L'étude est clôturée",
