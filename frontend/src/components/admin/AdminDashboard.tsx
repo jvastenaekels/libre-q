@@ -211,14 +211,9 @@ export function AdminDashboard() {
             </div>
 
             {/* Section header */}
-            <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                    {t('admin.dashboard.all_studies', 'All studies')}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                    {t('admin.dashboard.all_studies_description', 'All studies in this workspace.')}
-                </p>
-            </div>
+            <h2 className="text-lg font-semibold text-foreground">
+                {t('admin.dashboard.all_studies', 'All studies')}
+            </h2>
 
             {/* Study Cards Grid */}
             {studies && studies.length > 0 ? (
