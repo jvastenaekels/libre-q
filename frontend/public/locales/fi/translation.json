@@ -642,6 +642,7 @@
                 "created": "Rekrytointilinkit luotu onnistuneesti",
                 "failed": "Linkkien luominen epäonnistui",
                 "revoked": "Linkki peruutettu",
+                "revoke_failed": "Linkin peruuttaminen epäonnistui",
                 "copied": "Kopioitu leikepöydälle"
             }
         },

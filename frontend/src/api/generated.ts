@@ -8043,6 +8043,11 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -8051,11 +8056,6 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -8312,6 +8312,11 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                         ]),
                         undefined,
                     ]),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    study_id: faker.number.int({ min: undefined, max: undefined }),
+                    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    usage_count: faker.number.int({ min: undefined, max: undefined }),
+                    start_count: faker.number.int({ min: undefined, max: undefined }),
                     expires_at: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
                             `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -8320,11 +8325,6 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                         undefined,
                     ]),
                     is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-                    id: faker.number.int({ min: undefined, max: undefined }),
-                    study_id: faker.number.int({ min: undefined, max: undefined }),
-                    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    usage_count: faker.number.int({ min: undefined, max: undefined }),
-                    start_count: faker.number.int({ min: undefined, max: undefined }),
                     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
                 })
             ),
@@ -8570,6 +8570,11 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -8578,11 +8583,6 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -8828,6 +8828,11 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -8836,11 +8841,6 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -9089,6 +9089,11 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -9097,11 +9102,6 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -9363,6 +9363,11 @@ export const getListStudyLinksApiAdminRecruitmentSlugLinksGetResponseMock =
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -9371,11 +9376,6 @@ export const getListStudyLinksApiAdminRecruitmentSlugLinksGetResponseMock =
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         }));
 
@@ -9400,6 +9400,11 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMo
                 ]),
                 undefined,
             ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
             expires_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -9408,11 +9413,6 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMo
                 undefined,
             ]),
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            usage_count: faker.number.int({ min: undefined, max: undefined }),
-            start_count: faker.number.int({ min: undefined, max: undefined }),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         }));
 

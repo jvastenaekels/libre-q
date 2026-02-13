@@ -7,7 +7,6 @@
 import type { RecruitmentLinkCreateName } from './recruitmentLinkCreateName';
 import type { RecruitmentLinkType } from './recruitmentLinkType';
 import type { RecruitmentLinkCreateCapacity } from './recruitmentLinkCreateCapacity';
-import type { RecruitmentLinkCreateExpiresAt } from './recruitmentLinkCreateExpiresAt';
 
 /**
  * Schema for creating a recruitment link.
@@ -16,6 +15,4 @@ export interface RecruitmentLinkCreate {
     name?: RecruitmentLinkCreateName;
     type?: RecruitmentLinkType;
     capacity?: RecruitmentLinkCreateCapacity;
-    expires_at?: RecruitmentLinkCreateExpiresAt;
-    is_active?: boolean;
 }

@@ -622,9 +622,7 @@ class RecruitmentLinkBase(BaseModel):
 
     name: str | None = Field(None, max_length=100)
     type: RecruitmentLinkType = RecruitmentLinkType.public
-    capacity: int | None = None
-    expires_at: datetime | None = None
-    is_active: bool = True
+    capacity: int | None = Field(None, gt=0)
 
     @field_validator("name")
     @classmethod
@@ -646,6 +644,8 @@ class RecruitmentLinkRead(RecruitmentLinkBase):
     token: str
     usage_count: int
     start_count: int
+    expires_at: datetime | None = None
+    is_active: bool = True
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 

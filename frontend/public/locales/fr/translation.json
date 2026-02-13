@@ -642,6 +642,7 @@
                 "created": "Liens de recrutement créés avec succès",
                 "failed": "Échec de la création des liens",
                 "revoked": "Lien révoqué",
+                "revoke_failed": "Échec de la révocation du lien",
                 "copied": "Copié dans le presse-papiers"
             }
         },

@@ -52,7 +52,7 @@ import {
 import type { RecruitmentLinkRead, RecruitmentLinkType } from '@/api/model';
 
 const RecruitmentPage = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const { studySlug: slug } = useParams<{ studySlug: string }>();
     const { links: initialLinks } = useLoaderData() as {
         links: RecruitmentLinkRead[];
         slug: string;
@@ -88,7 +88,10 @@ const RecruitmentPage = () => {
         mutation: {
             onSuccess: () => {
                 toast.success(t('admin.recruitment.toasts.revoked', 'Link revoked'));
-                revalidator.revalidate(); // Refresh RR7 loader data
+                revalidator.revalidate();
+            },
+            onError: () => {
+                toast.error(t('admin.recruitment.toasts.revoke_failed', 'Failed to revoke link'));
             },
         },
     });
@@ -125,7 +128,17 @@ const RecruitmentPage = () => {
                 )}
                 icon={UserPlus}
                 actions={
-                    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                    <Dialog
+                        open={isCreateModalOpen}
+                        onOpenChange={(open) => {
+                            setIsCreateModalOpen(open);
+                            if (!open) {
+                                setNewLinkType('public');
+                                setNewLinkCount(1);
+                                setNewLinkName('');
+                            }
+                        }}
+                    >
                         <DialogTrigger asChild>
                             <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold h-11 px-6 rounded-xl">
                                 <Plus className="h-4 w-4 mr-2" />
@@ -272,7 +285,9 @@ const RecruitmentPage = () => {
                                                 max="500"
                                                 value={newLinkCount}
                                                 onChange={(e) =>
-                                                    setNewLinkCount(parseInt(e.target.value, 10))
+                                                    setNewLinkCount(
+                                                        parseInt(e.target.value, 10) || 1
+                                                    )
                                                 }
                                                 className="h-11 pl-10 rounded-xl"
                                             />
@@ -337,8 +352,7 @@ const RecruitmentPage = () => {
                         </span>
                     </div>
                     <div className="text-2xl sm:text-4xl font-black text-amber-600 tracking-tight">
-                        {/* biome-ignore lint/suspicious/noExplicitAny: API type inference issue */}
-                        {links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) || 0}
+                        {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1 font-medium">
                         {t('admin.recruitment.stats.engagements', 'Initial engagements')}

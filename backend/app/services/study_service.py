@@ -929,8 +929,12 @@ class StudyService:
                         **participant.presort_answers,
                         "_recruitment_token": data.link_token,
                     }
-                    # We also need to increment usage
-                    await RecruitmentService.increment_usage(db, link.id)
+                    # Atomically check capacity and increment usage
+                    if not await RecruitmentService.increment_usage(db, link.id):
+                        raise HTTPException(
+                            status_code=403,
+                            detail="Invalid, expired, or full recruitment link",
+                        )
             except IntegrityError:
                 # Race condition: Participant was created by another request in the meantime.
                 # Rollback the failed insert and fetch the existing participant.

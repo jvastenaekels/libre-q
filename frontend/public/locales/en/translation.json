@@ -650,6 +650,7 @@
                 "created": "Recruitment links created successfully",
                 "failed": "Failed to create links",
                 "revoked": "Link revoked",
+                "revoke_failed": "Failed to revoke link",
                 "copied": "Copied to clipboard"
             }
         },

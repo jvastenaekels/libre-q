@@ -81,9 +81,14 @@ class RecruitmentService:
         return False
 
     @staticmethod
-    async def increment_usage(db: AsyncSession, link_id: int):
-        """Increment usage count for an individual or limited link."""
-        # Use row-level lock to prevent lost updates
+    async def increment_usage(db: AsyncSession, link_id: int) -> bool:
+        """Atomically check capacity and increment usage count.
+
+        Returns True if the increment succeeded, False if the link is
+        at capacity (or not found).  The capacity check and the increment
+        happen under a row-level lock so concurrent requests cannot
+        over-subscribe a link.
+        """
         stmt = (
             select(RecruitmentLink)
             .where(RecruitmentLink.id == link_id)
@@ -92,9 +97,15 @@ class RecruitmentService:
         result = await db.execute(stmt)
         link = result.scalar_one_or_none()
 
-        if link:
-            link.usage_count += 1
-            await db.flush()
+        if not link:
+            return False
+
+        if link.capacity is not None and link.usage_count >= link.capacity:
+            return False
+
+        link.usage_count += 1
+        await db.flush()
+        return True
 
     @staticmethod
     async def record_start(db: AsyncSession, link_id: int):
@@ -129,7 +140,7 @@ class RecruitmentService:
         if link.expires_at and link.expires_at < datetime.now(timezone.utc):
             return None
 
-        if link.capacity is not None and link.usage_count >= link.capacity:
-            return None
+        # Capacity is enforced atomically in increment_usage() under a
+        # row-level lock, so we don't check it here (avoids TOCTOU race).
 
         return link

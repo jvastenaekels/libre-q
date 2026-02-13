@@ -16,12 +16,12 @@ export interface RecruitmentLinkRead {
     name?: RecruitmentLinkReadName;
     type?: RecruitmentLinkType;
     capacity?: RecruitmentLinkReadCapacity;
-    expires_at?: RecruitmentLinkReadExpiresAt;
-    is_active?: boolean;
     id: number;
     study_id: number;
     token: string;
     usage_count: number;
     start_count: number;
+    expires_at?: RecruitmentLinkReadExpiresAt;
+    is_active?: boolean;
     created_at: string;
 }

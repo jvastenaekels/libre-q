@@ -3,6 +3,7 @@ from app.schemas import (
     StudyTranslationBase,
     StatementBase,
     RecruitmentLinkBase,
+    RecruitmentLinkCreate,
 )
 import pytest
 from pydantic import ValidationError
@@ -90,3 +91,24 @@ def test_recruitment_link_validation():
     # Name valid
     rl = RecruitmentLinkBase(name="  Valid Name  ")
     assert rl.name == "Valid Name"
+
+    # Capacity must be > 0
+    with pytest.raises(ValidationError):
+        RecruitmentLinkBase(capacity=0)
+
+    with pytest.raises(ValidationError):
+        RecruitmentLinkBase(capacity=-1)
+
+    rl = RecruitmentLinkBase(capacity=1)
+    assert rl.capacity == 1
+
+    # Capacity is optional (None is valid)
+    rl = RecruitmentLinkBase(capacity=None)
+    assert rl.capacity is None
+
+
+def test_recruitment_link_create_excludes_server_fields():
+    # RecruitmentLinkCreate should not accept expires_at or is_active
+    link = RecruitmentLinkCreate(name="Test", type="public")
+    assert not hasattr(link, "expires_at") or "expires_at" not in link.model_fields
+    assert not hasattr(link, "is_active") or "is_active" not in link.model_fields
