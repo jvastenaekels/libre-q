@@ -97,6 +97,8 @@ export function AdminDashboard() {
         if (translation?.title) return translation.title;
         const fallback = study.translations?.find((tr) => tr.language_code === 'en');
         if (fallback?.title) return fallback.title;
+        const anyTranslation = study.translations?.find((tr) => tr.title);
+        if (anyTranslation?.title) return anyTranslation.title;
         return study.slug;
     };
 
@@ -128,7 +130,9 @@ export function AdminDashboard() {
                 <div className="space-y-1 min-w-0">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
                         {t('admin.dashboard.welcome', 'Welcome back,')}{' '}
-                        <span className="text-indigo-600">{user?.email.split('@')[0]}</span>
+                        <span className="text-indigo-600">
+                            {user?.full_name || user?.email.split('@')[0]}
+                        </span>
                     </h1>
                     <p className="text-sm md:text-base text-muted-foreground">
                         {t(
@@ -221,7 +225,10 @@ export function AdminDashboard() {
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {studies.map((study, index) => {
                         const title = getStudyTitle(study);
-                        const languageCount = study.translations?.length ?? 0;
+                        const languageCodes =
+                            study.translations
+                                ?.map((tr) => tr.language_code.toUpperCase())
+                                .join(', ') ?? '';
 
                         return (
                             <Card
@@ -279,12 +286,9 @@ export function AdminDashboard() {
                                                 locale: currentLocale,
                                             })}
                                         </span>
-                                        {languageCount > 0 && (
+                                        {languageCodes && (
                                             <span className="inline-flex items-center gap-1.5">
-                                                {t('admin.dashboard.languages_count', {
-                                                    count: languageCount,
-                                                    defaultValue: '{{count}} languages',
-                                                })}
+                                                {languageCodes}
                                             </span>
                                         )}
                                     </div>

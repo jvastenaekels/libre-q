@@ -14,6 +14,7 @@ interface AuthState {
     user: {
         id: number;
         email: string;
+        full_name?: string | null;
         is_superuser: boolean;
     } | null;
     workspaces: Workspace[];

@@ -219,7 +219,15 @@ class Study(Base):
 
     @property
     def participant_count(self) -> int:
-        return len([p for p in self.participants if not p.is_test_run])
+        return len(
+            [
+                p
+                for p in self.participants
+                if not p.is_test_run
+                and not p.is_discarded
+                and p.status == ParticipantStatus.completed
+            ]
+        )
 
 
 class StudyTranslation(Base):

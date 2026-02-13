@@ -127,7 +127,7 @@ async def test_study_locking_logic(
     # 8. Verify participant_count in StudyRead
     response = await client.get(f"/api/admin/studies/{study_slug}", headers=headers)
     assert response.status_code == 200
-    assert response.json()["participant_count"] == 1  # Only the real one
+    assert response.json()["participant_count"] == 0  # Only completed, non-discarded
 
     # 9. Try to change statement TEXT (SHOULD BE ALLOWED - non-structural)
     response = await client.patch(

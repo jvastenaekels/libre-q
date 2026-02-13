@@ -59,6 +59,7 @@ const LoginPage = () => {
                 setAuth(tokenResponse.access_token as string, {
                     id: user.id,
                     email: user.email,
+                    full_name: user.full_name,
                     is_superuser: user.is_superuser,
                 });
 

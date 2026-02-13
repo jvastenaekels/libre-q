@@ -220,19 +220,23 @@ export default function InteractiveDataView({
         (p) => getDisplayStatus(p) === 'abandoned'
     ).length;
 
-    // Build set of IP hashes that appear more than once (potential duplicates)
-    const duplicateIps = useMemo(() => {
+    // Map duplicate IP hashes to a group number so participants sharing the same IP can be linked visually
+    const duplicateIpGroups = useMemo(() => {
         const ipCounts = new Map<string, number>();
         for (const p of liveParticipants) {
             if (p.ip_address) {
                 ipCounts.set(p.ip_address, (ipCounts.get(p.ip_address) || 0) + 1);
             }
         }
-        const dupes = new Set<string>();
+        const groups = new Map<string, number>();
+        let groupNum = 1;
         for (const [ip, count] of ipCounts) {
-            if (count > 1) dupes.add(ip);
+            if (count > 1) {
+                groups.set(ip, groupNum);
+                groupNum++;
+            }
         }
-        return dupes;
+        return groups;
     }, [liveParticipants]);
 
     const hasActiveFilters =
@@ -341,7 +345,7 @@ export default function InteractiveDataView({
                                     </Badge>
                                 )}
                             </div>
-                            {p.ip_address && duplicateIps.has(p.ip_address) && (
+                            {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -349,7 +353,8 @@ export default function InteractiveDataView({
                                                 variant="outline"
                                                 className="h-4 text-[10px] px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
                                             >
-                                                {t('admin.data.table.duplicate_ip', 'Duplicate IP')}
+                                                {t('admin.data.table.duplicate_ip', 'Duplicate IP')}{' '}
+                                                #{duplicateIpGroups.get(p.ip_address)}
                                             </Badge>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -657,7 +662,7 @@ export default function InteractiveDataView({
                 },
             }),
         ],
-        [t, currentLocale, duplicateIps]
+        [t, currentLocale, duplicateIpGroups]
     );
 
     const table = useReactTable({
