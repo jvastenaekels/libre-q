@@ -5,7 +5,7 @@
  */
 
 import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } from 'framer-motion';
-import { Eye, Frown, Smile } from 'lucide-react';
+import { Eye, Frown, Meh, Smile } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -153,8 +153,8 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     className="absolute inset-0 bg-green-100/50 pointer-events-none flex items-center justify-center border-4 border-green-500 rounded-3xl"
                 >
                     <Smile
-                        className="w-16 h-16 text-green-600 opacity-80 rotate-[-12deg]"
-                        strokeWidth={2.5}
+                        className="w-24 h-24 text-green-600 opacity-50 rotate-[-12deg]"
+                        strokeWidth={2}
                     />
                 </motion.div>
                 <motion.div
@@ -162,14 +162,16 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     className="absolute inset-0 bg-red-100/50 pointer-events-none flex items-center justify-center border-4 border-red-500 rounded-3xl"
                 >
                     <Frown
-                        className="w-16 h-16 text-red-600 opacity-80 rotate-[12deg]"
-                        strokeWidth={2.5}
+                        className="w-24 h-24 text-red-600 opacity-50 rotate-[12deg]"
+                        strokeWidth={2}
                     />
                 </motion.div>
                 <motion.div
                     style={{ opacity: opacityNeutral }}
-                    className="absolute inset-0 bg-gray-100/50 pointer-events-none border-4 border-gray-500 rounded-3xl"
-                />
+                    className="absolute inset-0 bg-slate-100/50 pointer-events-none flex items-center justify-center border-4 border-slate-400 rounded-3xl"
+                >
+                    <Meh className="w-24 h-24 text-slate-500 opacity-50" strokeWidth={2} />
+                </motion.div>
 
                 {/* Statement Code Watermark - Similar to SortableCard style */}
                 {statement.code && (

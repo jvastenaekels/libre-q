@@ -244,7 +244,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                                 <div className="text-sm font-bold tracking-tight mb-0.5">
                                     {step.label}
                                 </div>
-                                <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider text-center">
                                     {step.description}
                                 </div>
 

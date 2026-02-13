@@ -22,6 +22,7 @@ import {
     CheckCircle,
     Hash,
     AlertTriangle,
+    Tag,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +43,7 @@ interface ParticipantMetadataCardProps {
         language_used?: string;
         is_test_run?: boolean;
         is_discarded?: boolean;
+        recruitment_token?: string;
     };
     className?: string;
     onToggleDiscard?: (discarded: boolean) => void;
@@ -262,6 +264,24 @@ export function ParticipantMetadataCard({
                                 </p>
                             </div>
                         </div>
+                        {participant.recruitment_token && (
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-50 rounded-lg">
+                                    <Tag className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-slate-900 leading-none font-mono">
+                                        {participant.recruitment_token}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t(
+                                            'admin.participant.metadata.recruitment_link',
+                                            'Recruitment Link'
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         {participant.ip_address && (
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-slate-50 rounded-lg">

@@ -83,7 +83,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
 
 import type { DumpParticipant, DumpResponse } from './types';
@@ -166,6 +166,7 @@ export default function InteractiveDataView({
                 is_discarded: p.is_discarded,
                 is_test_run: p.is_test_run,
                 discard_reason: p.discard_reason,
+                created_at: p.created_at,
                 submitted_at: p.submitted_at || p.created_at,
                 recruitment_token: p.recruitment_token,
                 status: p.status,
@@ -367,12 +368,6 @@ export default function InteractiveDataView({
                                     </Tooltip>
                                 </TooltipProvider>
                             )}
-                            {p.recruitment_token && (
-                                <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                                    <Tag className="w-3 h-3" />
-                                    {p.recruitment_token}
-                                </span>
-                            )}
                         </div>
                     );
                 },
@@ -527,10 +522,27 @@ export default function InteractiveDataView({
                     const hasComments = Object.keys(p.postsort.card_comments || {}).length > 0;
                     const hasAudio =
                         p.audio_recordings && Object.keys(p.audio_recordings).length > 0;
+                    const hasRecruitmentLink = !!p.recruitment_token;
 
                     return (
                         <div className="flex items-center gap-1.5">
                             <TooltipProvider>
+                                {hasRecruitmentLink && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200">
+                                                <Tag className="h-3 w-3" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.tooltips.recruitment_link',
+                                                'Recruitment link'
+                                            )}
+                                            : {p.recruitment_token}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
                                 {isSuspect && (
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -570,7 +582,7 @@ export default function InteractiveDataView({
                                         </TooltipContent>
                                     </Tooltip>
                                 )}
-                                {!isSuspect && !hasComments && !hasAudio && (
+                                {!isSuspect && !hasComments && !hasAudio && !hasRecruitmentLink && (
                                     <span className="text-[10px] text-slate-300 font-medium">
                                         —
                                     </span>
@@ -640,21 +652,21 @@ export default function InteractiveDataView({
                 cell: (info) => {
                     const val = info.getValue();
                     if (!val) return <span className="text-slate-300">—</span>;
+                    const date = new Date(val);
                     return (
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                    <div className="flex flex-col text-xs text-slate-500 font-medium">
                                         <span>
-                                            {formatDistanceToNow(new Date(val), {
-                                                addSuffix: true,
+                                            {format(date, 'MMM d, HH:mm', {
                                                 locale: currentLocale,
                                             })}
                                         </span>
                                     </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    {format(new Date(val), 'PPpp', { locale: currentLocale })}
+                                    {format(date, 'PPpp', { locale: currentLocale })}
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
