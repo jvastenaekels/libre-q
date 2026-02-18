@@ -416,18 +416,16 @@ def compute_factor_scores(
         for rank, stmt_idx in enumerate(order):
             factor_arrays[stmt_idx, f] = sorted_dist[rank]
 
-        # Handle ties: for tied z-scores, assign the rounded mean of tied rank values
-        # This follows standard Q-method convention (averaging tied ranks)
+        # Handle ties: for tied z-scores, assign the minimum of tied rank values.
+        # This matches qmethod's qzscores() behavior (R: min(zsc_n[izscn,f])).
         zs = z_scores[:, f]
         unique_zs = np.unique(zs)
         for uz in unique_zs:
             tied = np.where(zs == uz)[0]
             if len(tied) > 1:
-                mean_val = round(
-                    sum(int(factor_arrays[idx, f]) for idx in tied) / len(tied)
-                )
+                min_val = min(int(factor_arrays[idx, f]) for idx in tied)
                 for idx in tied:
-                    factor_arrays[idx, f] = mean_val
+                    factor_arrays[idx, f] = min_val
 
     return z_scores, factor_arrays
 
@@ -540,6 +538,7 @@ def classify_statements(
         "p<0.05": 1.960,
         "p<0.01": 2.576,
         "p<0.001": 3.291,
+        "p<0.000001": 4.8916,
     }
 
     distinguishing: list[dict[str, Any]] = []
@@ -562,7 +561,10 @@ def classify_statements(
             pair_key = f"{i + 1}-{j + 1}"
 
             # Test against thresholds (most to least significant)
-            if diff > sed_val * z_critical["p<0.001"]:
+            if diff > sed_val * z_critical["p<0.000001"]:
+                sig_pairs[pair_key] = "p<0.000001"
+                any_significant = True
+            elif diff > sed_val * z_critical["p<0.001"]:
                 sig_pairs[pair_key] = "p<0.001"
                 any_significant = True
             elif diff > sed_val * z_critical["p<0.01"]:

@@ -650,8 +650,8 @@ class TestManualFlagging:
 class TestTieHandling:
     """Tests for z-score tie handling in factor arrays."""
 
-    def test_tied_zscores_get_mean_value(self):
-        """Tied z-scores should get the rounded mean of their distribution values."""
+    def test_tied_zscores_get_min_value(self):
+        """Tied z-scores should get the minimum of their distribution values (qmethod convention)."""
         # 5 statements, 2 participants with identical sorts → identical weighted sums
         dataset = np.array(
             [
@@ -685,6 +685,57 @@ class TestTieHandling:
         for f in range(2):
             if not np.all(factor_arrays[:, f] == 0):
                 assert np.all(np.isfinite(factor_arrays[:, f]))
+
+
+class TestTieResolutionMin:
+    """Test that tied z-scores use min() to match qmethod's qzscores()."""
+
+    def test_two_tied_get_minimum(self):
+        """Two statements with identical z-scores should both get the min distribution value."""
+        # 4 statements, 2 participants. S1 and S2 will have identical weighted sums.
+        dataset = np.array(
+            [
+                [2, 2],  # S1: same scores → tied z
+                [2, 2],  # S2: same scores → tied z
+                [0, 0],  # S3
+                [-2, -2],  # S4
+            ],
+            dtype=np.float64,
+        )
+        loadings = np.array([[0.9, 0.1], [0.1, 0.9]])
+        flags = np.array([[True, False], [True, False]])
+        distribution = np.array([-1, 0, 0, 1], dtype=np.int64)
+        _, factor_arrays = compute_factor_scores(
+            dataset, loadings, flags, distribution=distribution
+        )
+        # S1 and S2 are tied — both should get min of their assigned values
+        assert factor_arrays[0, 0] == factor_arrays[1, 0]
+        # The min of the two positions should be assigned (not the mean)
+        tied_val = int(factor_arrays[0, 0])
+        # With argsort, tied values get consecutive positions; min is the lower one
+        assert tied_val == min(int(factor_arrays[0, 0]), int(factor_arrays[1, 0]))
+
+
+class TestClassifySignificanceLevels:
+    """Test that classify_statements includes the p<0.000001 level."""
+
+    def test_extreme_difference_gets_highest_significance(self):
+        """A very large z-score difference should be classified as p<0.000001."""
+        # Two factors with very different z-scores
+        z_scores = np.array(
+            [
+                [3.0, -3.0],  # extreme difference of 6.0
+                [0.0, 0.0],  # no difference
+            ]
+        )
+        # Small SED → diff/SED will be very large
+        sed = np.array([[0.0, 0.3], [0.3, 0.0]])
+        dist, cons = classify_statements(z_scores, sed, n_factors=2)
+        # Statement 0: diff=6.0, threshold at p<0.000001 = 0.3*4.8916 ≈ 1.47 → significant
+        assert len(dist) == 1
+        assert dist[0]["significance"]["1-2"] == "p<0.000001"
+        # Statement 1: diff=0 → consensus
+        assert len(cons) == 1
 
 
 class TestClassifyWithNaN:

@@ -97,10 +97,17 @@ export function StatementsTable({ result }: StatementsTableProps) {
         const d = distinguishingMap.get(stmtId);
         if (d) {
             const maxSig = Object.values(d.significance).reduce((best, sig) => {
-                const levels = ['p<0.001', 'p<0.01', 'p<0.05'];
+                const levels = ['p<0.000001', 'p<0.001', 'p<0.01', 'p<0.05'];
                 return levels.indexOf(sig) < levels.indexOf(best) ? sig : best;
             }, 'p<0.05');
-            const stars = maxSig === 'p<0.001' ? '***' : maxSig === 'p<0.01' ? '**' : '*';
+            const stars =
+                maxSig === 'p<0.000001'
+                    ? '****'
+                    : maxSig === 'p<0.001'
+                      ? '***'
+                      : maxSig === 'p<0.01'
+                        ? '**'
+                        : '*';
             return `D${stars}`;
         }
         if (consensusIds.has(stmtId)) return 'C';
