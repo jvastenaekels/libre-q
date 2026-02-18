@@ -192,7 +192,9 @@ export default function AnalysisPage() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="pca">PCA</SelectItem>
+                                    <SelectItem value="pca">
+                                        {t('admin.analysis.pca', 'PCA')}
+                                    </SelectItem>
                                     <SelectItem value="centroid">
                                         {t('admin.analysis.centroid', 'Centroid')}
                                     </SelectItem>
@@ -230,7 +232,9 @@ export default function AnalysisPage() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="varimax">Varimax</SelectItem>
+                                    <SelectItem value="varimax">
+                                        {t('admin.analysis.varimax', 'Varimax')}
+                                    </SelectItem>
                                     <SelectItem value="none">
                                         {t('admin.analysis.none', 'None')}
                                     </SelectItem>

@@ -40,12 +40,22 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
         <div className="space-y-4">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
+                    <caption className="sr-only">
+                        {t(
+                            'admin.analysis.caption_characteristics',
+                            'Factor characteristics and reliability statistics'
+                        )}
+                    </caption>
                     <thead>
                         <tr className="border-b border-slate-200">
                             <th
                                 scope="col"
                                 className="text-left py-2 px-3 font-medium text-slate-600"
-                            />
+                            >
+                                <span className="sr-only">
+                                    {t('admin.analysis.metric', 'Metric')}
+                                </span>
+                            </th>
                             {chars.map((c) => (
                                 <th
                                     key={c.factor}
@@ -88,9 +98,19 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                     </h4>
                     <div className="overflow-x-auto">
                         <table className="text-sm">
+                            <caption className="sr-only">
+                                {t(
+                                    'admin.analysis.caption_correlations',
+                                    'Factor-to-factor correlation matrix'
+                                )}
+                            </caption>
                             <thead>
                                 <tr className="border-b border-slate-200">
-                                    <th scope="col" className="py-2 px-3" />
+                                    <th scope="col" className="py-2 px-3">
+                                        <span className="sr-only">
+                                            {t('admin.analysis.factor', 'Factor')}
+                                        </span>
+                                    </th>
                                     {Array.from({ length: result.n_factors }, (_, f) => (
                                         <th
                                             key={f}

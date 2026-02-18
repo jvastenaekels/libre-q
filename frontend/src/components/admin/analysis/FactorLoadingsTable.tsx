@@ -70,6 +70,9 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
                 )}
             </p>
             <table className="w-full text-sm">
+                <caption className="sr-only">
+                    {t('admin.analysis.caption_loadings', 'Factor loadings per participant')}
+                </caption>
                 <thead>
                     <tr className="border-b border-slate-200">
                         <th

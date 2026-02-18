@@ -585,7 +585,14 @@
             "factor_correlations": "Faktorikorrelaatiot",
             "total_variance": "Kokonaisvarianssi selitetty",
             "method_used": "Menetelmä",
-            "statements_label": "väittämää"
+            "statements_label": "väittämää",
+            "pca": "PCA",
+            "varimax": "Varimax",
+            "metric": "Mittari",
+            "caption_loadings": "Faktorikuormitukset osallistujittain",
+            "caption_statements": "Väittämien z-arvot ja faktorijärjestykset faktoreittain",
+            "caption_characteristics": "Faktorien ominaisuudet ja luotettavuustilastot",
+            "caption_correlations": "Faktorien välinen korrelaatiomatriisi"
         },
         "workspace": {
             "switcher": {

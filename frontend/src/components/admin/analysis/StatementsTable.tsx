@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
 
 interface StatementsTableProps {
@@ -109,6 +110,12 @@ export function StatementsTable({ result }: StatementsTableProps) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-sm">
+                <caption className="sr-only">
+                    {t(
+                        'admin.analysis.caption_statements',
+                        'Statement z-scores and factor arrays per factor'
+                    )}
+                </caption>
                 <thead>
                     <tr className="border-b border-slate-200">
                         <th
@@ -164,11 +171,20 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                 <td className="py-1.5 px-2 font-mono text-xs text-slate-500">
                                     {stmt.code}
                                 </td>
-                                <td
-                                    className="py-1.5 px-2 text-xs text-slate-700 max-w-xs truncate"
-                                    title={stmt.text}
-                                >
-                                    {stmt.text}
+                                <td className="py-1.5 px-2 text-xs text-slate-700 max-w-xs truncate">
+                                    <TooltipProvider delayDuration={300}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="block truncate">{stmt.text}</span>
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                                side="bottom"
+                                                className="max-w-sm text-xs"
+                                            >
+                                                {stmt.text}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </td>
                                 {stmt.z_scores.map((z, f) => (
                                     <td

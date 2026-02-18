@@ -650,6 +650,10 @@ def run_analysis(
         raise ValueError(
             f"n_factors ({n_factors}) cannot exceed n_participants ({n_participants})"
         )
+    if n_factors > n_statements:
+        raise ValueError(
+            f"n_factors ({n_factors}) cannot exceed n_statements ({n_statements})"
+        )
     if n_factors < 1:
         raise ValueError("n_factors must be at least 1")
 

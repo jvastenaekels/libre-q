@@ -123,7 +123,7 @@ function NavUser({ user }: { user: any }) {
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {user?.full_name || 'Admin User'}
+                                    {user?.full_name || t('admin.layout.admin_user')}
                                 </span>
                                 <span className="truncate text-xs">{user?.email}</span>
                             </div>

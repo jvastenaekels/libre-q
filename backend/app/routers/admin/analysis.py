@@ -118,6 +118,11 @@ async def run_factor_analysis(
             status_code=400,
             detail=f"n_factors ({body.n_factors}) cannot exceed the number of valid participants ({n_participants})",
         )
+    if body.n_factors > n_statements:
+        raise HTTPException(
+            status_code=400,
+            detail=f"n_factors ({body.n_factors}) cannot exceed the number of statements ({n_statements})",
+        )
 
     # Validate manual flagging request
     if body.flagging == "manual" and not body.manual_flags:

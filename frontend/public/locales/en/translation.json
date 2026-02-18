@@ -593,7 +593,14 @@
             "factor_correlations": "Factor Correlations",
             "total_variance": "Total Variance Explained",
             "method_used": "Method",
-            "statements_label": "statements"
+            "statements_label": "statements",
+            "pca": "PCA",
+            "varimax": "Varimax",
+            "metric": "Metric",
+            "caption_loadings": "Factor loadings per participant",
+            "caption_statements": "Statement z-scores and factor arrays per factor",
+            "caption_characteristics": "Factor characteristics and reliability statistics",
+            "caption_correlations": "Factor-to-factor correlation matrix"
         },
         "workspace": {
             "switcher": {

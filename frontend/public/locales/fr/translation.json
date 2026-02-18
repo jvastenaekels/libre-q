@@ -585,7 +585,14 @@
             "factor_correlations": "Corrélations entre facteurs",
             "total_variance": "Variance totale expliquée",
             "method_used": "Méthode",
-            "statements_label": "énoncés"
+            "statements_label": "énoncés",
+            "pca": "ACP",
+            "varimax": "Varimax",
+            "metric": "Métrique",
+            "caption_loadings": "Saturations factorielles par participant",
+            "caption_statements": "Scores z et tableaux factoriels par facteur",
+            "caption_characteristics": "Caractéristiques factorielles et statistiques de fiabilité",
+            "caption_correlations": "Matrice de corrélation entre facteurs"
         },
         "workspace": {
             "roles": {
