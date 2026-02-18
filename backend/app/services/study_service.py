@@ -1307,6 +1307,7 @@ class StudyService:
                     }
                     for s in sorted_statements
                 ],
+                "grid_config": study.grid_config,
             },
             "participants": participant_data,
         }

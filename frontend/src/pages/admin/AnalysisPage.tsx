@@ -12,6 +12,7 @@ import {
     Info,
     AlertTriangle,
 } from 'lucide-react';
+import { ApiError } from '@/api/client';
 
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
@@ -104,8 +105,8 @@ export default function AnalysisPage() {
     // Differentiate eigenvalue errors: 400 = too few participants, other = generic error
     const isTooFewParticipants =
         eigenvaluesQuery.isError &&
-        eigenvaluesQuery.error instanceof Error &&
-        eigenvaluesQuery.error.message.includes('400');
+        eigenvaluesQuery.error instanceof ApiError &&
+        eigenvaluesQuery.error.status === 400;
     const isEigenvalueError = eigenvaluesQuery.isError && !isTooFewParticipants;
 
     return (
@@ -257,7 +258,17 @@ export default function AnalysisPage() {
 
             {/* Results */}
             {result && (
-                <Card className="border-none shadow-sm bg-white rounded-2xl">
+                <Card className="border-none shadow-sm bg-white rounded-2xl relative">
+                    {analysisMutation.isPending && (
+                        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center rounded-2xl">
+                            <div className="flex items-center gap-2 text-slate-500">
+                                <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                                <span className="text-sm">
+                                    {t('admin.analysis.reanalyzing', 'Re-analyzing...')}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                     <CardContent className="pt-6">
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
                             <TabsList className="mb-4">

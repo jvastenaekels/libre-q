@@ -53,6 +53,8 @@ export default function AdminLayout() {
             dashboard: t('admin.breadcrumbs.dashboard'),
             design: t('admin.breadcrumbs.design'),
             recruitment: t('admin.breadcrumbs.recruitment'),
+            data: t('admin.breadcrumbs.data', 'Data'),
+            analysis: t('admin.breadcrumbs.analysis', 'Analysis'),
             exports: t('admin.breadcrumbs.exports'),
             settings: t('admin.breadcrumbs.settings'),
             participants: t('admin.breadcrumbs.participants'),

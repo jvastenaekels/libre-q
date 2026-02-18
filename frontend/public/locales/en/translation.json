@@ -558,6 +558,7 @@
             "none": "None",
             "run": "Run Analysis",
             "running": "Analyzing...",
+            "reanalyzing": "Re-analyzing...",
             "success": "Analysis complete — {{n}} factors extracted",
             "error": "Analysis failed: {{message}}",
             "scree_hint": "Click a bar to select the number of factors. Dashed line = Kaiser criterion (eigenvalue > 1).",
@@ -736,6 +737,8 @@
             "team": "Team",
             "recruitment": "Recruit",
             "exports": "Data",
+            "data": "Data",
+            "analysis": "Analysis",
             "settings": "Settings"
         },
         "command_menu": {

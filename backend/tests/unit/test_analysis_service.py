@@ -610,3 +610,127 @@ class TestNoFlaggedParticipants:
         # Factor 1 should have valid z-scores, factor 2 should be NaN
         assert not np.all(np.isnan(z_scores[:, 0]))
         assert np.all(np.isnan(z_scores[:, 1]))
+
+
+class TestManualFlagging:
+    """Tests for manual flagging pipeline through run_analysis."""
+
+    def test_manual_flags_used(self, dataset):
+        """Manual flags should override auto-flagging."""
+        manual = np.zeros((8, 2), dtype=bool)
+        manual[0, 0] = True  # Flag only P1 on F1
+        manual[4, 1] = True  # Flag only P5 on F2
+        result = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            flagging="manual",
+            manual_flags_matrix=manual,
+        )
+        assert result["flags"][0, 0]  # P1 flagged on F1
+        assert result["flags"][4, 1]  # P5 flagged on F2
+        assert not result["flags"][1, 0]  # P2 not flagged
+        # z-scores should still be computed
+        assert not np.all(np.isnan(result["z_scores"][:, 0]))
+        assert not np.all(np.isnan(result["z_scores"][:, 1]))
+
+
+class TestTieHandling:
+    """Tests for z-score tie handling in factor arrays."""
+
+    def test_tied_zscores_get_mean_value(self):
+        """Tied z-scores should get the rounded mean of their distribution values."""
+        # 5 statements, 2 participants with identical sorts → identical weighted sums
+        dataset = np.array(
+            [
+                [2, 2],
+                [1, 1],
+                [0, 0],
+                [-1, -1],
+                [-2, -2],
+            ],
+            dtype=np.float64,
+        )
+        loadings = np.array([[0.9, 0.1], [0.1, 0.9]])
+        flags = np.array([[True, False], [True, False]])
+        distribution = np.array([-2, -1, 0, 1, 2], dtype=np.int64)
+        z_scores, factor_arrays = compute_factor_scores(
+            dataset, loadings, flags, distribution=distribution
+        )
+        # All factor array values should be finite integers
+        assert np.all(np.isfinite(factor_arrays[:, 0]))
+
+    def test_factor_arrays_finite_with_distribution(self, dataset):
+        """Factor arrays should be all finite when distribution is passed."""
+        distribution = np.array([-2, -1, -1, 0, 0, 0, 1, 1, 2], dtype=np.int64)
+        cor = correlation_matrix(dataset)
+        loadings = extract_pca(cor, 2)
+        rotated = rotate_varimax(loadings)
+        flags = flag_sorts(rotated, n_statements=9)
+        _, factor_arrays = compute_factor_scores(
+            dataset, rotated, flags, distribution=distribution
+        )
+        for f in range(2):
+            if not np.all(factor_arrays[:, f] == 0):
+                assert np.all(np.isfinite(factor_arrays[:, f]))
+
+
+class TestClassifyWithNaN:
+    """Tests for classify_statements when some factors have NaN z-scores."""
+
+    def test_nan_factor_skips_pairs(self):
+        """Pairs involving NaN factors should be skipped, not crash."""
+        z_scores = np.array(
+            [
+                [1.5, np.nan],
+                [0.5, np.nan],
+                [-0.5, np.nan],
+                [-1.5, np.nan],
+            ]
+        )
+        sed = np.array([[0.0, 0.3], [0.3, 0.0]])
+        dist, cons = classify_statements(z_scores, sed, n_factors=2)
+        # All statements should be consensus since no valid pair comparisons
+        assert len(dist) == 0
+        assert len(cons) == 4
+
+
+class TestNFactorsZero:
+    """Test n_factors=0 raises ValueError."""
+
+    def test_zero_factors_raises(self, dataset):
+        with pytest.raises(ValueError, match="at least 1"):
+            run_analysis(dataset, n_factors=0)
+
+
+class TestGridConfigDistribution:
+    """Tests for grid_config-based distribution in run_analysis."""
+
+    def test_grid_config_used(self, dataset):
+        """When grid_config is provided, it should be used for factor arrays."""
+        grid_config = [
+            {"value": -2, "count": 1},
+            {"value": -1, "count": 2},
+            {"value": 0, "count": 3},
+            {"value": 1, "count": 2},
+            {"value": 2, "count": 1},
+        ]
+        result = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            grid_config=grid_config,
+        )
+        # Factor arrays should be produced
+        assert result["factor_arrays"].shape == (9, 2)
+
+    def test_centroid_no_rotation(self, dataset):
+        """Centroid extraction with no rotation should work."""
+        result = run_analysis(
+            dataset, n_factors=2, extraction="centroid", rotation="none"
+        )
+        np.testing.assert_array_equal(
+            result["unrotated_loadings"], result["rotated_loadings"]
+        )

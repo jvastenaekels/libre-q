@@ -82,9 +82,15 @@ async def get_eigenvalues(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    eigenvalues, suggested = await asyncio.to_thread(
-        lambda: compute_eigenvalues(correlation_matrix(dataset))
-    )
+    try:
+        eigenvalues, suggested = await asyncio.to_thread(
+            lambda: compute_eigenvalues(correlation_matrix(dataset))
+        )
+    except np.linalg.LinAlgError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to compute eigenvalues: {e}",
+        )
 
     return EigenvalueResult(eigenvalues=eigenvalues, suggested_n_factors=suggested)
 
@@ -113,6 +119,13 @@ async def run_factor_analysis(
             detail=f"n_factors ({body.n_factors}) cannot exceed the number of valid participants ({n_participants})",
         )
 
+    # Validate manual flagging request
+    if body.flagging == "manual" and not body.manual_flags:
+        raise HTTPException(
+            status_code=400,
+            detail="manual_flags is required when flagging='manual'",
+        )
+
     # Build manual flags matrix if needed
     manual_flags_matrix = None
     if body.flagging == "manual" and body.manual_flags:
@@ -120,6 +133,9 @@ async def run_factor_analysis(
         manual_flags_matrix = apply_manual_flags(
             n_participants, body.n_factors, body.manual_flags, participant_db_ids
         )
+
+    # Extract grid_config for the forced distribution
+    grid_config = dump.get("study", {}).get("grid_config")
 
     try:
         result = await asyncio.to_thread(
@@ -130,8 +146,9 @@ async def run_factor_analysis(
             rotation=body.rotation,
             flagging=body.flagging,
             manual_flags_matrix=manual_flags_matrix,
+            grid_config=grid_config,
         )
-    except ValueError as e:
+    except (ValueError, np.linalg.LinAlgError) as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     # Determine study language for statement text

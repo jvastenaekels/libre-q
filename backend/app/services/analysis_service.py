@@ -354,6 +354,7 @@ def compute_factor_scores(
     dataset: NDArray[np.float64],
     loadings: NDArray[np.float64],
     flagged: NDArray[np.bool_],
+    distribution: NDArray[np.int64] | None = None,
 ) -> tuple[NDArray[np.float64], NDArray[np.int64]]:
     """Compute z-scores and factor arrays (integer scores) per factor.
 
@@ -364,6 +365,8 @@ def compute_factor_scores(
         dataset: Sort matrix (n_statements x n_participants)
         loadings: (Rotated) loadings matrix (n_participants x n_factors)
         flagged: Flagging matrix (n_participants x n_factors)
+        distribution: Forced distribution from grid_config. If None, inferred
+            from the first participant's data (fallback).
 
     Returns:
         Tuple of (z_scores, factor_arrays) where:
@@ -376,8 +379,9 @@ def compute_factor_scores(
     z_scores = np.full((n_statements, n_factors), np.nan)
     factor_arrays = np.full((n_statements, n_factors), 0, dtype=np.int64)
 
-    # Determine the forced distribution from the first column
-    distribution = np.sort(dataset[:, 0]).astype(np.int64)
+    # Use provided distribution or fall back to first participant's data
+    if distribution is None:
+        distribution = np.sort(dataset[:, 0]).astype(np.int64)
 
     for f in range(n_factors):
         # Flagged loadings for this factor
@@ -412,15 +416,18 @@ def compute_factor_scores(
         for rank, stmt_idx in enumerate(order):
             factor_arrays[stmt_idx, f] = sorted_dist[rank]
 
-        # Handle ties: for tied z-scores, assign the minimum dist value
+        # Handle ties: for tied z-scores, assign the rounded mean of tied rank values
+        # This follows standard Q-method convention (averaging tied ranks)
         zs = z_scores[:, f]
         unique_zs = np.unique(zs)
         for uz in unique_zs:
             tied = np.where(zs == uz)[0]
             if len(tied) > 1:
-                min_val = min(factor_arrays[idx, f] for idx in tied)
+                mean_val = round(
+                    sum(int(factor_arrays[idx, f]) for idx in tied) / len(tied)
+                )
                 for idx in tied:
-                    factor_arrays[idx, f] = min_val
+                    factor_arrays[idx, f] = mean_val
 
     return z_scores, factor_arrays
 
@@ -596,6 +603,20 @@ def compute_eigenvalues(
     return eigenvalues_list, max(suggested, 1)
 
 
+def _distribution_from_grid_config(
+    grid_config: list[dict[str, Any]],
+) -> NDArray[np.int64]:
+    """Build the forced distribution array from the study's grid_config.
+
+    Each entry in grid_config has {"value": int, "count": int}.
+    Returns a sorted array of all score values repeated by their count.
+    """
+    dist: list[int] = []
+    for entry in grid_config:
+        dist.extend([int(entry["value"])] * int(entry["count"]))
+    return np.sort(np.array(dist, dtype=np.int64))
+
+
 def run_analysis(
     dataset: NDArray[np.float64],
     n_factors: int,
@@ -603,6 +624,7 @@ def run_analysis(
     rotation: str = "varimax",
     flagging: str = "auto",
     manual_flags_matrix: NDArray[np.bool_] | None = None,
+    grid_config: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run the complete Q-method factor analysis pipeline.
 
@@ -616,6 +638,8 @@ def run_analysis(
         rotation: 'varimax' or 'none'
         flagging: 'auto' or 'manual'
         manual_flags_matrix: Required if flagging='manual'
+        grid_config: Study grid configuration for the forced distribution.
+            If None, distribution is inferred from the first participant.
 
     Returns:
         Dictionary with all analysis results
@@ -656,7 +680,10 @@ def run_analysis(
         flags = flag_sorts(rotated, n_statements)
 
     # Step 6: Z-scores and factor arrays
-    z_scores, factor_arrays = compute_factor_scores(dataset, rotated, flags)
+    distribution = _distribution_from_grid_config(grid_config) if grid_config else None
+    z_scores, factor_arrays = compute_factor_scores(
+        dataset, rotated, flags, distribution=distribution
+    )
 
     # Step 7: Factor characteristics
     characteristics, factor_cor, sed = compute_factor_characteristics(

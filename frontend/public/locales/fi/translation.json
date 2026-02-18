@@ -550,6 +550,7 @@
             "none": "Ei mitään",
             "run": "Suorita analyysi",
             "running": "Analysoidaan...",
+            "reanalyzing": "Analysoidaan uudelleen...",
             "success": "Analyysi valmis — {{n}} faktoria poimittu",
             "error": "Analyysi epäonnistui: {{message}}",
             "scree_hint": "Napsauta palkkia valitaksesi faktorien lukumäärä. Katkoviiva = Kaiserin kriteeri (ominaisarvo > 1).",
@@ -728,6 +729,8 @@
             "team": "Tiimi",
             "recruitment": "Rekrytointi",
             "exports": "Tiedot",
+            "data": "Tiedot",
+            "analysis": "Analyysi",
             "settings": "Asetukset"
         },
         "command_menu": {
