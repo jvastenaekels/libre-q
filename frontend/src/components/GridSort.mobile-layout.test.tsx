@@ -148,7 +148,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         // We can traverse up from the button
         const container = minimizeBtn.closest('div.absolute');
         expect(container).toBeInTheDocument();
-        expect(container?.className).toContain('z-[60]');
+        expect(container?.className).toContain('z-toolbar');
     });
 
     it('toggles instruction minimization on click', async () => {
@@ -248,7 +248,7 @@ describe('GridSort Landscape Mobile Layout', () => {
 
         // Overlay ReadingZone is rendered inside the grid panel as an overlay
         const overlayReadingZone = container.querySelector(
-            '[class*="z-[70]"][class*="pointer-events-none"]'
+            '[class*="z-toolbar"][class*="pointer-events-none"]'
         );
         expect(overlayReadingZone).toBeInTheDocument();
 
