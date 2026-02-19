@@ -239,16 +239,22 @@ describe('GridSort Landscape Mobile Layout', () => {
         expect(stickyReadingZone).not.toBeInTheDocument();
     });
 
-    it('renders ReadingZone in sidebar with landscape variant (auto-collapsing)', () => {
+    it('renders ReadingZone as overlay on grid canvas (not in sidebar)', () => {
         const { container } = render(
             <DndContext>
                 <GridSort {...defaultProps} />
             </DndContext>
         );
 
-        // Landscape ReadingZone starts collapsed (h-0) when no card is active/hovered
-        const landscapeReadingZone = container.querySelector('[class*="h-0"]');
-        expect(landscapeReadingZone).toBeInTheDocument();
+        // Overlay ReadingZone is rendered inside the grid panel as a z-50 overlay
+        const overlayReadingZone = container.querySelector(
+            '[class*="z-50"][class*="pointer-events-none"]'
+        );
+        expect(overlayReadingZone).toBeInTheDocument();
+
+        // The overlay should be inside the grid panel, not the sidebar
+        const sidebar = container.querySelector('[class*="w-[min(280px,40vw)]"]');
+        expect(sidebar?.contains(overlayReadingZone)).toBe(false);
     });
 
     it('uses vertical scroll for deck cards (not horizontal)', () => {

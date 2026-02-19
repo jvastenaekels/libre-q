@@ -170,12 +170,13 @@ export const useGridZoom = ({
         };
     }, [performAutoFit, width, height]);
 
-    // Handle container visibility/resize and content size changes
-    // Consolidated into a single observer to avoid redundant autoFit calls per frame
+    // Handle container visibility/resize (e.g. sidebar toggle, tab switch)
+    // Only observe the wrapper — observing content triggers auto-fit on every
+    // card placement because the grid layout shifts, causing annoying zoom
+    // bouncing on mobile.
     useEffect(() => {
         const wrapper = wrapperRef.current;
-        const content = contentRef.current;
-        if (!wrapper && !content) return;
+        if (!wrapper) return;
 
         let rafId: number;
         const observer = new ResizeObserver((entries) => {
@@ -188,14 +189,13 @@ export const useGridZoom = ({
             }
         });
 
-        if (wrapper) observer.observe(wrapper);
-        if (content) observer.observe(content);
+        observer.observe(wrapper);
 
         return () => {
             observer.disconnect();
             cancelAnimationFrame(rafId);
         };
-    }, [performAutoFit, wrapperRef, contentRef]);
+    }, [performAutoFit, wrapperRef]);
 
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone

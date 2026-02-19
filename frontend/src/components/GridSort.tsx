@@ -749,11 +749,14 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 place:
                     uiLabels?.['fine.workbench.place_on_grid'] || t('fine.workbench.place_on_grid'),
                 initial:
-                    uiLabels?.['fine.workbench.initial_instruction'] ||
-                    t('fine.workbench.initial_instruction'),
+                    isMobile || isLandscapeMobile
+                        ? uiLabels?.['fine.workbench.initial_instruction_mobile'] ||
+                          t('fine.workbench.initial_instruction_mobile', 'Tap statement')
+                        : uiLabels?.['fine.workbench.initial_instruction'] ||
+                          t('fine.workbench.initial_instruction'),
                 finish: uiLabels?.['fine.actions.finish'] || t('fine.actions.finish'),
             }),
-            [t, uiLabels]
+            [t, uiLabels, isMobile, isLandscapeMobile]
         );
 
         const toolbarLabels = useMemo(
@@ -793,7 +796,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     className={cn(
                         'flex-none lg:w-full lg:flex-none',
                         isLandscapeMobile
-                            ? 'w-full h-[52px]'
+                            ? 'w-full h-[60px]'
                             : isMobile
                               ? 'h-[80px]'
                               : 'h-full w-[130px] sm:w-[140px]'
@@ -854,6 +857,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing touch-none"
                         ref={wrapperRef}
                     >
+                        {isLandscapeMobile && <ReadingZone variant="overlay" />}
+
                         <GridToolbar
                             onZoomIn={zoomIn}
                             onZoomOut={zoomOut}
@@ -1028,16 +1033,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     ) : (
                         <>
-                            {(!isMobile || isLandscapeMobile) && (
-                                <div
-                                    className={cn(
-                                        'flex-none pb-0',
-                                        isLandscapeMobile ? 'p-2' : 'p-4'
-                                    )}
-                                >
-                                    <ReadingZone
-                                        variant={isLandscapeMobile ? 'landscape' : 'desktop'}
-                                    />
+                            {!isMobile && !isLandscapeMobile && (
+                                <div className="flex-none pb-0 p-4">
+                                    <ReadingZone variant="desktop" />
                                 </div>
                             )}
 
@@ -1096,7 +1094,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                     className={cn(
                                         'flex-1 min-h-0 custom-scrollbar',
                                         isLandscapeMobile
-                                            ? 'grid grid-cols-2 gap-1 content-start overflow-y-auto overflow-x-hidden p-1.5'
+                                            ? 'grid grid-cols-2 gap-1.5 content-start overflow-y-auto overflow-x-hidden p-1.5'
                                             : 'p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden items-stretch justify-start lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
                                         activeCards.length === 0 &&
                                             'justify-center lg:place-content-center'

@@ -58,7 +58,7 @@ const CardHeader: React.FC<{
 );
 
 interface ReadingZoneProps {
-    variant: 'mobile' | 'desktop' | 'landscape';
+    variant: 'mobile' | 'desktop' | 'landscape' | 'overlay';
 }
 const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const { t } = useTranslation();
@@ -149,6 +149,35 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 </div>
 
                 {hasOverflow && displayCard && <ScrollIndicator />}
+            </div>
+        );
+    }
+
+    if (variant === 'overlay') {
+        // Floating overlay on the grid canvas for landscape mobile.
+        // Appears when a card is selected/touched, hides when released.
+        // pointer-events-none so it doesn't block grid interaction.
+        return (
+            <div
+                className={cn(
+                    'absolute top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-200 ease-in-out',
+                    displayCard ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+                )}
+            >
+                {displayCard && (
+                    <div className="mx-2 mt-2 bg-indigo-50/85 backdrop-blur-md border border-indigo-100 rounded-xl p-2 shadow-sm">
+                        <CardHeader
+                            label={t(labelKey)}
+                            code={displayCard.code}
+                            className="text-[9px] mb-0 gap-1"
+                            iconSize={9}
+                            showCodes={showCodes}
+                        />
+                        <p className="text-slate-800 text-xs font-medium leading-snug line-clamp-3">
+                            {displayCard.text}
+                        </p>
+                    </div>
+                )}
             </div>
         );
     }
