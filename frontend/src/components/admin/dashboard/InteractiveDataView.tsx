@@ -90,6 +90,7 @@ import { enUS, fr, fi } from 'date-fns/locale';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { DumpParticipant, DumpResponse } from './types';
+import { QuestionDistributionCharts } from './charts/QuestionDistributionCharts';
 
 interface InteractiveDataViewProps {
     slug: string;
@@ -118,8 +119,8 @@ function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'ab
 const STEP_LABEL_KEYS: Record<number, [string, string]> = {
     1: ['admin.data.step.consent', 'Consent'],
     2: ['admin.data.step.presort', 'Pre-sort'],
-    3: ['admin.data.step.rough', 'Rough sort'],
-    4: ['admin.data.step.fine', 'Fine sort'],
+    3: ['admin.data.step.rough', 'Preliminary sort'],
+    4: ['admin.data.step.fine', 'Q-sort'],
     5: ['admin.data.step.post', 'Post-sort'],
 };
 const PAGE_SIZE = 25;
@@ -251,27 +252,33 @@ function ParticipantCard({
                 <div className="flex items-center gap-1.5">
                     {participant.postsort.email && (
                         <div
+                            role="img"
+                            aria-label={t('admin.data.tooltips.email_provided', 'Email provided')}
                             className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100"
-                            title={t('admin.data.tooltips.email_provided', 'Email provided')}
                         >
                             <Mail className="h-3 w-3" />
                         </div>
                     )}
                     {participant.postsort.newsletter_consent && (
                         <div
-                            className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100"
-                            title={t(
+                            role="img"
+                            aria-label={t(
                                 'admin.data.tooltips.newsletter_consent',
-                                'Newsletter consent'
+                                'Wants results'
                             )}
+                            className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100"
                         >
                             <Bell className="h-3 w-3" />
                         </div>
                     )}
                     {participant.postsort.interview_consent && (
                         <div
+                            role="img"
+                            aria-label={t(
+                                'admin.data.tooltips.interview_consent',
+                                'Accepts follow-up'
+                            )}
                             className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100"
-                            title={t('admin.data.tooltips.interview_consent', 'Interview consent')}
                         >
                             <Briefcase className="h-3 w-3" />
                         </div>
@@ -280,32 +287,36 @@ function ParticipantCard({
                 <div className="flex items-center gap-1.5">
                     {participant.recruitment_token && (
                         <div
+                            role="img"
+                            aria-label={`${t('admin.data.tooltips.recruitment_link', 'Recruitment link')}: ${participant.recruitment_token}`}
                             className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200"
-                            title={`${t('admin.data.tooltips.recruitment_link', 'Recruitment link')}: ${participant.recruitment_token}`}
                         >
                             <Tag className="h-3 w-3" />
                         </div>
                     )}
                     {isSuspect && (
                         <div
+                            role="img"
+                            aria-label={t('admin.data.tooltips.suspect')}
                             className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100"
-                            title={t('admin.data.tooltips.suspect')}
                         >
                             <AlertTriangle className="h-3 w-3" />
                         </div>
                     )}
                     {hasComments && (
                         <div
+                            role="img"
+                            aria-label={t('admin.data.tooltips.has_comments')}
                             className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100"
-                            title={t('admin.data.tooltips.has_comments')}
                         >
                             <MessageSquare className="h-3 w-3" />
                         </div>
                     )}
                     {hasAudio && (
                         <div
+                            role="img"
+                            aria-label={t('admin.data.tooltips.has_audio', 'Has audio responses')}
                             className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100"
-                            title={t('admin.data.tooltips.has_audio', 'Has audio responses')}
                         >
                             <Mic className="h-3 w-3" />
                         </div>
@@ -417,7 +428,9 @@ export default function InteractiveDataView({
     );
 
     const liveCount = liveParticipants.length;
-    const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
+    const newsletterCount = liveParticipants.filter(
+        (p) => p.postsort.newsletter_consent && p.postsort.email
+    ).length;
     const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
     const completedCount = liveParticipants.filter(
         (p) => getDisplayStatus(p) === 'completed'
@@ -542,6 +555,18 @@ export default function InteractiveDataView({
         document.body.removeChild(a);
     }, []);
 
+    const exportNewsletterList = useCallback(() => {
+        runExport(async () => {
+            const escapeCsv = (v: string) => `"${v.replace(/"/g, '""')}"`;
+            const rows = liveParticipants.filter(
+                (p) => p.postsort.newsletter_consent && p.postsort.email
+            );
+            const csv = ['email', ...rows.map((p) => escapeCsv(p.postsort.email ?? ''))].join('\n');
+            const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
+            downloadBlob(blob, `${slug}_newsletter_emails.csv`);
+        });
+    }, [liveParticipants, slug, downloadBlob, runExport]);
+
     const showLanguageColumn = data.study.translations.length > 1;
 
     const columns = useMemo(
@@ -652,6 +677,7 @@ export default function InteractiveDataView({
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    aria-label={t('admin.data.table.status', 'Status')}
                                     className={cn(
                                         'h-6 w-6 p-0 rounded',
                                         statusFilter !== 'all'
@@ -737,6 +763,7 @@ export default function InteractiveDataView({
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    aria-label={t('admin.data.table.consent', 'Consent')}
                                     className={cn(
                                         'h-6 w-6 p-0 rounded',
                                         consentFilters.size > 0
@@ -763,7 +790,7 @@ export default function InteractiveDataView({
                                     )}
                                 >
                                     <Mail className="w-3.5 h-3.5 mr-2" />
-                                    {t('admin.data.filters.has_email', 'Has email')}
+                                    {t('admin.data.filters.has_email', 'Email provided')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => toggleConsent('newsletter')}
@@ -773,7 +800,7 @@ export default function InteractiveDataView({
                                     )}
                                 >
                                     <Bell className="w-3.5 h-3.5 mr-2" />
-                                    {t('admin.data.filters.newsletter', 'Newsletter')}
+                                    {t('admin.data.filters.newsletter', 'Wants results')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => toggleConsent('interview')}
@@ -819,7 +846,7 @@ export default function InteractiveDataView({
                                         <TooltipContent>
                                             {t(
                                                 'admin.data.tooltips.newsletter_consent',
-                                                'Newsletter consent'
+                                                'Wants results'
                                             )}
                                         </TooltipContent>
                                     </Tooltip>
@@ -834,7 +861,7 @@ export default function InteractiveDataView({
                                         <TooltipContent>
                                             {t(
                                                 'admin.data.tooltips.interview_consent',
-                                                'Interview consent'
+                                                'Accepts follow-up'
                                             )}
                                         </TooltipContent>
                                     </Tooltip>
@@ -864,6 +891,7 @@ export default function InteractiveDataView({
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    aria-label={t('admin.data.table.flags')}
                                     className={cn(
                                         'h-6 w-6 p-0 rounded',
                                         qualityFilter !== 'all'
@@ -1100,6 +1128,7 @@ export default function InteractiveDataView({
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    aria-label={t('admin.data.table.last_step', 'Last step')}
                                     className={cn(
                                         'h-6 w-6 p-0 rounded',
                                         stepFilter !== 'all'
@@ -1360,7 +1389,7 @@ export default function InteractiveDataView({
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t(
                                         'admin.data.stats.interview_interested',
-                                        'Accepted follow-up'
+                                        'Accepts follow-up'
                                     )}
                                 </span>
                             </div>
@@ -1378,16 +1407,13 @@ export default function InteractiveDataView({
                         </div>
                     </button>
 
-                    {/* Newsletter Consent Card */}
+                    {/* Newsletter Consent Card — exports email list */}
                     <button
                         type="button"
-                        onClick={() => toggleConsent('newsletter')}
-                        className={cn(
-                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
-                            consentFilters.has('newsletter')
-                                ? 'border-indigo-500 ring-4 ring-indigo-50/50'
-                                : 'border-slate-100 hover:border-indigo-200'
-                        )}
+                        onClick={exportNewsletterList}
+                        disabled={newsletterCount === 0}
+                        aria-label={t('admin.data.stats.click_to_export', 'Click to export list')}
+                        className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
                             <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
@@ -1395,22 +1421,13 @@ export default function InteractiveDataView({
 
                         <div>
                             <div className="flex items-center gap-2 mb-3">
-                                <div
-                                    className={cn(
-                                        'p-2 rounded-lg transition-colors',
-                                        consentFilters.has('newsletter')
-                                            ? 'bg-indigo-100 text-indigo-700'
-                                            : 'bg-indigo-50 text-indigo-600'
-                                    )}
-                                >
+                                <div className="p-2 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
                                     <Bell className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    {t(
-                                        'admin.data.tooltips.newsletter_consent',
-                                        'Wants to receive results'
-                                    )}
+                                    {t('admin.data.stats.newsletter', 'Wants results')}
                                 </span>
+                                <Download className="w-3.5 h-3.5 text-indigo-400 ml-auto sm:hidden" />
                             </div>
 
                             <div className="flex items-baseline gap-2">
@@ -1421,8 +1438,8 @@ export default function InteractiveDataView({
                         </div>
 
                         <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                            {t('admin.data.stats.click_to_filter', 'Filter table')}
-                            <ArrowRight className="w-3 h-3" />
+                            {t('admin.data.stats.click_to_export', 'Click to export list')}
+                            <Download className="w-3 h-3" />
                         </div>
                     </button>
                 </div>
@@ -1439,11 +1456,12 @@ export default function InteractiveDataView({
                             className="h-7 px-3 gap-2 bg-indigo-100 text-indigo-700 border-indigo-200 font-semibold"
                         >
                             <Mail className="w-3 h-3" />
-                            {t('admin.data.filters.has_email', 'Has email')}
+                            {t('admin.data.filters.has_email', 'Email provided')}
                             <button
                                 type="button"
                                 onClick={() => toggleConsent('email')}
-                                className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-indigo-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1455,11 +1473,12 @@ export default function InteractiveDataView({
                             className="h-7 px-3 gap-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold"
                         >
                             <Bell className="w-3 h-3" />
-                            {t('admin.data.filters.newsletter', 'Newsletter consent')}
+                            {t('admin.data.filters.newsletter', 'Wants results')}
                             <button
                                 type="button"
                                 onClick={() => toggleConsent('newsletter')}
-                                className="hover:bg-emerald-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-emerald-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1471,11 +1490,12 @@ export default function InteractiveDataView({
                             className="h-7 px-3 gap-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold"
                         >
                             <Briefcase className="w-3 h-3" />
-                            {t('admin.data.filters.interview', 'Interview consent')}
+                            {t('admin.data.filters.interview', 'Accepts follow-up')}
                             <button
                                 type="button"
                                 onClick={() => toggleConsent('interview')}
-                                className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-amber-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1500,7 +1520,8 @@ export default function InteractiveDataView({
                             <button
                                 type="button"
                                 onClick={() => setQualityFilter('all')}
-                                className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-amber-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1520,7 +1541,8 @@ export default function InteractiveDataView({
                             <button
                                 type="button"
                                 onClick={() => setStepFilter('all')}
-                                className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-indigo-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1543,8 +1565,9 @@ export default function InteractiveDataView({
                             <button
                                 type="button"
                                 onClick={() => setStatusFilter('all')}
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
                                 className={cn(
-                                    'rounded-full p-0.5 transition-colors',
+                                    'rounded-full p-1.5 -m-1 transition-colors',
                                     statusFilter === 'completed'
                                         ? 'hover:bg-emerald-200'
                                         : statusFilter === 'in_progress'
@@ -1566,7 +1589,8 @@ export default function InteractiveDataView({
                             <button
                                 type="button"
                                 onClick={() => setGlobalFilter('')}
-                                className="hover:bg-slate-200 rounded-full p-0.5 transition-colors"
+                                aria-label={t('admin.data.filters.remove_filter', 'Remove filter')}
+                                className="hover:bg-slate-200 rounded-full p-1.5 -m-1 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -2078,6 +2102,13 @@ export default function InteractiveDataView({
                     )}
                 </div>
             )}
+
+            {/* Post-sort question distribution charts */}
+            <QuestionDistributionCharts
+                postsortConfig={data.study.postsort_config}
+                filteredParticipants={filteredParticipants}
+                language={i18n.language}
+            />
         </div>
     );
 }

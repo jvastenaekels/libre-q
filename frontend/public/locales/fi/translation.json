@@ -1490,16 +1490,17 @@
             "stats": {
                 "email_collection": "Sähköpostien kerääminen",
                 "participants": "osallistujaa",
-                "newsletter": "Uutiskirjeen tilaus",
+                "newsletter": "Haluaa tulokset",
                 "opt_in": "vastausosuus",
                 "follow_up": "Jatko-osallistuminen",
                 "interested": "kiinnostunutta",
                 "click_to_filter": "Klikkaa suodattaaksesi",
+                "click_to_export": "Klikkaa viedäksesi listan",
                 "completed": "Valmis",
                 "in_progress": "Kesken",
                 "abandoned_count": "{{count}} hylätty(ä)",
                 "interview_interested": "Avoin jatkohaastattelulle",
-                "interview": "Haastattelut",
+                "interview": "Hyväksyy seurannan",
                 "email": "Sähköpostit"
             },
             "tabs": {
@@ -1518,8 +1519,8 @@
             "step": {
                 "consent": "Suostumus",
                 "presort": "Esilajittelu",
-                "rough": "Karkea lajittelu",
-                "fine": "Tarkka lajittelu",
+                "rough": "Alustava lajittelu",
+                "fine": "Q-lajitteluruudukko",
                 "post": "Jälkilajittelu"
             },
             "actions": {
@@ -1577,8 +1578,8 @@
                 "has_comments": "Sisältää osallistujan kommentteja korteista",
                 "has_audio": "Sisältää äänivastauksia",
                 "email_provided": "Sähköposti annettu",
-                "newsletter_consent": "Haluaa saada tulokset",
-                "interview_consent": "Avoin jatkohaastattelulle"
+                "newsletter_consent": "Haluaa tulokset",
+                "interview_consent": "Hyväksyy seurannan"
             },
             "toast": {
                 "discarded": "Osallistuja hylätty",
@@ -1615,10 +1616,11 @@
             "filters": {
                 "active": "Aktiiviset suodattimet",
                 "has_email": "Sähköposti annettu",
-                "newsletter": "Uutiskirjeen suostumus",
-                "interview": "Haastattelusuostumus",
+                "newsletter": "Haluaa tulokset",
+                "interview": "Hyväksyy seurannan",
                 "flagged": "Vain merkityt",
                 "clear_all": "Tyhjennä suodattimet",
+                "remove_filter": "Poista suodatin",
                 "all_statuses": "Kaikki tilat",
                 "all_consents": "Kaikki",
                 "all_indicators": "Kaikki",
@@ -1626,6 +1628,15 @@
                 "has_comments": "Sisältää kommentteja",
                 "has_audio": "Sisältää ääntä",
                 "has_recruitment": "Rekrytointilinkki"
+            },
+            "charts": {
+                "section_title": "Vastausten jakaumat",
+                "distribution_label": "Jakauma: {{question}}",
+                "multi_select_note": "Monivalinta sallittu",
+                "responses_count": "{{count}} vastausta",
+                "no_answer": "Ei vastausta",
+                "option": "Vaihtoehto",
+                "count": "Määrä"
             },
             "search": {
                 "placeholder": "Hae ID:llä tai tunnisteella...",

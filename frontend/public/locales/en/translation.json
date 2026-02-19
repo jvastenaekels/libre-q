@@ -122,7 +122,7 @@
             "welcome": "Welcome",
             "consent": "Privacy & Consent",
             "rough": "First impressions",
-            "fine": "Q-Sort grid",
+            "fine": "Q-sort",
             "post": "Final questions"
         },
         "mobile_step": "Step",
@@ -1498,16 +1498,17 @@
             "stats": {
                 "email_collection": "Email collection",
                 "participants": "total",
-                "newsletter": "Newsletter consent",
+                "newsletter": "Wants results",
                 "opt_in": "Response rate",
                 "follow_up": "Follow-up potential",
                 "interested": "interested",
                 "click_to_filter": "Click to filter",
+                "click_to_export": "Click to export list",
                 "completed": "Completed",
                 "in_progress": "In progress",
                 "abandoned_count": "{{count}} abandoned",
-                "interview_interested": "Accepted follow-up",
-                "interview": "Interviews",
+                "interview_interested": "Accepts follow-up",
+                "interview": "Accepts follow-up",
                 "email": "Emails"
             },
             "tabs": {
@@ -1526,8 +1527,8 @@
             "step": {
                 "consent": "Consent",
                 "presort": "Pre-sort",
-                "rough": "Rough sort",
-                "fine": "Fine sort",
+                "rough": "Preliminary sort",
+                "fine": "Q-sort",
                 "post": "Post-sort"
             },
             "actions": {
@@ -1585,8 +1586,8 @@
                 "has_comments": "Contains participant comments on cards",
                 "has_audio": "Has audio responses",
                 "email_provided": "Email provided",
-                "newsletter_consent": "Wants to receive results",
-                "interview_consent": "Open to follow-up interview"
+                "newsletter_consent": "Wants results",
+                "interview_consent": "Accepts follow-up"
             },
             "toast": {
                 "discarded": "Participant discarded",
@@ -1622,11 +1623,12 @@
             },
             "filters": {
                 "active": "Active filters",
-                "has_email": "Has email",
-                "newsletter": "Newsletter consent",
-                "interview": "Interview consent",
+                "has_email": "Email provided",
+                "newsletter": "Wants results",
+                "interview": "Accepts follow-up",
                 "flagged": "Flagged only",
                 "clear_all": "Clear filters",
+                "remove_filter": "Remove filter",
                 "all_statuses": "All statuses",
                 "all_consents": "All",
                 "all_indicators": "All",
@@ -1634,6 +1636,15 @@
                 "has_comments": "Has comments",
                 "has_audio": "Has audio",
                 "has_recruitment": "Has recruitment link"
+            },
+            "charts": {
+                "section_title": "Response Distributions",
+                "distribution_label": "Distribution for {{question}}",
+                "multi_select_note": "Multiple selections allowed",
+                "responses_count": "{{count}} responses",
+                "no_answer": "No answer",
+                "option": "Option",
+                "count": "Count"
             },
             "search": {
                 "placeholder": "Search by ID or recruitment token...",

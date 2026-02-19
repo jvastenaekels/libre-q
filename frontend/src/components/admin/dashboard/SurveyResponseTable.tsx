@@ -83,8 +83,8 @@ export function SurveyResponseTable({
 
         // Special Post-Sort Fields
         if (key === 'email') return t('post.contact.email_label', 'Email Address');
-        if (key === 'interview_consent') return t('post.contact.interview_consent', 'Interview');
-        if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Newsletter');
+        if (key === 'interview_consent') return t('post.contact.interview_consent', 'Follow-up');
+        if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Results');
         if (key === '_recruitment_token')
             return t('admin.participant.metadata.recruitment_token', 'Ref');
         if (key === 'missing_statement')
