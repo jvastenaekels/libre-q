@@ -1606,6 +1606,7 @@
                 "duration": "Durée",
                 "submitted": "Soumis",
                 "last_step": "Dernière étape",
+                "current_step": "Étape en cours",
                 "view": "Voir",
                 "actions": "Détails",
                 "duplicate_ip": "IP dupliquée",

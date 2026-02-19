@@ -1568,6 +1568,7 @@
                 "duration": "Kesto",
                 "submitted": "Lähetetty",
                 "last_step": "Viimeinen vaihe",
+                "current_step": "Nykyinen vaihe",
                 "view": "Näytä",
                 "actions": "Tiedot",
                 "duplicate_ip": "Sama IP",

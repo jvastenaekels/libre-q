@@ -37,7 +37,15 @@ interface ChartDataItem {
     totalParticipants: number;
 }
 
+interface ChartableQuestion {
+    key: string;
+    def: PostsortQuestion;
+    /** How to read this question's answer from a participant */
+    getAnswer: (p: DumpParticipant) => unknown;
+}
+
 interface QuestionDistributionChartsProps {
+    presortConfig: DumpResponse['study']['presort_config'];
     postsortConfig: DumpResponse['study']['postsort_config'];
     filteredParticipants: DumpParticipant[];
     language: string;
@@ -47,7 +55,19 @@ const CHARTABLE_TYPES = new Set(['select', 'radio', 'checkbox']);
 const BAR_COLOR = '#6366f1';
 const NO_ANSWER_COLOR = '#cbd5e1';
 
+/** Extract questions record from presort_config (handles legacy flat format + new {enabled, fields} format) */
+function getPresortQuestions(
+    config: Record<string, unknown> | undefined
+): Record<string, PostsortQuestion> {
+    if (!config || typeof config !== 'object') return {};
+    if ('fields' in config && config.fields && typeof config.fields === 'object')
+        return config.fields as Record<string, PostsortQuestion>;
+    if (!('enabled' in config)) return config as Record<string, PostsortQuestion>;
+    return {};
+}
+
 export function QuestionDistributionCharts({
+    presortConfig,
     postsortConfig,
     filteredParticipants,
     language,
@@ -55,17 +75,48 @@ export function QuestionDistributionCharts({
     const { t } = useTranslation();
 
     const chartableQuestions = useMemo(() => {
-        const questions = (postsortConfig as Record<string, unknown> | undefined)?.questions;
-        if (!questions || typeof questions !== 'object') return [];
+        const result: ChartableQuestion[] = [];
 
-        return Object.entries(questions as Record<string, PostsortQuestion>).filter(
-            ([, q]) =>
-                CHARTABLE_TYPES.has(q.type) && Array.isArray(q.options) && q.options.length > 0
+        // Presort questions — answers are flat in p.presort[key]
+        const presortQuestions = getPresortQuestions(
+            presortConfig as Record<string, unknown> | undefined
         );
-    }, [postsortConfig]);
+        for (const [key, q] of Object.entries(presortQuestions)) {
+            if (CHARTABLE_TYPES.has(q.type) && Array.isArray(q.options) && q.options.length > 0) {
+                result.push({
+                    key,
+                    def: q,
+                    getAnswer: (p) => p.presort[key],
+                });
+            }
+        }
+
+        // Postsort questions — answers are nested in p.postsort.questions_answers[key]
+        const postsortQuestions = (postsortConfig as Record<string, unknown> | undefined)
+            ?.questions;
+        if (postsortQuestions && typeof postsortQuestions === 'object') {
+            for (const [key, q] of Object.entries(
+                postsortQuestions as Record<string, PostsortQuestion>
+            )) {
+                if (
+                    CHARTABLE_TYPES.has(q.type) &&
+                    Array.isArray(q.options) &&
+                    q.options.length > 0
+                ) {
+                    result.push({
+                        key,
+                        def: q,
+                        getAnswer: (p) => p.postsort.questions_answers?.[key],
+                    });
+                }
+            }
+        }
+
+        return result;
+    }, [presortConfig, postsortConfig]);
 
     const chartData: ChartDataItem[] = useMemo(() => {
-        return chartableQuestions.map(([questionKey, questionDef]) => {
+        return chartableQuestions.map(({ key: questionKey, def: questionDef, getAnswer }) => {
             const optionMap = new Map<string, string>();
             const optionOrder: string[] = [];
 
@@ -86,7 +137,7 @@ export function QuestionDistributionCharts({
             let noAnswerCount = 0;
 
             for (const p of filteredParticipants) {
-                const answer = p.postsort.questions_answers?.[questionKey];
+                const answer = getAnswer(p);
 
                 if (
                     answer === undefined ||

@@ -60,6 +60,8 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AdminService } from '@/api/admin';
@@ -182,19 +184,31 @@ function ParticipantCard({
                         </Badge>
                     )}
                 </div>
-                <Badge
-                    variant="outline"
-                    className={cn(
-                        'h-5 text-[10px] px-2 font-semibold border-none shrink-0',
-                        displayStatus === 'completed'
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : displayStatus === 'abandoned'
-                              ? 'bg-rose-50 text-rose-500'
-                              : 'bg-sky-50 text-sky-600'
-                    )}
-                >
-                    {t(`admin.data.status.${displayStatus}`, displayStatus)}
-                </Badge>
+                <div className="flex items-center gap-1.5 shrink-0">
+                    <Badge
+                        variant="outline"
+                        className={cn(
+                            'h-5 text-[10px] px-2 font-semibold border-none',
+                            displayStatus === 'completed'
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : displayStatus === 'abandoned'
+                                  ? 'bg-rose-50 text-rose-500'
+                                  : 'bg-sky-50 text-sky-600'
+                        )}
+                    >
+                        {t(`admin.data.status.${displayStatus}`, displayStatus)}
+                    </Badge>
+                    {displayStatus !== 'completed' &&
+                        participant.last_step_reached != null &&
+                        STEP_LABEL_KEYS[participant.last_step_reached + 1] && (
+                            <Badge
+                                variant="outline"
+                                className="h-5 text-[10px] px-2 font-semibold border-slate-200 text-slate-500"
+                            >
+                                {t(...STEP_LABEL_KEYS[participant.last_step_reached + 1])}
+                            </Badge>
+                        )}
+                </div>
             </div>
 
             {/* Row 2: Metadata */}
@@ -234,17 +248,6 @@ function ParticipantCard({
                             : '—'}
                     </span>
                 </div>
-                {displayStatus !== 'completed' && (
-                    <div className="flex items-center gap-1.5">
-                        <Footprints className="h-3 w-3 text-slate-400" />
-                        <span>
-                            {participant.last_step_reached != null &&
-                            STEP_LABEL_KEYS[participant.last_step_reached]
-                                ? t(...STEP_LABEL_KEYS[participant.last_step_reached])
-                                : '?'}
-                        </span>
-                    </div>
-                )}
             </div>
 
             {/* Row 3: Consent + Quality indicators */}
@@ -398,7 +401,14 @@ export default function InteractiveDataView({
     const data = useMemo(() => {
         if (rawData) return rawData as unknown as DumpResponse;
         return {
-            study: { slug, statements: [], translations: [], postsort_config: {}, state: 'draft' },
+            study: {
+                slug,
+                statements: [],
+                translations: [],
+                presort_config: {},
+                postsort_config: {},
+                state: 'draft',
+            },
             participants: effectiveParticipants,
             statement_id_to_index: {},
         } as DumpResponse;
@@ -680,7 +690,7 @@ export default function InteractiveDataView({
                                     aria-label={t('admin.data.table.status', 'Status')}
                                     className={cn(
                                         'h-6 w-6 p-0 rounded',
-                                        statusFilter !== 'all'
+                                        statusFilter !== 'all' || stepFilter !== 'all'
                                             ? 'text-indigo-600 bg-indigo-50'
                                             : 'text-slate-400 hover:text-slate-600'
                                     )}
@@ -693,11 +703,23 @@ export default function InteractiveDataView({
                                 className="w-48"
                                 collisionPadding={8}
                             >
-                                <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                                    {t('admin.data.filters.all_statuses', 'All statuses')}
-                                </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => setStatusFilter('completed')}
+                                    onClick={() => {
+                                        setStatusFilter('all');
+                                        setStepFilter('all');
+                                    }}
+                                >
+                                    {t('admin.data.filters.all_statuses', 'All')}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-slate-400">
+                                    {t('admin.data.table.status', 'Status')}
+                                </DropdownMenuLabel>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setStatusFilter('completed');
+                                        setStepFilter('all');
+                                    }}
                                     className={cn(
                                         'text-emerald-600',
                                         statusFilter === 'completed' && 'bg-emerald-50'
@@ -707,7 +729,10 @@ export default function InteractiveDataView({
                                     {t('admin.data.status.completed', 'Completed')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => setStatusFilter('in_progress')}
+                                    onClick={() => {
+                                        setStatusFilter('in_progress');
+                                        setStepFilter('all');
+                                    }}
                                     className={cn(
                                         'text-sky-600',
                                         statusFilter === 'in_progress' && 'bg-sky-50'
@@ -717,7 +742,10 @@ export default function InteractiveDataView({
                                     {t('admin.data.status.in_progress', 'In Progress')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => setStatusFilter('abandoned')}
+                                    onClick={() => {
+                                        setStatusFilter('abandoned');
+                                        setStepFilter('all');
+                                    }}
                                     className={cn(
                                         'text-rose-600',
                                         statusFilter === 'abandoned' && 'bg-rose-50'
@@ -726,6 +754,25 @@ export default function InteractiveDataView({
                                     <AlertTriangle className="w-3.5 h-3.5 mr-2" />
                                     {t('admin.data.status.abandoned', 'Abandoned')}
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-slate-400">
+                                    {t('admin.data.table.current_step', 'Current step')}
+                                </DropdownMenuLabel>
+                                {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (
+                                    <DropdownMenuItem
+                                        key={step}
+                                        onClick={() => {
+                                            setStepFilter(Number(step) as 1 | 2 | 3 | 4 | 5);
+                                            setStatusFilter('all');
+                                        }}
+                                        className={cn(
+                                            stepFilter === Number(step) &&
+                                                'bg-indigo-50 text-indigo-700'
+                                        )}
+                                    >
+                                        {t(key, fallback)}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -733,20 +780,34 @@ export default function InteractiveDataView({
                 cell: ({ row }) => {
                     const p = row.original;
                     const displayStatus = getDisplayStatus(p);
+                    const currentStep =
+                        displayStatus !== 'completed' && p.last_step_reached != null
+                            ? p.last_step_reached + 1
+                            : null;
                     return (
-                        <Badge
-                            variant="outline"
-                            className={cn(
-                                'h-5 text-[10px] px-2 font-semibold border-none',
-                                displayStatus === 'completed'
-                                    ? 'bg-emerald-50 text-emerald-600'
-                                    : displayStatus === 'abandoned'
-                                      ? 'bg-rose-50 text-rose-500'
-                                      : 'bg-sky-50 text-sky-600'
+                        <div className="flex items-center gap-1.5">
+                            <Badge
+                                variant="outline"
+                                className={cn(
+                                    'h-5 text-[10px] px-2 font-semibold border-none',
+                                    displayStatus === 'completed'
+                                        ? 'bg-emerald-50 text-emerald-600'
+                                        : displayStatus === 'abandoned'
+                                          ? 'bg-rose-50 text-rose-500'
+                                          : 'bg-sky-50 text-sky-600'
+                                )}
+                            >
+                                {t(`admin.data.status.${displayStatus}`, displayStatus)}
+                            </Badge>
+                            {currentStep != null && STEP_LABEL_KEYS[currentStep] && (
+                                <Badge
+                                    variant="outline"
+                                    className="h-5 text-[10px] px-2 font-semibold border-slate-200 text-slate-500"
+                                >
+                                    {t(...STEP_LABEL_KEYS[currentStep])}
+                                </Badge>
                             )}
-                        >
-                            {t(`admin.data.status.${displayStatus}`, displayStatus)}
-                        </Badge>
+                        </div>
                     );
                 },
             }),
@@ -1113,85 +1174,6 @@ export default function InteractiveDataView({
                             </Tooltip>
                         </TooltipProvider>
                     );
-                },
-            }),
-            columnHelper.display({
-                id: 'last_step',
-                header: () => (
-                    <div className="flex items-center gap-1">
-                        <div className="flex items-center gap-1.5">
-                            <Footprints className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{t('admin.data.table.last_step', 'Last step')}</span>
-                        </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    aria-label={t('admin.data.table.last_step', 'Last step')}
-                                    className={cn(
-                                        'h-6 w-6 p-0 rounded',
-                                        stepFilter !== 'all'
-                                            ? 'text-indigo-600 bg-indigo-50'
-                                            : 'text-slate-400 hover:text-slate-600'
-                                    )}
-                                >
-                                    <Filter className="h-3 w-3" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="start"
-                                className="w-48"
-                                collisionPadding={8}
-                            >
-                                <DropdownMenuItem onClick={() => setStepFilter('all')}>
-                                    {t('admin.data.filters.all_steps', 'All steps')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setStepFilter('completed')}
-                                    className={cn(
-                                        'text-emerald-600',
-                                        stepFilter === 'completed' && 'bg-emerald-50'
-                                    )}
-                                >
-                                    <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
-                                    {t('admin.data.status.completed', 'Completed')}
-                                </DropdownMenuItem>
-                                {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (
-                                    <DropdownMenuItem
-                                        key={step}
-                                        onClick={() =>
-                                            setStepFilter(Number(step) as 1 | 2 | 3 | 4 | 5)
-                                        }
-                                        className={cn(
-                                            stepFilter === Number(step) &&
-                                                'bg-indigo-50 text-indigo-700'
-                                        )}
-                                    >
-                                        {t(key, fallback)}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                ),
-                cell: ({ row }) => {
-                    const p = row.original;
-                    if (p.status === 'completed') {
-                        return (
-                            <span className="text-xs text-emerald-600 font-medium">
-                                {t('admin.data.status.completed', 'Completed')}
-                            </span>
-                        );
-                    }
-                    if (p.last_step_reached != null && STEP_LABEL_KEYS[p.last_step_reached]) {
-                        return (
-                            <span className="text-xs text-slate-500 font-medium">
-                                {t(...STEP_LABEL_KEYS[p.last_step_reached])}
-                            </span>
-                        );
-                    }
-                    return <span className="text-slate-300">?</span>;
                 },
             }),
         ],
@@ -2103,8 +2085,9 @@ export default function InteractiveDataView({
                 </div>
             )}
 
-            {/* Post-sort question distribution charts */}
+            {/* Question distribution charts (presort + postsort) */}
             <QuestionDistributionCharts
+                presortConfig={data.study.presort_config}
                 postsortConfig={data.study.postsort_config}
                 filteredParticipants={filteredParticipants}
                 language={i18n.language}

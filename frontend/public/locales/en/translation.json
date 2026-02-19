@@ -1576,6 +1576,7 @@
                 "duration": "Duration",
                 "submitted": "Submitted",
                 "last_step": "Last step",
+                "current_step": "Current step",
                 "view": "View",
                 "actions": "Details",
                 "duplicate_ip": "Duplicate IP",

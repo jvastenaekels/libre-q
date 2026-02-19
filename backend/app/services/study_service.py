@@ -1227,6 +1227,7 @@ class StudyService:
                 "slug": study.slug,
                 "state": study.state.value,
                 "grid_config": study.grid_config,
+                "presort_config": study.presort_config,
                 "postsort_config": study.postsort_config,
                 "statements": [
                     {
