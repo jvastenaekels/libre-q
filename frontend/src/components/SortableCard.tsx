@@ -223,9 +223,12 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         }
                     }
                 }}
-                onClick={() => {
-                    // Prevent event from bubbling if it's a drag activation
+                onClick={(e) => {
                     if (isDragging) return;
+
+                    // Stop propagation so parent slot click handlers don't
+                    // also fire (which would re-place the selected card).
+                    e.stopPropagation();
 
                     if (hoverTimerRef.current) {
                         clearTimeout(hoverTimerRef.current);
