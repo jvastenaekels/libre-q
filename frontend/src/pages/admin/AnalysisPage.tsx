@@ -32,6 +32,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -41,6 +42,7 @@ import {
 } from '@/api/generated';
 import type { AnalysisResult } from '@/api/model';
 
+import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { ScreePlot } from '@/components/admin/analysis/ScreePlot';
 import { FactorLoadingsTable } from '@/components/admin/analysis/FactorLoadingsTable';
@@ -109,6 +111,7 @@ export default function AnalysisPage() {
     const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
     const manualFlagsInitialized = useRef(false);
     const [activeTab, setActiveTab] = useState('loadings');
+    const [isExporting, setIsExporting] = useState(false);
 
     // Analysis result state
     const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -238,14 +241,28 @@ export default function AnalysisPage() {
     }, [result, flagging]);
 
     const handleExport = useCallback(
-        (type: 'loadings' | 'scores') => {
+        async (type: 'loadings' | 'scores' | 'xlsx') => {
             if (!result) return;
+            if (type === 'xlsx') {
+                setIsExporting(true);
+                try {
+                    const blob = await generateAnalysisXlsx(result);
+                    downloadBlob(blob, `${slug}_analysis.xlsx`);
+                } catch {
+                    toast.error(
+                        t('admin.analysis.export_error', 'Failed to generate XLSX export.')
+                    );
+                } finally {
+                    setIsExporting(false);
+                }
+                return;
+            }
             const csv =
                 type === 'loadings' ? generateLoadingsCsv(result) : generateScoresCsv(result);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             downloadBlob(blob, `${slug}_analysis_${type}.csv`);
         },
-        [result, slug]
+        [result, slug, t]
     );
 
     const hasEigenvalues = eigenvaluesQuery.isSuccess && eigenvaluesQuery.data;
@@ -491,6 +508,22 @@ export default function AnalysisPage() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start">
+                                    <DropdownMenuItem
+                                        onClick={() => handleExport('xlsx')}
+                                        disabled={isExporting}
+                                    >
+                                        {isExporting && (
+                                            <Loader2
+                                                className="size-3.5 animate-spin mr-1.5"
+                                                aria-hidden="true"
+                                            />
+                                        )}
+                                        {t(
+                                            'admin.analysis.export_xlsx',
+                                            'XLSX — Complete Analysis'
+                                        )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => handleExport('loadings')}>
                                         {t(
                                             'admin.analysis.export_loadings',

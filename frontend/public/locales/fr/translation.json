@@ -614,6 +614,8 @@
             "export": "Exporter",
             "export_loadings": "CSV — Saturations factorielles",
             "export_scores": "CSV — Scores des énoncés",
+            "export_xlsx": "XLSX — Analyse complète",
+            "export_error": "Échec de la génération de l'export XLSX.",
             "select_factors": "Sélectionner le nombre de facteurs",
             "loadings_help": "Les saturations factorielles montrent la corrélation entre le tri de chaque participant et chaque facteur. Les cellules surlignées dépassent le seuil de significativité indiqué ci-dessus.",
             "factor_array_help": "Q-sort composite montrant le patron de tri idéalisé pour ce facteur. Les énoncés sont placés dans la distribution selon leurs scores z pondérés.",

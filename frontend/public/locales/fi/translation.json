@@ -614,6 +614,8 @@
             "export": "Vie",
             "export_loadings": "CSV — Faktorikuormitukset",
             "export_scores": "CSV — Väittämäpisteet",
+            "export_xlsx": "XLSX — Koko analyysi",
+            "export_error": "XLSX-viennin luominen epäonnistui.",
             "select_factors": "Valitse faktorien lukumäärä",
             "loadings_help": "Faktorikuormitukset osoittavat, kuinka voimakkaasti kunkin osallistujan lajittelu korreloi kunkin faktorin kanssa. Korostetut solut ylittävät yllä näkyvän merkitsevyyskynnyksen.",
             "factor_array_help": "Komposiitti-Q-lajittelu, joka näyttää tämän faktorin idealisoidun lajittelukuvion. Väittämät sijoitetaan jakaumaan painotettujen z-arvojen perusteella.",

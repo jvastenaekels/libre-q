@@ -622,6 +622,8 @@
             "export": "Export",
             "export_loadings": "CSV — Factor Loadings",
             "export_scores": "CSV — Statement Scores",
+            "export_xlsx": "XLSX — Complete Analysis",
+            "export_error": "Failed to generate XLSX export.",
             "select_factors": "Select number of factors",
             "loadings_help": "Factor loadings show how strongly each participant's sort correlates with each factor. Highlighted cells exceed the significance threshold shown above.",
             "factor_array_help": "Composite Q-sort showing the idealized sort pattern for this factor. Statements are placed in the distribution based on their weighted z-scores.",
