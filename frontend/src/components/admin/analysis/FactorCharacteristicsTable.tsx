@@ -8,30 +8,30 @@ function BenchmarkBadge({
     good,
     caution,
     higherIsBetter = true,
-    goodLabel,
-    cautionLabel,
+    aboveLabel,
+    belowLabel,
 }: {
     value: number;
     good: number;
     caution: number;
     higherIsBetter?: boolean;
-    goodLabel: string;
-    cautionLabel: string;
+    aboveLabel: string;
+    belowLabel: string;
 }) {
-    const isGood = higherIsBetter ? value >= good : value <= good;
-    const isCaution = higherIsBetter ? value < caution : value > caution;
-    if (isGood)
+    const isAbove = higherIsBetter ? value >= good : value <= good;
+    const isBelow = higherIsBetter ? value < caution : value > caution;
+    if (isAbove)
         return (
-            <span className="inline-flex ml-1 text-emerald-600" title={goodLabel}>
+            <span className="inline-flex ml-1 text-emerald-600" title={aboveLabel}>
                 <Check className="size-3" aria-hidden="true" />
-                <span className="sr-only">{goodLabel}</span>
+                <span className="sr-only">{aboveLabel}</span>
             </span>
         );
-    if (isCaution)
+    if (isBelow)
         return (
-            <span className="inline-flex ml-1 text-amber-500" title={cautionLabel}>
+            <span className="inline-flex ml-1 text-amber-500" title={belowLabel}>
                 <AlertTriangle className="size-3" aria-hidden="true" />
-                <span className="sr-only">{cautionLabel}</span>
+                <span className="sr-only">{belowLabel}</span>
             </span>
         );
     return null;
@@ -53,8 +53,8 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
         );
     }
 
-    const goodLabel = t('admin.analysis.benchmark_good', 'Good');
-    const cautionLabel = t('admin.analysis.benchmark_caution', 'Caution');
+    const aboveLabel = t('admin.analysis.benchmark_above', 'Above threshold');
+    const belowLabel = t('admin.analysis.benchmark_below', 'Below threshold');
 
     const rows: {
         label: string;
@@ -105,89 +105,95 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
 
     return (
         <div className="space-y-4">
-            <div className="overflow-x-auto">
-                <div className="flex items-center gap-2 mb-2">
-                    <h4 className="text-sm font-medium text-slate-700">
-                        {t('admin.analysis.factor_statistics', 'Factor Statistics')}
-                    </h4>
-                    <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Info
-                                    className="size-3.5 text-slate-400 cursor-help"
-                                    aria-hidden="true"
-                                />
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" className="max-w-xs text-xs">
-                                {t(
-                                    'admin.analysis.characteristics_help',
-                                    'Eigenvalues indicate factor strength. Composite reliability measures internal consistency. SE indicates precision of factor score estimates.'
-                                )}
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-                <table className="w-full text-sm">
-                    <caption className="sr-only">
-                        {t(
-                            'admin.analysis.caption_characteristics',
-                            'Factor characteristics and reliability statistics'
-                        )}
-                    </caption>
-                    <thead>
-                        <tr className="border-b border-slate-200">
-                            <th
-                                scope="col"
-                                className="text-left py-2 px-3 font-medium text-slate-600"
-                            >
-                                <span className="sr-only">
-                                    {t('admin.analysis.metric', 'Metric')}
-                                </span>
-                            </th>
-                            {chars.map((c) => (
+            <div className="relative">
+                <div className="overflow-x-auto">
+                    <div className="flex items-center gap-2 mb-2">
+                        <h4 className="text-sm font-medium text-slate-700">
+                            {t('admin.analysis.factor_statistics', 'Factor Statistics')}
+                        </h4>
+                        <TooltipProvider delayDuration={300}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Info
+                                        className="size-3.5 text-slate-400 cursor-help"
+                                        aria-hidden="true"
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                    {t(
+                                        'admin.analysis.characteristics_help',
+                                        'Eigenvalues reflect the amount of variance explained. Composite reliability reflects internal consistency among flagged sorts. SE of factor scores reflects the precision of the composite estimate.'
+                                    )}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                    <table className="w-full text-sm">
+                        <caption className="sr-only">
+                            {t(
+                                'admin.analysis.caption_characteristics',
+                                'Factor characteristics and reliability statistics'
+                            )}
+                        </caption>
+                        <thead>
+                            <tr className="border-b border-slate-200">
                                 <th
-                                    key={c.factor}
                                     scope="col"
-                                    className="text-right py-2 px-3 font-medium text-slate-600"
+                                    className="text-left py-2 px-3 font-medium text-slate-600"
                                 >
-                                    F{c.factor}
+                                    <span className="sr-only">
+                                        {t('admin.analysis.metric', 'Metric')}
+                                    </span>
                                 </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows.map((row) => (
-                            <tr key={row.label} className="border-b border-slate-100">
-                                <th
-                                    scope="row"
-                                    className="py-1.5 px-3 text-slate-700 font-medium text-xs text-left"
-                                >
-                                    {row.label}
-                                </th>
-                                {row.values.map((val, i) => (
-                                    <td
-                                        key={i}
-                                        className="text-right py-1.5 px-3 font-mono text-xs tabular-nums text-slate-600"
+                                {chars.map((c) => (
+                                    <th
+                                        key={c.factor}
+                                        scope="col"
+                                        className="text-right py-2 px-3 font-medium text-slate-600"
                                     >
-                                        {val}
-                                        {row.benchmark?.[i] && (
-                                            <BenchmarkBadge
-                                                value={row.benchmark[i].value}
-                                                good={row.benchmark[i].good}
-                                                caution={row.benchmark[i].caution}
-                                                higherIsBetter={
-                                                    row.benchmark[i].higherIsBetter ?? true
-                                                }
-                                                goodLabel={goodLabel}
-                                                cautionLabel={cautionLabel}
-                                            />
-                                        )}
-                                    </td>
+                                        F{c.factor}
+                                    </th>
                                 ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {rows.map((row) => (
+                                <tr key={row.label} className="border-b border-slate-100">
+                                    <th
+                                        scope="row"
+                                        className="py-1.5 px-3 text-slate-700 font-medium text-xs text-left"
+                                    >
+                                        {row.label}
+                                    </th>
+                                    {row.values.map((val, i) => (
+                                        <td
+                                            key={i}
+                                            className="text-right py-1.5 px-3 font-mono text-xs tabular-nums text-slate-600"
+                                        >
+                                            {val}
+                                            {row.benchmark?.[i] && (
+                                                <BenchmarkBadge
+                                                    value={row.benchmark[i].value}
+                                                    good={row.benchmark[i].good}
+                                                    caution={row.benchmark[i].caution}
+                                                    higherIsBetter={
+                                                        row.benchmark[i].higherIsBetter ?? true
+                                                    }
+                                                    aboveLabel={aboveLabel}
+                                                    belowLabel={belowLabel}
+                                                />
+                                            )}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div
+                    className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                    aria-hidden="true"
+                />
             </div>
 
             {/* Factor correlation matrix */}
@@ -196,63 +202,70 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                     <h4 className="text-sm font-medium text-slate-700 mb-2">
                         {t('admin.analysis.factor_correlations', 'Factor Correlations')}
                     </h4>
-                    <div className="overflow-x-auto">
-                        <table className="text-sm">
-                            <caption className="sr-only">
-                                {t(
-                                    'admin.analysis.caption_correlations',
-                                    'Factor-to-factor correlation matrix'
-                                )}
-                            </caption>
-                            <thead>
-                                <tr className="border-b border-slate-200">
-                                    <th scope="col" className="py-2 px-3">
-                                        <span className="sr-only">
-                                            {t('admin.analysis.factor', 'Factor')}
-                                        </span>
-                                    </th>
-                                    {Array.from({ length: result.n_factors }, (_, f) => (
-                                        <th
-                                            key={f}
-                                            scope="col"
-                                            className="text-right py-2 px-3 font-medium text-slate-600"
-                                        >
-                                            F{f + 1}
+                    <div className="relative">
+                        <div className="overflow-x-auto">
+                            <table className="text-sm">
+                                <caption className="sr-only">
+                                    {t(
+                                        'admin.analysis.caption_correlations',
+                                        'Factor-to-factor correlation matrix'
+                                    )}
+                                </caption>
+                                <thead>
+                                    <tr className="border-b border-slate-200">
+                                        <th scope="col" className="py-2 px-3">
+                                            <span className="sr-only">
+                                                {t('admin.analysis.factor', 'Factor')}
+                                            </span>
                                         </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {result.correlation_matrix.map((row, i) => (
-                                    <tr key={i} className="border-b border-slate-100">
-                                        <th
-                                            scope="row"
-                                            className="py-1.5 px-3 font-medium text-slate-600 text-xs text-left"
-                                        >
-                                            F{i + 1}
-                                        </th>
-                                        {row.map((val, j) => {
-                                            const isOffDiagonal = i !== j;
-                                            const isHigh = isOffDiagonal && Math.abs(val) > 0.5;
-                                            return (
-                                                <td
-                                                    key={j}
-                                                    className={`text-right py-1.5 px-3 font-mono text-xs tabular-nums ${isHigh ? 'text-amber-700 bg-amber-50' : 'text-slate-600'}`}
-                                                >
-                                                    {isOffDiagonal ? val.toFixed(3) : '1.000'}
-                                                    {isHigh && (
-                                                        <span className="sr-only">
-                                                            {' '}
-                                                            ({cautionLabel})
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            );
-                                        })}
+                                        {Array.from({ length: result.n_factors }, (_, f) => (
+                                            <th
+                                                key={f}
+                                                scope="col"
+                                                className="text-right py-2 px-3 font-medium text-slate-600"
+                                            >
+                                                F{f + 1}
+                                            </th>
+                                        ))}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {result.correlation_matrix.map((row, i) => (
+                                        <tr key={i} className="border-b border-slate-100">
+                                            <th
+                                                scope="row"
+                                                className="py-1.5 px-3 font-medium text-slate-600 text-xs text-left"
+                                            >
+                                                F{i + 1}
+                                            </th>
+                                            {row.map((val, j) => {
+                                                const v = val ?? 0;
+                                                const isOffDiagonal = i !== j;
+                                                const isHigh = isOffDiagonal && Math.abs(v) > 0.5;
+                                                return (
+                                                    <td
+                                                        key={j}
+                                                        className={`text-right py-1.5 px-3 font-mono text-xs tabular-nums ${isHigh ? 'text-amber-700 bg-amber-50' : 'text-slate-600'}`}
+                                                    >
+                                                        {isOffDiagonal ? v.toFixed(3) : '1.000'}
+                                                        {isHigh && (
+                                                            <span className="sr-only">
+                                                                {' '}
+                                                                ({belowLabel})
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                            aria-hidden="true"
+                        />
                     </div>
                 </div>
             )}

@@ -92,8 +92,18 @@ def correlation_matrix(dataset: NDArray[np.float64]) -> NDArray[np.float64]:
 
     Returns:
         Correlation matrix of shape (n_participants, n_participants)
+
+    Raises:
+        ValueError: If the resulting matrix contains NaN (e.g. zero-variance
+            columns that slipped past the build_sort_matrix filter).
     """
-    return np.asarray(np.corrcoef(dataset, rowvar=False))
+    cor = np.asarray(np.corrcoef(dataset, rowvar=False))
+    if np.any(np.isnan(cor)):
+        raise ValueError(
+            "Correlation matrix contains NaN values. "
+            "This usually means some participants have zero variance in their sorts."
+        )
+    return cor
 
 
 def extract_pca(cor_mat: NDArray[np.float64], n_factors: int) -> NDArray[np.float64]:
@@ -177,7 +187,14 @@ def extract_centroid(
         col_sums = tmat.sum(axis=0)
         rmean = col_sums / (n - 1)
         t1 = rmean + col_sums
-        f1 = t1 / np.sqrt(np.sum(t1))
+        sum_t1 = np.sum(t1)
+        if sum_t1 <= 0:
+            logger.warning(
+                "Centroid factor %d: degenerate initial estimate (sum <= 0)",
+                f + 1,
+            )
+            break
+        f1 = t1 / np.sqrt(sum_t1)
 
         # Step 3: Iterate until convergence
         max_iter = 1000
@@ -418,14 +435,22 @@ def compute_factor_scores(
 
         # Handle ties: for tied z-scores, assign the minimum of tied rank values.
         # This matches qmethod's qzscores() behavior (R: min(zsc_n[izscn,f])).
+        # Use tolerance-based comparison to handle floating-point imprecision.
         zs = z_scores[:, f]
-        unique_zs = np.unique(zs)
-        for uz in unique_zs:
-            tied = np.where(zs == uz)[0]
-            if len(tied) > 1:
+        order_by_z = np.argsort(zs)
+        i = 0
+        while i < len(order_by_z):
+            j = i + 1
+            while j < len(order_by_z) and np.isclose(
+                zs[order_by_z[i]], zs[order_by_z[j]]
+            ):
+                j += 1
+            if j > i + 1:
+                tied = order_by_z[i:j]
                 min_val = min(int(factor_arrays[idx, f]) for idx in tied)
                 for idx in tied:
                     factor_arrays[idx, f] = min_val
+            i = j
 
     return z_scores, factor_arrays
 
@@ -467,7 +492,10 @@ def compute_factor_characteristics(
 
         # Standard error of factor scores
         if not np.all(np.isnan(z_scores[:, f])):
-            se = float(np.std(z_scores[:, f], ddof=1) * np.sqrt(1 - reliability))
+            clamped_rel = min(reliability, 1.0)
+            se = float(
+                np.std(z_scores[:, f], ddof=1) * np.sqrt(max(1 - clamped_rel, 0.0))
+            )
         else:
             se = 0.0
         se_scores[f] = se
@@ -491,16 +519,21 @@ def compute_factor_characteristics(
         c["cumulative_variance"] = cumulative
 
     # Factor correlation matrix (correlation between z-score columns)
+    # Drop rows with any NaN to avoid silent NaN propagation in np.corrcoef
     valid_cols = [f for f in range(n_factors) if not np.all(np.isnan(z_scores[:, f]))]
+    full_cor = np.eye(n_factors)
     if len(valid_cols) >= 2:
-        factor_cor = np.asarray(np.corrcoef(z_scores[:, valid_cols], rowvar=False))
-        # Expand to full n_factors x n_factors
-        full_cor = np.eye(n_factors)
-        for i, vi in enumerate(valid_cols):
-            for j, vj in enumerate(valid_cols):
-                full_cor[vi, vj] = factor_cor[i, j]
-    else:
-        full_cor = np.eye(n_factors)
+        subset = z_scores[:, valid_cols]
+        valid_rows = ~np.any(np.isnan(subset), axis=1)
+        if np.sum(valid_rows) >= 2:
+            factor_cor = np.asarray(
+                np.corrcoef(subset[valid_rows], rowvar=False)
+            )
+            # Replace any residual NaN (e.g. zero-variance column) with 0
+            factor_cor = np.nan_to_num(factor_cor, nan=0.0)
+            for i, vi in enumerate(valid_cols):
+                for j, vj in enumerate(valid_cols):
+                    full_cor[vi, vj] = factor_cor[i, j]
 
     # SED matrix
     sed = np.zeros((n_factors, n_factors))
@@ -612,10 +645,19 @@ def _distribution_from_grid_config(
 
     Each entry in grid_config has {"score": int, "capacity": int}.
     Returns a sorted array of all score values repeated by their count.
+
+    Raises:
+        ValueError: If grid_config entries are missing required keys.
     """
     dist: list[int] = []
-    for entry in grid_config:
+    for i, entry in enumerate(grid_config):
+        if "score" not in entry or "capacity" not in entry:
+            raise ValueError(
+                f"grid_config entry {i} missing 'score' or 'capacity' key"
+            )
         dist.extend([int(entry["score"])] * int(entry["capacity"]))
+    if not dist:
+        raise ValueError("grid_config produced an empty distribution")
     return np.sort(np.array(dist, dtype=np.int64))
 
 

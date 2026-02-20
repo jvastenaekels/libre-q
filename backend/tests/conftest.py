@@ -6,11 +6,18 @@
 """Pytest configuration and fixtures."""
 
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load .env from project root so TEST_DATABASE_URL is available
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
 
-# Set testing environment variable BEFORE app matches are imported
+# Set testing environment variable BEFORE app modules are imported
 os.environ["TESTING"] = "true"
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
@@ -36,12 +43,11 @@ from app.utils.security import get_password_hash
 TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword"
 
-# Use PostgreSQL for testing
-# We use the 'open_q' database as default since creating new databases
-# (like 'open_q_test') might require superuser permissions not available in all environments.
+# Use PostgreSQL for testing.
+# Set TEST_DATABASE_URL in your .env file (project root) or environment.
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://open_q_user:open-q-pwd@127.0.0.1:5432/open_q",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q_test",
 )
 
 

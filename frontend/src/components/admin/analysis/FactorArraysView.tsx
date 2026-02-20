@@ -37,7 +37,7 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                 // Group statements by their factor array score for this factor
                 const groups = new Map<number, typeof result.statement_scores>();
                 for (const stmt of result.statement_scores) {
-                    const score = stmt.factor_arrays[f];
+                    const score = stmt.factor_arrays[f] ?? 0;
                     if (!groups.has(score)) groups.set(score, []);
                     groups.get(score)?.push(stmt);
                 }
@@ -74,70 +74,76 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
-                        <div className="overflow-x-auto pb-2">
-                            <table
-                                className="border-collapse"
-                                aria-label={t(
-                                    'admin.analysis.factor_array_label',
-                                    'Factor {{n}} composite sort',
-                                    { n: f + 1 }
-                                )}
-                            >
-                                <thead>
-                                    <tr>
-                                        {sortedScores.map((score) => (
-                                            <th
-                                                key={score}
-                                                scope="col"
-                                                className="text-center text-xs font-medium text-slate-500 py-1 px-1 min-w-[100px]"
-                                            >
-                                                {score > 0 ? `+${score}` : score}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {Array.from({ length: maxRows }, (_, row) => (
-                                        <tr key={row}>
-                                            {sortedScores.map((score) => {
-                                                const stmts = groups.get(score) ?? [];
-                                                const stmt = stmts[row];
-                                                if (!stmt) {
-                                                    return (
-                                                        <td
-                                                            key={score}
-                                                            className="p-0.5 align-top"
-                                                        />
-                                                    );
-                                                }
-                                                const isDistinguishing = distinguishingIds.has(
-                                                    stmt.statement_id
-                                                );
-                                                return (
-                                                    <td key={score} className="p-0.5 align-top">
-                                                        <div
-                                                            className={cn(
-                                                                'px-2 py-1.5 rounded text-xs border min-w-[100px]',
-                                                                isDistinguishing
-                                                                    ? 'bg-amber-50 border-amber-200'
-                                                                    : 'bg-white border-slate-200'
-                                                            )}
-                                                            title={stmt.text}
-                                                        >
-                                                            <span className="font-mono font-medium text-slate-500">
-                                                                {stmt.code}
-                                                            </span>
-                                                            <p className="text-slate-700 mt-0.5 line-clamp-3 md:line-clamp-3 leading-tight">
-                                                                {stmt.text}
-                                                            </p>
-                                                        </div>
-                                                    </td>
-                                                );
-                                            })}
+                        <div className="relative">
+                            <div className="overflow-x-auto pb-2">
+                                <table
+                                    className="border-collapse"
+                                    aria-label={t(
+                                        'admin.analysis.factor_array_label',
+                                        'Factor {{n}} composite sort',
+                                        { n: f + 1 }
+                                    )}
+                                >
+                                    <thead>
+                                        <tr>
+                                            {sortedScores.map((score) => (
+                                                <th
+                                                    key={score}
+                                                    scope="col"
+                                                    className="text-center text-xs font-medium text-slate-500 py-1 px-1 min-w-[70px] sm:min-w-[100px]"
+                                                >
+                                                    {score > 0 ? `+${score}` : score}
+                                                </th>
+                                            ))}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {Array.from({ length: maxRows }, (_, row) => (
+                                            <tr key={row}>
+                                                {sortedScores.map((score) => {
+                                                    const stmts = groups.get(score) ?? [];
+                                                    const stmt = stmts[row];
+                                                    if (!stmt) {
+                                                        return (
+                                                            <td
+                                                                key={score}
+                                                                className="p-0.5 align-top"
+                                                            />
+                                                        );
+                                                    }
+                                                    const isDistinguishing = distinguishingIds.has(
+                                                        stmt.statement_id
+                                                    );
+                                                    return (
+                                                        <td key={score} className="p-0.5 align-top">
+                                                            <div
+                                                                className={cn(
+                                                                    'px-2 py-1.5 rounded text-xs border min-w-[70px] sm:min-w-[100px]',
+                                                                    isDistinguishing
+                                                                        ? 'bg-amber-50 border-amber-200'
+                                                                        : 'bg-white border-slate-200'
+                                                                )}
+                                                                title={stmt.text}
+                                                            >
+                                                                <span className="font-mono font-medium text-slate-500">
+                                                                    {stmt.code}
+                                                                </span>
+                                                                <p className="text-slate-700 mt-0.5 line-clamp-3 md:line-clamp-3 leading-tight">
+                                                                    {stmt.text}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div
+                                className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                                aria-hidden="true"
+                            />
                         </div>
                     </div>
                 );

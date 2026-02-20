@@ -26,17 +26,19 @@ export function ScreePlot({
 }: ScreePlotProps) {
     const { t } = useTranslation();
 
-    const data = eigenvalues.map((value, index) => ({
-        factor: index + 1,
-        eigenvalue: Number(value.toFixed(3)),
-    }));
+    const data = eigenvalues
+        .filter((v) => Number.isFinite(v))
+        .map((value, index) => ({
+            factor: index + 1,
+            eigenvalue: Number(value.toFixed(3)),
+        }));
 
     return (
         <div className="space-y-2">
             <p className="text-xs text-slate-500">
                 {t(
                     'admin.analysis.scree_hint',
-                    'Each bar shows how much variance a factor explains (its eigenvalue). Factors above the dashed Kaiser line (eigenvalue > 1) are typically meaningful. Click a bar to select the number of factors to extract.'
+                    'Each bar shows how much variance a factor explains (its eigenvalue). The dashed line marks eigenvalue = 1 (Kaiser criterion). Click a bar to select the number of factors to extract.'
                 )}
             </p>
             <ResponsiveContainer width="100%" height={220} minWidth={0}>
@@ -118,7 +120,7 @@ export function ScreePlot({
             <p className="text-xs text-slate-400 text-center">
                 {t(
                     'admin.analysis.kaiser_suggestion',
-                    'Kaiser criterion suggests {{n}} factor(s)',
+                    '{{n}} factor(s) have eigenvalues above 1 (Kaiser criterion)',
                     {
                         n: suggestedNFactors,
                     }

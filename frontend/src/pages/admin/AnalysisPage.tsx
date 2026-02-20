@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -107,6 +107,7 @@ export default function AnalysisPage() {
         (searchParams.get('flagging') as 'auto' | 'manual') || 'auto'
     );
     const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
+    const manualFlagsInitialized = useRef(false);
     const [activeTab, setActiveTab] = useState('loadings');
 
     // Analysis result state
@@ -221,7 +222,7 @@ export default function AnalysisPage() {
 
     // Initialize manual flags from auto-flagging result when switching to manual mode
     useEffect(() => {
-        if (result && flagging === 'manual' && Object.keys(manualFlags).length === 0) {
+        if (result && flagging === 'manual' && !manualFlagsInitialized.current) {
             const flags: Record<number, number[]> = {};
             for (const p of result.participants) {
                 if (p.flagged_factors && p.flagged_factors.length > 0) {
@@ -229,8 +230,12 @@ export default function AnalysisPage() {
                 }
             }
             setManualFlags(flags);
+            manualFlagsInitialized.current = true;
         }
-    }, [result, flagging, manualFlags]);
+        if (flagging === 'auto') {
+            manualFlagsInitialized.current = false;
+        }
+    }, [result, flagging]);
 
     const handleExport = useCallback(
         (type: 'loadings' | 'scores') => {
@@ -361,7 +366,7 @@ export default function AnalysisPage() {
                             <p className="text-xs text-muted-foreground max-w-[180px]">
                                 {t(
                                     'admin.analysis.help_extraction',
-                                    'How factors are derived. PCA is standard; Centroid is traditional in Q.'
+                                    'PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.'
                                 )}
                             </p>
                         </div>
@@ -389,7 +394,7 @@ export default function AnalysisPage() {
                             <p className="text-xs text-muted-foreground max-w-[140px]">
                                 {t(
                                     'admin.analysis.help_n_factors',
-                                    'Viewpoints to extract. Use the scree plot to guide your choice.'
+                                    'Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.'
                                 )}
                             </p>
                         </div>
@@ -418,7 +423,7 @@ export default function AnalysisPage() {
                             <p className="text-xs text-muted-foreground max-w-[180px]">
                                 {t(
                                     'admin.analysis.help_rotation',
-                                    'Simplifies factor structure. Varimax is recommended for most studies.'
+                                    'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.'
                                 )}
                             </p>
                         </div>
@@ -450,7 +455,7 @@ export default function AnalysisPage() {
                             <p className="text-xs text-muted-foreground max-w-[160px]">
                                 {t(
                                     'admin.analysis.help_flagging',
-                                    'How participants are assigned to factors. Auto uses significance thresholds.'
+                                    'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
                                 )}
                             </p>
                         </div>
@@ -502,7 +507,11 @@ export default function AnalysisPage() {
             {result && (
                 <Card className="border-none shadow-sm bg-white rounded-2xl relative">
                     {isRunning && (
-                        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center rounded-2xl">
+                        <div
+                            className="absolute inset-0 bg-white/75 z-10 flex items-center justify-center rounded-2xl"
+                            role="status"
+                            aria-live="polite"
+                        >
                             <div className="flex items-center gap-2 text-slate-500">
                                 <Loader2 className="size-5 animate-spin" aria-hidden="true" />
                                 <span className="text-sm">
@@ -595,7 +604,7 @@ export default function AnalysisPage() {
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_arrays_2',
-                                                'Read left-to-right as most disagreed to most agreed. Focus on the extreme positions.'
+                                                'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
                                             )}
                                         </li>
                                         <li>
@@ -646,7 +655,7 @@ export default function AnalysisPage() {
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_statements_4',
-                                                'Focus on D statements for interpretation: they reveal what makes each viewpoint unique.'
+                                                'D statements reveal what makes each viewpoint unique. C statements show where viewpoints converge.'
                                             )}
                                         </li>
                                     </ul>
@@ -667,25 +676,25 @@ export default function AnalysisPage() {
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_summary_1',
-                                                'Eigenvalues > 1.00 (Kaiser criterion) suggest a factor explains more variance than a single variable.'
+                                                'Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.'
                                             )}
                                         </li>
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_summary_2',
-                                                'Composite reliability > 0.80 indicates a dependable factor. Values below 0.70 warrant caution.'
+                                                'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
                                             )}
                                         </li>
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_summary_3',
-                                                'Low factor correlations (< 0.50) confirm factors represent distinct viewpoints.'
+                                                'Factor correlations show how much overlap exists between viewpoints. Higher correlations mean the factors share more common ground; lower correlations mean they are more distinct.'
                                             )}
                                         </li>
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_summary_4',
-                                                'Total variance > 35-40% is typical for Q studies. Higher is better but not strictly required.'
+                                                'Total variance explained indicates how much of the overall variation in sorting patterns is captured by your solution.'
                                             )}
                                         </li>
                                     </ul>

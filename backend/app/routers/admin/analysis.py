@@ -86,7 +86,7 @@ async def get_eigenvalues(
         eigenvalues, suggested = await asyncio.to_thread(
             lambda: compute_eigenvalues(correlation_matrix(dataset))
         )
-    except np.linalg.LinAlgError as e:
+    except (np.linalg.LinAlgError, ValueError) as e:
         raise HTTPException(
             status_code=400,
             detail=f"Failed to compute eigenvalues: {e}",
