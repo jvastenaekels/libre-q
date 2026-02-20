@@ -15,3 +15,4 @@
 - audio and picture statements
 - stimulus
 - collaboration simultanée sur le study designer
+- mettre la réinitialisation des données dans la zone de danger
