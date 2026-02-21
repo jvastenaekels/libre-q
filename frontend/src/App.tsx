@@ -257,7 +257,12 @@ const App = () => {
                 richColors
                 position="top-center"
                 closeButton
-                toastOptions={{ style: { fontFamily: 'inherit' } }}
+                toastOptions={{
+                    style: {
+                        fontFamily: '"Google Sans Flex", "Google Sans Flex Local", sans-serif',
+                        fontSize: '0.9375rem',
+                    },
+                }}
             />
         </ErrorBoundary>
     );
