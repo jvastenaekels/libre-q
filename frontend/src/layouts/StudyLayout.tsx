@@ -18,7 +18,7 @@ import {
     CloudOff,
     Copy,
     Globe,
-    ScreenShare,
+    MonitorSmartphone,
     Share2,
     WifiOff,
 } from 'lucide-react';
@@ -813,7 +813,7 @@ const StudyLayoutContent: React.FC = () => {
                                 aria-expanded={isResumeMenuOpen}
                                 aria-haspopup="dialog"
                             >
-                                <ScreenShare size={20} />
+                                <MonitorSmartphone size={20} />
                             </button>
                             {isResumeMenuOpen && (
                                 <div
