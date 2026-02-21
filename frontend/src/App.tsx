@@ -253,7 +253,12 @@ const App = () => {
                     <RouterProvider router={router} />
                 </MotionConfig>
             </ViewportProvider>
-            <Toaster richColors position="top-center" closeButton />
+            <Toaster
+                richColors
+                position="top-center"
+                closeButton
+                toastOptions={{ style: { fontFamily: 'inherit' } }}
+            />
         </ErrorBoundary>
     );
 };
