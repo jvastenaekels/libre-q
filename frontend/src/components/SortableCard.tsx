@@ -106,7 +106,7 @@ const textStyles = cva('w-full text-center font-medium text-slate-800 [hyphens:m
         variant: {
             hand: 'text-sm sm:text-base leading-relaxed',
             compact: 'text-xs leading-tight text-slate-700',
-            grid: 'text-sm font-medium leading-tight text-slate-800',
+            grid: 'text-xs sm:text-sm font-medium leading-tight text-slate-800',
         },
         allowScroll: {
             false: '',
