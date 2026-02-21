@@ -186,7 +186,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                 <div className="flex-1 w-full flex flex-col p-2 overflow-hidden pointer-events-none">
                     <div
                         ref={textRef}
-                        className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none`}
+                        className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none [hyphens:manual]`}
                     >
                         <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                             {statement.text}

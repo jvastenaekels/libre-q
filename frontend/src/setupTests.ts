@@ -82,6 +82,11 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
+// Mock useHyphenation globally so soft-hyphen characters don't break text assertions
+vi.mock('@/hooks/useHyphenation', () => ({
+    useHyphenation: () => (text: string) => text,
+}));
+
 // Mock react-router-dom's useLoaderData globally
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');

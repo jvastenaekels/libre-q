@@ -20,6 +20,7 @@ import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
+import { useHyphenation } from '@/hooks/useHyphenation';
 
 const markdownComponents = {
     p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
@@ -100,7 +101,7 @@ const innerCardStyles = cva(
     }
 );
 
-const textStyles = cva('w-full text-center font-medium text-slate-800', {
+const textStyles = cva('w-full text-center font-medium text-slate-800 [hyphens:manual]', {
     variants: {
         variant: {
             hand: 'text-sm sm:text-base leading-relaxed',
@@ -144,6 +145,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             useSortable({ id, disabled: readOnly });
 
         const setHoveredCard = useUIStore((state) => state.setHoveredCard);
+        const hyphenate = useHyphenation();
         const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
         const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -294,7 +296,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                                     {text}
                                 </SafeMarkdown>
                             ) : (
-                                <span>{text}</span>
+                                <span>{hyphenate(text)}</span>
                             )}
                         </div>
                     </div>

@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfigStore } from '@/store/useConfigStore';
+import { useHyphenation } from '@/hooks/useHyphenation';
 
 interface MethodologyTipsProps {
     variant: 'mobile' | 'desktop';
@@ -16,6 +17,7 @@ interface MethodologyTipsProps {
 const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const { t } = useTranslation();
     const { config } = useConfigStore();
+    const hyphenate = useHyphenation();
     const [step, setStep] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -83,8 +85,8 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                             {t('fine.workbench.help')}
                         </p>
                     </div>
-                    <p className="text-xs font-semibold leading-relaxed italic text-indigo-600/80">
-                        {tips[step]}
+                    <p className="text-base font-semibold leading-relaxed italic text-indigo-600/80 [hyphens:manual]">
+                        {hyphenate(tips[step])}
                     </p>
                     <div className="flex gap-1 mt-1 justify-center">
                         {tips.map((_, i) => (
@@ -122,8 +124,8 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative">
                     <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
                 </div>
-                <p className="text-sm font-medium leading-relaxed italic text-indigo-600/70 min-h-[3rem] flex items-center justify-center">
-                    {tips[step]}
+                <p className="text-lg font-medium leading-relaxed italic text-indigo-600/70 min-h-[3rem] flex items-center justify-center [hyphens:manual]">
+                    {hyphenate(tips[step])}
                 </p>
                 <div className="flex gap-1.5 mt-2">
                     {tips.map((_, i) => (

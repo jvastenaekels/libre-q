@@ -2,6 +2,7 @@ import type React from 'react';
 import { useMemo } from 'react';
 import ReactMarkdown, { type Options } from 'react-markdown';
 import DOMPurify from 'dompurify';
+import { useHyphenation } from '@/hooks/useHyphenation';
 
 interface Props extends Options {
     children: string | null | undefined;
@@ -13,6 +14,8 @@ interface Props extends Options {
  * Use this component instead of raw ReactMarkdown to prevent XSS.
  */
 export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, ...props }) => {
+    const hyphenateText = useHyphenation();
+
     const sanitizedContent = useMemo(() => {
         if (!children) return '';
         // Sanitize the raw markdown before passing to ReactMarkdown logic
@@ -42,14 +45,15 @@ export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, ...
         // 1. Use ReactMarkdown `urlTransform` to block dangerous protocols.
         // 2. Wrap basic text content in DOMPurify just in case we ever enable HTML parsing.
 
-        return DOMPurify.sanitize(children, {
+        const sanitized = DOMPurify.sanitize(children, {
             ALLOWED_TAGS: [], // Strip all HTML tags if we only want Markdown to be interpreted
             // Wait, if we strip HTML tags, we lose ability for users to use HTML formatting if they wanted to?
             // Usually Markdown supports some HTML. Security says we should probably strip it unless explicitly whitelisted.
             // Let's strip HTML tags to be safe and strictly support Markdown.
             KEEP_CONTENT: true,
         });
-    }, [children]);
+        return hyphenateText(sanitized);
+    }, [children, hyphenateText]);
 
     const urlTransform = (url: string) => {
         if (!allowLinks) return '#';
@@ -67,7 +71,7 @@ export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, ...
         <ReactMarkdown
             {...props}
             urlTransform={urlTransform}
-            className={`prose prose-sm max-w-none text-slate-600 ${props.className || ''}`}
+            className={`prose prose-sm max-w-none text-slate-600 [hyphens:manual] ${props.className || ''}`}
         >
             {sanitizedContent}
         </ReactMarkdown>

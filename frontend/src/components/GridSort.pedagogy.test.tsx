@@ -76,7 +76,7 @@ describe('GridSort Pedagogy', () => {
         expect(header?.querySelector('svg')).toBeDefined();
     });
 
-    it('shows active card text and Eye icon in Reading Zone when a card is selected', () => {
+    it('shows selected card text in Reading Zone when a card is selected', () => {
         const selectedCard = { id: 1, text: 'Selected Statement Text' };
 
         setupStoreMocks({
@@ -96,11 +96,5 @@ describe('GridSort Pedagogy', () => {
         );
 
         expect(screen.getByText('Selected Statement Text')).toBeInTheDocument();
-        expect(screen.getByText('fine.workbench.active_card')).toBeInTheDocument();
-
-        // The Eye icon is in ReadingZone. In its desktop variant, it has id 'fine.workbench.active_card' or 'fine.toolbar.preview'
-        // We look for theEye icon by checking the parent of the label
-        const eyeLabel = screen.getByText('fine.workbench.active_card');
-        expect(eyeLabel.querySelector('svg')).toBeDefined();
     });
 });

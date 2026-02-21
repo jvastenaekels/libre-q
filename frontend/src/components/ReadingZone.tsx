@@ -6,11 +6,11 @@
 
 import { Eye } from 'lucide-react';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useConfigStore } from '../store/useConfigStore';
 import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
 import { cn } from '@/lib/utils';
+import { useHyphenation } from '@/hooks/useHyphenation';
 
 const ScrollIndicator: React.FC = () => (
     <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">
@@ -33,50 +33,41 @@ const ScrollIndicator: React.FC = () => (
     </div>
 );
 
-const CardHeader: React.FC<{
-    label: string;
+const InlineIcon: React.FC<{
     code?: string;
-    className: string;
     iconSize: number;
     showCodes: boolean;
-}> = ({ label, code, className, iconSize, showCodes }) => (
-    <div
-        className={cn(
-            'font-bold text-indigo-400 uppercase tracking-wider flex items-center',
-            className
-        )}
-    >
-        <Eye size={iconSize} strokeWidth={2.5} />
-        {label}
+    className?: string;
+}> = ({ code, iconSize, showCodes, className }) => (
+    <>
+        <Eye
+            size={iconSize}
+            strokeWidth={2.5}
+            className={cn('inline shrink-0 text-indigo-400 mr-1.5 align-middle', className)}
+            aria-hidden="true"
+        />
         {showCodes && code && (
-            <>
-                <span className="text-indigo-300 mx-1">•</span>
+            <span className="text-indigo-400 font-bold text-[10px] uppercase tracking-wider mr-1.5 align-middle">
                 {code}
-            </>
+            </span>
         )}
-    </div>
+    </>
 );
 
 interface ReadingZoneProps {
     variant: 'mobile' | 'desktop' | 'landscape' | 'overlay';
 }
 const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
-    const { t } = useTranslation();
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const activeCard = useUIStore((state) => state.activeCard);
     const selectedCard = useUIStore((state) => state.selectedCard);
+    const hyphenate = useHyphenation();
 
     const config = useConfigStore((state) => state.config);
     const showCodes = config?.show_statement_codes ?? true;
 
     const rawDisplayCard = activeCard || hoveredCard || selectedCard;
-    const rawLabelKey = activeCard
-        ? 'fine.workbench.active_card'
-        : hoveredCard
-          ? 'fine.toolbar.preview'
-          : 'fine.workbench.active_card';
     const displayCard = React.useDeferredValue(rawDisplayCard);
-    const labelKey = React.useDeferredValue(rawLabelKey);
 
     // Scroll indicator logic
     const textRef = React.useRef<HTMLDivElement>(null);
@@ -118,18 +109,14 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 >
                     {displayCard && (
                         <div className="animate-in fade-in slide-in-from-top-1 duration-300 pb-2">
-                            <CardHeader
-                                label={t(labelKey)}
-                                code={displayCard.code}
-                                className="text-[10px] mb-0.5 gap-1.5"
-                                iconSize={12}
-                                showCodes={showCodes}
-                            />
-                            <div className="flex flex-col gap-0.5">
-                                <p className="text-slate-800 text-sm font-medium leading-relaxed">
-                                    {displayCard.text}
-                                </p>
-                            </div>
+                            <p className="text-slate-800 text-base font-medium leading-relaxed [hyphens:manual]">
+                                <InlineIcon
+                                    code={displayCard.code}
+                                    iconSize={14}
+                                    showCodes={showCodes}
+                                />
+                                {hyphenate(displayCard.text)}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -165,17 +152,21 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 )}
             >
                 {displayCard && (
-                    <div className="mx-2 mt-2 bg-indigo-50/85 backdrop-blur-md border border-indigo-100 rounded-xl p-2 shadow-sm">
-                        <CardHeader
-                            label={t(labelKey)}
-                            code={displayCard.code}
-                            className="text-[9px] mb-0 gap-1"
-                            iconSize={9}
-                            showCodes={showCodes}
-                        />
-                        <p className="text-slate-800 text-xs font-medium leading-snug line-clamp-3">
-                            {displayCard.text}
-                        </p>
+                    <div className="mx-2 mt-2 bg-indigo-50/85 backdrop-blur-md border border-indigo-100 rounded-xl shadow-sm relative overflow-hidden max-h-24">
+                        <div
+                            ref={textRef}
+                            className="p-2 overflow-y-auto max-h-24 custom-scrollbar pointer-events-auto"
+                        >
+                            <p className="text-slate-800 text-sm font-medium leading-snug [hyphens:manual]">
+                                <InlineIcon
+                                    code={displayCard.code}
+                                    iconSize={11}
+                                    showCodes={showCodes}
+                                />
+                                {hyphenate(displayCard.text)}
+                            </p>
+                        </div>
+                        {hasOverflow && <ScrollIndicator />}
                     </div>
                 )}
             </div>
@@ -204,15 +195,13 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 >
                     {displayCard && (
                         <div className="animate-in fade-in duration-200">
-                            <CardHeader
-                                label={t(labelKey)}
-                                code={displayCard.code}
-                                className="text-[9px] mb-0 gap-1"
-                                iconSize={9}
-                                showCodes={showCodes}
-                            />
-                            <p className="text-slate-800 text-xs font-medium leading-snug">
-                                {displayCard.text}
+                            <p className="text-slate-800 text-sm font-medium leading-snug [hyphens:manual]">
+                                <InlineIcon
+                                    code={displayCard.code}
+                                    iconSize={11}
+                                    showCodes={showCodes}
+                                />
+                                {hyphenate(displayCard.text)}
                             </p>
                         </div>
                     )}
@@ -235,15 +224,13 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
             >
                 {displayCard && (
                     <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
-                        <CardHeader
-                            label={t(labelKey)}
-                            code={displayCard.code}
-                            className="text-xs mb-1.5 gap-2"
-                            iconSize={14}
-                            showCodes={showCodes}
-                        />
-                        <p className="text-slate-800 text-base font-medium leading-relaxed">
-                            {displayCard.text}
+                        <p className="text-slate-800 text-lg font-medium leading-relaxed [hyphens:manual]">
+                            <InlineIcon
+                                code={displayCard.code}
+                                iconSize={16}
+                                showCodes={showCodes}
+                            />
+                            {hyphenate(displayCard.text)}
                         </p>
                     </div>
                 )}

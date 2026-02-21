@@ -768,6 +768,7 @@ const StudyLayoutContent: React.FC = () => {
                     {/* Auto-save status indicator — always reserves space to prevent layout shift */}
                     {hasConsented && !isCompleted && !isPilotMode && (
                         <span
+                            role="status"
                             className={`hidden sm:flex items-center justify-center w-5 transition-opacity duration-300 ${draftSaveStatus === 'idle' ? 'opacity-0' : 'opacity-100'}`}
                             aria-live="polite"
                             aria-label={
