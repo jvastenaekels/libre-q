@@ -14,6 +14,27 @@ interface MethodologyTipsProps {
     variant: 'mobile' | 'desktop';
 }
 
+const ScrollIndicator: React.FC = () => (
+    <div className="absolute bottom-0 left-0 right-0 h-5 bg-gradient-to-t from-indigo-50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 z-10">
+        <div className="motion-safe:animate-bounce opacity-50">
+            <svg
+                aria-hidden="true"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-indigo-900"
+            >
+                <path d="m6 9 6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+);
+
 const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const { t } = useTranslation();
     const { config } = useConfigStore();
@@ -21,6 +42,16 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const [step, setStep] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const textRef = useRef<HTMLDivElement>(null);
+    const [hasOverflow, setHasOverflow] = useState(false);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: step change triggers re-measurement
+    useEffect(() => {
+        const el = textRef.current;
+        if (el) {
+            setHasOverflow(el.scrollHeight > el.clientHeight + 2);
+        }
+    }, [step]);
 
     const defaultTips = [
         t('fine.workbench.methodology.extremes'),
@@ -77,18 +108,24 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 </button>
                 <div
                     key={step}
-                    className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300 px-8"
+                    className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300 px-8 overflow-hidden flex-1 min-h-0 relative"
                 >
-                    <div className="flex items-center gap-1.5 opacity-60 mb-0.5">
+                    <div className="flex items-center gap-1.5 opacity-60 mb-0.5 flex-none">
                         <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
                         <p className="text-[10px] font-bold uppercase tracking-widest">
                             {t('fine.workbench.help')}
                         </p>
                     </div>
-                    <p className="text-base font-semibold leading-relaxed italic text-indigo-600/80 [hyphens:manual]">
-                        {hyphenate(tips[step])}
-                    </p>
-                    <div className="flex gap-1 mt-1 justify-center">
+                    <div
+                        ref={textRef}
+                        className="overflow-y-auto custom-scrollbar flex-1 min-h-0"
+                    >
+                        <p className="text-base font-semibold leading-relaxed italic text-indigo-600/80 [hyphens:manual]">
+                            {hyphenate(tips[step])}
+                        </p>
+                    </div>
+                    {hasOverflow && <ScrollIndicator />}
+                    <div className="flex gap-1 mt-1 justify-center flex-none">
                         {tips.map((_, i) => (
                             <div
                                 key={i}
@@ -120,14 +157,20 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 <ChevronLeft size={20} />
             </button>
 
-            <div className="flex flex-col items-center gap-3 px-8 animate-in fade-in duration-300">
-                <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative">
+            <div className="flex flex-col items-center gap-3 px-8 animate-in fade-in duration-300 overflow-hidden flex-1 min-h-0 relative">
+                <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative flex-none">
                     <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
                 </div>
-                <p className="text-lg font-medium leading-relaxed italic text-indigo-600/70 min-h-[3rem] flex items-center justify-center [hyphens:manual]">
-                    {hyphenate(tips[step])}
-                </p>
-                <div className="flex gap-1.5 mt-2">
+                <div
+                    ref={textRef}
+                    className="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full"
+                >
+                    <p className="text-lg font-medium leading-relaxed italic text-indigo-600/70 text-center [hyphens:manual]">
+                        {hyphenate(tips[step])}
+                    </p>
+                </div>
+                {hasOverflow && <ScrollIndicator />}
+                <div className="flex gap-1.5 mt-2 flex-none">
                     {tips.map((_, i) => (
                         <button
                             key={i}
