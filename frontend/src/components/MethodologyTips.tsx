@@ -49,7 +49,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     useEffect(() => {
         const el = textRef.current;
         if (el) {
-            setHasOverflow(el.scrollHeight > el.clientHeight + 2);
+            setHasOverflow(el.scrollHeight > el.clientHeight + 8);
         }
     }, [step]);
 
@@ -108,7 +108,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 </button>
                 <div
                     key={step}
-                    className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300 px-8 overflow-hidden flex-1 min-h-0 relative"
+                    className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300 px-6 overflow-hidden flex-1 min-h-0 relative"
                 >
                     <div className="flex items-center gap-1.5 opacity-60 mb-0.5 flex-none">
                         <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
@@ -154,7 +154,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 <ChevronLeft size={20} />
             </button>
 
-            <div className="flex flex-col items-center gap-3 px-8 animate-in fade-in duration-300 overflow-hidden flex-1 min-h-0 relative">
+            <div className="flex flex-col items-center gap-3 px-6 animate-in fade-in duration-300 overflow-hidden flex-1 min-h-0 relative">
                 <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative flex-none">
                     <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
                 </div>
