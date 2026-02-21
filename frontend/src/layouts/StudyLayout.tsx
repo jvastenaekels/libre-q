@@ -792,134 +792,146 @@ const StudyLayoutContent: React.FC = () => {
                         </span>
                     )}
 
-                    {/* Continue Later (Resume Link) */}
-                    {hasConsented && !isCompleted && !isPilotMode && resumeCode && (
-                        <div className="relative" ref={resumeMenuRef}>
-                            <button
-                                ref={resumeButtonRef}
-                                type="button"
-                                onClick={() => {
-                                    if (isResumeMenuOpen) {
-                                        closeResumeMenu();
-                                    } else {
-                                        setIsResumeMenuOpen(true);
-                                        setLinkCopied(false);
-                                        // Auto-focus input after popover renders
-                                        setTimeout(() => resumeInputRef.current?.focus(), 50);
-                                    }
-                                }}
-                                className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-blue-50 text-blue-500 transition-colors touch-manipulation"
-                                title={t('resume.continue_later', 'Continue later')}
-                                aria-expanded={isResumeMenuOpen}
-                                aria-haspopup="dialog"
-                            >
-                                <MonitorSmartphone size={20} />
-                            </button>
-                            {isResumeMenuOpen && (
-                                <div
-                                    role="dialog"
-                                    aria-label={t('resume.continue_later', 'Continue later')}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Escape') closeResumeMenu();
+                    {/* Continue Later (Resume Link) — on welcome/consent, only show if there's real progress to resume */}
+                    {hasConsented &&
+                        !isCompleted &&
+                        !isPilotMode &&
+                        resumeCode &&
+                        maxReachedStep > 1 && (
+                            <div className="relative" ref={resumeMenuRef}>
+                                <button
+                                    ref={resumeButtonRef}
+                                    type="button"
+                                    onClick={() => {
+                                        if (isResumeMenuOpen) {
+                                            closeResumeMenu();
+                                        } else {
+                                            setIsResumeMenuOpen(true);
+                                            setLinkCopied(false);
+                                            // Auto-focus input after popover renders
+                                            setTimeout(() => resumeInputRef.current?.focus(), 50);
+                                        }
                                     }}
-                                    className="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-72 bg-white rounded-lg shadow-xl border border-slate-100 p-4 z-popover animate-in fade-in zoom-in-95 space-y-3"
+                                    className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-blue-50 text-blue-500 transition-colors touch-manipulation"
+                                    title={t('resume.continue_later', 'Continue later')}
+                                    aria-expanded={isResumeMenuOpen}
+                                    aria-haspopup="dialog"
                                 >
-                                    <p className="text-sm text-slate-600">
-                                        {t(
-                                            'resume.instruction_same_browser',
-                                            'If you return on this browser, your progress will be saved automatically.'
+                                    <MonitorSmartphone size={20} />
+                                </button>
+                                {isResumeMenuOpen && (
+                                    <div
+                                        role="dialog"
+                                        aria-label={t('resume.continue_later', 'Continue later')}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Escape') closeResumeMenu();
+                                        }}
+                                        className="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-72 bg-white rounded-lg shadow-xl border border-slate-100 p-4 z-popover animate-in fade-in zoom-in-95 space-y-3"
+                                    >
+                                        <p className="text-sm text-slate-600">
+                                            {t(
+                                                'resume.instruction_same_browser',
+                                                'If you return on this browser, your progress will be saved automatically.'
+                                            )}
+                                        </p>
+                                        <p className="text-sm text-slate-600">
+                                            {t(
+                                                'resume.instruction',
+                                                'To continue on a different device, save this link:'
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
+                                            {t(
+                                                'resume.instruction_detail',
+                                                'Keep this link private — it gives access to your session.'
+                                            )}
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={resumeInputRef}
+                                                type="text"
+                                                readOnly
+                                                aria-label={t('resume.resume_url', 'Resume URL')}
+                                                value={`${window.location.origin}/study/${slug}/resume/${resumeCode}`}
+                                                className="flex-1 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded px-2 py-2 text-slate-700 select-all truncate"
+                                                onFocus={(e) => e.target.select()}
+                                                onClick={(e) =>
+                                                    (e.target as HTMLInputElement).select()
+                                                }
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    navigator.clipboard
+                                                        .writeText(
+                                                            `${window.location.origin}/study/${slug}/resume/${resumeCode}`
+                                                        )
+                                                        .then(() => {
+                                                            setLinkCopied(true);
+                                                            if (copyTimeoutRef.current)
+                                                                clearTimeout(
+                                                                    copyTimeoutRef.current
+                                                                );
+                                                            copyTimeoutRef.current = setTimeout(
+                                                                () => setLinkCopied(false),
+                                                                3000
+                                                            );
+                                                        })
+                                                        .catch(() => {
+                                                            toast.error(
+                                                                t(
+                                                                    'resume.copy_failed',
+                                                                    'Unable to copy. Please select the link manually.'
+                                                                )
+                                                            );
+                                                        });
+                                                }}
+                                                aria-label={
+                                                    linkCopied
+                                                        ? t('resume.link_copied', 'Link copied!')
+                                                        : t('resume.copy_link', 'Copy link')
+                                                }
+                                                className="shrink-0 flex items-center justify-center p-2 rounded-md transition-colors"
+                                                style={{
+                                                    backgroundColor: linkCopied
+                                                        ? '#10b981'
+                                                        : 'var(--brand-accent)',
+                                                    color: 'white',
+                                                }}
+                                            >
+                                                {linkCopied ? (
+                                                    <Check size={16} />
+                                                ) : (
+                                                    <Copy size={16} />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {typeof navigator.share === 'function' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    navigator
+                                                        .share({
+                                                            title: t(
+                                                                'resume.share_title',
+                                                                'My study session'
+                                                            ),
+                                                            url: `${window.location.origin}/study/${slug}/resume/${resumeCode}`,
+                                                        })
+                                                        .catch(() => {
+                                                            /* user cancelled share sheet */
+                                                        });
+                                                }}
+                                                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-colors"
+                                            >
+                                                <Share2 size={14} />
+                                                {t('resume.share', 'Send to myself')}
+                                            </button>
                                         )}
-                                    </p>
-                                    <p className="text-sm text-slate-600">
-                                        {t(
-                                            'resume.instruction',
-                                            'To continue on a different device, save this link:'
-                                        )}
-                                    </p>
-                                    <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
-                                        {t(
-                                            'resume.instruction_detail',
-                                            'Keep this link private — it gives access to your session.'
-                                        )}
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            ref={resumeInputRef}
-                                            type="text"
-                                            readOnly
-                                            aria-label={t('resume.resume_url', 'Resume URL')}
-                                            value={`${window.location.origin}/study/${slug}/resume/${resumeCode}`}
-                                            className="flex-1 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded px-2 py-2 text-slate-700 select-all truncate"
-                                            onFocus={(e) => e.target.select()}
-                                            onClick={(e) => (e.target as HTMLInputElement).select()}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                navigator.clipboard
-                                                    .writeText(
-                                                        `${window.location.origin}/study/${slug}/resume/${resumeCode}`
-                                                    )
-                                                    .then(() => {
-                                                        setLinkCopied(true);
-                                                        if (copyTimeoutRef.current)
-                                                            clearTimeout(copyTimeoutRef.current);
-                                                        copyTimeoutRef.current = setTimeout(
-                                                            () => setLinkCopied(false),
-                                                            3000
-                                                        );
-                                                    })
-                                                    .catch(() => {
-                                                        toast.error(
-                                                            t(
-                                                                'resume.copy_failed',
-                                                                'Unable to copy. Please select the link manually.'
-                                                            )
-                                                        );
-                                                    });
-                                            }}
-                                            aria-label={
-                                                linkCopied
-                                                    ? t('resume.link_copied', 'Link copied!')
-                                                    : t('resume.copy_link', 'Copy link')
-                                            }
-                                            className="shrink-0 flex items-center justify-center p-2 rounded-md transition-colors"
-                                            style={{
-                                                backgroundColor: linkCopied
-                                                    ? '#10b981'
-                                                    : 'var(--brand-accent)',
-                                                color: 'white',
-                                            }}
-                                        >
-                                            {linkCopied ? <Check size={16} /> : <Copy size={16} />}
-                                        </button>
                                     </div>
-                                    {typeof navigator.share === 'function' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                navigator
-                                                    .share({
-                                                        title: t(
-                                                            'resume.share_title',
-                                                            'My study session'
-                                                        ),
-                                                        url: `${window.location.origin}/study/${slug}/resume/${resumeCode}`,
-                                                    })
-                                                    .catch(() => {
-                                                        /* user cancelled share sheet */
-                                                    });
-                                            }}
-                                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-colors"
-                                        >
-                                            <Share2 size={14} />
-                                            {t('resume.share', 'Send to myself')}
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        )}
 
                     <HelpOverlay />
 
