@@ -15,7 +15,7 @@ import { ArrowRight, Target } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -23,7 +23,6 @@ import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '../components/DynamicIcon';
 import { DEFAULT_STUDY_CONTENT } from '../constants/studyDefaults';
-import { STEP_ROUTES } from '../constants/stepRoutes';
 
 interface WelcomePageProps {
     highlightKey?: string | null;
@@ -101,12 +100,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
         return () => observer.disconnect();
     }, []);
-
-    // Redirect returning users to their latest step
-    if (isReturningUser) {
-        const target = STEP_ROUTES[maxReachedStep] || 'welcome';
-        return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
-    }
 
     if (!config) return null;
 
