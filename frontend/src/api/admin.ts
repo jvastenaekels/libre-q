@@ -3,7 +3,6 @@ import {
     changeStudyStateApiAdminStudiesSlugStatePost,
     deleteStudyApiAdminStudiesSlugDelete,
 } from './generated';
-import { customInstance } from './mutator';
 import type { StudyState } from './model';
 import type { StudyUpdate } from './model';
 import { useAuthStore } from '../store/useAuthStore';
