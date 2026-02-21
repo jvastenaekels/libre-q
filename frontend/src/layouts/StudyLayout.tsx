@@ -303,6 +303,21 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [config?.title, t]);
 
+    // Welcome-back toast for returning same-browser users
+    const hasShownWelcomeBack = useRef(false);
+    useEffect(() => {
+        if (
+            !hasShownWelcomeBack.current &&
+            hasConsented &&
+            !isCompleted &&
+            !isPilotMode &&
+            maxReachedStep > 1
+        ) {
+            hasShownWelcomeBack.current = true;
+            toast.success(t('resume.welcome_back', 'Welcome back! Your progress has been saved.'));
+        }
+    }, [hasConsented, isCompleted, isPilotMode, maxReachedStep, t]);
+
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
         useSessionStore.getState().setLanguage(lng);
