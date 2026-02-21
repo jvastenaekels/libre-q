@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => ({
     setStep: vi.fn(),
     setLanguage: vi.fn(),
     setResumeCode: vi.fn(),
+    completeSession: vi.fn(),
     setState: vi.fn(),
     toastSuccess: vi.fn(),
 }));
@@ -62,6 +63,7 @@ vi.mock('../store/useSessionStore', () => ({
             setStep: mocks.setStep,
             setLanguage: mocks.setLanguage,
             setResumeCode: mocks.setResumeCode,
+            completeSession: mocks.completeSession,
         }),
     },
 }));
@@ -114,15 +116,16 @@ describe('ResumePage', () => {
         expect(screen.getByText('Start a new session')).toBeInTheDocument();
     });
 
-    it('shows already_completed error on 410', async () => {
+    it('redirects to confirmation page on 410 (already completed)', async () => {
         mocks.customInstance.mockRejectedValue({ status: 410 });
         renderResumePage();
 
         await waitFor(() => {
-            expect(screen.getByText(/already submitted your responses/)).toBeInTheDocument();
+            expect(mocks.completeSession).toHaveBeenCalledWith(null);
+            expect(mocks.navigate).toHaveBeenCalledWith('/study/test-study/post-sort', {
+                replace: true,
+            });
         });
-        // No "Start a new session" link for completed
-        expect(screen.queryByText('Start a new session')).not.toBeInTheDocument();
     });
 
     it('shows study_closed error on 403', async () => {

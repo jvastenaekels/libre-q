@@ -17,7 +17,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { initialResponses, useResponseStore } from '../store/useResponseStore';
 
-type ResumeError = 'not_found' | 'already_completed' | 'study_closed' | 'rate_limited' | 'error';
+type ResumeError = 'not_found' | 'study_closed' | 'rate_limited' | 'error';
 
 export default function ResumePage() {
     const { t } = useTranslation();
@@ -133,7 +133,10 @@ export default function ResumePage() {
                 if (status === 404) {
                     setError('not_found');
                 } else if (status === 410) {
-                    setError('already_completed');
+                    // Session already submitted — redirect to the confirmation screen
+                    useSessionStore.getState().completeSession(null);
+                    navigate(`/study/${slug}/post-sort`, { replace: true });
+                    return;
                 } else if (status === 403) {
                     setError('study_closed');
                 } else if (status === 429) {
@@ -161,14 +164,6 @@ export default function ResumePage() {
                     "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link."
                 ),
                 showStudyLink: true,
-                showRetry: false,
-            },
-            already_completed: {
-                message: t(
-                    'resume.already_completed',
-                    "You've already submitted your responses. Thank you for your participation!"
-                ),
-                showStudyLink: false,
                 showRetry: false,
             },
             study_closed: {
