@@ -202,6 +202,7 @@ else:
             # Delete in correct order to respect foreign keys
             tables_to_clean = [
                 "qsort_entries",
+                "audio_recordings",
                 "participants",
                 "recruitment_links",
                 "statement_translations",
@@ -232,6 +233,7 @@ else:
             # Delete everything in reverse dependency order
             tables_to_clean = [
                 "qsort_entries",
+                "audio_recordings",
                 "participants",
                 "recruitment_links",
                 "statement_translations",

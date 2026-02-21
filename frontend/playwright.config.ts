@@ -106,6 +106,8 @@ export default defineConfig({
             url: 'http://localhost:5173',
             reuseExistingServer: true,
             timeout: 120 * 1000,
+            stdout: 'pipe',
+            stderr: 'pipe',
             env: {
                 VITE_API_URL: 'http://127.0.0.1:8000',
             },

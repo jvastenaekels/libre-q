@@ -28,6 +28,21 @@ async function globalSetup() {
         }
     }
 
+    // Clean up stale data from previous runs
+    console.log('🧹 Cleaning up stale data from previous runs...');
+    try {
+        const cleanupRes = await fetch(`${backendUrl}/api/test/cleanup-all`, {
+            method: 'POST',
+        });
+        if (cleanupRes.ok) {
+            console.log('✅ Previous data cleaned up');
+        } else {
+            console.warn(`⚠️  Cleanup returned ${cleanupRes.status} (continuing anyway)`);
+        }
+    } catch (error) {
+        console.warn('⚠️  Cleanup failed (continuing anyway):', error);
+    }
+
     // Initialize test database
     console.log('🗄️  Initializing test database...');
     try {
