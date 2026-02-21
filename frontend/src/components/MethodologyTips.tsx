@@ -97,7 +97,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
 
     if (variant === 'mobile') {
         return (
-            <div className="h-full flex flex-col items-center justify-center gap-1.5 text-indigo-400 relative">
+            <div className="h-full flex flex-col items-center justify-center gap-0.5 text-indigo-400 relative">
                 <button
                     type="button"
                     onClick={prevTip}
@@ -117,12 +117,12 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                         </p>
                     </div>
                     <div ref={textRef} className="overflow-y-auto custom-scrollbar flex-1 min-h-0">
-                        <p className="text-base font-semibold leading-relaxed italic text-indigo-600/80 [hyphens:manual]">
+                        <p className="text-base font-semibold leading-snug italic text-indigo-600/80 [hyphens:manual]">
                             {hyphenate(tips[step])}
                         </p>
                     </div>
                     {hasOverflow && <ScrollIndicator />}
-                    <div className="flex gap-1 mt-1 justify-center flex-none">
+                    <div className="flex gap-1 mt-0.5 justify-center flex-none">
                         {tips.map((_, i) => (
                             <div
                                 key={i}
@@ -144,7 +144,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400 py-2 relative group-hover:opacity-100 transition-opacity">
+        <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400 py-1 relative group-hover:opacity-100 transition-opacity">
             <button
                 type="button"
                 onClick={prevTip}
@@ -154,20 +154,20 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 <ChevronLeft size={20} />
             </button>
 
-            <div className="flex flex-col items-center gap-3 px-6 animate-in fade-in duration-300 overflow-hidden flex-1 min-h-0 relative">
-                <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative flex-none">
-                    <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
+            <div className="flex flex-col items-center gap-2 px-6 animate-in fade-in duration-300 overflow-hidden flex-1 min-h-0 relative">
+                <div className="p-1.5 bg-amber-50 rounded-full text-amber-500 relative flex-none">
+                    <Lightbulb size={20} strokeWidth={1.5} className="fill-amber-500/10" />
                 </div>
                 <div
                     ref={textRef}
                     className="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full"
                 >
-                    <p className="text-lg font-medium leading-relaxed italic text-indigo-600/70 text-center [hyphens:manual]">
+                    <p className="text-lg font-medium leading-snug italic text-indigo-600/70 text-center [hyphens:manual]">
                         {hyphenate(tips[step])}
                     </p>
                 </div>
                 {hasOverflow && <ScrollIndicator />}
-                <div className="flex gap-1.5 mt-2 flex-none">
+                <div className="flex gap-1.5 mt-1 flex-none">
                     {tips.map((_, i) => (
                         <button
                             key={i}
