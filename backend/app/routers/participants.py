@@ -11,7 +11,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.limiter import limiter
 from app.models import Participant, ParticipantStatus, Study, StudyState
-from app.schemas import ConsentInput, DraftSaveInput, ProgressUpdate, ResumeResponse
+from app.schemas import (
+    ConsentInput,
+    ConsentResponse,
+    DraftSaveInput,
+    ProgressUpdate,
+    ResumeResponse,
+)
 from app.services.study_service import StudyService
 
 _UUID_RE = re.compile(
@@ -21,7 +27,7 @@ _UUID_RE = re.compile(
 router = APIRouter()
 
 
-@router.post("/consent")
+@router.post("/consent", response_model=ConsentResponse)
 @limiter.limit("60/minute")
 async def record_consent(
     data: ConsentInput,
@@ -126,7 +132,11 @@ async def resume_session(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     code: str = Path(
-        ..., title="Resume Code", description="Memorable resume code or legacy UUID"
+        ...,
+        title="Resume Code",
+        description="Memorable resume code or legacy UUID",
+        max_length=60,
+        pattern=r"^[a-zA-Z0-9-]+$",
     ),
     db: AsyncSession = Depends(get_db),
 ):

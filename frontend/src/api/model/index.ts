@@ -27,6 +27,7 @@ export * from './brandingBasePrimaryColor';
 export * from './changeStudyStateApiAdminStudiesSlugStatePostParams';
 export * from './consentInput';
 export * from './consentInputConsentHash';
+export * from './consentResponse';
 export * from './createRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams';
 export * from './deleteAudioRecordingApiAudioRecordingIdDeleteParams';
 export * from './draftSaveInput';

@@ -100,9 +100,8 @@ const ConsentPage: React.FC = () => {
                     });
 
                     // Store the memorable resume code for "Continue Later" feature
-                    const resumeCode = (result as Record<string, unknown>)?.resume_code;
-                    if (typeof resumeCode === 'string' && resumeCode) {
-                        useSessionStore.getState().setResumeCode(resumeCode);
+                    if (result.resume_code) {
+                        useSessionStore.getState().setResumeCode(result.resume_code);
                     }
                 } catch (err) {
                     // Non-blocking: we still allow user to proceed but log the error

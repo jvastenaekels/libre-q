@@ -511,22 +511,22 @@ WORD_LISTS: dict[str, dict[str, list[str]]] = {
             "syvat",
             "pitkat",
             "tarkka",
-            "lemma",
+            "hemma",
             "hertta",
             "navakka",
             "tuore",
             "pyhat",
             "leheva",
-            "luotsi",
+            "sulavat",
             "ponteva",
             "rauhea",
             "soljuva",
             "tahkea",
-            "ulappa",
+            "vekkuli",
             "sujuva",
             "samea",
             "kirjava",
-            "toivoa",
+            "vankea",
             "pirtea",
             "kevyt",
         ],
@@ -666,7 +666,15 @@ async def generate_unique_resume_code(
         if exists.scalar_one_or_none() is None:
             return code
 
-    # Fallback: extend with extra digits to guarantee uniqueness
+    # Fallback: extend with extra digits to reduce collision probability.
+    # The caller's savepoint-retry loop provides the final safety net.
     code = _generate_code(language)
     extra = secrets.randbelow(9000) + 1000  # 1000..9999
-    return f"{code}-{extra}"
+    fallback = f"{code}-{extra}"
+    exists = await db.execute(
+        select(Participant.id).where(Participant.resume_code == fallback).limit(1)
+    )
+    if exists.scalar_one_or_none() is None:
+        return fallback
+    # Last resort: append more entropy
+    return f"{fallback}-{secrets.randbelow(9000) + 1000}"

@@ -723,6 +723,13 @@ class ResumeResponse(BaseModel):
     resume_code: str
 
 
+class ConsentResponse(BaseModel):
+    """Schema for the consent endpoint response."""
+
+    status: str
+    resume_code: str
+
+
 # Analysis Schemas
 
 

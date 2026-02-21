@@ -200,9 +200,10 @@ url_expires_at
 validate_draft
 
 # Draft/Resume schemas (app/schemas.py)
-# ResumeResponse fields
+# ResumeResponse / ConsentResponse fields
 language
 resume_code
+ConsentResponse
 
 # app/resume_codes.py
 generate_unique_resume_code

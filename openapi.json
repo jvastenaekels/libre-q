@@ -2905,7 +2905,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentResponse"
+                }
               }
             }
           },
@@ -3054,6 +3056,8 @@
             "required": true,
             "schema": {
               "type": "string",
+              "maxLength": 60,
+              "pattern": "^[a-zA-Z0-9-]+$",
               "title": "Resume Code",
               "description": "Memorable resume code or legacy UUID"
             },
@@ -3967,6 +3971,25 @@
         ],
         "title": "ConsentInput",
         "description": "Schema for recording participant consent."
+      },
+      "ConsentResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "resume_code": {
+            "type": "string",
+            "title": "Resume Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "resume_code"
+        ],
+        "title": "ConsentResponse",
+        "description": "Schema for the consent endpoint response."
       },
       "DraftSaveInput": {
         "properties": {

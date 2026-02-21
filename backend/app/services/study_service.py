@@ -330,6 +330,11 @@ class StudyService:
                         break
                     except IntegrityError:
                         pass  # savepoint rolled back; retry with new code
+                else:
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Could not generate a unique resume code.",
+                    )
             except IntegrityError:
                 # Race condition: Participant created concurrently
                 await db.rollback()
@@ -363,6 +368,11 @@ class StudyService:
                         break
                     except IntegrityError:
                         pass  # savepoint rolled back; retry with new code
+                else:
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Could not generate a unique resume code.",
+                    )
 
         await db.commit()
         return {"status": "recorded", "resume_code": participant.resume_code}

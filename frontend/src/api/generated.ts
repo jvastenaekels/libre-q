@@ -66,6 +66,7 @@ import type {
     AnalysisResult,
     AudioRecordingRead,
     AudioUploadResponse,
+    ConsentResponse,
     EigenvalueResult,
     InvitationLink,
     ParticipantDetailRead,
@@ -6731,7 +6732,7 @@ export const recordConsentApiStudySlugConsentPost = (
     consentInput: ConsentInput,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<ConsentResponse>({
         url: `/api/study/${slug}/consent`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10371,6 +10372,14 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMoc
     ...overrideResponse,
 });
 
+export const getRecordConsentApiStudySlugConsentPostResponseMock = (
+    overrideResponse: Partial<ConsentResponse> = {}
+): ConsentResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    resume_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
 export const getResumeSessionApiStudySlugResumeCodeGetResponseMock = (
     overrideResponse: Partial<ResumeResponse> = {}
 ): ResumeResponse => ({
@@ -11661,17 +11670,25 @@ export const getUnlockStudyApiStudySlugUnlockPostMockHandler = (
 
 export const getRecordConsentApiStudySlugConsentPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | ConsentResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConsentResponse> | ConsentResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/study/:slug/consent',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getRecordConsentApiStudySlugConsentPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
