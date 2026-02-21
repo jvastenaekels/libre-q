@@ -134,7 +134,7 @@ export default function ResumePage() {
                     setError('not_found');
                 } else if (status === 410) {
                     // Session already submitted — redirect to the confirmation screen
-                    useSessionStore.getState().completeSession(null);
+                    useSessionStore.getState().completeSession('');
                     navigate(`/study/${slug}/post-sort`, { replace: true });
                     return;
                 } else if (status === 403) {

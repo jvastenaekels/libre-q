@@ -104,7 +104,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
 
     if (variant === 'mobile') {
         return (
-            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-24">
+            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-28">
                 {/* Card Content Layer */}
                 <div
                     ref={textRef}

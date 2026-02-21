@@ -891,11 +891,7 @@ const StudyLayoutContent: React.FC = () => {
                                                 color: 'white',
                                             }}
                                         >
-                                            {linkCopied ? (
-                                                <Check size={16} />
-                                            ) : (
-                                                <Copy size={16} />
-                                            )}
+                                            {linkCopied ? <Check size={16} /> : <Copy size={16} />}
                                         </button>
                                     </div>
                                     {typeof navigator.share === 'function' && (

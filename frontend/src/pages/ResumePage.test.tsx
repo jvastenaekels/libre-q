@@ -121,7 +121,7 @@ describe('ResumePage', () => {
         renderResumePage();
 
         await waitFor(() => {
-            expect(mocks.completeSession).toHaveBeenCalledWith(null);
+            expect(mocks.completeSession).toHaveBeenCalledWith('');
             expect(mocks.navigate).toHaveBeenCalledWith('/study/test-study/post-sort', {
                 replace: true,
             });
