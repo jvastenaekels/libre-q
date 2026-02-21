@@ -32,7 +32,9 @@ async def test_record_consent_new_participant(db, seed_study):
         db, seed_study.slug, session_token, language, consent_hash, ip
     )
 
-    assert result == {"status": "recorded"}
+    assert result["status"] == "recorded"
+    assert isinstance(result["resume_code"], str)
+    assert len(result["resume_code"]) > 0
 
     # Verify DB
     stmt = select(Participant).where(Participant.session_token == session_token)
@@ -45,6 +47,7 @@ async def test_record_consent_new_participant(db, seed_study):
     assert p.consented_at is not None
     assert p.status == ParticipantStatus.started
     assert p.ip_address is not None  # Hashed IP
+    assert p.resume_code == result["resume_code"]
 
 
 @pytest.mark.asyncio

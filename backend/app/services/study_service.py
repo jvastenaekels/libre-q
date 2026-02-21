@@ -315,6 +315,21 @@ class StudyService:
                 )
                 db.add(participant)
                 await db.flush()
+
+                # Generate memorable resume code (savepoint protects
+                # against the extremely rare concurrent collision)
+                from ..resume_codes import generate_unique_resume_code
+
+                for _rc in range(3):
+                    participant.resume_code = await generate_unique_resume_code(
+                        db, language_code
+                    )
+                    try:
+                        async with db.begin_nested():
+                            await db.flush()
+                        break
+                    except IntegrityError:
+                        pass  # savepoint rolled back; retry with new code
             except IntegrityError:
                 # Race condition: Participant created concurrently
                 await db.rollback()
@@ -334,9 +349,23 @@ class StudyService:
             participant.user_agent = user_agent
             if is_test_run:
                 participant.is_test_run = True
+            # Generate resume code if missing (e.g. pre-existing participant)
+            if not participant.resume_code:
+                from ..resume_codes import generate_unique_resume_code
+
+                for _rc in range(3):
+                    participant.resume_code = await generate_unique_resume_code(
+                        db, language_code
+                    )
+                    try:
+                        async with db.begin_nested():
+                            await db.flush()
+                        break
+                    except IntegrityError:
+                        pass  # savepoint rolled back; retry with new code
 
         await db.commit()
-        return {"status": "recorded"}
+        return {"status": "recorded", "resume_code": participant.resume_code}
 
     @staticmethod
     def resolve_translation(

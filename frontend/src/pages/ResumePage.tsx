@@ -39,6 +39,7 @@ export default function ResumePage() {
                     language: string;
                     last_step_reached: number;
                     draft_responses: Record<string, unknown>;
+                    resume_code: string;
                 }>({
                     url: `/api/study/${slug}/resume/${token}`,
                     method: 'GET',
@@ -65,6 +66,9 @@ export default function ResumePage() {
                 session.setConsent(true);
                 session.setStep(data.last_step_reached);
                 session.setLanguage(data.language);
+                if (data.resume_code) {
+                    session.setResumeCode(data.resume_code);
+                }
 
                 // Hydrate response store from draft (with runtime shape validation)
                 const draft = data.draft_responses;

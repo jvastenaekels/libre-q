@@ -88,7 +88,7 @@ const ConsentPage: React.FC = () => {
                     const consentText = config.consent?.description || t('consent.default_text');
                     const consentHash = await hashConsent(consentText);
 
-                    await recordConsentMutation({
+                    const result = await recordConsentMutation({
                         slug: slug || '',
                         data: {
                             study_slug: slug || '',
@@ -98,6 +98,12 @@ const ConsentPage: React.FC = () => {
                             is_test_run: false,
                         },
                     });
+
+                    // Store the memorable resume code for "Continue Later" feature
+                    const resumeCode = (result as Record<string, unknown>)?.resume_code;
+                    if (typeof resumeCode === 'string' && resumeCode) {
+                        useSessionStore.getState().setResumeCode(resumeCode);
+                    }
                 } catch (err) {
                     // Non-blocking: we still allow user to proceed but log the error
                     console.error('Failed to record consent proof:', err);

@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
     setConsent: vi.fn(),
     setStep: vi.fn(),
     setLanguage: vi.fn(),
+    setResumeCode: vi.fn(),
     setState: vi.fn(),
     toastSuccess: vi.fn(),
 }));
@@ -60,6 +61,7 @@ vi.mock('../store/useSessionStore', () => ({
             setConsent: mocks.setConsent,
             setStep: mocks.setStep,
             setLanguage: mocks.setLanguage,
+            setResumeCode: mocks.setResumeCode,
         }),
     },
 }));
@@ -164,6 +166,7 @@ describe('ResumePage', () => {
                 qsort: [[1], [2]],
                 postsort: { feedback: 'good' },
             },
+            resume_code: 'brave-tiger-42',
         });
 
         renderResumePage();
@@ -176,6 +179,7 @@ describe('ResumePage', () => {
             expect(mocks.setConsent).toHaveBeenCalledWith(true);
             expect(mocks.setStep).toHaveBeenCalledWith(3);
             expect(mocks.setLanguage).toHaveBeenCalledWith('en');
+            expect(mocks.setResumeCode).toHaveBeenCalledWith('brave-tiger-42');
             expect(mocks.setState).toHaveBeenCalledWith({
                 presort: { q1: 'yes' },
                 rough: { agree: [1], disagree: [2], neutral: [3], history: [] },
@@ -199,6 +203,7 @@ describe('ResumePage', () => {
                 qsort: 'not-an-array',
                 postsort: [1, 2, 3],
             },
+            resume_code: 'calm-fox-11',
         });
 
         renderResumePage();
@@ -219,6 +224,7 @@ describe('ResumePage', () => {
             language: 'en',
             last_step_reached: 1,
             draft_responses: {},
+            resume_code: 'keen-owl-55',
         });
 
         renderResumePage();
@@ -237,6 +243,7 @@ describe('ResumePage', () => {
             language: 'en',
             last_step_reached: 4,
             draft_responses: {},
+            resume_code: 'swift-deer-73',
         });
 
         renderResumePage();

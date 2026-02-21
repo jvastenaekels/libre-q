@@ -206,7 +206,7 @@ const StudyLayoutContent: React.FC = () => {
     const resumeMenuRef = useRef<HTMLDivElement>(null);
     const resumeButtonRef = useRef<HTMLButtonElement>(null);
     const resumeInputRef = useRef<HTMLInputElement>(null);
-    const sessionToken = useSessionStore((state) => state.token);
+    const resumeCode = useSessionStore((state) => state.resumeCode);
 
     // Network Status
     const { isOnline } = useNetworkStatus();
@@ -763,7 +763,7 @@ const StudyLayoutContent: React.FC = () => {
                     )}
 
                     {/* Continue Later (Resume Link) */}
-                    {hasConsented && !isCompleted && !isPilotMode && sessionToken && (
+                    {hasConsented && !isCompleted && !isPilotMode && resumeCode && (
                         <div className="relative" ref={resumeMenuRef}>
                             <button
                                 ref={resumeButtonRef}
@@ -819,7 +819,7 @@ const StudyLayoutContent: React.FC = () => {
                                             type="text"
                                             readOnly
                                             aria-label={t('resume.resume_url', 'Resume URL')}
-                                            value={`${window.location.origin}/study/${slug}/resume/${sessionToken}`}
+                                            value={`${window.location.origin}/study/${slug}/resume/${resumeCode}`}
                                             className="flex-1 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded px-2 py-2 text-slate-700 select-all truncate"
                                             onFocus={(e) => e.target.select()}
                                             onClick={(e) => (e.target as HTMLInputElement).select()}
@@ -829,7 +829,7 @@ const StudyLayoutContent: React.FC = () => {
                                             onClick={() => {
                                                 navigator.clipboard
                                                     .writeText(
-                                                        `${window.location.origin}/study/${slug}/resume/${sessionToken}`
+                                                        `${window.location.origin}/study/${slug}/resume/${resumeCode}`
                                                     )
                                                     .then(() => {
                                                         setLinkCopied(true);
@@ -880,7 +880,7 @@ const StudyLayoutContent: React.FC = () => {
                                                             'resume.share_title',
                                                             'My study session'
                                                         ),
-                                                        url: `${window.location.origin}/study/${slug}/resume/${sessionToken}`,
+                                                        url: `${window.location.origin}/study/${slug}/resume/${resumeCode}`,
                                                     })
                                                     .catch(() => {
                                                         /* user cancelled share sheet */

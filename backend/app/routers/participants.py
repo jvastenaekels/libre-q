@@ -1,5 +1,6 @@
 """API router for participant actions."""
 
+import re
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -12,6 +13,10 @@ from app.limiter import limiter
 from app.models import Participant, ParticipantStatus, Study, StudyState
 from app.schemas import ConsentInput, DraftSaveInput, ProgressUpdate, ResumeResponse
 from app.services.study_service import StudyService
+
+_UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
+)
 
 router = APIRouter()
 
@@ -113,24 +118,32 @@ async def save_draft(
     return {"status": "ok"}
 
 
-@router.get("/resume/{session_token}", response_model=ResumeResponse)
+@router.get("/resume/{code}", response_model=ResumeResponse)
 @limiter.limit("30/minute")
 async def resume_session(
     request: Request,
     slug: str = Path(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
-    session_token: UUID = Path(
-        ..., title="Session Token", description="The participant's session token"
+    code: str = Path(
+        ..., title="Resume Code", description="Memorable resume code or legacy UUID"
     ),
     db: AsyncSession = Depends(get_db),
 ):
     """Returns participant session data for resuming on another device."""
-    result = await db.execute(
-        select(Participant, Study)
-        .join(Study, Participant.study_id == Study.id)
-        .where(Participant.session_token == session_token, Study.slug == slug)
-    )
+    # Build query: try resume_code first, fall back to session_token for legacy UUIDs
+    if _UUID_RE.match(code):
+        result = await db.execute(
+            select(Participant, Study)
+            .join(Study, Participant.study_id == Study.id)
+            .where(Participant.session_token == UUID(code), Study.slug == slug)
+        )
+    else:
+        result = await db.execute(
+            select(Participant, Study)
+            .join(Study, Participant.study_id == Study.id)
+            .where(Participant.resume_code == code, Study.slug == slug)
+        )
     row = result.one_or_none()
 
     if not row:
@@ -152,4 +165,5 @@ async def resume_session(
         language=participant.language_used,
         last_step_reached=participant.last_step_reached or 1,
         draft_responses=participant.draft_responses or {},
+        resume_code=participant.resume_code or "",
     )

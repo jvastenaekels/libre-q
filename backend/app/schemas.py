@@ -720,6 +720,7 @@ class ResumeResponse(BaseModel):
     language: str
     last_step_reached: int
     draft_responses: dict[str, Any]
+    resume_code: str
 
 
 # Analysis Schemas

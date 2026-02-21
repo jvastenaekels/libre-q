@@ -334,6 +334,9 @@ class Participant(Base):
     confirmation_code: Mapped[str | None] = mapped_column(
         String(8), unique=True, index=True, nullable=True
     )
+    resume_code: Mapped[str | None] = mapped_column(
+        String(50), unique=True, index=True, nullable=True
+    )
     is_discarded: Mapped[bool] = mapped_column(Boolean, default=False)
     is_test_run: Mapped[bool] = mapped_column(Boolean, default=False)
     discard_reason: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -3028,14 +3028,14 @@
         }
       }
     },
-    "/api/study/{slug}/resume/{session_token}": {
+    "/api/study/{slug}/resume/{code}": {
       "get": {
         "tags": [
           "participants"
         ],
         "summary": "Resume Session",
         "description": "Returns participant session data for resuming on another device.",
-        "operationId": "resume_session_api_study__slug__resume__session_token__get",
+        "operationId": "resume_session_api_study__slug__resume__code__get",
         "parameters": [
           {
             "name": "slug",
@@ -3049,16 +3049,15 @@
             "description": "The distinct slug of the study"
           },
           {
-            "name": "session_token",
+            "name": "code",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid",
-              "title": "Session Token",
-              "description": "The participant's session token"
+              "title": "Resume Code",
+              "description": "Memorable resume code or legacy UUID"
             },
-            "description": "The participant's session token"
+            "description": "Memorable resume code or legacy UUID"
           }
         ],
         "responses": {
@@ -4878,6 +4877,10 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Draft Responses"
+          },
+          "resume_code": {
+            "type": "string",
+            "title": "Resume Code"
           }
         },
         "type": "object",
@@ -4885,7 +4888,8 @@
           "session_token",
           "language",
           "last_step_reached",
-          "draft_responses"
+          "draft_responses",
+          "resume_code"
         ],
         "title": "ResumeResponse",
         "description": "Schema for returning participant resume data."

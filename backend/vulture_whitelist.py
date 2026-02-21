@@ -202,6 +202,10 @@ validate_draft
 # Draft/Resume schemas (app/schemas.py)
 # ResumeResponse fields
 language
+resume_code
+
+# app/resume_codes.py
+generate_unique_resume_code
 
 # Analysis schemas (app/schemas.py)
 validate_extraction

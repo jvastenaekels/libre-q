@@ -18,6 +18,7 @@ interface SessionState {
     language: string | null;
     isCompleted: boolean;
     confirmationCode: string | null;
+    resumeCode: string | null;
     isSaving: boolean;
     isPilotMode: boolean;
 
@@ -26,6 +27,7 @@ interface SessionState {
     setStep: (step: number) => void;
     setLanguage: (lang: string) => void;
     completeSession: (code: string) => void;
+    setResumeCode: (code: string) => void;
     setSaving: (isSaving: boolean) => void;
     setPilotMode: (isPilot: boolean) => void;
     resetSession: () => void;
@@ -54,6 +56,7 @@ export const useSessionStore = create<SessionState>()(
             language: null,
             isCompleted: false,
             confirmationCode: null,
+            resumeCode: null,
             isSaving: false,
             isPilotMode: isPilot(),
 
@@ -70,6 +73,7 @@ export const useSessionStore = create<SessionState>()(
                     return { language };
                 }),
             completeSession: (confirmationCode) => set({ isCompleted: true, confirmationCode }),
+            setResumeCode: (resumeCode) => set({ resumeCode }),
             setSaving: (isSaving) => set({ isSaving }),
             setPilotMode: (isPilotMode) => set({ isPilotMode }),
             resetSession: () => {
@@ -82,6 +86,7 @@ export const useSessionStore = create<SessionState>()(
                     language: null,
                     isCompleted: false,
                     confirmationCode: null,
+                    resumeCode: null,
                     isSaving: false,
                     isPilotMode: false,
                 });
