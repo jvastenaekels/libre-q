@@ -793,7 +793,7 @@ const StudyLayoutContent: React.FC = () => {
                                     onKeyDown={(e) => {
                                         if (e.key === 'Escape') closeResumeMenu();
                                     }}
-                                    className="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-72 bg-white rounded-lg shadow-xl border border-slate-100 p-4 z-dropdown animate-in fade-in zoom-in-95 space-y-3"
+                                    className="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-72 bg-white rounded-lg shadow-xl border border-slate-100 p-4 z-popover animate-in fade-in zoom-in-95 space-y-3"
                                 >
                                     <p className="text-sm text-slate-600">
                                         {t(
@@ -913,7 +913,7 @@ const StudyLayoutContent: React.FC = () => {
 
                             {/* Dropdown (Simplified) */}
                             {isLangMenuOpen && (
-                                <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-dropdown animate-in fade-in zoom-in-95">
+                                <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-popover animate-in fade-in zoom-in-95">
                                     {(config?.available_languages &&
                                     config.available_languages.length > 0
                                         ? config.available_languages
