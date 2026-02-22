@@ -1699,7 +1699,7 @@
                 "count": "Nombre"
             },
             "search": {
-                "placeholder": "Chercher par ID ou jeton...",
+                "placeholder": "Chercher par ID, email...",
                 "records_found": "enregistrements détectés",
                 "no_results": "Aucun enregistrement ne correspond à votre requête"
             },

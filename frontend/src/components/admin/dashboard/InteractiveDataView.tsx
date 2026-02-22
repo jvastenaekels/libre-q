@@ -1537,19 +1537,19 @@ export default function InteractiveDataView({
                     </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex flex-row items-center justify-between gap-2 sm:gap-3 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
                     {/* Left Group: Search */}
-                    <div className="flex items-center gap-3 w-full sm:w-auto flex-1 sm:max-w-sm lg:max-w-2xl">
+                    <div className="flex items-center gap-3 flex-1 min-w-0 sm:max-w-sm lg:max-w-2xl">
                         <div className="relative group w-full">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                             <Input
                                 placeholder={t(
                                     'admin.data.search.placeholder',
-                                    'Search participants by ID, email...'
+                                    'Search by ID, email...'
                                 )}
                                 aria-label={t(
                                     'admin.data.search.placeholder',
-                                    'Search participants by ID, email...'
+                                    'Search by ID, email...'
                                 )}
                                 value={globalFilter ?? ''}
                                 onChange={(e) => setGlobalFilter(e.target.value)}
@@ -1558,7 +1558,7 @@ export default function InteractiveDataView({
                         </div>
                     </div>
                     {/* Right Group: Actions */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         {/* Export Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
