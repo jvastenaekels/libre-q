@@ -194,12 +194,12 @@ export default function ParticipantDetailsPage() {
         return { studyData: studyDump, participantData: adaptedParticipant };
     }, [study, participant]);
 
-    const handleToggleDiscard = async (isDiscarded: boolean) => {
+    const handleToggleDiscard = async (isDiscarded: boolean, reason?: string) => {
         if (!participant) return;
         try {
             await discardMutation.mutateAsync({
                 participantId: participant.id,
-                data: { is_discarded: isDiscarded },
+                data: { is_discarded: isDiscarded, discard_reason: reason ?? null },
             });
             await refetch();
             toast.success(

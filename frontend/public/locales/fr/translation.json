@@ -1597,7 +1597,9 @@
             },
             "confirm_discard": {
                 "title": "Exclure le participant ?",
-                "description": "Ce participant sera exclu des exports et de l'analyse. Vous pourrez le restaurer ultérieurement."
+                "description": "Ce participant sera exclu des exports et de l'analyse. Vous pourrez le restaurer ultérieurement.",
+                "reason_label": "Raison (optionnel)",
+                "reason_placeholder": "Pourquoi ce participant est-il écarté ?"
             },
             "confirm_restore": {
                 "title": "Restaurer le participant ?",

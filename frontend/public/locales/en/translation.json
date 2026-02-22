@@ -1567,7 +1567,9 @@
             },
             "confirm_discard": {
                 "title": "Discard participant?",
-                "description": "This participant will be excluded from exports and analysis. You can restore them later."
+                "description": "This participant will be excluded from exports and analysis. You can restore them later.",
+                "reason_label": "Reason (optional)",
+                "reason_placeholder": "Why is this participant being discarded?"
             },
             "confirm_restore": {
                 "title": "Restore participant?",

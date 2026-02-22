@@ -30,7 +30,7 @@ import type { InteractionUtils } from '@/types/grid';
 interface ParticipantDetailContentProps {
     participant: DumpParticipant;
     studyData: DumpResponse;
-    onToggleDiscard: (isDiscarded: boolean) => void;
+    onToggleDiscard: (isDiscarded: boolean, reason?: string) => void;
     isDiscardPending?: boolean;
 }
 

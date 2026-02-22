@@ -1559,7 +1559,9 @@
             },
             "confirm_discard": {
                 "title": "Hylätäänkö osallistuja?",
-                "description": "Tämä osallistuja jätetään pois viennistä ja analyysistä. Voit palauttaa hänet myöhemmin."
+                "description": "Tämä osallistuja jätetään pois viennistä ja analyysistä. Voit palauttaa hänet myöhemmin.",
+                "reason_label": "Syy (valinnainen)",
+                "reason_placeholder": "Miksi tämä osallistuja hylätään?"
             },
             "confirm_restore": {
                 "title": "Palautetaanko osallistuja?",

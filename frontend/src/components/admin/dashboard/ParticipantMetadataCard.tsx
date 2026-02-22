@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
@@ -43,10 +44,11 @@ interface ParticipantMetadataCardProps {
         language_used?: string;
         is_test_run?: boolean;
         is_discarded?: boolean;
+        discard_reason?: string | null;
         recruitment_token?: string;
     };
     className?: string;
-    onToggleDiscard?: (discarded: boolean) => void;
+    onToggleDiscard?: (discarded: boolean, reason?: string) => void;
     isDiscardPending?: boolean;
 }
 
@@ -58,6 +60,7 @@ export function ParticipantMetadataCard({
 }: ParticipantMetadataCardProps) {
     const { t, i18n } = useTranslation();
     const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
+    const [discardReason, setDiscardReason] = useState(participant.discard_reason || '');
     const uaInfo = parseUA(participant.user_agent || '');
     const isDiscarded = !!participant.is_discarded;
 
@@ -108,12 +111,19 @@ export function ParticipantMetadataCard({
                             </Button>
                         )}
                         {isDiscarded && (
-                            <Badge
-                                variant="outline"
-                                className="bg-rose-50 text-rose-600 border-rose-200 font-black text-2xs"
-                            >
-                                {t('admin.data.detail.discarded_badge', 'Discarded')}
-                            </Badge>
+                            <div className="flex items-center gap-1.5">
+                                <Badge
+                                    variant="outline"
+                                    className="bg-rose-50 text-rose-600 border-rose-200 font-black text-2xs"
+                                >
+                                    {t('admin.data.detail.discarded_badge', 'Discarded')}
+                                </Badge>
+                                {participant.discard_reason && (
+                                    <span className="text-2xs text-rose-500">
+                                        {participant.discard_reason}
+                                    </span>
+                                )}
+                            </div>
                         )}
                         {participant.is_test_run && (
                             <Badge
@@ -301,7 +311,13 @@ export function ParticipantMetadataCard({
                 </div>
             </CardContent>
 
-            <AlertDialog open={discardDialogOpen} onOpenChange={setDiscardDialogOpen}>
+            <AlertDialog
+                open={discardDialogOpen}
+                onOpenChange={(open) => {
+                    setDiscardDialogOpen(open);
+                    if (!open) setDiscardReason(participant.discard_reason || '');
+                }}
+            >
                 <AlertDialogContent className="border-none shadow-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-xl font-black text-slate-900 flex items-center gap-3">
@@ -331,12 +347,39 @@ export function ParticipantMetadataCard({
                                   )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
+                    {!isDiscarded && (
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="discard-reason"
+                                className="text-sm font-bold text-slate-700"
+                            >
+                                {t('admin.data.confirm_discard.reason_label', 'Reason (optional)')}
+                            </label>
+                            <Textarea
+                                id="discard-reason"
+                                value={discardReason}
+                                onChange={(e) => setDiscardReason(e.target.value)}
+                                placeholder={t(
+                                    'admin.data.confirm_discard.reason_placeholder',
+                                    'Why is this participant being discarded?'
+                                )}
+                                maxLength={500}
+                                rows={3}
+                                className="resize-none"
+                            />
+                        </div>
+                    )}
                     <AlertDialogFooter className="gap-2">
                         <AlertDialogCancel className="rounded-2xl font-bold h-12">
                             {t('common.cancel')}
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={() => onToggleDiscard?.(!isDiscarded)}
+                            onClick={() =>
+                                onToggleDiscard?.(
+                                    !isDiscarded,
+                                    !isDiscarded ? discardReason || undefined : undefined
+                                )
+                            }
                             className={cn(
                                 'rounded-2xl font-bold h-12',
                                 isDiscarded
