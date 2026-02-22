@@ -176,7 +176,7 @@ export function AdminDashboard() {
                         >
                             <FileText className="w-5 h-5" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.dashboard.total_studies', 'Total studies')}
                         </span>
                     </div>
@@ -198,7 +198,7 @@ export function AdminDashboard() {
                         >
                             <TrendingUp className="w-5 h-5" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.dashboard.active_data_collection', 'Active data collection')}
                         </span>
                     </div>
@@ -220,7 +220,7 @@ export function AdminDashboard() {
                         >
                             <Users className="w-5 h-5" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.dashboard.total_participants', 'Total participants')}
                         </span>
                     </div>

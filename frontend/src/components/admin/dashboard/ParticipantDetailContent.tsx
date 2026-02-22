@@ -242,7 +242,7 @@ export function ParticipantDetailContent({
                         {/* Text Comment */}
                         {detailComment && (
                             <div className="bg-indigo-50/50 p-3 sm:p-4 rounded-xl border border-indigo-100/50 space-y-2">
-                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
+                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs">
                                     <MessageSquare className="w-3.5 h-3.5" />
                                     {t('common.comment', 'Comment')}
                                 </div>
@@ -255,7 +255,7 @@ export function ParticipantDetailContent({
                         {/* Audio Recording */}
                         {detailAudio && (
                             <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
+                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs">
                                     <Mic className="w-3.5 h-3.5" />
                                     {t('admin.audio.recording', 'Audio Recording')}
                                 </div>

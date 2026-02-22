@@ -63,10 +63,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
             </CardHeader>
             <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
-                    <label
-                        htmlFor="public-url"
-                        className="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
-                    >
+                    <label htmlFor="public-url" className="text-[10px] font-bold text-slate-400">
                         {t('admin.recruitment.public_url_label', 'Public Participation URL')}
                     </label>
                     <div className="flex gap-2">

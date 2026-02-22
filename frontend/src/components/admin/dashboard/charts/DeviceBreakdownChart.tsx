@@ -110,7 +110,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
                                         <Icon size={14} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <span className="text-[10px] font-black text-slate-500">
                                             {t(
                                                 `admin.dashboard.devices.types.${item.key}`,
                                                 item.name

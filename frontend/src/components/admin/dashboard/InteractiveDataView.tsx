@@ -630,7 +630,7 @@ export default function InteractiveDataView({
                                     {t('admin.data.filters.all_statuses', 'All')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-slate-400">
+                                <DropdownMenuLabel className="text-[10px] text-slate-400">
                                     {t('admin.data.table.status', 'Status')}
                                 </DropdownMenuLabel>
                                 <DropdownMenuItem
@@ -673,7 +673,7 @@ export default function InteractiveDataView({
                                     {t('admin.data.status.abandoned', 'Abandoned')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-slate-400">
+                                <DropdownMenuLabel className="text-[10px] text-slate-400">
                                     {t('admin.data.table.current_step', 'Current step')}
                                 </DropdownMenuLabel>
                                 {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (

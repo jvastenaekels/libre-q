@@ -96,7 +96,7 @@ export function ParticipantMetadataCard({
                                 onClick={() => setDiscardDialogOpen(true)}
                                 disabled={isDiscardPending}
                                 className={cn(
-                                    'min-h-[44px] px-4 text-xs sm:text-[11px] font-bold uppercase tracking-wider',
+                                    'min-h-[44px] px-4 text-xs sm:text-[11px] font-bold',
                                     isDiscarded
                                         ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
                                         : 'text-red-500 hover:text-red-600 hover:bg-red-50'
@@ -143,7 +143,7 @@ export function ParticipantMetadataCard({
             <CardContent className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Tech Info */}
                 <div className="space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    <h4 className="text-[10px] font-black text-slate-400">
                         {t('admin.participant.metadata.technology', 'Technology')}
                     </h4>
                     <div className="space-y-3">
@@ -185,7 +185,7 @@ export function ParticipantMetadataCard({
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    <h4 className="text-[10px] font-black text-slate-400">
                         {t('admin.participant.metadata.session', 'Session Details')}
                     </h4>
                     <div className="space-y-3">
