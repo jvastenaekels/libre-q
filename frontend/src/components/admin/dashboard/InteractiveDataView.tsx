@@ -156,7 +156,6 @@ function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'ab
 }
 
 const STEP_LABEL_KEYS: Record<number, [string, string]> = {
-    1: ['admin.data.step.consent', 'Consent'],
     2: ['admin.data.step.presort', 'Pre-sort'],
     3: ['admin.data.step.rough', 'Preliminary sort'],
     4: ['admin.data.step.fine', 'Q-sort'],

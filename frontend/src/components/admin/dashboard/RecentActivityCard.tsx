@@ -30,21 +30,19 @@ const dateLocales: Record<string, Locale> = {
 };
 
 const STEP_INFO: Record<number, { labelKey: string; labelDefault: string; progress: number }> = {
-    1: { labelKey: 'admin.study_overview.steps.welcome', labelDefault: 'Welcome', progress: 20 },
-    2: { labelKey: 'admin.study_overview.steps.consent', labelDefault: 'Consent', progress: 40 },
+    2: { labelKey: 'admin.data.step.presort', labelDefault: 'Pre-sort', progress: 25 },
     3: {
-        labelKey: 'admin.study_overview.steps.rough_sort',
-        labelDefault: 'Rough sort',
-        progress: 60,
+        labelKey: 'admin.data.step.rough',
+        labelDefault: 'Preliminary sort',
+        progress: 50,
     },
-    4: { labelKey: 'admin.study_overview.steps.fine_sort', labelDefault: 'Q-sort', progress: 80 },
+    4: { labelKey: 'admin.data.step.fine', labelDefault: 'Q-sort', progress: 75 },
     5: {
-        labelKey: 'admin.study_overview.steps.final',
-        labelDefault: 'Final steps',
+        labelKey: 'admin.data.step.post',
+        labelDefault: 'Post-sort',
         progress: 100,
     },
 };
-const TOTAL_STEPS = 5;
 
 const DEVICE_ICONS = {
     mobile: Smartphone,
@@ -94,7 +92,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
     const durationSeconds = computeDurationSeconds(participant);
     const stepNum = (participant.last_step_reached as number) ?? 1;
-    const stepInfo = STEP_INFO[stepNum] ?? STEP_INFO[1];
+    const stepInfo = STEP_INFO[stepNum] ?? null;
 
     return (
         <div
@@ -155,7 +153,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                             </span>
                         )}
                     </div>
-                ) : (
+                ) : stepInfo ? (
                     <div className="flex items-center gap-1.5">
                         <span className="text-[10px] font-medium text-sky-700 shrink-0">
                             {t(stepInfo.labelKey, stepInfo.labelDefault)}
@@ -164,10 +162,9 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                             value={stepInfo.progress}
                             className="h-1 w-12 bg-sky-100 [&>div]:bg-sky-500"
                         />
-                        <span className="text-[9px] text-slate-400 font-medium shrink-0">
-                            {stepNum}/{TOTAL_STEPS}
-                        </span>
                     </div>
+                ) : (
+                    <span className="text-[10px] text-slate-400">—</span>
                 )}
 
                 {/* Line 3: time · device · language */}
