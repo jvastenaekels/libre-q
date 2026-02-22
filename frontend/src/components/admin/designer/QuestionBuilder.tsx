@@ -282,7 +282,7 @@ const QuestionItem = ({
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
-                                                    <div className="px-2 py-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    <div className="px-2 py-1.5 text-2xs font-black text-slate-400 uppercase tracking-widest">
                                                         {t(
                                                             'admin.design.questions.actions.copy_from'
                                                         )}
@@ -320,7 +320,7 @@ const QuestionItem = ({
                             <AccordionContent className="pt-6 pb-2 space-y-6">
                                 <div className="grid gap-2.5">
                                     <div className="flex items-center gap-2">
-                                        <Label className="text-[10px] font-black text-slate-500">
+                                        <Label className="text-2xs font-black text-slate-500">
                                             {t('admin.design.questions.labels.question')}
                                         </Label>
                                         <MultiLangFieldIcon
@@ -366,7 +366,7 @@ const QuestionItem = ({
 
                                     <div
                                         data-testid="question-type-label"
-                                        className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-slate-50 px-2 py-1 rounded-lg"
+                                        className="text-2xs text-slate-400 uppercase tracking-widest font-black bg-slate-50 px-2 py-1 rounded-lg"
                                     >
                                         {question.type}
                                     </div>
@@ -377,7 +377,7 @@ const QuestionItem = ({
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
-                                                <Label className="text-[10px] font-black text-slate-500">
+                                                <Label className="text-2xs font-black text-slate-500">
                                                     {t('admin.design.questions.logic.title')}
                                                 </Label>
                                             </div>
@@ -411,7 +411,7 @@ const QuestionItem = ({
                                         {question.visibility_condition && (
                                             <div className="grid gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-bold text-slate-500 uppercase">
+                                                    <Label className="text-2xs font-bold text-slate-500 uppercase">
                                                         {t(
                                                             'admin.design.questions.logic.depends_on'
                                                         )}
@@ -463,7 +463,7 @@ const QuestionItem = ({
 
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <Label className="text-[10px] font-bold text-slate-500 uppercase">
+                                                        <Label className="text-2xs font-bold text-slate-500 uppercase">
                                                             {t(
                                                                 'admin.design.questions.logic.operator'
                                                             )}
@@ -515,7 +515,7 @@ const QuestionItem = ({
                                                     </div>
 
                                                     <div className="space-y-2">
-                                                        <Label className="text-[10px] font-bold text-slate-500 uppercase">
+                                                        <Label className="text-2xs font-bold text-slate-500 uppercase">
                                                             {t(
                                                                 'admin.design.questions.logic.value'
                                                             )}
@@ -551,7 +551,7 @@ const QuestionItem = ({
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-[10px] font-black text-slate-500">
+                                        <Label className="text-2xs font-black text-slate-500">
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
                                                 ` (${t('admin.design.questions.labels.multiple')})`}
@@ -884,7 +884,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <div className="text-2xs font-black text-slate-400 uppercase tracking-widest">
                                     {t('admin.design.questions.basic_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -914,7 +914,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <div className="text-2xs font-black text-slate-400 uppercase tracking-widest">
                                     {t('admin.design.questions.choice_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">

@@ -487,7 +487,7 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type 
                         exit={{ opacity: 0, y: -30 }}
                         className="absolute -top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
                     >
-                        <span className="text-[10px] font-bold text-blue-600 bg-white/90 px-1 py-0.5 rounded shadow-sm border border-blue-100">
+                        <span className="text-2xs font-bold text-blue-600 bg-white/90 px-1 py-0.5 rounded shadow-sm border border-blue-100">
                             +1
                         </span>
                     </motion.div>

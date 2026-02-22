@@ -838,7 +838,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             )}
                         </div>
 
-                        <span className="text-[11px] font-mono text-slate-400 shrink-0 tabular-nums">
+                        <span className="text-xs font-mono text-slate-400 shrink-0 tabular-nums">
                             {state === 'playing'
                                 ? `${formatTime(Math.floor(playbackPosition))} / ${formatTime(duration)}`
                                 : formatTime(duration)}
@@ -901,7 +901,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     </div>
 
                     {existingRecording && (
-                        <p className="text-[10px] text-slate-400 text-right px-1">
+                        <p className="text-2xs text-slate-400 text-right px-1">
                             {(existingRecording.file_size_bytes / 1024).toFixed(1)} KB
                         </p>
                     )}

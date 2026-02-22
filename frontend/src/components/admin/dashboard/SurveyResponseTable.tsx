@@ -136,7 +136,7 @@ export function SurveyResponseTable({
                             <Badge
                                 key={v}
                                 variant="secondary"
-                                className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border-indigo-100"
+                                className="text-2xs font-medium bg-indigo-50 text-indigo-700 border-indigo-100"
                             >
                                 {resolveOptionNode(v)}
                             </Badge>
@@ -338,7 +338,7 @@ export function SurveyResponseTable({
                                                     />
                                                 )}
                                             </div>
-                                            <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
+                                            <p className="text-2xs font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
                                                 {t('admin.participant.metadata.id', 'ID')}:{' '}
                                                 {item.id || item.key}
                                             </p>

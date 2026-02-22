@@ -47,7 +47,7 @@ const InlineIcon: React.FC<{
             aria-hidden="true"
         />
         {showCodes && code && (
-            <span className="text-indigo-400 font-bold text-[10px] uppercase tracking-wider mr-1.5 align-middle">
+            <span className="text-indigo-400 font-bold text-2xs uppercase tracking-wider mr-1.5 align-middle">
                 {code}
             </span>
         )}

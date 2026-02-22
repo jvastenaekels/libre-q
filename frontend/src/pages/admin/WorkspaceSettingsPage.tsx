@@ -229,7 +229,7 @@ export default function WorkspaceSettingsPage() {
                                         name="title"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500">
                                                     {t(
                                                         'admin.workspaces.settings.general.label_title'
                                                     )}
@@ -253,7 +253,7 @@ export default function WorkspaceSettingsPage() {
                                         name="slug"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500">
                                                     {t(
                                                         'admin.workspaces.settings.general.label_slug'
                                                     )}
@@ -273,7 +273,7 @@ export default function WorkspaceSettingsPage() {
                                                         </div>
                                                     </div>
                                                 </FormControl>
-                                                <FormDescription className="text-[10px] italic">
+                                                <FormDescription className="text-2xs italic">
                                                     {t(
                                                         'admin.workspaces.settings.general.slug_hint'
                                                     )}
@@ -330,25 +330,25 @@ export default function WorkspaceSettingsPage() {
                                     <TableRow className="hover:bg-transparent border-slate-100">
                                         <TableHead
                                             scope="col"
-                                            className="text-[10px] font-black uppercase tracking-wider px-6 h-12"
+                                            className="text-2xs font-black uppercase tracking-wider px-6 h-12"
                                         >
                                             {t('admin.workspaces.settings.team.col_user')}
                                         </TableHead>
                                         <TableHead
                                             scope="col"
-                                            className="text-[10px] font-black uppercase tracking-wider h-12"
+                                            className="text-2xs font-black uppercase tracking-wider h-12"
                                         >
                                             {t('admin.workspaces.settings.team.col_role')}
                                         </TableHead>
                                         <TableHead
                                             scope="col"
-                                            className="text-[10px] font-black uppercase tracking-wider h-12"
+                                            className="text-2xs font-black uppercase tracking-wider h-12"
                                         >
                                             {t('admin.workspaces.settings.team.col_joined')}
                                         </TableHead>
                                         <TableHead
                                             scope="col"
-                                            className="text-[10px] font-black uppercase tracking-wider text-right px-6 h-12"
+                                            className="text-2xs font-black uppercase tracking-wider text-right px-6 h-12"
                                         >
                                             {t('admin.workspaces.settings.team.col_actions')}
                                         </TableHead>
@@ -495,7 +495,7 @@ export default function WorkspaceSettingsPage() {
                             <div className="space-y-3">
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[10px] font-black uppercase text-slate-900">
+                                        <span className="text-2xs font-black uppercase text-slate-900">
                                             {t(
                                                 'admin.workspaces.settings.team.permissions_matrix.researcher.label'
                                             )}
@@ -509,7 +509,7 @@ export default function WorkspaceSettingsPage() {
                                             )}
                                         </Badge>
                                     </div>
-                                    <p className="text-[10px] text-slate-500 leading-tight">
+                                    <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.workspaces.settings.team.permissions_matrix.researcher.desc'
                                         )}
@@ -517,7 +517,7 @@ export default function WorkspaceSettingsPage() {
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[10px] font-black uppercase text-slate-900">
+                                        <span className="text-2xs font-black uppercase text-slate-900">
                                             {t(
                                                 'admin.workspaces.settings.team.permissions_matrix.viewer.label'
                                             )}
@@ -531,7 +531,7 @@ export default function WorkspaceSettingsPage() {
                                             )}
                                         </Badge>
                                     </div>
-                                    <p className="text-[10px] text-slate-500 leading-tight">
+                                    <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.workspaces.settings.team.permissions_matrix.viewer.desc'
                                         )}
@@ -595,10 +595,10 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
             <DialogContent className="rounded-2xl border-slate-200 bg-white shadow-2xl max-w-sm p-0 overflow-hidden">
                 <div className="p-6">
                     <DialogHeader className="mb-4">
-                        <DialogTitle className="text-2xl font-black text-slate-900 leading-tight">
+                        <DialogTitle className="text-xl font-black text-slate-900 leading-tight">
                             {t('admin.workspaces.settings.team.invite_modal.title')}
                         </DialogTitle>
-                        <DialogDescription className="text-sm font-medium text-slate-600 mt-2">
+                        <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
                             {t('admin.workspaces.settings.team.invite_modal.desc')}
                         </DialogDescription>
                     </DialogHeader>
@@ -606,7 +606,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                     {!inviteUrl ? (
                         <form onSubmit={handleInvite} className="space-y-4 pt-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                                <Label className="text-2xs font-black uppercase tracking-wider text-slate-700">
                                     {t('admin.workspaces.settings.team.invite_modal.email_label')}
                                 </Label>
                                 <Input
@@ -619,7 +619,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                                <Label className="text-2xs font-black uppercase tracking-wider text-slate-700">
                                     {t('admin.workspaces.settings.team.invite_modal.role_label')}
                                 </Label>
                                 <Select
@@ -692,7 +692,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                         )}
                                     </Button>
                                 </div>
-                                <p className="text-[10px] text-emerald-600/70 italic">
+                                <p className="text-2xs text-emerald-600/70 italic">
                                     {t('admin.workspaces.settings.team.invite_modal.copy_hint')}
                                 </p>
                             </div>

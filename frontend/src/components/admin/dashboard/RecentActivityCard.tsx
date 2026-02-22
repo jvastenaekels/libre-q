@@ -103,7 +103,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
             }`}
         >
             <div
-                className="h-8 w-8 rounded-full border-2 flex items-center justify-center text-[10px] font-black shadow-sm shrink-0"
+                className="h-8 w-8 rounded-full border-2 flex items-center justify-center text-2xs font-black shadow-sm shrink-0"
                 style={{
                     backgroundColor: colors.bg,
                     borderColor: colors.border,
@@ -139,7 +139,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
-                            <span className="text-[10px] text-slate-500">
+                            <span className="text-2xs text-slate-500">
                                 {durationSeconds >= 3600
                                     ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
                                           h: Math.floor(durationSeconds / 3600),
@@ -155,7 +155,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                     </div>
                 ) : stepInfo ? (
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-medium text-sky-700 shrink-0">
+                        <span className="text-2xs font-medium text-sky-700 shrink-0">
                             {t(stepInfo.labelKey, stepInfo.labelDefault)}
                         </span>
                         <Progress
@@ -164,11 +164,11 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                         />
                     </div>
                 ) : (
-                    <span className="text-[10px] text-slate-400">—</span>
+                    <span className="text-2xs text-slate-400">—</span>
                 )}
 
                 {/* Line 3: time · device · language */}
-                <div className="flex items-center gap-1 text-[10px] text-slate-400 truncate">
+                <div className="flex items-center gap-1 text-2xs text-slate-400 truncate">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -287,7 +287,7 @@ export default function RecentActivityCard({
                 <div className="p-2.5 bg-slate-50/50 border-t border-slate-100 text-center">
                     <Link
                         to={`/app/${workspaceSlug}/studies/${studySlug}/data`}
-                        className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                     >
                         <TableIcon className="w-3 h-3" />
                         {t(

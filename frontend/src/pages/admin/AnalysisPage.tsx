@@ -288,7 +288,7 @@ export default function AnalysisPage() {
             {/* Controls */}
             <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-bold">
+                    <CardTitle className="text-lg font-black">
                         {t('admin.analysis.configuration', 'Configuration')}
                     </CardTitle>
                     <CardDescription>
@@ -363,7 +363,10 @@ export default function AnalysisPage() {
                         {/* Parameters */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-x-4 gap-y-3 lg:w-[320px]">
                             <div className="space-y-1.5">
-                                <Label htmlFor="extraction-select" className="text-xs">
+                                <Label
+                                    htmlFor="extraction-select"
+                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                >
                                     {t('admin.analysis.extraction_method', 'Extraction')}
                                 </Label>
                                 <Select
@@ -383,7 +386,7 @@ export default function AnalysisPage() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_extraction',
                                         'PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.'
@@ -392,7 +395,10 @@ export default function AnalysisPage() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="factors-select" className="text-xs">
+                                <Label
+                                    htmlFor="factors-select"
+                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                >
                                     {t('admin.analysis.n_factors', 'Factors')}
                                 </Label>
                                 <Select
@@ -411,7 +417,7 @@ export default function AnalysisPage() {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_n_factors',
                                         'Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.'
@@ -420,7 +426,10 @@ export default function AnalysisPage() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="rotation-select" className="text-xs">
+                                <Label
+                                    htmlFor="rotation-select"
+                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                >
                                     {t('admin.analysis.rotation_method', 'Rotation')}
                                 </Label>
                                 <Select
@@ -440,7 +449,7 @@ export default function AnalysisPage() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_rotation',
                                         'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.'
@@ -449,7 +458,10 @@ export default function AnalysisPage() {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="flagging-select" className="text-xs">
+                                <Label
+                                    htmlFor="flagging-select"
+                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                >
                                     {t('admin.analysis.flagging_method', 'Flagging')}
                                 </Label>
                                 <Select
@@ -472,7 +484,7 @@ export default function AnalysisPage() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_flagging',
                                         'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'

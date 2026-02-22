@@ -164,7 +164,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="space-y-3 pb-4 border-b border-slate-50">
-                    <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">
+                    <DialogTitle className="text-xl font-black tracking-tight text-slate-900">
                         {t('admin.dialogs.create_study.title', 'Create New Study')}
                     </DialogTitle>
                     <DialogDescription className="text-sm font-medium text-slate-500">
@@ -182,7 +182,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    <FormLabel className="text-2xs font-black uppercase tracking-widest text-slate-500">
                                         {t('admin.dialogs.create_study.study_title', 'Study Title')}
                                     </FormLabel>
                                     <FormControl>
@@ -205,7 +205,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             name="slug"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    <FormLabel className="text-2xs font-black uppercase tracking-widest text-slate-500">
                                         {t('admin.dialogs.create_study.url_slug', 'URL Slug')}
                                     </FormLabel>
                                     <FormControl>
@@ -229,10 +229,10 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             render={() => (
                                 <FormItem>
                                     <div className="mb-4">
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                        <FormLabel className="text-2xs font-black uppercase tracking-widest text-slate-500">
                                             {t('admin.dialogs.create_study.languages', 'Languages')}
                                         </FormLabel>
-                                        <p className="text-[11px] font-medium text-slate-400 mt-1">
+                                        <p className="text-xs font-medium text-slate-400 mt-1">
                                             {t(
                                                 'admin.dialogs.create_study.languages_desc',
                                                 'Select languages to enable for this study. Content will be initialized with localized defaults.'

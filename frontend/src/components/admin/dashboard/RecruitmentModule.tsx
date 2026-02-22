@@ -63,7 +63,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
             </CardHeader>
             <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
-                    <label htmlFor="public-url" className="text-[10px] font-bold text-slate-400">
+                    <label htmlFor="public-url" className="text-2xs font-bold text-slate-400">
                         {t('admin.recruitment.public_url_label', 'Public Participation URL')}
                     </label>
                     <div className="flex gap-2">
@@ -142,7 +142,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                                 {t('admin.recruitment.download_qr', 'Download Image')}
                             </Button>
 
-                            <p className="text-[11px] text-slate-400 text-center leading-relaxed max-w-[200px]">
+                            <p className="text-xs text-slate-400 text-center leading-relaxed max-w-[200px]">
                                 {t(
                                     'admin.recruitment.qr_print_hint',
                                     'Scan or print this code for physical recruitment materials (flyers, posters).'

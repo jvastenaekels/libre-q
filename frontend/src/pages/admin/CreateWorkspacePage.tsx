@@ -133,7 +133,7 @@ export default function CreateWorkspacePage() {
                                 name="title"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.workspace.create.name_label')}
                                         </FormLabel>
                                         <FormControl>
@@ -155,7 +155,7 @@ export default function CreateWorkspacePage() {
                                 name="slug"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.workspace.create.url_label')}
                                         </FormLabel>
                                         <FormControl>
@@ -172,7 +172,7 @@ export default function CreateWorkspacePage() {
                                                 </div>
                                             </div>
                                         </FormControl>
-                                        <FormDescription className="text-[10px] italic font-medium px-1">
+                                        <FormDescription className="text-2xs italic font-medium px-1">
                                             {t('admin.workspace.create.url_description')}
                                         </FormDescription>
                                         <FormMessage />

@@ -57,7 +57,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                         {label}
                     </label>
                     <div
-                        className="flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded cursor-help"
+                        className="flex items-center gap-1 text-2xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded cursor-help"
                         title={t('admin.components.markdown.tooltip')}
                     >
                         <Info className="h-3 w-3" />
@@ -116,7 +116,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                         <Button
                             variant={view === 'edit' ? 'secondary' : 'ghost'}
                             size="sm"
-                            className="h-6 px-2 text-[10px] gap-1.5"
+                            className="h-6 px-2 text-2xs gap-1.5"
                             onClick={() => setView('edit')}
                         >
                             <Edit3 className="h-3 w-3" />
@@ -125,7 +125,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                         <Button
                             variant={view === 'preview' ? 'secondary' : 'ghost'}
                             size="sm"
-                            className="h-6 px-2 text-[10px] gap-1.5"
+                            className="h-6 px-2 text-2xs gap-1.5"
                             onClick={() => setView('preview')}
                         >
                             <Eye className="h-3 w-3" />

@@ -386,7 +386,7 @@ const PileTab: React.FC<{
                 )}
             />
             {!compact && (
-                <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
+                <span className="hidden sm:block text-2xs font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
                     {label}
                 </span>
             )}
@@ -473,7 +473,7 @@ const ValidationFooter: React.FC<{
                         {selectedCardId ? (
                             <>
                                 <span
-                                    className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] text-white font-black"
+                                    className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-2xs text-white font-black"
                                     style={{ backgroundColor: 'var(--brand-accent)' }}
                                 >
                                     2
@@ -497,7 +497,7 @@ const ValidationFooter: React.FC<{
                             </>
                         ) : (
                             <>
-                                <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">
+                                <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-2xs text-slate-500 font-black">
                                     1
                                 </span>
                                 <span className="text-xs font-bold uppercase tracking-wide">

@@ -507,7 +507,7 @@ export default function InteractiveDataView({
                                             </TooltipTrigger>
                                             <TooltipContent
                                                 side="bottom"
-                                                className="max-w-xs break-all font-mono text-[10px]"
+                                                className="max-w-xs break-all font-mono text-2xs"
                                             >
                                                 {p.user_agent}
                                             </TooltipContent>
@@ -517,7 +517,7 @@ export default function InteractiveDataView({
                                 {p.is_discarded && (
                                     <Badge
                                         variant="destructive"
-                                        className="h-4 text-[10px] px-1.5 font-semibold"
+                                        className="h-4 text-2xs px-1.5 font-semibold"
                                     >
                                         {t('admin.data.detail.discarded_badge')}
                                     </Badge>
@@ -529,7 +529,7 @@ export default function InteractiveDataView({
                                         <TooltipTrigger>
                                             <Badge
                                                 variant="outline"
-                                                className="h-4 text-[10px] px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
+                                                className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
                                             >
                                                 {t('admin.data.table.duplicate_ip', 'Duplicate IP')}{' '}
                                                 #{duplicateIpGroups.get(p.ip_address)}
@@ -630,7 +630,7 @@ export default function InteractiveDataView({
                                     {t('admin.data.filters.all_statuses', 'All')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuLabel className="text-[10px] text-slate-400">
+                                <DropdownMenuLabel className="text-2xs text-slate-400">
                                     {t('admin.data.table.status', 'Status')}
                                 </DropdownMenuLabel>
                                 <DropdownMenuItem
@@ -673,7 +673,7 @@ export default function InteractiveDataView({
                                     {t('admin.data.status.abandoned', 'Abandoned')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuLabel className="text-[10px] text-slate-400">
+                                <DropdownMenuLabel className="text-2xs text-slate-400">
                                     {t('admin.data.table.current_step', 'Current step')}
                                 </DropdownMenuLabel>
                                 {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (
@@ -707,7 +707,7 @@ export default function InteractiveDataView({
                             <Badge
                                 variant="outline"
                                 className={cn(
-                                    'h-5 text-[10px] px-2 font-semibold border-none',
+                                    'h-5 text-2xs px-2 font-semibold border-none',
                                     displayStatus === 'completed'
                                         ? 'bg-emerald-50 text-emerald-600'
                                         : displayStatus === 'abandoned'
@@ -720,7 +720,7 @@ export default function InteractiveDataView({
                             {currentStep != null && STEP_LABEL_KEYS[currentStep] && (
                                 <Badge
                                     variant="outline"
-                                    className="h-5 text-[10px] px-2 font-semibold border-slate-200 text-slate-500"
+                                    className="h-5 text-2xs px-2 font-semibold border-slate-200 text-slate-500"
                                 >
                                     {t(...STEP_LABEL_KEYS[currentStep])}
                                 </Badge>
@@ -848,7 +848,7 @@ export default function InteractiveDataView({
                                 {!p.postsort.email &&
                                     !p.postsort.newsletter_consent &&
                                     !p.postsort.interview_consent && (
-                                        <span className="text-[10px] text-slate-300 font-medium">
+                                        <span className="text-2xs text-slate-300 font-medium">
                                             —
                                         </span>
                                     )}
@@ -1004,9 +1004,7 @@ export default function InteractiveDataView({
                                     </Tooltip>
                                 )}
                                 {!isSuspect && !hasComments && !hasAudio && !hasRecruitmentLink && (
-                                    <span className="text-[10px] text-slate-300 font-medium">
-                                        —
-                                    </span>
+                                    <span className="text-2xs text-slate-300 font-medium">—</span>
                                 )}
                             </TooltipProvider>
                         </div>
@@ -1207,7 +1205,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -1256,7 +1254,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -1304,7 +1302,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -1340,7 +1338,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_export', 'Click to export list')}
                             <Download className="w-3 h-3" />
                         </div>
@@ -1688,7 +1686,7 @@ export default function InteractiveDataView({
                 <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
                     <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                            <AlertDialogTitle className="text-xl font-black text-slate-900 flex items-center gap-3">
                                 <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
                                     <Trash2 className="w-5 h-5" />
                                 </div>

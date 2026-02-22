@@ -203,7 +203,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                     <div className="mt-4 p-3 bg-red-50 rounded text-xs text-red-800 text-left font-mono overflow-auto max-h-32 border border-red-100">
                         {error.toString()}
                         {error instanceof ApiError && !!error.details && (
-                            <pre className="mt-2 text-[10px]">
+                            <pre className="mt-2 text-2xs">
                                 {JSON.stringify(error.details, null, 2)}
                             </pre>
                         )}

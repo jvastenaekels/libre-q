@@ -127,7 +127,7 @@ export function WorkspaceSwitcher() {
                                             <span className="text-sm font-bold">
                                                 {workspace.title}
                                             </span>
-                                            <span className="text-[10px] font-medium opacity-60 flex items-center gap-1">
+                                            <span className="text-2xs font-medium opacity-60 flex items-center gap-1">
                                                 {/* Show Role Badge */}
                                                 <span
                                                     className={cn(
@@ -149,7 +149,7 @@ export function WorkspaceSwitcher() {
                                         {isActive && (
                                             <div className="ml-auto flex items-center gap-1 bg-indigo-100/50 px-1.5 py-0.5 rounded-full ring-1 ring-indigo-500/20">
                                                 <div className="size-1 rounded-full bg-indigo-500 animate-pulse" />
-                                                <span className="text-[10px] font-semibold">
+                                                <span className="text-2xs font-semibold">
                                                     {t('admin.command_menu.active', 'Active')}
                                                 </span>
                                             </div>

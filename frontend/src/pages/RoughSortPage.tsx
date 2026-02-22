@@ -205,7 +205,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
         const words = labels.flatMap((l) => l.split(/[\s/]+/));
         const maxWordLength = Math.max(...words.map((w) => w.length));
 
-        if (maxWordLength > 10) return 'text-[10px]';
+        if (maxWordLength > 10) return 'text-2xs';
         if (maxWordLength > 8) return 'text-xs';
         return 'text-sm';
     }, [t, isDesktop]);
@@ -277,7 +277,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     >
                         {config.pre_instruction || config.condition_of_instruction}
                     </SafeMarkdown>
-                    <span className="text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
+                    <span className="text-slate-400 text-2xs sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
                         {config &&
                             `${config.statements.length - unsortedCards.length + 1}/${config.statements.length}`}
                     </span>
@@ -388,14 +388,14 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             type="button"
                             onClick={handleUndo}
                             disabled={roughHistory.length === 0}
-                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
+                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-2xs sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
                             aria-keyshortcuts="z"
                         >
                             <RotateCcw size={14} />
                             {config.ui_labels?.['common.undo'] || t('common.undo')}
                         </button>
                         {/* Desktop Keyboard Shortcuts Hint */}
-                        <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                        <div className="hidden lg:flex items-center gap-1.5 text-2xs text-slate-400 font-medium">
                             <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
                                 ←
                             </kbd>
@@ -621,7 +621,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                         lang={t('common.lang_code', { defaultValue: 'en' })}
                         className={cn(
                             sharedFontSize,
-                            'font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-[10px] sm:text-xs px-0.5'
+                            'font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-2xs sm:text-xs px-0.5'
                         )}
                     >
                         {uiLabels?.[`common.${type}`] || t(`common.${type}`)}
@@ -635,7 +635,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         className={cn(
-                            'absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-bold border-2 shadow-sm z-30 text-white border-white',
+                            'absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-2xs sm:text-xs font-bold border-2 shadow-sm z-30 text-white border-white',
                             styleConfig.badgeClass
                         )}
                     >

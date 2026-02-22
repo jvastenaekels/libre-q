@@ -281,7 +281,7 @@ export function AdminDashboard() {
                                         <Badge
                                             variant="outline"
                                             className={cn(
-                                                'shrink-0 text-[10px] font-semibold uppercase tracking-wide border',
+                                                'shrink-0 text-2xs font-semibold uppercase tracking-wide border',
                                                 getStateStyles(study.state)
                                             )}
                                         >

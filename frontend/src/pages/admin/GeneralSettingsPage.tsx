@@ -289,7 +289,7 @@ export default function GeneralSettingsPage() {
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                            <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                                 <Globe className="w-3 h-3" />
                                                 {t('admin.settings.basic.slug_label')}
                                             </FormLabel>
@@ -305,7 +305,7 @@ export default function GeneralSettingsPage() {
                                                     />
                                                 </div>
                                             </FormControl>
-                                            <FormDescription className="text-[11px]">
+                                            <FormDescription className="text-xs">
                                                 {t('admin.settings.basic.slug_description')}
                                             </FormDescription>
                                             <FormMessage />
@@ -426,7 +426,7 @@ export default function GeneralSettingsPage() {
                                     <div className="border-t border-slate-100 pt-4 space-y-2">
                                         <label
                                             htmlFor="storage-quota"
-                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5"
+                                            className="text-2xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5"
                                         >
                                             <HardDrive className="w-3 h-3" />
                                             {t(
@@ -525,7 +525,7 @@ export default function GeneralSettingsPage() {
                                     {t('admin.settings.lifecycle.archive_button')}
                                 </Button>
                                 {!isClosed && (
-                                    <p className="text-[10px] text-slate-400 font-medium ml-1">
+                                    <p className="text-2xs text-slate-400 font-medium ml-1">
                                         * {t('admin.settings.lifecycle.notice').split('.')[0]}.
                                     </p>
                                 )}
@@ -565,7 +565,7 @@ export default function GeneralSettingsPage() {
                                 {t('admin.settings.danger.delete_button')}
                             </Button>
                             {!isArchived && (
-                                <p className="text-[11px] text-red-400/80 font-medium">
+                                <p className="text-xs text-red-400/80 font-medium">
                                     * {t('admin.settings.danger.notice').split('. ').pop()}
                                 </p>
                             )}

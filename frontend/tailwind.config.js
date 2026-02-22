@@ -12,6 +12,7 @@ export default {
         },
         extend: {
             fontSize: {
+                '2xs': 'var(--font-size-2xs)',
                 xs: 'var(--font-size-xs)',
                 sm: 'var(--font-size-sm)',
                 base: 'var(--font-size-base)',

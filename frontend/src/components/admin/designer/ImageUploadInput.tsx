@@ -117,11 +117,11 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
         <div className="space-y-3">
             {label && (
                 <div className="flex items-center justify-between">
-                    <Label htmlFor={id} className="text-[10px] font-black text-slate-500">
+                    <Label htmlFor={id} className="text-2xs font-black text-slate-500">
                         {label}
                     </Label>
                     {recommendedSize && (
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">
+                        <span className="text-2xs font-semibold text-slate-400 uppercase tracking-tighter">
                             {t('admin.design.theme.upload.recommended', 'Recommended')}:{' '}
                             {recommendedSize}
                         </span>

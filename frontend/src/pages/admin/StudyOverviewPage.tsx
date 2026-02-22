@@ -53,7 +53,7 @@ const StudyOverviewPage = () => {
                         variant="outline"
                         role="status"
                         className={cn(
-                            'font-semibold text-[10px] px-2 py-0.5 rounded-full',
+                            'font-semibold text-2xs px-2 py-0.5 rounded-full',
                             study?.state === 'active'
                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                                 : study?.state === 'paused'
@@ -158,13 +158,13 @@ const StudyOverviewPage = () => {
                                 </div>
                                 {stats.median_duration_seconds &&
                                     stats.median_duration_seconds < 120 && (
-                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-semibold ring-1 ring-amber-200">
+                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-2xs font-semibold ring-1 ring-amber-200">
                                             <AlertTriangle size={9} />{' '}
                                             {t('admin.study_overview.suspect', 'Suspect')}
                                         </span>
                                     )}
                             </div>
-                            <p className="text-[10px] text-slate-400 font-medium">
+                            <p className="text-2xs text-slate-400 font-medium">
                                 {t('admin.study_overview.time_to_complete', 'Time to complete')}
                             </p>
                         </div>

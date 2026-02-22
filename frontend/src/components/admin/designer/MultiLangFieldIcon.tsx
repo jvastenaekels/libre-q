@@ -94,7 +94,7 @@ export const MultiLangFieldIcon = ({
                 align="end"
                 className="w-80 max-h-[400px] overflow-y-auto rounded-xl shadow-xl border-slate-100 p-2"
             >
-                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 py-1.5">
+                <DropdownMenuLabel className="text-2xs font-black uppercase tracking-widest text-slate-400 px-2 py-1.5">
                     {t('admin.design.multilang.other_formulations', 'Other Formulations')}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-slate-100 my-1" />
@@ -105,7 +105,7 @@ export const MultiLangFieldIcon = ({
                     >
                         <div className="flex items-center gap-2 group">
                             <span className="text-xs">{trans.flag}</span>
-                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 transition-colors">
+                            <span className="text-2xs font-bold text-slate-500 group-hover:text-indigo-600 transition-colors">
                                 {trans.label}
                             </span>
                         </div>

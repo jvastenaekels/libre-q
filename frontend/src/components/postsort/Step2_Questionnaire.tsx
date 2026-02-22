@@ -514,7 +514,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                         {t('post.contact.interview_consent')}
                                     </Label>
                                     {postsort.interview_consent && (
-                                        <p className="text-[10px] text-slate-400 font-medium leading-tight max-w-sm animate-in fade-in slide-in-from-top-1">
+                                        <p className="text-2xs text-slate-400 font-medium leading-tight max-w-sm animate-in fade-in slide-in-from-top-1">
                                             {t('post.contact.pseudonymization_note')}
                                         </p>
                                     )}

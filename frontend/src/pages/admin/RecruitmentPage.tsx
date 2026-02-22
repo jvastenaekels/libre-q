@@ -147,7 +147,7 @@ const RecruitmentPage = () => {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2">
+                                <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-2">
                                     <div className="p-2 bg-indigo-50 rounded-lg">
                                         <Plus className="h-5 w-5 text-indigo-600" />
                                     </div>
@@ -164,7 +164,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="type"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        className="text-2xs font-black uppercase tracking-wider text-slate-500"
                                     >
                                         {t('admin.recruitment.link_type', 'Link Type')}
                                     </Label>
@@ -218,7 +218,7 @@ const RecruitmentPage = () => {
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[11px] text-slate-500 leading-relaxed italic">
+                                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs text-slate-500 leading-relaxed italic">
                                         {newLinkType === 'public' &&
                                             t(
                                                 'admin.recruitment.guidance.public',
@@ -239,7 +239,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="name"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        className="text-2xs font-black uppercase tracking-wider text-slate-500"
                                     >
                                         {t(
                                             'admin.recruitment.campaign_name',
@@ -264,7 +264,7 @@ const RecruitmentPage = () => {
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <Label
                                             htmlFor="count"
-                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                            className="text-2xs font-black uppercase tracking-wider text-slate-500"
                                         >
                                             {newLinkType === 'individual'
                                                 ? t(
@@ -337,7 +337,7 @@ const RecruitmentPage = () => {
                     <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                         {links?.length || 0}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                    <p className="text-2xs text-slate-400 mt-1 font-medium">
                         {t('admin.recruitment.stats.active_channels', 'Recruitment channels')}
                     </p>
                 </div>
@@ -360,7 +360,7 @@ const RecruitmentPage = () => {
                     <div className="text-2xl sm:text-4xl font-black text-amber-600 tracking-tight">
                         {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                    <p className="text-2xs text-slate-400 mt-1 font-medium">
                         {t('admin.recruitment.stats.engagements', 'Initial engagements')}
                     </p>
                 </div>
@@ -383,7 +383,7 @@ const RecruitmentPage = () => {
                     <div className="text-2xl sm:text-4xl font-black text-emerald-600 tracking-tight">
                         {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                    <p className="text-2xs text-slate-400 mt-1 font-medium">
                         {t('admin.recruitment.stats.completions', 'Validated responses')}
                     </p>
                 </div>
@@ -394,7 +394,7 @@ const RecruitmentPage = () => {
                     <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-500">
                         {t('admin.recruitment.table_title', 'Participant Access Control')}
                     </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-400">
+                    <CardDescription className="text-sm font-medium text-slate-500">
                         {t(
                             'admin.recruitment.table_description',
                             'Generate and manage secure entry points for your study cohorts.'
@@ -410,37 +410,37 @@ const RecruitmentPage = () => {
                             <TableRow className="hover:bg-transparent border-slate-100">
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 pl-6"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400 pl-6"
                                 >
                                     {t('admin.recruitment.table.name', 'Name / Cohort')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
                                 >
                                     {t('admin.recruitment.table.type', 'Type')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
                                 >
                                     {t('admin.recruitment.table.token', 'Token')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
                                 >
                                     {t('admin.recruitment.table.usage', 'Usage')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
                                 >
                                     {t('admin.recruitment.table.status', 'Status')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 text-right pr-6"
+                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400 text-right pr-6"
                                 >
                                     {t('admin.recruitment.table.actions', 'Actions')}
                                 </TableHead>
@@ -483,7 +483,7 @@ const RecruitmentPage = () => {
                                                 ) : (
                                                     <Lock className="h-3.5 w-3.5 text-orange-500" />
                                                 )}
-                                                <span className="capitalize text-[10px] font-bold text-slate-600">
+                                                <span className="capitalize text-2xs font-bold text-slate-600">
                                                     {t(
                                                         `admin.recruitment.status.${link.type}`,
                                                         link.type || 'Unknown'
@@ -492,13 +492,13 @@ const RecruitmentPage = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <code className="bg-indigo-50 px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-indigo-600 border border-indigo-100/50">
+                                            <code className="bg-indigo-50 px-2 py-1 rounded-lg text-2xs font-mono font-bold text-indigo-600 border border-indigo-100/50">
                                                 {link.token}
                                             </code>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1.5">
-                                                <span className="text-[10px] font-black text-slate-700">
+                                                <span className="text-2xs font-black text-slate-700">
                                                     {link.usage_count}
                                                     {link.capacity ? (
                                                         <span className="text-slate-300 font-medium">

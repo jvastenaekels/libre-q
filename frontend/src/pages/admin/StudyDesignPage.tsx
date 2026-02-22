@@ -1115,7 +1115,7 @@ const StudyDesignPage = () => {
                             </div>
                         </div>
                         <div className="pt-6 border-t border-slate-100">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                            <h4 className="text-2xs font-black uppercase tracking-widest text-slate-400 mb-3">
                                 {t('admin.design.checklist.languages', 'Languages')}
                             </h4>
                             <div className="space-y-2">
@@ -1132,7 +1132,7 @@ const StudyDesignPage = () => {
                                         {lang.isReady ? (
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
                                                 <CheckCircle className="h-3 w-3" />
-                                                <span className="text-[10px] font-bold uppercase tracking-wide">
+                                                <span className="text-2xs font-bold uppercase tracking-wide">
                                                     {t(
                                                         'admin.design.checklist.status_ready',
                                                         'Ready'
@@ -1142,7 +1142,7 @@ const StudyDesignPage = () => {
                                         ) : (
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">
                                                 <CircleDashed className="h-3 w-3" />
-                                                <span className="text-[10px] font-bold uppercase tracking-wide">
+                                                <span className="text-2xs font-bold uppercase tracking-wide">
                                                     {t(
                                                         'admin.design.checklist.status_pending',
                                                         'Pending'

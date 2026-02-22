@@ -176,7 +176,7 @@ const RegistrationPage = () => {
         <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-6">
             <div className="w-full max-w-[420px] space-y-8">
                 <div className="text-center space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-2xs font-bold uppercase tracking-widest mb-4">
                         <ShieldCheck className="h-3 w-3" /> {t('auth.register.secure_invitation')}
                     </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 italic">
@@ -196,7 +196,7 @@ const RegistrationPage = () => {
                         <CardDescription className="pt-4">
                             <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
                                 <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
-                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                                    <span className="text-2xs font-black text-indigo-400 uppercase tracking-widest">
                                         {t('auth.register.invitation_to')}
                                     </span>
                                 </div>
@@ -211,7 +211,7 @@ const RegistrationPage = () => {
                                     </div>
                                     <Badge
                                         variant="outline"
-                                        className="bg-white text-[10px] font-bold uppercase text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
+                                        className="bg-white text-2xs font-bold uppercase text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
                                     >
                                         {invite?.role}
                                     </Badge>
@@ -297,7 +297,7 @@ const RegistrationPage = () => {
                     </form>
                 </Card>
 
-                <p className="text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest opacity-50">
+                <p className="text-center text-2xs text-slate-400 font-medium uppercase tracking-widest opacity-50">
                     Libre-Q
                 </p>
             </div>
