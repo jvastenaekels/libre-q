@@ -35,7 +35,7 @@ import {
     MessageSquare,
     Search,
     Mail,
-    Bell,
+    FileText,
     Users,
     Trash2,
     Calendar,
@@ -778,7 +778,7 @@ export default function InteractiveDataView({
                                             'bg-emerald-50 text-emerald-700'
                                     )}
                                 >
-                                    <Bell className="w-3.5 h-3.5 mr-2" />
+                                    <FileText className="w-3.5 h-3.5 mr-2" />
                                     {t('admin.data.filters.newsletter', 'Wants results')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -819,7 +819,7 @@ export default function InteractiveDataView({
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100">
-                                                <Bell className="h-3 w-3" />
+                                                <FileText className="h-3 w-3" />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -1319,13 +1319,13 @@ export default function InteractiveDataView({
                         className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                            <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
+                            <FileText className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
                         </div>
 
                         <div>
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-2 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
-                                    <Bell className="w-5 h-5" />
+                                    <FileText className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t('admin.data.stats.newsletter', 'Wants results')}
@@ -1383,7 +1383,7 @@ export default function InteractiveDataView({
                                 variant="secondary"
                                 className="h-7 px-3 gap-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold"
                             >
-                                <Bell className="w-3 h-3" />
+                                <FileText className="w-3 h-3" />
                                 {t('admin.data.filters.newsletter', 'Wants results')}
                                 <button
                                     type="button"

@@ -1549,7 +1549,7 @@
             "stats": {
                 "email_collection": "Collecte d'emails",
                 "participants": "au total",
-                "newsletter": "Souhaite résultats",
+                "newsletter": "Souhaite les résultats",
                 "opt_in": "de participation",
                 "follow_up": "Suivi qualitatif",
                 "interested": "intéressés",
@@ -1638,7 +1638,7 @@
                 "has_comments": "Contient des commentaires du participant sur les cartes",
                 "has_audio": "A des réponses audio",
                 "email_provided": "Email fourni",
-                "newsletter_consent": "Souhaite résultats",
+                "newsletter_consent": "Souhaite les résultats",
                 "interview_consent": "Accepte suivi"
             },
             "toast": {
@@ -1676,7 +1676,7 @@
             "filters": {
                 "active": "Filtres actifs",
                 "has_email": "E-mail fourni",
-                "newsletter": "Souhaite résultats",
+                "newsletter": "Souhaite les résultats",
                 "interview": "Accepte suivi",
                 "flagged": "Signalés uniquement",
                 "clear_all": "Effacer les filtres",
