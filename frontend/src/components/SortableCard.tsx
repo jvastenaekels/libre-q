@@ -149,6 +149,60 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
         const scrollRef = React.useRef<HTMLDivElement>(null);
+        const textRef = React.useRef<HTMLDivElement>(null);
+        const [dynamicLineClamp, setDynamicLineClamp] = React.useState<number | undefined>(
+            undefined
+        );
+
+        // Dynamic line clamp: measure available container height and compute max lines.
+        // Uses useLayoutEffect to compute before paint, avoiding a visible reflow
+        // from the static CSS fallback to the dynamic value.
+        //
+        // scrollRef has h-full so its clientHeight reflects the card's available space,
+        // independent of text content. lineHeight is read from textRef which inherits
+        // the variant's font-size/leading via CSS.
+        //
+        // When dimensions are provided (grid-placed cards), compute once without an
+        // observer. Reserve ResizeObserver for CSS-sized cards (deck/sidebar) only.
+        // biome-ignore lint/correctness/useExhaustiveDependencies: variant changes font-size/line-height without resizing the container; dimensions?.height triggers recomputation when the grid resizes
+        React.useLayoutEffect(() => {
+            if (allowScroll) {
+                setDynamicLineClamp(undefined);
+                return;
+            }
+
+            const container = scrollRef.current;
+            const text = textRef.current;
+            if (!container || !text) return;
+
+            const computeLines = () => {
+                const lineHeight = parseFloat(getComputedStyle(text).lineHeight);
+                if (!lineHeight || lineHeight <= 0) return;
+                // clientHeight includes padding; subtract it to get the actual
+                // content box available for text (matters for compact's pt-0.5).
+                const cs = getComputedStyle(container);
+                const available =
+                    container.clientHeight -
+                    parseFloat(cs.paddingTop) -
+                    parseFloat(cs.paddingBottom);
+                if (available <= 0) return;
+                setDynamicLineClamp((prev) => {
+                    const lines = Math.max(1, Math.floor(available / lineHeight));
+                    return prev === lines ? prev : lines;
+                });
+            };
+
+            computeLines();
+
+            // Only CSS-sized cards (no dimensions prop) need an observer —
+            // their size can change without a prop update (e.g. viewport resize).
+            // Grid cards recompute via the dimensions?.height dependency instead.
+            if (dimensions) return;
+
+            const observer = new ResizeObserver(computeLines);
+            observer.observe(container);
+            return () => observer.disconnect();
+        }, [allowScroll, variant, dimensions?.height]);
 
         // Cleanup timer on unmount
         React.useEffect(() => {
@@ -287,7 +341,15 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         ref={scrollRef}
                         className={`w-full h-full flex ${variant === 'compact' ? 'items-start pt-0.5' : 'items-center'} justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
                     >
-                        <div className={textStyles({ variant, allowScroll })}>
+                        <div
+                            ref={textRef}
+                            className={textStyles({ variant, allowScroll })}
+                            style={
+                                dynamicLineClamp != null
+                                    ? { WebkitLineClamp: dynamicLineClamp }
+                                    : undefined
+                            }
+                        >
                             {/[*_~#]/.test(text) ? (
                                 <SafeMarkdown
                                     components={markdownComponents}
