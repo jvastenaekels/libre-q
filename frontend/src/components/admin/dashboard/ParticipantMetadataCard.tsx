@@ -302,7 +302,7 @@ export function ParticipantMetadataCard({
             </CardContent>
 
             <AlertDialog open={discardDialogOpen} onOpenChange={setDiscardDialogOpen}>
-                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                <AlertDialogContent className="border-none shadow-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-xl font-black text-slate-900 flex items-center gap-3">
                             <div

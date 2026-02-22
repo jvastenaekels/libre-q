@@ -282,7 +282,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-sm font-bold">
+                                <CardTitle className="text-sm font-black">
                                     {t('admin.design.intro.consent_details')}
                                 </CardTitle>
                                 <CardDescription className="text-xs font-medium text-slate-500">

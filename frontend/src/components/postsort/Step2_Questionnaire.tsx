@@ -464,7 +464,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
             {(emailEnabled || interviewConsentEnabled || newsletterConsentEnabled) && (
                 <Card className="border-blue-100 bg-blue-50/50 shadow-sm">
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
+                        <CardTitle className="text-lg font-black text-blue-900 flex items-center gap-2">
                             ✉️ {t('post.contact.title', 'Contact')}
                         </CardTitle>
                     </CardHeader>

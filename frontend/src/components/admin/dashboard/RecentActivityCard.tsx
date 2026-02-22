@@ -249,7 +249,7 @@ export default function RecentActivityCard({
         <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 px-4 py-3">
                 <div className="space-y-0.5">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                    <CardTitle className="text-sm font-black flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-indigo-500" />
                         {t('admin.study_overview.recent_activity', 'Recent activity')}
                     </CardTitle>

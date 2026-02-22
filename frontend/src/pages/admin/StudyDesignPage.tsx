@@ -1161,7 +1161,7 @@ const StudyDesignPage = () => {
             </div>
             {/* Validation Error Dialog */}
             <Dialog open={isValidationErrorOpen} onOpenChange={setIsValidationErrorOpen}>
-                <DialogContent className="max-w-md rounded-3xl p-6">
+                <DialogContent className="max-w-md p-6">
                     <DialogHeader>
                         <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-4 border border-rose-100">
                             <AlertTriangle className="h-6 w-6 text-rose-500" />

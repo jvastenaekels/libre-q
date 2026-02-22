@@ -147,7 +147,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <ArrowRight className="h-4 w-4 text-indigo-500" />
-                        <CardTitle className="text-sm font-bold">
+                        <CardTitle className="text-sm font-black">
                             {t('admin.design.interface.nav.title')}
                         </CardTitle>
                     </div>
@@ -339,7 +339,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <RotateCcw className="h-4 w-4 text-indigo-500" />
-                        <CardTitle className="text-sm font-bold">
+                        <CardTitle className="text-sm font-black">
                             {t('admin.design.interface.terms.title')}
                         </CardTitle>
                     </div>
@@ -513,7 +513,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <Lightbulb className="h-4 w-4 text-amber-500" />
-                        <CardTitle className="text-sm font-bold">
+                        <CardTitle className="text-sm font-black">
                             {t('admin.design.interface.hints.title')}
                         </CardTitle>
                     </div>
@@ -612,7 +612,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <Info className="h-4 w-4 text-indigo-500" />
-                        <CardTitle className="text-sm font-bold">
+                        <CardTitle className="text-sm font-black">
                             {t('admin.design.interface.help.title')}
                         </CardTitle>
                     </div>

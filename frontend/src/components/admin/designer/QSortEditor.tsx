@@ -735,7 +735,7 @@ const QSortEditor = ({
                                     <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
                                         <Plus className="h-4 w-4 text-indigo-600" />
                                     </div>
-                                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                                         {t('admin.design.qsort.bulk.title')}
                                     </CardTitle>
                                 </div>
@@ -990,7 +990,7 @@ const QSortEditor = ({
                     {/* Research Settings */}
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-10">
                         <CardHeader className="pb-4">
-                            <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">
+                            <CardTitle className="text-sm font-black text-slate-900 tracking-tight">
                                 {t('admin.design.qsort.settings.title')}
                             </CardTitle>
                             <CardDescription className="text-xs font-medium text-slate-500">

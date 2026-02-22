@@ -42,7 +42,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
 
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                        <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                             {t('admin.design.condition.pre_title', 'Preliminary Sort Instruction')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500 italic">
@@ -112,7 +112,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
 
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                        <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                             {t('admin.design.condition.grid_title', 'Q-Sort Instruction')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500 italic">

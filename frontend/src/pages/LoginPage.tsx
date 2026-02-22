@@ -123,7 +123,9 @@ const LoginPage = () => {
                 <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-md">
                     <form onSubmit={handleLogin}>
                         <CardHeader className="space-y-1 pb-4">
-                            <CardTitle className="text-xl">{t('auth.login.card_title')}</CardTitle>
+                            <CardTitle className="text-xl font-black">
+                                {t('auth.login.card_title')}
+                            </CardTitle>
                             <CardDescription>{t('auth.login.card_description')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">

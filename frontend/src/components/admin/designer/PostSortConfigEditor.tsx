@@ -160,7 +160,7 @@ const PostSortConfigEditor = ({
                                 <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
                                     <Info className="h-4 w-4 text-indigo-600" />
                                 </div>
-                                <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                                     {t('admin.design.postsort.extreme.title')}
                                 </CardTitle>
                             </div>
@@ -376,7 +376,7 @@ const PostSortConfigEditor = ({
                         <CardHeader className={allowRandomComments ? 'pb-4' : ''}>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                                         {t('admin.design.postsort.random_comments.title')}
                                     </CardTitle>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
@@ -436,7 +436,7 @@ const PostSortConfigEditor = ({
                         <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                                         {t('admin.design.postsort.missing.title')}
                                     </CardTitle>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
@@ -499,7 +499,7 @@ const PostSortConfigEditor = ({
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <CardTitle className="text-lg font-black text-slate-800 flex items-center gap-2">
                                         <Mic className="w-5 h-5 text-indigo-600" />
                                         {t('admin.design.postsort.audio.title') ||
                                             'Audio Recording'}
@@ -596,7 +596,7 @@ const PostSortConfigEditor = ({
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader>
                             <div className="space-y-1">
-                                <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                <CardTitle className="text-base font-black text-slate-900 tracking-tight">
                                     {t('admin.design.postsort.custom.title')}
                                 </CardTitle>
                                 <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">

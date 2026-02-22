@@ -47,7 +47,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
     return (
         <Card className={className}>
             <CardHeader className="pb-2">
-                <CardTitle className="text-base font-bold">
+                <CardTitle className="text-base font-black">
                     {t('admin.dashboard.devices.title', 'Device Distribution')}
                 </CardTitle>
                 <CardDescription>

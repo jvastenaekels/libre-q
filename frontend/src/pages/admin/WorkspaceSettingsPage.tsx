@@ -586,7 +586,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                     {t('admin.workspaces.settings.team.invite_button')}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-2xl border-slate-200 bg-white shadow-2xl max-w-sm p-0 overflow-hidden">
+            <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm p-0 overflow-hidden">
                 <div className="p-6">
                     <DialogHeader className="mb-4">
                         <DialogTitle className="text-xl font-black text-slate-900 leading-tight">

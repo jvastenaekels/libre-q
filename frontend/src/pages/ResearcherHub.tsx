@@ -84,7 +84,7 @@ export default function ResearcherHub() {
                                                 <Briefcase className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-lg">
+                                                <CardTitle className="text-lg font-black">
                                                     {workspace.title}
                                                 </CardTitle>
                                                 <CardDescription className="text-xs">

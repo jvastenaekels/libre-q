@@ -56,7 +56,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-4">
                             <div className="flex items-center gap-2">
-                                <CardTitle className="text-sm font-bold">
+                                <CardTitle className="text-sm font-black">
                                     {t('admin.design.theme.accent.title')}
                                 </CardTitle>
                                 <TooltipProvider>
@@ -158,7 +158,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-4">
                             <div className="flex items-center gap-2">
-                                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                                <CardTitle className="text-sm font-black flex items-center gap-2">
                                     <ImageIcon className="h-4 w-4 text-indigo-500" />
                                     {t('admin.design.theme.logo.title')}
                                 </CardTitle>
@@ -215,7 +215,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-4">
                             <div className="flex items-center gap-2">
-                                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                                <CardTitle className="text-sm font-black flex items-center gap-2">
                                     <ImageIcon className="h-4 w-4 text-indigo-500" />
                                     {t(
                                         'admin.design.theme.partners.title',

@@ -195,7 +195,7 @@ export function QuestionDistributionCharts({
                         className="border-none shadow-sm bg-white rounded-2xl"
                     >
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-base font-bold">
+                            <CardTitle className="text-base font-black">
                                 {item.questionLabel}
                             </CardTitle>
                             <CardDescription className="text-xs">

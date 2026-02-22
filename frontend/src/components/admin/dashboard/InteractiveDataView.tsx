@@ -1684,7 +1684,7 @@ export default function InteractiveDataView({
                 </div>
 
                 <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
-                    <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                    <AlertDialogContent className="border-none shadow-2xl">
                         <AlertDialogHeader>
                             <AlertDialogTitle className="text-xl font-black text-slate-900 flex items-center gap-3">
                                 <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">

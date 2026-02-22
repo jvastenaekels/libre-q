@@ -40,7 +40,9 @@ export const StudyAccessGate: React.FC<StudyAccessGateProps> = ({
                         <Lock className="w-8 h-8" />
                     </div>
                     <div className="space-y-2">
-                        <CardTitle className="text-2xl font-bold text-slate-900">{title}</CardTitle>
+                        <CardTitle className="text-2xl font-black text-slate-900">
+                            {title}
+                        </CardTitle>
                         <CardDescription className="text-slate-500 italic">
                             {description ||
                                 t(

@@ -128,7 +128,7 @@ const RegistrationPage = () => {
                         <div className="bg-red-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
                             <AlertCircle className="h-8 w-8 text-red-500" />
                         </div>
-                        <CardTitle className="text-red-600">
+                        <CardTitle className="text-red-600 font-black">
                             {t('auth.register.invalid_title')}
                         </CardTitle>
                         <CardDescription>{t('auth.register.invalid_desc')}</CardDescription>
@@ -151,7 +151,7 @@ const RegistrationPage = () => {
                         <div className="bg-emerald-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
                             <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                         </div>
-                        <CardTitle className="text-emerald-600">
+                        <CardTitle className="text-emerald-600 font-black">
                             {t('auth.register.success_title')}
                         </CardTitle>
                         <CardDescription>{t('auth.register.success_desc')}</CardDescription>

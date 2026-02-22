@@ -388,7 +388,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             type="button"
                             onClick={handleUndo}
                             disabled={roughHistory.length === 0}
-                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-2xs sm:text-xs font-bold active:scale-95 touch-manipulation"
+                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-xs sm:text-sm font-bold active:scale-95 touch-manipulation"
                             aria-keyshortcuts="z"
                         >
                             <RotateCcw size={14} />
@@ -621,7 +621,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                         lang={t('common.lang_code', { defaultValue: 'en' })}
                         className={cn(
                             sharedFontSize,
-                            'font-bold text-center leading-[1.1] break-words hyphens-auto text-2xs sm:text-xs px-0.5'
+                            'font-bold text-center leading-[1.1] break-words hyphens-auto text-xs sm:text-sm px-0.5'
                         )}
                     >
                         {uiLabels?.[`common.${type}`] || t(`common.${type}`)}

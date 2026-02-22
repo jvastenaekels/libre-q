@@ -59,7 +59,7 @@ const HelpOverlay: React.FC = () => {
                     <HelpCircle className="size-5" />
                 </button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl bg-white border-slate-200 shadow-xl rounded-lg p-0 overflow-hidden">
+            <DialogContent className="max-w-3xl bg-white border-slate-200 shadow-xl p-0 overflow-hidden">
                 <DialogHeader className="p-6 pb-4 border-b border-slate-100">
                     <div className="space-y-2">
                         <DialogTitle className="text-xl font-semibold text-slate-900 flex items-center gap-2.5">
