@@ -1195,7 +1195,7 @@ export default function InteractiveDataView({
                                 >
                                     <CheckCircle2 className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.data.stats.completed', 'Completed')}
                                 </span>
                             </div>
@@ -1244,7 +1244,7 @@ export default function InteractiveDataView({
                                 >
                                     <Clock className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.data.stats.in_progress', 'In Progress')}
                                 </span>
                             </div>
@@ -1289,7 +1289,7 @@ export default function InteractiveDataView({
                                 >
                                     <MessagesSquare className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t(
                                         'admin.data.stats.interview_interested',
                                         'Accepts follow-up'
@@ -1327,7 +1327,7 @@ export default function InteractiveDataView({
                                 <div className="p-2 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
                                     <FileText className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.data.stats.newsletter', 'Wants results')}
                                 </span>
                                 <Download className="w-3.5 h-3.5 text-indigo-400 ml-auto sm:hidden" />
