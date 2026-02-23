@@ -410,7 +410,7 @@
           "admin-studies"
         ],
         "summary": "List Studies",
-        "description": "List studies in the active workspace.",
+        "description": "List studies in the active workspace with pagination.",
         "operationId": "list_studies_api_admin_studies_get",
         "security": [
           {
@@ -418,6 +418,26 @@
           }
         ],
         "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
           {
             "name": "X-Workspace-ID",
             "in": "header",
@@ -441,11 +461,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StudyRead"
-                  },
-                  "title": "Response List Studies Api Admin Studies Get"
+                  "$ref": "#/components/schemas/PaginatedResponse_StudyRead_"
                 }
               }
             }
@@ -767,14 +783,82 @@
         }
       }
     },
-    "/api/admin/studies/{slug}/stats": {
+    "/api/admin/studies/{slug}/participants": {
       "get": {
         "tags": [
           "admin-studies"
         ],
-        "summary": "Get Study Stats",
-        "description": "Get aggregated study statistics.",
-        "operationId": "get_study_stats_api_admin_studies__slug__stats_get",
+        "summary": "List Study Participants",
+        "description": "List participants for a specific study with pagination.",
+        "operationId": "list_study_participants_api_admin_studies__slug__participants_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_ParticipantRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Clear All Participants",
+        "description": "Delete ALL participants for this study. Only allowed in DRAFT state.",
+        "operationId": "clear_all_participants_api_admin_studies__slug__participants_delete",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -794,15 +878,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudyStatsRead"
-                }
-              }
-            }
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -923,14 +1000,57 @@
         }
       }
     },
-    "/api/admin/studies/{slug}/participants": {
+    "/api/admin/studies/{slug}/test-runs": {
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Clear Test Runs",
+        "description": "Delete all participants flagged as is_test_run for this study.",
+        "operationId": "clear_test_runs_api_admin_studies__slug__test_runs_delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/stats": {
       "get": {
         "tags": [
           "admin-studies"
         ],
-        "summary": "List Study Participants",
-        "description": "List all participants for a specific study.",
-        "operationId": "list_study_participants_api_admin_studies__slug__participants_get",
+        "summary": "Get Study Stats",
+        "description": "Get aggregated study statistics.",
+        "operationId": "get_study_stats_api_admin_studies__slug__stats_get",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -955,55 +1075,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ParticipantRead"
-                  },
-                  "title": "Response List Study Participants Api Admin Studies  Slug  Participants Get"
+                  "$ref": "#/components/schemas/StudyStatsRead"
                 }
               }
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admin-studies"
-        ],
-        "summary": "Clear All Participants",
-        "description": "Delete ALL participants for this study. Only allowed in DRAFT state.",
-        "operationId": "clear_all_participants_api_admin_studies__slug__participants_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -1184,49 +1259,6 @@
                 }
               }
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/studies/{slug}/test-runs": {
-      "delete": {
-        "tags": [
-          "admin-studies"
-        ],
-        "summary": "Clear Test Runs",
-        "description": "Delete all participants flagged as is_test_run for this study.",
-        "operationId": "clear_test_runs_api_admin_studies__slug__test_runs_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -1915,29 +1947,57 @@
           "Admin Users"
         ],
         "summary": "List Users",
-        "description": "List all users in the system.",
+        "description": "List all users in the system with pagination.",
         "operationId": "list_users_api_admin_users_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/UserRead"
-                  },
-                  "type": "array",
-                  "title": "Response List Users Api Admin Users Get"
+                  "$ref": "#/components/schemas/PaginatedResponse_UserRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -1947,15 +2007,20 @@
         "summary": "Create User",
         "description": "Create a new user.",
         "operationId": "create_user_api_admin_users_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -1978,12 +2043,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/admin/users/{user_id}": {
@@ -2211,27 +2271,55 @@
         "summary": "List Workspaces",
         "description": "List all workspaces the current user is a member of, with their role.",
         "operationId": "list_workspaces_api_admin_workspaces_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/WorkspaceWithRole"
-                  },
-                  "type": "array",
-                  "title": "Response List Workspaces Api Admin Workspaces Get"
+                  "$ref": "#/components/schemas/PaginatedResponse_WorkspaceWithRole_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -2240,15 +2328,20 @@
         "summary": "Create Workspace",
         "description": "Create a new workspace and assign the current user as Owner.",
         "operationId": "create_workspace_api_admin_workspaces_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/WorkspaceCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -2271,12 +2364,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/admin/workspaces/{slug}": {
@@ -2434,7 +2522,7 @@
           "admin-workspaces"
         ],
         "summary": "List Workspace Members",
-        "description": "List all members of a workspace.",
+        "description": "List all members of a workspace with pagination.",
         "operationId": "list_workspace_members_api_admin_workspaces__slug__members_get",
         "security": [
           {
@@ -2452,6 +2540,26 @@
               "title": "Slug"
             },
             "description": "The slug of the workspace"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
           }
         ],
         "responses": {
@@ -2460,11 +2568,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkspaceMemberRead"
-                  },
-                  "title": "Response List Workspace Members Api Admin Workspaces  Slug  Members Get"
+                  "$ref": "#/components/schemas/PaginatedResponse_WorkspaceMemberRead_"
                 }
               }
             }
@@ -4221,6 +4325,161 @@
         ],
         "title": "LogEntry",
         "description": "Schema for frontend log entries."
+      },
+      "PaginatedResponse_ParticipantRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[ParticipantRead]"
+      },
+      "PaginatedResponse_StudyRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StudyRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[StudyRead]"
+      },
+      "PaginatedResponse_UserRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UserRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[UserRead]"
+      },
+      "PaginatedResponse_WorkspaceMemberRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMemberRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[WorkspaceMemberRead]"
+      },
+      "PaginatedResponse_WorkspaceWithRole_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceWithRole"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[WorkspaceWithRole]"
       },
       "ParticipantDetailRead": {
         "properties": {

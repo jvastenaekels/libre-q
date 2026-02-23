@@ -163,7 +163,7 @@ class TestStudyAdmin:
         }
         response = await client.get("/api/admin/studies", headers=headers)
         assert response.status_code == 200
-        assert any(s["slug"] == seed_study.slug for s in response.json())
+        assert any(s["slug"] == seed_study.slug for s in response.json()["items"])
 
     async def test_update_study(
         self,

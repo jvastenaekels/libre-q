@@ -96,10 +96,11 @@ export default function WorkspaceSettingsPage() {
         useGetWorkspaceApiAdminWorkspacesSlugGet(slug);
 
     const {
-        data: members,
+        data: membersData,
         isLoading: isMembersLoading,
         refetch: refetchMembers,
     } = useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug);
+    const members = membersData?.items;
 
     const updateWorkspaceMutation = useUpdateWorkspaceApiAdminWorkspacesSlugPatch();
     const updateMemberMutation = useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch();

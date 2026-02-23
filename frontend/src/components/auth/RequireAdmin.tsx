@@ -9,12 +9,13 @@ import { useTranslation } from 'react-i18next';
 const RequireAdmin = () => {
     const { t } = useTranslation();
     const { isLoading, isAuthenticated, isAdmin } = useAuth();
-    const { data: workspaces, isLoading: workspacesLoading } =
-        useListWorkspacesApiAdminWorkspacesGet({
+    const { data: workspacesData, isLoading: workspacesLoading } =
+        useListWorkspacesApiAdminWorkspacesGet(undefined, {
             query: {
                 enabled: isAuthenticated, // Only fetch if authenticated
             },
         });
+    const workspaces = workspacesData?.items;
     const location = useLocation();
 
     // Show loading state while checking auth or workspaces

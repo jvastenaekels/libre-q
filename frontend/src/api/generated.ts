@@ -33,6 +33,11 @@ import type {
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
     InvitationAccept,
+    ListStudiesApiAdminStudiesGetParams,
+    ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
+    ListUsersApiAdminUsersGetParams,
+    ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    ListWorkspacesApiAdminWorkspacesGetParams,
     LogEntry,
     ParticipantDiscardUpdate,
     PasswordChange,
@@ -69,6 +74,11 @@ import type {
     ConsentResponse,
     EigenvalueResult,
     InvitationLink,
+    PaginatedResponseParticipantRead,
+    PaginatedResponseStudyRead,
+    PaginatedResponseUserRead,
+    PaginatedResponseWorkspaceMemberRead,
+    PaginatedResponseWorkspaceWithRole,
     ParticipantDetailRead,
     ParticipantRead,
     RecruitmentLinkRead,
@@ -916,32 +926,49 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
 };
 
 /**
- * List studies in the active workspace.
+ * List studies in the active workspace with pagination.
  * @summary List Studies
  */
-export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({ url: `/api/admin/studies`, method: 'GET', signal });
+export const listStudiesApiAdminStudiesGet = (
+    params?: ListStudiesApiAdminStudiesGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<PaginatedResponseStudyRead>({
+        url: `/api/admin/studies`,
+        method: 'GET',
+        params,
+        signal,
+    });
 };
 
-export const getListStudiesApiAdminStudiesGetQueryKey = () => {
-    return [`/api/admin/studies`] as const;
+export const getListStudiesApiAdminStudiesGetQueryKey = (
+    params?: ListStudiesApiAdminStudiesGetParams
+) => {
+    return [`/api/admin/studies`, ...(params ? [params] : [])] as const;
 };
 
 export const getListStudiesApiAdminStudiesGetQueryOptions = <
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = HTTPValidationError,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
-    >;
-}) => {
+>(
+    params?: ListStudiesApiAdminStudiesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
+    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey(params);
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
         signal,
-    }) => listStudiesApiAdminStudiesGet(signal);
+    }) => listStudiesApiAdminStudiesGet(params, signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
@@ -959,6 +986,7 @@ export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = HTTPValidationError,
 >(
+    params: undefined | ListStudiesApiAdminStudiesGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -982,6 +1010,7 @@ export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = HTTPValidationError,
 >(
+    params?: ListStudiesApiAdminStudiesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -1005,6 +1034,7 @@ export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = HTTPValidationError,
 >(
+    params?: ListStudiesApiAdminStudiesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -1024,6 +1054,7 @@ export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = HTTPValidationError,
 >(
+    params?: ListStudiesApiAdminStudiesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -1035,7 +1066,7 @@ export function useListStudiesApiAdminStudiesGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
+    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -1598,30 +1629,39 @@ export const useResetStudyParticipantsApiAdminStudiesSlugResetPost = <
 };
 
 /**
- * Get aggregated study statistics.
- * @summary Get Study Stats
+ * List participants for a specific study with pagination.
+ * @summary List Study Participants
  */
-export const getStudyStatsApiAdminStudiesSlugStatsGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<StudyStatsRead>({
-        url: `/api/admin/studies/${slug}/stats`,
+export const listStudyParticipantsApiAdminStudiesSlugParticipantsGet = (
+    slug: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<PaginatedResponseParticipantRead>({
+        url: `/api/admin/studies/${slug}/participants`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/stats`] as const;
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey = (
+    slug?: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams
+) => {
+    return [`/api/admin/studies/${slug}/participants`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
                 TError,
                 TData
             >
@@ -1631,81 +1671,94 @@ export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
     const { query: queryOptions } = options ?? {};
 
     const queryKey =
-        queryOptions?.queryKey ?? getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey(slug);
+        queryOptions?.queryKey ??
+        getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey(slug, params);
 
     const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
-    > = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
+        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
+    > = ({ signal }) =>
+        listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, params, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
 >;
-export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryError = HTTPValidationError;
+export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryError = HTTPValidationError;
 
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
+    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
+    params: undefined | ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                    Awaited<
+                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
+                    >,
                     TError,
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+                    Awaited<
+                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
+                    >
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
+    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                    Awaited<
+                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
+                    >,
                     TError,
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+                    Awaited<
+                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
+                    >
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
+    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
                 TError,
                 TData
             >
@@ -1714,18 +1767,19 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Get Study Stats
+ * @summary List Study Participants
  */
 
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
+    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
                 TError,
                 TData
             >
@@ -1733,7 +1787,11 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug, options);
+    const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(
+        slug,
+        params,
+        options
+    );
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -1743,6 +1801,87 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
 
     return query;
 }
+
+/**
+ * Delete ALL participants for this study. Only allowed in DRAFT state.
+ * @summary Clear All Participants
+ */
+export const clearAllParticipantsApiAdminStudiesSlugParticipantsDelete = (slug: string) => {
+    return customInstance<void>({
+        url: `/api/admin/studies/${slug}/participants`,
+        method: 'DELETE',
+    });
+};
+
+export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['clearAllParticipantsApiAdminStudiesSlugParticipantsDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return clearAllParticipantsApiAdminStudiesSlugParticipantsDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>
+>;
+
+export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Clear All Participants
+ */
+export const useClearAllParticipantsApiAdminStudiesSlugParticipantsDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Get detailed participant info including responses.
@@ -2036,35 +2175,107 @@ export const useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
 };
 
 /**
- * List all participants for a specific study.
- * @summary List Study Participants
+ * Delete all participants flagged as is_test_run for this study.
+ * @summary Clear Test Runs
  */
-export const listStudyParticipantsApiAdminStudiesSlugParticipantsGet = (
-    slug: string,
-    signal?: AbortSignal
-) => {
-    return customInstance<ParticipantRead[]>({
-        url: `/api/admin/studies/${slug}/participants`,
+export const clearTestRunsApiAdminStudiesSlugTestRunsDelete = (slug: string) => {
+    return customInstance<void>({ url: `/api/admin/studies/${slug}/test-runs`, method: 'DELETE' });
+};
+
+export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['clearTestRunsApiAdminStudiesSlugTestRunsDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return clearTestRunsApiAdminStudiesSlugTestRunsDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>
+>;
+
+export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Clear Test Runs
+ */
+export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get aggregated study statistics.
+ * @summary Get Study Stats
+ */
+export const getStudyStatsApiAdminStudiesSlugStatsGet = (slug: string, signal?: AbortSignal) => {
+    return customInstance<StudyStatsRead>({
+        url: `/api/admin/studies/${slug}/stats`,
         method: 'GET',
         signal,
     });
 };
 
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey = (
-    slug?: string
-) => {
-    return [`/api/admin/studies/${slug}/participants`] as const;
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey = (slug?: string) => {
+    return [`/api/admin/studies/${slug}/stats`] as const;
 };
 
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                 TError,
                 TData
             >
@@ -2074,90 +2285,81 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOpti
     const { query: queryOptions } = options ?? {};
 
     const queryKey =
-        queryOptions?.queryKey ??
-        getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey(slug);
+        queryOptions?.queryKey ?? getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey(slug);
 
     const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
-    > = ({ signal }) => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, signal);
+        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+    > = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
+export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
 >;
-export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryError = HTTPValidationError;
+export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryError = HTTPValidationError;
 
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
+    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >,
+                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                     TError,
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >
+                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
+    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >,
+                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                     TError,
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >
+                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
+    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                 TError,
                 TData
             >
@@ -2166,18 +2368,18 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary List Study Participants
+ * @summary Get Study Stats
  */
 
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
+    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
                 TError,
                 TData
             >
@@ -2185,10 +2387,7 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(
-        slug,
-        options
-    );
+    const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -2198,87 +2397,6 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
 
     return query;
 }
-
-/**
- * Delete ALL participants for this study. Only allowed in DRAFT state.
- * @summary Clear All Participants
- */
-export const clearAllParticipantsApiAdminStudiesSlugParticipantsDelete = (slug: string) => {
-    return customInstance<void>({
-        url: `/api/admin/studies/${slug}/participants`,
-        method: 'DELETE',
-    });
-};
-
-export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
-        TError,
-        { slug: string },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationKey = ['clearAllParticipantsApiAdminStudiesSlugParticipantsDelete'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
-        { slug: string }
-    > = (props) => {
-        const { slug } = props ?? {};
-
-        return clearAllParticipantsApiAdminStudiesSlugParticipantsDelete(slug);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>
->;
-
-export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationError =
-    HTTPValidationError;
-
-/**
- * @summary Clear All Participants
- */
-export const useClearAllParticipantsApiAdminStudiesSlugParticipantsDelete = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
-            TError,
-            { slug: string },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationOptions =
-        getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
 
 /**
  * Export study configuration without participant data.
@@ -2605,83 +2723,6 @@ export const useImportStudyConfigApiAdminStudiesImportPost = <
     TContext
 > => {
     const mutationOptions = getImportStudyConfigApiAdminStudiesImportPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Delete all participants flagged as is_test_run for this study.
- * @summary Clear Test Runs
- */
-export const clearTestRunsApiAdminStudiesSlugTestRunsDelete = (slug: string) => {
-    return customInstance<void>({ url: `/api/admin/studies/${slug}/test-runs`, method: 'DELETE' });
-};
-
-export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-        TError,
-        { slug: string },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationKey = ['clearTestRunsApiAdminStudiesSlugTestRunsDelete'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-        { slug: string }
-    > = (props) => {
-        const { slug } = props ?? {};
-
-        return clearTestRunsApiAdminStudiesSlugTestRunsDelete(slug);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>
->;
-
-export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationError = HTTPValidationError;
-
-/**
- * @summary Clear Test Runs
- */
-export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-            TError,
-            { slug: string },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationOptions =
-        getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -4846,32 +4887,43 @@ export const useAcceptInvitationApiAdminInvitationsAcceptPost = <
 };
 
 /**
- * List all users in the system.
+ * List all users in the system with pagination.
  * @summary List Users
  */
-export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead[]>({ url: `/api/admin/users`, method: 'GET', signal });
+export const listUsersApiAdminUsersGet = (
+    params?: ListUsersApiAdminUsersGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<PaginatedResponseUserRead>({
+        url: `/api/admin/users`,
+        method: 'GET',
+        params,
+        signal,
+    });
 };
 
-export const getListUsersApiAdminUsersGetQueryKey = () => {
-    return [`/api/admin/users`] as const;
+export const getListUsersApiAdminUsersGetQueryKey = (params?: ListUsersApiAdminUsersGetParams) => {
+    return [`/api/admin/users`, ...(params ? [params] : [])] as const;
 };
 
 export const getListUsersApiAdminUsersGetQueryOptions = <
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-    >;
-}) => {
+    TError = HTTPValidationError,
+>(
+    params?: ListUsersApiAdminUsersGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
+        >;
+    }
+) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getListUsersApiAdminUsersGetQueryKey();
+    const queryKey = queryOptions?.queryKey ?? getListUsersApiAdminUsersGetQueryKey(params);
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>> = ({
         signal,
-    }) => listUsersApiAdminUsersGet(signal);
+    }) => listUsersApiAdminUsersGet(params, signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
@@ -4883,12 +4935,13 @@ export const getListUsersApiAdminUsersGetQueryOptions = <
 export type ListUsersApiAdminUsersGetQueryResult = NonNullable<
     Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
 >;
-export type ListUsersApiAdminUsersGetQueryError = unknown;
+export type ListUsersApiAdminUsersGetQueryError = HTTPValidationError;
 
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params: undefined | ListUsersApiAdminUsersGetParams,
     options: {
         query: Partial<
             UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
@@ -4906,8 +4959,9 @@ export function useListUsersApiAdminUsersGet<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListUsersApiAdminUsersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
@@ -4925,8 +4979,9 @@ export function useListUsersApiAdminUsersGet<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListUsersApiAdminUsersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
@@ -4940,8 +4995,9 @@ export function useListUsersApiAdminUsersGet<
 
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListUsersApiAdminUsersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
@@ -4949,7 +5005,7 @@ export function useListUsersApiAdminUsersGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListUsersApiAdminUsersGetQueryOptions(options);
+    const queryOptions = getListUsersApiAdminUsersGetQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -5464,37 +5520,47 @@ export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
  * List all workspaces the current user is a member of, with their role.
  * @summary List Workspaces
  */
-export const listWorkspacesApiAdminWorkspacesGet = (signal?: AbortSignal) => {
-    return customInstance<WorkspaceWithRole[]>({
+export const listWorkspacesApiAdminWorkspacesGet = (
+    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<PaginatedResponseWorkspaceWithRole>({
         url: `/api/admin/workspaces`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getListWorkspacesApiAdminWorkspacesGetQueryKey = () => {
-    return [`/api/admin/workspaces`] as const;
+export const getListWorkspacesApiAdminWorkspacesGetQueryKey = (
+    params?: ListWorkspacesApiAdminWorkspacesGetParams
+) => {
+    return [`/api/admin/workspaces`, ...(params ? [params] : [])] as const;
 };
 
 export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-            TError,
-            TData
-        >
-    >;
-}) => {
+    TError = HTTPValidationError,
+>(
+    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getListWorkspacesApiAdminWorkspacesGetQueryKey();
+    const queryKey =
+        queryOptions?.queryKey ?? getListWorkspacesApiAdminWorkspacesGetQueryKey(params);
 
     const queryFn: QueryFunction<
         Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
-    > = ({ signal }) => listWorkspacesApiAdminWorkspacesGet(signal);
+    > = ({ signal }) => listWorkspacesApiAdminWorkspacesGet(params, signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
@@ -5506,12 +5572,13 @@ export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
 export type ListWorkspacesApiAdminWorkspacesGetQueryResult = NonNullable<
     Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
 >;
-export type ListWorkspacesApiAdminWorkspacesGetQueryError = unknown;
+export type ListWorkspacesApiAdminWorkspacesGetQueryError = HTTPValidationError;
 
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params: undefined | ListWorkspacesApiAdminWorkspacesGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -5533,8 +5600,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListWorkspacesApiAdminWorkspacesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -5556,8 +5624,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListWorkspacesApiAdminWorkspacesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -5575,8 +5644,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
 
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
-    TError = unknown,
+    TError = HTTPValidationError,
 >(
+    params?: ListWorkspacesApiAdminWorkspacesGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -5588,7 +5658,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListWorkspacesApiAdminWorkspacesGetQueryOptions(options);
+    const queryOptions = getListWorkspacesApiAdminWorkspacesGetQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -5992,22 +6062,27 @@ export const useDeleteWorkspaceApiAdminWorkspacesSlugDelete = <
 };
 
 /**
- * List all members of a workspace.
+ * List all members of a workspace with pagination.
  * @summary List Workspace Members
  */
 export const listWorkspaceMembersApiAdminWorkspacesSlugMembersGet = (
     slug: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<WorkspaceMemberRead[]>({
+    return customInstance<PaginatedResponseWorkspaceMemberRead>({
         url: `/api/admin/workspaces/${slug}/members`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey = (slug?: string) => {
-    return [`/api/admin/workspaces/${slug}/members`] as const;
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey = (
+    slug?: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams
+) => {
+    return [`/api/admin/workspaces/${slug}/members`, ...(params ? [params] : [])] as const;
 };
 
 export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions = <
@@ -6015,6 +6090,7 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6029,11 +6105,11 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions
 
     const queryKey =
         queryOptions?.queryKey ??
-        getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey(slug);
+        getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey(slug, params);
 
     const queryFn: QueryFunction<
         Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
-    > = ({ signal }) => listWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug, signal);
+    > = ({ signal }) => listWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug, params, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
@@ -6052,6 +6128,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params: undefined | ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -6078,6 +6155,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6104,6 +6182,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6124,6 +6203,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6137,6 +6217,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions(
         slug,
+        params,
         options
     );
 
@@ -8647,274 +8728,295 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     ...overrideResponse,
 });
 
-export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
-    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-        slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
-        state: faker.helpers.arrayElement([
-            faker.helpers.arrayElement(Object.values(StudyState)),
-            undefined,
-        ]),
-        grid_config: Array.from(
-            { length: faker.number.int({ min: 1, max: 10 }) },
-            (_, i) => i + 1
-        ).map(() => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
-            capacity: faker.number.int({ min: undefined, max: undefined }),
-        })),
-        presort_config: {},
-        postsort_config: {},
-        branding: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                {
-                    logo_url: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 500 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    accent_color: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 50 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    primary_color: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 50 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    partners: faker.helpers.arrayElement([
-                        Array.from(
-                            { length: faker.number.int({ min: 1, max: 10 }) },
-                            (_, i) => i + 1
-                        ).map(() => ({
-                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            url: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
-                        })),
-                        undefined,
-                    ]),
-                },
-                null,
+export const getListStudiesApiAdminStudiesGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseStudyRead> = {}
+): PaginatedResponseStudyRead => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+            state: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(StudyState)),
+                undefined,
             ]),
-            undefined,
-        ]),
-        default_language: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
-            undefined,
-        ]),
-        show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-        randomize_statement_order: faker.helpers.arrayElement([
-            faker.datatype.boolean(),
-            undefined,
-        ]),
-        symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-        start_date: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
-            undefined,
-        ]),
-        end_date: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
-            undefined,
-        ]),
-        id: faker.number.int({ min: undefined, max: undefined }),
-        workspace_id: faker.number.int({ min: undefined, max: undefined }),
-        workspace: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                {
-                    id: faker.number.int({ min: undefined, max: undefined }),
-                    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                },
-                null,
-            ]),
-            undefined,
-        ]),
-        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-        updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-        translations: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                () => ({
-                    language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                    title: faker.string.alpha({ length: { min: 10, max: 200 } }),
-                    description: faker.helpers.arrayElement([
-                        faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                        undefined,
-                    ]),
-                    instructions: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    subtitle: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 200 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    objective: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    condition_of_instruction: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    pre_instruction: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    consent_title: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 200 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    consent_description: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
-                            null,
-                        ]),
-                        undefined,
-                    ]),
-                    ui_labels: faker.helpers.arrayElement([{}, undefined]),
-                    process_steps: faker.helpers.arrayElement([
-                        Array.from(
-                            { length: faker.number.int({ min: 1, max: 10 }) },
-                            (_, i) => i + 1
-                        ).map(() => ({
-                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            title: faker.string.alpha({ length: { min: 10, max: 100 } }),
-                            description: faker.string.alpha({ length: { min: 10, max: 500 } }),
-                            icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            color: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
-                                    null,
-                                ]),
-                                undefined,
+            grid_config: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                score: faker.number.int({ min: undefined, max: undefined }),
+                capacity: faker.number.int({ min: undefined, max: undefined }),
+            })),
+            presort_config: {},
+            postsort_config: {},
+            branding: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    {
+                        logo_url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 500 } }),
+                                null,
                             ]),
-                        })),
-                        undefined,
-                    ]),
-                    methodology_tips: faker.helpers.arrayElement([
-                        Array.from(
-                            { length: faker.number.int({ min: 1, max: 10 }) },
-                            (_, i) => i + 1
-                        ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
-                        undefined,
-                    ]),
-                    step_help: faker.helpers.arrayElement([
-                        {
-                            [faker.string.alphanumeric(5)]: {
-                                [faker.string.alphanumeric(5)]: faker.string.alpha({
-                                    length: { min: 10, max: 20 },
-                                }),
+                            undefined,
+                        ]),
+                        accent_color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 50 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        primary_color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 50 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        partners: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => ({
+                                id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                url: faker.helpers.arrayElement([
+                                    faker.helpers.arrayElement([
+                                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                        null,
+                                    ]),
+                                    undefined,
+                                ]),
+                            })),
+                            undefined,
+                        ]),
+                    },
+                    null,
+                ]),
+                undefined,
+            ]),
+            default_language: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            randomize_statement_order: faker.helpers.arrayElement([
+                faker.datatype.boolean(),
+                undefined,
+            ]),
+            symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            start_date: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            end_date: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+            workspace: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    {
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    },
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+                        description: faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            undefined,
+                        ]),
+                        instructions: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        subtitle: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 200 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        objective: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        condition_of_instruction: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        pre_instruction: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        consent_title: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 200 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        consent_description: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        ui_labels: faker.helpers.arrayElement([{}, undefined]),
+                        process_steps: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => ({
+                                id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                                icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                color: faker.helpers.arrayElement([
+                                    faker.helpers.arrayElement([
+                                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                        null,
+                                    ]),
+                                    undefined,
+                                ]),
+                            })),
+                            undefined,
+                        ]),
+                        methodology_tips: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+                            undefined,
+                        ]),
+                        step_help: faker.helpers.arrayElement([
+                            {
+                                [faker.string.alphanumeric(5)]: {
+                                    [faker.string.alphanumeric(5)]: faker.string.alpha({
+                                        length: { min: 10, max: 20 },
+                                    }),
+                                },
                             },
-                        },
-                        undefined,
-                    ]),
-                    id: faker.number.int({ min: undefined, max: undefined }),
-                    study_id: faker.number.int({ min: undefined, max: undefined }),
-                })
-            ),
-            undefined,
-        ]),
-        statements: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                () => ({
-                    code: faker.string.alpha({ length: { min: 10, max: 50 } }),
-                    id: faker.number.int({ min: undefined, max: undefined }),
-                    display_order: faker.helpers.arrayElement([
-                        faker.number.int({ min: undefined, max: undefined }),
-                        undefined,
-                    ]),
-                    translations: faker.helpers.arrayElement([
-                        Array.from(
-                            { length: faker.number.int({ min: 1, max: 10 }) },
-                            (_, i) => i + 1
-                        ).map(() => ({
-                            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                            text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
-                            id: faker.number.int({ min: undefined, max: undefined }),
-                            statement_id: faker.number.int({ min: undefined, max: undefined }),
-                        })),
-                        undefined,
-                    ]),
-                })
-            ),
-            undefined,
-        ]),
-        recruitment_links: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                () => ({
-                    name: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            faker.string.alpha({ length: { min: 10, max: 100 } }),
-                            null,
+                            undefined,
                         ]),
-                        undefined,
-                    ]),
-                    type: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
-                        undefined,
-                    ]),
-                    capacity: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        study_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            statements: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        display_order: faker.helpers.arrayElement([
                             faker.number.int({ min: undefined, max: undefined }),
-                            null,
+                            undefined,
                         ]),
-                        undefined,
-                    ]),
-                    id: faker.number.int({ min: undefined, max: undefined }),
-                    study_id: faker.number.int({ min: undefined, max: undefined }),
-                    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    usage_count: faker.number.int({ min: undefined, max: undefined }),
-                    start_count: faker.number.int({ min: undefined, max: undefined }),
-                    expires_at: faker.helpers.arrayElement([
-                        faker.helpers.arrayElement([
-                            `${faker.date.past().toISOString().split('.')[0]}Z`,
-                            null,
+                        translations: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => ({
+                                language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                                text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                                id: faker.number.int({ min: undefined, max: undefined }),
+                                statement_id: faker.number.int({ min: undefined, max: undefined }),
+                            })),
+                            undefined,
                         ]),
-                        undefined,
-                    ]),
-                    is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                })
-            ),
-            undefined,
-        ]),
-        requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-        participant_count: faker.helpers.arrayElement([
-            faker.number.int({ min: undefined, max: undefined }),
-            undefined,
-        ]),
-    }));
+                    })
+                ),
+                undefined,
+            ]),
+            recruitment_links: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        name: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        type: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                            undefined,
+                        ]),
+                        capacity: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.number.int({ min: undefined, max: undefined }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        study_id: faker.number.int({ min: undefined, max: undefined }),
+                        token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        usage_count: faker.number.int({ min: undefined, max: undefined }),
+                        start_count: faker.number.int({ min: undefined, max: undefined }),
+                        expires_at: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        is_active: faker.helpers.arrayElement([
+                            faker.datatype.boolean(),
+                            undefined,
+                        ]),
+                        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })
+                ),
+                undefined,
+            ]),
+            requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            participant_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
 
 export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     overrideResponse: Partial<StudyRead> = {}
@@ -9693,19 +9795,57 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     ...overrideResponse,
 });
 
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock = (
-    overrideResponse: Partial<StudyStatsRead> = {}
-): StudyStatsRead => ({
-    started_count: faker.number.int({ min: undefined, max: undefined }),
-    completed_count: faker.number.int({ min: undefined, max: undefined }),
-    completion_rate: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
-    median_duration_seconds: faker.helpers.arrayElement([
-        faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
-        null,
-    ]),
-    device_breakdown: {
-        [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
-    },
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseParticipantRead> = {}
+): PaginatedResponseParticipantRead => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            session_token: faker.string.uuid(),
+            language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            submitted_at: faker.helpers.arrayElement([
+                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                null,
+            ]),
+            is_discarded: faker.datatype.boolean(),
+            is_test_run: faker.datatype.boolean(),
+            discard_reason: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            user_agent: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            last_step_reached: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            last_step_reached_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            recruitment_token: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
     ...overrideResponse,
 });
 
@@ -9839,51 +9979,21 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
         ...overrideResponse,
     });
 
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock =
-    (): ParticipantRead[] =>
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-            id: faker.number.int({ min: undefined, max: undefined }),
-            study_id: faker.number.int({ min: undefined, max: undefined }),
-            session_token: faker.string.uuid(),
-            language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
-            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-            submitted_at: faker.helpers.arrayElement([
-                `${faker.date.past().toISOString().split('.')[0]}Z`,
-                null,
-            ]),
-            is_discarded: faker.datatype.boolean(),
-            is_test_run: faker.datatype.boolean(),
-            discard_reason: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                null,
-            ]),
-            user_agent: faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                null,
-            ]),
-            last_step_reached: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            last_step_reached_at: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    null,
-                ]),
-                undefined,
-            ]),
-            recruitment_token: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-        }));
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock = (
+    overrideResponse: Partial<StudyStatsRead> = {}
+): StudyStatsRead => ({
+    started_count: faker.number.int({ min: undefined, max: undefined }),
+    completed_count: faker.number.int({ min: undefined, max: undefined }),
+    completion_rate: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    median_duration_seconds: faker.helpers.arrayElement([
+        faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+        null,
+    ]),
+    device_breakdown: {
+        [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
+    },
+    ...overrideResponse,
+});
 
 export const getValidateStudyImportApiAdminStudiesValidateImportPostResponseMock = (
     overrideResponse: Partial<ValidationResult> = {}
@@ -10084,21 +10194,30 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
     ...overrideResponse,
 });
 
-export const getListUsersApiAdminUsersGetResponseMock = (): UserRead[] =>
-    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        full_name: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 100 } }),
-                null,
+export const getListUsersApiAdminUsersGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseUserRead> = {}
+): PaginatedResponseUserRead => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            full_name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
             ]),
-            undefined,
-        ]),
-        id: faker.number.int({ min: undefined, max: undefined }),
-        is_active: faker.datatype.boolean(),
-        is_superuser: faker.datatype.boolean(),
-        is_totp_enabled: faker.datatype.boolean(),
-    }));
+            id: faker.number.int({ min: undefined, max: undefined }),
+            is_active: faker.datatype.boolean(),
+            is_superuser: faker.datatype.boolean(),
+            is_totp_enabled: faker.datatype.boolean(),
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
 
 export const getCreateUserApiAdminUsersPostResponseMock = (
     overrideResponse: Partial<UserRead> = {}
@@ -10189,38 +10308,47 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMo
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         }));
 
-export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (): WorkspaceWithRole[] =>
-    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-        id: faker.number.int({ min: undefined, max: undefined }),
-        title: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-        members: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                () => ({
-                    user_id: faker.number.int({ min: undefined, max: undefined }),
-                    user: {
-                        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        full_name: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                null,
+export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseWorkspaceWithRole> = {}
+): PaginatedResponseWorkspaceWithRole => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            members: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        user_id: faker.number.int({ min: undefined, max: undefined }),
+                        user: {
+                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            full_name: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                    null,
+                                ]),
+                                undefined,
                             ]),
-                            undefined,
-                        ]),
-                        id: faker.number.int({ min: undefined, max: undefined }),
-                        is_active: faker.datatype.boolean(),
-                        is_superuser: faker.datatype.boolean(),
-                        is_totp_enabled: faker.datatype.boolean(),
-                    },
-                    role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                    joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                })
-            ),
-            undefined,
-        ]),
-        user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-    }));
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            is_active: faker.datatype.boolean(),
+                            is_superuser: faker.datatype.boolean(),
+                            is_totp_enabled: faker.datatype.boolean(),
+                        },
+                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })
+                ),
+                undefined,
+            ]),
+            user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
 
 export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
     overrideResponse: Partial<WorkspaceRead> = {}
@@ -10319,9 +10447,11 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock = (
     ...overrideResponse,
 });
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock =
-    (): WorkspaceMemberRead[] =>
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseWorkspaceMemberRead> = {}
+): PaginatedResponseWorkspaceMemberRead => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
             user_id: faker.number.int({ min: undefined, max: undefined }),
             user: {
                 email: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -10339,7 +10469,13 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock
             },
             role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-        }));
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
 
 export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchResponseMock = (
     overrideResponse: Partial<WorkspaceMemberRead> = {}
@@ -10634,10 +10770,10 @@ export const getCreateStudyApiAdminStudiesPostMockHandler = (
 
 export const getListStudiesApiAdminStudiesGetMockHandler = (
     overrideResponse?:
-        | StudyRead[]
+        | PaginatedResponseStudyRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<StudyRead[]> | StudyRead[]),
+          ) => Promise<PaginatedResponseStudyRead> | PaginatedResponseStudyRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -10794,16 +10930,16 @@ export const getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler = 
     );
 };
 
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler = (
     overrideResponse?:
-        | StudyStatsRead
+        | PaginatedResponseParticipantRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<StudyStatsRead> | StudyStatsRead),
+          ) => Promise<PaginatedResponseParticipantRead> | PaginatedResponseParticipantRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/studies/:slug/stats',
+        '*/api/admin/studies/:slug/participants',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -10811,10 +10947,28 @@ export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock()
+                        : getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
+        },
+        options
+    );
+};
+
+export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug/participants',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
         },
         options
     );
@@ -10873,16 +11027,34 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
         );
     };
 
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler = (
+export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
     overrideResponse?:
-        | ParticipantRead[]
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug/test-runs',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
+    overrideResponse?:
+        | StudyStatsRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<ParticipantRead[]> | ParticipantRead[]),
+          ) => Promise<StudyStatsRead> | StudyStatsRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/studies/:slug/participants',
+        '*/api/admin/studies/:slug/stats',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -10890,28 +11062,10 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandl
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock()
+                        : getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
-        },
-        options
-    );
-};
-
-export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler = (
-    overrideResponse?:
-        | void
-        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
-    options?: RequestHandlerOptions
-) => {
-    return http.delete(
-        '*/api/admin/studies/:slug/participants',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 204 });
         },
         options
     );
@@ -10982,24 +11136,6 @@ export const getImportStudyConfigApiAdminStudiesImportPostMockHandler = (
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
-        },
-        options
-    );
-};
-
-export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
-    overrideResponse?:
-        | void
-        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
-    options?: RequestHandlerOptions
-) => {
-    return http.delete(
-        '*/api/admin/studies/:slug/test-runs',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 204 });
         },
         options
     );
@@ -11260,10 +11396,10 @@ export const getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler = (
 
 export const getListUsersApiAdminUsersGetMockHandler = (
     overrideResponse?:
-        | UserRead[]
+        | PaginatedResponseUserRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<UserRead[]> | UserRead[]),
+          ) => Promise<PaginatedResponseUserRead> | PaginatedResponseUserRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -11398,10 +11534,10 @@ export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHan
 
 export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
     overrideResponse?:
-        | WorkspaceWithRole[]
+        | PaginatedResponseWorkspaceWithRole
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<WorkspaceWithRole[]> | WorkspaceWithRole[]),
+          ) => Promise<PaginatedResponseWorkspaceWithRole> | PaginatedResponseWorkspaceWithRole),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -11520,10 +11656,12 @@ export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler = (
 
 export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler = (
     overrideResponse?:
-        | WorkspaceMemberRead[]
+        | PaginatedResponseWorkspaceMemberRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<WorkspaceMemberRead[]> | WorkspaceMemberRead[]),
+          ) =>
+              | Promise<PaginatedResponseWorkspaceMemberRead>
+              | PaginatedResponseWorkspaceMemberRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -12004,15 +12142,15 @@ export const getLibreQAPIMock = () => [
     getValidateStudyApiAdminStudiesSlugValidatePostMockHandler(),
     getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler(),
     getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler(),
-    getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
-    getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
-    getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
     getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
     getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler(),
+    getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
+    getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
+    getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
+    getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
     getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
     getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
     getImportStudyConfigApiAdminStudiesImportPostMockHandler(),
-    getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
     getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler(),
     getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetMockHandler(),
     getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler(),

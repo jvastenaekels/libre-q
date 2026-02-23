@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, sta
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.exceptions import ServiceError
 from app.limiter import limiter
 from app.schemas import SubmissionInput
 from app.services.study_service import StudyService
@@ -43,6 +44,9 @@ async def submit_study(
         }
     except HTTPException:
         # Re-raise HTTP exceptions (they're already properly formatted)
+        raise
+    except ServiceError:
+        # Re-raise business exceptions (handled by global exception handler)
         raise
     except Exception as e:
         await db.rollback()

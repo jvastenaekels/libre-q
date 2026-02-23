@@ -32,12 +32,14 @@ export const CommandMenu = () => {
         useAdminStore();
     const { logout, setCurrentWorkspace, currentWorkspace } = useAuthStore();
     // Studies query enabled only when workspace is present
-    const { data: studies } = useListStudiesApiAdminStudiesGet({
+    const { data: studiesData } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
             enabled: !!currentWorkspace?.id,
         },
     });
-    const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
+    const studies = studiesData?.items;
+    const { data: workspacesData } = useListWorkspacesApiAdminWorkspacesGet();
+    const workspaces = workspacesData?.items;
     const { t } = useTranslation();
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);

@@ -29,8 +29,8 @@ async def test_list_workspaces(
     response = await client.get("/api/admin/workspaces", headers=headers)
     assert response.status_code == 200
     data = response.json()
-    assert len(data) >= 1
-    assert any(d["slug"] == "test-ws" for d in data)
+    assert len(data["items"]) >= 1
+    assert any(d["slug"] == "test-ws" for d in data["items"])
 
 
 @pytest.mark.asyncio

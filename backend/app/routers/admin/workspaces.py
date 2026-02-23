@@ -22,6 +22,7 @@ from app.schemas import (
     InvitationLink,
     WorkspaceWithRole,
 )
+from app.schemas.common import PaginatedResponse
 from app.utils.security import create_invitation_token
 from app.utils.email import send_invitation_email
 from app.core.config import settings
@@ -31,29 +32,41 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("", response_model=list[WorkspaceWithRole])
+@router.get("", response_model=PaginatedResponse[WorkspaceWithRole])
 async def list_workspaces(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-) -> list[WorkspaceWithRole]:
+    limit: int = 50,
+    offset: int = 0,
+):
     """
     List all workspaces the current user is a member of, with their role.
     """
-    # Select workspaces where the user is a member, inclusive of role
+    # Total count
+    count_result = await db.execute(
+        select(func.count()).where(WorkspaceMember.user_id == current_user.id)
+    )
+    total = count_result.scalar() or 0
+
+    # Paginated items
     query = (
         select(Workspace, WorkspaceMember.role)
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(WorkspaceMember.user_id == current_user.id)
         .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+        .limit(limit)
+        .offset(offset)
     )
     result = await db.execute(query)
     rows = result.unique().all()
 
     # Map to schema
-    return [
+    items = [
         WorkspaceWithRole(**workspace.__dict__, user_role=role)
         for workspace, role in rows
     ]
+
+    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
 
 
 @router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
@@ -205,27 +218,30 @@ async def update_workspace(
     return workspace
 
 
-@router.get("/{slug}/members", response_model=list[WorkspaceMemberRead])
+@router.get("/{slug}/members", response_model=PaginatedResponse[WorkspaceMemberRead])
 async def list_workspace_members(
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
     db: AsyncSession = Depends(get_db),
-) -> list[WorkspaceMember]:
+    limit: int = 50,
+    offset: int = 0,
+):
     """
-    List all members of a workspace.
+    List all members of a workspace with pagination.
     """
     from sqlalchemy.orm import selectinload
 
-    query = (
-        select(WorkspaceMember)
-        .where(WorkspaceMember.workspace_id == workspace.id)
-        .options(selectinload(WorkspaceMember.user))
-    )
-    result = await db.execute(query)
-    members = result.scalars().all()
+    base = select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace.id)
 
-    # Manually populate user_email for the schema if needed,
-    # though lazy="selectin" or join should handle it.
-    return list(members)
+    # Total count
+    count_result = await db.execute(select(func.count()).select_from(base.subquery()))
+    total = count_result.scalar() or 0
+
+    # Paginated items
+    query = base.options(selectinload(WorkspaceMember.user)).limit(limit).offset(offset)
+    result = await db.execute(query)
+    items = list(result.scalars().all())
+
+    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
 
 
 @router.patch("/{slug}/members/{user_id}", response_model=WorkspaceMemberRead)

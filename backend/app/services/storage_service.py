@@ -13,9 +13,8 @@ from uuid import UUID
 import boto3  # type: ignore
 from botocore.config import Config as BotoConfig  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
-from fastapi import HTTPException
-
 from app.core.config import settings
+from app.exceptions import NotFoundError, ServiceError
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +127,7 @@ class StorageService:
                     await asyncio.sleep(delay)
                 else:
                     logger.error("S3 upload failed for key %s: %s", s3_key, e)
-                    raise HTTPException(status_code=500, detail="Audio upload failed")
+                    raise ServiceError("Audio upload failed")
 
         return {
             "s3_bucket": self.bucket_name,
@@ -149,7 +148,7 @@ class StorageService:
             Presigned URL string
 
         Raises:
-            HTTPException: If URL generation fails
+            ServiceError: If URL generation fails
         """
         try:
             url = self.s3_client.generate_presigned_url(
@@ -160,7 +159,7 @@ class StorageService:
             return url
         except ClientError as e:
             logger.error("Presigned URL generation failed for key %s: %s", s3_key, e)
-            raise HTTPException(status_code=500, detail="Failed to generate audio URL")
+            raise ServiceError("Failed to generate audio URL")
 
     async def download_object(self, s3_key: str) -> bytes:
         """
@@ -173,7 +172,8 @@ class StorageService:
             Object content as bytes
 
         Raises:
-            HTTPException: If object not found or download fails
+            NotFoundError: If the S3 object does not exist
+            ServiceError: If the download fails for another reason
         """
         try:
             loop = asyncio.get_running_loop()
@@ -186,9 +186,9 @@ class StorageService:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "NoSuchKey":
                 logger.warning("S3 object not found: %s", s3_key)
-                raise HTTPException(status_code=404, detail="Audio file not found")
+                raise NotFoundError("Audio file")
             logger.error("S3 download failed for key %s: %s", s3_key, e)
-            raise HTTPException(status_code=500, detail="Audio download failed")
+            raise ServiceError("Audio download failed")
 
     async def delete_audio(self, s3_key: str) -> None:
         """

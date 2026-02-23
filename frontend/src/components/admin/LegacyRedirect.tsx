@@ -21,7 +21,8 @@ export const LegacyRedirect = () => {
     const location = useLocation();
     const { workspaces } = useAuthStore();
     const { setActiveStudy, setActiveWorkspace, lastVisitedStudySlug } = useAdminStore();
-    const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet();
+    const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet();
+    const allStudies = allStudiesData?.items;
 
     useEffect(() => {
         // Redirection effect

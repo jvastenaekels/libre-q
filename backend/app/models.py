@@ -20,9 +20,10 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
     CheckConstraint,
+    select,
 )
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy.sql import func
 
 from .database import Base
@@ -218,17 +219,7 @@ class Study(Base):
     def requires_password(self) -> bool:
         return bool(self.access_password)
 
-    @property
-    def participant_count(self) -> int:
-        return len(
-            [
-                p
-                for p in self.participants
-                if not p.is_test_run
-                and not p.is_discarded
-                and p.status == ParticipantStatus.completed
-            ]
-        )
+    # participant_count is defined as a column_property after Participant class
 
 
 class StudyTranslation(Base):
@@ -515,3 +506,17 @@ class Invitation(Base):
     )
 
     workspace: Mapped["Workspace"] = relationship(lazy="raise")
+
+
+# Computed column properties (defined after all models to avoid circular references)
+Study.participant_count = column_property(
+    select(func.count(Participant.id))
+    .where(
+        Participant.study_id == Study.id,
+        Participant.is_test_run.is_(False),
+        Participant.is_discarded.is_(False),
+        Participant.status == ParticipantStatus.completed,
+    )
+    .correlate(Study)
+    .scalar_subquery()
+)

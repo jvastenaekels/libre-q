@@ -30,9 +30,10 @@ export function StudySwitcher() {
     const navigate = useNavigate();
     const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
     const { currentWorkspace } = useAuthStore();
-    const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet({
+    const { data: studiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
         query: { enabled: !!activeWorkspaceId },
     });
+    const studies = studiesData?.items;
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);

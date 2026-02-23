@@ -1,0 +1,327 @@
+"""Service for study data export, statistics, and participant management."""
+
+import logging
+from typing import Any
+
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from ..exceptions import NotFoundError
+from ..models import (
+    AudioRecording,
+    Participant,
+    ParticipantStatus,
+    Statement,
+    Study,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class StudyDataService:
+    """Handles study data export, statistics, and bulk participant operations."""
+
+    @staticmethod
+    async def delete_audio_files_for_study(
+        db: AsyncSession,
+        study_id: int,
+        *,
+        test_runs_only: bool = False,
+    ) -> None:
+        """Delete S3 audio files for participants of a study.
+
+        Must be called BEFORE deleting participants (DB cascade would
+        remove AudioRecording rows, orphaning S3 objects).
+        """
+        from ..services.storage_service import storage_service
+
+        query = (
+            select(AudioRecording.s3_key)
+            .join(Participant)
+            .where(Participant.study_id == study_id)
+        )
+        if test_runs_only:
+            query = query.where(Participant.is_test_run.is_(True))
+
+        result = await db.execute(query)
+        s3_keys = result.scalars().all()
+
+        for key in s3_keys:
+            await storage_service.delete_audio(key)
+
+    @staticmethod
+    async def reset_study_participants(db: AsyncSession, study_id: int):
+        """Delete all participants for a specific study."""
+        await StudyDataService.delete_audio_files_for_study(db, study_id)
+        stmt = delete(Participant).where(Participant.study_id == study_id)
+        await db.execute(stmt)
+        await db.commit()
+
+    @staticmethod
+    async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Calculates aggregated statistics for a study."""
+        # 1. Get all participants for this study (excluding discarded)
+        stmt = select(Participant).where(
+            Participant.study_id == study_id,
+            Participant.is_discarded.is_(False),
+            Participant.is_test_run.is_(False),
+        )
+        result = await db.execute(stmt)
+        participants = result.scalars().all()
+
+        started_count = len(participants)
+        completed_participants = [
+            p for p in participants if p.status == ParticipantStatus.completed
+        ]
+        completed_count = len(completed_participants)
+
+        # 2. Completion Rate
+        completion_rate = completed_count / started_count if started_count > 0 else 0.0
+
+        # 3. Median Duration (Seconds)
+        durations = []
+        for p in completed_participants:
+            if p.submitted_at and p.consented_at:
+                duration = (p.submitted_at - p.consented_at).total_seconds()
+                if duration > 0:
+                    durations.append(duration)
+
+        median_duration = None
+        if durations:
+            import statistics
+
+            median_duration = statistics.median(durations)
+
+        # 4. Device Breakdown (Simple Heuristic)
+        device_breakdown = {"mobile": 0, "desktop": 0}
+        for p in participants:
+            ua = (p.user_agent or "").lower()
+            if any(x in ua for x in ["mobile", "android", "iphone", "ipad"]):
+                device_breakdown["mobile"] += 1
+            else:
+                device_breakdown["desktop"] += 1
+
+        return {
+            "started_count": started_count,
+            "completed_count": completed_count,
+            "completion_rate": completion_rate,
+            "median_duration_seconds": median_duration,
+            "device_breakdown": device_breakdown,
+        }
+
+    @staticmethod
+    async def get_study_full_dump(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Extracts complete study data and valid participant sorts for export."""
+        # 1. Get Study with statements (ordered by ID for consistency)
+        stmt = (
+            select(Study)
+            .where(Study.id == study_id)
+            .options(
+                selectinload(Study.statements).selectinload(Statement.translations),
+                selectinload(Study.translations),
+            )
+        )
+        result = await db.execute(stmt)
+        study = result.scalar_one_or_none()
+        if not study:
+            raise NotFoundError("Study")
+
+        # 2. Get all non-discarded completed participants with their Q-sort entries and audio
+        p_stmt = (
+            select(Participant)
+            .where(
+                Participant.study_id == study_id,
+            )
+            .options(
+                selectinload(Participant.qsort_entries),
+                selectinload(Participant.audio_recordings),
+            )
+        )
+        p_result = await db.execute(p_stmt)
+        participants = p_result.scalars().all()
+
+        # 3. Build Export Structure
+        # PQMethod and others need a fixed reference for statement order.
+        # We sort by original statement ID.
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
+        statement_id_to_index = {s.id: i for i, s in enumerate(sorted_statements)}
+
+        participant_data = []
+        for p in participants:
+            # Edge case: Handle missing or None qsort_entries
+            placements = {}
+            if p.qsort_entries:
+                placements = {
+                    entry.statement_id: entry.grid_score for entry in p.qsort_entries
+                }
+
+            # Create a score list in the exact order of sorted_statements
+            scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            # Edge case: Ensure presort and postsort are not None
+            presort = p.presort_answers if p.presort_answers is not None else {}
+            postsort = p.postsort_answers if p.postsort_answers is not None else {}
+
+            # Build audio recordings map with presigned URLs
+            audio_recordings = {}
+            from ..services.storage_service import storage_service
+
+            for audio_rec in p.audio_recordings:
+                try:
+                    # Generate fresh presigned URL (24h expiration for exports)
+                    presigned_url = storage_service.generate_presigned_url(
+                        audio_rec.s3_key, expiration=86400
+                    )
+                    audio_recordings[audio_rec.question_key] = {
+                        "id": audio_rec.id,
+                        "duration_seconds": audio_rec.duration_seconds,
+                        "file_size_bytes": audio_rec.file_size_bytes,
+                        "mime_type": audio_rec.mime_type,
+                        "created_at": audio_rec.created_at.isoformat(),
+                        "presigned_url": presigned_url,
+                    }
+                except Exception as e:
+                    # Log but don't fail export
+                    logger.warning(
+                        "Failed to generate presigned URL for %s: %s",
+                        audio_rec.s3_key,
+                        e,
+                    )
+
+            participant_data.append(
+                {
+                    "id": str(p.session_token)[:8].upper(),
+                    "db_id": p.id,
+                    "duration_seconds": (
+                        p.submitted_at - p.consented_at
+                    ).total_seconds()
+                    if p.submitted_at and p.consented_at
+                    else None,
+                    "scores": scores,
+                    # For raw CSV/KenQ
+                    "placements": placements,
+                    "presort": presort,
+                    "postsort": postsort,
+                    "audio_recordings": audio_recordings,
+                    "language": p.language_used,
+                    "is_discarded": p.is_discarded,
+                    "discard_reason": p.discard_reason,
+                    "is_test_run": p.is_test_run,
+                    "status": p.status.value,
+                    "recruitment_token": getattr(p, "recruitment_token", None),
+                    "ip_address": p.ip_address,
+                    "user_agent": p.user_agent,
+                    "submitted_at": p.submitted_at.isoformat()
+                    if p.submitted_at
+                    else None,
+                    "created_at": p.created_at.isoformat() if p.created_at else None,
+                    "last_step_reached": p.last_step_reached,
+                    "last_step_reached_at": p.last_step_reached_at.isoformat()
+                    if p.last_step_reached_at
+                    else None,
+                }
+            )
+
+        return {
+            "study": {
+                "slug": study.slug,
+                "state": study.state.value,
+                "grid_config": study.grid_config,
+                "presort_config": study.presort_config,
+                "postsort_config": study.postsort_config,
+                "statements": [
+                    {
+                        "id": s.id,
+                        "code": s.code,
+                        "translations": [
+                            {"lang": t.language_code, "text": t.text}
+                            for t in s.translations
+                        ],
+                    }
+                    for s in sorted_statements
+                ],
+                "translations": [
+                    {"lang": t.language_code, "title": t.title}
+                    for t in study.translations
+                ],
+            },
+            "participants": participant_data,
+            "statement_id_to_index": statement_id_to_index,
+        }
+
+    @staticmethod
+    async def get_study_sort_data(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Lightweight version of get_study_full_dump for analysis.
+
+        Skips audio recordings, presigned URLs, presort/postsort answers,
+        and other metadata not needed for factor analysis. Only loads
+        completed, non-discarded, non-test participants with Q-sort scores.
+        """
+        # 1. Study with statements
+        stmt = (
+            select(Study)
+            .where(Study.id == study_id)
+            .options(
+                selectinload(Study.statements).selectinload(Statement.translations),
+            )
+        )
+        result = await db.execute(stmt)
+        study = result.scalar_one_or_none()
+        if not study:
+            raise NotFoundError("Study")
+
+        # 2. Only completed, non-discarded, non-test participants (with Q-sort entries only)
+        p_stmt = (
+            select(Participant)
+            .where(
+                Participant.study_id == study_id,
+                Participant.is_discarded.is_(False),
+                Participant.is_test_run.is_(False),
+                Participant.status == ParticipantStatus.completed,
+            )
+            .options(selectinload(Participant.qsort_entries))
+        )
+        p_result = await db.execute(p_stmt)
+        participants = p_result.scalars().all()
+
+        # 3. Build lightweight structure
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
+
+        participant_data = []
+        for p in participants:
+            placements = {}
+            if p.qsort_entries:
+                placements = {
+                    entry.statement_id: entry.grid_score for entry in p.qsort_entries
+                }
+            scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            participant_data.append(
+                {
+                    "id": str(p.session_token)[:8].upper(),
+                    "db_id": p.id,
+                    "scores": scores,
+                    "is_discarded": False,
+                    "is_test_run": False,
+                    "status": "completed",
+                }
+            )
+
+        return {
+            "study": {
+                "statements": [
+                    {
+                        "id": s.id,
+                        "code": s.code,
+                        "translations": [
+                            {"lang": t.language_code, "text": t.text}
+                            for t in s.translations
+                        ],
+                    }
+                    for s in sorted_statements
+                ],
+                "grid_config": study.grid_config,
+            },
+            "participants": participant_data,
+        }

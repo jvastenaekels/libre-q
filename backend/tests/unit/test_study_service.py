@@ -3,10 +3,10 @@
 import uuid
 
 import pytest
-from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from app.exceptions import ValidationError
 from app.models import Participant, ParticipantStatus
 from app.schemas import QSortEntryInput, SubmissionInput
 from app.services.study_service import StudyService
@@ -28,10 +28,8 @@ async def test_validate_distribution_valid(active_study):
 @pytest.mark.asyncio
 async def test_validate_distribution_incomplete(active_study):
     qsort = [QSortEntryInput(statement_id=1, grid_score=0)]
-    with pytest.raises(HTTPException) as excinfo:
+    with pytest.raises(ValidationError, match="Submission incomplete"):
         StudyService.validate_distribution(active_study, qsort)
-    assert excinfo.value.status_code == 400
-    assert "Submission incomplete" in excinfo.value.detail
 
 
 @pytest.mark.asyncio
@@ -43,10 +41,8 @@ async def test_validate_distribution_wrong_counts(active_study):
         QSortEntryInput(statement_id=3, grid_score=0),
         QSortEntryInput(statement_id=4, grid_score=0),
     ]
-    with pytest.raises(HTTPException) as excinfo:
+    with pytest.raises(ValidationError, match="incorrect number of cards"):
         StudyService.validate_distribution(active_study, qsort)
-    assert excinfo.value.status_code == 400
-    assert "incorrect number of cards" in excinfo.value.detail
 
 
 @pytest.mark.asyncio
@@ -57,12 +53,10 @@ async def test_validate_distribution_invalid_score(active_study):
         QSortEntryInput(statement_id=3, grid_score=0),
         QSortEntryInput(statement_id=4, grid_score=5),  # Out of distribution range
     ]
-    with pytest.raises(HTTPException) as excinfo:
-        StudyService.validate_distribution(active_study, qsort)
-    assert excinfo.value.status_code == 400
     # It hits the "incorrect number of cards" for column 1 first, because 4 cards are expected
     # and column 1 has 0.
-    assert "incorrect number of cards" in excinfo.value.detail
+    with pytest.raises(ValidationError, match="incorrect number of cards"):
+        StudyService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio

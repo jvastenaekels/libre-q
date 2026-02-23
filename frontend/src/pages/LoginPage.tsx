@@ -73,8 +73,9 @@ const LoginPage = () => {
                 }
 
                 try {
-                    const workspaces = await listWorkspacesApiAdminWorkspacesGet();
-                    if (workspaces && Array.isArray(workspaces) && workspaces.length > 0) {
+                    const response = await listWorkspacesApiAdminWorkspacesGet();
+                    const workspaces = response?.items;
+                    if (workspaces && workspaces.length > 0) {
                         const sorted = [...workspaces].sort(
                             (a, b) =>
                                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime()

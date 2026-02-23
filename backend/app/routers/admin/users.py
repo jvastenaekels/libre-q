@@ -1,7 +1,7 @@
 """API router for administrative user management."""
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
@@ -9,6 +9,7 @@ from ...dependencies import get_current_user
 from ...limiter import limiter
 from ...models import User
 from ...schemas import UserCreate, UserRead
+from ...schemas.common import PaginatedResponse
 from ...utils.security import get_password_hash
 
 router = APIRouter(tags=["Admin Users"])
@@ -24,14 +25,21 @@ async def check_superuser(current_user: User = Depends(get_current_user)) -> Use
     return current_user
 
 
-@router.get("", response_model=list[UserRead])
+@router.get("", response_model=PaginatedResponse[UserRead])
 async def list_users(
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
+    limit: int = 50,
+    offset: int = 0,
 ):
-    """List all users in the system."""
-    result = await db.execute(select(User))
-    return result.scalars().all()
+    """List all users in the system with pagination."""
+    count_result = await db.execute(select(func.count(User.id)))
+    total = count_result.scalar() or 0
+
+    result = await db.execute(select(User).limit(limit).offset(offset))
+    items = list(result.scalars().all())
+
+    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)

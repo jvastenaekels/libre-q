@@ -10,12 +10,12 @@ export const dataExportsPageLoader = async ({ params }: LoaderFunctionArgs) => {
     if (!slug) throw new Error('Slug is required (Data Exports)');
 
     try {
-        const participants = await queryClient.fetchQuery({
+        const response = await queryClient.fetchQuery({
             queryKey: getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey(slug),
             queryFn: () => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug),
         });
 
-        return { participants, slug };
+        return { participants: response.items, slug };
     } catch (error) {
         console.error('Failed to load export data:', error);
         return { participants: [], slug };

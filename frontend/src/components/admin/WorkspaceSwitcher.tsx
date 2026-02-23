@@ -32,10 +32,10 @@ export function WorkspaceSwitcher() {
     const { setActiveWorkspace } = useAdminStore();
 
     // Fetch data using generated hook (React Query)
-    const { data: workspacesData, isLoading: isWorkspacesLoading } =
+    const { data: workspacesResponse, isLoading: isWorkspacesLoading } =
         useListWorkspacesApiAdminWorkspacesGet();
-    // Cast to our type including role
-    const workspaces = workspacesData as WorkspaceWithRole[] | undefined;
+    // Extract items from paginated response
+    const workspaces = workspacesResponse?.items as WorkspaceWithRole[] | undefined;
     // Use Auth Store for global state
     const { currentWorkspace, setWorkspaces } = useAuthStore();
 

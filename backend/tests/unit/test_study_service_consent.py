@@ -3,9 +3,9 @@
 import uuid
 
 import pytest
-from fastapi import HTTPException
 from sqlalchemy import select
 
+from app.exceptions import NotFoundError
 from app.models import Participant, ParticipantStatus
 from app.services.study_service import StudyService
 
@@ -14,10 +14,8 @@ from app.services.study_service import StudyService
 async def test_record_consent_study_not_found(db):
     """Should raise 404 if study does not exist."""
     session_token = uuid.uuid4()
-    with pytest.raises(HTTPException) as excinfo:
+    with pytest.raises(NotFoundError, match="Study not found"):
         await StudyService.record_consent(db, "non-existent-study", session_token, "en")
-    assert excinfo.value.status_code == 404
-    assert "Study not found" in excinfo.value.detail
 
 
 @pytest.mark.asyncio

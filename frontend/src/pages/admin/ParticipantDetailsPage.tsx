@@ -53,12 +53,11 @@ export default function ParticipantDetailsPage() {
     });
 
     // Fetch participant list for prev/next navigation
-    const { data: participantList } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(
-        effectiveSlug,
-        {
+    const { data: participantListData } =
+        useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(effectiveSlug, undefined, {
             query: { enabled: !!effectiveSlug },
-        }
-    );
+        });
+    const participantList = participantListData?.items;
 
     const { currentIndex, prevId, nextId } = useMemo(() => {
         if (!participantList || !participantId) {

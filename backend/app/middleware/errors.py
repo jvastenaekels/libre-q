@@ -113,6 +113,51 @@ async def sqlalchemy_exception_handler(
     )
 
 
+async def service_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Handle business-layer exceptions from the service layer."""
+    from app.exceptions import (
+        ConflictError,
+        ForbiddenError,
+        NotFoundError,
+        ServiceError,
+        ValidationError,
+    )
+
+    if isinstance(exc, NotFoundError):
+        return create_error_response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            code="resource_not_found",
+            message=exc.message,
+        )
+    if isinstance(exc, ValidationError):
+        return create_error_response(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            code="validation_error",
+            message=exc.message,
+        )
+    if isinstance(exc, ConflictError):
+        return create_error_response(
+            status_code=status.HTTP_409_CONFLICT,
+            code="conflict",
+            message=exc.message,
+        )
+    if isinstance(exc, ForbiddenError):
+        return create_error_response(
+            status_code=status.HTTP_403_FORBIDDEN,
+            code="forbidden",
+            message=exc.message,
+        )
+
+    # ConcurrencyError and generic ServiceError → 500
+    exc = cast(ServiceError, exc)
+    logger.error(f"Service error on {request.method} {request.url}: {exc.message}")
+    return create_error_response(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        code="internal_server_error",
+        message=exc.message,
+    )
+
+
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global handler for all unhandled exceptions."""
     # Log the full traceback

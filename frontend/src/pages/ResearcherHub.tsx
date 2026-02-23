@@ -26,7 +26,8 @@ export default function ResearcherHub() {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const { data: allStudies } = useListStudiesApiAdminStudiesGet();
+    const { data: allStudiesData } = useListStudiesApiAdminStudiesGet();
+    const allStudies = allStudiesData?.items;
 
     const handleWorkspaceClick = (workspaceSlug: string, workspaceId: number) => {
         setActiveWorkspace(workspaceId);

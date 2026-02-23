@@ -16,7 +16,7 @@ export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) =>
 
     try {
         // Pre-fetch all data in parallel
-        const [stats, participants, study] = await Promise.all([
+        const [stats, participantsResponse, study] = await Promise.all([
             queryClient.fetchQuery({
                 queryKey: getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey(slug),
                 queryFn: () => getStudyStatsApiAdminStudiesSlugStatsGet(slug),
@@ -31,7 +31,7 @@ export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) =>
             }),
         ]);
 
-        return { stats, participants, study, slug };
+        return { stats, participants: participantsResponse.items, study, slug };
     } catch (error) {
         console.error('Failed to load study overview:', error);
 

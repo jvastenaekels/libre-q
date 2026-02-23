@@ -61,11 +61,12 @@ export function AdminDashboard() {
     const { setActiveStudy } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showImportDialog, setShowImportDialog] = useState(false);
-    const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet({
+    const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
             enabled: !!currentWorkspace?.id,
         },
     });
+    const allStudies = allStudiesData?.items;
     const { t, i18n } = useTranslation();
 
     // biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns

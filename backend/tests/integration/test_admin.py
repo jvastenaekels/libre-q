@@ -25,7 +25,7 @@ class TestAdminUsers:
         headers = {"Authorization": f"Bearer {create_access_token(super_user.email)}"}
         response = await client.get("/api/admin/users", headers=headers)
         assert response.status_code == 200
-        assert any(u["email"] == super_user.email for u in response.json())
+        assert any(u["email"] == super_user.email for u in response.json()["items"])
 
     async def test_list_users_forbidden_for_normal(
         self, client: AsyncClient, test_user: User

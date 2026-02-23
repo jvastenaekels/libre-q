@@ -198,11 +198,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const isFocusMode = isNewArchitecture && !!params.studySlug;
     const workspaceSlug = params.workspaceSlug || currentWorkspace?.slug;
 
-    const { data: studies } = useListStudiesApiAdminStudiesGet({
+    const { data: studiesData } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
             enabled: !!currentWorkspace?.id,
         },
     });
+    const studies = studiesData?.items;
 
     const { can } = usePermission();
 
