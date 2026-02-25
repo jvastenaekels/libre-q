@@ -76,6 +76,7 @@ const StudyLayoutContent: React.FC = () => {
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
     const currentStep = useSessionStore((state) => state.currentStep);
     const isCompleted = useSessionStore((state) => state.isCompleted);
+    const studySlug = useSessionStore((state) => state.studySlug);
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const sessionLanguage = useSessionStore((state) => state.language);
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
@@ -456,8 +457,10 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Enforce One-Time Submission
-    // If completed, redirect everything to post-sort (Thank You page)
-    if (isCompleted && !location.pathname.includes('post-sort')) {
+    // If completed for THIS study, redirect everything to post-sort (Thank You page).
+    // When studySlug is null (pre-migration session), assume same study to preserve existing behavior.
+    const isCompletedForThisStudy = isCompleted && (!studySlug || studySlug === slug);
+    if (isCompletedForThisStudy && !location.pathname.includes('post-sort')) {
         return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 

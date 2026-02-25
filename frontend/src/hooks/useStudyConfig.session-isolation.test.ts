@@ -211,6 +211,62 @@ describe('Session Isolation Tests', () => {
         });
     });
 
+    describe('Cross-Study Completion Isolation', () => {
+        it('should not block participation in Study B after completing Study A', () => {
+            // Complete Study A
+            useSessionStore.getState().setToken('token-a');
+            useSessionStore.getState().setStudySlug('study-a');
+            useSessionStore.getState().setConsent(true);
+            useSessionStore.getState().setStep(5);
+            useSessionStore.getState().completeSession('CONF-A');
+
+            // Verify Study A is completed
+            expect(useSessionStore.getState().isCompleted).toBe(true);
+            expect(useSessionStore.getState().studySlug).toBe('study-a');
+
+            // The redirect guard in StudyLayout checks:
+            // isCompleted && (!studySlug || studySlug === slug)
+            // For Study B (slug='study-b'), this should be FALSE
+            const isCompleted = useSessionStore.getState().isCompleted;
+            const studySlug = useSessionStore.getState().studySlug;
+            const currentSlug = 'study-b';
+            const wouldRedirect = isCompleted && (!studySlug || studySlug === currentSlug);
+
+            expect(wouldRedirect).toBe(false);
+        });
+
+        it('should still enforce one-time submission for the same study', () => {
+            // Complete Study A
+            useSessionStore.getState().setToken('token-a');
+            useSessionStore.getState().setStudySlug('study-a');
+            useSessionStore.getState().completeSession('CONF-A');
+
+            // The redirect guard for the SAME study should still trigger
+            const isCompleted = useSessionStore.getState().isCompleted;
+            const studySlug = useSessionStore.getState().studySlug;
+            const currentSlug = 'study-a';
+            const wouldRedirect = isCompleted && (!studySlug || studySlug === currentSlug);
+
+            expect(wouldRedirect).toBe(true);
+        });
+
+        it('should preserve redirect behavior for pre-migration sessions (studySlug=null)', () => {
+            // Simulate a pre-migration completed session (no studySlug)
+            useSessionStore.getState().setToken('token-old');
+            useSessionStore.getState().completeSession('CONF-OLD');
+
+            // studySlug should be null (never set)
+            expect(useSessionStore.getState().studySlug).toBeNull();
+
+            // The redirect guard treats null studySlug as "same study" for backward compat
+            const isCompleted = useSessionStore.getState().isCompleted;
+            const studySlug = useSessionStore.getState().studySlug;
+            const wouldRedirect = isCompleted && (!studySlug || studySlug === 'any-study');
+
+            expect(wouldRedirect).toBe(true);
+        });
+    });
+
     describe('Pilot Mode Isolation', () => {
         it.skip('should use separate storage keys for pilot mode', () => {
             // ... (rest of test)

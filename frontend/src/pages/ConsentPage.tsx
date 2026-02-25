@@ -81,6 +81,8 @@ const ConsentPage: React.FC = () => {
                 useResponseStore.getState().resetResponses();
                 setToken(token);
             }
+            // Track which study this session belongs to (for cross-study isolation)
+            useSessionStore.getState().setStudySlug(slug || '');
 
             // Record proof of consent in DB (skip in pilot mode — no backend persistence)
             if (!session.isPilotMode) {

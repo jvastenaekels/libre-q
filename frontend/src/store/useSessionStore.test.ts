@@ -9,6 +9,7 @@ describe('useSessionStore', () => {
     it('initializes with default values', () => {
         const state = useSessionStore.getState();
         expect(state.token).toBeNull();
+        expect(state.studySlug).toBeNull();
         expect(state.hasConsented).toBe(false);
         expect(state.currentStep).toBe(1);
         expect(state.maxReachedStep).toBe(1);
@@ -45,6 +46,11 @@ describe('useSessionStore', () => {
         expect(useSessionStore.getState().token).toBe('test-token');
     });
 
+    it('sets study slug', () => {
+        useSessionStore.getState().setStudySlug('my-study');
+        expect(useSessionStore.getState().studySlug).toBe('my-study');
+    });
+
     it('completes session', () => {
         useSessionStore.getState().completeSession('code-123');
         const state = useSessionStore.getState();
@@ -55,6 +61,7 @@ describe('useSessionStore', () => {
     it('resets session', () => {
         const store = useSessionStore.getState();
         store.setToken('token');
+        store.setStudySlug('my-study');
         store.setConsent(true);
         store.setStep(3);
         store.completeSession('code');
@@ -63,6 +70,7 @@ describe('useSessionStore', () => {
 
         const newState = useSessionStore.getState();
         expect(newState.token).toBeNull();
+        expect(newState.studySlug).toBeNull();
         expect(newState.hasConsented).toBe(false);
         expect(newState.currentStep).toBe(1);
         expect(newState.isCompleted).toBe(false);

@@ -12,6 +12,7 @@ import { safeLocalStorage } from './safeStorage';
 
 interface SessionState {
     token: string | null;
+    studySlug: string | null;
     hasConsented: boolean;
     currentStep: number;
     maxReachedStep: number;
@@ -23,6 +24,7 @@ interface SessionState {
     isPilotMode: boolean;
 
     setToken: (token: string) => void;
+    setStudySlug: (slug: string) => void;
     setConsent: (hasConsented: boolean) => void;
     setStep: (step: number) => void;
     setLanguage: (lang: string) => void;
@@ -50,6 +52,7 @@ export const useSessionStore = create<SessionState>()(
     persist(
         (set) => ({
             token: null,
+            studySlug: null,
             hasConsented: false,
             currentStep: 1,
             maxReachedStep: 1,
@@ -61,6 +64,7 @@ export const useSessionStore = create<SessionState>()(
             isPilotMode: isPilot(),
 
             setToken: (token) => set({ token }),
+            setStudySlug: (studySlug) => set({ studySlug }),
             setConsent: (hasConsented) => set({ hasConsented }),
             setStep: (step) =>
                 set((state) => ({
@@ -80,6 +84,7 @@ export const useSessionStore = create<SessionState>()(
                 resetBaseLocales();
                 set({
                     token: null,
+                    studySlug: null,
                     hasConsented: false,
                     currentStep: 1,
                     maxReachedStep: 1,
@@ -94,12 +99,17 @@ export const useSessionStore = create<SessionState>()(
         }),
         {
             name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
-            version: 1,
+            version: 2,
             storage: safeLocalStorage,
             migrate: (persisted: unknown, version: number) => {
+                const state = persisted as Record<string, unknown>;
                 if (version === 0) {
                     // v0 → v1: added resumeCode field
-                    return { ...(persisted as Record<string, unknown>), resumeCode: null };
+                    return { ...state, resumeCode: null, studySlug: null };
+                }
+                if (version === 1) {
+                    // v1 → v2: added studySlug for per-study session isolation
+                    return { ...state, studySlug: null };
                 }
                 return persisted as SessionState;
             },

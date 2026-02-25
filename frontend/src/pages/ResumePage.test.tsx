@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
     resetSession: vi.fn(),
     resetResponses: vi.fn(),
     setToken: vi.fn(),
+    setStudySlug: vi.fn(),
     setConsent: vi.fn(),
     setStep: vi.fn(),
     setLanguage: vi.fn(),
@@ -59,6 +60,7 @@ vi.mock('../store/useSessionStore', () => ({
         getState: () => ({
             resetSession: mocks.resetSession,
             setToken: mocks.setToken,
+            setStudySlug: mocks.setStudySlug,
             setConsent: mocks.setConsent,
             setStep: mocks.setStep,
             setLanguage: mocks.setLanguage,

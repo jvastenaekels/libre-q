@@ -60,6 +60,7 @@ export default function ResumePage() {
                 // Hydrate session store
                 const session = useSessionStore.getState();
                 session.setToken(data.session_token);
+                session.setStudySlug(slug || '');
                 session.setConsent(true);
                 session.setStep(data.last_step_reached);
                 session.setLanguage(data.language);
