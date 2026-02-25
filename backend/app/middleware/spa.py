@@ -12,7 +12,10 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Resolve paths relative to the backend/ directory
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # backend/
+# spa.py is at backend/app/middleware/spa.py → 3 dirname calls to reach backend/
+_BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)  # backend/
 _ROOT_DIR = os.path.dirname(_BASE_DIR)  # project root
 FRONTEND_DIST = os.path.join(_ROOT_DIR, "frontend", "dist")
 
@@ -35,17 +38,9 @@ def mount_spa(app: FastAPI) -> None:
     If the frontend build directory doesn't exist (e.g. in development),
     registers a simple root endpoint instead.
     """
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.info("SPA mount: FRONTEND_DIST=%s exists=%s", FRONTEND_DIST, os.path.exists(FRONTEND_DIST))
-    logger.info("SPA mount: _ROOT_DIR=%s contents=%s", _ROOT_DIR, os.listdir(_ROOT_DIR) if os.path.exists(_ROOT_DIR) else "N/A")
-    if os.path.exists(os.path.join(_ROOT_DIR, "frontend")):
-        logger.info("SPA mount: frontend/ contents=%s", os.listdir(os.path.join(_ROOT_DIR, "frontend")))
-
     if not os.path.exists(FRONTEND_DIST):
 
-        @app.get("/")
+        @app.get("/", include_in_schema=False)
         def read_root():
             """Root endpoint when frontend is not mounted."""
             return {"Hello": "Frontend build not found. API is running."}
@@ -59,7 +54,7 @@ def mount_spa(app: FastAPI) -> None:
         name="assets",
     )
 
-    @app.get("/{full_path:path}")
+    @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str):
         """Serve SPA static files and handle client-side routing."""
         # 1. Never serve SPA for missing API routes

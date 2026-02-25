@@ -8279,96 +8279,6 @@ export function useHealthCheckHealthGet<
     return query;
 }
 
-/**
- * Root endpoint when frontend is not mounted.
- * @summary Read Root
- */
-export const readRootGet = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/`, method: 'GET', signal });
-};
-
-export const getReadRootGetQueryKey = () => {
-    return [`/`] as const;
-};
-
-export const getReadRootGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof readRootGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
-}) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getReadRootGetQueryKey();
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readRootGet>>> = ({ signal }) =>
-        readRootGet(signal);
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof readRootGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ReadRootGetQueryResult = NonNullable<Awaited<ReturnType<typeof readRootGet>>>;
-export type ReadRootGetQueryError = unknown;
-
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readRootGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof readRootGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readRootGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof readRootGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary Read Root
- */
-
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getReadRootGetQueryOptions(options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
-
-    query.queryKey = queryOptions.queryKey;
-
-    return query;
-}
-
 export const getReadUsersMeApiMeGetResponseMock = (
     overrideResponse: Partial<UserRead> = {}
 ): UserRead => ({
@@ -12078,24 +11988,6 @@ export const getHealthCheckHealthGetMockHandler = (
         options
     );
 };
-
-export const getReadRootGetMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.get(
-        '*/',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
 export const getLibreQAPIMock = () => [
     getReadUsersMeApiMeGetMockHandler(),
     getUpdateUserMeApiMePatchMockHandler(),
@@ -12168,5 +12060,4 @@ export const getLibreQAPIMock = () => [
     getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
     getTestHealthApiTestHealthGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
-    getReadRootGetMockHandler(),
 ];

@@ -3569,23 +3569,6 @@
           }
         }
       }
-    },
-    "/": {
-      "get": {
-        "summary": "Read Root",
-        "description": "Root endpoint when frontend is not mounted.",
-        "operationId": "read_root__get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
