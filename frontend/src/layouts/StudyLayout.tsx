@@ -319,11 +319,14 @@ const StudyLayoutContent: React.FC = () => {
     // arriving via ResumePage, which shows its own "restored" toast).
     // Only fires when maxReachedStep was already > 1 at mount (persisted from
     // a previous visit), not when the user first progresses past step 1.
+    // Waits for i18n language to match sessionLanguage so the toast is localized.
     const mountMaxStep = useRef(maxReachedStep);
     const hasShownWelcomeBack = useRef(false);
+    const langReady = !sessionLanguage || i18n.language === sessionLanguage;
     useEffect(() => {
         if (
             !hasShownWelcomeBack.current &&
+            langReady &&
             mountMaxStep.current > 1 &&
             hasConsented &&
             !isCompleted &&
@@ -343,7 +346,7 @@ const StudyLayoutContent: React.FC = () => {
                 t('resume.welcome_back', 'Welcome back! Your progress has been restored.')
             );
         }
-    }, [hasConsented, isCompleted, isPilotMode, maxReachedStep, t]);
+    }, [hasConsented, isCompleted, isPilotMode, langReady, maxReachedStep, t]);
 
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)

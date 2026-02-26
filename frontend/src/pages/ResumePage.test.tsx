@@ -30,6 +30,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (_key: string, fallback: string) => fallback,
+        i18n: { changeLanguage: vi.fn().mockResolvedValue(undefined) },
     }),
 }));
 

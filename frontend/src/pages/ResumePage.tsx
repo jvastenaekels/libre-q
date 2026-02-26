@@ -20,7 +20,7 @@ import { initialResponses, useResponseStore } from '../store/useResponseStore';
 type ResumeError = 'not_found' | 'study_closed' | 'rate_limited' | 'error';
 
 export default function ResumePage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { slug, token } = useParams<{ slug: string; token: string }>();
     const [error, setError] = useState<ResumeError | null>(null);
@@ -64,6 +64,9 @@ export default function ResumePage() {
                 session.setConsent(true);
                 session.setStep(data.last_step_reached);
                 session.setLanguage(data.language);
+                if (data.language) {
+                    await i18n.changeLanguage(data.language);
+                }
                 if (data.resume_code) {
                     session.setResumeCode(data.resume_code);
                 }
