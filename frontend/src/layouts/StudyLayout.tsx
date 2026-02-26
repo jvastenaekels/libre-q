@@ -234,6 +234,17 @@ const StudyLayoutContent: React.FC = () => {
     // Trigger config fetch/re-fetch on slug or language change
     const { retry, unlock, passwordError } = useStudyConfig();
 
+    // Cross-study session cleanup
+    // If the stored session was completed for a DIFFERENT study (or a legacy session with
+    // unknown slug), reset it so the participant can start fresh in this study.
+    // Their submitted data is safe on the backend — only the local state is cleared.
+    useEffect(() => {
+        if (slug && isCompleted && studySlug !== slug) {
+            useSessionStore.getState().resetSession();
+            useResponseStore.getState().resetResponses();
+        }
+    }, [slug, isCompleted, studySlug]);
+
     // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -440,6 +451,23 @@ const StudyLayoutContent: React.FC = () => {
         );
     }
 
+    // Show loading while the stale session is being reset to prevent flash of stale content
+    const isStaleCompletedSession = isCompleted && studySlug !== slug; // covers both null (legacy) and mismatched slugs
+    if (isStaleCompletedSession) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
+                <div
+                    data-testid="loading-spinner"
+                    className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin"
+                    style={{
+                        borderColor: 'var(--brand-accent)',
+                        borderTopColor: 'transparent',
+                    }}
+                ></div>
+            </div>
+        );
+    }
+
     // Basic Protection Check
     const protectedPaths = ['/presort', '/rough-sort', '/fine-sort', '/post-sort'];
     const isProtected = protectedPaths.some((path) => location.pathname.includes(path));
@@ -457,10 +485,8 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Enforce One-Time Submission
-    // If completed for THIS study, redirect everything to post-sort (Thank You page).
-    // When studySlug is null (pre-migration session), assume same study to preserve existing behavior.
-    const isCompletedForThisStudy = isCompleted && (!studySlug || studySlug === slug);
-    if (isCompletedForThisStudy && !location.pathname.includes('post-sort')) {
+    // If completed for THIS specific study, redirect everything to post-sort (Thank You page).
+    if (isCompleted && studySlug === slug && !location.pathname.includes('post-sort')) {
         return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 

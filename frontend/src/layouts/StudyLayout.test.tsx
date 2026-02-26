@@ -332,7 +332,7 @@ describe('Layout Route Protection', () => {
     });
 
     it('Redirects to Post-Sort if study is completed', () => {
-        useSessionStore.setState({ isCompleted: true, hasConsented: true });
+        useSessionStore.setState({ isCompleted: true, hasConsented: true, studySlug: 'test' });
 
         renderWithProviders(
             <Routes>
