@@ -662,7 +662,7 @@ const StudyLayoutContent: React.FC = () => {
                                             <span className="text-sm">
                                                 {index + 1}. {t(step.labelKey)}
                                             </span>
-                                            {isReached && !isCurrent && currentStep > step.id && (
+                                            {isReached && !isCurrent && (
                                                 <Check
                                                     size={14}
                                                     style={{ color: 'var(--brand-accent)' }}
@@ -686,7 +686,7 @@ const StudyLayoutContent: React.FC = () => {
                             const status =
                                 currentStep === step.id
                                     ? 'current'
-                                    : currentStep > step.id
+                                    : step.id <= maxReachedStep
                                       ? 'completed'
                                       : 'upcoming';
 
