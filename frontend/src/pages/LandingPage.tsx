@@ -16,7 +16,7 @@ const LandingPage: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (slug.trim()) {
-            navigate(`/study/${slug.trim()}/welcome`);
+            navigate(`/study/${slug.trim()}`);
         }
     };
 

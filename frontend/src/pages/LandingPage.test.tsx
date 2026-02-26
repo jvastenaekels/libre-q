@@ -42,6 +42,6 @@ describe('LandingPage', () => {
         const button = screen.getByRole('button');
         fireEvent.click(button);
 
-        expect(mockNavigate).toHaveBeenCalledWith('/study/test-study/welcome');
+        expect(mockNavigate).toHaveBeenCalledWith('/study/test-study');
     });
 });

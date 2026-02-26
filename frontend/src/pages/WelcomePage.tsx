@@ -42,13 +42,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
 
-    const isReturningUser = hasConsented && maxReachedStep > 1;
-
     // Set Step 1 on mount and sync Pilot Mode
     React.useEffect(() => {
-        if (!isReturningUser) {
-            setStep(1);
-        }
+        setStep(1);
 
         // Pilot Mode Logic: "Running a test run and then a normal run should not contaminate the normal run"
         // We strictly sync the pilot state with the URL presence of 'mode=test' at the entry point (Welcome).
@@ -72,7 +68,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                 sessionStorage.removeItem('libre-q-pilot-mode');
             }
         }
-    }, [isReturningUser, setStep, setPilotMode, isPilotMode, location.search]);
+    }, [setStep, setPilotMode, isPilotMode, location.search]);
 
     // Dynamic scaling logic for animation
     const containerRef = React.useRef<HTMLDivElement>(null);
