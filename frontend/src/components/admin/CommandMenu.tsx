@@ -20,8 +20,7 @@ import {
     useListStudiesApiAdminStudiesGet,
     useListWorkspacesApiAdminWorkspacesGet,
 } from '@/api/generated';
-import { useSessionStore } from '@/store/useSessionStore';
-import { useResponseStore } from '@/store/useResponseStore';
+import { resetAllStores } from '@/utils/sessionReset';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -78,8 +77,7 @@ export const CommandMenu = () => {
 
     const handleLogout = () => {
         logout();
-        useSessionStore.getState().resetSession();
-        useResponseStore.getState().resetResponses();
+        resetAllStores({ skipConfig: true });
         navigate('/login');
         toast.success(t('admin.command_menu.logged_out', 'Logged out successfully'));
     };

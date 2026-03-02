@@ -2,7 +2,6 @@
  * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
- * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
 /**
@@ -109,10 +108,21 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         })
     );
 
+    const isCompleted = useSessionStore((state) => state.isCompleted);
+
     // 4. Effects
     useEffect(() => {
         setStep(4);
     }, [setStep]);
+
+    // Deep-link guard: redirect to rough-sort if no rough sort data
+    useEffect(() => {
+        if (isCompleted) return;
+        const totalRough = rough.agree.length + rough.disagree.length + rough.neutral.length;
+        if (config && totalRough === 0) {
+            navigate(`/study/${slug}/rough-sort${location.search}`, { replace: true });
+        }
+    }, [config, rough, navigate, slug, isCompleted, location.search]);
 
     // 5. Memoized derived data
     const gridColumns = useMemo(

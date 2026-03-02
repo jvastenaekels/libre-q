@@ -17,6 +17,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
+import { isPresortEnabled } from '../utils/studyConfig';
 
 import { evaluateVisibilityCondition } from '../utils/visibilityEvaluator';
 import { getLocalizedText } from '@/utils/localization';
@@ -176,11 +177,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
     // Handle skipping if disabled
     React.useEffect(() => {
-        if (
-            config?.presort_config &&
-            'enabled' in config.presort_config &&
-            !config.presort_config.enabled
-        ) {
+        if (!isPresortEnabled(config)) {
             navigate(`/study/${slug}/rough-sort${location.search}`, { replace: true });
         }
     }, [config, navigate, slug, location.search]);
@@ -192,13 +189,6 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         setStep(3);
         navigate(`/study/${slug}/rough-sort${location.search}`);
     };
-
-    // Helper for multilingual strings
-    // const getLocalizedText = (obj: string | Record<string, string>) => {
-    //     if (typeof obj === 'string') return obj;
-    //     if (!obj) return '';
-    //     return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
-    // };
 
     return (
         <div className="max-w-3xl mx-auto py-6 sm:py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">

@@ -1,32 +1,14 @@
 import { act, screen } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import ResetPage from './ResetPage';
 
-// Mock Stores
-vi.mock('../store/useSessionStore');
-vi.mock('../store/useConfigStore');
-vi.mock('../store/useResponseStore');
+const mockResetAllStores = vi.fn();
 
-const mockResetSession = vi.fn();
-const mockResetConfig = vi.fn();
-const mockResetResponses = vi.fn();
-
-vi.mocked(useSessionStore).getState = vi.fn(() => ({
-    resetSession: mockResetSession,
-})) as unknown as ReturnType<typeof useSessionStore.getState>;
-
-vi.mocked(useConfigStore).getState = vi.fn(() => ({
-    resetConfig: mockResetConfig,
-})) as unknown as ReturnType<typeof useConfigStore.getState>;
-
-vi.mocked(useResponseStore).getState = vi.fn(() => ({
-    resetResponses: mockResetResponses,
-})) as unknown as ReturnType<typeof useResponseStore.getState>;
+vi.mock('../utils/sessionReset', () => ({
+    resetAllStores: (...args: unknown[]) => mockResetAllStores(...args),
+}));
 
 describe('ResetPage', () => {
     beforeEach(() => {
@@ -50,10 +32,8 @@ describe('ResetPage', () => {
         // Expect loading spinner
         expect(screen.getByText('Resetting study session...')).toBeInTheDocument();
 
-        // Verify Resets called immediately
-        expect(mockResetSession).toHaveBeenCalled();
-        expect(mockResetConfig).toHaveBeenCalled();
-        expect(mockResetResponses).toHaveBeenCalled();
+        // Verify resetAllStores called immediately
+        expect(mockResetAllStores).toHaveBeenCalled();
 
         // Fast-forward timer (500ms)
         act(() => {

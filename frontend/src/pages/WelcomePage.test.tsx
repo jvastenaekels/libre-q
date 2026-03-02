@@ -108,22 +108,14 @@ describe('WelcomePage', () => {
         const confirmSpy = vi.spyOn(window, 'confirm');
         confirmSpy.mockImplementation(() => true);
 
-        // Mock window.location.reload (optional, but good practice since we call it)
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: { reload: vi.fn() },
-        });
-
         renderWithProviders(<WelcomePage />);
 
         const link = screen.getByText('Start a new session');
         fireEvent.click(link);
 
         expect(confirmSpy).toHaveBeenCalled();
-        expect(window.location.reload).toHaveBeenCalled();
 
         // Verify store was reset (hasConsented should be false)
-        // Note: useSessionStore.getState() might reflect the change immediately
         expect(useSessionStore.getState().hasConsented).toBe(false);
 
         // Verify response store was reset

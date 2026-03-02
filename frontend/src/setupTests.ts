@@ -11,10 +11,8 @@
 import '@testing-library/jest-dom';
 
 import { vi } from 'vitest';
-import { useConfigStore } from './store/useConfigStore';
-import { useResponseStore } from './store/useResponseStore';
-import { useSessionStore } from './store/useSessionStore';
 import { useUIStore } from './store/useUIStore';
+import { resetAllStores } from './utils/sessionReset';
 import { useStudyDesigner } from './store/useStudyDesigner';
 import { server } from './test-utils/server';
 // Initialize i18n for tests (side effect - this sets up the singleton)
@@ -65,9 +63,7 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => {
     server.resetHandlers();
     // Reset Zustand stores
-    useConfigStore.getState().resetConfig();
-    useResponseStore.getState().resetResponses();
-    useSessionStore.getState().resetSession();
+    resetAllStores();
     useUIStore.getState().setHoveredCard(null);
     // Reset StudyDesigner store
     useStudyDesigner.setState({

@@ -18,8 +18,8 @@ import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { resetAllStores } from '../utils/sessionReset';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '../components/DynamicIcon';
 import { DEFAULT_STUDY_CONTENT } from '../constants/studyDefaults';
@@ -295,9 +295,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         type="button"
                         onClick={() => {
                             if (window.confirm(t('welcome.reset_confirm'))) {
-                                useSessionStore.getState().resetSession();
-                                useResponseStore.getState().resetResponses();
-                                window.location.reload();
+                                resetAllStores({ skipConfig: true });
                             }
                         }}
                         className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"

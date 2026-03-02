@@ -54,6 +54,8 @@ describe('RoughSortPage', () => {
         useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
         useSessionStore.getState().resetSession();
         useResponseStore.getState().resetResponses();
+        // Set consent so the deep-link guard doesn't redirect away
+        useSessionStore.getState().setConsent(true);
     });
 
     it('renders completed status message correctly', () => {

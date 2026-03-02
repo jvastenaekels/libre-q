@@ -8,9 +8,7 @@ import { RefreshCw } from 'lucide-react';
 import type React from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useSessionStore } from '../store/useSessionStore';
+import { resetAllStores } from '../utils/sessionReset';
 
 const ResetPage: React.FC = () => {
     const { slug } = useParams();
@@ -20,10 +18,7 @@ const ResetPage: React.FC = () => {
     // We access stores directly in useEffect to avoid unnecessary subscriptions
 
     useEffect(() => {
-        // Atomic reset of all stores
-        useSessionStore.getState().resetSession();
-        useConfigStore.getState().resetConfig();
-        useResponseStore.getState().resetResponses();
+        resetAllStores();
 
         // Short delay to ensure state clears before redirect
         const timer = setTimeout(() => {

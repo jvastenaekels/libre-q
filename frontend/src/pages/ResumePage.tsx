@@ -13,9 +13,9 @@ import { toast } from 'sonner';
 import type { ResumeResponse } from '../api/model';
 import { customInstance } from '../api/mutator';
 import { STEP_ROUTES } from '../constants/stepRoutes';
-import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { initialResponses, useResponseStore } from '../store/useResponseStore';
+import { resetAllStores } from '../utils/sessionReset';
 
 type ResumeError = 'not_found' | 'study_closed' | 'rate_limited' | 'error';
 
@@ -53,9 +53,7 @@ export default function ResumePage() {
 
                 // Reset all stores — including configStore to prevent the slug guard
                 // in useStudyConfig from wiping our hydrated session when StudyLayout mounts
-                useConfigStore.getState().resetConfig();
-                useSessionStore.getState().resetSession();
-                useResponseStore.getState().resetResponses();
+                resetAllStores();
 
                 // Hydrate session store
                 const session = useSessionStore.getState();

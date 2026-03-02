@@ -2,7 +2,6 @@
  * Libre-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
- * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
 /**
@@ -53,6 +52,8 @@ import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
+import { resetAllStores } from '../utils/sessionReset';
+import { isPresortEnabled } from '../utils/studyConfig';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -112,20 +113,37 @@ const StudyLayoutContent: React.FC = () => {
         'idle'
     );
     const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    /** Returns the session token when draft-saving is allowed, or null to skip. */
+    const getDraftSaveToken = useCallback(() => {
+        const session = useSessionStore.getState();
+        if (
+            !session.token ||
+            session.isPilotMode ||
+            session.isCompleted ||
+            session.isSubmitting ||
+            !slug
+        )
+            return null;
+        return session.token;
+    }, [slug]);
+
     useEffect(() => {
         const unsub = useResponseStore.subscribe(() => {
-            const session = useSessionStore.getState();
-            if (!session.token || session.isPilotMode || session.isCompleted || !slug) return;
+            const token = getDraftSaveToken();
+            if (!token) return;
 
             if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
             draftSaveTimerRef.current = setTimeout(() => {
+                const freshToken = getDraftSaveToken();
+                if (!freshToken) return;
                 const { presort, rough, qsort, postsort } = useResponseStore.getState();
                 setDraftSaveStatus('saving');
                 customInstance({
                     url: `/api/study/${slug}/save-draft`,
                     method: 'PUT',
                     data: {
-                        session_token: session.token,
+                        session_token: freshToken,
                         draft_responses: { presort, rough, qsort, postsort },
                     },
                 })
@@ -150,13 +168,13 @@ const StudyLayoutContent: React.FC = () => {
 
         // Helper: build draft save payload
         const buildDraftPayload = () => {
-            const session = useSessionStore.getState();
-            if (!session.token || session.isPilotMode || session.isCompleted || !slug) return null;
+            const token = getDraftSaveToken();
+            if (!token) return null;
             const { presort, rough, qsort, postsort } = useResponseStore.getState();
             return {
                 url: `${BASE_URL}/api/study/${slug}/save-draft`,
                 body: JSON.stringify({
-                    session_token: session.token,
+                    session_token: token,
                     draft_responses: { presort, rough, qsort, postsort },
                 }),
             };
@@ -193,7 +211,7 @@ const StudyLayoutContent: React.FC = () => {
                 }
             }
         };
-    }, [slug]);
+    }, [slug, getDraftSaveToken]);
 
     const location = useLocation();
     const { headerAction } = useLayoutState();
@@ -216,12 +234,7 @@ const StudyLayoutContent: React.FC = () => {
         if (stepId > maxReachedStep) return;
 
         // Skip presort if disabled
-        if (
-            stepId === 2 &&
-            config?.presort_config &&
-            'enabled' in config.presort_config &&
-            config.presort_config.enabled === false
-        ) {
+        if (stepId === 2 && !isPresortEnabled(config)) {
             return;
         }
 
@@ -240,8 +253,7 @@ const StudyLayoutContent: React.FC = () => {
     // Their submitted data is safe on the backend — only the local state is cleared.
     useEffect(() => {
         if (slug && isCompleted && studySlug !== slug) {
-            useSessionStore.getState().resetSession();
-            useResponseStore.getState().resetResponses();
+            resetAllStores({ skipConfig: true });
         }
     }, [slug, isCompleted, studySlug]);
 
@@ -501,12 +513,7 @@ const StudyLayoutContent: React.FC = () => {
     const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
 
     // Filter steps based on config
-    const isPresortDisabled =
-        config?.presort_config &&
-        'enabled' in config.presort_config &&
-        config.presort_config.enabled === false;
-
-    const visibleSteps = steps.filter((step) => !(step.id === 2 && isPresortDisabled));
+    const visibleSteps = steps.filter((step) => !(step.id === 2 && !isPresortEnabled(config)));
 
     const currentVisibleIndex = visibleSteps.findIndex((s) => s.id === currentStep);
 

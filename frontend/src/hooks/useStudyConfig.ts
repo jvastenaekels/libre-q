@@ -4,9 +4,9 @@ import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
 import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
+import { resetAllStores } from '../utils/sessionReset';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
@@ -29,8 +29,6 @@ export const useStudyConfig = () => {
     const setPilotMode = useSessionStore((state) => state.setPilotMode);
     const sessionLanguage = useSessionStore((state) => state.language);
     const setLanguage = useSessionStore((state) => state.setLanguage);
-    const resetSession = useSessionStore((state) => state.resetSession);
-    const resetResponses = useResponseStore((state) => state.resetResponses);
 
     // --- Query Hook ---
     const searchParams = new URLSearchParams(window.location.search);
@@ -68,8 +66,7 @@ export const useStudyConfig = () => {
             // Check if we need a fresh start (set by StudyDesignPage)
             const resetKey = `libre-q-pilot-reset-${slug}`;
             if (localStorage.getItem(resetKey)) {
-                resetSession();
-                resetResponses();
+                resetAllStores({ skipConfig: true });
                 localStorage.removeItem(resetKey);
             }
 
@@ -205,8 +202,6 @@ export const useStudyConfig = () => {
         sessionLanguage,
         setConfigError,
         setConfigLoading,
-        resetSession,
-        resetResponses,
         resetConfig,
         refetch,
     ]);
@@ -215,13 +210,9 @@ export const useStudyConfig = () => {
     // This is the "Slug Guard" - it ensures clean slate when switching studies
     useEffect(() => {
         if (slug && config && config.slug !== slug) {
-            resetSession();
-            resetConfig();
-            resetResponses();
-            // Force a hard query reset to avoid mixing data
-            queryClient.clear();
+            resetAllStores();
         }
-    }, [slug, config, resetSession, resetConfig, resetResponses]);
+    }, [slug, config]);
 
     // --- Effect: Sync Loading State ---
     useEffect(() => {

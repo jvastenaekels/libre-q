@@ -9,9 +9,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useSessionStore } from '../store/useSessionStore';
+import { resetAllStores } from '../utils/sessionReset';
 
 interface ErrorPageProps {
     error?: Error | ApiError | null;
@@ -32,11 +30,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     const { t } = useTranslation();
 
     const handleReset = () => {
-        useSessionStore.getState().resetSession();
-        useConfigStore.getState().resetConfig();
-        useResponseStore.getState().resetResponses();
-        localStorage.removeItem('libre-q-session');
-        localStorage.removeItem('libre-q-responses');
+        resetAllStores();
         window.location.href = '/';
     };
 

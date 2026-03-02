@@ -18,27 +18,13 @@ vi.mock('react-i18next', () => ({
 }));
 
 const mocks = vi.hoisted(() => ({
-    resetSession: vi.fn(),
-    resetConfig: vi.fn(),
-    resetResponses: vi.fn(),
+    resetAllStores: vi.fn(),
     navigate: vi.fn(),
 }));
 
 // Mocks
-vi.mock('../store/useSessionStore', () => ({
-    useSessionStore: {
-        getState: () => ({ resetSession: mocks.resetSession }),
-    },
-}));
-vi.mock('../store/useConfigStore', () => ({
-    useConfigStore: {
-        getState: () => ({ resetConfig: mocks.resetConfig }),
-    },
-}));
-vi.mock('../store/useResponseStore', () => ({
-    useResponseStore: {
-        getState: () => ({ resetResponses: mocks.resetResponses }),
-    },
+vi.mock('../utils/sessionReset', () => ({
+    resetAllStores: mocks.resetAllStores,
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -103,9 +89,7 @@ describe('ErrorPage', () => {
         });
         fireEvent.click(resetButton);
 
-        expect(mocks.resetSession).toHaveBeenCalled();
-        expect(mocks.resetConfig).toHaveBeenCalled();
-        expect(mocks.resetResponses).toHaveBeenCalled();
+        expect(mocks.resetAllStores).toHaveBeenCalled();
         expect(window.location.href).toBe('/');
     });
 

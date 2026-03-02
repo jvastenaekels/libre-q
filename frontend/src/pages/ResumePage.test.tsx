@@ -13,9 +13,7 @@ import ResumePage from './ResumePage';
 const mocks = vi.hoisted(() => ({
     customInstance: vi.fn(),
     navigate: vi.fn(),
-    resetConfig: vi.fn(),
-    resetSession: vi.fn(),
-    resetResponses: vi.fn(),
+    resetAllStores: vi.fn(),
     setToken: vi.fn(),
     setStudySlug: vi.fn(),
     setConsent: vi.fn(),
@@ -41,6 +39,10 @@ vi.mock('../api/mutator', () => ({
     customInstance: mocks.customInstance,
 }));
 
+vi.mock('../utils/sessionReset', () => ({
+    resetAllStores: mocks.resetAllStores,
+}));
+
 vi.mock('sonner', () => ({
     toast: { success: mocks.toastSuccess, error: vi.fn() },
 }));
@@ -53,16 +55,9 @@ vi.mock('react-router-dom', async () => {
     };
 });
 
-vi.mock('../store/useConfigStore', () => ({
-    useConfigStore: {
-        getState: () => ({ resetConfig: mocks.resetConfig }),
-    },
-}));
-
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
         getState: () => ({
-            resetSession: mocks.resetSession,
             setToken: mocks.setToken,
             setStudySlug: mocks.setStudySlug,
             setConsent: mocks.setConsent,
@@ -82,7 +77,7 @@ vi.mock('../store/useResponseStore', () => ({
         postsort: {},
     },
     useResponseStore: {
-        getState: () => ({ resetResponses: mocks.resetResponses }),
+        getState: () => ({}),
         setState: mocks.setState,
     },
 }));
@@ -181,9 +176,7 @@ describe('ResumePage', () => {
         renderResumePage();
 
         await waitFor(() => {
-            expect(mocks.resetConfig).toHaveBeenCalled();
-            expect(mocks.resetSession).toHaveBeenCalled();
-            expect(mocks.resetResponses).toHaveBeenCalled();
+            expect(mocks.resetAllStores).toHaveBeenCalled();
             expect(mocks.setToken).toHaveBeenCalledWith('abc-123');
             expect(mocks.setConsent).toHaveBeenCalledWith(true);
             expect(mocks.setStep).toHaveBeenCalledWith(3);

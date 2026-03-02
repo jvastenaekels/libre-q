@@ -287,7 +287,13 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 return get().postsort.audio_recordings?.[questionKey] || null;
             },
 
-            resetResponses: () => set(initialResponses),
+            resetResponses: () => {
+                if (autoSaveTimeoutId !== null) {
+                    clearTimeout(autoSaveTimeoutId);
+                    autoSaveTimeoutId = null;
+                }
+                set(initialResponses);
+            },
         }),
         {
             name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',

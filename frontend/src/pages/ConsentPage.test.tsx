@@ -124,17 +124,32 @@ describe('ConsentPage', () => {
         });
     });
 
-    it('persists consent state', async () => {
-        const { unmount } = renderWithProviders(<ConsentPage />);
+    it('persists consent state after form submission', async () => {
+        const { unmount } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
+        );
 
         const checkbox = screen.getByRole('checkbox');
         fireEvent.click(checkbox);
+
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
 
         await waitFor(() => expect(useSessionStore.getState().hasConsented).toBe(true));
 
         unmount();
 
-        renderWithProviders(<ConsentPage />);
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
+        );
 
         const newCheckbox = screen.getByRole('checkbox');
         expect(newCheckbox).toBeChecked();

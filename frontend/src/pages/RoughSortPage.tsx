@@ -45,6 +45,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Other Stores
     const setStep = useSessionStore((state) => state.setStep);
+    const hasConsented = useSessionStore((state) => state.hasConsented);
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
     const { setHeaderAction } = useLayoutAction();
@@ -74,6 +75,13 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     useEffect(() => {
         setStep(3);
     }, [setStep]);
+
+    // Deep-link guard: redirect to welcome if consent not given
+    useEffect(() => {
+        if (!hasConsented) {
+            navigate(`/study/${slug}/welcome${location.search}`, { replace: true });
+        }
+    }, [hasConsented, navigate, slug, location.search]);
 
     // Auto-dismiss tip on first interaction (mobile only)
     useEffect(() => {

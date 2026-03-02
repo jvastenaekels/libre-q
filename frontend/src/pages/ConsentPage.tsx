@@ -6,7 +6,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'lucide-react';
-import React from 'react';
+import type React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
@@ -17,6 +17,7 @@ import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { isPresortEnabled } from '../utils/studyConfig';
 
 const consentSchema = z.object({
     consent: z.boolean().refine((val) => val === true, {
@@ -50,22 +51,11 @@ const ConsentPage: React.FC = () => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors, isValid },
     } = useForm<ConsentForm>({
         resolver: zodResolver(consentSchema),
         defaultValues: { consent: session.hasConsented },
     });
-
-    // Auto-save consent to store
-    React.useEffect(() => {
-        const subscription = watch((value) => {
-            if (value.consent !== undefined) {
-                setConsent(value.consent);
-            }
-        });
-        return () => subscription.unsubscribe();
-    }, [watch, setConsent]);
 
     const { mutateAsync: recordConsentMutation } = useRecordConsentApiStudySlugConsentPost();
 
@@ -118,11 +108,7 @@ const ConsentPage: React.FC = () => {
             let nextStep = 2; // Default to Pre-Sort
             let nextPath = 'presort';
 
-            if (
-                config.presort_config &&
-                'enabled' in config.presort_config &&
-                !config.presort_config.enabled
-            ) {
+            if (!isPresortEnabled(config)) {
                 nextStep = 3;
                 nextPath = 'rough-sort';
             }
