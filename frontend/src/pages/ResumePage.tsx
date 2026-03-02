@@ -156,7 +156,7 @@ export default function ResumePage() {
         return () => {
             cancelled = true;
         };
-    }, [slug, token, navigate, t]);
+    }, [slug, token, navigate, i18n.changeLanguage, i18n.t]);
 
     if (error) {
         const config: Record<

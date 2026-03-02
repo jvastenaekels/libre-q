@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { reportBug } from '../api/client';
 import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
@@ -43,7 +44,9 @@ const ConsentPage: React.FC = () => {
     const { t, i18n } = useTranslation();
 
     const config = useConfigStore((state) => state.config);
-    const session = useSessionStore();
+    const token = useSessionStore((s) => s.token);
+    const hasConsented = useSessionStore((s) => s.hasConsented);
+    const isPilotMode = useSessionStore((s) => s.isPilotMode);
     const setConsent = useSessionStore((state) => state.setConsent);
     const setToken = useSessionStore((state) => state.setToken);
     const setStep = useSessionStore((state) => state.setStep);
@@ -54,7 +57,7 @@ const ConsentPage: React.FC = () => {
         formState: { errors, isValid },
     } = useForm<ConsentForm>({
         resolver: zodResolver(consentSchema),
-        defaultValues: { consent: session.hasConsented },
+        defaultValues: { consent: hasConsented },
     });
 
     const { mutateAsync: recordConsentMutation } = useRecordConsentApiStudySlugConsentPost();
@@ -65,17 +68,17 @@ const ConsentPage: React.FC = () => {
     const onSubmit = async (data: ConsentForm) => {
         if (data.consent) {
             setConsent(true);
-            const token = session.token || crypto.randomUUID();
-            if (!session.token) {
+            const sessionToken = token || crypto.randomUUID();
+            if (!token) {
                 // New session — clear any stale response data (e.g. audio recordings from a prior session)
                 useResponseStore.getState().resetResponses();
-                setToken(token);
+                setToken(sessionToken);
             }
             // Track which study this session belongs to (for cross-study isolation)
             useSessionStore.getState().setStudySlug(slug || '');
 
             // Record proof of consent in DB (skip in pilot mode — no backend persistence)
-            if (!session.isPilotMode) {
+            if (!isPilotMode) {
                 try {
                     const consentText = config.consent?.description || t('consent.default_text');
                     const consentHash = await hashConsent(consentText);
@@ -84,7 +87,7 @@ const ConsentPage: React.FC = () => {
                         slug: slug || '',
                         data: {
                             study_slug: slug || '',
-                            session_token: token,
+                            session_token: sessionToken,
                             language_code: i18n.language,
                             consent_hash: consentHash,
                             is_test_run: false,
@@ -101,6 +104,12 @@ const ConsentPage: React.FC = () => {
                     reportBug(err instanceof Error ? err : new Error(String(err)), {
                         context: 'ConsentPage',
                     });
+                    toast.warning(
+                        t(
+                            'consent.record_error',
+                            'Could not save consent record. You may continue.'
+                        )
+                    );
                 }
             }
 
@@ -135,7 +144,6 @@ const ConsentPage: React.FC = () => {
                 className="bg-white p-5 sm:p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
             >
                 {/* Consent Description/Legal Text */}
-                {/* Consent Description/Legal Text */}
                 <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                     {config.consent?.description ? (
                         <SafeMarkdown>{config.consent.description}</SafeMarkdown>
@@ -159,8 +167,9 @@ const ConsentPage: React.FC = () => {
                                 type="checkbox"
                                 data-testid="consent-checkbox"
                                 {...register('consent')}
-                                // biome-ignore lint/suspicious/noExplicitAny: style override
-                                style={{ accentColor: 'var(--brand-accent)' } as any}
+                                style={
+                                    { accentColor: 'var(--brand-accent)' } as React.CSSProperties
+                                }
                                 className="h-6 w-6 rounded border-gray-300 cursor-pointer"
                             />
                         </div>

@@ -4,7 +4,7 @@
 
 """SQLAlchemy database models."""
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
@@ -27,6 +27,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy.sql import func
 
 from .database import Base
+
+# Sessions expire after this many days of inactivity (based on last_step_reached_at)
+SESSION_TTL_DAYS: int = 30
 
 
 # Enums
@@ -363,6 +366,20 @@ class Participant(Base):
     audio_recordings: Mapped[list["AudioRecording"]] = relationship(
         back_populates="participant", cascade="all, delete-orphan", lazy="raise"
     )
+
+    @property
+    def is_expired(self) -> bool:
+        """A session is expired when it has been inactive for more than SESSION_TTL_DAYS."""
+        if self.status == ParticipantStatus.completed:
+            return False
+        reference = self.last_step_reached_at or self.consented_at or self.created_at
+        if reference is None:
+            return False
+        cutoff = datetime.now(timezone.utc) - timedelta(days=SESSION_TTL_DAYS)
+        # Handle naive datetimes from the DB
+        if reference.tzinfo is None:
+            return reference < cutoff.replace(tzinfo=None)
+        return reference < cutoff
 
     @property
     def recruitment_token(self) -> str | None:

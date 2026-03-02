@@ -10,6 +10,21 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 
+const MAX_RETRIES = 3;
+const INITIAL_DELAY_MS = 1000;
+
+/** Returns true if the error looks like a transient network/server issue worth retrying. */
+const isRetryableError = (err: unknown): boolean => {
+    if (err instanceof Error && err.message === 'Failed to fetch') return true;
+    if (typeof err === 'object' && err !== null && 'status' in err) {
+        const status = (err as { status: number }).status;
+        return status >= 500 || status === 0 || status === 429;
+    }
+    return false;
+};
+
+const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
 export const useSubmitStudy = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -21,9 +36,11 @@ export const useSubmitStudy = () => {
     const sessionLanguage = useSessionStore((s) => s.language);
     const isPilotMode = useSessionStore((s) => s.isPilotMode);
     const completeSession = useSessionStore((s) => s.completeSession);
+    const setSubmitting = useSessionStore((s) => s.setSubmitting);
     const presort = useResponseStore((s) => s.presort);
     const qsort = useResponseStore((s) => s.qsort);
     const postsort = useResponseStore((s) => s.postsort);
+    const resetResponses = useResponseStore((s) => s.resetResponses);
 
     const { mutateAsync: submitStudyMutation } = useSubmitStudyApiSubmitPost();
     const isSubmittingRef = useRef(false);
@@ -32,7 +49,10 @@ export const useSubmitStudy = () => {
         async (status: 'started' | 'completed' = 'completed', options?: { silent?: boolean }) => {
             // Guard against concurrent submissions
             if (isSubmittingRef.current && status === 'completed') return;
-            if (status === 'completed') isSubmittingRef.current = true;
+            if (status === 'completed') {
+                isSubmittingRef.current = true;
+                setSubmitting(true);
+            }
 
             if (!options?.silent) {
                 setIsLoading(true);
@@ -47,6 +67,13 @@ export const useSubmitStudy = () => {
                 const linkToken = searchParams.get('token') || undefined;
 
                 if (!isTestMode && !sessionToken) throw new Error('No session token');
+
+                // Validate Q-sort completeness before final submission
+                if (status === 'completed' && qsort.length !== config.statements.length) {
+                    throw new Error(
+                        `Incomplete Q-sort: expected ${config.statements.length} cards, got ${qsort.length}.`
+                    );
+                }
 
                 const qsortPayload = qsort.map(
                     (item: { statementId: number; col: number; row: number }) => {
@@ -84,33 +111,55 @@ export const useSubmitStudy = () => {
                         const code = `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
                         setConfirmationCode(code);
                         completeSession(code);
+                        resetResponses();
                     }
                     return;
                 }
 
-                const data = await submitStudyMutation({ data: payload });
+                // Submit with exponential backoff retry for transient errors
+                let lastError: unknown = null;
+                let data: unknown;
+                const maxAttempts = status === 'completed' ? MAX_RETRIES : 1;
+                for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                    try {
+                        if (attempt > 0) {
+                            await delay(INITIAL_DELAY_MS * 2 ** (attempt - 1));
+                        }
+                        data = await submitStudyMutation({ data: payload });
+                        lastError = null;
+                        break;
+                    } catch (err: unknown) {
+                        lastError = err;
+                        if (!isRetryableError(err) || attempt === maxAttempts - 1) break;
+                        console.warn(`Submission attempt ${attempt + 1} failed, retrying...`, err);
+                    }
+                }
+
+                if (lastError) throw lastError;
 
                 if (status === 'completed') {
-                    setIsSuccess(true);
                     // biome-ignore lint/suspicious/noExplicitAny: API types are unknown
                     const responseData = data as any;
                     const code =
                         responseData?.confirmation_code || responseData?.data?.confirmation_code;
 
-                    if (code) {
-                        setConfirmationCode(code);
-                        completeSession(code);
-                    } else {
-                        console.warn('No confirmation code in response:', data);
-                        // Mark as complete even if code is missing to show success screen
-                        completeSession('SUBMITTED');
+                    if (!code) {
+                        throw new Error(
+                            'Submission may have failed: no confirmation code received. Please try again.'
+                        );
                     }
+
+                    setIsSuccess(true);
+                    setConfirmationCode(code);
+                    completeSession(code);
+                    resetResponses();
                 }
             } catch (err: unknown) {
                 console.error(err);
                 setError(err instanceof Error ? err.message : 'An unexpected error occurred');
             } finally {
                 isSubmittingRef.current = false; // Allow retry after failure or re-submission
+                setSubmitting(false);
                 if (!options?.silent) {
                     setIsLoading(false);
                 }
@@ -125,6 +174,8 @@ export const useSubmitStudy = () => {
             presort,
             submitStudyMutation,
             completeSession,
+            setSubmitting,
+            resetResponses,
             isPilotMode,
         ]
     );

@@ -8,6 +8,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { resetBaseLocales } from '../utils/i18nOverrides';
+import { clearPilotFlag, isPilot } from '../utils/pilotMode';
 import { safeLocalStorage } from './safeStorage';
 
 interface SessionState {
@@ -21,6 +22,7 @@ interface SessionState {
     confirmationCode: string | null;
     resumeCode: string | null;
     isSaving: boolean;
+    isSubmitting: boolean;
     isPilotMode: boolean;
 
     setToken: (token: string) => void;
@@ -31,22 +33,10 @@ interface SessionState {
     completeSession: (code: string) => void;
     setResumeCode: (code: string) => void;
     setSaving: (isSaving: boolean) => void;
+    setSubmitting: (isSubmitting: boolean) => void;
     setPilotMode: (isPilot: boolean) => void;
     resetSession: () => void;
 }
-
-const isPilot = () => {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('mode') === 'test') {
-            sessionStorage.setItem('libre-q-pilot-mode', 'true');
-            return true;
-        }
-        return sessionStorage.getItem('libre-q-pilot-mode') === 'true';
-    } catch {
-        return false;
-    }
-};
 
 export const useSessionStore = create<SessionState>()(
     persist(
@@ -61,6 +51,7 @@ export const useSessionStore = create<SessionState>()(
             confirmationCode: null,
             resumeCode: null,
             isSaving: false,
+            isSubmitting: false,
             isPilotMode: isPilot(),
 
             setToken: (token) => set({ token }),
@@ -79,8 +70,10 @@ export const useSessionStore = create<SessionState>()(
             completeSession: (confirmationCode) => set({ isCompleted: true, confirmationCode }),
             setResumeCode: (resumeCode) => set({ resumeCode }),
             setSaving: (isSaving) => set({ isSaving }),
+            setSubmitting: (isSubmitting) => set({ isSubmitting }),
             setPilotMode: (isPilotMode) => set({ isPilotMode }),
             resetSession: () => {
+                clearPilotFlag();
                 resetBaseLocales();
                 set({
                     token: null,
@@ -93,6 +86,7 @@ export const useSessionStore = create<SessionState>()(
                     confirmationCode: null,
                     resumeCode: null,
                     isSaving: false,
+                    isSubmitting: false,
                     isPilotMode: false,
                 });
             },
@@ -101,17 +95,22 @@ export const useSessionStore = create<SessionState>()(
             name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
             version: 2,
             storage: safeLocalStorage,
+            partialize: (state) => {
+                // Exclude transient flags from persistence
+                const { isSubmitting: _isSubmitting, isSaving: _isSaving, ...rest } = state;
+                return rest;
+            },
             migrate: (persisted: unknown, version: number) => {
-                const state = persisted as Record<string, unknown>;
-                if (version === 0) {
+                let state = persisted as Record<string, unknown>;
+                if (version < 1) {
                     // v0 → v1: added resumeCode field
-                    return { ...state, resumeCode: null, studySlug: null };
+                    state = { ...state, resumeCode: null, studySlug: null };
                 }
-                if (version === 1) {
+                if (version < 2) {
                     // v1 → v2: added studySlug for per-study session isolation
-                    return { ...state, studySlug: null };
+                    state = { ...state, studySlug: state.studySlug ?? null };
                 }
-                return persisted as SessionState;
+                return state as unknown as SessionState;
             },
         }
     )

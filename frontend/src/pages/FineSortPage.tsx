@@ -209,21 +209,16 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     // RECONCILIATION: Recover missing cards into Neutral deck
     useEffect(() => {
         if (!config || !qsort || !rough) return;
-
-        const allStatementIds = config.statements.map((s) => s.id);
-        const placedIds = qsort.map((p) => p.statementId);
-        const roughIds = [...rough.agree, ...rough.neutral, ...rough.disagree];
-
-        const missingIds = allStatementIds.filter(
-            (id) => !placedIds.includes(id) && !roughIds.includes(id)
-        );
-
+        const placedIds = new Set(qsort.map((p) => p.statementId));
+        const roughIds = new Set([...rough.agree, ...rough.neutral, ...rough.disagree]);
+        const missingIds = config.statements
+            .map((s) => s.id)
+            .filter((id) => !placedIds.has(id) && !roughIds.has(id));
         if (missingIds.length > 0) {
             console.warn('Reconciling missing cards:', missingIds);
-            // Add missing cards to Neutral by default
-            missingIds.forEach((id) => {
+            for (const id of missingIds) {
                 actions.categorizeCard(id, 'neutral');
-            });
+            }
         }
     }, [config, qsort, rough, actions]);
 
@@ -367,10 +362,6 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         []
     );
 
-    const handleTransformChange = useCallback(() => {
-        // panVersion was removed as it's no longer used for measurement frequency
-    }, []);
-
     const handleReset = useCallback(() => {
         if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort();
     }, [resetFineSort, t]);
@@ -420,7 +411,6 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         onDimensionsChange={setCardDimensions}
                         onReset={handleReset}
                         onZoomChange={setZoomLevel}
-                        onTransformChange={handleTransformChange}
                         onInteractionUtils={setInteractionUtils}
                         isAllPlaced={isAllPlaced}
                         onValidate={handleValidate}

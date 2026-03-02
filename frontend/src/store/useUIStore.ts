@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 
+export type CardInfo = { id: number; text: string; code?: string };
+
 interface UIState {
-    hoveredCard: { id: number; text: string; code?: string } | null;
-    activeCard: { id: number; text: string; code?: string } | null;
-    selectedCard: { id: number; text: string; code?: string } | null;
-    setHoveredCard: (card: { id: number; text: string; code?: string } | null) => void;
-    setActiveCard: (card: { id: number; text: string; code?: string } | null) => void;
-    setSelectedCard: (card: { id: number; text: string; code?: string } | null) => void;
+    hoveredCard: CardInfo | null;
+    activeCard: CardInfo | null;
+    selectedCard: CardInfo | null;
+    setHoveredCard: (card: CardInfo | null) => void;
+    setActiveCard: (card: CardInfo | null) => void;
+    setSelectedCard: (card: CardInfo | null) => void;
+    resetUI: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -16,4 +19,5 @@ export const useUIStore = create<UIState>((set) => ({
     setHoveredCard: (hoveredCard) => set({ hoveredCard }),
     setActiveCard: (activeCard) => set({ activeCard }),
     setSelectedCard: (selectedCard) => set({ selectedCard }),
+    resetUI: () => set({ hoveredCard: null, activeCard: null, selectedCard: null }),
 }));

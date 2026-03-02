@@ -4,7 +4,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import {
+    AnimatePresence,
+    type MotionValue,
+    motion,
+    useMotionValue,
+    useTransform,
+} from 'framer-motion';
 import { ArrowRight, Check, Frown, Keyboard, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
@@ -136,20 +142,20 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const scaleNeutral = useTransform(y, [50, 150], [1, 1.1]); // Slightly less scale for the wide dock
 
     // Opacity (Dimming Inactive)
-    const opacityDisagree = useTransform([x, y], ([latestX, latestY]: number[]) => {
-        if (latestX > 50) return 0.5; // Dragging Right
-        if (latestY > 50) return 0.5; // Dragging Down
+    const opacityDisagree = useTransform([x, y], ([latestX, latestY]: number[]): number => {
+        if (latestX > 50) return 0.5;
+        if (latestY > 50) return 0.5;
         return 1;
     });
 
-    const opacityAgree = useTransform([x, y], ([latestX, latestY]: number[]) => {
-        if (latestX < -50) return 0.5; // Dragging Left
-        if (latestY > 50) return 0.5; // Dragging Down
+    const opacityAgree = useTransform([x, y], ([latestX, latestY]: number[]): number => {
+        if (latestX < -50) return 0.5;
+        if (latestY > 50) return 0.5;
         return 1;
     });
 
-    const opacityNeutral = useTransform(x, (latestX: number) => {
-        if (Math.abs(latestX) > 50) return 0.5; // Dragging Left or Right
+    const opacityNeutral = useTransform(x, (latestX: number): number => {
+        if (Math.abs(latestX) > 50) return 0.5;
         return 1;
     });
 
@@ -219,8 +225,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     }, [t, isDesktop]);
 
     if (!config) return null;
-
-    // Pre-instruction screen
 
     // Completed State
     if (!currentCard) {
@@ -328,8 +332,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 pt-12 pb-4 relative gap-2 sm:gap-8 md:gap-12">
-                {/* FLOATING TIP REMOVED (Moved to Header) */}
-
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
                     {/* Left Button (Disagree) */}
@@ -340,7 +342,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         scale={scaleDisagree}
                         opacity={opacityDisagree}
                         highlightKey={highlightKey}
-                        t={t}
                         sharedFontSize={sharedFontSize}
                         uiLabels={config?.ui_labels}
                     />
@@ -370,7 +371,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         scale={scaleAgree}
                         opacity={opacityAgree}
                         highlightKey={highlightKey}
-                        t={t}
                         sharedFontSize={sharedFontSize}
                         uiLabels={config?.ui_labels}
                     />
@@ -385,9 +385,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                         scale={scaleNeutral}
                         opacity={opacityNeutral}
                         highlightKey={highlightKey}
-                        t={t}
                         sharedFontSize={sharedFontSize}
-                        isNeutral
                         uiLabels={config?.ui_labels}
                     />
 
@@ -471,13 +469,9 @@ interface DeckButtonProps {
     type: 'agree' | 'disagree' | 'neutral';
     count: number;
     onClick: () => void;
-    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
-    scale: any;
-    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
-    opacity: any;
+    scale: MotionValue<number>;
+    opacity: MotionValue<number>;
     highlightKey?: string | null;
-    // biome-ignore lint/suspicious/noExplicitAny: translation function
-    t: any;
     sharedFontSize: string;
     isNeutral?: boolean;
     uiLabels?: Record<string, string>;
@@ -490,10 +484,10 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     scale,
     opacity,
     highlightKey,
-    t,
     sharedFontSize,
     uiLabels,
 }) => {
+    const { t } = useTranslation();
     const { width } = useViewport();
     const styleConfig = React.useMemo(() => {
         const base =

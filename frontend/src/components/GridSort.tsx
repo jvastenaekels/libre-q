@@ -34,11 +34,7 @@ import type { TFunction } from 'i18next';
 import { useViewport } from '@/contexts/ViewportContext';
 
 import { cn } from '@/lib/utils';
-
-const noop = () => {};
-const markdownComponents = {
-    p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
-};
+import { inlineMarkdownComponents } from './markdown-config';
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -163,7 +159,7 @@ const InstructionHeader: React.FC<{
                     aria-hidden="true"
                 />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
-                    <SafeMarkdown components={markdownComponents}>
+                    <SafeMarkdown components={inlineMarkdownComponents}>
                         {instruction || defaultText}
                     </SafeMarkdown>
                 </div>
@@ -212,7 +208,7 @@ const InstructionHeader: React.FC<{
                                 aria-hidden="true"
                             />
                             <div className="text-sm font-medium text-slate-700 text-center leading-relaxed max-w-[90%] [&_strong]:font-bold [&_strong]:text-indigo-700">
-                                <SafeMarkdown components={markdownComponents}>
+                                <SafeMarkdown components={inlineMarkdownComponents}>
                                     {instruction || defaultText}
                                 </SafeMarkdown>
                             </div>
@@ -421,7 +417,7 @@ const PileTab: React.FC<{
 const ValidationFooter: React.FC<{
     isAllPlaced: boolean;
     selectedCardId?: number | null;
-    onValidate: () => void;
+    onValidate?: () => void;
     onCancelSelection?: () => void;
     labels: {
         validate: string;
@@ -454,7 +450,7 @@ const ValidationFooter: React.FC<{
                 <button
                     type="button"
                     data-testid="fine-sort-validate-btn"
-                    onClick={onValidate}
+                    onClick={() => onValidate?.()}
                     style={{ backgroundColor: 'var(--brand-accent)' }}
                     className={cn(
                         cn(
@@ -1088,7 +1084,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             <ValidationFooter
                                 isAllPlaced={isAllPlaced}
                                 selectedCardId={selectedCardId}
-                                onValidate={onValidate || noop}
+                                onValidate={onValidate}
                                 onCancelSelection={
                                     selectedCardId && onCardClick
                                         ? handleCancelSelection

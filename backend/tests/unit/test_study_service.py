@@ -149,9 +149,10 @@ async def test_process_submission_completed_early_return(db, active_study):
         qsort=[],
     )
 
-    # Should return existing code and NOT update anything
+    # Should return existing code, flag already_submitted, and NOT update anything
     result = await StudyService.process_submission(db, data, "1.2.3.4")
-    assert result["confirmation_code"] == str(session_token)[:8].upper()
+    assert result["confirmation_code"] == "OLDCODE"
+    assert result["already_submitted"] is True
 
     # Double check if it actually didn't update
     db.expire_all()

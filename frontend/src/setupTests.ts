@@ -59,7 +59,7 @@ window.scrollTo = vi.fn();
 window.confirm = vi.fn();
 
 // MSW Server Setup
-beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => {
     server.resetHandlers();
     // Reset Zustand stores

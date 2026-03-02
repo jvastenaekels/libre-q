@@ -277,5 +277,7 @@ describe('FineSortPage Integration', () => {
         renderWithProviders(<FineSortPage />);
 
         fireEvent.keyDown(window, { key: 'Escape' });
+        // Escape sets selectedCardId to null, which triggers setSelectedCard(null) via effect
+        expect(setSelectedCardMock).toHaveBeenCalledWith(null);
     });
 });

@@ -37,7 +37,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const config = useConfigStore((state) => state.config);
     const setStep = useSessionStore((state) => state.setStep);
     const setPilotMode = useSessionStore((state) => state.setPilotMode);
-    const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
@@ -50,25 +49,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
         // We strictly sync the pilot state with the URL presence of 'mode=test' at the entry point (Welcome).
         const params = new URLSearchParams(location.search);
         const isUrlTest = params.get('mode') === 'test';
+        const currentPilotMode = useSessionStore.getState().isPilotMode;
 
         if (isUrlTest) {
-            if (!isPilotMode) {
+            if (!currentPilotMode) {
                 setPilotMode(true);
             }
             if (sessionStorage.getItem('libre-q-pilot-mode') !== 'true') {
                 sessionStorage.setItem('libre-q-pilot-mode', 'true');
             }
         } else {
-            // If URL does not have mode=test, we ensure we are NOT in pilot mode.
-            // This cleans up any leftover state from previous test runs.
-            if (isPilotMode) {
+            if (currentPilotMode) {
                 setPilotMode(false);
             }
             if (sessionStorage.getItem('libre-q-pilot-mode')) {
                 sessionStorage.removeItem('libre-q-pilot-mode');
             }
         }
-    }, [setStep, setPilotMode, isPilotMode, location.search]);
+    }, [setStep, setPilotMode, location.search]);
 
     // Dynamic scaling logic for animation
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -99,18 +97,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
     if (!config) return null;
 
-    const study = config;
-
     const handleContinue = () => {
         navigate(`/study/${slug}/consent`);
     };
 
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
-    const studyLang = (study as any).language || 'en';
+    const studyLang = config.language || 'en';
     const defaultSteps =
         DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
-    const rawSteps = (study as any).process_steps;
+    const rawSteps = config.process_steps;
     const steps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
 
     return (
@@ -119,20 +113,20 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             <div className="text-center max-w-3xl mx-auto mb-8 space-y-6">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                        {study.title}
+                        {config.title}
                     </h1>
-                    {study.subtitle && (
+                    {config.subtitle && (
                         <h2 className="text-lg sm:text-xl text-slate-600 font-normal mt-3">
-                            {study.subtitle}
+                            {config.subtitle}
                         </h2>
                     )}
                 </div>
 
                 <p className="text-base sm:text-xl text-gray-800 leading-relaxed font-medium">
-                    {study.description}
+                    {config.description}
                 </p>
 
-                {study.objective && (
+                {config.objective && (
                     <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 w-full mx-auto mt-8 text-left shadow-md relative overflow-hidden">
                         <div
                             className="absolute top-0 left-0 w-1 h-full"
@@ -143,19 +137,15 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             {t('welcome.objective_label', 'Objective of the study')}
                         </h2>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
-                            <SafeMarkdown>{study.objective}</SafeMarkdown>
+                            <SafeMarkdown>{config.objective}</SafeMarkdown>
                         </div>
 
-                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */}
-                        {Array.isArray((study.branding as any)?.partners) &&
-                            // biome-ignore lint/suspicious/noExplicitAny: dynamic branding
-                            (study.branding as any).partners.some((p: any) => !!p.logo_url) && (
+                        {Array.isArray(config.branding?.partners) &&
+                            config.branding.partners.some((p) => !!p.logo_url) && (
                                 <div className="mt-10 pt-8 border-t border-slate-200">
                                     <div className="flex flex-wrap gap-8 items-center justify-start">
-                                        {/* biome-ignore lint/suspicious/noExplicitAny: partner logo data */}
-                                        {(study.branding as any).partners.map(
-                                            // biome-ignore lint/suspicious/noExplicitAny: partner data
-                                            (partner: any) =>
+                                        {config.branding.partners.map(
+                                            (partner) =>
                                                 partner.logo_url && (
                                                     <a
                                                         key={partner.id || partner.logo_url}
@@ -198,53 +188,65 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             {t('welcome.how_it_works', 'How it works')}
                         </div>
 
-                        {study.instructions && (
+                        {config.instructions && (
                             <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium mb-8">
-                                <SafeMarkdown>{study.instructions}</SafeMarkdown>
+                                <SafeMarkdown>{config.instructions}</SafeMarkdown>
                             </div>
                         )}
 
                         <div className="flex flex-col gap-4 sm:gap-8 mt-2">
-                            {/* biome-ignore lint/suspicious/noExplicitAny: step data */}
-                            {steps.map((step: any, index: number) => (
-                                <div
-                                    key={step.id || index}
-                                    className="flex gap-4 items-start group"
-                                >
+                            {steps.map(
+                                (
+                                    step: {
+                                        id?: string;
+                                        title: string;
+                                        description: string;
+                                        icon: string;
+                                        color?: string | null;
+                                    },
+                                    index: number
+                                ) => (
                                     <div
-                                        className="flex-shrink-0 w-12 h-12 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center group-hover:shadow-md transition-all duration-300"
-                                        style={{
-                                            backgroundColor: step.color
-                                                ? `color-mix(in srgb, ${step.color}, transparent 92%)`
-                                                : 'white',
-                                            borderColor: step.color
-                                                ? `color-mix(in srgb, ${step.color}, transparent 80%)`
-                                                : undefined,
-                                        }}
+                                        key={step.id || index}
+                                        className="flex gap-4 items-start group"
                                     >
-                                        <DynamicIcon
-                                            name={step.icon}
-                                            size={24}
-                                            style={{ color: step.color || 'var(--brand-accent)' }}
-                                        />
-                                    </div>
-                                    <div className="pt-0.5">
-                                        <h3
-                                            className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
+                                        <div
+                                            className="flex-shrink-0 w-12 h-12 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center group-hover:shadow-md transition-all duration-300"
                                             style={{
-                                                color: step.color
-                                                    ? `color-mix(in srgb, ${step.color}, black 20%)`
+                                                backgroundColor: step.color
+                                                    ? `color-mix(in srgb, ${step.color}, transparent 92%)`
+                                                    : 'white',
+                                                borderColor: step.color
+                                                    ? `color-mix(in srgb, ${step.color}, transparent 80%)`
                                                     : undefined,
                                             }}
                                         >
-                                            {step.title}
-                                        </h3>
-                                        <p className="text-slate-600 leading-relaxed text-[0.95rem]">
-                                            {step.description}
-                                        </p>
+                                            <DynamicIcon
+                                                name={step.icon}
+                                                size={24}
+                                                style={{
+                                                    color: step.color || 'var(--brand-accent)',
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="pt-0.5">
+                                            <h3
+                                                className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
+                                                style={{
+                                                    color: step.color
+                                                        ? `color-mix(in srgb, ${step.color}, black 20%)`
+                                                        : undefined,
+                                                }}
+                                            >
+                                                {step.title}
+                                            </h3>
+                                            <p className="text-slate-600 leading-relaxed text-[0.95rem]">
+                                                {step.description}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            )}
                         </div>
                     </div>
 

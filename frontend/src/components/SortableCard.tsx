@@ -17,14 +17,11 @@ import { motion } from 'framer-motion';
 import { Eye, MessageSquare, Mic } from 'lucide-react';
 import React from 'react';
 import { SafeMarkdown } from './SafeMarkdown';
+import { inlineMarkdownComponents } from './markdown-config';
 import { useUIStore } from '../store/useUIStore';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
 import { useHyphenation } from '@/hooks/useHyphenation';
-
-const markdownComponents = {
-    p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
-};
 
 interface SortableCardProps {
     id: number;
@@ -45,7 +42,7 @@ interface SortableCardProps {
 }
 
 const CARD_SPRING_TRANSITION = {
-    type: 'spring',
+    type: 'spring' as const,
     stiffness: 350,
     damping: 25,
     duration: 0.4,
@@ -56,9 +53,9 @@ const CARD_PULSE_ANIMATION = {
     filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
     transition: {
         duration: 0.5,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const,
         times: [0, 0.5, 1],
-        type: 'tween',
+        type: 'tween' as const,
     },
 };
 
@@ -146,7 +143,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
 
         const setHoveredCard = useUIStore((state) => state.setHoveredCard);
         const hyphenate = useHyphenation();
-        const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
         const scrollRef = React.useRef<HTMLDivElement>(null);
         const textRef = React.useRef<HTMLDivElement>(null);
@@ -203,15 +199,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             observer.observe(container);
             return () => observer.disconnect();
         }, [allowScroll, variant, dimensions?.height]);
-
-        // Cleanup timer on unmount
-        React.useEffect(() => {
-            return () => {
-                if (hoverTimerRef.current) {
-                    clearTimeout(hoverTimerRef.current);
-                }
-            };
-        }, []);
 
         const handleMouseEnter = () => {
             // Immediate hover feedback for Reading Zone
@@ -290,10 +277,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         e.stopPropagation();
                     }
 
-                    if (hoverTimerRef.current) {
-                        clearTimeout(hoverTimerRef.current);
-                        hoverTimerRef.current = null;
-                    }
                     if (onAction) {
                         onAction(id);
                     } else if (onClick) {
@@ -316,15 +299,8 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                               ? undefined
                               : `card-${id}`
                     }
-                    // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
-                    transition={CARD_SPRING_TRANSITION as any}
-                    // Trigger a subtle pulse/flash when the card content (id) changes or on mount
-                    animate={
-                        process.env.NODE_ENV === 'test'
-                            ? undefined
-                            : // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
-                              (CARD_PULSE_ANIMATION as any)
-                    }
+                    transition={CARD_SPRING_TRANSITION}
+                    animate={process.env.NODE_ENV === 'test' ? undefined : CARD_PULSE_ANIMATION}
                     key={id} // Ensure animation re-triggers if ID changes in this slot
                     className={innerCardStyles({ variant, isSelected, isOverlay })}
                 >
@@ -352,7 +328,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         >
                             {/[*_~#]/.test(text) ? (
                                 <SafeMarkdown
-                                    components={markdownComponents}
+                                    components={inlineMarkdownComponents}
                                     className="!prose-none text-inherit"
                                 >
                                     {text}

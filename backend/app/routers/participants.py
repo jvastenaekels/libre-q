@@ -170,6 +170,9 @@ async def resume_session(
         # outweighs the minor enumeration oracle risk (codes are rate-limited).
         raise HTTPException(status_code=410, detail="Session already completed")
 
+    if participant.is_expired:
+        raise HTTPException(status_code=410, detail="Session has expired")
+
     if study.state != StudyState.active:
         raise HTTPException(
             status_code=403,

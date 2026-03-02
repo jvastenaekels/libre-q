@@ -37,11 +37,14 @@ async def submit_study(
     try:
         result = await StudyService.process_submission(db, data, client_ip, user_agent)
         await db.commit()
-        return {
+        response = {
             "status": "success",
             "confirmation_code": result["confirmation_code"],
             "id": result["id"],
         }
+        if result.get("already_submitted"):
+            response["already_submitted"] = True
+        return response
     except HTTPException:
         # Re-raise HTTP exceptions (they're already properly formatted)
         raise

@@ -240,8 +240,6 @@ class SubmissionService:
 
         # 2.5b Validation: Date-based closure (DB state stays 'active' past end_date)
         if study.state == StudyState.active and not data.is_test_run:
-            from datetime import datetime, timezone
-
             now = datetime.now(timezone.utc)
             if study.end_date:
                 end_dt = study.end_date
@@ -302,6 +300,10 @@ class SubmissionService:
         participant = participant_result.scalar_one_or_none()
         is_newly_created = False
 
+        # Validate token belongs to this study
+        if participant and participant.study_id != study.id:
+            raise ValidationError("Session token does not belong to this study.")
+
         if not participant:
             try:
                 participant = Participant(
@@ -333,21 +335,7 @@ class SubmissionService:
                 is_newly_created = True
 
                 # Increment link usage if link was used
-                if link:
-                    # Persist the token in presort_answers for admin tracking
-                    # Persist the token in presort_answers for admin tracking
-                    # We modify the local 'participant' object's presort_answers so it gets saved on flush?
-                    # Actually, we passed 'presort_answers' dict to constructor. We should update it before constructor or update object after.
-                    # Since presort_answers is a dict, we can modify it.
-                    # Re-fetching participant after flush might be safest, or just relying on reference.
-                    # Let's simple add it to the dict passed to constructor if we want it saved.
-                    pass
-
                 if link and data.link_token:
-                    # We need to make sure this gets saved. The Participant constructor took 'presort_answers'.
-                    # If we modify 'presort_answers' *before* constructor, it would be cleaner.
-                    # But we allow 'link' to be checked after some validations.
-                    # Let's update the object directly.
                     participant.presort_answers = {
                         **participant.presort_answers,
                         "_recruitment_token": data.link_token,
@@ -383,9 +371,17 @@ class SubmissionService:
             # Update existing participant
             if participant.status == ParticipantStatus.completed:
                 return {
-                    "confirmation_code": str(participant.session_token)[:8].upper(),
+                    "confirmation_code": participant.confirmation_code
+                    or str(participant.session_token)[:8].upper(),
                     "id": participant.id,
+                    "already_submitted": True,
                 }
+
+            # Reject expired sessions
+            if participant.is_expired:
+                raise ValidationError(
+                    "Session has expired. Please start a new session."
+                )
 
             participant.language_used = data.language_used
             participant.presort_answers = presort_answers

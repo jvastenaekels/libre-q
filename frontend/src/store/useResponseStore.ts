@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { isPilot } from '../utils/pilotMode';
 import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
 import { safeLocalStorage } from './safeStorage';
@@ -77,29 +78,40 @@ export const initialResponses: Responses = {
 };
 
 // Helper: Trigger Saving Indicator (debounced — cancels previous timeout)
-let autoSaveTimeoutId: ReturnType<typeof setTimeout> | null = null;
-const triggerAutoSave = () => {
+let savingIndicatorTimeoutId: ReturnType<typeof setTimeout> | null = null;
+const triggerSavingIndicator = () => {
     useSessionStore.getState().setSaving(true);
-    if (autoSaveTimeoutId !== null) {
-        clearTimeout(autoSaveTimeoutId);
+    if (savingIndicatorTimeoutId !== null) {
+        clearTimeout(savingIndicatorTimeoutId);
     }
-    autoSaveTimeoutId = setTimeout(() => {
+    savingIndicatorTimeoutId = setTimeout(() => {
         useSessionStore.getState().setSaving(false);
-        autoSaveTimeoutId = null;
+        savingIndicatorTimeoutId = null;
     }, 800);
 };
 
-const isPilot = () => {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('mode') === 'test') {
-            sessionStorage.setItem('libre-q-pilot-mode', 'true');
-            return true;
-        }
-        return sessionStorage.getItem('libre-q-pilot-mode') === 'true';
-    } catch {
-        return false;
+type SetFn = (partial: Partial<Responses>) => void;
+const _placeOrMove = (
+    get: () => Responses & ResponseActions,
+    set: SetFn,
+    statementId: number,
+    col: number,
+    row: number,
+    warnOnFull: boolean
+) => {
+    const config = useConfigStore.getState().config;
+    if (!config) return;
+    const colConfig = config.grid_config?.[col];
+    if (!colConfig) return;
+    const state = get();
+    const cardsInCol = state.qsort.filter((c) => c.col === col && c.statementId !== statementId);
+    if (cardsInCol.length >= colConfig.capacity) {
+        if (warnOnFull) console.warn(`Column ${col} is full.`);
+        return;
     }
+    const filtered = state.qsort.filter((p) => p.statementId !== statementId);
+    set({ qsort: [...filtered, { statementId, col, row }] });
+    triggerSavingIndicator();
 };
 
 export const useResponseStore = create<Responses & ResponseActions>()(
@@ -111,15 +123,10 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 const current = get().presort;
                 if (JSON.stringify(current) === JSON.stringify(data)) return;
                 set({ presort: data });
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             categorizeCard: (statementId, category) => {
-                const validCategories = ['agree', 'disagree', 'neutral'];
-                if (!validCategories.includes(category)) {
-                    console.error(`Invalid category: ${category}`);
-                    return;
-                }
                 set((state) => {
                     const { rough } = state;
 
@@ -147,12 +154,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                     };
                 });
 
-                // Downgrade max step? Logic was in useStudyStore.
-                // We should probably handle step logic in the component or a dedicated controller,
-                // but strictly keeping it here mimics old behavior.
-                // However, accessing other store to set step is tricky.
-                // Let's stick to data updates. Step regression logic should be in the UI/Page.
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             undoRoughSort: () => {
@@ -172,48 +174,15 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         },
                     };
                 });
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             placeCardInGrid: (statementId, col, row) => {
-                const config = useConfigStore.getState().config;
-                if (!config) return;
-
-                const colConfig = config.grid_config?.[col];
-                if (!colConfig) return;
-
-                const state = get();
-                const cardsInCol = state.qsort.filter(
-                    (c) => c.col === col && c.statementId !== statementId
-                );
-
-                if (cardsInCol.length >= colConfig.capacity) {
-                    console.warn(`Column ${col} is full.`);
-                    return;
-                }
-
-                const filtered = state.qsort.filter((p) => p.statementId !== statementId);
-                set({ qsort: [...filtered, { statementId, col, row }] });
-                triggerAutoSave();
+                _placeOrMove(get, set, statementId, col, row, true);
             },
 
             moveCardInGrid: (statementId, col, row) => {
-                const config = useConfigStore.getState().config;
-                if (!config) return;
-
-                const colConfig = config.grid_config?.[col];
-                if (!colConfig) return;
-
-                const state = get();
-                const cardsInCol = state.qsort.filter(
-                    (c) => c.col === col && c.statementId !== statementId
-                );
-
-                if (cardsInCol.length >= colConfig.capacity) return;
-
-                const filtered = state.qsort.filter((p) => p.statementId !== statementId);
-                set({ qsort: [...filtered, { statementId, col, row }] });
-                triggerAutoSave();
+                _placeOrMove(get, set, statementId, col, row, false);
             },
 
             swapCardsInGrid: (id1, id2) => {
@@ -230,19 +199,19 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                     (p) => p.statementId !== id1 && p.statementId !== id2
                 );
                 set({ qsort: [...others, newCard1, newCard2] });
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             unplaceCard: (statementId) => {
                 set((state) => ({
                     qsort: state.qsort.filter((p) => p.statementId !== statementId),
                 }));
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             resetFineSort: () => {
                 set({ qsort: [] });
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             setPostSortResponse: (field, value) => {
@@ -254,7 +223,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         [field]: value,
                     },
                 }));
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             setAudioRecording: (questionKey, metadata) => {
@@ -267,7 +236,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         },
                     },
                 }));
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             deleteAudioRecording: (questionKey) => {
@@ -280,7 +249,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         },
                     };
                 });
-                triggerAutoSave();
+                triggerSavingIndicator();
             },
 
             getAudioRecording: (questionKey) => {
@@ -288,9 +257,9 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
 
             resetResponses: () => {
-                if (autoSaveTimeoutId !== null) {
-                    clearTimeout(autoSaveTimeoutId);
-                    autoSaveTimeoutId = null;
+                if (savingIndicatorTimeoutId !== null) {
+                    clearTimeout(savingIndicatorTimeoutId);
+                    savingIndicatorTimeoutId = null;
                 }
                 set(initialResponses);
             },
@@ -299,6 +268,10 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',
             version: 2,
             storage: safeLocalStorage,
+            migrate: (persisted: unknown, version: number) => {
+                if (version < 2) return persisted as Responses;
+                return persisted as Responses;
+            },
         }
     )
 );

@@ -6,10 +6,10 @@
 
 import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } from 'framer-motion';
 import { Eye, Frown, Meh, Smile } from 'lucide-react';
-import type React from 'react';
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from './SafeMarkdown';
+import { inlineMarkdownComponents } from './markdown-config';
 import { useUIStore } from '../store/useUIStore';
 import { useViewport } from '@/contexts/ViewportContext';
 
@@ -53,7 +53,8 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     else if (textLength > 100) fontSizeClass = 'text-3xl @sm:text-4xl @md:text-5xl';
     else if (textLength > 40) fontSizeClass = 'text-4xl @sm:text-6xl @md:text-7xl';
 
-    // Overflow Detection
+    // Overflow Detection — re-check when the displayed statement changes
+    // biome-ignore lint/correctness/useExhaustiveDependencies: statement.id triggers re-check when card changes
     useEffect(() => {
         const checkOverflow = () => {
             if (textRef.current) {
@@ -63,7 +64,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
         };
 
         checkOverflow();
-    }, []);
+    }, [statement.id]);
 
     useImperativeHandle(ref, () => ({
         swipe: async (direction) => {
@@ -188,7 +189,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                         ref={textRef}
                         className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none [hyphens:manual]`}
                     >
-                        <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                        <SafeMarkdown components={inlineMarkdownComponents}>
                             {statement.text}
                         </SafeMarkdown>
                     </div>
@@ -217,4 +218,4 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     );
 };
 
-export default CardStack;
+export default React.memo(CardStack);
