@@ -76,7 +76,8 @@ async def delete_tag(
     ),
     db: AsyncSession = Depends(get_db),
 ):
-    await ConcourseService.delete_tag(db, tag_id)
+    workspace, _ = workspace_ctx
+    await ConcourseService.delete_tag(db, workspace.id, tag_id)
     return None
 
 
@@ -168,12 +169,7 @@ async def update_concourse(
     db: AsyncSession = Depends(get_db),
 ):
     workspace, _ = workspace_ctx
-    concourse = await ConcourseService.update_concourse(db, concourse_id, data)
-    if concourse.workspace_id != workspace.id:
-        from fastapi import HTTPException
-
-        raise HTTPException(status_code=404, detail="Concourse not found")
-    return concourse
+    return await ConcourseService.update_concourse(db, workspace.id, concourse_id, data)
 
 
 @router.delete("/{concourse_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -217,6 +213,8 @@ async def create_item(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
     return await ConcourseService.create_item(db, concourse_id, data, current_user.id)
 
 
@@ -236,6 +234,8 @@ async def bulk_create_items(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
     return await ConcourseService.bulk_create_items(
         db, concourse_id, data, current_user.id
     )
@@ -257,6 +257,8 @@ async def import_items_from_text(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
     return await ConcourseService.bulk_import_text(
         db, concourse_id, data, current_user.id
     )
@@ -277,7 +279,9 @@ async def update_item(
     ),
     db: AsyncSession = Depends(get_db),
 ):
-    return await ConcourseService.update_item(db, item_id, data)
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
+    return await ConcourseService.update_item(db, concourse_id, item_id, data)
 
 
 @router.delete(
@@ -294,5 +298,7 @@ async def delete_item(
     ),
     db: AsyncSession = Depends(get_db),
 ):
-    await ConcourseService.delete_item(db, item_id)
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
+    await ConcourseService.delete_item(db, concourse_id, item_id)
     return None

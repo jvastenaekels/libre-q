@@ -605,6 +605,8 @@
             "delete_confirm": "Are you sure you want to delete this concourse and all its items?",
             "deleted": "Concourse deleted",
             "delete_error": "Failed to delete concourse",
+            "delete_item_title": "Delete Item",
+            "delete_item_confirm": "Are you sure you want to delete this item? This cannot be undone.",
             "status": {
                 "proposed": "Proposed",
                 "accepted": "Accepted",
@@ -637,7 +639,8 @@
             "source_deleted_tip": "The source concourse item has been deleted.",
             "new_version": "New version in concourse:",
             "synced": "Statement updated from concourse",
-            "error": "Sync failed"
+            "error": "Sync failed",
+            "stale_banner": "{{count}} statement(s) have updates available from the concourse."
         },
         "analysis": {
             "title": "Analysis",

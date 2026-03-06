@@ -2030,6 +2030,91 @@ export const useSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
 };
 
 /**
+ * Sync all stale statements from their concourse sources.
+ * @summary Sync All Stale Statements
+ */
+export const syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<StudyRead>({
+        url: `/api/admin/studies/${slug}/sync-all-stale`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type SyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>
+>;
+
+export type SyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Sync All Stale Statements
+ */
+export const useSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof syncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * List participants for a specific study with pagination.
  * @summary List Study Participants
  */
@@ -12005,6 +12090,278 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
         ...overrideResponse,
     });
 
+export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            pre_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseParticipantRead> = {}
 ): PaginatedResponseParticipantRead => ({
@@ -13594,6 +13951,32 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
         );
     };
 
+export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/sync-all-stale',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler = (
     overrideResponse?:
         | PaginatedResponseParticipantRead
@@ -15105,6 +15488,7 @@ export const getLibreQAPIMock = () => [
     getImportFromConcourseApiAdminStudiesSlugImportConcoursePostMockHandler(),
     getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetMockHandler(),
     getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMockHandler(),
+    getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostMockHandler(),
     getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
     getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler(),
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),

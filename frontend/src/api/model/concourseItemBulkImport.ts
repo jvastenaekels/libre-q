@@ -9,7 +9,10 @@
  * Schema for importing items from a text block (one statement per line).
  */
 export interface ConcourseItemBulkImport {
-    /** @minLength 1 */
+    /**
+     * @minLength 1
+     * @maxLength 100000
+     */
     text_block: string;
     /**
      * @maxLength 5

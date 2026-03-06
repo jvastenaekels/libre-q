@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -228,6 +228,8 @@ export default function ConcourseDetailPage() {
     };
 
     // Bulk import
+    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
     const [importText, setImportText] = useState('');
     const [importPrefix, setImportPrefix] = useState('C');
 
@@ -256,16 +258,8 @@ export default function ConcourseDetailPage() {
     };
 
     // Delete concourse
+    const [deleteConcourseOpen, setDeleteConcourseOpen] = useState(false);
     const handleDeleteConcourse = async () => {
-        if (
-            !confirm(
-                t(
-                    'admin.concourse.delete_confirm',
-                    'Are you sure you want to delete this concourse and all its items?'
-                )
-            )
-        )
-            return;
         try {
             await deleteConcourseMutation.mutateAsync({ concourseId: id });
             await queryClient.invalidateQueries({
@@ -283,6 +277,23 @@ export default function ConcourseDetailPage() {
         }
     };
 
+    const languages = useMemo(
+        () => [
+            ...new Set(
+                concourse?.items?.flatMap(
+                    (i) => i.translations?.map((tr) => tr.language_code) ?? []
+                ) ?? []
+            ),
+        ],
+        [concourse?.items]
+    );
+
+    useEffect(() => {
+        if (!languages.includes(activeLocale) && languages.length > 0) {
+            setActiveLocale(languages[0]);
+        }
+    }, [languages, activeLocale]);
+
     if (isLoading) {
         return (
             <div className="p-8">
@@ -298,16 +309,6 @@ export default function ConcourseDetailPage() {
                 {t('common.errors.not_found', 'Not found')}
             </div>
         );
-    }
-
-    const languages = [
-        ...new Set(
-            concourse.items?.flatMap((i) => i.translations?.map((tr) => tr.language_code) ?? []) ??
-                []
-        ),
-    ];
-    if (!languages.includes(activeLocale) && languages.length > 0) {
-        setActiveLocale(languages[0]);
     }
 
     const canEdit = can('study:edit_design');
@@ -611,7 +612,9 @@ export default function ConcourseDetailPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                            onClick={() => handleDelete(item.id)}
+                                                            onClick={() =>
+                                                                setDeleteConfirmId(item.id)
+                                                            }
                                                         >
                                                             <Trash2 className="size-3.5" />
                                                         </Button>
@@ -640,8 +643,7 @@ export default function ConcourseDetailPage() {
                             variant="outline"
                             size="sm"
                             className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
-                            onClick={handleDeleteConcourse}
-                            disabled={deleteConcourseMutation.isPending}
+                            onClick={() => setDeleteConcourseOpen(true)}
                         >
                             <Trash2 className="size-4 mr-1" />
                             {t('admin.concourse.delete', 'Delete Concourse')}
@@ -724,6 +726,97 @@ export default function ConcourseDetailPage() {
                                 <Plus className="size-4 mr-2" />
                             )}
                             {t('common.add', 'Add')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Item Confirmation Dialog */}
+            <Dialog
+                open={deleteConfirmId !== null}
+                onOpenChange={(open) => {
+                    if (!open) setDeleteConfirmId(null);
+                }}
+            >
+                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900">
+                            {t('admin.concourse.delete_item_title', 'Delete Item')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500">
+                            {t(
+                                'admin.concourse.delete_item_confirm',
+                                'Are you sure you want to delete this item? This cannot be undone.'
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            className="rounded-xl"
+                            onClick={() => setDeleteConfirmId(null)}
+                        >
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            className="rounded-xl"
+                            disabled={deleteItemMutation.isPending}
+                            onClick={async () => {
+                                if (deleteConfirmId !== null) {
+                                    await handleDelete(deleteConfirmId);
+                                    setDeleteConfirmId(null);
+                                }
+                            }}
+                        >
+                            {deleteItemMutation.isPending ? (
+                                <Loader2 className="size-4 animate-spin mr-2" />
+                            ) : (
+                                <Trash2 className="size-4 mr-2" />
+                            )}
+                            {t('common.delete', 'Delete')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Concourse Confirmation Dialog */}
+            <Dialog open={deleteConcourseOpen} onOpenChange={setDeleteConcourseOpen}>
+                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900">
+                            {t('admin.concourse.delete', 'Delete Concourse')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500">
+                            {t(
+                                'admin.concourse.delete_confirm',
+                                'Are you sure you want to delete this concourse and all its items?'
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            className="rounded-xl"
+                            onClick={() => setDeleteConcourseOpen(false)}
+                        >
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            className="rounded-xl"
+                            disabled={deleteConcourseMutation.isPending}
+                            onClick={async () => {
+                                await handleDeleteConcourse();
+                                setDeleteConcourseOpen(false);
+                            }}
+                        >
+                            {deleteConcourseMutation.isPending ? (
+                                <Loader2 className="size-4 animate-spin mr-2" />
+                            ) : (
+                                <Trash2 className="size-4 mr-2" />
+                            )}
+                            {t('admin.concourse.delete', 'Delete Concourse')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

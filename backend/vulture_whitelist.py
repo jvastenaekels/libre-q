@@ -46,7 +46,6 @@ audio_recordings
 s3_bucket
 draft_responses
 concourse_tags
-source_concourse_item
 accepted
 rejected
 creator
@@ -94,6 +93,7 @@ get_study_storage_usage
 import_from_concourse
 check_stale_statements
 sync_statement_from_concourse
+sync_all_stale_statements
 import_items_from_text
 
 # admin/analysis.py

@@ -1,7 +1,7 @@
 """Service layer for Concourse operations."""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,6 +36,30 @@ logger = logging.getLogger(__name__)
 
 class ConcourseService:
     """Concourse CRUD and item management."""
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def _verify_concourse_ownership(
+        db: AsyncSession, concourse_id: int, workspace_id: int
+    ) -> Concourse:
+        """Load a concourse and verify it belongs to the given workspace."""
+        concourse = await db.get(Concourse, concourse_id)
+        if concourse is None or concourse.workspace_id != workspace_id:
+            raise NotFoundError("Concourse")
+        return concourse
+
+    @staticmethod
+    async def _verify_item_ownership(
+        db: AsyncSession, item_id: int, concourse_id: int
+    ) -> ConcourseItem:
+        """Load an item and verify it belongs to the given concourse."""
+        item = await db.get(ConcourseItem, item_id)
+        if item is None or item.concourse_id != concourse_id:
+            raise NotFoundError("ConcourseItem")
+        return item
 
     # ------------------------------------------------------------------
     # Concourse CRUD
@@ -112,11 +136,11 @@ class ConcourseService:
 
     @staticmethod
     async def update_concourse(
-        db: AsyncSession, concourse_id: int, data: ConcourseUpdate
+        db: AsyncSession, workspace_id: int, concourse_id: int, data: ConcourseUpdate
     ) -> Concourse:
-        concourse = await db.get(Concourse, concourse_id)
-        if concourse is None:
-            raise NotFoundError("Concourse")
+        concourse = await ConcourseService._verify_concourse_ownership(
+            db, concourse_id, workspace_id
+        )
 
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -292,9 +316,12 @@ class ConcourseService:
 
     @staticmethod
     async def update_item(
-        db: AsyncSession, item_id: int, data: ConcourseItemUpdate
+        db: AsyncSession, concourse_id: int, item_id: int, data: ConcourseItemUpdate
     ) -> ConcourseItem:
         """Update an item with optimistic locking."""
+        # Verify item belongs to the concourse
+        await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
+
         update_values: dict = {}
         if data.code is not None:
             update_values["code"] = data.code
@@ -342,10 +369,8 @@ class ConcourseService:
         return await ConcourseService._load_item(db, item_id)
 
     @staticmethod
-    async def delete_item(db: AsyncSession, item_id: int) -> None:
-        item = await db.get(ConcourseItem, item_id)
-        if item is None:
-            raise NotFoundError("ConcourseItem")
+    async def delete_item(db: AsyncSession, concourse_id: int, item_id: int) -> None:
+        item = await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
         await db.delete(item)
         await db.commit()
 
@@ -393,9 +418,9 @@ class ConcourseService:
         return tag
 
     @staticmethod
-    async def delete_tag(db: AsyncSession, tag_id: int) -> None:
+    async def delete_tag(db: AsyncSession, workspace_id: int, tag_id: int) -> None:
         tag = await db.get(ConcourseTag, tag_id)
-        if tag is None:
+        if tag is None or tag.workspace_id != workspace_id:
             raise NotFoundError("ConcourseTag")
         await db.delete(tag)
         await db.commit()
@@ -459,8 +484,31 @@ class ConcourseService:
             )
             start_order = (max_order_result.scalar() or 0) + 1
 
+        # Pre-validate code uniqueness to avoid IntegrityError
+        new_codes = [
+            f"{data.code_prefix}{item.code}" if data.code_prefix else item.code
+            for item in items
+        ]
+        if not data.replace_existing:
+            existing_codes_result = await db.execute(
+                select(Statement.code).where(
+                    Statement.study_id == study.id,
+                    Statement.code.in_(new_codes),
+                )
+            )
+            existing_codes = set(existing_codes_result.scalars().all())
+            if existing_codes:
+                raise ValidationError(
+                    f"Statement codes already exist in study: {sorted(existing_codes)}"
+                )
+        # Check for duplicates within the import batch itself
+        if len(new_codes) != len(set(new_codes)):
+            seen = set()
+            dupes = sorted({c for c in new_codes if c in seen or seen.add(c)})  # type: ignore[func-returns-value]
+            raise ValidationError(f"Duplicate codes in import batch: {dupes}")
+
         # Copy items as statements (with traceability link)
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for i, item in enumerate(items):
             code = f"{data.code_prefix}{item.code}" if data.code_prefix else item.code
             new_stmt = Statement(
@@ -628,7 +676,7 @@ class ConcourseService:
             )
 
         # Update imported_at timestamp
-        statement.source_imported_at = datetime.utcnow()
+        statement.source_imported_at = datetime.now(timezone.utc)
         await db.commit()
 
         # Reload

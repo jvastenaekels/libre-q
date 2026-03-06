@@ -597,6 +597,8 @@
             "delete_confirm": "Haluatko varmasti poistaa tämän lausekokoelman ja kaikki sen kohteet?",
             "deleted": "Lausekokoelma poistettu",
             "delete_error": "Lausekokoelman poisto epäonnistui",
+            "delete_item_title": "Poista kohde",
+            "delete_item_confirm": "Haluatko varmasti poistaa tämän kohteen? Tätä ei voi peruuttaa.",
             "status": {
                 "proposed": "Ehdotettu",
                 "accepted": "Hyväksytty",
@@ -629,7 +631,8 @@
             "source_deleted_tip": "Lähteen lausekokoelmakohde on poistettu.",
             "new_version": "Uusi versio lausekokoelmassa:",
             "synced": "Lause päivitetty lausekokoelmasta",
-            "error": "Synkronointi epäonnistui"
+            "error": "Synkronointi epäonnistui",
+            "stale_banner": "{{count}} lauseella on päivityksiä saatavilla lausekokoelmasta."
         },
         "analysis": {
             "title": "Analyysi",

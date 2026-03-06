@@ -23,13 +23,12 @@ def upgrade() -> None:
         sa.Column(
             "source_concourse_item_id",
             sa.Integer(),
-            sa.ForeignKey("concourse_items.id", ondelete="SET NULL"),
             nullable=True,
         ),
     )
     op.add_column(
         "statements",
-        sa.Column("source_imported_at", sa.DateTime(), nullable=True),
+        sa.Column("source_imported_at", sa.DateTime(timezone=True), nullable=True),
     )
     op.create_index(
         "ix_statements_source_concourse_item_id",

@@ -10,7 +10,10 @@
  */
 export interface ConcourseImportToStudy {
     concourse_id: number;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     * @maxItems 500
+     */
     item_ids: number[];
     /** @maxLength 20 */
     code_prefix?: string;

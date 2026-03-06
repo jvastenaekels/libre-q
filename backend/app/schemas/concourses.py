@@ -82,7 +82,7 @@ class ConcourseItemUpdate(BaseModel):
 
     version: int = Field(..., description="Current version for optimistic locking")
     code: str | None = Field(None, max_length=50)
-    source: str | None = None
+    source: str | None = Field(None, max_length=500)
     status: ConcourseItemStatus | None = None
     translations: list[ConcourseItemTranslationCreate] | None = None
     tag_ids: list[int] | None = None
@@ -97,7 +97,7 @@ class ConcourseItemBulkCreate(BaseModel):
 class ConcourseItemBulkImport(BaseModel):
     """Schema for importing items from a text block (one statement per line)."""
 
-    text_block: str = Field(..., min_length=1)
+    text_block: str = Field(..., min_length=1, max_length=100_000)
     language_code: str = Field(..., pattern=r"^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     code_prefix: str = Field("C", max_length=20)
 
@@ -124,7 +124,7 @@ class ConcourseUpdate(BaseModel):
     """Schema for updating a concourse."""
 
     title: str | None = Field(None, max_length=200, min_length=1)
-    description: str | None = None
+    description: str | None = Field(None, max_length=2000)
 
 
 class ConcourseRead(BaseModel):
@@ -151,7 +151,7 @@ class ConcourseImportToStudy(BaseModel):
     """Schema for importing concourse items into a study as statements."""
 
     concourse_id: int
-    item_ids: list[int] = Field(..., min_length=1)
+    item_ids: list[int] = Field(..., min_length=1, max_length=500)
     code_prefix: str = Field("", max_length=20)
     replace_existing: bool = False
 

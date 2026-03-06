@@ -288,23 +288,24 @@ class Statement(Base):
     display_order: Mapped[int] = mapped_column(default=0)
 
     # Concourse traceability — nullable, set when imported from a concourse
+    # Plain integer (no FK) to preserve traceability after concourse item deletion.
+    # With a FK + ondelete="SET NULL", deletions would erase the link before
+    # staleness checks could detect the deletion.
     source_concourse_item_id: Mapped[int | None] = mapped_column(
-        ForeignKey("concourse_items.id", ondelete="SET NULL"),
+        Integer,
         nullable=True,
         default=None,
         index=True,
     )
     source_imported_at: Mapped[datetime | None] = mapped_column(
-        nullable=True, default=None
+        DateTime(timezone=True), nullable=True, default=None
     )
 
     study: Mapped["Study"] = relationship(back_populates="statements", lazy="raise")
     translations: Mapped[list["StatementTranslation"]] = relationship(
         back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
     )
-    source_concourse_item: Mapped["ConcourseItem | None"] = relationship(
-        lazy="noload", foreign_keys=[source_concourse_item_id]
-    )
+    # No relationship — source_concourse_item_id is a plain integer for traceability
 
     __table_args__ = (UniqueConstraint("study_id", "code", name="uq_statement_code"),)
 

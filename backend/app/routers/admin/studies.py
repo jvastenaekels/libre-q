@@ -294,6 +294,42 @@ async def sync_statement_from_concourse(
     return res.scalar_one()
 
 
+@router.post("/{slug}/sync-all-stale", response_model=StudyRead)
+@limiter.limit("10/minute")
+async def sync_all_stale_statements(
+    request: Request,
+    slug: str,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> Study:
+    """Sync all stale statements from their concourse sources."""
+    from app.services.concourse_service import ConcourseService
+
+    stale = await ConcourseService.check_stale_statements(db, study)
+    for entry in stale:
+        if entry["source_deleted"]:
+            continue
+        try:
+            await ConcourseService.sync_statement_from_concourse(
+                db, study, entry["statement_id"]
+            )
+        except Exception:
+            logger.warning("Failed to sync statement %s", entry["statement_id"])
+
+    # Return refreshed study
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants),
+        )
+    )
+    res = await db.execute(stmt)
+    return res.scalar_one()
+
+
 # ------------------------------------------------------------------
 # Include sub-routers
 # ------------------------------------------------------------------

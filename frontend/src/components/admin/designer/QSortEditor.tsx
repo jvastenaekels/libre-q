@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import type { StudyTranslationCreate } from '@/api/model';
@@ -368,14 +368,18 @@ const QSortEditor = ({
             },
         }
     );
-    const staleByStatementId = new Map<number, StaleInfo>(
-        staleData?.map((s) => [
-            s.statement_id,
-            {
-                concourse_translations: s.concourse_translations,
-                source_deleted: s.source_deleted,
-            },
-        ]) ?? []
+    const staleByStatementId = useMemo(
+        () =>
+            new Map<number, StaleInfo>(
+                staleData?.map((s) => [
+                    s.statement_id,
+                    {
+                        concourse_translations: s.concourse_translations,
+                        source_deleted: s.source_deleted,
+                    },
+                ]) ?? []
+            ),
+        [staleData]
     );
 
     const syncMutation =
@@ -1101,6 +1105,19 @@ const QSortEditor = ({
                                 )}
                             </div>
                         </div>
+
+                        {staleByStatementId.size > 0 && !readOnly && (
+                            <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+                                <RefreshCw className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                                <span className="text-amber-800 font-medium">
+                                    {t(
+                                        'admin.concourse_sync.stale_banner',
+                                        '{{count}} statement(s) have updates available from the concourse.',
+                                        { count: staleByStatementId.size }
+                                    )}
+                                </span>
+                            </div>
+                        )}
 
                         <DndContext
                             sensors={sensors}

@@ -28,7 +28,7 @@ import {
     useGetConcourseApiAdminConcoursesConcourseIdGet,
     useImportFromConcourseApiAdminStudiesSlugImportConcoursePost,
 } from '@/api/generated';
-import type { ConcourseItemRead } from '@/api/model';
+import type { ConcourseItemRead, ConcourseItemStatus } from '@/api/model';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { cn } from '@/lib/utils';
 
@@ -67,10 +67,10 @@ export function ImportFromConcourseDialog({
     const concourses = concoursesData?.items ?? [];
 
     const concourseId = selectedConcourseId ? Number(selectedConcourseId) : undefined;
-    const { data: concourse } = useGetConcourseApiAdminConcoursesConcourseIdGet(
-        concourseId as number,
-        { query: { enabled: !!concourseId } }
-    );
+    const { data: concourse, isLoading: isLoadingConcourse } =
+        useGetConcourseApiAdminConcoursesConcourseIdGet(concourseId as number, {
+            query: { enabled: !!concourseId },
+        });
 
     const importMutation = useImportFromConcourseApiAdminStudiesSlugImportConcoursePost();
 
@@ -135,6 +135,12 @@ export function ImportFromConcourseDialog({
         item.translations?.find((tr) => tr.language_code === activeLocale)?.text ??
         item.translations?.[0]?.text ??
         '';
+
+    const STATUS_LABELS: Record<ConcourseItemStatus, string> = {
+        proposed: t('admin.concourse.status.proposed', 'Proposed'),
+        accepted: t('admin.concourse.status.accepted', 'Accepted'),
+        rejected: t('admin.concourse.status.rejected', 'Rejected'),
+    };
 
     return (
         <Dialog
@@ -211,7 +217,10 @@ export function ImportFromConcourseDialog({
                         <Label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer font-normal">
                             <Switch
                                 checked={showOnlyAccepted}
-                                onCheckedChange={setShowOnlyAccepted}
+                                onCheckedChange={(v) => {
+                                    setShowOnlyAccepted(v);
+                                    setSelectedItemIds(new Set());
+                                }}
                             />
                             {t('admin.concourse_import.only_accepted', 'Only accepted')}
                         </Label>
@@ -228,7 +237,13 @@ export function ImportFromConcourseDialog({
                     </div>
 
                     {/* Item list */}
-                    {concourseId && filteredItems.length > 0 && (
+                    {concourseId && isLoadingConcourse && (
+                        <div className="py-8 flex justify-center">
+                            <Loader2 className="size-5 animate-spin text-slate-400" />
+                        </div>
+                    )}
+
+                    {concourseId && !isLoadingConcourse && filteredItems.length > 0 && (
                         <div className="flex-1 overflow-auto border rounded-xl">
                             {/* Select all header */}
                             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 border-b sticky top-0">
@@ -290,7 +305,7 @@ export function ImportFromConcourseDialog({
                                                         STATUS_COLORS[item.status] ?? ''
                                                     )}
                                                 >
-                                                    {item.status}
+                                                    {STATUS_LABELS[item.status] ?? item.status}
                                                 </Badge>
                                             </div>
                                             <p className="text-sm text-slate-700 leading-relaxed">
@@ -303,7 +318,7 @@ export function ImportFromConcourseDialog({
                         </div>
                     )}
 
-                    {concourseId && filteredItems.length === 0 && (
+                    {concourseId && !isLoadingConcourse && filteredItems.length === 0 && (
                         <div className="py-8 text-center text-slate-400 text-sm">
                             {showOnlyAccepted
                                 ? t(
@@ -339,7 +354,12 @@ export function ImportFromConcourseDialog({
                     <Button
                         onClick={handleImport}
                         disabled={selectedItemIds.size === 0 || importMutation.isPending}
-                        className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                        className={cn(
+                            'h-10 rounded-xl px-6 font-bold text-white',
+                            replaceExisting
+                                ? 'bg-amber-600 hover:bg-amber-700'
+                                : 'bg-indigo-600 hover:bg-indigo-700'
+                        )}
                     >
                         {importMutation.isPending ? (
                             <Loader2 className="size-4 animate-spin mr-2" />

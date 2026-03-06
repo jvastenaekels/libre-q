@@ -597,6 +597,8 @@
             "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce concours et tous ses éléments ?",
             "deleted": "Concours supprimé",
             "delete_error": "Échec de la suppression du concours",
+            "delete_item_title": "Supprimer l'élément",
+            "delete_item_confirm": "Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.",
             "status": {
                 "proposed": "Proposé",
                 "accepted": "Accepté",
@@ -629,7 +631,8 @@
             "source_deleted_tip": "L'élément source du concours a été supprimé.",
             "new_version": "Nouvelle version dans le concours :",
             "synced": "Énoncé mis à jour depuis le concours",
-            "error": "Échec de la synchronisation"
+            "error": "Échec de la synchronisation",
+            "stale_banner": "{{count}} énoncé(s) ont des mises à jour disponibles depuis le concours."
         },
         "analysis": {
             "title": "Analyse",

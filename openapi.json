@@ -959,6 +959,56 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/sync-all-stale": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Sync All Stale Statements",
+        "description": "Sync all stale statements from their concourse sources.",
+        "operationId": "sync_all_stale_statements_api_admin_studies__slug__sync_all_stale_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/participants": {
       "get": {
         "tags": [
@@ -5168,6 +5218,7 @@
               "type": "integer"
             },
             "type": "array",
+            "maxItems": 500,
             "minItems": 1,
             "title": "Item Ids"
           },
@@ -5214,6 +5265,7 @@
         "properties": {
           "text_block": {
             "type": "string",
+            "maxLength": 100000,
             "minLength": 1,
             "title": "Text Block"
           },
@@ -5455,7 +5507,8 @@
           "source": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -5658,7 +5711,8 @@
           "description": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 2000
               },
               {
                 "type": "null"
