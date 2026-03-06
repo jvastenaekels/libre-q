@@ -121,7 +121,7 @@ function SortableStatementItem({
             ref={setNodeRef}
             style={style}
             className={cn(
-                'flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100',
+                'flex items-center gap-3 p-3 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100',
                 isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
             )}
         >
@@ -223,7 +223,7 @@ function SortableStatementItem({
                                         size="sm"
                                         onClick={onSync}
                                         disabled={isSyncing || staleInfo.source_deleted}
-                                        className="h-8 px-2 gap-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg font-bold text-2xs animate-in fade-in"
+                                        className="h-8 px-2 gap-1.5 text-amber-700 hover:text-amber-800 hover:bg-amber-50 rounded-xl font-bold text-xs animate-in fade-in"
                                     >
                                         <RefreshCw
                                             className={cn(
@@ -1107,9 +1107,16 @@ const QSortEditor = ({
                         </div>
 
                         {staleByStatementId.size > 0 && !readOnly && (
-                            <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
-                                <RefreshCw className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                                <span className="text-amber-800 font-medium">
+                            <div
+                                role="status"
+                                aria-live="polite"
+                                className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm"
+                            >
+                                <RefreshCw
+                                    className="h-4 w-4 text-amber-600 flex-shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <span className="text-amber-800 font-semibold">
                                     {t(
                                         'admin.concourse_sync.stale_banner',
                                         '{{count}} statement(s) have updates available from the concourse.',

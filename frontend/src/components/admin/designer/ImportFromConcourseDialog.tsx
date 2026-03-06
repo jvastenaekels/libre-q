@@ -33,9 +33,9 @@ import { parseApiErrorSync } from '@/lib/error-utils';
 import { cn } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
-    proposed: 'bg-amber-50 text-amber-700',
-    accepted: 'bg-emerald-50 text-emerald-700',
-    rejected: 'bg-red-50 text-red-700',
+    proposed: 'bg-amber-100 text-amber-800',
+    accepted: 'bg-emerald-100 text-emerald-800',
+    rejected: 'bg-red-100 text-red-800',
 };
 
 interface ImportFromConcourseDialogProps {
@@ -280,7 +280,7 @@ export function ImportFromConcourseDialog({
                                             }
                                         }}
                                         className={cn(
-                                            'flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50/50 transition-colors',
+                                            'flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
                                             selectedItemIds.has(item.id) && 'bg-indigo-50/30'
                                         )}
                                     >
@@ -293,7 +293,7 @@ export function ImportFromConcourseDialog({
                                             <div className="flex items-center gap-2 mb-0.5">
                                                 <Badge
                                                     variant="outline"
-                                                    className="font-mono text-2xs bg-slate-50"
+                                                    className="font-mono text-xs bg-slate-50"
                                                 >
                                                     {codePrefix}
                                                     {item.code}
@@ -301,7 +301,7 @@ export function ImportFromConcourseDialog({
                                                 <Badge
                                                     variant="outline"
                                                     className={cn(
-                                                        'text-2xs',
+                                                        'text-xs',
                                                         STATUS_COLORS[item.status] ?? ''
                                                     )}
                                                 >

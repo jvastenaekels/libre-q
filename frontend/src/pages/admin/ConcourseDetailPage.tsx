@@ -56,9 +56,9 @@ import { parseApiErrorSync } from '@/lib/error-utils';
 import { cn } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
-    proposed: 'bg-amber-50 text-amber-700 border-amber-100',
-    accepted: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    rejected: 'bg-red-50 text-red-700 border-red-100',
+    proposed: 'bg-amber-100 text-amber-800 border-amber-200',
+    accepted: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    rejected: 'bg-red-100 text-red-800 border-red-200',
 };
 
 export default function ConcourseDetailPage() {
@@ -362,10 +362,10 @@ export default function ConcourseDetailPage() {
                     placeholder={t('admin.concourse.search_placeholder', 'Search items...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 rounded-xl w-64 bg-white"
+                    className="h-9 rounded-xl w-full sm:w-64 bg-white"
                 />
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="h-9 w-36 rounded-xl bg-white text-xs font-bold">
+                    <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -383,7 +383,7 @@ export default function ConcourseDetailPage() {
                 </Select>
                 {tags && tags.length > 0 && (
                     <Select value={filterTag} onValueChange={setFilterTag}>
-                        <SelectTrigger className="h-9 w-36 rounded-xl bg-white text-xs font-bold">
+                        <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
                             <Tag className="size-3 mr-1" />
                             <SelectValue />
                         </SelectTrigger>
@@ -443,7 +443,7 @@ export default function ConcourseDetailPage() {
                                 return (
                                     <div
                                         key={item.id}
-                                        className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50/50 transition-colors group"
+                                        className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50/50 transition-colors group"
                                     >
                                         {/* Code badge */}
                                         <div className="flex-shrink-0 pt-0.5">
@@ -492,7 +492,7 @@ export default function ConcourseDetailPage() {
                                                         {text}
                                                     </p>
                                                     {item.source && (
-                                                        <p className="text-2xs text-slate-400 mt-1 italic">
+                                                        <p className="text-xs text-slate-500 mt-1 italic">
                                                             {item.source}
                                                         </p>
                                                     )}
@@ -579,6 +579,7 @@ export default function ConcourseDetailPage() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
+                                                            aria-label={t('common.save', 'Save')}
                                                             className="size-8 p-0 text-emerald-600 hover:bg-emerald-50"
                                                             onClick={() => saveEdit(item)}
                                                             disabled={updateItemMutation.isPending}
@@ -592,6 +593,10 @@ export default function ConcourseDetailPage() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
+                                                            aria-label={t(
+                                                                'common.cancel',
+                                                                'Cancel'
+                                                            )}
                                                             className="size-8 p-0 text-slate-400 hover:bg-slate-100"
                                                             onClick={() => setEditingItem(null)}
                                                         >
@@ -603,7 +608,8 @@ export default function ConcourseDetailPage() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            aria-label={t('common.edit', 'Edit')}
+                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() => startEdit(item)}
                                                         >
                                                             <Pencil className="size-3.5" />
@@ -611,7 +617,11 @@ export default function ConcourseDetailPage() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            aria-label={t(
+                                                                'common.delete',
+                                                                'Delete'
+                                                            )}
+                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 setDeleteConfirmId(item.id)
                                                             }
