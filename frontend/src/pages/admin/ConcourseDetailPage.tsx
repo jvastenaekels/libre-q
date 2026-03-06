@@ -488,7 +488,7 @@ export default function ConcourseDetailPage() {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <p className="text-sm text-slate-800 leading-relaxed">
+                                                    <p className="text-sm text-slate-800 leading-normal">
                                                         {text}
                                                     </p>
                                                     {item.source && (

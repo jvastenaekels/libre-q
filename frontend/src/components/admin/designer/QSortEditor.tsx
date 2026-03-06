@@ -193,7 +193,7 @@ function SortableStatementItem({
                         role="button"
                         tabIndex={0}
                         className={cn(
-                            'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed',
+                            'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
                             !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
                         )}
                         onClick={() => {
@@ -889,7 +889,7 @@ const QSortEditor = ({
                                         onValueChange={(v) =>
                                             setImportMode(v as 'replace' | 'append' | 'sync')
                                         }
-                                        className="flex flex-wrap gap-6"
+                                        className="flex flex-wrap gap-3 sm:gap-6"
                                     >
                                         <div className="flex items-center space-x-2.5">
                                             <RadioGroupItem

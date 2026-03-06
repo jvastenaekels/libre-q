@@ -150,7 +150,7 @@ export function ImportFromConcourseDialog({
                 if (!v) resetState();
             }}
         >
-            <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-2xl max-h-[80vh] flex flex-col">
+            <DialogContent className="border-slate-200 bg-white shadow-lg max-w-2xl max-h-[80vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                         <Library className="size-5 text-indigo-600" />
@@ -253,6 +253,10 @@ export function ImportFromConcourseDialog({
                                         filteredItems.length > 0
                                     }
                                     onCheckedChange={toggleAll}
+                                    aria-label={t(
+                                        'admin.concourse_import.select_all',
+                                        'Select all'
+                                    )}
                                 />
                                 <span className="text-xs font-bold text-slate-500">
                                     {selectedItemIds.size > 0
