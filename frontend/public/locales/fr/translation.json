@@ -614,7 +614,17 @@
             "comment_added": "Commentaire ajouté",
             "comment_error": "Échec de l'ajout du commentaire",
             "version_label": "v{{n}}",
-            "item_detail_desc": "Historique et commentaires de cet élément"
+            "item_detail_desc": "Historique et commentaires de cet élément",
+            "manage_tags": "Étiquettes",
+            "manage_tags_desc": "Créez et gérez des étiquettes pour catégoriser les éléments du concours par thème ou dimension.",
+            "tag_name_placeholder": "Nom de l'étiquette",
+            "tag_color": "Couleur de l'étiquette",
+            "tag_created": "Étiquette créée",
+            "tag_create_error": "Échec de la création de l'étiquette",
+            "tag_deleted": "Étiquette supprimée",
+            "tag_delete_error": "Échec de la suppression de l'étiquette",
+            "no_tags": "Aucune étiquette. Créez votre première étiquette ci-dessus.",
+            "field_tags": "Étiquettes"
         },
         "concourse_import": {
             "title": "Importer depuis un concours",

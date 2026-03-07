@@ -614,7 +614,17 @@
             "comment_added": "Kommentti lisätty",
             "comment_error": "Kommentin lisääminen epäonnistui",
             "version_label": "v{{n}}",
-            "item_detail_desc": "Kohteen historia ja kommentit"
+            "item_detail_desc": "Kohteen historia ja kommentit",
+            "manage_tags": "Tunnisteet",
+            "manage_tags_desc": "Luo ja hallitse tunnisteita luokitellaksesi lausekokoelman kohteita teeman tai ulottuvuuden mukaan.",
+            "tag_name_placeholder": "Tunnisteen nimi",
+            "tag_color": "Tunnisteen väri",
+            "tag_created": "Tunniste luotu",
+            "tag_create_error": "Tunnisteen luonti epäonnistui",
+            "tag_deleted": "Tunniste poistettu",
+            "tag_delete_error": "Tunnisteen poisto epäonnistui",
+            "no_tags": "Ei tunnisteita. Luo ensimmäinen tunniste yllä.",
+            "field_tags": "Tunnisteet"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",

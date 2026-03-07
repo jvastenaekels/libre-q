@@ -622,7 +622,17 @@
             "comment_added": "Comment added",
             "comment_error": "Failed to add comment",
             "version_label": "v{{n}}",
-            "item_detail_desc": "History and comments for this item"
+            "item_detail_desc": "History and comments for this item",
+            "manage_tags": "Tags",
+            "manage_tags_desc": "Create and manage tags to categorize concourse items by theme or dimension.",
+            "tag_name_placeholder": "Tag name",
+            "tag_color": "Tag color",
+            "tag_created": "Tag created",
+            "tag_create_error": "Failed to create tag",
+            "tag_deleted": "Tag deleted",
+            "tag_delete_error": "Failed to delete tag",
+            "no_tags": "No tags yet. Create your first tag above.",
+            "field_tags": "Tags"
         },
         "concourse_import": {
             "title": "Import from Concourse",

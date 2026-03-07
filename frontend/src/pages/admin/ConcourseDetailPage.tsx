@@ -14,6 +14,7 @@ import {
     Pencil,
     Clock,
     MessageSquare,
+    Settings2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,14 +49,18 @@ import {
     useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete,
     useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost,
     useListTagsApiAdminConcoursesTagsGet,
+    useCreateTagApiAdminConcoursesTagsPost,
+    useDeleteTagApiAdminConcoursesTagsTagIdDelete,
     useDeleteConcourseApiAdminConcoursesConcourseIdDelete,
     getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey,
     getListConcoursesApiAdminConcoursesGetQueryKey,
+    getListTagsApiAdminConcoursesTagsGetQueryKey,
 } from '@/api/generated';
-import type { ConcourseItemRead, ConcourseItemStatus } from '@/api/model';
+import type { ConcourseItemRead, ConcourseItemStatus, ConcourseTagRead } from '@/api/model';
 import { useQueryClient } from '@tanstack/react-query';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ItemDetailSheet } from '@/components/admin/concourse/ItemDetailSheet';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -96,6 +101,10 @@ export default function ConcourseDetailPage() {
     const [sheetItemId, setSheetItemId] = useState<number | null>(null);
     const [sheetItemCode, setSheetItemCode] = useState('');
     const [sheetTab, setSheetTab] = useState<'history' | 'comments'>('history');
+    const [tagManagerOpen, setTagManagerOpen] = useState(false);
+    const [newTagName, setNewTagName] = useState('');
+    const [newTagColor, setNewTagColor] = useState('#6366f1');
+    const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
 
     // Mutations
     const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
@@ -103,11 +112,53 @@ export default function ConcourseDetailPage() {
     const deleteItemMutation = useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete();
     const importMutation = useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost();
     const deleteConcourseMutation = useDeleteConcourseApiAdminConcoursesConcourseIdDelete();
+    const createTagMutation = useCreateTagApiAdminConcoursesTagsPost();
+    const deleteTagMutation = useDeleteTagApiAdminConcoursesTagsTagIdDelete();
 
     const invalidate = () =>
         queryClient.invalidateQueries({
             queryKey: getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey(id),
         });
+
+    const invalidateTags = () =>
+        queryClient.invalidateQueries({
+            queryKey: getListTagsApiAdminConcoursesTagsGetQueryKey(),
+        });
+
+    const handleCreateTag = async () => {
+        if (!newTagName.trim()) return;
+        try {
+            await createTagMutation.mutateAsync({
+                data: { name: newTagName.trim(), color: newTagColor },
+            });
+            await invalidateTags();
+            setNewTagName('');
+            toast.success(t('admin.concourse.tag_created', 'Tag created'));
+        } catch (err) {
+            toast.error(
+                parseApiErrorSync(
+                    err,
+                    t('admin.concourse.tag_create_error', 'Failed to create tag')
+                )
+            );
+        }
+    };
+
+    const handleDeleteTag = async (tagId: number) => {
+        try {
+            await deleteTagMutation.mutateAsync({ tagId });
+            await Promise.all([invalidateTags(), invalidate()]);
+            setDeleteTagId(null);
+            toast.success(t('admin.concourse.tag_deleted', 'Tag deleted'));
+        } catch (err) {
+            toast.error(
+                parseApiErrorSync(
+                    err,
+                    t('admin.concourse.tag_delete_error', 'Failed to delete tag')
+                )
+            );
+        }
+    };
 
     // Filter items
     const filteredItems = useMemo(() => {
@@ -139,6 +190,7 @@ export default function ConcourseDetailPage() {
     const [newCode, setNewCode] = useState('');
     const [newText, setNewText] = useState('');
     const [newSource, setNewSource] = useState('');
+    const [newTagIds, setNewTagIds] = useState<number[]>([]);
 
     const handleAddItem = async () => {
         if (!newCode.trim() || !newText.trim()) return;
@@ -149,7 +201,7 @@ export default function ConcourseDetailPage() {
                     code: newCode.trim(),
                     source: newSource.trim() || null,
                     translations: [{ language_code: activeLocale, text: newText.trim() }],
-                    tag_ids: [],
+                    tag_ids: newTagIds,
                 },
             });
             await invalidate();
@@ -157,6 +209,7 @@ export default function ConcourseDetailPage() {
             setNewCode('');
             setNewText('');
             setNewSource('');
+            setNewTagIds([]);
             toast.success(t('admin.concourse.item_created', 'Item added'));
         } catch (err) {
             toast.error(
@@ -166,6 +219,8 @@ export default function ConcourseDetailPage() {
     };
 
     // Edit item
+    const [editTagIds, setEditTagIds] = useState<number[]>([]);
+
     const startEdit = (item: ConcourseItemRead) => {
         setEditingItem(item.id);
         setEditCode(item.code);
@@ -176,6 +231,7 @@ export default function ConcourseDetailPage() {
         );
         setEditSource(item.source ?? '');
         setEditChangeNote('');
+        setEditTagIds(item.tags?.map((tag) => tag.id) ?? []);
     };
 
     const saveEdit = async (item: ConcourseItemRead) => {
@@ -188,6 +244,7 @@ export default function ConcourseDetailPage() {
                     code: editCode.trim() || undefined,
                     source: editSource.trim() || undefined,
                     translations: [{ language_code: activeLocale, text: editText.trim() }],
+                    tag_ids: editTagIds,
                     change_comment: editChangeNote.trim() || undefined,
                 },
             });
@@ -410,6 +467,17 @@ export default function ConcourseDetailPage() {
                             ))}
                         </SelectContent>
                     </Select>
+                )}
+                {canEdit && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 rounded-xl text-xs font-bold"
+                        onClick={() => setTagManagerOpen(true)}
+                    >
+                        <Settings2 className="size-3 mr-1" />
+                        {t('admin.concourse.manage_tags', 'Tags')}
+                    </Button>
                 )}
                 {languages.length > 1 && (
                     <Select value={activeLocale} onValueChange={setActiveLocale}>
@@ -677,6 +745,53 @@ export default function ConcourseDetailPage() {
                                                         className="h-8 text-xs rounded-lg"
                                                         maxLength={500}
                                                     />
+                                                    {tags && tags.length > 0 && (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {tags.map((tag) => (
+                                                                <div
+                                                                    key={tag.id}
+                                                                    className="flex items-center gap-1.5 cursor-pointer"
+                                                                >
+                                                                    <Checkbox
+                                                                        checked={editTagIds.includes(
+                                                                            tag.id
+                                                                        )}
+                                                                        onCheckedChange={(
+                                                                            checked
+                                                                        ) => {
+                                                                            setEditTagIds((prev) =>
+                                                                                checked
+                                                                                    ? [
+                                                                                          ...prev,
+                                                                                          tag.id,
+                                                                                      ]
+                                                                                    : prev.filter(
+                                                                                          (id) =>
+                                                                                              id !==
+                                                                                              tag.id
+                                                                                      )
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                    <Badge
+                                                                        variant="outline"
+                                                                        className="text-2xs h-5 cursor-pointer"
+                                                                        style={
+                                                                            tag.color
+                                                                                ? {
+                                                                                      borderColor:
+                                                                                          tag.color,
+                                                                                      color: tag.color,
+                                                                                  }
+                                                                                : undefined
+                                                                        }
+                                                                    >
+                                                                        {tag.name}
+                                                                    </Badge>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <>
@@ -955,6 +1070,14 @@ export default function ConcourseDetailPage() {
                                 className="h-10 rounded-xl"
                             />
                         </div>
+                        {tags && tags.length > 0 && (
+                            <TagCheckboxGroup
+                                tags={tags}
+                                selectedIds={newTagIds}
+                                onChange={setNewTagIds}
+                                label={t('admin.concourse.field_tags', 'Tags')}
+                            />
+                        )}
                     </div>
                     <DialogFooter>
                         <Button
@@ -1130,6 +1253,117 @@ export default function ConcourseDetailPage() {
                 </DialogContent>
             </Dialog>
 
+            {/* Tag Manager Dialog */}
+            <Dialog open={tagManagerOpen} onOpenChange={setTagManagerOpen}>
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900">
+                            {t('admin.concourse.manage_tags', 'Tags')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500">
+                            {t(
+                                'admin.concourse.manage_tags_desc',
+                                'Create and manage tags to categorize concourse items by theme or dimension.'
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="flex gap-2">
+                            <Input
+                                value={newTagName}
+                                onChange={(e) => setNewTagName(e.target.value)}
+                                placeholder={t('admin.concourse.tag_name_placeholder', 'Tag name')}
+                                className="h-9 rounded-xl flex-1"
+                                maxLength={100}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleCreateTag();
+                                }}
+                            />
+                            <input
+                                type="color"
+                                value={newTagColor}
+                                onChange={(e) => setNewTagColor(e.target.value)}
+                                className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer p-0.5"
+                                title={t('admin.concourse.tag_color', 'Tag color')}
+                            />
+                            <Button
+                                size="sm"
+                                className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                disabled={!newTagName.trim() || createTagMutation.isPending}
+                                onClick={handleCreateTag}
+                            >
+                                {createTagMutation.isPending ? (
+                                    <Loader2 className="size-3.5 animate-spin" />
+                                ) : (
+                                    <Plus className="size-3.5" />
+                                )}
+                            </Button>
+                        </div>
+                        {tags && tags.length > 0 ? (
+                            <div className="space-y-1.5">
+                                {tags.map((tag) => (
+                                    <div
+                                        key={tag.id}
+                                        className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="size-3 rounded-full"
+                                                style={{ backgroundColor: tag.color ?? '#94a3b8' }}
+                                            />
+                                            <span className="text-sm font-medium text-slate-700">
+                                                {tag.name}
+                                            </span>
+                                        </div>
+                                        {deleteTagId === tag.id ? (
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-7 px-2 text-red-600 hover:bg-red-50 text-xs"
+                                                    disabled={deleteTagMutation.isPending}
+                                                    onClick={() => handleDeleteTag(tag.id)}
+                                                >
+                                                    {deleteTagMutation.isPending ? (
+                                                        <Loader2 className="size-3 animate-spin" />
+                                                    ) : (
+                                                        t('common.confirm', 'Confirm')
+                                                    )}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-7 px-2 text-slate-400 text-xs"
+                                                    onClick={() => setDeleteTagId(null)}
+                                                >
+                                                    <X className="size-3" />
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                onClick={() => setDeleteTagId(tag.id)}
+                                            >
+                                                <Trash2 className="size-3.5" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-sm text-slate-400 py-4">
+                                {t(
+                                    'admin.concourse.no_tags',
+                                    'No tags yet. Create your first tag above.'
+                                )}
+                            </p>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
             {/* Item Detail Sheet (History & Comments) */}
             <ItemDetailSheet
                 open={sheetItemId !== null}
@@ -1141,6 +1375,54 @@ export default function ConcourseDetailPage() {
                 itemCode={sheetItemCode}
                 defaultTab={sheetTab}
             />
+        </div>
+    );
+}
+
+function TagCheckboxGroup({
+    tags,
+    selectedIds,
+    onChange,
+    label,
+}: {
+    tags: ConcourseTagRead[];
+    selectedIds: number[];
+    onChange: (ids: number[]) => void;
+    label: string;
+}) {
+    return (
+        <div className="space-y-1">
+            <Label className="text-2xs font-black text-slate-500">
+                {label}
+                <span className="text-slate-400 font-normal ml-1">
+                    ({selectedIds.length}/{tags.length})
+                </span>
+            </Label>
+            <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                    <div key={tag.id} className="flex items-center gap-1.5 cursor-pointer">
+                        <Checkbox
+                            checked={selectedIds.includes(tag.id)}
+                            onCheckedChange={(checked) => {
+                                onChange(
+                                    checked
+                                        ? [...selectedIds, tag.id]
+                                        : selectedIds.filter((id) => id !== tag.id)
+                                );
+                            }}
+                        />
+                        <Badge
+                            variant="outline"
+                            className="text-2xs h-5 cursor-pointer"
+                            style={
+                                tag.color ? { borderColor: tag.color, color: tag.color } : undefined
+                            }
+                        >
+                            {tag.name}
+                        </Badge>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
