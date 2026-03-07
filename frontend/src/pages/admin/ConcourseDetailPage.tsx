@@ -71,7 +71,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function ConcourseDetailPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const statusLabel = useCallback(
         (status: string) =>
             ({
@@ -297,16 +297,18 @@ export default function ConcourseDetailPage() {
     const [newText, setNewText] = useState('');
     const [newSource, setNewSource] = useState('');
     const [newTagIds, setNewTagIds] = useState<number[]>([]);
+    const [newItemLocale, setNewItemLocale] = useState('');
 
     const handleAddItem = async () => {
-        if (!newCode.trim() || !newText.trim()) return;
+        const itemLocale = activeLocale || newItemLocale;
+        if (!newCode.trim() || !newText.trim() || !itemLocale) return;
         try {
             await createItemMutation.mutateAsync({
                 concourseId: id,
                 data: {
                     code: newCode.trim(),
                     source: newSource.trim() || null,
-                    translations: [{ language_code: activeLocale, text: newText.trim() }],
+                    translations: [{ language_code: itemLocale, text: newText.trim() }],
                     tag_ids: newTagIds,
                 },
             });
@@ -316,6 +318,7 @@ export default function ConcourseDetailPage() {
             setNewText('');
             setNewSource('');
             setNewTagIds([]);
+            setNewItemLocale('');
             toast.success(t('admin.concourse.item_created', 'Item added'));
         } catch (err) {
             toast.error(
@@ -451,8 +454,67 @@ export default function ConcourseDetailPage() {
         [concourse?.items]
     );
 
+    const langDisplayName = useCallback(
+        (code: string) => {
+            try {
+                const dn = new Intl.DisplayNames([i18n.language], { type: 'language' });
+                const name = dn.of(code);
+                return name ? name.charAt(0).toUpperCase() + name.slice(1) : code.toUpperCase();
+            } catch {
+                return code.toUpperCase();
+            }
+        },
+        [i18n.language]
+    );
+
+    const missingCountByLang = useMemo(() => {
+        if (languages.length <= 1) return {};
+        const counts: Record<string, number> = {};
+        const items = concourse?.items ?? [];
+        for (const lang of languages) {
+            let missing = 0;
+            for (const item of items) {
+                if (!item.translations?.some((tr) => tr.language_code === lang)) {
+                    missing++;
+                }
+            }
+            if (missing > 0) counts[lang] = missing;
+        }
+        return counts;
+    }, [languages, concourse?.items]);
+
+    // Common languages for the "add language" picker
+    const commonLanguages = useMemo(() => {
+        const codes = [
+            'en',
+            'fr',
+            'fi',
+            'de',
+            'es',
+            'it',
+            'pt',
+            'nl',
+            'sv',
+            'da',
+            'no',
+            'pl',
+            'cs',
+            'ja',
+            'zh',
+            'ko',
+            'ar',
+            'hi',
+            'ru',
+            'tr',
+        ];
+        return codes
+            .filter((c) => !languages.includes(c))
+            .map((code) => ({ code, name: langDisplayName(code) }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, [languages, langDisplayName]);
+
     useEffect(() => {
-        if (!activeLocale && languages.length > 0) {
+        if (languages.length > 0 && !languages.includes(activeLocale)) {
             setActiveLocale(languages[0]);
         }
     }, [languages, activeLocale]);
@@ -583,39 +645,64 @@ export default function ConcourseDetailPage() {
                             {t('admin.concourse.manage_tags', 'Tags')}
                         </Button>
                     )}
-                    <Select
-                        value={activeLocale}
-                        onValueChange={(val) => {
-                            if (val === '__add__') {
-                                setAddLangOpen(true);
-                            } else {
-                                setActiveLocale(val);
-                            }
-                        }}
-                    >
-                        <SelectTrigger
-                            className="h-9 w-28 rounded-xl bg-white text-xs font-bold"
-                            title={t(
-                                'admin.concourse.language_tooltip',
-                                'Language of statement texts'
-                            )}
-                        >
-                            <Globe className="size-3 mr-1 text-slate-400" />
-                            <SelectValue
-                                placeholder={t('admin.concourse.select_language', 'Language')}
-                            />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl">
+                    {/* Language: tabs when multiple, subtle add button when single */}
+                    {languages.length > 1 ? (
+                        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-0.5">
                             {languages.map((lang) => (
-                                <SelectItem key={lang} value={lang}>
+                                <button
+                                    key={lang}
+                                    type="button"
+                                    onClick={() => setActiveLocale(lang)}
+                                    className={`relative h-8 px-3 rounded-lg text-xs font-bold transition-colors ${
+                                        activeLocale === lang
+                                            ? 'bg-white text-slate-900 shadow-sm'
+                                            : 'text-slate-500 hover:text-slate-700'
+                                    }`}
+                                    title={langDisplayName(lang)}
+                                >
                                     {lang.toUpperCase()}
-                                </SelectItem>
+                                    {missingCountByLang[lang] && (
+                                        <span className="absolute -top-1 -right-1 size-4 rounded-full bg-amber-400 text-[10px] font-bold text-white flex items-center justify-center">
+                                            {missingCountByLang[lang]}
+                                        </span>
+                                    )}
+                                </button>
                             ))}
-                            <SelectItem value="__add__" className="text-indigo-600 font-bold">
-                                + {t('admin.concourse.add_language', 'Add language')}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                            {canEdit && (
+                                <button
+                                    type="button"
+                                    onClick={() => setAddLangOpen(true)}
+                                    className="h-8 px-2 rounded-lg text-xs font-bold text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-colors"
+                                    title={t('admin.concourse.add_language', 'Add language')}
+                                >
+                                    +
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            {languages.length === 1 && (
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                    <Globe className="size-3" />
+                                    {langDisplayName(languages[0])}
+                                </span>
+                            )}
+                            {canEdit && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-9 rounded-xl text-xs text-slate-400 hover:text-indigo-600"
+                                    onClick={() => setAddLangOpen(true)}
+                                    title={t(
+                                        'admin.concourse.add_language_tooltip',
+                                        'Add a translation language'
+                                    )}
+                                >
+                                    + {t('admin.concourse.add_language', 'Add language')}
+                                </Button>
+                            )}
+                        </>
+                    )}
                     <span className="text-xs text-slate-400 ml-auto">
                         {filteredItems.length} / {concourse.items?.length ?? 0}{' '}
                         {t('admin.concourse.items_label', 'items')}
@@ -1382,10 +1469,38 @@ export default function ConcourseDetailPage() {
                                 autoFocus
                             />
                         </div>
+                        {!activeLocale && (
+                            <div className="space-y-1">
+                                <Label className="text-2xs font-black text-slate-500">
+                                    {t('admin.concourse.field_language', 'Language')}
+                                </Label>
+                                <Select
+                                    value={newItemLocale}
+                                    onValueChange={(val) => setNewItemLocale(val)}
+                                >
+                                    <SelectTrigger className="h-10 rounded-xl">
+                                        <SelectValue
+                                            placeholder={t(
+                                                'admin.concourse.select_language',
+                                                'Select language'
+                                            )}
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl max-h-60">
+                                        {commonLanguages.map((lang) => (
+                                            <SelectItem key={lang.code} value={lang.code}>
+                                                {lang.name} ({lang.code})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                         <div className="space-y-1">
                             <Label className="text-2xs font-black text-slate-500">
-                                {t('admin.concourse.field_text', 'Statement text')} (
-                                {activeLocale.toUpperCase()})
+                                {t('admin.concourse.field_text', 'Statement text')}{' '}
+                                {(activeLocale || newItemLocale) &&
+                                    `(${langDisplayName(activeLocale || newItemLocale)})`}
                             </Label>
                             <Textarea
                                 value={newText}
@@ -1427,7 +1542,10 @@ export default function ConcourseDetailPage() {
                         <Button
                             onClick={handleAddItem}
                             disabled={
-                                !newCode.trim() || !newText.trim() || createItemMutation.isPending
+                                !newCode.trim() ||
+                                !newText.trim() ||
+                                (!activeLocale && !newItemLocale) ||
+                                createItemMutation.isPending
                             }
                             className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
@@ -1570,20 +1688,32 @@ export default function ConcourseDetailPage() {
                             <Label className="text-2xs font-black text-slate-500">
                                 {t('admin.concourse.import_language', 'Language')}
                             </Label>
-                            <Input
-                                value={importLocale}
-                                onChange={(e) =>
-                                    setImportLocale(e.target.value.toLowerCase().slice(0, 5))
-                                }
-                                placeholder="en"
-                                className="h-10 rounded-xl w-32 font-mono"
-                                maxLength={5}
-                            />
+                            <Select
+                                value={importLocale || activeLocale}
+                                onValueChange={(val) => setImportLocale(val)}
+                            >
+                                <SelectTrigger className="h-10 rounded-xl w-48">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl max-h-60">
+                                    {languages.map((lang) => (
+                                        <SelectItem key={lang} value={lang}>
+                                            {langDisplayName(lang)} ({lang})
+                                        </SelectItem>
+                                    ))}
+                                    {commonLanguages.map((lang) => (
+                                        <SelectItem key={lang.code} value={lang.code}>
+                                            {lang.name} ({lang.code})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-1">
                             <Label className="text-2xs font-black text-slate-500">
-                                {t('admin.concourse.import_statements', 'Statements')} (
-                                {(importLocale || activeLocale).toUpperCase()})
+                                {t('admin.concourse.import_statements', 'Statements')}
+                                {(importLocale || activeLocale) &&
+                                    ` (${langDisplayName(importLocale || activeLocale)})`}
                             </Label>
                             <Textarea
                                 value={importText}
@@ -1739,33 +1869,28 @@ export default function ConcourseDetailPage() {
                         </DialogTitle>
                         <DialogDescription className="text-sm text-slate-500">
                             {t(
-                                'admin.concourse.add_language_desc',
-                                'Enter a language code (e.g. en, fr, fi).'
+                                'admin.concourse.add_language_desc_v2',
+                                'Select a language for statement translations.'
                             )}
                         </DialogDescription>
                     </DialogHeader>
-                    <Input
-                        value={newLangCode}
-                        onChange={(e) =>
-                            setNewLangCode(
-                                e.target.value
-                                    .toLowerCase()
-                                    .replace(/[^a-z-]/g, '')
-                                    .slice(0, 5)
-                            )
-                        }
-                        placeholder="en"
-                        className="h-10 rounded-xl font-mono"
-                        maxLength={5}
-                        autoFocus
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && /^[a-z]{2}(-[A-Z]{2})?$/.test(newLangCode)) {
-                                setActiveLocale(newLangCode);
-                                setAddLangOpen(false);
-                                setNewLangCode('');
-                            }
-                        }}
-                    />
+                    <Select value={newLangCode} onValueChange={(val) => setNewLangCode(val)}>
+                        <SelectTrigger className="h-10 rounded-xl">
+                            <SelectValue
+                                placeholder={t(
+                                    'admin.concourse.select_language',
+                                    'Select language'
+                                )}
+                            />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl max-h-60">
+                            {commonLanguages.map((lang) => (
+                                <SelectItem key={lang.code} value={lang.code}>
+                                    {lang.name} ({lang.code})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <DialogFooter>
                         <Button
                             onClick={() => {
@@ -1773,7 +1898,7 @@ export default function ConcourseDetailPage() {
                                 setAddLangOpen(false);
                                 setNewLangCode('');
                             }}
-                            disabled={!/^[a-z]{2}$/.test(newLangCode)}
+                            disabled={!newLangCode}
                             className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
                             {t('common.add', 'Add')}
