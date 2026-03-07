@@ -1038,6 +1038,7 @@
             "alert_deadline": "{{study}} : fermeture dans {{days}} jours avec {{count}} participants",
             "view": "Voir",
             "open_study": "Ouvrir l'étude",
+            "add_study": "Ajouter une étude",
             "closes": "Fermeture le",
             "timeline": {
                 "title": "Chronologie des participations",

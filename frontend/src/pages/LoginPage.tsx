@@ -6,6 +6,7 @@ import {
     listProjectsApiAdminProjectsGet,
 } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useAdminStore } from '@/store/useAdminStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -76,11 +77,13 @@ const LoginPage = () => {
                     const response = await listProjectsApiAdminProjectsGet();
                     const projects = response?.items;
                     if (projects && projects.length > 0) {
-                        const sorted = [...projects].sort(
-                            (a, b) =>
-                                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-                        );
-                        navigate(`/app/${sorted[0].slug}/dashboard`);
+                        // Prefer last visited project if still accessible
+                        const lastProjectId = useAdminStore.getState().activeProjectId;
+                        const lastProject = lastProjectId
+                            ? projects.find((p) => p.id === lastProjectId)
+                            : null;
+                        const target = lastProject ?? projects[0];
+                        navigate(`/app/${target.slug}/dashboard`);
                     } else {
                         navigate('/hub');
                     }

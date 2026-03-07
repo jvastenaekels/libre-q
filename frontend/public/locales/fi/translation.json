@@ -1038,6 +1038,7 @@
             "alert_deadline": "{{study}}: sulkeutuu {{days}} päivän kuluttua, {{count}} osallistujaa",
             "view": "Näytä",
             "open_study": "Avaa tutkimus",
+            "add_study": "Lisää tutkimus",
             "closes": "Sulkeutuu",
             "timeline": {
                 "title": "Vastausten aikajana",

@@ -11,6 +11,10 @@ import {
     Circle,
     Clock,
     Settings2,
+    PencilRuler,
+    Link2,
+    Download,
+    ChartColumnStacked,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -469,21 +473,35 @@ export function AdminDashboard() {
                 />
             </div>
 
-            {/* Studies */}
-            <div className="space-y-1">
-                <h2 className="text-lg font-semibold">{t('admin.dashboard.studies', 'Studies')}</h2>
-            </div>
-
-            <StudyGroups
-                activeStudies={activeStudies}
-                pausedStudies={pausedStudies}
-                draftStudies={draftStudies}
-                closedStudies={closedStudies}
-                getTitle={getStudyTitle}
-                onOpen={handleOpenStudy}
-                locale={currentLocale}
-                t={t}
-            />
+            {/* Studies — single study gets prominent treatment */}
+            {studies && studies.length === 1 ? (
+                <SingleStudyCard
+                    study={studies[0]}
+                    title={getStudyTitle(studies[0])}
+                    projectSlug={projectSlug}
+                    locale={currentLocale}
+                    t={t}
+                    onCreateStudy={() => setShowCreateDialog(true)}
+                />
+            ) : (
+                <>
+                    <div className="space-y-1">
+                        <h2 className="text-lg font-semibold">
+                            {t('admin.dashboard.studies', 'Studies')}
+                        </h2>
+                    </div>
+                    <StudyGroups
+                        activeStudies={activeStudies}
+                        pausedStudies={pausedStudies}
+                        draftStudies={draftStudies}
+                        closedStudies={closedStudies}
+                        getTitle={getStudyTitle}
+                        onOpen={handleOpenStudy}
+                        locale={currentLocale}
+                        t={t}
+                    />
+                </>
+            )}
 
             <CreateStudyDialog
                 open={showCreateDialog}
@@ -721,6 +739,148 @@ function TeamCard({
                 )}
             </CardContent>
         </Card>
+    );
+}
+
+function SingleStudyCard({
+    study,
+    title,
+    projectSlug,
+    locale,
+    t,
+    onCreateStudy,
+}: {
+    study: StudyRead;
+    title: string;
+    projectSlug: string;
+    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
+    locale: any;
+    t: TranslateFn;
+    onCreateStudy: () => void;
+}) {
+    const navigate = useNavigate();
+    const participants = study.participant_count ?? 0;
+    const languageCodes =
+        study.translations?.map((tr) => tr.language_code.toUpperCase()).join(', ') ?? '';
+    const studyBase = `/app/${projectSlug}/studies/${study.slug}`;
+
+    const tools = [
+        {
+            key: 'design',
+            icon: PencilRuler,
+            label: t('admin.sidebar.design', 'Design'),
+            url: `${studyBase}/design`,
+        },
+        {
+            key: 'recruit',
+            icon: Link2,
+            label: t('admin.sidebar.recruit', 'Access'),
+            url: `${studyBase}/recruitment`,
+        },
+        {
+            key: 'data',
+            icon: Download,
+            label: t('admin.sidebar.data', 'Data'),
+            url: `${studyBase}/data`,
+        },
+        {
+            key: 'analysis',
+            icon: ChartColumnStacked,
+            label: t('admin.sidebar.analysis', 'Analysis'),
+            url: `${studyBase}/analysis`,
+        },
+    ];
+
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">{t('admin.dashboard.studies', 'Studies')}</h2>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground"
+                    onClick={onCreateStudy}
+                >
+                    <Plus className="h-3 w-3 mr-1" />
+                    {t('admin.dashboard.add_study', 'Add study')}
+                </Button>
+            </div>
+
+            <Card
+                className="group cursor-pointer hover:border-foreground/20 transition-colors"
+                onClick={() => navigate(studyBase)}
+            >
+                <CardContent className="py-4 px-5">
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                                <div className="shrink-0">{getStateIcon(study.state)}</div>
+                                <h3 className="text-base font-semibold truncate group-hover:text-indigo-600 transition-colors">
+                                    {title}
+                                </h3>
+                                <Badge
+                                    variant="outline"
+                                    className={cn(
+                                        'shrink-0 text-2xs border',
+                                        getStateColor(study.state)
+                                    )}
+                                >
+                                    {t(
+                                        `admin.project.study_states.${study.state}`,
+                                        study.state ?? 'draft'
+                                    )}
+                                </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                                {languageCodes && <span>{languageCodes}</span>}
+                                <span className="inline-flex items-center gap-1">
+                                    <Users className="h-3 w-3" />
+                                    {t('admin.dashboard.n_participants', {
+                                        count: participants,
+                                        defaultValue: '{{count}} participants',
+                                    })}
+                                </span>
+                                <span className="inline-flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {formatDistanceToNow(new Date(study.created_at), {
+                                        addSuffix: true,
+                                        locale,
+                                    })}
+                                </span>
+                                {study.end_date && (
+                                    <span className="inline-flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {t('admin.dashboard.closes', 'Closes')}{' '}
+                                        {format(new Date(study.end_date as string), 'PP', {
+                                            locale,
+                                        })}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
+                    </div>
+
+                    {/* Quick-action tool links */}
+                    <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t">
+                        {tools.map((tool) => (
+                            <button
+                                type="button"
+                                key={tool.key}
+                                className="flex flex-col items-center gap-1.5 py-2 px-1 rounded-lg hover:bg-slate-50 transition-colors text-muted-foreground hover:text-foreground"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(tool.url);
+                                }}
+                            >
+                                <tool.icon className="h-4 w-4" />
+                                <span className="text-2xs font-medium">{tool.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 
