@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     useLoginForAccessTokenApiTokenPost,
     useReadUsersMeApiMeGet,
-    listWorkspacesApiAdminWorkspacesGet,
+    listProjectsApiAdminProjectsGet,
 } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
@@ -65,7 +65,7 @@ const LoginPage = () => {
 
                 toast.success(t('auth.login.welcome_back'));
 
-                // Handle redirection: preference for 'redirect' param, then most recent workspace, then /admin
+                // Handle redirection: preference for 'redirect' param, then most recent project, then /admin
                 const explicitRedirect = searchParams.get('redirect');
                 if (explicitRedirect) {
                     navigate(explicitRedirect);
@@ -73,10 +73,10 @@ const LoginPage = () => {
                 }
 
                 try {
-                    const response = await listWorkspacesApiAdminWorkspacesGet();
-                    const workspaces = response?.items;
-                    if (workspaces && workspaces.length > 0) {
-                        const sorted = [...workspaces].sort(
+                    const response = await listProjectsApiAdminProjectsGet();
+                    const projects = response?.items;
+                    if (projects && projects.length > 0) {
+                        const sorted = [...projects].sort(
                             (a, b) =>
                                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                         );

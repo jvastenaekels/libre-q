@@ -123,13 +123,13 @@ Researchers can override default UI strings (button text, step names) per langua
 
 ## Team Management
 
-**Location**: Workspace settings (sidebar > workspace menu)
+**Location**: Project settings (sidebar > project menu)
 
-Team management is handled at the **workspace level**, not per-study. Workspace owners can invite collaborators and manage roles from the workspace settings page.
+Team management is handled at the **project level**, not per-study. Project owners can invite collaborators and manage roles from the project settings page.
 
 ### Inviting Collaborators
 
-1. Navigate to your workspace settings.
+1. Navigate to your project settings.
 2. Enter the collaborator's email address.
 3. Select their role (**Researcher** or **Viewer**).
 4. Click **Send Invitation**.
@@ -146,7 +146,7 @@ The system generates a unique registration link. If SMTP is configured, an email
 | Change Study State           |  Yes  |    Yes     |  No    |
 | Manage Recruitment Links     |  Yes  |    Yes     |  No    |
 | Export Data                  |  Yes  |    Yes     |  No    |
-| Manage Workspace Members     |  Yes  |    No      |  No    |
+| Manage Project Members       |  Yes  |    No      |  No    |
 | Delete Study                 |  Yes  |    No      |  No    |
 
 ---
@@ -314,13 +314,13 @@ Once enabled, login requires both your password and a valid TOTP token.
 
 ---
 
-## Workspace Management
+## Project Management
 
-Workspaces provide organizational isolation for multi-tenant deployments:
+Projects provide organizational isolation for multi-tenant deployments:
 
-- **Create Workspace**: Set up an isolated environment for a research team.
-- **Manage Members**: Assign workspace-level roles (Owner, Researcher, Viewer).
-- **Switch Workspaces**: Use the workspace switcher in the sidebar.
+- **Create Project**: Set up an isolated environment for a research team.
+- **Manage Members**: Assign project-level roles (Owner, Researcher, Viewer).
+- **Switch Projects**: Use the project switcher in the sidebar.
 - **Storage Usage**: Monitor total audio storage consumption and quota from the study settings page.
 
 ---
@@ -340,7 +340,7 @@ When multiple team members edit a study simultaneously, Libre-Q provides safety 
 
 | Shortcut        | Action                                |
 | :-------------- | :------------------------------------ |
-| `Cmd+K` / `Ctrl+K` | Open the command menu for quick navigation between studies, workspaces, and actions |
+| `Cmd+K` / `Ctrl+K` | Open the command menu for quick navigation between studies, projects, and actions |
 
 ---
 
@@ -353,7 +353,7 @@ Superusers can manage all user accounts:
 - **Delete User**: Remove an account (cannot delete yourself).
 
 > [!CAUTION]
-> Superuser status grants global access to all studies and workspaces. Only assign this role to trusted platform administrators.
+> Superuser status grants global access to all studies and projects. Only assign this role to trusted platform administrators.
 
 ---
 

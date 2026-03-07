@@ -11,7 +11,7 @@ from app.models import ConcourseItemStatus
 
 
 class ConcourseTagCreate(BaseModel):
-    """Schema for creating a workspace-scoped tag."""
+    """Schema for creating a project-scoped tag."""
 
     name: str = Field(..., max_length=100, min_length=1)
     color: str | None = Field(None, pattern=r"^#[0-9a-fA-F]{6}$", max_length=7)
@@ -21,7 +21,7 @@ class ConcourseTagRead(ConcourseTagCreate):
     """Schema for reading a tag."""
 
     id: int
-    workspace_id: int
+    project_id: int
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -133,7 +133,7 @@ class ConcourseRead(BaseModel):
     """Schema for reading a concourse (list view)."""
 
     id: int
-    workspace_id: int
+    project_id: int
     title: str
     description: str | None = None
     item_count: int = 0

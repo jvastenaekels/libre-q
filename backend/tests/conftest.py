@@ -33,9 +33,9 @@ from app.models import (
     StudyState,
     StudyTranslation,
     User,
-    Workspace,
-    WorkspaceMember,
-    WorkspaceRole,
+    Project,
+    ProjectMember,
+    ProjectRole,
 )
 from app.utils.security import get_password_hash
 
@@ -115,23 +115,23 @@ async def test_user(db: AsyncSession):
 
 
 @pytest_asyncio.fixture
-async def test_workspace(db: AsyncSession, test_user: User):
-    """Create a test workspace and add test_user as owner."""
-    ws = Workspace(title="Test Workspace", slug="test-workspace")
-    db.add(ws)
+async def test_project(db: AsyncSession, test_user: User):
+    """Create a test project and add test_user as owner."""
+    proj = Project(title="Test Project", slug="test-project")
+    db.add(proj)
     await db.flush()
 
-    member = WorkspaceMember(
-        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.owner
+    member = ProjectMember(
+        project_id=proj.id, user_id=test_user.id, role=ProjectRole.owner
     )
     db.add(member)
     await db.commit()
-    await db.refresh(ws)
-    return ws
+    await db.refresh(proj)
+    return proj
 
 
 @pytest_asyncio.fixture
-async def seed_study(db, test_user, test_workspace):
+async def seed_study(db, test_user, test_project):
     """Seeds a complete study with statements and configs."""
     # 2. Study
     grid_config = [
@@ -143,7 +143,7 @@ async def seed_study(db, test_user, test_workspace):
 
     study = Study(
         slug="test-study",
-        workspace_id=test_workspace.id,
+        project_id=test_project.id,
         state=StudyState.draft,  # Use draft for update tests
         grid_config=grid_config,
         presort_config={
@@ -224,41 +224,41 @@ async def user_factory(db: AsyncSession):
 
 
 @pytest_asyncio.fixture
-async def workspace_factory(db: AsyncSession):
-    """Factory to create workspaces with specific owners."""
+async def project_factory(db: AsyncSession):
+    """Factory to create projects with specific owners."""
 
-    async def _create_workspace(owner: User, title: str | None = None) -> Workspace:
+    async def _create_project(owner: User, title: str | None = None) -> Project:
         import uuid
 
-        title = title or f"Workspace {uuid.uuid4()}"
-        ws = Workspace(title=title, slug=f"ws-{uuid.uuid4()}")
-        db.add(ws)
+        title = title or f"Project {uuid.uuid4()}"
+        proj = Project(title=title, slug=f"proj-{uuid.uuid4()}")
+        db.add(proj)
         await db.flush()
 
-        member = WorkspaceMember(
-            workspace_id=ws.id, user_id=owner.id, role=WorkspaceRole.owner
+        member = ProjectMember(
+            project_id=proj.id, user_id=owner.id, role=ProjectRole.owner
         )
         db.add(member)
         await db.commit()
-        await db.refresh(ws)
-        return ws
+        await db.refresh(proj)
+        return proj
 
-    return _create_workspace
+    return _create_project
 
 
 @pytest_asyncio.fixture
 async def study_factory(db: AsyncSession):
-    """Factory to create studies for specific workspaces."""
+    """Factory to create studies for specific projects."""
 
     async def _create_study(
-        workspace: Workspace, owner: User, title: str | None = None
+        project: Project, owner: User, title: str | None = None
     ) -> Study:
         import uuid
 
         slug = f"study-{uuid.uuid4()}"
         study = Study(
             slug=slug,
-            workspace_id=workspace.id,
+            project_id=project.id,
             state=StudyState.draft,  # Use draft for update tests
             grid_config=[{"score": 0, "capacity": 1}],
             presort_config={},
@@ -302,15 +302,15 @@ def auth_token_factory():
 
 
 @pytest_asyncio.fixture
-async def workspace_member_factory(db: AsyncSession):
-    """Factory to add users as members of a workspace."""
-    from app.models import WorkspaceMember, WorkspaceRole
+async def project_member_factory(db: AsyncSession):
+    """Factory to add users as members of a project."""
+    from app.models import ProjectMember, ProjectRole
 
     async def _add_member(
-        workspace: Workspace, user: User, role: WorkspaceRole
+        project: Project, user: User, role: ProjectRole
     ) -> None:
-        member = WorkspaceMember(
-            workspace_id=workspace.id,
+        member = ProjectMember(
+            project_id=project.id,
             user_id=user.id,
             role=role,
         )

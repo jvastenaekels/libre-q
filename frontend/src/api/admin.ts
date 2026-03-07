@@ -55,7 +55,7 @@ export const AdminService = {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${useAuthStore.getState().token}`,
-                'X-Workspace-ID': String(useAuthStore.getState().currentWorkspace?.id),
+                'X-Project-ID': String(useAuthStore.getState().currentProject?.id),
             },
             body: JSON.stringify(config),
             signal,
@@ -76,7 +76,7 @@ export const AdminService = {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${useAuthStore.getState().token}`,
-                'X-Workspace-ID': String(useAuthStore.getState().currentWorkspace?.id),
+                'X-Project-ID': String(useAuthStore.getState().currentProject?.id),
             },
             body: JSON.stringify(data),
             signal,

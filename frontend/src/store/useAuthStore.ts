@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { safeSessionStorage } from './safeStorage';
 
-interface Workspace {
+interface Project {
     id: number;
     title: string;
     slug: string;
@@ -17,11 +17,11 @@ interface AuthState {
         full_name?: string | null;
         is_superuser: boolean;
     } | null;
-    workspaces: Workspace[];
-    currentWorkspace: Workspace | null;
+    projects: Project[];
+    currentProject: Project | null;
     setAuth: (token: string, user: AuthState['user']) => void;
-    setWorkspaces: (workspaces: Workspace[]) => void;
-    setCurrentWorkspace: (workspace: Workspace | null) => void;
+    setProjects: (projects: Project[]) => void;
+    setCurrentProject: (project: Project | null) => void;
     logout: () => void;
 }
 
@@ -30,23 +30,37 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             token: null,
             user: null,
-            workspaces: [],
-            currentWorkspace: null,
+            projects: [],
+            currentProject: null,
             setAuth: (token, user) => set({ token, user }),
-            setWorkspaces: (workspaces) => set({ workspaces }),
-            setCurrentWorkspace: (currentWorkspace) => set({ currentWorkspace }),
+            setProjects: (projects) => set({ projects }),
+            setCurrentProject: (currentProject) => set({ currentProject }),
             logout: () =>
                 set({
                     token: null,
                     user: null,
-                    workspaces: [],
-                    currentWorkspace: null,
+                    projects: [],
+                    currentProject: null,
                 }),
         }),
         {
             name: 'admin-auth-storage',
-            version: 1,
+            version: 2,
             storage: safeSessionStorage,
+            migrate: (persistedState: unknown, version: number) => {
+                const state = persistedState as Record<string, unknown>;
+                if (version < 2) {
+                    if ('workspaces' in state) {
+                        state.projects = state.workspaces;
+                        delete state.workspaces;
+                    }
+                    if ('currentWorkspace' in state) {
+                        state.currentProject = state.currentWorkspace;
+                        delete state.currentWorkspace;
+                    }
+                }
+                return state as AuthState;
+            },
         }
     )
 );

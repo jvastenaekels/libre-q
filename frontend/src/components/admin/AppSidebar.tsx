@@ -19,7 +19,7 @@ import {
     Table,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
-import { WorkspaceSwitcher } from './WorkspaceSwitcher';
+import { ProjectSwitcher } from './ProjectSwitcher';
 import {
     Sidebar,
     SidebarContent,
@@ -179,13 +179,13 @@ function NavUser({ user }: { user: any }) {
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { activeStudyId, activeWorkspaceId } = useAdminStore();
-    const { currentWorkspace } = useAuthStore();
+    const { activeStudyId, activeProjectId } = useAdminStore();
+    const { currentProject } = useAuthStore();
     const { user } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const params = useParams<{ workspaceSlug?: string; studySlug?: string }>();
+    const params = useParams<{ projectSlug?: string; studySlug?: string }>();
     const { setOpenMobile } = useSidebar();
 
     // Close mobile sidebar on route change
@@ -194,14 +194,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         setOpenMobile(false);
     }, [location.pathname]);
 
-    // Detect if we're in the new Workspace-First architecture
+    // Detect if we're in the new Project-First architecture
     const isNewArchitecture = location.pathname.startsWith('/app/');
     const isFocusMode = isNewArchitecture && !!params.studySlug;
-    const workspaceSlug = params.workspaceSlug || currentWorkspace?.slug;
+    const projectSlug = params.projectSlug || currentProject?.slug;
 
     const { data: studiesData } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
-            enabled: !!currentWorkspace?.id,
+            enabled: !!currentProject?.id,
         },
     });
     const studies = studiesData?.items;
@@ -211,34 +211,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // For legacy routes
     const isValidStudy =
         activeStudyId &&
-        studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId);
+        studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeProjectId);
 
-    // Workspace-level navigation (always visible in new architecture)
-    const workspaceNav = workspaceSlug
+    // Project-level navigation (always visible in new architecture)
+    const projectNav = projectSlug
         ? [
               {
                   title: t('admin.sidebar.dashboard', 'Dashboard'),
-                  url: `/app/${workspaceSlug}/dashboard`,
+                  url: `/app/${projectSlug}/dashboard`,
                   icon: LayoutDashboard,
                   show: true,
               },
               {
                   title: t('admin.sidebar.concourses', 'Concourses'),
-                  url: `/app/${workspaceSlug}/concourses`,
+                  url: `/app/${projectSlug}/concourses`,
                   icon: Library,
                   show: true,
               },
               {
                   title: t('admin.sidebar.team', 'Team'),
-                  url: `/app/${workspaceSlug}/team`,
+                  url: `/app/${projectSlug}/team`,
                   icon: Users,
-                  show: can('workspace:manage_team'),
+                  show: can('project:manage_team'),
               },
               {
-                  title: t('admin.sidebar.workspace_settings', 'Settings'),
-                  url: `/app/${workspaceSlug}/settings`,
+                  title: t('admin.sidebar.project_settings', 'Settings'),
+                  url: `/app/${projectSlug}/settings`,
                   icon: Settings2,
-                  show: can('workspace:settings'),
+                  show: can('project:settings'),
               },
           ].filter((item) => item.show)
         : [];
@@ -249,37 +249,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ? [
                   {
                       title: t('admin.sidebar.dashboard'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}`,
                       icon: LayoutDashboard,
                       show: true,
                   },
                   {
                       title: t('admin.sidebar.design'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/design`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/design`,
                       icon: PencilRuler,
                       show: can('study:edit_design'),
                   },
                   {
                       title: t('admin.sidebar.recruit'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/recruitment`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/recruitment`,
                       icon: Link2,
                       show: can('study:launch_recruitment'),
                   },
                   {
                       title: t('admin.sidebar.data'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/data`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/data`,
                       icon: Download,
                       show: can('study:view_data'),
                   },
                   {
                       title: t('admin.sidebar.analysis', 'Analysis'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/analysis`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/analysis`,
                       icon: ChartColumnStacked,
                       show: can('study:edit_design'),
                   },
                   {
                       title: t('admin.sidebar.settings'),
-                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/settings`,
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/settings`,
                       icon: Settings,
                       show: can('study:edit_settings'),
                   },
@@ -287,7 +287,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             : [];
 
     const activeStudy = studies?.find(
-        (s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId
+        (s) => s.slug === activeStudyId && s.workspace_id === activeProjectId
     );
 
     // Legacy navigation for backward compatibility
@@ -301,8 +301,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.overview', 'Overview'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}`
                                     : `/admin/studies/${activeStudyId}`,
@@ -311,8 +311,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.design', 'Design'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/design`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/design`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/design`
                                     : `/admin/studies/${activeStudyId}/design`,
@@ -321,8 +321,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.recruitment', 'Recruitment'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/recruitment`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/recruitment`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/recruitment`
                                     : `/admin/studies/${activeStudyId}/recruitment`,
@@ -331,8 +331,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.data_exports', 'Data & Exports'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/data`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/data`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/data`
                                     : `/admin/studies/${activeStudyId}/exports`,
@@ -341,8 +341,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.analysis', 'Analysis'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/analysis`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/analysis`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/analysis`
                                     : `/admin/studies/${activeStudyId}/analysis`,
@@ -351,8 +351,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.settings', 'Settings'),
                           url:
-                              workspaceSlug && activeStudyId
-                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/settings`
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/settings`
                                   : activeStudy?.workspace?.slug && activeStudyId
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/settings`
                                     : `/admin/studies/${activeStudyId}/settings`,
@@ -373,13 +373,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <div className="flex flex-col gap-2">
                             <button
                                 type="button"
-                                onClick={() => navigate(`/app/${workspaceSlug}/dashboard`)}
+                                onClick={() => navigate(`/app/${projectSlug}/dashboard`)}
                                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 <ArrowLeft className="h-4 w-4" />
-                                <span>
-                                    {currentWorkspace?.title || t('admin.sidebar.workspace')}
-                                </span>
+                                <span>{currentProject?.title || t('admin.sidebar.project')}</span>
                             </button>
                             <div className="px-2">
                                 <Badge variant="outline" className="font-semibold">
@@ -388,8 +386,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </div>
                         </div>
                     ) : (
-                        // Workspace View: Show workspace switcher
-                        <WorkspaceSwitcher />
+                        // Project View: Show project switcher
+                        <ProjectSwitcher />
                     )}
                 </SidebarHeader>
                 <SidebarContent>
@@ -437,7 +435,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenu>
                         </SidebarGroup>
                     ) : (
-                        // Workspace View: Workspace navigation
+                        // Project View: Project navigation
                         <SidebarGroup>
                             <SidebarMenu>
                                 <SidebarMenuItem className="px-2 mb-4">
@@ -459,10 +457,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </SidebarMenuItem>
                             </SidebarMenu>
                             <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
-                                {t('admin.sidebar.workspace', 'Workspace')}
+                                {t('admin.sidebar.project', 'Project')}
                             </SidebarGroupLabel>
                             <SidebarMenu>
-                                {workspaceNav.map((item) => (
+                                {projectNav.map((item) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
                                             asChild
@@ -491,7 +489,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
-                <WorkspaceSwitcher />
+                <ProjectSwitcher />
                 <StudySwitcher />
             </SidebarHeader>
             <SidebarContent>

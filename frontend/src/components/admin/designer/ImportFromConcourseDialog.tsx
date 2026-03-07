@@ -340,7 +340,7 @@ export function ImportFromConcourseDialog({
                         <div className="py-8 text-center text-slate-400 text-sm">
                             {t(
                                 'admin.concourse_import.no_concourses',
-                                'No concourses in this workspace. Create one first.'
+                                'No concourses in this project. Create one first.'
                             )}
                         </div>
                     )}

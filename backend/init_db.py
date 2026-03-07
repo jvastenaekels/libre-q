@@ -57,7 +57,7 @@ def run_migrations():
 
 
 async def seed_data():
-    """Seed the database with initial user and workspace."""
+    """Seed the database with initial user and project."""
     print("1. Tables verified/created (by migrations side-effect).")
 
     async with SessionLocal() as session:
@@ -72,7 +72,7 @@ async def seed_data():
             return
 
         print(
-            "2. No users found. Initializing superuser account and default workspace..."
+            "2. No users found. Initializing superuser account and default project..."
         )
 
         # 1. Create Initial Admin User
@@ -90,28 +90,28 @@ async def seed_data():
         session.add(owner)
         await session.flush()  # get ID
 
-        # 2. Create Default Workspace
-        from app.models import Workspace, WorkspaceMember, WorkspaceRole
+        # 2. Create Default Project
+        from app.models import Project, ProjectMember, ProjectRole
 
-        default_workspace = Workspace(
-            title="Example Workspace",
-            slug="example-workspace",
+        default_project = Project(
+            title="Example Project",
+            slug="example-project",
         )
-        session.add(default_workspace)
+        session.add(default_project)
         await session.flush()  # get ID
 
-        # 3. Add Owner to Workspace
-        member = WorkspaceMember(
-            workspace_id=default_workspace.id,
+        # 3. Add Owner to Project
+        member = ProjectMember(
+            project_id=default_project.id,
             user_id=owner.id,
-            role=WorkspaceRole.owner,
+            role=ProjectRole.owner,
         )
         session.add(member)
 
         await session.commit()
         print(f"3. Superuser created: {admin_email}")
-        print("   (Workspace Owner role assigned)")
-        print(f"4. Default workspace created: {default_workspace.title}")
+        print("   (Project Owner role assigned)")
+        print(f"4. Default project created: {default_project.title}")
         print("\nNote: To seed a study, use: python seed.py data/example-study.json")
         print("--- Initialization Complete ---")
     await engine.dispose()

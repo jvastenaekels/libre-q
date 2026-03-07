@@ -4,6 +4,5 @@
  * Libre-Q API
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceBrief } from './workspaceBrief';
 
-export type StudyReadWorkspace = WorkspaceBrief | null;
+export type ProjectUpdateSlug = string | null;

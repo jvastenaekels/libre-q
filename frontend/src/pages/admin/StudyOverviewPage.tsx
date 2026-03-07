@@ -22,12 +22,12 @@ interface LoaderData {
 
 const StudyOverviewPage = () => {
     const { stats, participants, study, slug } = useLoaderData() as LoaderData;
-    const { workspace } = useAdminContext();
+    const { project } = useAdminContext();
 
-    if (!workspace) {
-        // This should not happen if RequireAdmin and WorkspaceLayout are doing their jobs,
+    if (!project) {
+        // This should not happen if RequireAdmin and ProjectLayout are doing their jobs,
         // but it's better to fail gracefully than crash.
-        console.error('No workspace context found in StudyOverviewPage');
+        console.error('No project context found in StudyOverviewPage');
     }
 
     const revalidator = useRevalidator();
@@ -175,7 +175,7 @@ const StudyOverviewPage = () => {
                             participants={validParticipants}
                             totalParticipantCount={(participants || []).length}
                             isMultiLang={(study?.translations?.length ?? 0) > 1}
-                            workspaceSlug={workspace?.slug || ''}
+                            projectSlug={project?.slug || ''}
                             studySlug={slug}
                         />
 

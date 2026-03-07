@@ -17,8 +17,8 @@ from app.database import get_db
 from app.dependencies import (
     check_study_permission,
     get_current_user,
-    get_current_workspace,
-    require_workspace_role,
+    get_current_project,
+    require_project_role,
 )
 from app.limiter import limiter
 from app.models import (
@@ -32,9 +32,9 @@ from app.models import (
     StudyState,
     StudyTranslation,
     User,
-    Workspace,
-    WorkspaceMember,
-    WorkspaceRole,
+    Project,
+    ProjectMember,
+    ProjectRole,
 )
 from app.schemas import StudyStatsRead
 
@@ -201,7 +201,7 @@ async def validate_study_import(
     request: Request,
     config: dict,
     current_user: User = Depends(get_current_user),
-    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -393,8 +393,8 @@ async def import_study_config(
     request: Request,
     import_data: StudyImportRequest,
     current_user: User = Depends(get_current_user),
-    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(
-        require_workspace_role(WorkspaceRole.researcher)
+    project_ctx: tuple[Project, ProjectMember] = Depends(
+        require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
 ):
@@ -402,7 +402,7 @@ async def import_study_config(
     Import study configuration from exported JSON.
     Creates a new study in draft state.
     """
-    workspace, member = workspace_ctx
+    project, member = project_ctx
 
     config = import_data.config
     version = config.get("version")
@@ -427,7 +427,7 @@ async def import_study_config(
     try:
         db_study = Study(
             slug=import_data.new_slug,
-            workspace_id=workspace.id,
+            project_id=project.id,
             state=StudyState.draft,
             grid_config=study_data.get("grid_config"),
             presort_config=study_data.get("presort_config", {}),

@@ -120,15 +120,15 @@ list_users
 create_user
 delete_user
 
-# admin/workspaces.py
-list_workspaces
-create_workspace
-get_workspace
-update_workspace
-list_workspace_members
-update_workspace_member
-remove_workspace_member
-delete_workspace
+# admin/projects.py
+list_projects
+create_project
+get_project
+update_project
+list_project_members
+update_project_member
+remove_project_member
+delete_project
 create_invitation
 
 # auth.py

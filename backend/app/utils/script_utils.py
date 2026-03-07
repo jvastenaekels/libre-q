@@ -34,7 +34,7 @@ class APIClient:
             self.client = httpx.AsyncClient(base_url=str(self.base_url), timeout=30.0)
 
     async def login(self, email: str | None = None, password: str | None = None):
-        """Authenticate and store the JWT token. Automatically fetches workspace context."""
+        """Authenticate and store the JWT token. Automatically fetches project context."""
         email = email or os.getenv("ADMIN_EMAIL", "admin@example.com")
         password = password or os.getenv("ADMIN_PASSWORD", "admin123")
 
@@ -52,20 +52,20 @@ class APIClient:
         self.client.headers.update({"Authorization": f"Bearer {self.token}"})
         print(f"Logged in as {email}")
 
-        # Fetch workspaces to set X-Workspace-ID header automatically
-        print("DEBUG: Fetching workspaces for context...")
-        ws_response = await self.client.get("/api/admin/workspaces")
+        # Fetch projects to set X-Project-ID header automatically
+        print("DEBUG: Fetching projects for context...")
+        ws_response = await self.client.get("/api/admin/projects")
         if ws_response.status_code == 200:
-            workspaces = ws_response.json()
-            if workspaces and len(workspaces) > 0:
-                # Use the first workspace as default
-                first_ws_id = workspaces[0]["id"]
-                self.client.headers.update({"X-Workspace-ID": str(first_ws_id)})
-                print(f"DEBUG: Set X-Workspace-ID to {first_ws_id}")
+            projects = ws_response.json()
+            if projects and len(projects) > 0:
+                # Use the first project as default
+                first_proj_id = projects[0]["id"]
+                self.client.headers.update({"X-Project-ID": str(first_proj_id)})
+                print(f"DEBUG: Set X-Project-ID to {first_proj_id}")
             else:
-                print("DEBUG: No workspaces found for this user.")
+                print("DEBUG: No projects found for this user.")
         else:
-            print(f"DEBUG: Failed to fetch workspaces: {ws_response.text}")
+            print(f"DEBUG: Failed to fetch projects: {ws_response.text}")
 
     async def close(self):
         """Close the underlying HTTPX client."""

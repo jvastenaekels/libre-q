@@ -9,7 +9,7 @@ from app.models import (
     Study,
     StudyState,
     User,
-    Workspace,
+    Project,
     StudyTranslation,
     Statement,
     StatementTranslation,
@@ -33,14 +33,14 @@ class TestStudyPublic:
         assert response.status_code == 404
 
     async def test_language_resolution_cascade(
-        self, client: AsyncClient, db: AsyncSession, user_factory, workspace_factory
+        self, client: AsyncClient, db: AsyncSession, user_factory, project_factory
     ):
         """Priority: Requested Lang -> Default (Study) -> English -> First Available."""
         user = await user_factory()
-        ws = await workspace_factory(owner=user)
+        ws = await project_factory(owner=user)
         study = Study(
             slug="lang-study",
-            workspace_id=ws.id,
+            project_id=ws.id,
             state=StudyState.active,
             default_language="fr",
             grid_config=[],
@@ -83,13 +83,13 @@ class TestStudyPublic:
         assert response.json()["title"] == "Title FR"
 
     async def test_statement_fallbacks(
-        self, client: AsyncClient, db: AsyncSession, user_factory, workspace_factory
+        self, client: AsyncClient, db: AsyncSession, user_factory, project_factory
     ):
         user = await user_factory()
-        ws = await workspace_factory(owner=user)
+        ws = await project_factory(owner=user)
         study = Study(
             slug="opts-study",
-            workspace_id=ws.id,
+            project_id=ws.id,
             state=StudyState.active,
             grid_config=[],
             presort_config={},
@@ -124,12 +124,12 @@ class TestStudyAdmin:
         self,
         client: AsyncClient,
         test_user: User,
-        test_workspace: Workspace,
+        test_project: Project,
         auth_token_factory,
     ):
         headers = {
             **auth_token_factory(test_user),
-            "X-Workspace-ID": str(test_workspace.id),
+            "X-Project-ID": str(test_project.id),
         }
         payload = {
             "slug": "new-study-admin",
@@ -155,11 +155,11 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
-        test_workspace: Workspace,
+        test_project: Project,
     ):
         headers = {
             **auth_token_factory(test_user),
-            "X-Workspace-ID": str(test_workspace.id),
+            "X-Project-ID": str(test_project.id),
         }
         response = await client.get("/api/admin/studies", headers=headers)
         assert response.status_code == 200
@@ -171,12 +171,12 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
-        test_workspace: Workspace,
+        test_project: Project,
         db: AsyncSession,
     ):
         headers = {
             **auth_token_factory(test_user),
-            "X-Workspace-ID": str(test_workspace.id),
+            "X-Project-ID": str(test_project.id),
         }
         # Ensure DRAFT for update if needed, but the router allows update in active usually
         response = await client.patch(
@@ -193,7 +193,7 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
-        test_workspace: Workspace,
+        test_project: Project,
         db: AsyncSession,
     ):
         # 1. Promote user to Superuser
@@ -205,7 +205,7 @@ class TestStudyAdmin:
 
         headers = {
             **auth_token_factory(test_user),
-            "X-Workspace-ID": str(test_workspace.id),
+            "X-Project-ID": str(test_project.id),
         }
         slug = seed_study.slug
         response = await client.delete(f"/api/admin/studies/{slug}", headers=headers)
@@ -225,12 +225,12 @@ class TestStudyLifecycle:
         client: AsyncClient,
         test_user: User,
         seed_study: Study,
-        test_workspace: Workspace,
+        test_project: Project,
         auth_token_factory,
     ):
         headers = {
             **auth_token_factory(test_user),
-            "X-Workspace-ID": str(test_workspace.id),
+            "X-Project-ID": str(test_project.id),
         }
 
         # Pause study

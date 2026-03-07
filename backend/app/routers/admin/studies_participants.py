@@ -19,8 +19,8 @@ from app.models import (
     StudyRole,
     StudyState,
     User,
-    WorkspaceMember,
-    WorkspaceRole,
+    ProjectMember,
+    ProjectRole,
 )
 from app.schemas import ParticipantDetailRead, ParticipantDiscardUpdate, ParticipantRead
 from app.schemas.common import PaginatedResponse
@@ -66,11 +66,11 @@ async def get_participant(
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(ProjectMember, ProjectMember.project_id == Study.project_id)
         .where(
             Participant.id == participant_id,
-            WorkspaceMember.user_id == current_user.id,
-            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher]),
+            ProjectMember.user_id == current_user.id,
+            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.researcher]),
         )
         .options(
             selectinload(Participant.qsort_entries),
@@ -115,15 +115,15 @@ async def discard_participant(
     db: AsyncSession = Depends(get_db),
 ):
     """Flag or unflag a participant for exclusion from stats/exports."""
-    # Security: Ensure participant belongs to a study in a workspace user can access
+    # Security: Ensure participant belongs to a study in a project user can access
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(ProjectMember, ProjectMember.project_id == Study.project_id)
         .where(
             Participant.id == participant_id,
-            WorkspaceMember.user_id == current_user.id,
-            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher]),
+            ProjectMember.user_id == current_user.id,
+            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.researcher]),
         )
     )
     result = await db.execute(stmt)

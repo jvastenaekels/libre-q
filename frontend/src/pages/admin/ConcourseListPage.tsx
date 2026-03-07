@@ -32,7 +32,7 @@ import { usePermission } from '@/hooks/usePermission';
 export default function ConcourseListPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { workspace } = useAdminContext();
+    const { project: workspace } = useAdminContext();
     const { can } = usePermission();
     const queryClient = useQueryClient();
 

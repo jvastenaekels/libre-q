@@ -28,20 +28,20 @@ export function StudySwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
-    const { currentWorkspace } = useAuthStore();
+    const { activeStudyId, setActiveStudy, activeProjectId } = useAdminStore();
+    const { currentProject } = useAuthStore();
     const { data: studiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
-        query: { enabled: !!activeWorkspaceId },
+        query: { enabled: !!activeProjectId },
     });
     const studies = studiesData?.items;
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
-    const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const filteredStudies = studies?.filter((s) => s.workspace_id === activeProjectId);
     const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
 
     const handleStudySelect = (studySlug: string) => {
-        if (currentWorkspace?.slug) {
-            navigate(`/app/${currentWorkspace.slug}/studies/${studySlug}`);
+        if (currentProject?.slug) {
+            navigate(`/app/${currentProject.slug}/studies/${studySlug}`);
         } else {
             setActiveStudy(studySlug);
         }
@@ -163,8 +163,8 @@ export function StudySwitcher() {
                             <DropdownMenuItem
                                 className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
                                 onClick={() => {
-                                    if (currentWorkspace?.slug) {
-                                        navigate(`/app/${currentWorkspace.slug}/dashboard`);
+                                    if (currentProject?.slug) {
+                                        navigate(`/app/${currentProject.slug}/dashboard`);
                                     } else {
                                         navigate('/admin?dashboard=true');
                                     }
@@ -203,7 +203,7 @@ export function StudySwitcher() {
             <CreateStudyDialog
                 open={showCreateDialog}
                 onOpenChange={setShowCreateDialog}
-                workspaceSlug={currentWorkspace?.slug || ''}
+                projectSlug={currentProject?.slug || ''}
             />
         </>
     );

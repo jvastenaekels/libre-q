@@ -39,11 +39,11 @@ def mock_storage_service():
 
 
 @pytest_asyncio.fixture
-async def audio_enabled_study(db: AsyncSession, test_user, test_workspace) -> Study:
+async def audio_enabled_study(db: AsyncSession, test_user, test_project) -> Study:
     """Create a study with audio recording enabled."""
     study = Study(
         slug="audio-study",
-        workspace_id=test_workspace.id,
+        project_id=test_project.id,
         state=StudyState.active,
         grid_config=[{"score": 0, "capacity": 1}],
         presort_config={},
@@ -151,14 +151,14 @@ class TestAudioUpload:
         client: AsyncClient,
         db: AsyncSession,
         test_user,
-        test_workspace,
+        test_project,
     ):
         """Test upload fails when audio is disabled for study."""
         mock_magic.return_value = "audio/webm"
         # Create study without audio enabled
         study = Study(
             slug="no-audio-study",
-            workspace_id=test_workspace.id,
+            project_id=test_project.id,
             state=StudyState.active,
             grid_config=[],
             presort_config={},

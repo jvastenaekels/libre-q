@@ -5,7 +5,7 @@
  */
 
 import { Outlet, useParams, Navigate } from 'react-router-dom';
-import { useGetWorkspaceApiAdminWorkspacesSlugGet } from '@/api/generated';
+import { useGetProjectApiAdminProjectsSlugGet } from '@/api/generated';
 import { Skeleton } from '@/components/ui/skeleton';
 import ErrorPage from '@/pages/ErrorPage';
 import { ApiError } from '@/api/client';
@@ -14,34 +14,34 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
 
 /**
- * WorkspaceLayout
+ * ProjectLayout
  *
- * Fetches and validates workspace context based on URL slug.
- * Provides workspace data to all nested routes via context.
+ * Fetches and validates project context based on URL slug.
+ * Provides project data to all nested routes via context.
  */
-export default function WorkspaceLayout() {
-    const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
-    const { setCurrentWorkspace } = useAuthStore();
-    const { setActiveWorkspace } = useAdminStore();
+export default function ProjectLayout() {
+    const { projectSlug } = useParams<{ projectSlug: string }>();
+    const { setCurrentProject } = useAuthStore();
+    const { setActiveProject } = useAdminStore();
 
     const {
-        data: workspace,
+        data: project,
         isLoading,
         error,
-    } = useGetWorkspaceApiAdminWorkspacesSlugGet(workspaceSlug ?? '', {
+    } = useGetProjectApiAdminProjectsSlugGet(projectSlug ?? '', {
         query: {
-            enabled: !!workspaceSlug,
+            enabled: !!projectSlug,
         },
     });
 
-    // Sync store state when workspace is fetched
+    // Sync store state when project is fetched
     useEffect(() => {
-        if (workspace) {
+        if (project) {
             // biome-ignore lint/suspicious/noExplicitAny: casting for store compatibility
-            setCurrentWorkspace(workspace as any);
-            setActiveWorkspace(workspace.id);
+            setCurrentProject(project as any);
+            setActiveProject(project.id);
         }
-    }, [workspace, setCurrentWorkspace, setActiveWorkspace]);
+    }, [project, setCurrentProject, setActiveProject]);
 
     // Loading state
     if (isLoading) {
@@ -58,14 +58,14 @@ export default function WorkspaceLayout() {
         if (status === 403) {
             return <Navigate to="/hub" replace />;
         }
-        return <ErrorPage error={new ApiError(status, 'Workspace not found or access denied')} />;
+        return <ErrorPage error={new ApiError(status, 'Project not found or access denied')} />;
     }
 
-    // No workspace found
-    if (!workspace) {
-        return <ErrorPage error={new ApiError(404, 'Workspace not found')} />;
+    // No project found
+    if (!project) {
+        return <ErrorPage error={new ApiError(404, 'Project not found')} />;
     }
 
-    // Render nested routes with workspace context
-    return <Outlet context={{ workspace }} />;
+    // Render nested routes with project context
+    return <Outlet context={{ project }} />;
 }

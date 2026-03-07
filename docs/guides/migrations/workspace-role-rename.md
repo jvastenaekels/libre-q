@@ -1,5 +1,7 @@
 # Migration Guide: Workspace Admin → Owner Role Rename
 
+> **Note**: Since this migration, the "workspace" concept has been renamed to "project" across the entire codebase (tables: `projects`, `project_members`; enum: `projectrole`). The information below uses the original terminology for historical accuracy.
+
 **Date**: 2026-01-15
 **Type**: Breaking Change
 **Affects**: API, Database, Frontend

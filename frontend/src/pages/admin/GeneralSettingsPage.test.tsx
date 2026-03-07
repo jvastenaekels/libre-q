@@ -51,7 +51,7 @@ describe('GeneralSettingsPage', () => {
             slug: 'test-study',
         });
         vi.mocked(router.useParams).mockReturnValue({
-            workspaceSlug: 'test-workspace',
+            projectSlug: 'test-workspace',
             studySlug: 'test-study',
         });
 

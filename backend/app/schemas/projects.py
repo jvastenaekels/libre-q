@@ -1,27 +1,27 @@
-"""Workspace schemas."""
+"""Project schemas."""
 
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models import WorkspaceRole
+from app.models import ProjectRole
 
 from .common import validate_non_empty_string
 from .users import UserRead
 
 
-class WorkspaceMemberRead(BaseModel):
-    """Schema for reading workspace member details."""
+class ProjectMemberRead(BaseModel):
+    """Schema for reading project member details."""
 
     user_id: int
     user: UserRead
-    role: WorkspaceRole
+    role: ProjectRole
     joined_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 
-class WorkspaceBrief(BaseModel):
-    """Lightweight workspace schema (no members) for nested use in StudyRead."""
+class ProjectBrief(BaseModel):
+    """Lightweight project schema (no members) for nested use in StudyRead."""
 
     id: int
     title: str
@@ -30,20 +30,20 @@ class WorkspaceBrief(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class WorkspaceRead(WorkspaceBrief):
-    """Schema for reading a workspace with members."""
+class ProjectRead(ProjectBrief):
+    """Schema for reading a project with members."""
 
-    members: list[WorkspaceMemberRead] = []
-
-
-class WorkspaceWithRole(WorkspaceRead):
-    """Schema for reading a workspace with the current user's role."""
-
-    user_role: WorkspaceRole
+    members: list[ProjectMemberRead] = []
 
 
-class WorkspaceCreate(BaseModel):
-    """Schema for creating a workspace."""
+class ProjectWithRole(ProjectRead):
+    """Schema for reading a project with the current user's role."""
+
+    user_role: ProjectRole
+
+
+class ProjectCreate(BaseModel):
+    """Schema for creating a project."""
 
     title: str = Field(..., max_length=100)
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
@@ -57,8 +57,8 @@ class WorkspaceCreate(BaseModel):
         return res
 
 
-class WorkspaceUpdate(BaseModel):
-    """Schema for updating a workspace."""
+class ProjectUpdate(BaseModel):
+    """Schema for updating a project."""
 
     title: str | None = Field(None, max_length=100)
     slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
@@ -69,14 +69,14 @@ class WorkspaceUpdate(BaseModel):
         return validate_non_empty_string(v)
 
 
-class WorkspaceMemberUpdate(BaseModel):
-    """Schema for updating a workspace member."""
+class ProjectMemberUpdate(BaseModel):
+    """Schema for updating a project member."""
 
-    role: WorkspaceRole
+    role: ProjectRole
 
 
-class WorkspaceInvitationCreate(BaseModel):
-    """Schema for creating a workspace invitation."""
+class ProjectInvitationCreate(BaseModel):
+    """Schema for creating a project invitation."""
 
     email: str
-    role: WorkspaceRole = WorkspaceRole.researcher
+    role: ProjectRole = ProjectRole.researcher

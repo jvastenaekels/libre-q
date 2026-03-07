@@ -56,14 +56,14 @@ function getStateStyles(state: string | undefined): string {
 }
 
 export function AdminDashboard() {
-    const { user, currentWorkspace } = useAuthStore();
+    const { user, currentProject } = useAuthStore();
     const navigate = useNavigate();
     const { setActiveStudy } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showImportDialog, setShowImportDialog] = useState(false);
     const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
-            enabled: !!currentWorkspace?.id,
+            enabled: !!currentProject?.id,
         },
     });
     const allStudies = allStudiesData?.items;
@@ -77,16 +77,16 @@ export function AdminDashboard() {
     };
     const currentLocale = dateLocales[i18n.language] || enUS;
 
-    const studies = allStudies?.filter((s) => s.workspace_id === currentWorkspace?.id);
+    const studies = allStudies?.filter((s) => s.workspace_id === currentProject?.id);
 
     const totalStudies = studies?.length ?? 0;
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length ?? 0;
     const totalParticipants = studies?.reduce((sum, s) => sum + (s.participant_count ?? 0), 0) ?? 0;
 
     const handleOpenStudy = (studySlug: string) => {
-        if (currentWorkspace?.slug) {
+        if (currentProject?.slug) {
             setActiveStudy(studySlug);
-            navigate(`/app/${currentWorkspace.slug}/studies/${studySlug}`);
+            navigate(`/app/${currentProject.slug}/studies/${studySlug}`);
         } else {
             setActiveStudy(studySlug);
             navigate(`/admin/studies/${studySlug}`);
@@ -287,7 +287,7 @@ export function AdminDashboard() {
                                             )}
                                         >
                                             {t(
-                                                `admin.workspace.study_states.${study.state}`,
+                                                `admin.project.study_states.${study.state}`,
                                                 study.state ?? 'draft'
                                             )}
                                         </Badge>
@@ -349,12 +349,12 @@ export function AdminDashboard() {
             <CreateStudyDialog
                 open={showCreateDialog}
                 onOpenChange={setShowCreateDialog}
-                workspaceSlug={currentWorkspace?.slug || ''}
+                projectSlug={currentProject?.slug || ''}
             />
             <ImportStudyDialog
                 open={showImportDialog}
                 onOpenChange={setShowImportDialog}
-                workspaceSlug={currentWorkspace?.slug || ''}
+                projectSlug={currentProject?.slug || ''}
             />
         </div>
     );

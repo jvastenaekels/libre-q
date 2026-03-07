@@ -58,15 +58,15 @@ class TestSubmissionValidation:
     """Tests for submission validation logic (grid, status, ownership)."""
 
     async def test_submit_to_draft_study_fails(
-        self, client: AsyncClient, db: AsyncSession, user_factory, workspace_factory
+        self, client: AsyncClient, db: AsyncSession, user_factory, project_factory
     ):
         # Create a DRAFT study
         u = await user_factory()
-        ws = await workspace_factory(owner=u)
+        ws = await project_factory(owner=u)
         study = Study(
             slug="draft-only",
             state=StudyState.draft,
-            workspace_id=ws.id,
+            project_id=ws.id,
             grid_config=[],
             presort_config={},
             postsort_config={},
@@ -113,14 +113,14 @@ class TestSubmissionValidation:
         db: AsyncSession,
         active_study: Study,
         user_factory,
-        workspace_factory,
+        project_factory,
     ):
         # Create another study with its own statement
         u = await user_factory()
-        ws = await workspace_factory(owner=u)
+        ws = await project_factory(owner=u)
         other_study = Study(
             slug="other",
-            workspace_id=ws.id,
+            project_id=ws.id,
             grid_config=[],
             presort_config={},
             postsort_config={},

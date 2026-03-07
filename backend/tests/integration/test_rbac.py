@@ -1,19 +1,19 @@
-"""Consolidated integration tests for RBAC and workspace isolation."""
+"""Consolidated integration tests for RBAC and project isolation."""
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import WorkspaceMember, WorkspaceRole
+from app.models import ProjectMember, ProjectRole
 from app.utils.security import create_access_token
 
 
 @pytest.mark.asyncio
-class TestWorkspaceRBAC:
-    """Tests for workspace-level role-based access control."""
+class TestProjectRBAC:
+    """Tests for project-level role-based access control."""
 
-    async def test_workspace_rbac_flow(
-        self, client: AsyncClient, db: AsyncSession, user_factory, workspace_factory
+    async def test_project_rbac_flow(
+        self, client: AsyncClient, db: AsyncSession, user_factory, project_factory
     ):
         # 1. Setup
         admin = await user_factory(email="admin@ws.com")
@@ -21,17 +21,17 @@ class TestWorkspaceRBAC:
         viewer = await user_factory(email="view@ws.com")
         outsider = await user_factory(email="out@ws.com")
 
-        ws = await workspace_factory(owner=admin)
+        ws = await project_factory(owner=admin)
         # researcher membership
         db.add(
-            WorkspaceMember(
-                workspace_id=ws.id, user_id=researcher.id, role=WorkspaceRole.researcher
+            ProjectMember(
+                project_id=ws.id, user_id=researcher.id, role=ProjectRole.researcher
             )
         )
         # viewer membership
         db.add(
-            WorkspaceMember(
-                workspace_id=ws.id, user_id=viewer.id, role=WorkspaceRole.viewer
+            ProjectMember(
+                project_id=ws.id, user_id=viewer.id, role=ProjectRole.viewer
             )
         )
         await db.commit()
@@ -39,7 +39,7 @@ class TestWorkspaceRBAC:
         # 2. Researcher creates study (Allowed)
         headers_res = {
             "Authorization": f"Bearer {create_access_token(researcher.email)}",
-            "X-Workspace-ID": str(ws.id),
+            "X-Project-ID": str(ws.id),
         }
         payload = {
             "slug": "res-study",
@@ -57,7 +57,7 @@ class TestWorkspaceRBAC:
         # 3. Viewer creates study (Forbidden)
         headers_view = {
             "Authorization": f"Bearer {create_access_token(viewer.email)}",
-            "X-Workspace-ID": str(ws.id),
+            "X-Project-ID": str(ws.id),
         }
         payload_view = {**payload, "slug": "view-study"}
         response = await client.post(
@@ -73,19 +73,19 @@ class TestWorkspaceRBAC:
 
 @pytest.mark.asyncio
 class TestStudyRBAC:
-    """Tests for study-level access based on workspace roles."""
+    """Tests for study-level access based on project roles."""
 
     @pytest.mark.parametrize(
         "role,expected_get,expected_patch,expected_delete",
         [
-            (WorkspaceRole.owner, 200, 200, 403),  # Delete is Superuser only
+            (ProjectRole.owner, 200, 200, 403),  # Delete is Superuser only
             (
-                WorkspaceRole.researcher,
+                ProjectRole.researcher,
                 200,
                 200,
                 403,
             ),  # Researcher is Editor (cannot delete)
-            (WorkspaceRole.viewer, 200, 403, 403),  # Viewer (cannot edit)
+            (ProjectRole.viewer, 200, 403, 403),  # Viewer (cannot edit)
         ],
     )
     async def test_study_rbac_matrix(
@@ -93,9 +93,9 @@ class TestStudyRBAC:
         client: AsyncClient,
         db: AsyncSession,
         user_factory,
-        workspace_factory,
+        project_factory,
         study_factory,
-        workspace_member_factory,
+        project_member_factory,
         auth_token_factory,
         role,
         expected_get,
@@ -103,11 +103,11 @@ class TestStudyRBAC:
         expected_delete,
     ):
         owner = await user_factory()
-        ws = await workspace_factory(owner=owner)
-        study = await study_factory(workspace=ws, owner=owner)
+        ws = await project_factory(owner=owner)
+        study = await study_factory(project=ws, owner=owner)
 
         test_user = await user_factory()
-        await workspace_member_factory(ws, test_user, role)
+        await project_member_factory(ws, test_user, role)
         headers = auth_token_factory(test_user)
 
         # GET
@@ -135,22 +135,22 @@ class TestStudyRBAC:
 class TestIsolation:
     """Tests for strict resource isolation."""
 
-    async def test_cross_workspace_isolation(
+    async def test_cross_project_isolation(
         self,
         client: AsyncClient,
         user_factory,
-        workspace_factory,
+        project_factory,
         study_factory,
     ):
         # User A
         u_a = await user_factory(email="a@ws.com")
-        ws_a = await workspace_factory(owner=u_a)
-        await study_factory(workspace=ws_a, owner=u_a)
+        ws_a = await project_factory(owner=u_a)
+        await study_factory(project=ws_a, owner=u_a)
 
         # User B
         u_b = await user_factory(email="b@ws.com")
-        ws_b = await workspace_factory(owner=u_b)
-        s_b = await study_factory(workspace=ws_b, owner=u_b)
+        ws_b = await project_factory(owner=u_b)
+        s_b = await study_factory(project=ws_b, owner=u_b)
 
         # A tries to access B
         headers_a = {"Authorization": f"Bearer {create_access_token(u_a.email)}"}

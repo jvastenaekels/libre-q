@@ -6,9 +6,9 @@
  */
 
 /**
- * Schema for creating a workspace.
+ * Schema for creating a project.
  */
-export interface WorkspaceCreate {
+export interface ProjectCreate {
     /** @maxLength 100 */
     title: string;
     /**

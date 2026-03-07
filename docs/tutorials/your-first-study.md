@@ -6,7 +6,7 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **What you will learn:**
 
-- How to create a workspace and a study
+- How to create a project and a study
 - How to configure the General tab (title, description, consent form)
 - How to write a Condition of Instruction
 - How to add statements and design a forced-distribution grid
@@ -19,24 +19,24 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 ---
 
-## Step 1: Create a Workspace
+## Step 1: Create a Project
 
-Workspaces in Libre-Q organize your studies and team members. Think of a workspace as a research lab or project group.
+Projects in Libre-Q organize your studies and team members. Think of a project as a research lab or project group.
 
 1. Log in to Libre-Q. You will land on the admin dashboard.
-2. In the left sidebar, look for the **Workspace Switcher** at the top. Click on it and select **Create Workspace**.
+2. In the left sidebar, look for the **Project Switcher** at the top. Click on it and select **Create Project**.
 3. Fill in the form:
    - **Name:** `Remote Work Research Lab`
    - **URL slug:** `remote-work-lab` (this auto-generates from the name; you can customize it)
-4. Click **Create Workspace**.
+4. Click **Create Project**.
 
-You are now inside your new workspace. The sidebar shows workspace-level navigation.
+You are now inside your new project. The sidebar shows project-level navigation.
 
 ---
 
 ## Step 2: Create a New Study
 
-1. From your workspace dashboard, click the **New Study** button (or use the Study Switcher in the sidebar).
+1. From your project dashboard, click the **New Study** button (or use the Study Switcher in the sidebar).
 2. In the "Create Study" dialog, fill in:
    - **Title:** `Attitudes Toward Remote Work`
    - **Slug:** `remote-work-attitudes` (auto-generated; must be lowercase letters, numbers, and hyphens only)
@@ -210,7 +210,7 @@ Your study is now live. The designer becomes read-only while the study is active
 ## What You Built
 
 You now have a fully configured Q-methodology study with:
-- A workspace to organize your research
+- A project to organize your research
 - A welcome page with title, description, and objective
 - An informed consent form
 - Two presort demographic questions

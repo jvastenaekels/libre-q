@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 export default function AdminLayout() {
     const location = useLocation();
     const { activeStudyId, setActiveStudy } = useAdminStore();
-    const { currentWorkspace } = useAuthStore();
+    const { currentProject } = useAuthStore();
     const { t } = useTranslation();
 
     // Fetch study data to get the actual title
@@ -63,12 +63,12 @@ export default function AdminLayout() {
         // Special cases
         if (last === 'admin') return t('admin.breadcrumbs.dashboard');
         if (last === activeStudyId) return t('admin.breadcrumbs.study_dashboard');
-        if (last === 'new') return t('admin.workspace.create.title');
+        if (last === 'new') return t('admin.project.create.title');
 
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);
     };
 
-    const { workspace: adminWorkspace, study: adminStudy } = useAdminContext();
+    const { project: adminProject, study: adminStudy } = useAdminContext();
 
     return (
         <SidebarProvider>
@@ -87,16 +87,16 @@ export default function AdminLayout() {
                         <Separator orientation="vertical" className="mr-2 h-4" />
                         <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
                             <BreadcrumbList className="flex-nowrap min-w-0">
-                                {/* Workspace Context (if available) */}
-                                {currentWorkspace && (
+                                {/* Project Context (if available) */}
+                                {currentProject && (
                                     <>
                                         <BreadcrumbItem className="hidden md:block min-w-0 max-w-[120px] lg:max-w-[180px]">
                                             <BreadcrumbLink
-                                                href={`/app/${currentWorkspace.slug}/dashboard`}
+                                                href={`/app/${currentProject.slug}/dashboard`}
                                                 className="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors truncate block"
-                                                title={currentWorkspace.title}
+                                                title={currentProject.title}
                                             >
-                                                {currentWorkspace.title}
+                                                {currentProject.title}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator className="hidden md:block shrink-0" />
@@ -108,7 +108,7 @@ export default function AdminLayout() {
                                     <>
                                         <BreadcrumbItem className="hidden md:block min-w-0 max-w-[160px] lg:max-w-[280px]">
                                             <BreadcrumbLink
-                                                href={`/app/${currentWorkspace?.slug}/studies/${activeStudyId}`}
+                                                href={`/app/${currentProject?.slug}/studies/${activeStudyId}`}
                                                 className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors truncate block"
                                                 title={
                                                     study.translations?.[0]?.title || activeStudyId
@@ -141,7 +141,7 @@ export default function AdminLayout() {
                 >
                     <Outlet
                         context={{
-                            workspace: adminWorkspace,
+                            project: adminProject,
                             study: adminStudy || study, // Use context study if available, else re-fetched study
                         }}
                     />

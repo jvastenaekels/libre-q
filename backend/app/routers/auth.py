@@ -149,16 +149,22 @@ async def register_user(
         # Flush to get ID, but be ready to rollback
         await db.flush()
 
-        # 4. Process invitation (link to workspace)
-        if invitation_payload and "workspace_id" in invitation_payload:
-            from app.models import WorkspaceMember, WorkspaceRole
+        # 4. Process invitation (link to project)
+        invitation_project_id = (
+            invitation_payload.get("project_id")
+            or invitation_payload.get("workspace_id")
+            if invitation_payload
+            else None
+        )
+        if invitation_project_id and invitation_payload:
+            from app.models import ProjectMember, ProjectRole
 
-            ws_member = WorkspaceMember(
-                workspace_id=invitation_payload["workspace_id"],
+            project_member = ProjectMember(
+                project_id=invitation_project_id,
                 user_id=new_user.id,
-                role=WorkspaceRole(invitation_payload["role"]),
+                role=ProjectRole(invitation_payload["role"]),
             )
-            db.add(ws_member)
+            db.add(project_member)
 
         await db.commit()
     except IntegrityError as e:

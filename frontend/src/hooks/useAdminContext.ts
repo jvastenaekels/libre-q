@@ -1,10 +1,10 @@
 import { useOutletContext } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { WorkspaceWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/types/backend';
 import type { StudyRead } from '@/api/model';
 
 interface AdminContext {
-    workspace?: WorkspaceWithRole;
+    project?: ProjectWithRole;
     study?: StudyRead;
 }
 
@@ -16,10 +16,10 @@ interface AdminContext {
  */
 export function useAdminContext() {
     const context = useOutletContext<AdminContext>() || {};
-    const { currentWorkspace: storeWorkspace } = useAuthStore();
+    const { currentProject: storeProject } = useAuthStore();
 
     return {
-        workspace: context.workspace || (storeWorkspace as WorkspaceWithRole | undefined),
+        project: context.project || (storeProject as ProjectWithRole | undefined),
         study: context.study,
     };
 }

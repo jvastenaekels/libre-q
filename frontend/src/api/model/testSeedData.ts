@@ -5,9 +5,9 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { TestUserData } from './testUserData';
-import type { TestWorkspaceData } from './testWorkspaceData';
+import type { TestProjectData } from './testProjectData';
 
 export interface TestSeedData {
     user: TestUserData;
-    workspace: TestWorkspaceData;
+    project: TestProjectData;
 }

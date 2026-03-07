@@ -25,17 +25,17 @@ else:
         password: str
         is_superuser: bool = False
 
-    class TestWorkspaceData(BaseModel):
+    class TestProjectData(BaseModel):
         name: str
         slug: str
 
     class TestSeedData(BaseModel):
         user: TestUserData
-        workspace: TestWorkspaceData
+        project: TestProjectData
 
     class TestMemberData(BaseModel):
         email: str
-        workspace_slug: str
+        project_slug: str
         role: str
 
     @router.post("/init")
@@ -64,7 +64,7 @@ else:
     @router.post("/seed")
     async def seed_test_data(data: TestSeedData, db: AsyncSession = Depends(get_db)):
         """
-        Seed base test data: user and workspace
+        Seed base test data: user and project
         Idempotent - won't create duplicates
         """
         try:
@@ -86,40 +86,40 @@ else:
             )
             user_id = result.scalar()
 
-            # Upsert Workspace
+            # Upsert Project
             result = await db.execute(
                 text("""
-                    INSERT INTO workspaces (title, slug, created_at, config)
+                    INSERT INTO projects (title, slug, created_at, config)
                     VALUES (:title, :slug, CURRENT_TIMESTAMP, :config)
                     ON CONFLICT (slug)
                     DO NOTHING
                     RETURNING id
                 """),
                 {
-                    "title": data.workspace.name,
-                    "slug": data.workspace.slug,
+                    "title": data.project.name,
+                    "slug": data.project.slug,
                     "config": "{}",
                 },
             )
-            workspace_id = result.scalar()
+            project_id = result.scalar()
 
-            if not workspace_id:
+            if not project_id:
                 # If existing, fetch ID
                 result = await db.execute(
-                    text("SELECT id FROM workspaces WHERE slug = :slug"),
-                    {"slug": data.workspace.slug},
+                    text("SELECT id FROM projects WHERE slug = :slug"),
+                    {"slug": data.project.slug},
                 )
-                workspace_id = result.scalar_one()
+                project_id = result.scalar_one()
             else:
-                # Add user as owner only if new workspace (or idempotent check)
+                # Add user as owner only if new project (or idempotent check)
                 await db.execute(
                     text("""
-                        INSERT INTO workspace_members (workspace_id, user_id, role)
-                        VALUES (:workspace_id, :user_id, 'owner')
-                        ON CONFLICT (workspace_id, user_id) DO NOTHING
+                        INSERT INTO project_members (project_id, user_id, role)
+                        VALUES (:project_id, :user_id, 'owner')
+                        ON CONFLICT (project_id, user_id) DO NOTHING
                     """),
                     {
-                        "workspace_id": workspace_id,
+                        "project_id": project_id,
                         "user_id": user_id,
                     },
                 )
@@ -129,7 +129,7 @@ else:
             return {
                 "status": "ok",
                 "user_id": user_id,
-                "workspace_id": workspace_id,
+                "project_id": project_id,
                 "message": "Test data seeded successfully",
             }
 
@@ -140,7 +140,7 @@ else:
     @router.post("/members")
     async def add_test_member(data: TestMemberData, db: AsyncSession = Depends(get_db)):
         """
-        Add a user to a workspace for testing purposes
+        Add a user to a project for testing purposes
         """
         try:
             # Get user
@@ -153,22 +153,22 @@ else:
                 raise HTTPException(status_code=404, detail="User not found")
             user_id = user[0]
 
-            # Get workspace
+            # Get project
             result = await db.execute(
-                text("SELECT id FROM workspaces WHERE slug = :slug"),
-                {"slug": data.workspace_slug},
+                text("SELECT id FROM projects WHERE slug = :slug"),
+                {"slug": data.project_slug},
             )
-            workspace = result.fetchone()
-            if not workspace:
-                raise HTTPException(status_code=404, detail="Workspace not found")
-            workspace_id = workspace[0]
+            project = result.fetchone()
+            if not project:
+                raise HTTPException(status_code=404, detail="Project not found")
+            project_id = project[0]
 
             # Check if member exists
             result = await db.execute(
                 text(
-                    "SELECT user_id FROM workspace_members WHERE workspace_id = :wid AND user_id = :uid"
+                    "SELECT user_id FROM project_members WHERE project_id = :pid AND user_id = :uid"
                 ),
-                {"wid": workspace_id, "uid": user_id},
+                {"pid": project_id, "uid": user_id},
             )
             if result.fetchone():
                 return {"status": "ok", "message": "Member already exists"}
@@ -176,10 +176,10 @@ else:
             # Add member
             await db.execute(
                 text("""
-                    INSERT INTO workspace_members (workspace_id, user_id, role)
-                    VALUES (:wid, :uid, :role)
+                    INSERT INTO project_members (project_id, user_id, role)
+                    VALUES (:pid, :uid, :role)
                 """),
-                {"wid": workspace_id, "uid": user_id, "role": data.role},
+                {"pid": project_id, "uid": user_id, "role": data.role},
             )
             await db.commit()
             return {"status": "ok", "message": "Member added"}
@@ -196,7 +196,7 @@ else:
     async def cleanup_test_data(db: AsyncSession = Depends(get_db)):
         """
         Cleanup test data between tests
-        Removes all data except the base test user and workspace
+        Removes all data except the base test user and project
         """
         try:
             # Delete in correct order to respect foreign keys
@@ -226,7 +226,7 @@ else:
     @router.post("/cleanup-all")
     async def cleanup_all_test_data(db: AsyncSession = Depends(get_db)):
         """
-        Full cleanup including users and workspaces
+        Full cleanup including users and projects
         Use at end of test suite
         """
         try:
@@ -241,8 +241,8 @@ else:
                 "study_translations",
                 "invitations",
                 "studies",
-                "workspace_members",
-                "workspaces",
+                "project_members",
+                "projects",
                 "users",
             ]
 

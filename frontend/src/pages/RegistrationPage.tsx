@@ -206,7 +206,7 @@ const RegistrationPage = () => {
                                             {invite?.workspace_name}
                                         </span>
                                         <span className="text-xs text-slate-500 font-medium">
-                                            {t('admin.workspace.switcher.new_workspace_desc')}
+                                            {t('admin.project.switcher.new_project_desc')}
                                         </span>
                                     </div>
                                     <Badge

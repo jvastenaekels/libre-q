@@ -11,7 +11,7 @@
  */
 
 import { lazy } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -37,7 +37,7 @@ import LoginPage from './pages/LoginPage';
 // Admin imports
 import RequireAdmin from './components/auth/RequireAdmin';
 import AdminLayout from './layouts/AdminLayout';
-import WorkspaceLayout from './layouts/WorkspaceLayout';
+import ProjectLayout from './layouts/ProjectLayout';
 import StudyFocusLayout from './layouts/StudyFocusLayout';
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
@@ -49,10 +49,10 @@ const AnalysisPage = lazy(() => import('./pages/admin/AnalysisPage'));
 import DataExportsPage from './pages/admin/DataExportsPage';
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
-const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
+const ProjectSettingsPage = lazy(() => import('./pages/admin/ProjectSettingsPage'));
 const ConcourseListPage = lazy(() => import('./pages/admin/ConcourseListPage'));
 const ConcourseDetailPage = lazy(() => import('./pages/admin/ConcourseDetailPage'));
-const CreateWorkspacePage = lazy(() => import('./pages/admin/CreateWorkspacePage'));
+const CreateProjectPage = lazy(() => import('./pages/admin/CreateProjectPage'));
 const ResearcherHub = lazy(() => import('./pages/ResearcherHub'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 
@@ -61,7 +61,7 @@ import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader'
 import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loader';
 import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
-import { workspaceSettingsPageLoader } from './pages/admin/WorkspaceSettingsPage.loader';
+import { projectSettingsPageLoader } from './pages/admin/ProjectSettingsPage.loader';
 import { LegacyRedirect } from './components/admin/LegacyRedirect';
 
 // Lazy load Admin Dashboard to prevent heavy libs leak
@@ -109,20 +109,20 @@ const router = createBrowserRouter([
             },
         ],
     },
-    // New Workspace-First Architecture
+    // New Project-First Architecture
     {
-        path: '/app/:workspaceSlug',
+        path: '/app/:projectSlug',
         element: <RequireAdmin />,
         children: [
             {
-                element: <WorkspaceLayout />,
+                element: <ProjectLayout />,
                 HydrateFallback: DesignerSkeleton,
                 errorElement: <RouteErrorBoundary />,
                 children: [
                     {
                         element: <AdminLayout />,
                         children: [
-                            // Workspace-level routes
+                            // Project-level routes
                             {
                                 path: 'dashboard',
                                 element: <AdminDashboard />,
@@ -135,8 +135,8 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: 'settings',
-                                element: <WorkspaceSettingsPage />,
-                                loader: workspaceSettingsPageLoader,
+                                element: <ProjectSettingsPage />,
+                                loader: projectSettingsPageLoader,
                                 HydrateFallback: DesignerSkeleton,
                             },
                             {
@@ -217,8 +217,12 @@ const router = createBrowserRouter([
                 element: <AdminLayout />,
                 children: [
                     {
+                        path: 'projects/new',
+                        element: <CreateProjectPage />,
+                    },
+                    {
                         path: 'workspaces/new',
-                        element: <CreateWorkspacePage />,
+                        element: <Navigate to="../projects/new" replace />,
                     },
                 ],
             },

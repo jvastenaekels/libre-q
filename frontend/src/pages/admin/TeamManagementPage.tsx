@@ -14,9 +14,9 @@ const TeamManagementPage = () => {
     const { study } = useLoaderData() as LoaderData;
     const { t } = useTranslation();
 
-    // Determine workspace slug, fallback to study slug's workspace logic if not present (should be present now)
-    // biome-ignore lint/suspicious/noExplicitAny: workspace slug fallback
-    const workspaceSlug = (study as any).workspace?.slug || 'default';
+    // Determine project slug, fallback to study slug's project logic if not present (should be present now)
+    // biome-ignore lint/suspicious/noExplicitAny: project slug fallback
+    const projectSlug = (study as any).workspace?.slug || 'default';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-8 max-w-4xl mx-auto w-full items-center justify-center min-h-[60vh]">
@@ -32,7 +32,7 @@ const TeamManagementPage = () => {
                 <p className="text-slate-500 font-medium leading-relaxed">
                     {t(
                         'admin.team.moved_description',
-                        'To make collaboration easier, team members and permissions are now managed at the Workspace level. This ensures consistent access across all your studies.'
+                        'To make collaboration easier, team members and permissions are now managed at the Project level. This ensures consistent access across all your studies.'
                     )}
                 </p>
 
@@ -41,8 +41,8 @@ const TeamManagementPage = () => {
                         asChild
                         className="h-12 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm text-base"
                     >
-                        <Link to={`/admin/workspaces/${workspaceSlug}/settings`}>
-                            {t('admin.team.go_to_workspace', 'Manage Workspace Team')}
+                        <Link to={`/app/${projectSlug}/settings`}>
+                            {t('admin.team.go_to_project', 'Manage Project Team')}
                             <ArrowRight className="ml-2 size-4" />
                         </Link>
                     </Button>
@@ -61,8 +61,8 @@ const TeamManagementPage = () => {
                             </h3>
                             <p className="text-xs text-indigo-800/70 leading-relaxed">
                                 Instead of adding collaborators to individual studies, you now add
-                                members to the Workspace. Their role (Admin, Researcher, or Viewer)
-                                determines what they can do in all studies within that workspace.
+                                members to the Project. Their role (Admin, Researcher, or Viewer)
+                                determines what they can do in all studies within that project.
                             </p>
                         </div>
                     </div>

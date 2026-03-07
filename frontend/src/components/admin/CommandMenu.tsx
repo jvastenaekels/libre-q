@@ -18,7 +18,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import {
     useListStudiesApiAdminStudiesGet,
-    useListWorkspacesApiAdminWorkspacesGet,
+    useListProjectsApiAdminProjectsGet,
 } from '@/api/generated';
 import { resetAllStores } from '@/utils/sessionReset';
 import { toast } from 'sonner';
@@ -27,21 +27,20 @@ import { useTranslation } from 'react-i18next';
 export const CommandMenu = () => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } =
-        useAdminStore();
-    const { logout, setCurrentWorkspace, currentWorkspace } = useAuthStore();
-    // Studies query enabled only when workspace is present
+    const { activeStudyId, activeProjectId, setActiveProject, setActiveStudy } = useAdminStore();
+    const { logout, setCurrentProject, currentProject } = useAuthStore();
+    // Studies query enabled only when project is present
     const { data: studiesData } = useListStudiesApiAdminStudiesGet(undefined, {
         query: {
-            enabled: !!currentWorkspace?.id,
+            enabled: !!currentProject?.id,
         },
     });
     const studies = studiesData?.items;
-    const { data: workspacesData } = useListWorkspacesApiAdminWorkspacesGet();
-    const workspaces = workspacesData?.items;
+    const { data: workspacesData } = useListProjectsApiAdminProjectsGet();
+    const projects = workspacesData?.items;
     const { t } = useTranslation();
 
-    const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const filteredStudies = studies?.filter((s) => s.workspace_id === activeProjectId);
     const isValidStudy = activeStudyId && filteredStudies?.some((s) => s.slug === activeStudyId);
 
     // Toggle on Cmd+K or Ctrl+K
@@ -106,23 +105,23 @@ export const CommandMenu = () => {
                         {t('admin.command_menu.no_results', 'No results found.')}
                     </Command.Empty>
 
-                    {/* Workspaces */}
+                    {/* Projects */}
                     <Command.Group
-                        heading={t('admin.command_menu.switch_workspace', 'Switch Workspace')}
+                        heading={t('admin.command_menu.switch_project', 'Switch Project')}
                         className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
-                        {(Array.isArray(workspaces) ? workspaces : []).map((ws) => (
+                        {(Array.isArray(projects) ? projects : []).map((ws) => (
                             <div key={ws.id}>
                                 <Command.Item
-                                    value={`workspace ${ws.title}`}
+                                    value={`project ${ws.title}`}
                                     onSelect={() =>
                                         runCommand(() => {
-                                            setActiveWorkspace(ws.id);
-                                            setCurrentWorkspace(ws);
+                                            setActiveProject(ws.id);
+                                            setCurrentProject(ws);
                                             setActiveStudy(null);
                                             toast.success(
                                                 t(
-                                                    'admin.command_menu.switched_workspace',
+                                                    'admin.command_menu.switched_project',
                                                     'Switched to {{name}}',
                                                     { name: ws.title }
                                                 )
@@ -135,13 +134,13 @@ export const CommandMenu = () => {
                                         <Briefcase className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                     <span>{ws.title}</span>
-                                    {ws.id === activeWorkspaceId && (
+                                    {ws.id === activeProjectId && (
                                         <div className="ml-auto size-1.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/50" />
                                     )}
                                 </Command.Item>
-                                {ws.id === activeWorkspaceId && ws.slug && (
+                                {ws.id === activeProjectId && ws.slug && (
                                     <Command.Item
-                                        value={`workspace settings manage ${ws.title}`}
+                                        value={`project settings manage ${ws.title}`}
                                         onSelect={() =>
                                             runCommand(() => navigate(`/app/${ws.slug}/settings`))
                                         }
@@ -149,7 +148,7 @@ export const CommandMenu = () => {
                                     >
                                         <Settings className="h-3 w-3" />
                                         <span className="text-xs font-bold">
-                                            {t('admin.workspace.switcher.settings')}
+                                            {t('admin.project.switcher.settings')}
                                         </span>
                                     </Command.Item>
                                 )}
@@ -169,7 +168,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() => {
                                         setActiveStudy(study.slug);
-                                        const ws = workspaces?.find(
+                                        const ws = projects?.find(
                                             (w) => w.id === study.workspace_id
                                         );
                                         if (ws) {
@@ -190,10 +189,7 @@ export const CommandMenu = () => {
                         ))}
                         {(!filteredStudies || filteredStudies.length === 0) && (
                             <div className="px-4 py-3 text-sm text-slate-400 italic">
-                                {t(
-                                    'admin.command_menu.no_studies',
-                                    'No studies in this workspace.'
-                                )}
+                                {t('admin.command_menu.no_studies', 'No studies in this project.')}
                             </div>
                         )}
                     </Command.Group>
@@ -209,7 +205,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}`
                                         )
                                     )
                                 }
@@ -225,7 +221,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/design`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/design`
                                         )
                                     )
                                 }
@@ -241,7 +237,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/recruitment`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/recruitment`
                                         )
                                     )
                                 }
@@ -257,7 +253,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/exports`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/exports`
                                         )
                                     )
                                 }
@@ -273,7 +269,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/team`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/team`
                                         )
                                     )
                                 }
@@ -289,7 +285,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentWorkspace?.slug}/studies/${activeStudyId}/settings`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/settings`
                                         )
                                     )
                                 }

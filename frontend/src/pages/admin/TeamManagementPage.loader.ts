@@ -6,7 +6,7 @@ import { queryClient } from '@/lib/queryClient';
 import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const teamManagementPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const slug = params.slug || params.workspaceSlug || params.studySlug;
+    const slug = params.slug || params.projectSlug || params.studySlug;
     if (!slug) throw new Error('Slug is required (Team Management)');
 
     try {

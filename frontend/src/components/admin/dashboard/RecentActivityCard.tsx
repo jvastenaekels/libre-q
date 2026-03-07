@@ -218,7 +218,7 @@ interface RecentActivityCardProps {
     participants: ParticipantRead[];
     totalParticipantCount: number;
     isMultiLang: boolean;
-    workspaceSlug: string;
+    projectSlug: string;
     studySlug: string;
 }
 
@@ -226,7 +226,7 @@ export default function RecentActivityCard({
     participants,
     totalParticipantCount,
     isMultiLang,
-    workspaceSlug,
+    projectSlug,
     studySlug,
 }: RecentActivityCardProps) {
     const { t, i18n } = useTranslation();
@@ -277,7 +277,7 @@ export default function RecentActivityCard({
                                 showLanguage={isMultiLang}
                                 onView={() =>
                                     navigate(
-                                        `/app/${workspaceSlug}/studies/${studySlug}/participants/${p.id}`
+                                        `/app/${projectSlug}/studies/${studySlug}/participants/${p.id}`
                                     )
                                 }
                             />
@@ -286,7 +286,7 @@ export default function RecentActivityCard({
                 )}
                 <div className="p-2.5 bg-slate-50/50 border-t border-slate-100 text-center">
                     <Link
-                        to={`/app/${workspaceSlug}/studies/${studySlug}/data`}
+                        to={`/app/${projectSlug}/studies/${studySlug}/data`}
                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                     >
                         <TableIcon className="w-3 h-3" />

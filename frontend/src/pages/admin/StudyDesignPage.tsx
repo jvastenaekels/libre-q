@@ -71,8 +71,8 @@ const DESIGN_STEPS = [
 
 const StudyDesignPage = () => {
     const { t } = useTranslation();
-    const { workspaceSlug, studySlug } = useParams<{ workspaceSlug: string; studySlug: string }>();
-    const effectiveSlug = studySlug || workspaceSlug || '';
+    const { projectSlug, studySlug } = useParams<{ projectSlug: string; studySlug: string }>();
+    const effectiveSlug = studySlug || projectSlug || '';
     const navigate = useNavigate();
     const {
         draft,
@@ -137,7 +137,7 @@ const StudyDesignPage = () => {
 
     const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(effectiveSlug, {
         query: {
-            enabled: !!workspaceSlug,
+            enabled: !!projectSlug,
         },
     });
 
@@ -934,7 +934,7 @@ const StudyDesignPage = () => {
                                                     className="h-auto p-0 text-amber-700 underline font-bold text-xs mt-2 hover:text-amber-900"
                                                     onClick={() =>
                                                         navigate(
-                                                            `/app/${workspaceSlug}/studies/${effectiveSlug}/data`
+                                                            `/app/${projectSlug}/studies/${effectiveSlug}/data`
                                                         )
                                                     }
                                                 >

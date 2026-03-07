@@ -35,13 +35,13 @@ graph LR
     style API stroke:#3b82f6,stroke-width:2px
 ```
 
-### Workspace-First Flow
+### Project-First Flow
 
-Libre-Q 2.0 introduces a **Workspace-First** architecture.
+Libre-Q 2.0 introduces a **Project-First** architecture.
 
-- Most API requests are scoped by a mandatory `X-Workspace-ID` header.
-- The `useAdminStore` maintains the global selection context (Active Workspace + Study) across all admin pages.
-- Access control is inherited from the Workspace level, ensuring researchers only see the studies and data they are authorized to manage.
+- Most API requests are scoped by a mandatory `X-Project-ID` header.
+- The `useAdminStore` maintains the global selection context (Active Project + Study) across all admin pages.
+- Access control is inherited from the Project level, ensuring researchers only see the studies and data they are authorized to manage.
 
 ---
 
@@ -57,8 +57,8 @@ Seven atomic stores are used for clean separation of concerns:
 ```mermaid
 flowchart TD
     subgraph "Zustand Stores"
-        Auth["useAuthStore<br/>User, Workspaces"]
-        Admin["useAdminStore<br/>Active Workspace, Study Selection"]
+        Auth["useAuthStore<br/>User, Projects"]
+        Admin["useAdminStore<br/>Active Project, Study Selection"]
         Designer["useStudyDesigner<br/>Draft state, sync status"]
         Config["useConfigStore<br/>Study config, statements, grid"]
         Session["useSessionStore<br/>Step, consent, language"]
@@ -94,8 +94,8 @@ flowchart TD
 
 | Store                | Purpose                                       | Persisted            |
 | -------------------- | --------------------------------------------- | -------------------- |
-| `useAuthStore`       | Current authenticated user and workspace list | sessionStorage       |
-| `useAdminStore`      | Active workspace and study selection context  | localStorage         |
+| `useAuthStore`       | Current authenticated user and project list   | sessionStorage       |
+| `useAdminStore`      | Active project and study selection context    | localStorage         |
 | `useStudyDesigner`   | Draft study state, sync status, active step   | None (transient)     |
 | `useConfigStore`     | Study configuration, statements, grid layout  | None                 |
 | `useSessionStore`    | Current step, consent status, language        | localStorage         |
@@ -178,10 +178,10 @@ For complex components that appear in various contexts (e.g., cards in a grid vs
 
 ```mermaid
 erDiagram
-    WORKSPACE ||--o{ WORKSPACE_MEMBER : has
-    USER ||--o{ WORKSPACE_MEMBER : member_of
-    WORKSPACE ||--o{ STUDY : contains
-    WORKSPACE ||--o{ INVITATION : has
+    PROJECT ||--o{ PROJECT_MEMBER : has
+    USER ||--o{ PROJECT_MEMBER : member_of
+    PROJECT ||--o{ STUDY : contains
+    PROJECT ||--o{ INVITATION : has
     STUDY ||--o{ STUDY_TRANSLATION : has
     STUDY ||--o{ STATEMENT : contains
     STUDY ||--o{ PARTICIPANT : has
@@ -191,7 +191,7 @@ erDiagram
     PARTICIPANT ||--o{ AUDIO_RECORDING : records
     STATEMENT ||--o{ QSORT_ENTRY : placed_in
 
-    WORKSPACE {
+    PROJECT {
         int id PK
         string title
         string slug UK
@@ -199,8 +199,8 @@ erDiagram
         datetime created_at
     }
 
-    WORKSPACE_MEMBER {
-        int workspace_id FK
+    PROJECT_MEMBER {
+        int project_id FK
         int user_id FK
         enum role "owner | researcher | viewer"
         datetime joined_at
@@ -221,7 +221,7 @@ erDiagram
         int id PK
         string slug UK
         enum state "draft | active | paused | closed | archived"
-        int workspace_id FK
+        int project_id FK
         string default_language
         boolean show_statement_codes
         boolean randomize_statement_order
@@ -329,7 +329,7 @@ erDiagram
     INVITATION {
         int id PK
         string email
-        int workspace_id FK
+        int project_id FK
         int study_id FK
         enum role
         string token UK
@@ -357,16 +357,16 @@ Libre-Q uses a two-tier RBAC system to balance global maintenance and fine-grain
 ### 1. Global Hierarchy
 
 - **Superuser**: Can manage all users in the system and perform global maintenance. Designated by `is_superuser: true` on the `User` model.
-- **User**: Standard account. Can be a member of one or more workspaces.
+- **User**: Standard account. Can be a member of one or more projects.
 
-### 2. Workspace-Level Roles
+### 2. Project-Level Roles
 
-Permissions are scoped per-workspace via the `WorkspaceMember` relationship:
+Permissions are scoped per-project via the `ProjectMember` relationship:
 
 | Role           | Ability                                                                 |
 | :------------- | :---------------------------------------------------------------------- |
-| **Owner**      | Full control over workspace: manage members, create/delete studies.     |
-| **Researcher** | Can create/edit studies, export results. Cannot manage workspace users. |
+| **Owner**      | Full control over project: manage members, create/delete studies.       |
+| **Researcher** | Can create/edit studies, export results. Cannot manage project users.   |
 | **Viewer**     | Read-only access to study configuration. Cannot export data.            |
 
 ---

@@ -25,7 +25,7 @@ import { useMemo } from 'react';
 import { useAdminContext } from '@/hooks/useAdminContext';
 
 export default function ParticipantDetailsPage() {
-    const { workspace: currentWorkspace } = useAdminContext();
+    const { project: currentWorkspace } = useAdminContext();
     const { studySlug, participantId } = useParams<{
         slug: string;
         studySlug: string;

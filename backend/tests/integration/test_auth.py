@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import User, WorkspaceRole, WorkspaceMember
+from app.models import User, ProjectRole, ProjectMember
 from app.utils.security import create_invitation_token
 from tests.conftest import TEST_PASSWORD
 
@@ -81,18 +81,18 @@ class TestRegistration:
         client: AsyncClient,
         db: AsyncSession,
         user_factory,
-        workspace_factory,
+        project_factory,
     ):
-        """Registration with valid invitation token adds user to workspace."""
-        # Setup: Create workspace
+        """Registration with valid invitation token adds user to project."""
+        # Setup: Create project
         owner = await user_factory()
-        workspace = await workspace_factory(owner=owner)
+        project = await project_factory(owner=owner)
 
-        # Create invitation token for workspace
+        # Create invitation token for project
         token = create_invitation_token(
             email="invited@example.com",
-            workspace_id=workspace.id,
-            role="researcher",  # WorkspaceRole
+            project_id=project.id,
+            role="researcher",  # ProjectRole
         )
 
         # Register with token
@@ -106,23 +106,23 @@ class TestRegistration:
         )
         assert response.status_code == 201
 
-        # Verify WorkspaceMember was added
+        # Verify ProjectMember was added
         result = await db.execute(
-            select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace.id)
+            select(ProjectMember).where(ProjectMember.project_id == project.id)
         )
         members = result.scalars().all()
         assert len(members) == 2  # Owner + Invited
         invited = next(m for m in members if m.user_id != owner.id)
-        assert invited.role == WorkspaceRole.researcher
+        assert invited.role == ProjectRole.researcher
 
     async def test_register_invitation_token_email_mismatch(
-        self, client: AsyncClient, user_factory, workspace_factory
+        self, client: AsyncClient, user_factory, project_factory
     ):
         """Invitation token email must match registration email."""
         owner = await user_factory()
-        workspace = await workspace_factory(owner=owner)
+        project = await project_factory(owner=owner)
         token = create_invitation_token(
-            email="invited@example.com", workspace_id=workspace.id, role="researcher"
+            email="invited@example.com", project_id=project.id, role="researcher"
         )
         response = await client.post(
             "/api/register",
@@ -136,14 +136,14 @@ class TestRegistration:
         assert "does not match" in response.json()["message"]
 
     async def test_register_invitation_token_expired(
-        self, client: AsyncClient, user_factory, workspace_factory
+        self, client: AsyncClient, user_factory, project_factory
     ):
         """Expired invitation token is rejected."""
         owner = await user_factory()
-        workspace = await workspace_factory(owner=owner)
+        project = await project_factory(owner=owner)
         token = create_invitation_token(
             email="late@example.com",
-            workspace_id=workspace.id,
+            project_id=project.id,
             role="researcher",
             expires_delta=timedelta(minutes=-1),
         )

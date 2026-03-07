@@ -1,6 +1,6 @@
 # TODO
 
-- Transformer les "workspaces" en "projects"
+- Transformer les "projects" (anciennement "workspaces") — terminé
 - Ajouter un concourse manager
     - traçage
     - collaboration

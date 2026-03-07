@@ -1,5 +1,5 @@
 from app.schemas import (
-    WorkspaceCreate,
+    ProjectCreate,
     StudyTranslationBase,
     StatementBase,
     RecruitmentLinkBase,
@@ -9,25 +9,25 @@ import pytest
 from pydantic import ValidationError
 
 
-def test_workspace_create_validation():
+def test_project_create_validation():
     # Valid
-    wc = WorkspaceCreate(title="Valid Workspace", slug="valid-slug")
-    assert wc.title == "Valid Workspace"
+    wc = ProjectCreate(title="Valid Project", slug="valid-slug")
+    assert wc.title == "Valid Project"
     assert wc.slug == "valid-slug"
 
     # Whitespace title
     with pytest.raises(ValidationError) as exc:
-        WorkspaceCreate(title="   ", slug="valid-slug")
+        ProjectCreate(title="   ", slug="valid-slug")
     assert "String cannot be empty" in str(exc.value)
 
     # Empty title
     with pytest.raises(ValidationError) as exc:
-        WorkspaceCreate(title="", slug="valid-slug")
+        ProjectCreate(title="", slug="valid-slug")
     assert "String cannot be empty" in str(exc.value)
 
     # Max length title
     with pytest.raises(ValidationError) as exc:
-        WorkspaceCreate(title="a" * 101, slug="valid-slug")
+        ProjectCreate(title="a" * 101, slug="valid-slug")
     assert "String should have at most 100 characters" in str(exc.value)
 
 

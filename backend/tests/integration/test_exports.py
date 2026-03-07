@@ -52,15 +52,15 @@ class TestExports:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
         db,
     ):
         """Test that CSV export contains actual participant data."""
         # 1. Setup Study with specific config
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
 
         # Update presort_config to ensure columns clearly exist
         study.presort_config = {
@@ -146,15 +146,15 @@ class TestExports:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
         db,
     ):
         """Test that single participant CSV export works and contains correct data with labels."""
         # 1. Setup Study with options
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
         study.presort_config = {
             "gender": {
                 "type": "select",
@@ -210,15 +210,15 @@ class TestExports:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
         db,
     ):
         """Test that single participant JSON export works."""
         # 1. Setup Study
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
         db.add(study)
         await db.commit()
         await db.refresh(study)
@@ -257,15 +257,15 @@ class TestExports:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
         db,
     ):
         """Test that the full research package ZIP is generated correctly."""
         # 1. Setup Study with statements and participants
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
 
         # Add a statement and participant to ensure ZIP has content
         from app.models import Statement, StatementTranslation
@@ -325,23 +325,23 @@ class TestExports:
         )
         assert response.status_code == 404
 
-    async def test_export_cross_workspace_forbidden(
+    async def test_export_cross_project_forbidden(
         self,
         client: AsyncClient,
         user_factory,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
     ):
-        """Ensure admin of Workspace B cannot export Study from Workspace A."""
-        # Workspace A & Study A
+        """Ensure admin of Project B cannot export Study from Project A."""
+        # Project A & Study A
         user_a = await user_factory()
-        ws_a = await workspace_factory(owner=user_a)
-        study_a = await study_factory(workspace=ws_a, owner=user_a)
+        ws_a = await project_factory(owner=user_a)
+        study_a = await study_factory(project=ws_a, owner=user_a)
 
-        # Workspace B & User B (Admin of B, unrelated to A)
+        # Project B & User B (Admin of B, unrelated to A)
         user_b = await user_factory()
-        await workspace_factory(owner=user_b)
+        await project_factory(owner=user_b)
 
         headers_b = auth_token_factory(user_b)
 
@@ -371,15 +371,15 @@ class TestExports:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         study_factory,
         auth_token_factory,
         db,
     ):
         """Test that R-Kit export generates correct column offset in R script."""
         # 1. Setup Study with multiple presort questions
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
 
         # Add presort config with 3 questions
         study.presort_config = {

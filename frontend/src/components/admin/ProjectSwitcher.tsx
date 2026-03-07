@@ -18,42 +18,42 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
-import { useListWorkspacesApiAdminWorkspacesGet } from '@/api/generated';
+import { useListProjectsApiAdminProjectsGet } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { WorkspaceWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/types/backend';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { useAdminStore } from '@/store/useAdminStore';
 
-export function WorkspaceSwitcher() {
+export function ProjectSwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { setActiveWorkspace } = useAdminStore();
+    const { setActiveProject } = useAdminStore();
 
     // Fetch data using generated hook (React Query)
-    const { data: workspacesResponse, isLoading: isWorkspacesLoading } =
-        useListWorkspacesApiAdminWorkspacesGet();
+    const { data: projectsResponse, isLoading: isProjectsLoading } =
+        useListProjectsApiAdminProjectsGet();
     // Extract items from paginated response
-    const workspaces = workspacesResponse?.items as WorkspaceWithRole[] | undefined;
+    const projects = projectsResponse?.items as ProjectWithRole[] | undefined;
     // Use Auth Store for global state
-    const { currentWorkspace, setWorkspaces } = useAuthStore();
+    const { currentProject, setProjects } = useAuthStore();
 
     // Sync React Query data to Zustand Store
     React.useEffect(() => {
-        if (workspaces) {
-            setWorkspaces(workspaces);
+        if (projects) {
+            setProjects(projects);
         }
-    }, [workspaces, setWorkspaces]);
+    }, [projects, setProjects]);
 
-    // Sync activeWorkspaceId if currentWorkspace is set but not in admin store
+    // Sync activeProjectId if currentProject is set but not in admin store
     React.useEffect(() => {
-        if (currentWorkspace) {
-            setActiveWorkspace(currentWorkspace.id);
+        if (currentProject) {
+            setActiveProject(currentProject.id);
         }
-    }, [currentWorkspace, setActiveWorkspace]);
+    }, [currentProject, setActiveProject]);
 
-    if (isWorkspacesLoading) {
+    if (isProjectsLoading) {
         return (
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -71,16 +71,16 @@ export function WorkspaceSwitcher() {
                         <SidebarMenuButton
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground transition-all duration-300 hover:bg-sidebar-accent/50"
-                            data-testid="workspace-switcher"
+                            data-testid="project-switcher"
                         >
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-lg shadow-indigo-500/20">
                                 <Briefcase className="size-4" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight ml-1">
                                 <span className="truncate font-bold tracking-tight text-slate-900">
-                                    {currentWorkspace
-                                        ? currentWorkspace.title
-                                        : t('admin.sidebar.select_workspace')}
+                                    {currentProject
+                                        ? currentProject.title
+                                        : t('admin.sidebar.select_project')}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
@@ -93,17 +93,17 @@ export function WorkspaceSwitcher() {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
-                            {t('admin.command_menu.switch_workspace', 'Workspaces')}
+                            {t('admin.command_menu.switch_project', 'Projects')}
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
-                            {workspaces?.map((workspace) => {
-                                const isActive = workspace.id === currentWorkspace?.id;
+                            {projects?.map((project) => {
+                                const isActive = project.id === currentProject?.id;
                                 return (
                                     <DropdownMenuItem
-                                        key={workspace.id}
+                                        key={project.id}
                                         onClick={() => {
-                                            if (workspace.id !== currentWorkspace?.id) {
-                                                navigate(`/app/${workspace.slug}/dashboard`);
+                                            if (project.id !== currentProject?.id) {
+                                                navigate(`/app/${project.slug}/dashboard`);
                                             }
                                         }}
                                         className={cn(
@@ -125,23 +125,23 @@ export function WorkspaceSwitcher() {
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold">
-                                                {workspace.title}
+                                                {project.title}
                                             </span>
                                             <span className="text-2xs font-medium opacity-60 flex items-center gap-1">
                                                 {/* Show Role Badge */}
                                                 <span
                                                     className={cn(
                                                         'px-1 rounded-sm text-[8px]',
-                                                        workspace.user_role === 'owner'
+                                                        project.user_role === 'owner'
                                                             ? 'bg-amber-100 text-amber-700'
-                                                            : workspace.user_role === 'admin'
+                                                            : project.user_role === 'admin'
                                                               ? 'bg-blue-100 text-blue-700'
                                                               : 'bg-slate-100'
                                                     )}
                                                 >
                                                     {t(
-                                                        `admin.workspace.roles.${workspace.user_role}`,
-                                                        workspace.user_role
+                                                        `admin.project.roles.${project.user_role}`,
+                                                        project.user_role
                                                     )}
                                                 </span>
                                             </span>
@@ -160,14 +160,14 @@ export function WorkspaceSwitcher() {
                         </div>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => navigate('/app/workspaces/new')}
+                            onClick={() => navigate('/app/projects/new')}
                             className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer text-muted-foreground hover:text-foreground"
                         >
                             <div className="flex size-7 items-center justify-center rounded-md border border-dashed border-slate-300">
                                 <Plus className="size-3.5" />
                             </div>
                             <span className="text-sm font-medium">
-                                {t('admin.workspace.switcher.new_workspace', 'New workspace')}
+                                {t('admin.project.switcher.new_project', 'New project')}
                             </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type WorkspaceUpdateSlug = string | null;
+export type ProjectUpdateTitle = string | null;

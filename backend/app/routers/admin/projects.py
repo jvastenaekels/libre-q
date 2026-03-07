@@ -8,20 +8,20 @@ import logging
 from app.limiter import limiter
 from app.dependencies import (
     PaginationParams,
-    check_workspace_permission,
+    check_project_permission,
     get_current_active_user,
     get_db,
 )
-from app.models import User, Workspace, WorkspaceMember, WorkspaceRole
+from app.models import User, Project, ProjectMember, ProjectRole
 from app.schemas import (
-    WorkspaceCreate,
-    WorkspaceMemberRead,
-    WorkspaceMemberUpdate,
-    WorkspaceRead,
-    WorkspaceUpdate,
-    WorkspaceInvitationCreate,
+    ProjectCreate,
+    ProjectMemberRead,
+    ProjectMemberUpdate,
+    ProjectRead,
+    ProjectUpdate,
+    ProjectInvitationCreate,
     InvitationLink,
-    WorkspaceWithRole,
+    ProjectWithRole,
 )
 from app.schemas.common import PaginatedResponse
 from app.utils.security import create_invitation_token
@@ -33,25 +33,25 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("", response_model=PaginatedResponse[WorkspaceWithRole])
-async def list_workspaces(
+@router.get("", response_model=PaginatedResponse[ProjectWithRole])
+async def list_projects(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
 ):
     """
-    List all workspaces the current user is a member of, with their role.
+    List all projects the current user is a member of, with their role.
     """
     count_result = await db.execute(
-        select(func.count()).where(WorkspaceMember.user_id == current_user.id)
+        select(func.count()).where(ProjectMember.user_id == current_user.id)
     )
     total = count_result.scalar() or 0
 
     query = (
-        select(Workspace, WorkspaceMember.role)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-        .where(WorkspaceMember.user_id == current_user.id)
-        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+        select(Project, ProjectMember.role)
+        .join(ProjectMember, ProjectMember.project_id == Project.id)
+        .where(ProjectMember.user_id == current_user.id)
+        .options(selectinload(Project.members).selectinload(ProjectMember.user))
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
@@ -59,8 +59,7 @@ async def list_workspaces(
     rows = result.unique().all()
 
     items = [
-        WorkspaceWithRole(**workspace.__dict__, user_role=role)
-        for workspace, role in rows
+        ProjectWithRole(**project.__dict__, user_role=role) for project, role in rows
     ]
 
     return PaginatedResponse(
@@ -68,87 +67,87 @@ async def list_workspaces(
     )
 
 
-@router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)
 @limiter.limit("30/minute")
-async def create_workspace(
+async def create_project(
     request: Request,
-    workspace_in: WorkspaceCreate,
+    project_in: ProjectCreate,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-) -> Workspace:
+) -> Project:
     """
-    Create a new workspace and assign the current user as Owner.
+    Create a new project and assign the current user as Owner.
     """
     # Check if slug exists globally
-    query = select(Workspace).where(Workspace.slug == workspace_in.slug)
+    query = select(Project).where(Project.slug == project_in.slug)
     result = await db.execute(query)
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Workspace with this slug already exists",
+            detail="Project with this slug already exists",
         )
 
     try:
-        # Create Workspace
-        workspace = Workspace(
-            title=workspace_in.title,
-            slug=workspace_in.slug,
+        # Create Project
+        project = Project(
+            title=project_in.title,
+            slug=project_in.slug,
         )
-        db.add(workspace)
+        db.add(project)
         await db.flush()  # To get ID
 
         # Create Member (Owner)
-        member = WorkspaceMember(
-            workspace_id=workspace.id,
+        member = ProjectMember(
+            project_id=project.id,
             user_id=current_user.id,
-            role=WorkspaceRole.owner,
+            role=ProjectRole.owner,
         )
         db.add(member)
         await db.commit()
     except IntegrityError as e:
         await db.rollback()
         logger.error(
-            f"Integrity check failed during workspace creation: {e}", exc_info=True
+            f"Integrity check failed during project creation: {e}", exc_info=True
         )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Workspace with this slug likely already exists",
+            detail="Project with this slug likely already exists",
         )
     except Exception as e:
         await db.rollback()
-        logger.error(f"Unexpected error during workspace creation: {e}", exc_info=True)
+        logger.error(f"Unexpected error during project creation: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while creating the workspace",
+            detail="An unexpected error occurred while creating the project",
         )
-    # Re-query with members loaded for WorkspaceRead serialization
+    # Re-query with members loaded for ProjectRead serialization
     query = (
-        select(Workspace)
-        .where(Workspace.id == workspace.id)
-        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+        select(Project)
+        .where(Project.id == project.id)
+        .options(selectinload(Project.members).selectinload(ProjectMember.user))
     )
     result = await db.execute(query)
-    workspace = result.scalar_one()
+    project = result.scalar_one()
 
-    return workspace
+    return project
 
 
-@router.get("/{slug}", response_model=WorkspaceWithRole)
-async def get_workspace(
+@router.get("/{slug}", response_model=ProjectWithRole)
+async def get_project(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-    slug: str = Path(..., description="The slug of the workspace"),
-) -> WorkspaceWithRole:
+    slug: str = Path(..., description="The slug of the project"),
+) -> ProjectWithRole:
     """
-    Get workspace details.
+    Get project details.
     """
     # Query membership to get the role
     query = (
-        select(Workspace, WorkspaceMember.role)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-        .where(Workspace.slug == slug)
-        .where(WorkspaceMember.user_id == current_user.id)
-        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+        select(Project, ProjectMember.role)
+        .join(ProjectMember, ProjectMember.project_id == Project.id)
+        .where(Project.slug == slug)
+        .where(ProjectMember.user_id == current_user.id)
+        .options(selectinload(Project.members).selectinload(ProjectMember.user))
     )
 
     result = await db.execute(query)
@@ -157,43 +156,43 @@ async def get_workspace(
     if not row:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found or access denied",
+            detail="Project not found or access denied",
         )
 
-    workspace, role = row
-    return WorkspaceWithRole(**workspace.__dict__, user_role=role)
+    project, role = row
+    return ProjectWithRole(**project.__dict__, user_role=role)
 
 
-@router.patch("/{slug}", response_model=WorkspaceRead)
+@router.patch("/{slug}", response_model=ProjectRead)
 @limiter.limit("30/minute")
-async def update_workspace(
+async def update_project(
     request: Request,
-    workspace_in: WorkspaceUpdate,
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    project_in: ProjectUpdate,
+    project: Project = Depends(check_project_permission(ProjectRole.owner)),
     db: AsyncSession = Depends(get_db),
-) -> Workspace:
+) -> Project:
     """
-    Update workspace details.
+    Update project details.
     """
     try:
-        if workspace_in.title is not None:
-            workspace.title = workspace_in.title
-        if workspace_in.slug is not None and workspace_in.slug != workspace.slug:
+        if project_in.title is not None:
+            project.title = project_in.title
+        if project_in.slug is not None and project_in.slug != project.slug:
             # Check if new slug exists
-            query = select(Workspace).where(Workspace.slug == workspace_in.slug)
+            query = select(Project).where(Project.slug == project_in.slug)
             result = await db.execute(query)
             if result.scalar_one_or_none():
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Workspace with this slug already exists",
+                    detail="Project with this slug already exists",
                 )
-            workspace.slug = workspace_in.slug
+            project.slug = project_in.slug
 
         await db.commit()
     except IntegrityError as e:
         await db.rollback()
         logger.error(
-            f"Integrity check failed during workspace update: {e}", exc_info=True
+            f"Integrity check failed during project update: {e}", exc_info=True
         )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -201,40 +200,40 @@ async def update_workspace(
         )
     except Exception as e:
         await db.rollback()
-        logger.error(f"Unexpected error during workspace update: {e}", exc_info=True)
+        logger.error(f"Unexpected error during project update: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while updating the workspace",
+            detail="An unexpected error occurred while updating the project",
         )
-    # Re-query with members loaded for WorkspaceRead serialization
+    # Re-query with members loaded for ProjectRead serialization
     query = (
-        select(Workspace)
-        .where(Workspace.id == workspace.id)
-        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+        select(Project)
+        .where(Project.id == project.id)
+        .options(selectinload(Project.members).selectinload(ProjectMember.user))
     )
     result = await db.execute(query)
-    workspace = result.scalar_one()
-    return workspace
+    project = result.scalar_one()
+    return project
 
 
-@router.get("/{slug}/members", response_model=PaginatedResponse[WorkspaceMemberRead])
-async def list_workspace_members(
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
+@router.get("/{slug}/members", response_model=PaginatedResponse[ProjectMemberRead])
+async def list_project_members(
+    project: Project = Depends(check_project_permission(ProjectRole.viewer)),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
 ):
     """
-    List all members of a workspace with pagination.
+    List all members of a project with pagination.
     """
     from sqlalchemy.orm import selectinload
 
-    base = select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace.id)
+    base = select(ProjectMember).where(ProjectMember.project_id == project.id)
 
     count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar() or 0
 
     query = (
-        base.options(selectinload(WorkspaceMember.user))
+        base.options(selectinload(ProjectMember.user))
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
@@ -246,25 +245,25 @@ async def list_workspace_members(
     )
 
 
-@router.patch("/{slug}/members/{user_id}", response_model=WorkspaceMemberRead)
+@router.patch("/{slug}/members/{user_id}", response_model=ProjectMemberRead)
 @limiter.limit("30/minute")
-async def update_workspace_member(
+async def update_project_member(
     request: Request,
     user_id: int,
-    member_in: WorkspaceMemberUpdate,
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    member_in: ProjectMemberUpdate,
+    project: Project = Depends(check_project_permission(ProjectRole.owner)),
     db: AsyncSession = Depends(get_db),
-) -> WorkspaceMember:
+) -> ProjectMember:
     """
-    Update a workspace member's role.
+    Update a project member's role.
     """
     query = (
-        select(WorkspaceMember)
+        select(ProjectMember)
         .where(
-            WorkspaceMember.workspace_id == workspace.id,
-            WorkspaceMember.user_id == user_id,
+            ProjectMember.project_id == project.id,
+            ProjectMember.user_id == user_id,
         )
-        .options(selectinload(WorkspaceMember.user))
+        .options(selectinload(ProjectMember.user))
     )
     result = await db.execute(query)
     member = result.scalar_one_or_none()
@@ -290,24 +289,24 @@ async def update_workspace_member(
 
 @router.delete("/{slug}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
-async def remove_workspace_member(
+async def remove_project_member(
     request: Request,
     user_id: int,
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    project: Project = Depends(check_project_permission(ProjectRole.owner)),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Remove a member from the workspace.
+    Remove a member from the project.
     """
     if user_id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You cannot remove yourself from the workspace",
+            detail="You cannot remove yourself from the project",
         )
 
-    query = select(WorkspaceMember).where(
-        WorkspaceMember.workspace_id == workspace.id, WorkspaceMember.user_id == user_id
+    query = select(ProjectMember).where(
+        ProjectMember.project_id == project.id, ProjectMember.user_id == user_id
     )
     result = await db.execute(query)
     member = result.scalar_one_or_none()
@@ -331,13 +330,13 @@ async def remove_workspace_member(
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
-async def delete_workspace(
+async def delete_project(
     request: Request,
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    project: Project = Depends(check_project_permission(ProjectRole.owner)),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Delete a workspace (Owner only).
+    Delete a project (Owner only).
     """
     # Check for active studies
     # We can't delete if there are studies? Plan says: "impossible si des études sont actives".
@@ -347,25 +346,25 @@ async def delete_workspace(
     # Query count of studies
     from app.models import Study
 
-    stmt = select(func.count(Study.id)).where(Study.workspace_id == workspace.id)
+    stmt = select(func.count(Study.id)).where(Study.project_id == project.id)
     result = await db.execute(stmt)
     study_count = result.scalar() or 0
 
     if study_count > 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Cannot delete workspace with {study_count} existing studies. Please delete them first.",
+            detail=f"Cannot delete project with {study_count} existing studies. Please delete them first.",
         )
 
     try:
-        await db.delete(workspace)
+        await db.delete(project)
         await db.commit()
     except Exception as e:
         await db.rollback()
-        logger.error(f"Unexpected error during workspace deletion: {e}", exc_info=True)
+        logger.error(f"Unexpected error during project deletion: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while deleting the workspace",
+            detail="An unexpected error occurred while deleting the project",
         )
 
 
@@ -373,16 +372,16 @@ async def delete_workspace(
 @limiter.limit("30/minute")
 async def create_invitation(
     request: Request,
-    invitation_in: WorkspaceInvitationCreate,
+    invitation_in: ProjectInvitationCreate,
     background_tasks: BackgroundTasks,
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    project: Project = Depends(check_project_permission(ProjectRole.owner)),
 ):
     """
-    Invite a user to the workspace.
+    Invite a user to the project.
     """
     token = create_invitation_token(
         email=invitation_in.email,
-        workspace_id=workspace.id,
+        project_id=project.id,
         role=invitation_in.role.value,
     )
 
@@ -391,9 +390,9 @@ async def create_invitation(
     background_tasks.add_task(
         send_invitation_email,
         email_to=invitation_in.email,
-        context_name=workspace.title,
+        context_name=project.title,
         invite_url=invite_url,
-        context_type="workspace",
+        context_type="project",
     )
 
     return InvitationLink(invite_url=invite_url, token=token)

@@ -31,13 +31,13 @@ npx playwright test e2e/admin/configuration/presort-fields.spec.ts
 
 Tests use an **"Add-Only"** strategy to support full parallelism:
 
-- Each test creates a **unique user** and **unique workspace** (e.g., `workspace-1736...`).
+- Each test creates a **unique user** and **unique project** (e.g., `project-1736...`).
 - Tests **do not clean up** after themselves to prevent race conditions (one test deleting data needed by another).
 - Global cleanup is handled by creating fresh databases in CI or manual scripts locally.
 
 **Implication for Tests:**
 
-- **Never hardcode slugs** (like `'test-workspace'`). Use `testDb.getWorkspaceSlug()`.
+- **Never hardcode slugs** (like `'test-project'`). Use `testDb.getProjectSlug()`.
 - **Never hardcode user emails**. Use `testDb.getUserEmail()`.
 
 ## Test Fixtures
@@ -48,8 +48,8 @@ Automatic setup (unique seeding) for each test:
 
 ```typescript
 test("my test", async ({ testDb, authToken }) => {
-  // testDb is ready with UNIQUE base data (user, workspace)
-  const workspaceSlug = testDb.getWorkspaceSlug();
+  // testDb is ready with UNIQUE base data (user, project)
+  const projectSlug = testDb.getProjectSlug();
 
   const study = await testDb.createStudy(
     authToken,
@@ -77,7 +77,7 @@ Pre-authenticated token for API calls (automatically logged in as the unique tes
 
 ```typescript
 test("API test", async ({ testDb, authToken }) => {
-  const slug = testDb.getWorkspaceSlug();
+  const slug = testDb.getProjectSlug();
   const study = await testDb.getStudy(authToken, `${slug}/my-study`);
 });
 ```
@@ -132,7 +132,7 @@ test.describe("Feature X Configuration", () => {
 The backend provides test-only endpoints (only available in test/dev):
 
 - `POST /api/test/init` - Initialize test database
-- `POST /api/test/seed` - Seed base data (user, workspace)
+- `POST /api/test/seed` - Seed base data (user, project)
 - `POST /api/test/cleanup` - Cleanup between tests
 - `POST /api/test/cleanup-all` - Full cleanup
 - `GET /api/test/health` - Test router health check

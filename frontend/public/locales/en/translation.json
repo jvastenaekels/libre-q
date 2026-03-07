@@ -34,7 +34,7 @@
         "cancel": "Cancel",
         "delete": "Delete",
         "slots": "slots",
-        "workspace_label": "Workspace",
+        "project_label": "Project",
         "read_full": "Read full statement",
         "reduce": "Reduce",
         "expand": "Expand",
@@ -435,8 +435,8 @@
         "hub": {
             "title": "Researcher hub",
             "welcome": "Welcome back,",
-            "new_workspace": "New workspace",
-            "your_workspaces": "Your workspaces",
+            "new_project": "New project",
+            "your_projects": "Your projects",
             "studies_count": "studies",
             "recent_studies": "Recent studies"
         },
@@ -543,9 +543,9 @@
             "analysis": "Analysis",
             "team": "Team",
             "settings": "Settings",
-            "workspace_settings": "Settings",
+            "project_settings": "Settings",
             "study_tools": "Study tools",
-            "workspace": "Workspace",
+            "project": "Project",
             "documentation": "Documentation",
             "support": "Support",
             "study_management": "Study management",
@@ -555,7 +555,7 @@
             "select_study_msg": "Please select or create a study to begin.",
             "view_all_studies": "All studies",
             "study": "Study",
-            "select_workspace": "Select workspace",
+            "select_project": "Select project",
             "concourses": "Concourses"
         },
         "concourse": {
@@ -642,7 +642,7 @@
             "error": "Import failed",
             "no_accepted": "No accepted items in this concourse. Uncheck \"Only accepted\" to see all.",
             "no_items": "This concourse has no items.",
-            "no_concourses": "No concourses in this workspace. Create one first."
+            "no_concourses": "No concourses in this project. Create one first."
         },
         "concourse_sync": {
             "update_available": "Update",
@@ -756,14 +756,14 @@
             "benchmark_above": "Above threshold",
             "benchmark_below": "Below threshold"
         },
-        "workspace": {
+        "project": {
             "remove_member": "Remove member",
-            "table_caption": "Workspace members",
+            "table_caption": "Project members",
             "switcher": {
-                "settings": "Workspace settings",
+                "settings": "Project settings",
                 "settings_desc": "Members & profiles",
-                "new_workspace": "New workspace",
-                "new_workspace_desc": "Create a new organization"
+                "new_project": "New project",
+                "new_project_desc": "Create a new organization"
             },
             "roles": {
                 "owner": "Owner",
@@ -779,20 +779,20 @@
                 "closed": "Closed"
             },
             "create": {
-                "title": "Create workspace",
+                "title": "Create project",
                 "description": "Create a new organization to manage your studies and team.",
-                "card_title": "Workspace details",
-                "card_description": "Enter the name and URL slug for your new workspace.",
-                "name_label": "Workspace name",
+                "card_title": "Project details",
+                "card_description": "Enter the name and URL slug for your new project.",
+                "name_label": "Project name",
                 "name_placeholder": "My university research group",
-                "url_label": "Workspace URL",
+                "url_label": "Project URL",
                 "url_placeholder": "My-research-group",
-                "url_description": "This will be used in your workspace URL.",
+                "url_description": "This will be used in your project URL.",
                 "cancel": "Cancel",
-                "create_button": "Create workspace",
+                "create_button": "Create project",
                 "creating": "Creating...",
-                "success": "Workspace created successfully",
-                "error": "Failed to create workspace"
+                "success": "Project created successfully",
+                "error": "Failed to create project"
             }
         },
         "recruitment": {
@@ -958,11 +958,11 @@
             "title": "Global command menu",
             "placeholder": "Type a command or search...",
             "no_results": "No results found.",
-            "switch_workspace": "Switch workspace",
+            "switch_project": "Switch project",
             "switch_study": "Switch study",
             "study_actions": "Study actions",
             "system": "System",
-            "no_studies": "No studies in this workspace.",
+            "no_studies": "No studies in this project.",
             "open_dashboard": "Open dashboard",
             "design_study": "Study design",
             "collaborators": "Collaborators",
@@ -974,10 +974,10 @@
             "active": "Active",
             "link_copied": "Study link copied!",
             "logged_out": "Logged out successfully",
-            "switched_workspace": "Switched to {{name}}"
+            "switched_project": "Switched to {{name}}"
         },
         "dashboard": {
-            "title": "Workspace dashboard",
+            "title": "Project dashboard",
             "welcome": "Welcome back,",
             "snapshot": "Here's a snapshot of your research activity.",
             "create_study": "Create study",
@@ -987,7 +987,7 @@
             "receiving_responses": "Studies receiving responses",
             "total_participants": "Total participants",
             "all_studies": "All studies",
-            "all_studies_description": "All studies in this workspace.",
+            "all_studies_description": "All studies in this project.",
             "languages_count_one": "{{count}} language",
             "languages_count_other": "{{count}} languages",
             "n_participants_one": "{{count}} participant",
@@ -1939,28 +1939,28 @@
                 "save_error": "Failed to update storage quota"
             }
         },
-        "workspaces": {
-            "title": "Workspaces",
+        "projects": {
+            "title": "Projects",
             "settings": {
-                "title": "Workspace settings",
-                "identity_desc": "Manage workspace identity and team access control.",
+                "title": "Project settings",
+                "identity_desc": "Manage project identity and team access control.",
                 "general": {
                     "title": "General settings",
-                    "desc": "Identity and primary identification of your workspace.",
-                    "label_title": "Workspace title",
+                    "desc": "Identity and primary identification of your project.",
+                    "label_title": "Project title",
                     "placeholder_title": "My awesome lab",
                     "label_slug": "URL slug",
                     "placeholder_slug": "My-lab",
                     "slug_hint": "Changing the slug will update all your research dashboard links.",
                     "save": "Save changes",
-                    "save_success": "Workspace updated successfully",
-                    "save_error": "Failed to update workspace."
+                    "save_success": "Project updated successfully",
+                    "save_error": "Failed to update project."
                 },
                 "team_growth_title": "Team management",
-                "team_growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
+                "team_growth_desc": "Need more researchers? You can invite collaborators to your project. They will be able to manage all studies within this project.",
                 "team": {
                     "title": "Team members",
-                    "desc": "List of users with access to this workspace.",
+                    "desc": "List of users with access to this project.",
                     "col_user": "User",
                     "col_role": "Role",
                     "col_joined": "Joined",
@@ -1969,24 +1969,24 @@
                     "remove_success": "Member removed successfully",
                     "remove_error": "Failed to remove member",
                     "growth_title": "Team growth",
-                    "growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
+                    "growth_desc": "Need more researchers? You can invite collaborators to your project. They will be able to manage all studies within this project.",
                     "invite_button": "Invite collaborator",
                     "permissions_matrix": {
                         "title": "Permissions matrix",
                         "admin": {
                             "label": "Admin",
                             "badge": "Full access",
-                            "desc": "Can manage workspace settings, members, and all studies."
+                            "desc": "Can manage project settings, members, and all studies."
                         },
                         "researcher": {
                             "label": "Researcher",
                             "badge": "Creation",
-                            "desc": "Can create and manage all studies. Restricted from workspace settings."
+                            "desc": "Can create and manage all studies. Restricted from project settings."
                         },
                         "viewer": {
                             "label": "Viewer",
                             "badge": "Read only",
-                            "desc": "Read-only access to all studies and data in the workspace."
+                            "desc": "Read-only access to all studies and data in the project."
                         }
                     },
                     "coming_soon": "Coming soon",

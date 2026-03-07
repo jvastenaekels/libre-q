@@ -1,5 +1,5 @@
-import type { WorkspaceRead } from '@/api/model/workspaceRead';
+import type { ProjectRead } from '@/api/model/projectRead';
 
-export interface WorkspaceWithRole extends WorkspaceRead {
+export interface ProjectWithRole extends ProjectRead {
     user_role: 'owner' | 'admin' | 'researcher' | 'viewer';
 }

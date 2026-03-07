@@ -6,12 +6,12 @@
  */
 
 /**
- * Enum for workspace roles.
+ * Enum for project roles.
  */
-export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
+export type ProjectRole = (typeof ProjectRole)[keyof typeof ProjectRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WorkspaceRole = {
+export const ProjectRole = {
     owner: 'owner',
     researcher: 'researcher',
     viewer: 'viewer',

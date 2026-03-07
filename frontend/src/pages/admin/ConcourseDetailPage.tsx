@@ -67,7 +67,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function ConcourseDetailPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { workspace } = useAdminContext();
+    const { project: workspace } = useAdminContext();
     const { can } = usePermission();
     const { concourseId } = useParams<{ concourseId: string }>();
     const queryClient = useQueryClient();
@@ -875,7 +875,7 @@ export default function ConcourseDetailPage() {
             </Card>
 
             {/* Danger Zone */}
-            {can('workspace:delete') && (
+            {can('project:delete') && (
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden border-l-4 border-l-red-500">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-black text-red-700">

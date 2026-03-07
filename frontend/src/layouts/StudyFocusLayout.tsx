@@ -16,12 +16,12 @@ import { useAdminContext } from '@/hooks/useAdminContext';
 /**
  * StudyFocusLayout
  *
- * Nested layout inside WorkspaceLayout.
- * Fetches and validates study context, ensuring it belongs to the active workspace.
+ * Nested layout inside ProjectLayout.
+ * Fetches and validates study context, ensuring it belongs to the active project.
  */
 export default function StudyFocusLayout() {
     const { studySlug } = useParams<{ studySlug: string }>();
-    const { workspace } = useAdminContext();
+    const { project } = useAdminContext();
     const { setActiveStudy } = useAdminStore();
 
     const {
@@ -61,11 +61,11 @@ export default function StudyFocusLayout() {
         return <ErrorPage error={new ApiError(404, 'Study not found')} />;
     }
 
-    // Validate that the study belongs to the current workspace
-    if (workspace && study.workspace_id !== workspace.id) {
-        return <Navigate to={`/app/${workspace.slug}/dashboard`} replace />;
+    // Validate that the study belongs to the current project
+    if (project && study.workspace_id !== project.id) {
+        return <Navigate to={`/app/${project.slug}/dashboard`} replace />;
     }
 
     // Render nested routes with study context
-    return <Outlet context={{ workspace, study }} />;
+    return <Outlet context={{ project, study }} />;
 }

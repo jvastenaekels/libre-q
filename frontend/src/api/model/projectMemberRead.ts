@@ -5,14 +5,14 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { UserRead } from './userRead';
-import type { WorkspaceRole } from './workspaceRole';
+import type { ProjectRole } from './projectRole';
 
 /**
- * Schema for reading workspace member details.
+ * Schema for reading project member details.
  */
-export interface WorkspaceMemberRead {
+export interface ProjectMemberRead {
     user_id: number;
     user: UserRead;
-    role: WorkspaceRole;
+    role: ProjectRole;
     joined_at: string;
 }

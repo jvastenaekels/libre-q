@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models import RecruitmentLinkType, WorkspaceRole
+from app.models import RecruitmentLinkType, ProjectRole
 
 from .common import validate_non_empty_string
 
@@ -46,10 +46,10 @@ class RecruitmentLinkRead(RecruitmentLinkBase):
 
 
 class InvitationCreate(BaseModel):
-    """Schema for creating a study/workspace invitation."""
+    """Schema for creating a study/project invitation."""
 
     email: str
-    role: WorkspaceRole = WorkspaceRole.researcher
+    role: ProjectRole = ProjectRole.researcher
 
 
 class InvitationLink(BaseModel):

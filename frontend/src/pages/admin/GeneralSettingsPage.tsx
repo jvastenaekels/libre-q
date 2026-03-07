@@ -55,13 +55,13 @@ export default function GeneralSettingsPage() {
         study: StudyRead;
         slug: string;
     };
-    const { workspaceSlug: paramWorkspaceSlug } = useParams<{
-        workspaceSlug?: string;
+    const { projectSlug: paramProjectSlug } = useParams<{
+        projectSlug?: string;
         studySlug?: string;
     }>();
-    const { workspace: currentWorkspace } = useAdminContext();
+    const { project: currentWorkspace } = useAdminContext();
     const { user } = useAuthStore();
-    const workspaceSlug = paramWorkspaceSlug || currentWorkspace?.slug;
+    const projectSlug = paramProjectSlug || currentWorkspace?.slug;
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const revalidator = useRevalidator();
@@ -110,8 +110,8 @@ export default function GeneralSettingsPage() {
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });
-            const targetHome = workspaceSlug
-                ? `/app/${workspaceSlug}/dashboard`
+            const targetHome = projectSlug
+                ? `/app/${projectSlug}/dashboard`
                 : `/app/${currentWorkspace?.slug}/dashboard`;
             navigate(targetHome);
         } catch (error) {

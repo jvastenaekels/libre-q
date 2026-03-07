@@ -57,24 +57,24 @@ import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
-import type { WorkspaceRole } from '@/api/model';
+import type { ProjectRole } from '@/api/model';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
 import {
-    useGetWorkspaceApiAdminWorkspacesSlugGet,
-    useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet,
-    useUpdateWorkspaceApiAdminWorkspacesSlugPatch,
-    useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch,
-    useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete,
-    useCreateInvitationApiAdminWorkspacesSlugInvitationsPost,
+    useGetProjectApiAdminProjectsSlugGet,
+    useListProjectMembersApiAdminProjectsSlugMembersGet,
+    useUpdateProjectApiAdminProjectsSlugPatch,
+    useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch,
+    useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete,
+    useCreateInvitationApiAdminProjectsSlugInvitationsPost,
 } from '@/api/generated';
 import { parseApiErrorSync } from '@/lib/error-utils';
-import { getListWorkspacesApiAdminWorkspacesGetQueryKey } from '@/api/generated';
+import { getListProjectsApiAdminProjectsGetQueryKey } from '@/api/generated';
 import { useQueryClient } from '@tanstack/react-query';
 
-const workspaceSchema = z.object({
+const projectSchema = z.object({
     title: z.string().min(1, 'Title is required').max(50),
     slug: z
         .string()
@@ -83,32 +83,31 @@ const workspaceSchema = z.object({
         .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
 });
 
-type WorkspaceFormValues = z.infer<typeof workspaceSchema>;
+type ProjectFormValues = z.infer<typeof projectSchema>;
 
-export default function WorkspaceSettingsPage() {
+export default function ProjectSettingsPage() {
     const { slug } = useLoaderData() as { slug: string };
     const navigate = useNavigate();
     const { t } = useTranslation();
     const { user: currentUser } = useAuthStore();
     const queryClient = useQueryClient();
 
-    const { data: workspace, isLoading: isWorkspaceLoading } =
-        useGetWorkspaceApiAdminWorkspacesSlugGet(slug);
+    const { data: project, isLoading: isProjectLoading } =
+        useGetProjectApiAdminProjectsSlugGet(slug);
 
     const {
         data: membersData,
         isLoading: isMembersLoading,
         refetch: refetchMembers,
-    } = useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug);
+    } = useListProjectMembersApiAdminProjectsSlugMembersGet(slug);
     const members = membersData?.items;
 
-    const updateWorkspaceMutation = useUpdateWorkspaceApiAdminWorkspacesSlugPatch();
-    const updateMemberMutation = useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch();
-    const removeMemberMutation =
-        useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete();
+    const updateProjectMutation = useUpdateProjectApiAdminProjectsSlugPatch();
+    const updateMemberMutation = useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch();
+    const removeMemberMutation = useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete();
 
-    const form = useForm<WorkspaceFormValues>({
-        resolver: zodResolver(workspaceSchema),
+    const form = useForm<ProjectFormValues>({
+        resolver: zodResolver(projectSchema),
         defaultValues: {
             title: '',
             slug: '',
@@ -117,17 +116,17 @@ export default function WorkspaceSettingsPage() {
 
     // Sync form with data
     useEffect(() => {
-        if (workspace) {
+        if (project) {
             form.reset({
-                title: workspace.title,
-                slug: workspace.slug,
+                title: project.title,
+                slug: project.slug,
             });
         }
-    }, [form, workspace]);
+    }, [form, project]);
 
-    async function onUpdateWorkspace(data: WorkspaceFormValues) {
+    async function onUpdateProject(data: ProjectFormValues) {
         try {
-            await updateWorkspaceMutation.mutateAsync({
+            await updateProjectMutation.mutateAsync({
                 slug,
                 data: {
                     title: data.title,
@@ -138,18 +137,18 @@ export default function WorkspaceSettingsPage() {
 
             // Invalidate React Query list to ensure Sidebar/Switcher are updated
             await queryClient.invalidateQueries({
-                queryKey: getListWorkspacesApiAdminWorkspacesGetQueryKey(),
+                queryKey: getListProjectsApiAdminProjectsGetQueryKey(),
             });
 
             if (data.slug !== slug) {
-                navigate(`/admin/workspaces/${data.slug}/settings`);
+                navigate(`/app/${data.slug}/settings`);
             }
         } catch (err) {
             toast.error(parseApiErrorSync(err, t('admin.workspaces.settings.general.save_error')));
         }
     }
 
-    const handleRoleChange = async (userId: number, role: WorkspaceRole) => {
+    const handleRoleChange = async (userId: number, role: ProjectRole) => {
         try {
             await updateMemberMutation.mutateAsync({
                 slug,
@@ -182,7 +181,7 @@ export default function WorkspaceSettingsPage() {
         }
     };
 
-    if (isWorkspaceLoading) {
+    if (isProjectLoading) {
         return (
             <div className="p-8">
                 <Skeleton className="h-12 w-1/3 mb-6" />
@@ -191,23 +190,23 @@ export default function WorkspaceSettingsPage() {
         );
     }
 
-    if (!workspace)
+    if (!project)
         return <div className="p-8 text-center text-slate-500">{t('common.errors.not_found')}</div>;
 
     // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
-    const userInWorkspace = members?.find((m: any) => m.user_id === currentUser?.id);
-    const isAdmin = userInWorkspace?.role === 'owner';
+    const userInProject = members?.find((m: any) => m.user_id === currentUser?.id);
+    const isAdmin = userInProject?.role === 'owner';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={workspace.title}
+                title={project.title}
                 description={t('admin.workspaces.settings.identity_desc')}
                 icon={Briefcase}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Workspace Profile */}
+                {/* Project Profile */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="border-b border-slate-50 pb-4">
@@ -222,7 +221,7 @@ export default function WorkspaceSettingsPage() {
                         <CardContent className="pt-6">
                             <Form {...form}>
                                 <form
-                                    onSubmit={form.handleSubmit(onUpdateWorkspace)}
+                                    onSubmit={form.handleSubmit(onUpdateProject)}
                                     className="space-y-4"
                                 >
                                     <FormField
@@ -288,9 +287,9 @@ export default function WorkspaceSettingsPage() {
                                             <Button
                                                 type="submit"
                                                 className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                                                disabled={updateWorkspaceMutation.isPending}
+                                                disabled={updateProjectMutation.isPending}
                                             >
-                                                {updateWorkspaceMutation.isPending ? (
+                                                {updateProjectMutation.isPending ? (
                                                     <span className="flex items-center">
                                                         <Globe className="size-4 mr-2 animate-spin" />
                                                         {t('common.processing')}
@@ -325,7 +324,7 @@ export default function WorkspaceSettingsPage() {
                         <CardContent className="p-0">
                             <Table>
                                 <caption className="sr-only">
-                                    {t('admin.workspace.table_caption', 'Workspace members')}
+                                    {t('admin.project.table_caption', 'Project members')}
                                 </caption>
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
@@ -381,7 +380,7 @@ export default function WorkspaceSettingsPage() {
                                                     onValueChange={(val) =>
                                                         handleRoleChange(
                                                             member.user_id,
-                                                            val as WorkspaceRole
+                                                            val as ProjectRole
                                                         )
                                                     }
                                                     disabled={
@@ -439,7 +438,7 @@ export default function WorkspaceSettingsPage() {
                                                         member.user_id === currentUser?.id
                                                     }
                                                     aria-label={t(
-                                                        'admin.workspace.remove_member',
+                                                        'admin.project.remove_member',
                                                         'Remove member'
                                                     )}
                                                 >
@@ -544,12 +543,12 @@ export default function WorkspaceSettingsPage() {
 function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }) {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
-    const [role, setRole] = useState<WorkspaceRole>('researcher');
+    const [role, setRole] = useState<ProjectRole>('researcher');
     const [open, setOpen] = useState(false);
     const [inviteUrl, setInviteUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
 
-    const inviteMutation = useCreateInvitationApiAdminWorkspacesSlugInvitationsPost();
+    const inviteMutation = useCreateInvitationApiAdminProjectsSlugInvitationsPost();
 
     const handleInvite = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -619,7 +618,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                 </Label>
                                 <Select
                                     value={role}
-                                    onValueChange={(val) => setRole(val as WorkspaceRole)}
+                                    onValueChange={(val) => setRole(val as ProjectRole)}
                                 >
                                     <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-slate-200">
                                         <SelectValue />

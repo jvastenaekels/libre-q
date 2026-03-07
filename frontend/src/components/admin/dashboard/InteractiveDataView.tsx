@@ -206,7 +206,7 @@ export default function InteractiveDataView({
 }: InteractiveDataViewProps) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
+    const { projectSlug } = useParams<{ projectSlug: string }>();
     const queryClient = useQueryClient();
 
     // biome-ignore lint/suspicious/noExplicitAny: complex locale types
@@ -413,12 +413,12 @@ export default function InteractiveDataView({
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
-            const baseUrl = workspaceSlug
-                ? `/app/${workspaceSlug}/studies/${slug}`
+            const baseUrl = projectSlug
+                ? `/app/${projectSlug}/studies/${slug}`
                 : `/admin/studies/${slug}`;
             navigate(`${baseUrl}/participants/${participant.db_id || participant.id}`);
         },
-        [navigate, slug, workspaceSlug]
+        [navigate, slug, projectSlug]
     );
 
     const runExport = useCallback(

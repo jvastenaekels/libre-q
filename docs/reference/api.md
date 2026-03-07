@@ -165,7 +165,7 @@ curl -X POST "http://localhost:8000/api/token" \
 Administrative endpoints require two layers of identification:
 
 1.  **JWT Token**: Provided in the `Authorization: Bearer <token>` header.
-2.  **Workspace ID**: Provided in the `X-Workspace-ID` header. This is mandatory for all requests targeting studies, recruitment, or exports.
+2.  **Project ID**: Provided in the `X-Project-ID` header. This is mandatory for all requests targeting studies, recruitment, or exports.
 
 ---
 
@@ -187,7 +187,7 @@ The Administrative API allows researchers to manage studies, users, and data.
 
 ### Invitations
 
-- `POST /api/admin/workspaces/{slug}/invitations`: Send a workspace invitation via email (or log the URL if SMTP is not configured).
+- `POST /api/admin/projects/{slug}/invitations`: Send a project invitation via email (or log the URL if SMTP is not configured).
 - `GET /api/admin/invitations/{token}`: Accept an invitation by token.
 
 ### Study Management
@@ -199,15 +199,15 @@ The Administrative API allows researchers to manage studies, users, and data.
 - `POST /api/admin/studies/{slug}/state`: Publish or Close a study.
 - `DELETE /api/admin/studies/{slug}`: Completely remove a study (Owner only).
 
-### Workspace Management
+### Project Management
 
-- `GET /api/admin/workspaces/`: List workspaces accessible to the current user.
-- `POST /api/admin/workspaces/`: Create a new workspace.
-- `GET /api/admin/workspaces/{slug}`: Get workspace details.
-- `PATCH /api/admin/workspaces/{slug}`: Update workspace settings.
-- `GET /api/admin/workspaces/{slug}/members`: List workspace members.
-- `PATCH /api/admin/workspaces/{slug}/members/{user_id}`: Update a member's role.
-- `DELETE /api/admin/workspaces/{slug}/members/{user_id}`: Remove a member.
+- `GET /api/admin/projects/`: List projects accessible to the current user.
+- `POST /api/admin/projects/`: Create a new project.
+- `GET /api/admin/projects/{slug}`: Get project details.
+- `PATCH /api/admin/projects/{slug}`: Update project settings.
+- `GET /api/admin/projects/{slug}/members`: List project members.
+- `PATCH /api/admin/projects/{slug}/members/{user_id}`: Update a member's role.
+- `DELETE /api/admin/projects/{slug}/members/{user_id}`: Remove a member.
 
 ### User Management (Superuser Only)
 

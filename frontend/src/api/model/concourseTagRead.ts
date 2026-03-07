@@ -17,5 +17,5 @@ export interface ConcourseTagRead {
     name: string;
     color?: ConcourseTagReadColor;
     id: number;
-    workspace_id: number;
+    project_id: number;
 }

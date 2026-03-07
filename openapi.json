@@ -347,7 +347,7 @@
           "admin-studies"
         ],
         "summary": "Create Study",
-        "description": "Create a new study in the active workspace.\n\nRequires Owner or Researcher workspace role.",
+        "description": "Create a new study in the active project.\n\nRequires Owner or Researcher project role.",
         "operationId": "create_study_api_admin_studies_post",
         "security": [
           {
@@ -356,7 +356,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -368,7 +368,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -410,7 +410,7 @@
           "admin-studies"
         ],
         "summary": "List Studies",
-        "description": "List studies in the active workspace with pagination.",
+        "description": "List studies in the active project with pagination.",
         "operationId": "list_studies_api_admin_studies_get",
         "security": [
           {
@@ -442,7 +442,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -454,7 +454,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -1385,7 +1385,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -1397,7 +1397,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -1452,7 +1452,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -1464,7 +1464,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -2088,7 +2088,7 @@
           "Admin Invitations"
         ],
         "summary": "Verify Invitation",
-        "description": "Verify an invitation token and return details including workspace name.",
+        "description": "Verify an invitation token and return details including project name.",
         "operationId": "verify_invitation_api_admin_invitations_verify_get",
         "parameters": [
           {
@@ -2495,14 +2495,14 @@
         }
       }
     },
-    "/api/admin/workspaces": {
+    "/api/admin/projects": {
       "get": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "List Workspaces",
-        "description": "List all workspaces the current user is a member of, with their role.",
-        "operationId": "list_workspaces_api_admin_workspaces_get",
+        "summary": "List Projects",
+        "description": "List all projects the current user is a member of, with their role.",
+        "operationId": "list_projects_api_admin_projects_get",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2539,7 +2539,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_WorkspaceWithRole_"
+                  "$ref": "#/components/schemas/PaginatedResponse_ProjectWithRole_"
                 }
               }
             }
@@ -2558,11 +2558,11 @@
       },
       "post": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Create Workspace",
-        "description": "Create a new workspace and assign the current user as Owner.",
-        "operationId": "create_workspace_api_admin_workspaces_post",
+        "summary": "Create Project",
+        "description": "Create a new project and assign the current user as Owner.",
+        "operationId": "create_project_api_admin_projects_post",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2573,7 +2573,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkspaceCreate"
+                "$ref": "#/components/schemas/ProjectCreate"
               }
             }
           }
@@ -2584,7 +2584,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceRead"
+                  "$ref": "#/components/schemas/ProjectRead"
                 }
               }
             }
@@ -2602,14 +2602,14 @@
         }
       }
     },
-    "/api/admin/workspaces/{slug}": {
+    "/api/admin/projects/{slug}": {
       "get": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Get Workspace",
-        "description": "Get workspace details.",
-        "operationId": "get_workspace_api_admin_workspaces__slug__get",
+        "summary": "Get Project",
+        "description": "Get project details.",
+        "operationId": "get_project_api_admin_projects__slug__get",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2622,10 +2622,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "responses": {
@@ -2634,7 +2634,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceWithRole"
+                  "$ref": "#/components/schemas/ProjectWithRole"
                 }
               }
             }
@@ -2653,11 +2653,11 @@
       },
       "patch": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Update Workspace",
-        "description": "Update workspace details.",
-        "operationId": "update_workspace_api_admin_workspaces__slug__patch",
+        "summary": "Update Project",
+        "description": "Update project details.",
+        "operationId": "update_project_api_admin_projects__slug__patch",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2670,10 +2670,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "requestBody": {
@@ -2681,7 +2681,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkspaceUpdate"
+                "$ref": "#/components/schemas/ProjectUpdate"
               }
             }
           }
@@ -2692,7 +2692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceRead"
+                  "$ref": "#/components/schemas/ProjectRead"
                 }
               }
             }
@@ -2711,11 +2711,11 @@
       },
       "delete": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Delete Workspace",
-        "description": "Delete a workspace (Owner only).",
-        "operationId": "delete_workspace_api_admin_workspaces__slug__delete",
+        "summary": "Delete Project",
+        "description": "Delete a project (Owner only).",
+        "operationId": "delete_project_api_admin_projects__slug__delete",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2728,10 +2728,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "responses": {
@@ -2751,14 +2751,14 @@
         }
       }
     },
-    "/api/admin/workspaces/{slug}/members": {
+    "/api/admin/projects/{slug}/members": {
       "get": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "List Workspace Members",
-        "description": "List all members of a workspace with pagination.",
-        "operationId": "list_workspace_members_api_admin_workspaces__slug__members_get",
+        "summary": "List Project Members",
+        "description": "List all members of a project with pagination.",
+        "operationId": "list_project_members_api_admin_projects__slug__members_get",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2771,10 +2771,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           },
           {
             "name": "limit",
@@ -2806,7 +2806,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_WorkspaceMemberRead_"
+                  "$ref": "#/components/schemas/PaginatedResponse_ProjectMemberRead_"
                 }
               }
             }
@@ -2824,14 +2824,14 @@
         }
       }
     },
-    "/api/admin/workspaces/{slug}/members/{user_id}": {
+    "/api/admin/projects/{slug}/members/{user_id}": {
       "patch": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Update Workspace Member",
-        "description": "Update a workspace member's role.",
-        "operationId": "update_workspace_member_api_admin_workspaces__slug__members__user_id__patch",
+        "summary": "Update Project Member",
+        "description": "Update a project member's role.",
+        "operationId": "update_project_member_api_admin_projects__slug__members__user_id__patch",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2853,10 +2853,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "requestBody": {
@@ -2864,7 +2864,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkspaceMemberUpdate"
+                "$ref": "#/components/schemas/ProjectMemberUpdate"
               }
             }
           }
@@ -2875,7 +2875,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceMemberRead"
+                  "$ref": "#/components/schemas/ProjectMemberRead"
                 }
               }
             }
@@ -2894,11 +2894,11 @@
       },
       "delete": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
-        "summary": "Remove Workspace Member",
-        "description": "Remove a member from the workspace.",
-        "operationId": "remove_workspace_member_api_admin_workspaces__slug__members__user_id__delete",
+        "summary": "Remove Project Member",
+        "description": "Remove a member from the project.",
+        "operationId": "remove_project_member_api_admin_projects__slug__members__user_id__delete",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2920,10 +2920,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "responses": {
@@ -2943,14 +2943,14 @@
         }
       }
     },
-    "/api/admin/workspaces/{slug}/invitations": {
+    "/api/admin/projects/{slug}/invitations": {
       "post": {
         "tags": [
-          "admin-workspaces"
+          "admin-projects"
         ],
         "summary": "Create Invitation",
-        "description": "Invite a user to the workspace.",
-        "operationId": "create_invitation_api_admin_workspaces__slug__invitations_post",
+        "description": "Invite a user to the project.",
+        "operationId": "create_invitation_api_admin_projects__slug__invitations_post",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2963,10 +2963,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "The slug of the workspace",
+              "description": "The slug of the project",
               "title": "Slug"
             },
-            "description": "The slug of the workspace"
+            "description": "The slug of the project"
           }
         ],
         "requestBody": {
@@ -2974,7 +2974,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkspaceInvitationCreate"
+                "$ref": "#/components/schemas/ProjectInvitationCreate"
               }
             }
           }
@@ -3017,7 +3017,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3029,7 +3029,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3073,7 +3073,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3085,7 +3085,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3146,7 +3146,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3158,7 +3158,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3193,7 +3193,7 @@
         ],
         "parameters": [
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3205,7 +3205,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3278,7 +3278,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3290,7 +3290,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3341,7 +3341,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3353,7 +3353,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3402,7 +3402,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3414,7 +3414,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3473,7 +3473,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3485,7 +3485,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3529,7 +3529,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3541,7 +3541,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3602,7 +3602,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3614,7 +3614,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3679,7 +3679,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3691,7 +3691,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3765,7 +3765,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3777,7 +3777,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3845,7 +3845,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3857,7 +3857,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -3933,7 +3933,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -3945,7 +3945,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -4032,7 +4032,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -4044,7 +4044,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -4106,7 +4106,7 @@
             }
           },
           {
-            "name": "X-Workspace-ID",
+            "name": "X-Project-ID",
             "in": "header",
             "required": false,
             "schema": {
@@ -4118,7 +4118,7 @@
                   "type": "null"
                 }
               ],
-              "title": "X-Workspace-Id"
+              "title": "X-Project-Id"
             }
           }
         ],
@@ -4795,7 +4795,7 @@
           "test"
         ],
         "summary": "Seed Test Data",
-        "description": "Seed base test data: user and workspace\nIdempotent - won't create duplicates",
+        "description": "Seed base test data: user and project\nIdempotent - won't create duplicates",
         "operationId": "seed_test_data_api_test_seed_post",
         "requestBody": {
           "content": {
@@ -4835,7 +4835,7 @@
           "test"
         ],
         "summary": "Add Test Member",
-        "description": "Add a user to a workspace for testing purposes",
+        "description": "Add a user to a project for testing purposes",
         "operationId": "add_test_member_api_test_members_post",
         "requestBody": {
           "content": {
@@ -4875,7 +4875,7 @@
           "test"
         ],
         "summary": "Cleanup Test Data",
-        "description": "Cleanup test data between tests\nRemoves all data except the base test user and workspace",
+        "description": "Cleanup test data between tests\nRemoves all data except the base test user and project",
         "operationId": "cleanup_test_data_api_test_cleanup_post",
         "responses": {
           "200": {
@@ -4895,7 +4895,7 @@
           "test"
         ],
         "summary": "Cleanup All Test Data",
-        "description": "Full cleanup including users and workspaces\nUse at end of test suite",
+        "description": "Full cleanup including users and projects\nUse at end of test suite",
         "operationId": "cleanup_all_test_data_api_test_cleanup_all_post",
         "responses": {
           "200": {
@@ -5420,9 +5420,9 @@
             "type": "integer",
             "title": "Id"
           },
-          "workspace_id": {
+          "project_id": {
             "type": "integer",
-            "title": "Workspace Id"
+            "title": "Project Id"
           },
           "title": {
             "type": "string",
@@ -5477,7 +5477,7 @@
         "type": "object",
         "required": [
           "id",
-          "workspace_id",
+          "project_id",
           "title",
           "created_at",
           "updated_at"
@@ -6017,9 +6017,9 @@
             "type": "integer",
             "title": "Id"
           },
-          "workspace_id": {
+          "project_id": {
             "type": "integer",
-            "title": "Workspace Id"
+            "title": "Project Id"
           },
           "title": {
             "type": "string",
@@ -6066,7 +6066,7 @@
         "type": "object",
         "required": [
           "id",
-          "workspace_id",
+          "project_id",
           "title",
           "created_at",
           "updated_at"
@@ -6101,7 +6101,7 @@
           "name"
         ],
         "title": "ConcourseTagCreate",
-        "description": "Schema for creating a workspace-scoped tag."
+        "description": "Schema for creating a project-scoped tag."
       },
       "ConcourseTagRead": {
         "properties": {
@@ -6128,16 +6128,16 @@
             "type": "integer",
             "title": "Id"
           },
-          "workspace_id": {
+          "project_id": {
             "type": "integer",
-            "title": "Workspace Id"
+            "title": "Project Id"
           }
         },
         "type": "object",
         "required": [
           "name",
           "id",
-          "workspace_id"
+          "project_id"
         ],
         "title": "ConcourseTagRead",
         "description": "Schema for reading a tag."
@@ -6529,6 +6529,68 @@
         ],
         "title": "PaginatedResponse[ParticipantRead]"
       },
+      "PaginatedResponse_ProjectMemberRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[ProjectMemberRead]"
+      },
+      "PaginatedResponse_ProjectWithRole_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectWithRole"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PaginatedResponse[ProjectWithRole]"
+      },
       "PaginatedResponse_StudyRead_": {
         "properties": {
           "items": {
@@ -6590,68 +6652,6 @@
           "offset"
         ],
         "title": "PaginatedResponse[UserRead]"
-      },
-      "PaginatedResponse_WorkspaceMemberRead_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/WorkspaceMemberRead"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "title": "PaginatedResponse[WorkspaceMemberRead]"
-      },
-      "PaginatedResponse_WorkspaceWithRole_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/WorkspaceWithRole"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "title": "PaginatedResponse[WorkspaceWithRole]"
       },
       "ParticipantDetailRead": {
         "properties": {
@@ -7114,6 +7114,241 @@
         ],
         "title": "ProgressUpdate",
         "description": "Schema for recording participant step progress."
+      },
+      "ProjectBrief": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at"
+        ],
+        "title": "ProjectBrief",
+        "description": "Lightweight project schema (no members) for nested use in StudyRead."
+      },
+      "ProjectCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "title": "ProjectCreate",
+        "description": "Schema for creating a project."
+      },
+      "ProjectInvitationCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "$ref": "#/components/schemas/ProjectRole",
+            "default": "researcher"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "ProjectInvitationCreate",
+        "description": "Schema for creating a project invitation."
+      },
+      "ProjectMemberRead": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserRead"
+          },
+          "role": {
+            "$ref": "#/components/schemas/ProjectRole"
+          },
+          "joined_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Joined At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "user",
+          "role",
+          "joined_at"
+        ],
+        "title": "ProjectMemberRead",
+        "description": "Schema for reading project member details."
+      },
+      "ProjectMemberUpdate": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/ProjectRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "title": "ProjectMemberUpdate",
+        "description": "Schema for updating a project member."
+      },
+      "ProjectRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberRead"
+            },
+            "type": "array",
+            "title": "Members",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at"
+        ],
+        "title": "ProjectRead",
+        "description": "Schema for reading a project with members."
+      },
+      "ProjectRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "researcher",
+          "viewer"
+        ],
+        "title": "ProjectRole",
+        "description": "Enum for project roles."
+      },
+      "ProjectUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50,
+                "minLength": 3,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "title": "ProjectUpdate",
+        "description": "Schema for updating a project."
+      },
+      "ProjectWithRole": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectMemberRead"
+            },
+            "type": "array",
+            "title": "Members",
+            "default": []
+          },
+          "user_role": {
+            "$ref": "#/components/schemas/ProjectRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at",
+          "user_role"
+        ],
+        "title": "ProjectWithRole",
+        "description": "Schema for reading a project with the current user's role."
       },
       "QSortEntryInput": {
         "properties": {
@@ -7906,14 +8141,14 @@
             "type": "integer",
             "title": "Id"
           },
-          "workspace_id": {
+          "project_id": {
             "type": "integer",
-            "title": "Workspace Id"
+            "title": "Project Id"
           },
-          "workspace": {
+          "project": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/WorkspaceBrief"
+                "$ref": "#/components/schemas/ProjectBrief"
               },
               {
                 "type": "null"
@@ -7972,7 +8207,7 @@
           "presort_config",
           "postsort_config",
           "id",
-          "workspace_id",
+          "project_id",
           "created_at",
           "updated_at"
         ],
@@ -8661,9 +8896,9 @@
             "type": "string",
             "title": "Email"
           },
-          "workspace_slug": {
+          "project_slug": {
             "type": "string",
-            "title": "Workspace Slug"
+            "title": "Project Slug"
           },
           "role": {
             "type": "string",
@@ -8673,24 +8908,42 @@
         "type": "object",
         "required": [
           "email",
-          "workspace_slug",
+          "project_slug",
           "role"
         ],
         "title": "TestMemberData"
+      },
+      "TestProjectData": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "slug"
+        ],
+        "title": "TestProjectData"
       },
       "TestSeedData": {
         "properties": {
           "user": {
             "$ref": "#/components/schemas/TestUserData"
           },
-          "workspace": {
-            "$ref": "#/components/schemas/TestWorkspaceData"
+          "project": {
+            "$ref": "#/components/schemas/TestProjectData"
           }
         },
         "type": "object",
         "required": [
           "user",
-          "workspace"
+          "project"
         ],
         "title": "TestSeedData"
       },
@@ -8716,24 +8969,6 @@
           "password"
         ],
         "title": "TestUserData"
-      },
-      "TestWorkspaceData": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "slug": {
-            "type": "string",
-            "title": "Slug"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "slug"
-        ],
-        "title": "TestWorkspaceData"
       },
       "Token": {
         "properties": {
@@ -9021,241 +9256,6 @@
           "has_postsort"
         ],
         "title": "ValidationSummary"
-      },
-      "WorkspaceBrief": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "slug": {
-            "type": "string",
-            "title": "Slug"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "title",
-          "slug",
-          "created_at"
-        ],
-        "title": "WorkspaceBrief",
-        "description": "Lightweight workspace schema (no members) for nested use in StudyRead."
-      },
-      "WorkspaceCreate": {
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 100,
-            "title": "Title"
-          },
-          "slug": {
-            "type": "string",
-            "maxLength": 50,
-            "minLength": 3,
-            "pattern": "^[a-z0-9-]+$",
-            "title": "Slug"
-          }
-        },
-        "type": "object",
-        "required": [
-          "title",
-          "slug"
-        ],
-        "title": "WorkspaceCreate",
-        "description": "Schema for creating a workspace."
-      },
-      "WorkspaceInvitationCreate": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "role": {
-            "$ref": "#/components/schemas/WorkspaceRole",
-            "default": "researcher"
-          }
-        },
-        "type": "object",
-        "required": [
-          "email"
-        ],
-        "title": "WorkspaceInvitationCreate",
-        "description": "Schema for creating a workspace invitation."
-      },
-      "WorkspaceMemberRead": {
-        "properties": {
-          "user_id": {
-            "type": "integer",
-            "title": "User Id"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserRead"
-          },
-          "role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
-          },
-          "joined_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Joined At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id",
-          "user",
-          "role",
-          "joined_at"
-        ],
-        "title": "WorkspaceMemberRead",
-        "description": "Schema for reading workspace member details."
-      },
-      "WorkspaceMemberUpdate": {
-        "properties": {
-          "role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
-          }
-        },
-        "type": "object",
-        "required": [
-          "role"
-        ],
-        "title": "WorkspaceMemberUpdate",
-        "description": "Schema for updating a workspace member."
-      },
-      "WorkspaceRead": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "slug": {
-            "type": "string",
-            "title": "Slug"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "members": {
-            "items": {
-              "$ref": "#/components/schemas/WorkspaceMemberRead"
-            },
-            "type": "array",
-            "title": "Members",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "title",
-          "slug",
-          "created_at"
-        ],
-        "title": "WorkspaceRead",
-        "description": "Schema for reading a workspace with members."
-      },
-      "WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "researcher",
-          "viewer"
-        ],
-        "title": "WorkspaceRole",
-        "description": "Enum for workspace roles."
-      },
-      "WorkspaceUpdate": {
-        "properties": {
-          "title": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          },
-          "slug": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50,
-                "minLength": 3,
-                "pattern": "^[a-z0-9-]+$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Slug"
-          }
-        },
-        "type": "object",
-        "title": "WorkspaceUpdate",
-        "description": "Schema for updating a workspace."
-      },
-      "WorkspaceWithRole": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "slug": {
-            "type": "string",
-            "title": "Slug"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "members": {
-            "items": {
-              "$ref": "#/components/schemas/WorkspaceMemberRead"
-            },
-            "type": "array",
-            "title": "Members",
-            "default": []
-          },
-          "user_role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "title",
-          "slug",
-          "created_at",
-          "user_role"
-        ],
-        "title": "WorkspaceWithRole",
-        "description": "Schema for reading a workspace with the current user's role."
       }
     },
     "securitySchemes": {

@@ -202,7 +202,7 @@ The `conftest.py` file handles:
 
 - **Database Isolation**: Uses a dedicated PostgreSQL test database and handles schema setup/teardown via Alembic or direct metadata calls.
 - **Async Client**: Provides a `client` fixture for making API calls.
-- **Factories**: Provides factories for creating workspaces, studies, and users dynamically within tests.
+- **Factories**: Provides factories for creating projects, studies, and users dynamically within tests.
 
 ---
 

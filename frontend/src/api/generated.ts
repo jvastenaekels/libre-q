@@ -45,15 +45,19 @@ import type {
     ListConcoursesApiAdminConcoursesGetParams,
     ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
     ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    ListProjectMembersApiAdminProjectsSlugMembersGetParams,
+    ListProjectsApiAdminProjectsGetParams,
     ListStudiesApiAdminStudiesGetParams,
     ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     ListUsersApiAdminUsersGetParams,
-    ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
-    ListWorkspacesApiAdminWorkspacesGetParams,
     LogEntry,
     ParticipantDiscardUpdate,
     PasswordChange,
     ProgressUpdate,
+    ProjectCreate,
+    ProjectInvitationCreate,
+    ProjectMemberUpdate,
+    ProjectUpdate,
     RecruitmentLinkCreate,
     StudyCreate,
     StudyImportRequest,
@@ -67,10 +71,6 @@ import type {
     UserUpdate,
     ValidateStudyImportApiAdminStudiesValidateImportPostBody,
     VerifyInvitationApiAdminInvitationsVerifyGetParams,
-    WorkspaceCreate,
-    WorkspaceInvitationCreate,
-    WorkspaceMemberUpdate,
-    WorkspaceUpdate,
 } from './model';
 
 import { faker } from '@faker-js/faker';
@@ -81,9 +81,9 @@ import type { RequestHandlerOptions } from 'msw';
 import {
     ConcourseItemStatus,
     ParticipantStatus,
+    ProjectRole,
     RecruitmentLinkType,
     StudyState,
-    WorkspaceRole,
 } from './model';
 import type {
     AnalysisResult,
@@ -100,12 +100,15 @@ import type {
     InvitationLink,
     PaginatedResponseConcourseRead,
     PaginatedResponseParticipantRead,
+    PaginatedResponseProjectMemberRead,
+    PaginatedResponseProjectWithRole,
     PaginatedResponseStudyRead,
     PaginatedResponseUserRead,
-    PaginatedResponseWorkspaceMemberRead,
-    PaginatedResponseWorkspaceWithRole,
     ParticipantDetailRead,
     ParticipantRead,
+    ProjectMemberRead,
+    ProjectRead,
+    ProjectWithRole,
     RecruitmentLinkRead,
     ResumeResponse,
     StaleStatementRead,
@@ -116,9 +119,6 @@ import type {
     Token,
     UserRead,
     ValidationResult,
-    WorkspaceMemberRead,
-    WorkspaceRead,
-    WorkspaceWithRole,
 } from './model';
 
 import { customInstance } from './mutator';
@@ -873,9 +873,9 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
 };
 
 /**
- * Create a new study in the active workspace.
+ * Create a new study in the active project.
 
-Requires Owner or Researcher workspace role.
+Requires Owner or Researcher project role.
  * @summary Create Study
  */
 export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
@@ -954,7 +954,7 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
 };
 
 /**
- * List studies in the active workspace with pagination.
+ * List studies in the active project with pagination.
  * @summary List Studies
  */
 export const listStudiesApiAdminStudiesGet = (
@@ -5135,7 +5135,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
 }
 
 /**
- * Verify an invitation token and return details including workspace name.
+ * Verify an invitation token and return details including project name.
  * @summary Verify Invitation
  */
 export const verifyInvitationApiAdminInvitationsVerifyGet = (
@@ -6008,36 +6008,36 @@ export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
 };
 
 /**
- * List all workspaces the current user is a member of, with their role.
- * @summary List Workspaces
+ * List all projects the current user is a member of, with their role.
+ * @summary List Projects
  */
-export const listWorkspacesApiAdminWorkspacesGet = (
-    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+export const listProjectsApiAdminProjectsGet = (
+    params?: ListProjectsApiAdminProjectsGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<PaginatedResponseWorkspaceWithRole>({
-        url: `/api/admin/workspaces`,
+    return customInstance<PaginatedResponseProjectWithRole>({
+        url: `/api/admin/projects`,
         method: 'GET',
         params,
         signal,
     });
 };
 
-export const getListWorkspacesApiAdminWorkspacesGetQueryKey = (
-    params?: ListWorkspacesApiAdminWorkspacesGetParams
+export const getListProjectsApiAdminProjectsGetQueryKey = (
+    params?: ListProjectsApiAdminProjectsGetParams
 ) => {
-    return [`/api/admin/workspaces`, ...(params ? [params] : [])] as const;
+    return [`/api/admin/projects`, ...(params ? [params] : [])] as const;
 };
 
-export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+export const getListProjectsApiAdminProjectsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
     TError = HTTPValidationError,
 >(
-    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    params?: ListProjectsApiAdminProjectsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                 TError,
                 TData
             >
@@ -6046,82 +6046,81 @@ export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
 ) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getListWorkspacesApiAdminWorkspacesGetQueryKey(params);
+    const queryKey = queryOptions?.queryKey ?? getListProjectsApiAdminProjectsGetQueryKey(params);
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
-    > = ({ signal }) => listWorkspacesApiAdminWorkspacesGet(params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>> = ({
+        signal,
+    }) => listProjectsApiAdminProjectsGet(params, signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+        Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ListWorkspacesApiAdminWorkspacesGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
+export type ListProjectsApiAdminProjectsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>
 >;
-export type ListWorkspacesApiAdminWorkspacesGetQueryError = HTTPValidationError;
+export type ListProjectsApiAdminProjectsGetQueryError = HTTPValidationError;
 
-export function useListWorkspacesApiAdminWorkspacesGet<
-    TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+export function useListProjectsApiAdminProjectsGet<
+    TData = Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
     TError = HTTPValidationError,
 >(
-    params: undefined | ListWorkspacesApiAdminWorkspacesGetParams,
+    params: undefined | ListProjectsApiAdminProjectsGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                    Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
+                    Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListWorkspacesApiAdminWorkspacesGet<
-    TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+export function useListProjectsApiAdminProjectsGet<
+    TData = Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
     TError = HTTPValidationError,
 >(
-    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    params?: ListProjectsApiAdminProjectsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                    Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>
+                    Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListWorkspacesApiAdminWorkspacesGet<
-    TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+export function useListProjectsApiAdminProjectsGet<
+    TData = Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
     TError = HTTPValidationError,
 >(
-    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    params?: ListProjectsApiAdminProjectsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                 TError,
                 TData
             >
@@ -6130,18 +6129,18 @@ export function useListWorkspacesApiAdminWorkspacesGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary List Workspaces
+ * @summary List Projects
  */
 
-export function useListWorkspacesApiAdminWorkspacesGet<
-    TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+export function useListProjectsApiAdminProjectsGet<
+    TData = Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
     TError = HTTPValidationError,
 >(
-    params?: ListWorkspacesApiAdminWorkspacesGetParams,
+    params?: ListProjectsApiAdminProjectsGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
+                Awaited<ReturnType<typeof listProjectsApiAdminProjectsGet>>,
                 TError,
                 TData
             >
@@ -6149,7 +6148,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListWorkspacesApiAdminWorkspacesGetQueryOptions(params, options);
+    const queryOptions = getListProjectsApiAdminProjectsGetQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -6161,39 +6160,39 @@ export function useListWorkspacesApiAdminWorkspacesGet<
 }
 
 /**
- * Create a new workspace and assign the current user as Owner.
- * @summary Create Workspace
+ * Create a new project and assign the current user as Owner.
+ * @summary Create Project
  */
-export const createWorkspaceApiAdminWorkspacesPost = (
-    workspaceCreate: WorkspaceCreate,
+export const createProjectApiAdminProjectsPost = (
+    projectCreate: ProjectCreate,
     signal?: AbortSignal
 ) => {
-    return customInstance<WorkspaceRead>({
-        url: `/api/admin/workspaces`,
+    return customInstance<ProjectRead>({
+        url: `/api/admin/projects`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: workspaceCreate,
+        data: projectCreate,
         signal,
     });
 };
 
-export const getCreateWorkspaceApiAdminWorkspacesPostMutationOptions = <
+export const getCreateProjectApiAdminProjectsPostMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>,
+        Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>,
         TError,
-        { data: WorkspaceCreate },
+        { data: ProjectCreate },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>,
+    Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>,
     TError,
-    { data: WorkspaceCreate },
+    { data: ProjectCreate },
     TContext
 > => {
-    const mutationKey = ['createWorkspaceApiAdminWorkspacesPost'];
+    const mutationKey = ['createProjectApiAdminProjectsPost'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6201,75 +6200,75 @@ export const getCreateWorkspaceApiAdminWorkspacesPostMutationOptions = <
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>,
-        { data: WorkspaceCreate }
+        Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>,
+        { data: ProjectCreate }
     > = (props) => {
         const { data } = props ?? {};
 
-        return createWorkspaceApiAdminWorkspacesPost(data);
+        return createProjectApiAdminProjectsPost(data);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type CreateWorkspaceApiAdminWorkspacesPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>
+export type CreateProjectApiAdminProjectsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>
 >;
-export type CreateWorkspaceApiAdminWorkspacesPostMutationBody = WorkspaceCreate;
-export type CreateWorkspaceApiAdminWorkspacesPostMutationError = HTTPValidationError;
+export type CreateProjectApiAdminProjectsPostMutationBody = ProjectCreate;
+export type CreateProjectApiAdminProjectsPostMutationError = HTTPValidationError;
 
 /**
- * @summary Create Workspace
+ * @summary Create Project
  */
-export const useCreateWorkspaceApiAdminWorkspacesPost = <
+export const useCreateProjectApiAdminProjectsPost = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>,
+            Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>,
             TError,
-            { data: WorkspaceCreate },
+            { data: ProjectCreate },
             TContext
         >;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof createWorkspaceApiAdminWorkspacesPost>>,
+    Awaited<ReturnType<typeof createProjectApiAdminProjectsPost>>,
     TError,
-    { data: WorkspaceCreate },
+    { data: ProjectCreate },
     TContext
 > => {
-    const mutationOptions = getCreateWorkspaceApiAdminWorkspacesPostMutationOptions(options);
+    const mutationOptions = getCreateProjectApiAdminProjectsPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
 
 /**
- * Get workspace details.
- * @summary Get Workspace
+ * Get project details.
+ * @summary Get Project
  */
-export const getWorkspaceApiAdminWorkspacesSlugGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<WorkspaceWithRole>({
-        url: `/api/admin/workspaces/${slug}`,
+export const getProjectApiAdminProjectsSlugGet = (slug: string, signal?: AbortSignal) => {
+    return customInstance<ProjectWithRole>({
+        url: `/api/admin/projects/${slug}`,
         method: 'GET',
         signal,
     });
 };
 
-export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey = (slug?: string) => {
-    return [`/api/admin/workspaces/${slug}`] as const;
+export const getGetProjectApiAdminProjectsSlugGetQueryKey = (slug?: string) => {
+    return [`/api/admin/projects/${slug}`] as const;
 };
 
-export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+export const getGetProjectApiAdminProjectsSlugGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                 TError,
                 TData
             >
@@ -6278,82 +6277,81 @@ export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions = <
 ) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey(slug);
+    const queryKey = queryOptions?.queryKey ?? getGetProjectApiAdminProjectsSlugGetQueryKey(slug);
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
-    > = ({ signal }) => getWorkspaceApiAdminWorkspacesSlugGet(slug, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>> = ({
+        signal,
+    }) => getProjectApiAdminProjectsSlugGet(slug, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+        Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetWorkspaceApiAdminWorkspacesSlugGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+export type GetProjectApiAdminProjectsSlugGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>
 >;
-export type GetWorkspaceApiAdminWorkspacesSlugGetQueryError = HTTPValidationError;
+export type GetProjectApiAdminProjectsSlugGetQueryError = HTTPValidationError;
 
-export function useGetWorkspaceApiAdminWorkspacesSlugGet<
-    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+export function useGetProjectApiAdminProjectsSlugGet<
+    TData = Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                     TError,
-                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                    Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetWorkspaceApiAdminWorkspacesSlugGet<
-    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+export function useGetProjectApiAdminProjectsSlugGet<
+    TData = Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                     TError,
-                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                    Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetWorkspaceApiAdminWorkspacesSlugGet<
-    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+export function useGetProjectApiAdminProjectsSlugGet<
+    TData = Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                 TError,
                 TData
             >
@@ -6362,18 +6360,18 @@ export function useGetWorkspaceApiAdminWorkspacesSlugGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Get Workspace
+ * @summary Get Project
  */
 
-export function useGetWorkspaceApiAdminWorkspacesSlugGet<
-    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+export function useGetProjectApiAdminProjectsSlugGet<
+    TData = Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                Awaited<ReturnType<typeof getProjectApiAdminProjectsSlugGet>>,
                 TError,
                 TData
             >
@@ -6381,7 +6379,7 @@ export function useGetWorkspaceApiAdminWorkspacesSlugGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions(slug, options);
+    const queryOptions = getGetProjectApiAdminProjectsSlugGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -6393,38 +6391,38 @@ export function useGetWorkspaceApiAdminWorkspacesSlugGet<
 }
 
 /**
- * Update workspace details.
- * @summary Update Workspace
+ * Update project details.
+ * @summary Update Project
  */
-export const updateWorkspaceApiAdminWorkspacesSlugPatch = (
+export const updateProjectApiAdminProjectsSlugPatch = (
     slug: string,
-    workspaceUpdate: WorkspaceUpdate
+    projectUpdate: ProjectUpdate
 ) => {
-    return customInstance<WorkspaceRead>({
-        url: `/api/admin/workspaces/${slug}`,
+    return customInstance<ProjectRead>({
+        url: `/api/admin/projects/${slug}`,
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        data: workspaceUpdate,
+        data: projectUpdate,
     });
 };
 
-export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions = <
+export const getUpdateProjectApiAdminProjectsSlugPatchMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+        Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>,
         TError,
-        { slug: string; data: WorkspaceUpdate },
+        { slug: string; data: ProjectUpdate },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>,
     TError,
-    { slug: string; data: WorkspaceUpdate },
+    { slug: string; data: ProjectUpdate },
     TContext
 > => {
-    const mutationKey = ['updateWorkspaceApiAdminWorkspacesSlugPatch'];
+    const mutationKey = ['updateProjectApiAdminProjectsSlugPatch'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6432,75 +6430,75 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions = <
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
-        { slug: string; data: WorkspaceUpdate }
+        Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>,
+        { slug: string; data: ProjectUpdate }
     > = (props) => {
         const { slug, data } = props ?? {};
 
-        return updateWorkspaceApiAdminWorkspacesSlugPatch(slug, data);
+        return updateProjectApiAdminProjectsSlugPatch(slug, data);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationResult = NonNullable<
-    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>
+export type UpdateProjectApiAdminProjectsSlugPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>
 >;
-export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationBody = WorkspaceUpdate;
-export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationError = HTTPValidationError;
+export type UpdateProjectApiAdminProjectsSlugPatchMutationBody = ProjectUpdate;
+export type UpdateProjectApiAdminProjectsSlugPatchMutationError = HTTPValidationError;
 
 /**
- * @summary Update Workspace
+ * @summary Update Project
  */
-export const useUpdateWorkspaceApiAdminWorkspacesSlugPatch = <
+export const useUpdateProjectApiAdminProjectsSlugPatch = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+            Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>,
             TError,
-            { slug: string; data: WorkspaceUpdate },
+            { slug: string; data: ProjectUpdate },
             TContext
         >;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    Awaited<ReturnType<typeof updateProjectApiAdminProjectsSlugPatch>>,
     TError,
-    { slug: string; data: WorkspaceUpdate },
+    { slug: string; data: ProjectUpdate },
     TContext
 > => {
-    const mutationOptions = getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions(options);
+    const mutationOptions = getUpdateProjectApiAdminProjectsSlugPatchMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
 
 /**
- * Delete a workspace (Owner only).
- * @summary Delete Workspace
+ * Delete a project (Owner only).
+ * @summary Delete Project
  */
-export const deleteWorkspaceApiAdminWorkspacesSlugDelete = (slug: string) => {
-    return customInstance<void>({ url: `/api/admin/workspaces/${slug}`, method: 'DELETE' });
+export const deleteProjectApiAdminProjectsSlugDelete = (slug: string) => {
+    return customInstance<void>({ url: `/api/admin/projects/${slug}`, method: 'DELETE' });
 };
 
-export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions = <
+export const getDeleteProjectApiAdminProjectsSlugDeleteMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>,
         TError,
         { slug: string },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>,
     TError,
     { slug: string },
     TContext
 > => {
-    const mutationKey = ['deleteWorkspaceApiAdminWorkspacesSlugDelete'];
+    const mutationKey = ['deleteProjectApiAdminProjectsSlugDelete'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6508,33 +6506,33 @@ export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions = <
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>,
         { slug: string }
     > = (props) => {
         const { slug } = props ?? {};
 
-        return deleteWorkspaceApiAdminWorkspacesSlugDelete(slug);
+        return deleteProjectApiAdminProjectsSlugDelete(slug);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>
+export type DeleteProjectApiAdminProjectsSlugDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>
 >;
 
-export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationError = HTTPValidationError;
+export type DeleteProjectApiAdminProjectsSlugDeleteMutationError = HTTPValidationError;
 
 /**
- * @summary Delete Workspace
+ * @summary Delete Project
  */
-export const useDeleteWorkspaceApiAdminWorkspacesSlugDelete = <
+export const useDeleteProjectApiAdminProjectsSlugDelete = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+            Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>,
             TError,
             { slug: string },
             TContext
@@ -6542,50 +6540,50 @@ export const useDeleteWorkspaceApiAdminWorkspacesSlugDelete = <
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    Awaited<ReturnType<typeof deleteProjectApiAdminProjectsSlugDelete>>,
     TError,
     { slug: string },
     TContext
 > => {
-    const mutationOptions = getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions(options);
+    const mutationOptions = getDeleteProjectApiAdminProjectsSlugDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
 
 /**
- * List all members of a workspace with pagination.
- * @summary List Workspace Members
+ * List all members of a project with pagination.
+ * @summary List Project Members
  */
-export const listWorkspaceMembersApiAdminWorkspacesSlugMembersGet = (
+export const listProjectMembersApiAdminProjectsSlugMembersGet = (
     slug: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<PaginatedResponseWorkspaceMemberRead>({
-        url: `/api/admin/workspaces/${slug}/members`,
+    return customInstance<PaginatedResponseProjectMemberRead>({
+        url: `/api/admin/projects/${slug}/members`,
         method: 'GET',
         params,
         signal,
     });
 };
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey = (
+export const getListProjectMembersApiAdminProjectsSlugMembersGetQueryKey = (
     slug?: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams
 ) => {
-    return [`/api/admin/workspaces/${slug}/members`, ...(params ? [params] : [])] as const;
+    return [`/api/admin/projects/${slug}/members`, ...(params ? [params] : [])] as const;
 };
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+export const getListProjectMembersApiAdminProjectsSlugMembersGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                 TError,
                 TData
             >
@@ -6596,88 +6594,84 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions
 
     const queryKey =
         queryOptions?.queryKey ??
-        getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey(slug, params);
+        getListProjectMembersApiAdminProjectsSlugMembersGetQueryKey(slug, params);
 
     const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
-    > = ({ signal }) => listWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug, params, signal);
+        Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>
+    > = ({ signal }) => listProjectMembersApiAdminProjectsSlugMembersGet(slug, params, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+        Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+export type ListProjectMembersApiAdminProjectsSlugMembersGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>
 >;
-export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryError = HTTPValidationError;
+export type ListProjectMembersApiAdminProjectsSlugMembersGetQueryError = HTTPValidationError;
 
-export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
-    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+export function useListProjectMembersApiAdminProjectsSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
-    params: undefined | ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params: undefined | ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
-                    >,
+                    Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                    Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
-    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+export function useListProjectMembersApiAdminProjectsSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
-                    >,
+                    Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                    Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
-    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+export function useListProjectMembersApiAdminProjectsSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                 TError,
                 TData
             >
@@ -6686,19 +6680,19 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary List Workspace Members
+ * @summary List Project Members
  */
 
-export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
-    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+export function useListProjectMembersApiAdminProjectsSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
     TError = HTTPValidationError,
 >(
     slug: string,
-    params?: ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetParams,
+    params?: ListProjectMembersApiAdminProjectsSlugMembersGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                Awaited<ReturnType<typeof listProjectMembersApiAdminProjectsSlugMembersGet>>,
                 TError,
                 TData
             >
@@ -6706,7 +6700,7 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions(
+    const queryOptions = getListProjectMembersApiAdminProjectsSlugMembersGetQueryOptions(
         slug,
         params,
         options
@@ -6722,39 +6716,39 @@ export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
 }
 
 /**
- * Update a workspace member's role.
- * @summary Update Workspace Member
+ * Update a project member's role.
+ * @summary Update Project Member
  */
-export const updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = (
+export const updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch = (
     slug: string,
     userId: number,
-    workspaceMemberUpdate: WorkspaceMemberUpdate
+    projectMemberUpdate: ProjectMemberUpdate
 ) => {
-    return customInstance<WorkspaceMemberRead>({
-        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+    return customInstance<ProjectMemberRead>({
+        url: `/api/admin/projects/${slug}/members/${userId}`,
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        data: workspaceMemberUpdate,
+        data: projectMemberUpdate,
     });
 };
 
-export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions = <
+export const getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+        Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>,
         TError,
-        { slug: string; userId: number; data: WorkspaceMemberUpdate },
+        { slug: string; userId: number; data: ProjectMemberUpdate },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>,
     TError,
-    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    { slug: string; userId: number; data: ProjectMemberUpdate },
     TContext
 > => {
-    const mutationKey = ['updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch'];
+    const mutationKey = ['updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6762,87 +6756,84 @@ export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMut
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
-        { slug: string; userId: number; data: WorkspaceMemberUpdate }
+        Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>,
+        { slug: string; userId: number; data: ProjectMemberUpdate }
     > = (props) => {
         const { slug, userId, data } = props ?? {};
 
-        return updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch(slug, userId, data);
+        return updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch(slug, userId, data);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationResult =
-    NonNullable<
-        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>
-    >;
-export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationBody =
-    WorkspaceMemberUpdate;
-export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationError =
+export type UpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>
+>;
+export type UpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMutationBody =
+    ProjectMemberUpdate;
+export type UpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMutationError =
     HTTPValidationError;
 
 /**
- * @summary Update Workspace Member
+ * @summary Update Project Member
  */
-export const useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = <
+export const useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<
-                ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>
-            >,
+            Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>,
             TError,
-            { slug: string; userId: number; data: WorkspaceMemberUpdate },
+            { slug: string; userId: number; data: ProjectMemberUpdate },
             TContext
         >;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    Awaited<ReturnType<typeof updateProjectMemberApiAdminProjectsSlugMembersUserIdPatch>>,
     TError,
-    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    { slug: string; userId: number; data: ProjectMemberUpdate },
     TContext
 > => {
     const mutationOptions =
-        getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions(options);
+        getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
 
 /**
- * Remove a member from the workspace.
- * @summary Remove Workspace Member
+ * Remove a member from the project.
+ * @summary Remove Project Member
  */
-export const removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = (
+export const removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete = (
     slug: string,
     userId: number
 ) => {
     return customInstance<void>({
-        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+        url: `/api/admin/projects/${slug}/members/${userId}`,
         method: 'DELETE',
     });
 };
 
-export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions = <
+export const getRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>,
         TError,
         { slug: string; userId: number },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>,
     TError,
     { slug: string; userId: number },
     TContext
 > => {
-    const mutationKey = ['removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete'];
+    const mutationKey = ['removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6850,37 +6841,34 @@ export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMu
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>,
         { slug: string; userId: number }
     > = (props) => {
         const { slug, userId } = props ?? {};
 
-        return removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete(slug, userId);
+        return removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete(slug, userId);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationResult =
-    NonNullable<
-        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>
-    >;
+export type RemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>
+>;
 
-export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationError =
+export type RemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMutationError =
     HTTPValidationError;
 
 /**
- * @summary Remove Workspace Member
+ * @summary Remove Project Member
  */
-export const useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = <
+export const useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<
-                ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>
-            >,
+            Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>,
             TError,
             { slug: string; userId: number },
             TContext
@@ -6888,52 +6876,52 @@ export const useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete =
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    Awaited<ReturnType<typeof removeProjectMemberApiAdminProjectsSlugMembersUserIdDelete>>,
     TError,
     { slug: string; userId: number },
     TContext
 > => {
     const mutationOptions =
-        getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions(options);
+        getRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
 
 /**
- * Invite a user to the workspace.
+ * Invite a user to the project.
  * @summary Create Invitation
  */
-export const createInvitationApiAdminWorkspacesSlugInvitationsPost = (
+export const createInvitationApiAdminProjectsSlugInvitationsPost = (
     slug: string,
-    workspaceInvitationCreate: WorkspaceInvitationCreate,
+    projectInvitationCreate: ProjectInvitationCreate,
     signal?: AbortSignal
 ) => {
     return customInstance<InvitationLink>({
-        url: `/api/admin/workspaces/${slug}/invitations`,
+        url: `/api/admin/projects/${slug}/invitations`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: workspaceInvitationCreate,
+        data: projectInvitationCreate,
         signal,
     });
 };
 
-export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions = <
+export const getCreateInvitationApiAdminProjectsSlugInvitationsPostMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+        Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>,
         TError,
-        { slug: string; data: WorkspaceInvitationCreate },
+        { slug: string; data: ProjectInvitationCreate },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>,
     TError,
-    { slug: string; data: WorkspaceInvitationCreate },
+    { slug: string; data: ProjectInvitationCreate },
     TContext
 > => {
-    const mutationKey = ['createInvitationApiAdminWorkspacesSlugInvitationsPost'];
+    const mutationKey = ['createInvitationApiAdminProjectsSlugInvitationsPost'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -6941,49 +6929,48 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOpt
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
-        { slug: string; data: WorkspaceInvitationCreate }
+        Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>,
+        { slug: string; data: ProjectInvitationCreate }
     > = (props) => {
         const { slug, data } = props ?? {};
 
-        return createInvitationApiAdminWorkspacesSlugInvitationsPost(slug, data);
+        return createInvitationApiAdminProjectsSlugInvitationsPost(slug, data);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>
+export type CreateInvitationApiAdminProjectsSlugInvitationsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>
 >;
-export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationBody =
-    WorkspaceInvitationCreate;
-export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationError =
-    HTTPValidationError;
+export type CreateInvitationApiAdminProjectsSlugInvitationsPostMutationBody =
+    ProjectInvitationCreate;
+export type CreateInvitationApiAdminProjectsSlugInvitationsPostMutationError = HTTPValidationError;
 
 /**
  * @summary Create Invitation
  */
-export const useCreateInvitationApiAdminWorkspacesSlugInvitationsPost = <
+export const useCreateInvitationApiAdminProjectsSlugInvitationsPost = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+            Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>,
             TError,
-            { slug: string; data: WorkspaceInvitationCreate },
+            { slug: string; data: ProjectInvitationCreate },
             TContext
         >;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    Awaited<ReturnType<typeof createInvitationApiAdminProjectsSlugInvitationsPost>>,
     TError,
-    { slug: string; data: WorkspaceInvitationCreate },
+    { slug: string; data: ProjectInvitationCreate },
     TContext
 > => {
     const mutationOptions =
-        getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions(options);
+        getCreateInvitationApiAdminProjectsSlugInvitationsPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -10116,7 +10103,7 @@ export const useInitTestDbApiTestInitPost = <TError = unknown, TContext = unknow
 };
 
 /**
- * Seed base test data: user and workspace
+ * Seed base test data: user and project
 Idempotent - won't create duplicates
  * @summary Seed Test Data
  */
@@ -10196,7 +10183,7 @@ export const useSeedTestDataApiTestSeedPost = <TError = HTTPValidationError, TCo
 };
 
 /**
- * Add a user to a workspace for testing purposes
+ * Add a user to a project for testing purposes
  * @summary Add Test Member
  */
 export const addTestMemberApiTestMembersPost = (
@@ -10282,7 +10269,7 @@ export const useAddTestMemberApiTestMembersPost = <
 
 /**
  * Cleanup test data between tests
-Removes all data except the base test user and workspace
+Removes all data except the base test user and project
  * @summary Cleanup Test Data
  */
 export const cleanupTestDataApiTestCleanupPost = (signal?: AbortSignal) => {
@@ -10353,7 +10340,7 @@ export const useCleanupTestDataApiTestCleanupPost = <TError = unknown, TContext 
 };
 
 /**
- * Full cleanup including users and workspaces
+ * Full cleanup including users and projects
 Use at end of test suite
  * @summary Cleanup All Test Data
  */
@@ -10804,8 +10791,8 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -11091,8 +11078,8 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 undefined,
             ]),
             id: faker.number.int({ min: undefined, max: undefined }),
-            workspace_id: faker.number.int({ min: undefined, max: undefined }),
-            workspace: faker.helpers.arrayElement([
+            project_id: faker.number.int({ min: undefined, max: undefined }),
+            project: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     {
                         id: faker.number.int({ min: undefined, max: undefined }),
@@ -11380,8 +11367,8 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -11652,8 +11639,8 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -11927,8 +11914,8 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -12199,8 +12186,8 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -12497,8 +12484,8 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             undefined,
         ]),
         id: faker.number.int({ min: undefined, max: undefined }),
-        workspace_id: faker.number.int({ min: undefined, max: undefined }),
-        workspace: faker.helpers.arrayElement([
+        project_id: faker.number.int({ min: undefined, max: undefined }),
+        project: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 {
                     id: faker.number.int({ min: undefined, max: undefined }),
@@ -12778,8 +12765,8 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
-    workspace: faker.helpers.arrayElement([
+    project_id: faker.number.int({ min: undefined, max: undefined }),
+    project: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
                 id: faker.number.int({ min: undefined, max: undefined }),
@@ -13484,9 +13471,9 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMo
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         }));
 
-export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (
-    overrideResponse: Partial<PaginatedResponseWorkspaceWithRole> = {}
-): PaginatedResponseWorkspaceWithRole => ({
+export const getListProjectsApiAdminProjectsGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseProjectWithRole> = {}
+): PaginatedResponseProjectWithRole => ({
     items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
             id: faker.number.int({ min: undefined, max: undefined }),
@@ -13511,13 +13498,13 @@ export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (
                             is_superuser: faker.datatype.boolean(),
                             is_totp_enabled: faker.datatype.boolean(),
                         },
-                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        role: faker.helpers.arrayElement(Object.values(ProjectRole)),
                         joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
                     })
                 ),
                 undefined,
             ]),
-            user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            user_role: faker.helpers.arrayElement(Object.values(ProjectRole)),
         })
     ),
     total: faker.number.int({ min: undefined, max: undefined }),
@@ -13526,9 +13513,9 @@ export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (
     ...overrideResponse,
 });
 
-export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
-    overrideResponse: Partial<WorkspaceRead> = {}
-): WorkspaceRead => ({
+export const getCreateProjectApiAdminProjectsPostResponseMock = (
+    overrideResponse: Partial<ProjectRead> = {}
+): ProjectRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -13550,7 +13537,7 @@ export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
             },
-            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -13558,9 +13545,9 @@ export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
     ...overrideResponse,
 });
 
-export const getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock = (
-    overrideResponse: Partial<WorkspaceWithRole> = {}
-): WorkspaceWithRole => ({
+export const getGetProjectApiAdminProjectsSlugGetResponseMock = (
+    overrideResponse: Partial<ProjectWithRole> = {}
+): ProjectWithRole => ({
     id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -13582,18 +13569,18 @@ export const getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock = (
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
             },
-            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
     ]),
-    user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+    user_role: faker.helpers.arrayElement(Object.values(ProjectRole)),
     ...overrideResponse,
 });
 
-export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock = (
-    overrideResponse: Partial<WorkspaceRead> = {}
-): WorkspaceRead => ({
+export const getUpdateProjectApiAdminProjectsSlugPatchResponseMock = (
+    overrideResponse: Partial<ProjectRead> = {}
+): ProjectRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -13615,7 +13602,7 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock = (
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
             },
-            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
@@ -13623,9 +13610,9 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock = (
     ...overrideResponse,
 });
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock = (
-    overrideResponse: Partial<PaginatedResponseWorkspaceMemberRead> = {}
-): PaginatedResponseWorkspaceMemberRead => ({
+export const getListProjectMembersApiAdminProjectsSlugMembersGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseProjectMemberRead> = {}
+): PaginatedResponseProjectMemberRead => ({
     items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
             user_id: faker.number.int({ min: undefined, max: undefined }),
@@ -13643,7 +13630,7 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
             },
-            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })
     ),
@@ -13653,9 +13640,9 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock
     ...overrideResponse,
 });
 
-export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchResponseMock = (
-    overrideResponse: Partial<WorkspaceMemberRead> = {}
-): WorkspaceMemberRead => ({
+export const getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchResponseMock = (
+    overrideResponse: Partial<ProjectMemberRead> = {}
+): ProjectMemberRead => ({
     user_id: faker.number.int({ min: undefined, max: undefined }),
     user: {
         email: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -13671,12 +13658,12 @@ export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchRes
         is_superuser: faker.datatype.boolean(),
         is_totp_enabled: faker.datatype.boolean(),
     },
-    role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+    role: faker.helpers.arrayElement(Object.values(ProjectRole)),
     joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
     ...overrideResponse,
 });
 
-export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMock = (
+export const getCreateInvitationApiAdminProjectsSlugInvitationsPostResponseMock = (
     overrideResponse: Partial<InvitationLink> = {}
 ): InvitationLink => ({
     invite_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -13692,7 +13679,7 @@ export const getListTagsApiAdminConcoursesTagsGetResponseMock = (): ConcourseTag
             undefined,
         ]),
         id: faker.number.int({ min: undefined, max: undefined }),
-        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+        project_id: faker.number.int({ min: undefined, max: undefined }),
     }));
 
 export const getCreateTagApiAdminConcoursesTagsPostResponseMock = (
@@ -13704,7 +13691,7 @@ export const getCreateTagApiAdminConcoursesTagsPostResponseMock = (
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    project_id: faker.number.int({ min: undefined, max: undefined }),
     ...overrideResponse,
 });
 
@@ -13712,7 +13699,7 @@ export const getCreateConcourseApiAdminConcoursesPostResponseMock = (
     overrideResponse: Partial<ConcourseRead> = {}
 ): ConcourseRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
@@ -13737,7 +13724,7 @@ export const getListConcoursesApiAdminConcoursesGetResponseMock = (
     items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
             id: faker.number.int({ min: undefined, max: undefined }),
-            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+            project_id: faker.number.int({ min: undefined, max: undefined }),
             title: faker.string.alpha({ length: { min: 10, max: 20 } }),
             description: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
@@ -13771,7 +13758,7 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
     overrideResponse: Partial<ConcourseDetailRead> = {}
 ): ConcourseDetailRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
@@ -13833,7 +13820,7 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
                             undefined,
                         ]),
                         id: faker.number.int({ min: undefined, max: undefined }),
-                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                        project_id: faker.number.int({ min: undefined, max: undefined }),
                     })
                 ),
                 undefined,
@@ -13852,7 +13839,7 @@ export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock = 
     overrideResponse: Partial<ConcourseRead> = {}
 ): ConcourseRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
-    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
@@ -13906,7 +13893,7 @@ export const getCreateItemApiAdminConcoursesConcourseIdItemsPostResponseMock = (
                 undefined,
             ]),
             id: faker.number.int({ min: undefined, max: undefined }),
-            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+            project_id: faker.number.int({ min: undefined, max: undefined }),
         })),
         undefined,
     ]),
@@ -13964,7 +13951,7 @@ export const getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostRespons
                             undefined,
                         ]),
                         id: faker.number.int({ min: undefined, max: undefined }),
-                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                        project_id: faker.number.int({ min: undefined, max: undefined }),
                     })
                 ),
                 undefined,
@@ -14022,7 +14009,7 @@ export const getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostR
                             undefined,
                         ]),
                         id: faker.number.int({ min: undefined, max: undefined }),
-                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                        project_id: faker.number.int({ min: undefined, max: undefined }),
                     })
                 ),
                 undefined,
@@ -14068,7 +14055,7 @@ export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchResponseM
                 undefined,
             ]),
             id: faker.number.int({ min: undefined, max: undefined }),
-            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+            project_id: faker.number.int({ min: undefined, max: undefined }),
         })),
         undefined,
     ]),
@@ -15290,16 +15277,16 @@ export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHan
     );
 };
 
-export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
+export const getListProjectsApiAdminProjectsGetMockHandler = (
     overrideResponse?:
-        | PaginatedResponseWorkspaceWithRole
+        | PaginatedResponseProjectWithRole
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<PaginatedResponseWorkspaceWithRole> | PaginatedResponseWorkspaceWithRole),
+          ) => Promise<PaginatedResponseProjectWithRole> | PaginatedResponseProjectWithRole),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/workspaces',
+        '*/api/admin/projects',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15307,7 +15294,7 @@ export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getListWorkspacesApiAdminWorkspacesGetResponseMock()
+                        : getListProjectsApiAdminProjectsGetResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15316,16 +15303,16 @@ export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
     );
 };
 
-export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
+export const getCreateProjectApiAdminProjectsPostMockHandler = (
     overrideResponse?:
-        | WorkspaceRead
+        | ProjectRead
         | ((
               info: Parameters<Parameters<typeof http.post>[1]>[0]
-          ) => Promise<WorkspaceRead> | WorkspaceRead),
+          ) => Promise<ProjectRead> | ProjectRead),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
-        '*/api/admin/workspaces',
+        '*/api/admin/projects',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15333,7 +15320,7 @@ export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getCreateWorkspaceApiAdminWorkspacesPostResponseMock()
+                        : getCreateProjectApiAdminProjectsPostResponseMock()
                 ),
                 { status: 201, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15342,16 +15329,16 @@ export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
     );
 };
 
-export const getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler = (
+export const getGetProjectApiAdminProjectsSlugGetMockHandler = (
     overrideResponse?:
-        | WorkspaceWithRole
+        | ProjectWithRole
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<WorkspaceWithRole> | WorkspaceWithRole),
+          ) => Promise<ProjectWithRole> | ProjectWithRole),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/workspaces/:slug',
+        '*/api/admin/projects/:slug',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15359,7 +15346,7 @@ export const getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock()
+                        : getGetProjectApiAdminProjectsSlugGetResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15368,16 +15355,16 @@ export const getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler = (
     );
 };
 
-export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler = (
+export const getUpdateProjectApiAdminProjectsSlugPatchMockHandler = (
     overrideResponse?:
-        | WorkspaceRead
+        | ProjectRead
         | ((
               info: Parameters<Parameters<typeof http.patch>[1]>[0]
-          ) => Promise<WorkspaceRead> | WorkspaceRead),
+          ) => Promise<ProjectRead> | ProjectRead),
     options?: RequestHandlerOptions
 ) => {
     return http.patch(
-        '*/api/admin/workspaces/:slug',
+        '*/api/admin/projects/:slug',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15385,7 +15372,7 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock()
+                        : getUpdateProjectApiAdminProjectsSlugPatchResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15394,14 +15381,14 @@ export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler = (
     );
 };
 
-export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler = (
+export const getDeleteProjectApiAdminProjectsSlugDeleteMockHandler = (
     overrideResponse?:
         | void
         | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
     options?: RequestHandlerOptions
 ) => {
     return http.delete(
-        '*/api/admin/workspaces/:slug',
+        '*/api/admin/projects/:slug',
         async (info) => {
             if (typeof overrideResponse === 'function') {
                 await overrideResponse(info);
@@ -15412,18 +15399,16 @@ export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler = (
     );
 };
 
-export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler = (
+export const getListProjectMembersApiAdminProjectsSlugMembersGetMockHandler = (
     overrideResponse?:
-        | PaginatedResponseWorkspaceMemberRead
+        | PaginatedResponseProjectMemberRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) =>
-              | Promise<PaginatedResponseWorkspaceMemberRead>
-              | PaginatedResponseWorkspaceMemberRead),
+          ) => Promise<PaginatedResponseProjectMemberRead> | PaginatedResponseProjectMemberRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/workspaces/:slug/members',
+        '*/api/admin/projects/:slug/members',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15431,7 +15416,7 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler 
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock()
+                        : getListProjectMembersApiAdminProjectsSlugMembersGetResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15440,16 +15425,16 @@ export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler 
     );
 };
 
-export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMockHandler = (
+export const getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMockHandler = (
     overrideResponse?:
-        | WorkspaceMemberRead
+        | ProjectMemberRead
         | ((
               info: Parameters<Parameters<typeof http.patch>[1]>[0]
-          ) => Promise<WorkspaceMemberRead> | WorkspaceMemberRead),
+          ) => Promise<ProjectMemberRead> | ProjectMemberRead),
     options?: RequestHandlerOptions
 ) => {
     return http.patch(
-        '*/api/admin/workspaces/:slug/members/:userId',
+        '*/api/admin/projects/:slug/members/:userId',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15457,7 +15442,7 @@ export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMoc
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchResponseMock()
+                        : getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -15466,14 +15451,14 @@ export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMoc
     );
 };
 
-export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMockHandler = (
+export const getRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMockHandler = (
     overrideResponse?:
         | void
         | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
     options?: RequestHandlerOptions
 ) => {
     return http.delete(
-        '*/api/admin/workspaces/:slug/members/:userId',
+        '*/api/admin/projects/:slug/members/:userId',
         async (info) => {
             if (typeof overrideResponse === 'function') {
                 await overrideResponse(info);
@@ -15484,7 +15469,7 @@ export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMo
     );
 };
 
-export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler = (
+export const getCreateInvitationApiAdminProjectsSlugInvitationsPostMockHandler = (
     overrideResponse?:
         | InvitationLink
         | ((
@@ -15493,7 +15478,7 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler
     options?: RequestHandlerOptions
 ) => {
     return http.post(
-        '*/api/admin/workspaces/:slug/invitations',
+        '*/api/admin/projects/:slug/invitations',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -15501,7 +15486,7 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMock()
+                        : getCreateInvitationApiAdminProjectsSlugInvitationsPostResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -16306,15 +16291,15 @@ export const getLibreQAPIMock = () => [
     getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler(),
     getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandler(),
     getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler(),
-    getListWorkspacesApiAdminWorkspacesGetMockHandler(),
-    getCreateWorkspaceApiAdminWorkspacesPostMockHandler(),
-    getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler(),
-    getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler(),
-    getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler(),
-    getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler(),
-    getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMockHandler(),
-    getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMockHandler(),
-    getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler(),
+    getListProjectsApiAdminProjectsGetMockHandler(),
+    getCreateProjectApiAdminProjectsPostMockHandler(),
+    getGetProjectApiAdminProjectsSlugGetMockHandler(),
+    getUpdateProjectApiAdminProjectsSlugPatchMockHandler(),
+    getDeleteProjectApiAdminProjectsSlugDeleteMockHandler(),
+    getListProjectMembersApiAdminProjectsSlugMembersGetMockHandler(),
+    getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchMockHandler(),
+    getRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDeleteMockHandler(),
+    getCreateInvitationApiAdminProjectsSlugInvitationsPostMockHandler(),
     getListTagsApiAdminConcoursesTagsGetMockHandler(),
     getCreateTagApiAdminConcoursesTagsPostMockHandler(),
     getDeleteTagApiAdminConcoursesTagsTagIdDeleteMockHandler(),

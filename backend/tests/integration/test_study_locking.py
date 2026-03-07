@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import Study, StudyState, Participant, User, Workspace
+from app.models import Study, StudyState, Participant, User, Project
 from datetime import datetime, timezone
 
 
@@ -10,7 +10,7 @@ async def test_study_locking_logic(
     client: AsyncClient,
     db: AsyncSession,
     test_user: User,
-    test_workspace: Workspace,
+    test_project: Project,
     auth_token_factory,
 ):
     """
@@ -19,7 +19,7 @@ async def test_study_locking_logic(
     """
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     from app.models import Statement, StatementTranslation, StudyTranslation
@@ -27,7 +27,7 @@ async def test_study_locking_logic(
     # 1. Create a study in DRAFT
     study = Study(
         slug="lock-test",
-        workspace_id=test_workspace.id,
+        project_id=test_project.id,
         state=StudyState.draft,
         grid_config=[{"score": 0, "capacity": 1}],
         presort_config={},

@@ -199,7 +199,7 @@ Production pool sizing (3 + 2 = 5 max connections) is designed to fit within Sca
 
 On startup, the backend validates the database schema by checking for:
 
-- Required tables (`workspaces`, `users`, `studies`, `participants`, etc.)
+- Required tables (`projects`, `users`, `studies`, `participants`, etc.)
 - Critical columns (e.g., `randomize_statement_order`, `random_seed`, `ui_labels`)
 
 If validation fails, the application logs warnings with remediation steps (e.g., "Run `alembic upgrade head`"). This helps diagnose deployment issues when migrations haven't been applied.

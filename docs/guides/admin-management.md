@@ -17,7 +17,7 @@ cd backend
 uv run python scripts/create_user.py
 ```
 
-Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`. This user will be added as the **Owner** of the default workspace.
+Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`. This user will be added as the **Owner** of the default project.
 
 ### API Access
 
@@ -54,7 +54,7 @@ Study owners can invite other researchers to collaborate on their work.
 
 ### Inviting a Collaborator
 
-Invite a user by their email through the **workspace settings** page.
+Invite a user by their email through the **project settings** page.
 
 1. Enter the collaborator's email.
 2. Select a role (**Researcher** or **Viewer**).
@@ -69,7 +69,7 @@ Libre-Q will generate a unique registration link. If SMTP is configured, the use
 
 ### Roles and Permissions
 
-Libre-Q supports three workspace-level roles with varying levels of access:
+Libre-Q supports three project-level roles with varying levels of access:
 
 | Feature                            | Owner | Researcher | Viewer |
 | :--------------------------------- | :---: | :--------: | :----: |
@@ -78,10 +78,10 @@ Libre-Q supports three workspace-level roles with varying levels of access:
 | Update Grid/Structure (Draft Only) |  Yes  |    Yes     |  No    |
 | Export Study Data                  |  Yes  |    Yes     |  No    |
 | Change Study State                 |  Yes  |    Yes     |  No    |
-| Manage Workspace Members           |  Yes  |    No      |  No    |
+| Manage Project Members             |  Yes  |    No      |  No    |
 | Delete Study                       |  Yes  |    No      |  No    |
 
-**Note**: Workspace Owners automatically have Owner-level access to all studies in their workspace.
+**Note**: Project Owners automatically have Owner-level access to all studies in their project.
 
 ---
 

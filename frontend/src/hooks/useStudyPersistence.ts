@@ -14,8 +14,8 @@ import { toast } from 'sonner';
  */
 export function useStudyPersistence() {
     const { t } = useTranslation();
-    const { workspaceSlug, studySlug } = useParams<{ workspaceSlug: string; studySlug: string }>();
-    const effectiveSlug = studySlug || workspaceSlug;
+    const { projectSlug, studySlug } = useParams<{ projectSlug: string; studySlug: string }>();
+    const effectiveSlug = studySlug || projectSlug;
     const {
         draft,
         original,

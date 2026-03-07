@@ -108,9 +108,9 @@ function toLocalDatetimeString(iso: string): string {
 }
 
 const RecruitmentPage = () => {
-    const { studySlug: slug, workspaceSlug } = useParams<{
+    const { studySlug: slug, projectSlug } = useParams<{
         studySlug: string;
-        workspaceSlug: string;
+        projectSlug: string;
     }>();
     const { links: initialLinks, study } = useLoaderData() as {
         links: RecruitmentLinkRead[];
@@ -121,7 +121,7 @@ const RecruitmentPage = () => {
     const revalidator = useRevalidator();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { workspace: currentWorkspace } = useAdminContext();
+    const { project: currentWorkspace } = useAdminContext();
 
     const isSlugLocked = study.state !== 'draft';
 
@@ -277,7 +277,7 @@ const RecruitmentPage = () => {
             });
 
             if (data.slug !== slug) {
-                const ws = workspaceSlug || currentWorkspace?.slug;
+                const ws = projectSlug || currentWorkspace?.slug;
                 navigate(`/app/${ws}/studies/${data.slug}/recruitment`);
             } else {
                 navigate('.', { replace: true });

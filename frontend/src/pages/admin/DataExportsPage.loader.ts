@@ -6,7 +6,7 @@ import { queryClient } from '@/lib/queryClient';
 import type { LoaderFunctionArgs } from 'react-router-dom';
 
 export const dataExportsPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const slug = params.slug || params.studySlug || params.workspaceSlug;
+    const slug = params.slug || params.studySlug || params.projectSlug;
     if (!slug) throw new Error('Slug is required (Data Exports)');
 
     try {

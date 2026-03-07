@@ -12,10 +12,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.database import SessionLocal
 
 
-async def backup_workspace_members():
-    """Create backup of workspace_members table data."""
+async def backup_project_members():
+    """Create backup of project_members table data."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_file = f"backups/workspace_members_{timestamp}.sql"
+    backup_file = f"backups/project_members_{timestamp}.sql"
 
     os.makedirs("backups", exist_ok=True)
 
@@ -30,8 +30,8 @@ async def backup_workspace_members():
         # Select role as text to avoid enum issues during backup/restore
         result = await db.execute(
             text("""
-            SELECT workspace_id, user_id, role::text, joined_at
-            FROM workspace_members
+            SELECT project_id, user_id, role::text, joined_at
+            FROM project_members
         """)
         )
         rows = result.fetchall()
@@ -42,9 +42,9 @@ async def backup_workspace_members():
             f.write(f"-- Total rows: {len(rows)}\n\n")
 
             for row in rows:
-                ws_id, user_id, role, joined_at = row
+                proj_id, user_id, role, joined_at = row
                 f.write(
-                    f"-- INSERT: workspace_id={ws_id}, user_id={user_id}, "
+                    f"-- INSERT: project_id={proj_id}, user_id={user_id}, "
                     f"role='{role}', joined_at='{joined_at}'\n"
                 )
 
@@ -55,5 +55,5 @@ async def backup_workspace_members():
 
 
 if __name__ == "__main__":
-    backup_file = asyncio.run(backup_workspace_members())
+    backup_file = asyncio.run(backup_project_members())
     print(f"\n✓ Backup complete: {backup_file}")

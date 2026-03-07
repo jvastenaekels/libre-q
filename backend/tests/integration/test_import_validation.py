@@ -9,7 +9,7 @@ class TestImport500:
         self,
         client: AsyncClient,
         test_user: User,
-        test_workspace,
+        test_project,
         auth_token_factory,
     ):
         """
@@ -17,7 +17,7 @@ class TestImport500:
         Hypothesis: Large base64 string or specific field structure might be causing issues.
         """
         auth_headers = auth_token_factory(test_user)
-        auth_headers["X-Workspace-ID"] = str(test_workspace.id)
+        auth_headers["X-Project-ID"] = str(test_project.id)
 
         # Huge base64 string
         huge_logo = "data:image/png;base64," + "a" * 500000
@@ -69,7 +69,7 @@ class TestImportPartial:
         self,
         client: AsyncClient,
         test_user: User,
-        test_workspace,
+        test_project,
         auth_token_factory,
     ):
         """
@@ -77,7 +77,7 @@ class TestImportPartial:
         We want this to succeed (by providing default), but currently it fails validation.
         """
         auth_headers = auth_token_factory(test_user)
-        auth_headers["X-Workspace-ID"] = str(test_workspace.id)
+        auth_headers["X-Project-ID"] = str(test_project.id)
 
         payload = {
             "version": "1.0",
@@ -132,14 +132,14 @@ class TestImportPartial:
         self,
         client: AsyncClient,
         test_user: User,
-        test_workspace,
+        test_project,
         auth_token_factory,
     ):
         """
         Test that we can actually create the study with missing description (defaults to empty string).
         """
         auth_headers = auth_token_factory(test_user)
-        auth_headers["X-Workspace-ID"] = str(test_workspace.id)
+        auth_headers["X-Project-ID"] = str(test_project.id)
 
         payload = {
             "config": {

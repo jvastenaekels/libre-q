@@ -53,7 +53,7 @@ def create_invitation_token(
     email: str,
     role: str,
     study_id: int | None = None,
-    workspace_id: int | None = None,
+    project_id: int | None = None,
     expires_delta: timedelta | None = None,
 ) -> str:
     """Create a JWT invitation token."""
@@ -70,8 +70,8 @@ def create_invitation_token(
     }
     if study_id:
         to_encode["study_id"] = study_id
-    if workspace_id:
-        to_encode["workspace_id"] = workspace_id
+    if project_id:
+        to_encode["project_id"] = project_id
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )

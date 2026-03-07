@@ -14,13 +14,13 @@ import { useAdminStore } from '@/store/useAdminStore';
 /**
  * LegacyRedirect
  *
- * Handles redirection from old /admin/* paths to the new /app/:workspaceSlug/* modular architecture.
+ * Handles redirection from old /admin/* paths to the new /app/:projectSlug/* modular architecture.
  * This ensures that bookmarks and old links continue to work seamlessly.
  */
 export const LegacyRedirect = () => {
     const location = useLocation();
-    const { workspaces } = useAuthStore();
-    const { setActiveStudy, setActiveWorkspace, lastVisitedStudySlug } = useAdminStore();
+    const { projects } = useAuthStore();
+    const { setActiveStudy, setActiveProject, lastVisitedStudySlug } = useAdminStore();
     const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet();
     const allStudies = allStudiesData?.items;
 
@@ -49,17 +49,15 @@ export const LegacyRedirect = () => {
         // If we have a last visited study, redirect to it in its workspace
         if (lastVisitedStudySlug && allStudies) {
             const study = allStudies.find((s) => s.slug === lastVisitedStudySlug);
-            if (study?.workspace) {
-                return (
-                    <Navigate to={`/app/${study.workspace.slug}/studies/${study.slug}`} replace />
-                );
+            if (study?.project) {
+                return <Navigate to={`/app/${study.project.slug}/studies/${study.slug}`} replace />;
             }
         }
 
-        // Otherwise try last visited workspace
-        const lastWs = workspaces?.[0]; // Fallback to first workspace for now
-        if (lastWs) {
-            return <Navigate to={`/app/${lastWs.slug}/dashboard`} replace />;
+        // Otherwise try last visited project
+        const lastProj = projects?.[0]; // Fallback to first project for now
+        if (lastProj) {
+            return <Navigate to={`/app/${lastProj.slug}/dashboard`} replace />;
         }
 
         return <Navigate to="/hub" replace />;
@@ -68,23 +66,23 @@ export const LegacyRedirect = () => {
     // /admin/studies/:slug/...
     if (pathParts[0] === 'admin' && pathParts[1] === 'studies' && slug) {
         const study = allStudies?.find((s) => s.slug === slug);
-        if (study?.workspace) {
-            const wsSlug = study.workspace.slug;
+        if (study?.project) {
+            const projSlug = study.project.slug;
             const subPathArray = pathParts.slice(3);
             let subPath = subPathArray.join('/');
 
             // Map legacy subpaths to new structure
             if (subPath === 'exports') subPath = 'data';
             if (subPath === 'team') {
-                // Individual study team management is decommissioned; redirect to workspace team
-                return <Navigate to={`/app/${wsSlug}/team`} replace />;
+                // Individual study team management is decommissioned; redirect to project team
+                return <Navigate to={`/app/${projSlug}/team`} replace />;
             }
 
-            const target = `/app/${wsSlug}/studies/${slug}${subPath ? `/${subPath}` : ''}`;
+            const target = `/app/${projSlug}/studies/${slug}${subPath ? `/${subPath}` : ''}`;
 
             // Update state
             setActiveStudy(slug);
-            setActiveWorkspace(study.workspace.id);
+            setActiveProject(study.project.id);
 
             return <Navigate to={target} replace />;
         }
@@ -92,9 +90,9 @@ export const LegacyRedirect = () => {
 
     // /admin/w/:slug
     if (pathParts[0] === 'admin' && pathParts[1] === 'w' && slug) {
-        const ws = workspaces?.find((w) => w.slug === slug);
-        if (ws) {
-            setActiveWorkspace(ws.id);
+        const proj = projects?.find((w) => w.slug === slug);
+        if (proj) {
+            setActiveProject(proj.id);
         }
         return <Navigate to={`/app/${slug}/dashboard`} replace />;
     }
@@ -106,18 +104,18 @@ export const LegacyRedirect = () => {
         pathParts[3] === 'settings' &&
         slug
     ) {
-        const ws = workspaces?.find((w) => w.slug === slug);
-        if (ws) {
-            setActiveWorkspace(ws.id);
+        const proj2 = projects?.find((w) => w.slug === slug);
+        if (proj2) {
+            setActiveProject(proj2.id);
         }
         return <Navigate to={`/app/${slug}/settings`} replace />;
     }
 
     // /admin/profile
     if (pathParts[0] === 'admin' && pathParts[1] === 'profile') {
-        const firstWs = workspaces?.[0];
-        if (firstWs) {
-            return <Navigate to={`/app/${firstWs.slug}/profile`} replace />;
+        const firstProj = projects?.[0];
+        if (firstProj) {
+            return <Navigate to={`/app/${firstProj.slug}/profile`} replace />;
         }
         return <Navigate to="/hub" replace />;
     }

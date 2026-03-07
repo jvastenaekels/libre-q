@@ -16,9 +16,9 @@ def send_invitation_email(
 
     Args:
         email_to: The recipient's email address.
-        context_name: The title of the study or workspace.
+        context_name: The title of the study or project.
         invite_url: The unique URL for accepting the invitation.
-        context_type: "study" or "workspace".
+        context_type: "study" or "project".
     """
     subject = f"Invitation to collaborate on {context_type} '{context_name}'"
 

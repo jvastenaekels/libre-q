@@ -7,7 +7,7 @@
 import type { ConcourseTagCreateColor } from './concourseTagCreateColor';
 
 /**
- * Schema for creating a workspace-scoped tag.
+ * Schema for creating a project-scoped tag.
  */
 export interface ConcourseTagCreate {
     /**

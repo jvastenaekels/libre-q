@@ -178,7 +178,7 @@ cd frontend && npm run lint:fix
 | `app/models.py` | SQLAlchemy database models |
 | `app/schemas.py` | Pydantic request/response validation |
 | `app/routers/` | API route handlers |
-| `app/routers/admin/` | Admin API routes (studies, workspaces, exports, analysis) |
+| `app/routers/admin/` | Admin API routes (studies, projects, exports, analysis) |
 | `app/services/` | Business logic services |
 | `app/core/config.py` | Application configuration |
 | `alembic/` | Database migration scripts |

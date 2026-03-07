@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { Briefcase, Plus, Save, ArrowLeft, Globe } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getListWorkspacesApiAdminWorkspacesGetQueryKey } from '@/api/generated';
+import { getListProjectsApiAdminProjectsGetQueryKey } from '@/api/generated';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ApiClient from '@/api/client';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { WorkspaceWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/types/backend';
 
 const schema = z.object({
     title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -34,10 +34,10 @@ const schema = z.object({
         .regex(/^[a-z0-9-]+$/, 'Slug must only contain lowercase letters, numbers, and hyphens'),
 });
 
-export default function CreateWorkspacePage() {
+export default function CreateProjectPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { setCurrentWorkspace, setWorkspaces, workspaces } = useAuthStore();
+    const { setCurrentProject, setProjects, projects } = useAuthStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const queryClient = useQueryClient();
 
@@ -68,30 +68,30 @@ export default function CreateWorkspacePage() {
         setIsSubmitting(true);
         try {
             // Manual API call with updated shim
-            const response = await ApiClient.post('/admin/workspaces', data);
-            const newWorkspace = response.data as WorkspaceWithRole;
+            const response = await ApiClient.post('/admin/projects', data);
+            const newProject = response.data as ProjectWithRole;
 
             // Allow immediate access by adding to store
             // Note: backend response might not include user_role because we just created it.
-            // But our updated backend Create returns WorkspaceRead.
+            // But our updated backend Create returns ProjectRead.
             // We know current user is owner.
-            if (!newWorkspace.user_role) {
-                newWorkspace.user_role = 'owner';
+            if (!newProject.user_role) {
+                newProject.user_role = 'owner';
             }
 
-            setWorkspaces([...workspaces, newWorkspace]);
-            setCurrentWorkspace(newWorkspace);
+            setProjects([...projects, newProject]);
+            setCurrentProject(newProject);
 
             // Invalidate React Query list to ensure Sidebar/Switcher are updated
             await queryClient.invalidateQueries({
-                queryKey: getListWorkspacesApiAdminWorkspacesGetQueryKey(),
+                queryKey: getListProjectsApiAdminProjectsGetQueryKey(),
             });
 
-            toast.success(t('admin.workspace.create.success'));
-            navigate(`/admin/workspaces/${newWorkspace.slug}/settings`);
+            toast.success(t('admin.project.create.success'));
+            navigate(`/app/${newProject.slug}/settings`);
         } catch (error: unknown) {
-            const message = parseApiErrorSync(error, t('admin.workspace.create.error'));
-            toast.error(t('admin.workspace.create.error'), {
+            const message = parseApiErrorSync(error, t('admin.project.create.error'));
+            toast.error(t('admin.project.create.error'), {
                 description: message,
             });
         } finally {
@@ -107,11 +107,11 @@ export default function CreateWorkspacePage() {
                         <Plus className="size-6" />
                     </div>
                     <h1 className="text-3xl font-black tracking-tight text-slate-900">
-                        {t('admin.workspace.create.title')}
+                        {t('admin.project.create.title')}
                     </h1>
                 </div>
                 <p className="text-slate-500 font-medium pl-1">
-                    {t('admin.workspace.create.description')}
+                    {t('admin.project.create.description')}
                 </p>
             </div>
 
@@ -119,10 +119,10 @@ export default function CreateWorkspacePage() {
                 <CardHeader className="border-b border-slate-50 pb-6">
                     <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                         <Briefcase className="size-5 text-indigo-500" />
-                        {t('admin.workspace.create.card_title')}
+                        {t('admin.project.create.card_title')}
                     </CardTitle>
                     <CardDescription className="text-sm font-medium text-slate-500">
-                        {t('admin.workspace.create.card_description')}
+                        {t('admin.project.create.card_description')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-8">
@@ -134,12 +134,12 @@ export default function CreateWorkspacePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-2xs font-black text-slate-500">
-                                            {t('admin.workspace.create.name_label')}
+                                            {t('admin.project.create.name_label')}
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder={t(
-                                                    'admin.workspace.create.name_placeholder'
+                                                    'admin.project.create.name_placeholder'
                                                 )}
                                                 className="h-12 rounded-xl bg-white/50 border-slate-200 focus:bg-white transition-all shadow-sm"
                                                 {...field}
@@ -156,13 +156,13 @@ export default function CreateWorkspacePage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-2xs font-black text-slate-500">
-                                            {t('admin.workspace.create.url_label')}
+                                            {t('admin.project.create.url_label')}
                                         </FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
                                                     placeholder={t(
-                                                        'admin.workspace.create.url_placeholder'
+                                                        'admin.project.create.url_placeholder'
                                                     )}
                                                     className="h-12 rounded-xl pl-32 bg-white/50 border-slate-200 focus:bg-white transition-all shadow-sm"
                                                     {...field}
@@ -173,7 +173,7 @@ export default function CreateWorkspacePage() {
                                             </div>
                                         </FormControl>
                                         <FormDescription className="text-2xs italic font-medium px-1">
-                                            {t('admin.workspace.create.url_description')}
+                                            {t('admin.project.create.url_description')}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -187,7 +187,7 @@ export default function CreateWorkspacePage() {
                                     onClick={() => navigate(-1)}
                                 >
                                     <ArrowLeft className="size-4 mr-2" />
-                                    {t('admin.workspace.create.cancel')}
+                                    {t('admin.project.create.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
@@ -197,12 +197,12 @@ export default function CreateWorkspacePage() {
                                     {isSubmitting ? (
                                         <>
                                             <Globe className="size-4 mr-2 animate-spin" />
-                                            {t('admin.workspace.create.creating')}
+                                            {t('admin.project.create.creating')}
                                         </>
                                     ) : (
                                         <>
                                             <Save className="size-4 mr-2" />
-                                            {t('admin.workspace.create.create_button')}
+                                            {t('admin.project.create.create_button')}
                                         </>
                                     )}
                                 </Button>

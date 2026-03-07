@@ -121,14 +121,14 @@ async function request(
     const sessionToken = useSessionStore.getState().token;
     const token = adminToken || sessionToken;
 
-    // Get current workspace ID
-    const currentWorkspace = useAuthStore.getState().currentWorkspace;
-    const workspaceId = currentWorkspace?.id ? String(currentWorkspace.id) : undefined;
+    // Get current project ID
+    const currentProject = useAuthStore.getState().currentProject;
+    const projectId = currentProject?.id ? String(currentProject.id) : undefined;
 
     const headers = {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
+        ...(projectId ? { 'X-Project-ID': projectId } : {}),
         ...options?.headers,
     };
 

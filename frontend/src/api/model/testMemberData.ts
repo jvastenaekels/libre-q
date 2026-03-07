@@ -7,6 +7,6 @@
 
 export interface TestMemberData {
     email: string;
-    workspace_slug: string;
+    project_slug: string;
     role: string;
 }

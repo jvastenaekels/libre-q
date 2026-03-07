@@ -16,8 +16,8 @@ from app.dependencies import (
     PaginationParams,
     check_study_permission,
     get_current_user,
-    get_current_workspace,
-    require_workspace_role,
+    get_current_project,
+    require_project_role,
 )
 from app.limiter import limiter
 from app.models import (
@@ -26,9 +26,9 @@ from app.models import (
     StudyRole,
     StudyState,
     User,
-    Workspace,
-    WorkspaceMember,
-    WorkspaceRole,
+    Project,
+    ProjectMember,
+    ProjectRole,
 )
 from app.schemas import StudyCreate, StudyRead, StudyUpdate
 from app.schemas.concourses import ConcourseImportToStudy, StaleStatementRead
@@ -44,36 +44,36 @@ logger = logging.getLogger(__name__)
 async def create_study(
     request: Request,
     study: StudyCreate,
-    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(
-        require_workspace_role(WorkspaceRole.researcher)
+    project_ctx: tuple[Project, ProjectMember] = Depends(
+        require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
-    """Create a new study in the active workspace.
+    """Create a new study in the active project.
 
-    Requires Owner or Researcher workspace role.
+    Requires Owner or Researcher project role.
     """
-    workspace, _ = workspace_ctx
-    return await StudyService.create_study(db, study, workspace.id)
+    project, _ = project_ctx
+    return await StudyService.create_study(db, study, project.id)
 
 
 @router.get("", response_model=PaginatedResponse[StudyRead])
 async def list_studies(
-    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
 ):
-    """List studies in the active workspace with pagination."""
-    workspace, _ = workspace_ctx
+    """List studies in the active project with pagination."""
+    project, _ = project_ctx
 
-    base = select(Study).where(Study.workspace_id == workspace.id)
+    base = select(Study).where(Study.project_id == project.id)
 
     count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar() or 0
 
     query = (
-        base.options(selectinload(Study.workspace))
+        base.options(selectinload(Study.project))
         .order_by(Study.created_at.desc())
         .limit(pagination.limit)
         .offset(pagination.offset)

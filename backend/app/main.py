@@ -31,7 +31,7 @@ from app.routers.admin import invitations as admin_invitations
 from app.routers.admin import recruitment as admin_recruitment
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
-from app.routers.admin import workspaces as admin_workspaces
+from app.routers.admin import projects as admin_projects
 from app.core.config import settings
 
 # Import test router (only active in test/dev environments)
@@ -146,7 +146,7 @@ app.include_router(
     tags=["admin-recruitment"],
 )
 app.include_router(
-    admin_workspaces.router, prefix="/api/admin/workspaces", tags=["admin-workspaces"]
+    admin_projects.router, prefix="/api/admin/projects", tags=["admin-projects"]
 )
 app.include_router(
     admin_concourses.router,

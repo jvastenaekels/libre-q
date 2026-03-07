@@ -5,9 +5,9 @@ from app.models import (
     Study,
     StudyState,
     User,
-    Workspace,
-    WorkspaceMember,
-    WorkspaceRole,
+    Project,
+    ProjectMember,
+    ProjectRole,
 )
 from app.database import SessionLocal
 from app.utils.security import get_password_hash, create_access_token
@@ -34,21 +34,21 @@ async def test_statement_sync():
             await db.flush()
 
             ws_slug = "sync-ws-v3"
-            await db.execute(delete(Workspace).where(Workspace.slug == ws_slug))
+            await db.execute(delete(Project).where(Project.slug == ws_slug))
             await db.commit()
 
-            ws = Workspace(title="Sync WS", slug=ws_slug)
+            ws = Project(title="Sync WS", slug=ws_slug)
             db.add(ws)
             await db.flush()
 
-            wsm = WorkspaceMember(
-                workspace_id=ws.id, user_id=user.id, role=WorkspaceRole.owner
+            wsm = ProjectMember(
+                project_id=ws.id, user_id=user.id, role=ProjectRole.owner
             )
             db.add(wsm)
 
             study = Study(
                 slug="sync-study-v3",
-                workspace_id=ws.id,
+                project_id=ws.id,
                 state=StudyState.draft,
                 grid_config=[{"score": 0, "capacity": 2}],
                 presort_config={},
@@ -86,7 +86,7 @@ async def test_statement_sync():
             token = create_access_token(
                 subject=user.email, expires_delta=timedelta(minutes=30)
             )
-            headers = {"Authorization": f"Bearer {token}", "X-Workspace-ID": str(ws.id)}
+            headers = {"Authorization": f"Bearer {token}", "X-Project-ID": str(ws.id)}
 
             print("\n--- Phase 1: Add and Update ---")
             update_payload = {
@@ -141,7 +141,7 @@ async def test_statement_sync():
 
             # Cleanup
             await db.execute(delete(User).where(User.id == user.id))
-            await db.execute(delete(Workspace).where(Workspace.id == ws.id))
+            await db.execute(delete(Project).where(Project.id == ws.id))
             await db.commit()
 
 

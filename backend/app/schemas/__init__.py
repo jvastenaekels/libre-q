@@ -77,15 +77,15 @@ from .concourses import (
     StaleStatementRead,
     StaleTranslation,
 )
-from .workspaces import (
-    WorkspaceBrief,
-    WorkspaceCreate,
-    WorkspaceInvitationCreate,
-    WorkspaceMemberRead,
-    WorkspaceMemberUpdate,
-    WorkspaceRead,
-    WorkspaceUpdate,
-    WorkspaceWithRole,
+from .projects import (
+    ProjectBrief,
+    ProjectCreate,
+    ProjectInvitationCreate,
+    ProjectMemberRead,
+    ProjectMemberUpdate,
+    ProjectRead,
+    ProjectUpdate,
+    ProjectWithRole,
 )
 
 __all__ = [
@@ -170,13 +170,13 @@ __all__ = [
     "UserCreate",
     "UserRead",
     "UserUpdate",
-    # workspaces
-    "WorkspaceBrief",
-    "WorkspaceCreate",
-    "WorkspaceInvitationCreate",
-    "WorkspaceMemberRead",
-    "WorkspaceMemberUpdate",
-    "WorkspaceRead",
-    "WorkspaceUpdate",
-    "WorkspaceWithRole",
+    # projects
+    "ProjectBrief",
+    "ProjectCreate",
+    "ProjectInvitationCreate",
+    "ProjectMemberRead",
+    "ProjectMemberUpdate",
+    "ProjectRead",
+    "ProjectUpdate",
+    "ProjectWithRole",
 ]

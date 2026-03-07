@@ -17,26 +17,26 @@ import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 /**
  * ResearcherHub
  *
- * Multi-workspace landing page for researchers with access to multiple workspaces.
- * Shows all workspaces and recent studies across them.
+ * Multi-project landing page for researchers with access to multiple projects.
+ * Shows all projects and recent studies across them.
  */
 export default function ResearcherHub() {
-    const { workspaces, user } = useAuthStore();
-    const { setActiveStudy, setActiveWorkspace } = useAdminStore();
+    const { projects, user } = useAuthStore();
+    const { setActiveStudy, setActiveProject } = useAdminStore();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
     const { data: allStudiesData } = useListStudiesApiAdminStudiesGet();
     const allStudies = allStudiesData?.items;
 
-    const handleWorkspaceClick = (workspaceSlug: string, workspaceId: number) => {
-        setActiveWorkspace(workspaceId);
-        navigate(`/app/${workspaceSlug}/dashboard`);
+    const handleProjectClick = (projectSlug: string, projectId: number) => {
+        setActiveProject(projectId);
+        navigate(`/app/${projectSlug}/dashboard`);
     };
 
-    const handleStudyClick = (workspaceSlug: string, studySlug: string) => {
+    const handleStudyClick = (projectSlug: string, studySlug: string) => {
         setActiveStudy(studySlug);
-        navigate(`/app/${workspaceSlug}/studies/${studySlug}`);
+        navigate(`/app/${projectSlug}/studies/${studySlug}`);
     };
 
     const recentStudies = allStudies?.slice(0, 5) || [];
@@ -56,9 +56,9 @@ export default function ResearcherHub() {
                                 <span className="font-semibold">{user?.email}</span>
                             </p>
                         </div>
-                        <Button onClick={() => navigate('/app/workspaces/new')}>
+                        <Button onClick={() => navigate('/app/projects/new')}>
                             <Plus className="h-4 w-4 mr-2" />
-                            {t('admin.hub.new_workspace', 'New Workspace')}
+                            {t('admin.hub.new_project', 'New Project')}
                         </Button>
                     </div>
                 </div>
@@ -66,17 +66,17 @@ export default function ResearcherHub() {
 
             {/* Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Workspaces Section */}
+                {/* Projects Section */}
                 <section className="mb-12">
                     <h2 className="text-xl font-bold text-slate-900 mb-4">
-                        {t('admin.hub.your_workspaces', 'Your Workspaces')}
+                        {t('admin.hub.your_projects', 'Your Projects')}
                     </h2>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {workspaces?.map((workspace) => (
+                        {projects?.map((project) => (
                             <Card
-                                key={workspace.id}
+                                key={project.id}
                                 className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                                onClick={() => handleWorkspaceClick(workspace.slug, workspace.id)}
+                                onClick={() => handleProjectClick(project.slug, project.id)}
                             >
                                 <CardHeader>
                                     <div className="flex items-start justify-between">
@@ -86,20 +86,20 @@ export default function ResearcherHub() {
                                             </div>
                                             <div>
                                                 <CardTitle className="text-lg font-black">
-                                                    {workspace.title}
+                                                    {project.title}
                                                 </CardTitle>
                                                 <CardDescription className="text-xs">
                                                     <span
                                                         className={cn(
                                                             'px-1.5 py-0.5 rounded text-2xs font-semibold',
-                                                            workspace.user_role === 'owner'
+                                                            project.user_role === 'owner'
                                                                 ? 'bg-amber-100 text-amber-700'
                                                                 : 'bg-blue-100 text-blue-700'
                                                         )}
                                                     >
                                                         {t(
-                                                            `admin.roles.${workspace.user_role}`,
-                                                            workspace.user_role as string
+                                                            `admin.roles.${project.user_role}`,
+                                                            project.user_role as string
                                                         )}
                                                     </span>
                                                 </CardDescription>
@@ -112,7 +112,7 @@ export default function ResearcherHub() {
                                         <TrendingUp className="h-4 w-4" />
                                         <span>
                                             {allStudies?.filter(
-                                                (s) => s.workspace_id === workspace.id
+                                                (s) => s.workspace_id === project.id
                                             ).length || 0}{' '}
                                             {t('admin.hub.studies_count', 'studies')}
                                         </span>
@@ -131,9 +131,7 @@ export default function ResearcherHub() {
                         </h2>
                         <div className="bg-white rounded-lg shadow">
                             {recentStudies.map((study, index) => {
-                                const workspace = workspaces?.find(
-                                    (w) => w.id === study.workspace_id
-                                );
+                                const project = projects?.find((w) => w.id === study.workspace_id);
                                 return (
                                     <div
                                         key={study.id}
@@ -141,8 +139,8 @@ export default function ResearcherHub() {
                                         tabIndex={0}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
-                                                workspace &&
-                                                    handleStudyClick(workspace.slug, study.slug);
+                                                project &&
+                                                    handleStudyClick(project.slug, study.slug);
                                             }
                                         }}
                                         className={cn(
@@ -150,8 +148,7 @@ export default function ResearcherHub() {
                                             index !== recentStudies.length - 1 && 'border-b'
                                         )}
                                         onClick={() =>
-                                            workspace &&
-                                            handleStudyClick(workspace.slug, study.slug)
+                                            project && handleStudyClick(project.slug, study.slug)
                                         }
                                     >
                                         <div>
@@ -159,7 +156,7 @@ export default function ResearcherHub() {
                                                 {study.translations?.[0]?.title || study.slug}
                                             </p>
                                             <p className="text-sm text-slate-500">
-                                                {workspace?.title}
+                                                {project?.title}
                                             </p>
                                         </div>
                                         <div
@@ -171,7 +168,7 @@ export default function ResearcherHub() {
                                             )}
                                         >
                                             {t(
-                                                `admin.workspace.study_states.${study.state}`,
+                                                `admin.project.study_states.${study.state}`,
                                                 study.state as string
                                             )}
                                         </div>

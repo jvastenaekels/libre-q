@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.models import StudyState
 
 from .recruitment import RecruitmentLinkRead
-from .workspaces import WorkspaceBrief
+from .projects import ProjectBrief
 
 
 # Translation Schemas
@@ -231,8 +231,8 @@ class StudyRead(StudyBase):
     """Schema for reading a study."""
 
     id: int
-    workspace_id: int
-    workspace: WorkspaceBrief | None = None
+    project_id: int
+    project: ProjectBrief | None = None
     created_at: datetime
     updated_at: datetime
     start_date: datetime | None = None

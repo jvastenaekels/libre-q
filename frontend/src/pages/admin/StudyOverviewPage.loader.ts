@@ -11,7 +11,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const slug = params.slug || params.studySlug || params.workspaceSlug;
+    const slug = params.slug || params.studySlug || params.projectSlug;
     if (!slug) throw new Error('Slug is required (Study Overview)');
 
     try {

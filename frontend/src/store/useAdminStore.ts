@@ -3,11 +3,11 @@ import { persist } from 'zustand/middleware';
 import { safeLocalStorage } from './safeStorage';
 
 interface AdminState {
-    activeWorkspaceId: number | null;
+    activeProjectId: number | null;
     activeStudyId: string | null;
     lastVisitedStudySlug: string | null;
     sidebarOpen: boolean;
-    setActiveWorkspace: (id: number | null) => void;
+    setActiveProject: (id: number | null) => void;
     setActiveStudy: (id: string | null) => void;
     setSidebarOpen: (open: boolean) => void;
     toggleSidebar: () => void;
@@ -16,11 +16,11 @@ interface AdminState {
 export const useAdminStore = create<AdminState>()(
     persist(
         (set) => ({
-            activeWorkspaceId: null,
+            activeProjectId: null,
             activeStudyId: null,
             lastVisitedStudySlug: null,
             sidebarOpen: true,
-            setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
+            setActiveProject: (id) => set({ activeProjectId: id }),
             setActiveStudy: (id) =>
                 set((state) => ({
                     activeStudyId: id,
@@ -32,8 +32,19 @@ export const useAdminStore = create<AdminState>()(
         {
             name: 'admin-storage',
             storage: safeLocalStorage,
+            version: 2,
+            migrate: (persistedState: unknown, version: number) => {
+                const state = persistedState as Record<string, unknown>;
+                if (version < 2) {
+                    if ('activeWorkspaceId' in state) {
+                        state.activeProjectId = state.activeWorkspaceId;
+                        delete state.activeWorkspaceId;
+                    }
+                }
+                return state as AdminState;
+            },
             partialize: (state) => ({
-                activeWorkspaceId: state.activeWorkspaceId,
+                activeProjectId: state.activeProjectId,
                 activeStudyId: state.activeStudyId,
                 lastVisitedStudySlug: state.lastVisitedStudySlug,
                 sidebarOpen: state.sidebarOpen,

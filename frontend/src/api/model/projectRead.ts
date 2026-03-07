@@ -4,13 +4,15 @@
  * Libre-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { ProjectMemberRead } from './projectMemberRead';
 
 /**
- * Lightweight workspace schema (no members) for nested use in StudyRead.
+ * Schema for reading a project with members.
  */
-export interface WorkspaceBrief {
+export interface ProjectRead {
     id: number;
     title: string;
     slug: string;
     created_at: string;
+    members?: ProjectMemberRead[];
 }

@@ -18,13 +18,13 @@ class TestRecruitment:
         test_user: User,
         auth_token_factory,
         study_factory,
-        workspace_factory,
-        workspace_member_factory,
+        project_factory,
+        project_member_factory,
     ):
         # 1. Setup
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
-        # test_user is already admin of workspace via factory
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        # test_user is already admin of project via factory
         headers = auth_token_factory(test_user)
 
         # 2. Create Links
@@ -57,12 +57,12 @@ class TestRecruitment:
         test_user: User,
         auth_token_factory,
         study_factory,
-        workspace_factory,
-        workspace_member_factory,
+        project_factory,
+        project_member_factory,
     ):
         """Capacity must be > 0; 0 or negative values should be rejected."""
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
         headers = auth_token_factory(test_user)
 
         response = await client.post(
@@ -86,12 +86,12 @@ class TestRecruitment:
         test_user: User,
         auth_token_factory,
         study_factory,
-        workspace_factory,
-        workspace_member_factory,
+        project_factory,
+        project_member_factory,
     ):
         """expires_at and is_active should not be settable via create endpoint."""
-        ws = await workspace_factory(owner=test_user)
-        study = await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
         headers = auth_token_factory(test_user)
 
         # Create with is_active=False — should be ignored (server controls this)
@@ -116,17 +116,17 @@ class TestInvitations:
         test_user: User,
         auth_token_factory,
         study_factory,
-        workspace_factory,
-        workspace_member_factory,
+        project_factory,
+        project_member_factory,
     ):
-        ws = await workspace_factory(owner=test_user)
-        await study_factory(workspace=ws, owner=test_user)
+        ws = await project_factory(owner=test_user)
+        await study_factory(project=ws, owner=test_user)
         # test_user is admin
         headers = auth_token_factory(test_user)
 
         # 1. Invite
         response = await client.post(
-            f"/api/admin/workspaces/{ws.slug}/invitations",
+            f"/api/admin/projects/{ws.slug}/invitations",
             json={"email": "collab@test.com", "role": "researcher"},
             headers=headers,
         )
@@ -140,5 +140,5 @@ class TestInvitations:
         response = await client.get(f"/api/admin/invitations/verify?token={token}")
         assert response.status_code == 200
         assert response.json()["email"] == "collab@test.com"
-        assert response.json()["workspace_name"] == ws.title
-        assert response.json()["workspace_id"] == ws.id
+        assert response.json()["project_name"] == ws.title
+        assert response.json()["project_id"] == ws.id

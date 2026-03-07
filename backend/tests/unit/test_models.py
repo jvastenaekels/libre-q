@@ -6,11 +6,11 @@ from app.models import Study, StudyState, User
 
 
 @pytest.mark.asyncio
-async def test_study_default_state(db, test_workspace):
+async def test_study_default_state(db, test_project):
     """Test that a new study defaults to 'draft' state when persisted."""
     study = Study(
         slug="test-default",
-        workspace_id=test_workspace.id,
+        project_id=test_project.id,
         grid_config={},
         presort_config={},
         postsort_config={},
@@ -22,11 +22,11 @@ async def test_study_default_state(db, test_workspace):
 
 
 @pytest.mark.asyncio
-async def test_study_new_fields(db, test_workspace):
+async def test_study_new_fields(db, test_project):
     """Test show_statement_codes and default_language in Study model."""
     study = Study(
         slug="test-fields",
-        workspace_id=test_workspace.id,
+        project_id=test_project.id,
         grid_config={},
         presort_config={},
         postsort_config={},

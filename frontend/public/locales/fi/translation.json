@@ -34,7 +34,7 @@
         "back": "Takaisin",
         "cancel": "Peruuta",
         "slots": "paikkaa",
-        "workspace_label": "Työtila",
+        "project_label": "Projekti",
         "read_full": "Lue koko väittämä",
         "reduce": "Vähennä",
         "expand": "Laajenna",
@@ -544,9 +544,9 @@
             "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi.",
             "view_all_studies": "Kaikki tutkimukset",
             "study": "Tutkimus",
-            "workspace": "Organisaatio",
-            "select_workspace": "Valitse työtila",
-            "workspace_settings": "Työtilan asetukset",
+            "project": "Projekti",
+            "select_project": "Valitse projekti",
+            "project_settings": "Projektin asetukset",
             "study_tools": "Tutkimustyökalut",
             "concourses": "Lausekokoelmat"
         },
@@ -748,14 +748,14 @@
             "benchmark_above": "Kynnyksen yläpuolella",
             "benchmark_below": "Kynnyksen alapuolella"
         },
-        "workspace": {
+        "project": {
             "remove_member": "Poista jäsen",
-            "table_caption": "Työtilan jäsenet",
+            "table_caption": "Projektin jäsenet",
             "switcher": {
-                "settings": "Työtilan asetukset",
+                "settings": "Projektin asetukset",
                 "settings_desc": "Jäsenet ja profiilit",
-                "new_workspace": "Uusi työtila",
-                "new_workspace_desc": "Luo uusi organisaatio"
+                "new_project": "Uusi projekti",
+                "new_project_desc": "Luo uusi organisaatio"
             },
             "roles": {
                 "owner": "Omistaja",
@@ -765,20 +765,20 @@
                 "viewer": "Tarkastelija"
             },
             "create": {
-                "title": "Luo työtila",
+                "title": "Luo projekti",
                 "description": "Luo uusi organisaatio hallinnoidaksesi tutkimuksiasi ja tiimiäsi.",
-                "card_title": "Työtilan tiedot",
-                "card_description": "Syötä nimi ja URL-tunnus uudelle työtilallesi.",
-                "name_label": "Työtilan nimi",
+                "card_title": "Projektin tiedot",
+                "card_description": "Syötä nimi ja URL-tunnus uudelle projektillesi.",
+                "name_label": "Projektin nimi",
                 "name_placeholder": "Yliopiston tutkimusryhmäni",
-                "url_label": "Työtilan URL",
+                "url_label": "Projektin URL",
                 "url_placeholder": "tutkimusryhma",
-                "url_description": "Tätä käytetään työtilasi URL-osoitteessa.",
+                "url_description": "Tätä käytetään projektisi URL-osoitteessa.",
                 "cancel": "Peruuta",
-                "create_button": "Luo työtila",
+                "create_button": "Luo projekti",
                 "creating": "Luodaan...",
-                "success": "Työtila luotu onnistuneesti",
-                "error": "Työtilan luominen epäonnistui"
+                "success": "Projekti luotu onnistuneesti",
+                "error": "Projektin luominen epäonnistui"
             },
             "study_states": {
                 "draft": "Luonnos",
@@ -950,11 +950,11 @@
             "title": "Globaali komentovalikko",
             "placeholder": "Kirjoita komento tai hae...",
             "no_results": "Tuloksia ei löytynyt.",
-            "switch_workspace": "Vaihda työtilaa",
+            "switch_project": "Vaihda projektia",
             "switch_study": "Vaihda tutkimusta",
             "study_actions": "Tutkimuksen toiminnot",
             "system": "Järjestelmä",
-            "no_studies": "Ei tutkimuksia tässä työtilassa.",
+            "no_studies": "Ei tutkimuksia tässä projektissa.",
             "open_dashboard": "Avaa kojelauta",
             "design_study": "Tutkimuksen suunnittelu",
             "collaborators": "Yhteistyökumppanit",
@@ -966,10 +966,10 @@
             "active": "Aktiivinen",
             "link_copied": "Tutkimuksen linkki kopioitu!",
             "logged_out": "Uloskirjautuminen onnistui",
-            "switched_workspace": "Vaihdettu tilaan {{name}}"
+            "switched_project": "Vaihdettu projektiin {{name}}"
         },
         "dashboard": {
-            "title": "Työtilan yhteenveto",
+            "title": "Projektin yhteenveto",
             "welcome": "Tervetuloa takaisin,",
             "snapshot": "Tässä on yhteenveto tutkimustoiminnastasi.",
             "create_study": "Luo tutkimus",
@@ -1931,28 +1931,28 @@
                 "save_error": "Tallennustilakiintiön päivitys epäonnistui"
             }
         },
-        "workspaces": {
-            "title": "Työtilat",
+        "projects": {
+            "title": "Projektit",
             "settings": {
-                "title": "Työtilan asetukset",
-                "identity_desc": "Hallitse työtilan identiteettiä ja tiimin käyttöoikeuksia.",
+                "title": "Projektin asetukset",
+                "identity_desc": "Hallitse projektin identiteettiä ja tiimin käyttöoikeuksia.",
                 "general": {
                     "title": "Yleiset asetukset",
-                    "desc": "Työtilasi identiteetti ja ensisijainen tunnistus.",
-                    "label_title": "Työtilan nimi",
+                    "desc": "Projektisi identiteetti ja ensisijainen tunnistus.",
+                    "label_title": "Projektin nimi",
                     "placeholder_title": "Oma mahtava laboratorio",
                     "label_slug": "URL-osoitteen polku",
                     "placeholder_slug": "oma-labra",
                     "slug_hint": "Polun muuttaminen päivittää kaikki tutkimuksen hallintapaneelin linkit.",
                     "save": "Tallenna muutokset",
-                    "save_success": "Työtila päivitetty onnistuneesti",
-                    "save_error": "Työtilan päivitys epäonnistui"
+                    "save_success": "Projekti päivitetty onnistuneesti",
+                    "save_error": "Projektin päivitys epäonnistui"
                 },
                 "team_growth_title": "Tiimin hallinta",
-                "team_growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He voivat hallinnoida kaikkia työtilan tutkimuksia.",
+                "team_growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita projektiisi. He voivat hallinnoida kaikkia projektin tutkimuksia.",
                 "team": {
                     "title": "Tiimin jäsenet",
-                    "desc": "Luettelo käyttäjistä, joilla on pääsy tähän työtilaan.",
+                    "desc": "Luettelo käyttäjistä, joilla on pääsy tähän projektiin.",
                     "col_user": "Käyttäjä",
                     "col_role": "Rooli",
                     "col_joined": "Liittynyt",
@@ -1961,24 +1961,24 @@
                     "remove_success": "Jäsen poistettu onnistuneesti",
                     "remove_error": "Jäsenen poistaminen epäonnistui",
                     "growth_title": "Tiimin kasvu",
-                    "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He pystyvät hallitsemaan kaikkia tämän työtilan tutkimuksia.",
+                    "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita projektiisi. He pystyvät hallitsemaan kaikkia tämän projektin tutkimuksia.",
                     "invite_button": "Kutsu yhteistyökumppani",
                     "permissions_matrix": {
                         "title": "Käyttöoikeusmatriisi",
                         "admin": {
                             "label": "Admin",
                             "badge": "Täysi pääsy",
-                            "desc": "Voi hallita työtilan asetuksia, jäseniä ja kaikkia tutkimuksia."
+                            "desc": "Voi hallita projektin asetuksia, jäseniä ja kaikkia tutkimuksia."
                         },
                         "researcher": {
                             "label": "Tutkija",
                             "badge": "Luonti",
-                            "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy työtilan asetuksiin."
+                            "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy projektin asetuksiin."
                         },
                         "viewer": {
                             "label": "Katsoja",
                             "badge": "Luku-oikeus",
-                            "desc": "Vain luku -pääsy kaikkiin työtilan tutkimuksiin ja tietoihin."
+                            "desc": "Vain luku -pääsy kaikkiin projektin tutkimuksiin ja tietoihin."
                         }
                     },
                     "coming_soon": "Tulossa pian",
@@ -1999,8 +1999,8 @@
         "hub": {
             "title": "Tutkijaportaali",
             "welcome": "Tervetuloa takaisin, ",
-            "new_workspace": "Uusi työtila",
-            "your_workspaces": "Työtilasi",
+            "new_project": "Uusi projekti",
+            "your_projects": "Projektisi",
             "studies_count": "tutkimusta",
             "recent_studies": "Viimeisimmät tutkimukset"
         },

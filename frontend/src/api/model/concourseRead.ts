@@ -12,7 +12,7 @@ import type { ConcourseReadCreatedBy } from './concourseReadCreatedBy';
  */
 export interface ConcourseRead {
     id: number;
-    workspace_id: number;
+    project_id: number;
     title: string;
     description?: ConcourseReadDescription;
     item_count?: number;

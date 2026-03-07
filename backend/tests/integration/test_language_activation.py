@@ -1,21 +1,21 @@
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import User, Workspace
+from app.models import User, Project
 
 
 @pytest.mark.asyncio
 async def test_activate_study_only_french(
     client: AsyncClient,
     test_user: User,
-    test_workspace: Workspace,
+    test_project: Project,
     auth_token_factory,
     db: AsyncSession,
 ):
     """Verify that a study can be activated even if English is missing, provided French is the default."""
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     # 1. Create a study with ONLY French translation and default_language="fr"
@@ -72,14 +72,14 @@ async def test_activate_study_only_french(
 async def test_activate_study_missing_default_fails(
     client: AsyncClient,
     test_user: User,
-    test_workspace: Workspace,
+    test_project: Project,
     auth_token_factory,
     db: AsyncSession,
 ):
     """Verify that activation STILL fails if the default language translation is missing."""
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     # Create a study with ONLY French translation but default_language is "en"
@@ -152,14 +152,14 @@ async def test_activate_study_missing_default_fails(
 async def test_create_study_auto_default_language(
     client: AsyncClient,
     test_user: User,
-    test_workspace: Workspace,
+    test_project: Project,
     auth_token_factory,
     db: AsyncSession,
 ):
     """Verify that creating a study without default_language picks the first translation's language."""
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     payload = {

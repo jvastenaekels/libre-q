@@ -6,36 +6,34 @@ from pydantic import BaseModel
 from app.utils.security import decode_invitation_token
 from app.limiter import limiter
 from app.dependencies import get_current_user, get_db
-from app.models import User, WorkspaceMember, WorkspaceRole
+from app.models import User, ProjectMember, ProjectRole
 
 router = APIRouter(tags=["Admin Invitations"])
 
 
-# Endpoint /slug/invite is deprecated and removed. Functionality moved to workspaces endpoint.
+# Endpoint /slug/invite is deprecated and removed. Functionality moved to projects endpoint.
 
 
 @router.get("/verify")
 async def verify_invitation(token: str, db: AsyncSession = Depends(get_db)):
-    """Verify an invitation token and return details including workspace name."""
+    """Verify an invitation token and return details including project name."""
     try:
         payload = decode_invitation_token(token)
-        workspace_id = payload.get("workspace_id")
+        project_id = payload.get("project_id") or payload.get("workspace_id")
 
-        workspace_name = "Unknown Workspace"
-        if workspace_id:
-            from app.models import Workspace
+        project_name = "Unknown Project"
+        if project_id:
+            from app.models import Project
 
-            result = await db.execute(
-                select(Workspace).where(Workspace.id == workspace_id)
-            )
-            workspace = result.scalar_one_or_none()
-            if workspace:
-                workspace_name = workspace.title
+            result = await db.execute(select(Project).where(Project.id == project_id))
+            project = result.scalar_one_or_none()
+            if project:
+                project_name = project.title
 
         return {
             "email": payload["sub"],
-            "workspace_id": workspace_id,
-            "workspace_name": workspace_name,
+            "project_id": project_id,
+            "project_name": project_name,
             "role": payload["role"],
         }
     except Exception as e:
@@ -76,31 +74,31 @@ async def accept_invitation(
             detail="This invitation was sent to a different email address.",
         )
 
-    workspace_id = payload.get("workspace_id")
+    project_id = payload.get("project_id") or payload.get("workspace_id")
     role = payload.get("role")
 
-    if not workspace_id or not role:
+    if not project_id or not role:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token payload"
         )
 
     # Check if already a member
     result = await db.execute(
-        select(WorkspaceMember).where(
-            WorkspaceMember.workspace_id == workspace_id,
-            WorkspaceMember.user_id == current_user.id,
+        select(ProjectMember).where(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == current_user.id,
         )
     )
     if result.scalar_one_or_none():
-        return {"message": "Already a member of this workspace"}
+        return {"message": "Already a member of this project"}
 
     # Add member
-    member = WorkspaceMember(
-        workspace_id=workspace_id,
+    member = ProjectMember(
+        project_id=project_id,
         user_id=current_user.id,
-        role=WorkspaceRole(role),
+        role=ProjectRole(role),
     )
     db.add(member)
     await db.commit()
 
-    return {"message": "Invitation accepted", "workspace_id": workspace_id}
+    return {"message": "Invitation accepted", "project_id": project_id}

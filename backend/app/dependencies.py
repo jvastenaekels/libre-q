@@ -18,12 +18,12 @@ from app.models import (
     Study,
     StudyRole,
     User,
-    WorkspaceMember,
-    WorkspaceRole,
+    ProjectMember,
+    ProjectRole,
 )
 
 if TYPE_CHECKING:
-    from app.models import Workspace
+    from app.models import Project
 from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
@@ -71,34 +71,34 @@ async def get_current_active_user(
     return current_user
 
 
-async def get_current_workspace(
-    x_workspace_id: str | None = Header(None, alias="X-Workspace-ID"),
+async def get_current_project(
+    x_project_id: str | None = Header(None, alias="X-Project-ID"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> tuple["Workspace", WorkspaceMember]:
-    """Validate workspace context from header and return workspace + member info."""
-    if not x_workspace_id:
+) -> tuple["Project", ProjectMember]:
+    """Validate project context from header and return project + member info."""
+    if not x_project_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="X-Workspace-ID header is required",
+            detail="X-Project-ID header is required",
         )
 
     try:
-        workspace_id = int(x_workspace_id)
+        project_id = int(x_project_id)
     except ValueError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Workspace ID"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Project ID"
         )
 
-    from app.models import Workspace
+    from app.models import Project
 
     # Check permission
     # Query membership
     query = (
-        select(Workspace, WorkspaceMember)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-        .where(Workspace.id == workspace_id)
-        .where(WorkspaceMember.user_id == current_user.id)
+        select(Project, ProjectMember)
+        .join(ProjectMember, ProjectMember.project_id == Project.id)
+        .where(Project.id == project_id)
+        .where(ProjectMember.user_id == current_user.id)
     )
 
     result = await db.execute(query)
@@ -107,18 +107,18 @@ async def get_current_workspace(
     if not row:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access to this workspace is denied",
+            detail="Access to this project is denied",
         )
 
-    return cast(tuple[Workspace, WorkspaceMember], row)
+    return cast(tuple[Project, ProjectMember], row)
 
 
 # --- RBAC Logic ---
 
 ROLE_MAP = {
-    WorkspaceRole.owner: StudyRole.owner,
-    WorkspaceRole.researcher: StudyRole.editor,
-    WorkspaceRole.viewer: StudyRole.viewer,
+    ProjectRole.owner: StudyRole.owner,
+    ProjectRole.researcher: StudyRole.editor,
+    ProjectRole.viewer: StudyRole.viewer,
 }
 
 STUDY_ROLE_HIERARCHY = {
@@ -128,10 +128,10 @@ STUDY_ROLE_HIERARCHY = {
 }
 
 
-WORKSPACE_ROLE_HIERARCHY = {
-    WorkspaceRole.owner: 40,
-    WorkspaceRole.researcher: 20,
-    WorkspaceRole.viewer: 10,
+PROJECT_ROLE_HIERARCHY = {
+    ProjectRole.owner: 40,
+    ProjectRole.researcher: 20,
+    ProjectRole.viewer: 10,
 }
 
 
@@ -147,20 +147,18 @@ async def check_superuser(
     return current_user
 
 
-def require_workspace_role(required_role: WorkspaceRole) -> Callable:
-    """Factory creating a dependency that validates workspace role from the X-Workspace-ID header.
+def require_project_role(required_role: ProjectRole) -> Callable:
+    """Factory creating a dependency that validates project role from the X-Project-ID header.
 
-    Returns the (Workspace, WorkspaceMember) tuple if the user has the required role.
+    Returns the (Project, ProjectMember) tuple if the user has the required role.
     """
 
     async def dependency(
-        workspace_ctx: tuple["Workspace", WorkspaceMember] = Depends(
-            get_current_workspace
-        ),
-    ) -> tuple["Workspace", WorkspaceMember]:
-        _, member = workspace_ctx
-        required_level = WORKSPACE_ROLE_HIERARCHY[required_role]
-        user_level = WORKSPACE_ROLE_HIERARCHY[member.role]
+        project_ctx: tuple["Project", ProjectMember] = Depends(get_current_project),
+    ) -> tuple["Project", ProjectMember]:
+        _, member = project_ctx
+        required_level = PROJECT_ROLE_HIERARCHY[required_role]
+        user_level = PROJECT_ROLE_HIERARCHY[member.role]
 
         if user_level < required_level:
             raise HTTPException(
@@ -168,27 +166,27 @@ def require_workspace_role(required_role: WorkspaceRole) -> Callable:
                 detail=f"Insufficient permissions. Required: {required_role.value}",
             )
 
-        return workspace_ctx
+        return project_ctx
 
     return dependency
 
 
-def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
-    """Factory creating a dependency to verify workspace access."""
+def check_project_permission(required_role: ProjectRole) -> Callable:
+    """Factory creating a dependency to verify project access."""
 
     async def permission_dependency(
-        slug: str = Path(..., description="The slug of the workspace"),
+        slug: str = Path(..., description="The slug of the project"),
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
-    ) -> "Workspace":
-        """Dependency that returns the Workspace if the user has required workspace role."""
-        from app.models import Workspace
+    ) -> "Project":
+        """Dependency that returns the Project if the user has required project role."""
+        from app.models import Project
 
         query = (
-            select(Workspace, WorkspaceMember)
-            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-            .where(Workspace.slug == slug)
-            .where(WorkspaceMember.user_id == current_user.id)
+            select(Project, ProjectMember)
+            .join(ProjectMember, ProjectMember.project_id == Project.id)
+            .where(Project.slug == slug)
+            .where(ProjectMember.user_id == current_user.id)
         )
 
         result = await db.execute(query)
@@ -197,14 +195,14 @@ def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
         if not row:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Workspace not found or access denied",
+                detail="Project not found or access denied",
             )
 
-        workspace, member = row
+        project, member = row
 
         # Check Role Hierarchy
-        required_level = WORKSPACE_ROLE_HIERARCHY[required_role]
-        user_level = WORKSPACE_ROLE_HIERARCHY[member.role]
+        required_level = PROJECT_ROLE_HIERARCHY[required_role]
+        user_level = PROJECT_ROLE_HIERARCHY[member.role]
 
         if user_level < required_level:
             raise HTTPException(
@@ -212,7 +210,7 @@ def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
                 detail=f"Insufficient permissions. Required: {required_role.value}",
             )
 
-        return cast(Workspace, workspace)
+        return cast(Project, project)
 
     return permission_dependency
 
@@ -225,15 +223,15 @@ def check_study_permission(required_role: StudyRole) -> Callable:
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
     ) -> Study:
-        """Dependency that returns the Study if the user has required study role (via Workspace)."""
-        # Strategy: Check Workspace Membership for the Study's Workspace
+        """Dependency that returns the Study if the user has required study role (via Project)."""
+        # Strategy: Check Project Membership for the Study's Project
         query = (
-            select(Study, WorkspaceMember)
-            .join(Study.workspace)
-            .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
-            .options(selectinload(Study.workspace))
+            select(Study, ProjectMember)
+            .join(Study.project)
+            .join(ProjectMember, ProjectMember.project_id == Study.project_id)
+            .options(selectinload(Study.project))
             .where(Study.slug == slug)
-            .where(WorkspaceMember.user_id == current_user.id)
+            .where(ProjectMember.user_id == current_user.id)
         )
 
         result = await db.execute(query)
@@ -247,11 +245,11 @@ def check_study_permission(required_role: StudyRole) -> Callable:
 
         study, member = row
 
-        # Map WorkspaceRole to StudyRole equivalent for hierarchy check
+        # Map ProjectRole to StudyRole equivalent for hierarchy check
         # We use strict mapping or hierarchy
-        # Workspace Owner/Admin -> Study Owner
-        # Workspace Researcher -> Study Editor
-        # Workspace Viewer -> Study Viewer
+        # Project Owner/Admin -> Study Owner
+        # Project Researcher -> Study Editor
+        # Project Viewer -> Study Viewer
 
         effective_study_role = ROLE_MAP.get(member.role, StudyRole.viewer)
 
@@ -261,7 +259,7 @@ def check_study_permission(required_role: StudyRole) -> Callable:
         if user_level < required_level:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions. Required: {required_role.value} (via Workspace Role)",
+                detail=f"Insufficient permissions. Required: {required_role.value} (via Project Role)",
             )
 
         return cast(Study, study)

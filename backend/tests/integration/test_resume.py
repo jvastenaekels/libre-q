@@ -112,19 +112,19 @@ class TestResumeEndpoint:
         db: AsyncSession,
         active_study: Study,
         user_factory,
-        workspace_factory,
+        project_factory,
     ):
         """Resume code from study A does not work on study B."""
         _token, code = await self._consent_participant(client, active_study)
 
         # Create a different active study
         u = await user_factory()
-        ws = await workspace_factory(owner=u)
+        ws = await project_factory(owner=u)
         from app.models import StudyState, StudyTranslation
 
         other = Study(
             slug="other-study",
-            workspace_id=ws.id,
+            project_id=ws.id,
             state=StudyState.active,
             grid_config=[],
             presort_config={},

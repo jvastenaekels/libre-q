@@ -13,7 +13,7 @@ from app.dependencies import (
     ROLE_MAP,
     STUDY_ROLE_HIERARCHY,
 )
-from app.models import Study, StudyRole, RecruitmentLink, WorkspaceMember, User
+from app.models import Study, StudyRole, RecruitmentLink, ProjectMember, User
 from app.schemas import RecruitmentLinkCreate, RecruitmentLinkRead
 from app.services.recruitment_service import RecruitmentService
 from sqlalchemy import select
@@ -69,12 +69,12 @@ async def revoke_recruitment_link(
     # 1. Fetch Link + Permissions
     # We require Editor permission on the study
     stmt = (
-        select(RecruitmentLink, Study, WorkspaceMember)
+        select(RecruitmentLink, Study, ProjectMember)
         .join(Study, Study.id == RecruitmentLink.study_id)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(ProjectMember, ProjectMember.project_id == Study.project_id)
         .where(
             RecruitmentLink.id == link_id,
-            WorkspaceMember.user_id == current_user.id,
+            ProjectMember.user_id == current_user.id,
         )
     )
     result = await db.execute(stmt)

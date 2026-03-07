@@ -5,12 +5,12 @@
  */
 
 import { useAuthStore } from '@/store/useAuthStore';
-import type { WorkspaceRole } from '@/api/model/workspaceRole';
+import type { ProjectRole } from '@/api/model/projectRole';
 
 type Permission =
-    | 'workspace:delete'
-    | 'workspace:manage_team'
-    | 'workspace:settings'
+    | 'project:delete'
+    | 'project:manage_team'
+    | 'project:settings'
     | 'study:create'
     | 'study:delete'
     | 'study:edit_design'
@@ -19,18 +19,18 @@ type Permission =
     | 'study:launch_recruitment';
 
 /**
- * Permission matrix based on workspace roles
+ * Permission matrix based on project roles
  *
  * Roles:
- * - owner: Full control over workspace and all studies
- * - researcher: Can create and edit studies, but cannot manage workspace team
+ * - owner: Full control over project and all studies
+ * - researcher: Can create and edit studies, but cannot manage project team
  * - viewer: Read-only access
  */
-const PERMISSION_MATRIX: Record<WorkspaceRole, Set<Permission>> = {
+const PERMISSION_MATRIX: Record<ProjectRole, Set<Permission>> = {
     owner: new Set([
-        'workspace:delete',
-        'workspace:manage_team',
-        'workspace:settings',
+        'project:delete',
+        'project:manage_team',
+        'project:settings',
         'study:create',
         'study:delete',
         'study:edit_design',
@@ -50,17 +50,17 @@ const PERMISSION_MATRIX: Record<WorkspaceRole, Set<Permission>> = {
 };
 
 /**
- * Hook to check user permissions based on workspace role
+ * Hook to check user permissions based on project role
  */
 export function usePermission() {
-    const { currentWorkspace } = useAuthStore();
+    const { currentProject } = useAuthStore();
 
     const hasPermission = (permission: Permission): boolean => {
-        if (!currentWorkspace?.user_role) {
+        if (!currentProject?.user_role) {
             return false;
         }
 
-        const role = currentWorkspace.user_role as WorkspaceRole;
+        const role = currentProject.user_role as ProjectRole;
         const rolePermissions = PERMISSION_MATRIX[role];
         return rolePermissions?.has(permission) || false;
     };
@@ -71,9 +71,9 @@ export function usePermission() {
     return {
         can,
         cannot,
-        role: currentWorkspace?.user_role,
-        isOwner: currentWorkspace?.user_role === 'owner',
-        isResearcher: currentWorkspace?.user_role === 'researcher',
-        isViewer: currentWorkspace?.user_role === 'viewer',
+        role: currentProject?.user_role,
+        isOwner: currentProject?.user_role === 'owner',
+        isResearcher: currentProject?.user_role === 'researcher',
+        isViewer: currentProject?.user_role === 'viewer',
     };
 }

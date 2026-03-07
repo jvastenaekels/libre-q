@@ -20,7 +20,7 @@ This tutorial continues from [Your First Study](your-first-study.md).
 
 ## Step 1: Navigate to the Recruitment Page
 
-1. From the admin dashboard, make sure your workspace and study are selected.
+1. From the admin dashboard, make sure your project and study are selected.
 2. In the left sidebar, click **Recruitment**.
 
 You will see summary cards at the top: **Total Links**, **Started**, and **Submitted**.

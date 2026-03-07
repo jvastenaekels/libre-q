@@ -13,7 +13,7 @@
 
 ### Backend (Python/FastAPI)
 - **Entry:** [backend/app/main.py](../../backend/app/main.py) — FastAPI app with middleware, exception handlers, CORS.
-- **Models:** [backend/app/models.py](../../backend/app/models.py) — SQLAlchemy async models (Workspaces, Studies, Participants, Submissions).
+- **Models:** [backend/app/models.py](../../backend/app/models.py) — SQLAlchemy async models (Projects, Studies, Participants, Submissions).
 - **Schemas:** [backend/app/schemas.py](../../backend/app/schemas.py) — Pydantic validation schemas; all HTTP I/O uses these.
 - **Services:** [backend/app/services/](../../backend/app/services/) — Business logic layer (study_service, export_service, recruitment_service).
 - **Routers:** [backend/app/routers/](../../backend/app/routers/) — HTTP endpoint definitions; delegate to services.

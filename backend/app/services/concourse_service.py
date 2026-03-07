@@ -45,11 +45,11 @@ class ConcourseService:
 
     @staticmethod
     async def _verify_concourse_ownership(
-        db: AsyncSession, concourse_id: int, workspace_id: int
+        db: AsyncSession, concourse_id: int, project_id: int
     ) -> Concourse:
-        """Load a concourse and verify it belongs to the given workspace."""
+        """Load a concourse and verify it belongs to the given project."""
         concourse = await db.get(Concourse, concourse_id)
-        if concourse is None or concourse.workspace_id != workspace_id:
+        if concourse is None or concourse.project_id != project_id:
             raise NotFoundError("Concourse")
         return concourse
 
@@ -70,12 +70,12 @@ class ConcourseService:
     @staticmethod
     async def create_concourse(
         db: AsyncSession,
-        workspace_id: int,
+        project_id: int,
         data: ConcourseCreate,
         user_id: int,
     ) -> Concourse:
         concourse = Concourse(
-            workspace_id=workspace_id,
+            project_id=project_id,
             title=data.title,
             description=data.description,
             created_by=user_id,
@@ -89,12 +89,12 @@ class ConcourseService:
     @staticmethod
     async def list_concourses(
         db: AsyncSession,
-        workspace_id: int,
+        project_id: int,
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[Concourse], int]:
         """Return concourses with item counts."""
-        base = select(Concourse).where(Concourse.workspace_id == workspace_id)
+        base = select(Concourse).where(Concourse.project_id == project_id)
 
         count_result = await db.execute(
             select(func.count()).select_from(base.subquery())
@@ -138,10 +138,10 @@ class ConcourseService:
 
     @staticmethod
     async def update_concourse(
-        db: AsyncSession, workspace_id: int, concourse_id: int, data: ConcourseUpdate
+        db: AsyncSession, project_id: int, concourse_id: int, data: ConcourseUpdate
     ) -> Concourse:
         concourse = await ConcourseService._verify_concourse_ownership(
-            db, concourse_id, workspace_id
+            db, concourse_id, project_id
         )
 
         update_data = data.model_dump(exclude_unset=True)
@@ -493,20 +493,20 @@ class ConcourseService:
     # ------------------------------------------------------------------
 
     @staticmethod
-    async def list_tags(db: AsyncSession, workspace_id: int) -> list[ConcourseTag]:
+    async def list_tags(db: AsyncSession, project_id: int) -> list[ConcourseTag]:
         result = await db.execute(
             select(ConcourseTag)
-            .where(ConcourseTag.workspace_id == workspace_id)
+            .where(ConcourseTag.project_id == project_id)
             .order_by(ConcourseTag.name)
         )
         return list(result.scalars().all())
 
     @staticmethod
     async def create_tag(
-        db: AsyncSession, workspace_id: int, data: ConcourseTagCreate
+        db: AsyncSession, project_id: int, data: ConcourseTagCreate
     ) -> ConcourseTag:
         tag = ConcourseTag(
-            workspace_id=workspace_id,
+            project_id=project_id,
             name=data.name,
             color=data.color,
         )
@@ -516,9 +516,9 @@ class ConcourseService:
         return tag
 
     @staticmethod
-    async def delete_tag(db: AsyncSession, workspace_id: int, tag_id: int) -> None:
+    async def delete_tag(db: AsyncSession, project_id: int, tag_id: int) -> None:
         tag = await db.get(ConcourseTag, tag_id)
-        if tag is None or tag.workspace_id != workspace_id:
+        if tag is None or tag.project_id != project_id:
             raise NotFoundError("ConcourseTag")
         await db.delete(tag)
         await db.commit()
@@ -544,9 +544,9 @@ class ConcourseService:
         concourse = await db.get(Concourse, data.concourse_id)
         if concourse is None:
             raise NotFoundError("Concourse")
-        if concourse.workspace_id != study.workspace_id:
+        if concourse.project_id != study.project_id:
             raise ValidationError(
-                "Concourse must belong to the same workspace as the study."
+                "Concourse must belong to the same project as the study."
             )
 
         # Load requested items with translations

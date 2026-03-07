@@ -38,8 +38,8 @@ async def validate_schema() -> None:
 
             # Check required tables
             required_tables = [
-                "workspaces",
-                "workspace_members",
+                "projects",
+                "project_members",
                 "studies",
                 # "study_collaborators", # Removed
                 "study_translations",
@@ -60,7 +60,7 @@ async def validate_schema() -> None:
                 for col in [
                     "randomize_statement_order",
                     "show_statement_codes",
-                    "workspace_id",
+                    "project_id",
                 ]:
                     if col not in study_columns:
                         issues.append(("missing_column", f"studies.{col}"))

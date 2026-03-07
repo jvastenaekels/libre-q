@@ -37,7 +37,7 @@
         "statement": "Énoncé",
         "step": "Étape",
         "slots": "emplacements",
-        "workspace_label": "Esp. de travail",
+        "project_label": "Projet",
         "yes": "Oui",
         "no": "Non",
         "score": "Score",
@@ -544,9 +544,9 @@
             "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer.",
             "view_all_studies": "Toutes les études",
             "study": "Étude",
-            "workspace": "Organisation",
-            "select_workspace": "Choisir un espace",
-            "workspace_settings": "Réglages de l'organisation",
+            "project": "Projet",
+            "select_project": "Choisir un projet",
+            "project_settings": "Réglages du projet",
             "study_tools": "Outils d'étude",
             "concourses": "Concours"
         },
@@ -748,9 +748,9 @@
             "benchmark_above": "Au-dessus du seuil",
             "benchmark_below": "En dessous du seuil"
         },
-        "workspace": {
+        "project": {
             "remove_member": "Retirer le membre",
-            "table_caption": "Membres de l'espace de travail",
+            "table_caption": "Membres du projet",
             "roles": {
                 "owner": "Propriétaire",
                 "admin": "Administrateur",
@@ -759,26 +759,26 @@
                 "viewer": "Observateur"
             },
             "switcher": {
-                "settings": "Paramètres de l'espace",
+                "settings": "Paramètres du projet",
                 "settings_desc": "Membres et profils",
-                "new_workspace": "Nouvel espace",
-                "new_workspace_desc": "Créer une nouvelle organisation"
+                "new_project": "Nouveau projet",
+                "new_project_desc": "Créer une nouvelle organisation"
             },
             "create": {
-                "title": "Créer un espace de travail",
+                "title": "Créer un projet",
                 "description": "Créez une nouvelle organisation pour gérer vos études et votre équipe.",
-                "card_title": "Détails de l'espace",
-                "card_description": "Entrez le nom et l'identifiant URL de votre nouvel espace.",
-                "name_label": "Nom de l'espace",
+                "card_title": "Détails du projet",
+                "card_description": "Entrez le nom et l'identifiant URL de votre nouveau projet.",
+                "name_label": "Nom du projet",
                 "name_placeholder": "Mon groupe de recherche universitaire",
-                "url_label": "URL de l'espace",
+                "url_label": "URL du projet",
                 "url_placeholder": "mon-groupe-recherche",
-                "url_description": "Ceci sera utilisé dans l'URL de votre espace de travail.",
+                "url_description": "Ceci sera utilisé dans l'URL de votre projet.",
                 "cancel": "Annuler",
-                "create_button": "Créer l'espace",
+                "create_button": "Créer le projet",
                 "creating": "Création...",
-                "success": "Espace créé avec succès",
-                "error": "Échec de la création de l'espace"
+                "success": "Projet créé avec succès",
+                "error": "Échec de la création du projet"
             },
             "study_states": {
                 "draft": "Brouillon",
@@ -950,7 +950,7 @@
             "title": "Menu de commandes global",
             "placeholder": "Tapez une commande ou cherchez...",
             "no_results": "Aucun résultat trouvé.",
-            "switch_workspace": "Changer d'espace de travail",
+            "switch_project": "Changer de projet",
             "switch_study": "Changer d'étude",
             "study_actions": "Actions de l'étude",
             "system": "Système",
@@ -966,10 +966,10 @@
             "active": "Actif",
             "link_copied": "Lien de l'étude copié !",
             "logged_out": "Déconnexion réussie",
-            "switched_workspace": "Basculé vers {{name}}"
+            "switched_project": "Basculé vers {{name}}"
         },
         "dashboard": {
-            "title": "Tableau de bord de l'espace",
+            "title": "Tableau de bord du projet",
             "welcome": "Bon retour,",
             "snapshot": "Voici un aperçu de votre activité de recherche.",
             "create_study": "Créer une étude",
@@ -1931,28 +1931,28 @@
                 "save_error": "Échec de la mise à jour du quota de stockage"
             }
         },
-        "workspaces": {
-            "title": "Espaces de travail",
+        "projects": {
+            "title": "Projets",
             "settings": {
-                "title": "Paramètres de l'espace de travail",
-                "identity_desc": "Gérez l'identité de l'espace de travail et le contrôle d'accès de l'équipe.",
+                "title": "Paramètres du projet",
+                "identity_desc": "Gérez l'identité du projet et le contrôle d'accès de l'équipe.",
                 "general": {
                     "title": "Paramètres généraux",
-                    "desc": "Identité et identification primaire de votre espace de travail.",
-                    "label_title": "Titre de l'espace de travail",
+                    "desc": "Identité et identification primaire de votre projet.",
+                    "label_title": "Titre du projet",
                     "placeholder_title": "Laboratoire de recherche institutionnel",
                     "label_slug": "Slug d'URL",
                     "placeholder_slug": "mon-labo",
                     "slug_hint": "Changer le slug mettra à jour tous les liens de votre tableau de bord de recherche.",
                     "save": "Enregistrer les modifications",
-                    "save_success": "Espace de travail mis à jour avec succès",
-                    "save_error": "Échec de la mise à jour de l'espace de travail"
+                    "save_success": "Projet mis à jour avec succès",
+                    "save_error": "Échec de la mise à jour du projet"
                 },
                 "team_growth_title": "Gérer l'équipe",
-                "team_growth_desc": "Besoin de plus de chercheurs ? Vous pouvez inviter des collaborateurs à votre espace de travail. Ils pourront gérer toutes les études au sein de cet espace.",
+                "team_growth_desc": "Besoin de plus de chercheurs ? Vous pouvez inviter des collaborateurs à votre projet. Ils pourront gérer toutes les études au sein de ce projet.",
                 "team": {
                     "title": "Membres de l'équipe",
-                    "desc": "Liste des utilisateurs ayant accès à cet espace de travail.",
+                    "desc": "Liste des utilisateurs ayant accès à ce projet.",
                     "col_user": "Utilisateur",
                     "col_role": "Rôle",
                     "col_joined": "Rejoint le",
@@ -1961,24 +1961,24 @@
                     "remove_success": "Membre supprimé avec succès",
                     "remove_error": "Échec de la suppression du membre",
                     "growth_title": "Gestion des accès",
-                    "growth_desc": "Gérez les accès institutionnels en ajoutant des chercheurs à cet espace de travail. Ils pourront gérer toutes les études au sein de cet espace.",
+                    "growth_desc": "Gérez les accès institutionnels en ajoutant des chercheurs à ce projet. Ils pourront gérer toutes les études au sein de ce projet.",
                     "invite_button": "Inviter un collaborateur",
                     "permissions_matrix": {
                         "title": "Matrice des permissions",
                         "admin": {
                             "label": "Admin",
                             "badge": "Accès complet",
-                            "desc": "Peut gérer les paramètres de l'espace, les membres et toutes les études."
+                            "desc": "Peut gérer les paramètres du projet, les membres et toutes les études."
                         },
                         "researcher": {
                             "label": "Chercheur",
                             "badge": "Création",
-                            "desc": "Peut créer et gérer toutes les études. Accès restreint aux paramètres de l'espace."
+                            "desc": "Peut créer et gérer toutes les études. Accès restreint aux paramètres du projet."
                         },
                         "viewer": {
                             "label": "Observateur",
                             "badge": "Lecture seule",
-                            "desc": "Accès en lecture seule à toutes les études et données de l'espace."
+                            "desc": "Accès en lecture seule à toutes les études et données du projet."
                         }
                     },
                     "coming_soon": "Bientôt disponible",
@@ -1999,8 +1999,8 @@
         "hub": {
             "title": "Portail Chercheur",
             "welcome": "Bon retour, ",
-            "new_workspace": "Nouvel espace",
-            "your_workspaces": "Vos espaces de travail",
+            "new_project": "Nouveau projet",
+            "your_projects": "Vos projets",
             "studies_count": "études",
             "recent_studies": "Études récentes"
         },

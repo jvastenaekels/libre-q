@@ -23,7 +23,7 @@ async def validate_pre_migration():
             try:
                 result = await db.execute(
                     text(
-                        f"SELECT COUNT(*) FROM workspace_members WHERE role::text = '{role}'"
+                        f"SELECT COUNT(*) FROM project_members WHERE role::text = '{role}'"
                     )
                 )
                 count = result.scalar() or 0
@@ -35,11 +35,11 @@ async def validate_pre_migration():
 
         # Total count
         try:
-            result = await db.execute(text("SELECT COUNT(*) FROM workspace_members"))
+            result = await db.execute(text("SELECT COUNT(*) FROM project_members"))
             total = result.scalar()
-            print(f"\nTotal workspace members: {total}")
+            print(f"\nTotal project members: {total}")
         except Exception:
-            print("\nTotal workspace members: Could not query")
+            print("\nTotal project members: Could not query")
 
         # Check database dialect
         dialect = db.bind.dialect.name
@@ -59,7 +59,7 @@ async def validate_post_migration():
     async with SessionLocal() as db:
         # Verify no 'admin' remain
         result = await db.execute(
-            text("SELECT COUNT(*) FROM workspace_members WHERE role::text = 'admin'")
+            text("SELECT COUNT(*) FROM project_members WHERE role::text = 'admin'")
         )
         admin_count = result.scalar()
 
@@ -73,7 +73,7 @@ async def validate_post_migration():
         for role in ["owner", "researcher", "viewer"]:
             result = await db.execute(
                 text(
-                    f"SELECT COUNT(*) FROM workspace_members WHERE role::text = '{role}'"
+                    f"SELECT COUNT(*) FROM project_members WHERE role::text = '{role}'"
                 )
             )
             count = result.scalar() or 0
@@ -82,7 +82,7 @@ async def validate_post_migration():
         # Check referential integrity
         result = await db.execute(
             text("""
-            SELECT COUNT(*) FROM workspace_members wm
+            SELECT COUNT(*) FROM project_members wm
             LEFT JOIN users u ON wm.user_id = u.id
             WHERE u.id IS NULL
         """)

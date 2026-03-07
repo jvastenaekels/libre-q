@@ -4,10 +4,10 @@
  * Libre-Q API
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceWithRole } from './workspaceWithRole';
+import type { ProjectMemberRead } from './projectMemberRead';
 
-export interface PaginatedResponseWorkspaceWithRole {
-    items: WorkspaceWithRole[];
+export interface PaginatedResponseProjectMemberRead {
+    items: ProjectMemberRead[];
     total: number;
     limit: number;
     offset: number;

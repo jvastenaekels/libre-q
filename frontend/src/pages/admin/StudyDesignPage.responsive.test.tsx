@@ -21,7 +21,7 @@ vi.mock('react-router-dom', async () => {
         ...actual,
         useParams: vi.fn(() => ({
             studySlug: 'test-study-responsive',
-            workspaceSlug: 'test-workspace',
+            projectSlug: 'test-workspace',
         })),
         useNavigate: vi.fn(() => vi.fn()),
         // Mock MemoryRouter to avoid nested router in preview

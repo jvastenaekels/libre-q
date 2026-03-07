@@ -42,9 +42,9 @@ export const customInstance = async <T>({
     const sessionToken = useSessionStore.getState().token;
     const token = adminToken || sessionToken;
 
-    // Get current workspace ID
-    const currentWorkspace = useAuthStore.getState().currentWorkspace;
-    const workspaceId = currentWorkspace?.id ? String(currentWorkspace.id) : undefined;
+    // Get current project ID
+    const currentProject = useAuthStore.getState().currentProject;
+    const projectId = currentProject?.id ? String(currentProject.id) : undefined;
 
     // Timeout Logic
     const timeout = 30000; // 30 seconds
@@ -62,7 +62,7 @@ export const customInstance = async <T>({
         // Prepare headers
         const requestHeaders: Record<string, string> = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
+            ...(projectId ? { 'X-Project-ID': projectId } : {}),
             ...(headers as Record<string, string>),
         };
 

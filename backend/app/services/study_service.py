@@ -73,7 +73,7 @@ class StudyService:
 
     @staticmethod
     async def create_study(
-        db: AsyncSession, study_in: StudyCreate, workspace_id: int
+        db: AsyncSession, study_in: StudyCreate, project_id: int
     ) -> Study:
         """Create a new study with translations and statements.
 
@@ -87,7 +87,7 @@ class StudyService:
         try:
             db_study = Study(
                 slug=study_in.slug,
-                workspace_id=workspace_id,
+                project_id=project_id,
                 state=StudyState.draft,
                 grid_config=[col.model_dump() for col in study_in.grid_config],
                 presort_config=study_in.presort_config,

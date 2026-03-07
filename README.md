@@ -44,7 +44,7 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 - **Visual grid designer** with symmetry lock, capacity validation, and configurable score ranges.
 - **Survey builder** with 9 question types (text, number, select, radio, checkbox, date, email, textarea, audio), conditional visibility, reordering, and per-question validation.
 - **Markdown-formatted content** for instructions, consent forms, and condition of instruction.
-- **Import/Export configurations** to create templates, back up designs, or clone studies across workspaces.
+- **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
 - **Pilot mode** to run through the full participant experience without persisting any data.
 
 ### Analysis
@@ -81,11 +81,11 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 - **Consent audit trail.** Each participant's consent is recorded with a hash of the consent version they agreed to.
 - **Security headers** (HSTS, CSP, X-Frame-Options) and bcrypt password hashing.
 - **Two-factor authentication** (TOTP) for researcher accounts.
-- **Role-based access control.** Workspace-level roles (Owner, Researcher, Viewer) control who can edit, export, or manage team members.
+- **Role-based access control.** Project-level roles (Owner, Researcher, Viewer) control who can edit, export, or manage team members.
 
 ### Collaboration
 
-- **Workspaces** to isolate research groups — each with its own members and studies.
+- **Projects** to isolate research groups — each with its own members and studies.
 - **Concurrent editing** with auto-save, optimistic locking, and conflict resolution.
 - **Invitation system** via email, or shareable link when SMTP is not configured.
 

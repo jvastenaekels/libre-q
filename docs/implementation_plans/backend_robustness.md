@@ -72,7 +72,7 @@ This document outlines a phased implementation plan to address these findings, p
 - Ensure `await db.rollback()` is called on error.
 - **Targets**:
   - `backend/app/routers/admin/studies.py` (Study creation/update)
-  - `backend/app/routers/admin/workspaces.py`
+  - `backend/app/routers/admin/projects.py`
   - `backend/app/routers/auth.py`
 
 ### 2. Atomic Q-Sort Entry Management (P1)

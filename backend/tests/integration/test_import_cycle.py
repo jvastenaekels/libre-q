@@ -13,7 +13,7 @@ class TestImportCycle:
         self,
         client: AsyncClient,
         test_user: User,
-        workspace_factory,
+        project_factory,
         auth_token_factory,
         db,
     ):
@@ -22,7 +22,7 @@ class TestImportCycle:
         exports it, imports it as a new study, and verifies exact match.
         """
         # 1. Create Source Study with EVERYTHING
-        ws = await workspace_factory(owner=test_user)
+        ws = await project_factory(owner=test_user)
 
         from app.models import (
             StudyTranslation,
@@ -66,7 +66,7 @@ class TestImportCycle:
 
         source_study = Study(
             slug="source-study",
-            workspace_id=ws.id,
+            project_id=ws.id,
             state=StudyState.active,  # Should become draft on import
             grid_config=grid_config,
             presort_config=presort,
@@ -192,7 +192,7 @@ class TestImportCycle:
         # 3. Import Config
         new_slug = "cloned-study"
         import_payload = {"config": config, "new_slug": new_slug}
-        headers = {**headers, "X-Workspace-ID": str(ws.id)}
+        headers = {**headers, "X-Project-ID": str(ws.id)}
         resp_import = await client.post(
             "/api/admin/studies/import", json=import_payload, headers=headers
         )

@@ -58,8 +58,8 @@ class ParticipantStatus(str, Enum):
     completed = "completed"
 
 
-class WorkspaceRole(str, Enum):
-    """Enum for workspace roles."""
+class ProjectRole(str, Enum):
+    """Enum for project roles."""
 
     owner = "owner"  # Renamed from 'admin' for consistency with StudyRole
     researcher = "researcher"
@@ -82,11 +82,11 @@ class RecruitmentLinkType(str, Enum):
     limited = "limited"
 
 
-# Workspace Models
-class Workspace(Base):
-    """SQLAlchemy model for workspaces."""
+# Project Models
+class Project(Base):
+    """SQLAlchemy model for projects."""
 
-    __tablename__ = "workspaces"
+    __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String)
@@ -98,40 +98,38 @@ class Workspace(Base):
 
     # Relationships
     studies: Mapped[list["Study"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+        back_populates="project", cascade="all, delete-orphan", lazy="raise"
     )
-    members: Mapped[list["WorkspaceMember"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+    members: Mapped[list["ProjectMember"]] = relationship(
+        back_populates="project", cascade="all, delete-orphan", lazy="raise"
     )
     concourses: Mapped[list["Concourse"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+        back_populates="project", cascade="all, delete-orphan", lazy="raise"
     )
     concourse_tags: Mapped[list["ConcourseTag"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+        back_populates="project", cascade="all, delete-orphan", lazy="raise"
     )
 
 
-class WorkspaceMember(Base):
-    """Association model for workspace members with roles."""
+class ProjectMember(Base):
+    """Association model for project members with roles."""
 
-    __tablename__ = "workspace_members"
+    __tablename__ = "project_members"
 
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), primary_key=True
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True
     )
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    role: Mapped[WorkspaceRole] = mapped_column(
-        SAEnum(WorkspaceRole), default=WorkspaceRole.viewer
+    role: Mapped[ProjectRole] = mapped_column(
+        SAEnum(ProjectRole), default=ProjectRole.viewer
     )
     joined_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
 
-    workspace: Mapped["Workspace"] = relationship(
-        back_populates="members", lazy="raise"
-    )
+    project: Mapped["Project"] = relationship(back_populates="members", lazy="raise")
     user: Mapped["User"] = relationship(back_populates="memberships", lazy="raise")
 
 
@@ -156,7 +154,7 @@ class User(Base):
     is_totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Relationships
-    memberships: Mapped[list["WorkspaceMember"]] = relationship(
+    memberships: Mapped[list["ProjectMember"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="raise",
@@ -171,8 +169,8 @@ class Study(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
     )
     state: Mapped[StudyState] = mapped_column(
         SAEnum(StudyState), default=StudyState.draft
@@ -216,9 +214,7 @@ class Study(Base):
     access_password: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Relationships
-    workspace: Mapped["Workspace"] = relationship(
-        back_populates="studies", lazy="selectin"
-    )
+    project: Mapped["Project"] = relationship(back_populates="studies", lazy="selectin")
     translations: Mapped[list["StudyTranslation"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
@@ -531,16 +527,16 @@ class Invitation(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, index=True)
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
     # study_id removed or made nullable if keeping for legacy ref?
-    # Replacing study_id with workspace_id entirely for now.
+    # Replacing study_id with project_id entirely for now.
     study_id: Mapped[int | None] = mapped_column(
         ForeignKey("studies.id", ondelete="SET NULL"), nullable=True
     )
-    role: Mapped[WorkspaceRole] = mapped_column(
-        SAEnum(WorkspaceRole), default=WorkspaceRole.viewer
+    role: Mapped[ProjectRole] = mapped_column(
+        SAEnum(ProjectRole), default=ProjectRole.viewer
     )
     token: Mapped[str] = mapped_column(String, unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
@@ -551,20 +547,20 @@ class Invitation(Base):
         DateTime(timezone=True), nullable=True
     )
 
-    workspace: Mapped["Workspace"] = relationship(lazy="raise")
+    project: Mapped["Project"] = relationship(lazy="raise")
 
 
 # Concourse Models
 
 
 class Concourse(Base):
-    """Workspace-level collection of candidate Q-methodology statements."""
+    """Project-level collection of candidate Q-methodology statements."""
 
     __tablename__ = "concourses"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -578,9 +574,7 @@ class Concourse(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    workspace: Mapped["Workspace"] = relationship(
-        back_populates="concourses", lazy="raise"
-    )
+    project: Mapped["Project"] = relationship(back_populates="concourses", lazy="raise")
     items: Mapped[list["ConcourseItem"]] = relationship(
         back_populates="concourse", cascade="all, delete-orphan", lazy="raise"
     )
@@ -656,18 +650,18 @@ class ConcourseItemTranslation(Base):
 
 
 class ConcourseTag(Base):
-    """Workspace-scoped tag for categorizing concourse items."""
+    """Project-scoped tag for categorizing concourse items."""
 
     __tablename__ = "concourse_tags"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True
     )
     name: Mapped[str] = mapped_column(String(100))
     color: Mapped[str | None] = mapped_column(String(7), nullable=True)
 
-    workspace: Mapped["Workspace"] = relationship(
+    project: Mapped["Project"] = relationship(
         back_populates="concourse_tags", lazy="raise"
     )
     items: Mapped[list["ConcourseItem"]] = relationship(
@@ -675,7 +669,7 @@ class ConcourseTag(Base):
     )
 
     __table_args__ = (
-        UniqueConstraint("workspace_id", "name", name="uq_workspace_tag_name"),
+        UniqueConstraint("project_id", "name", name="uq_project_tag_name"),
     )
 
 

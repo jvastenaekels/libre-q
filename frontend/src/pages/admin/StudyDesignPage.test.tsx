@@ -23,7 +23,7 @@ vi.mock('react-router-dom', async () => {
         ...actual,
         useParams: vi.fn(() => ({
             studySlug: 'test-study-designer',
-            workspaceSlug: 'test-workspace',
+            projectSlug: 'test-workspace',
         })),
         useNavigate: vi.fn(() => vi.fn()),
         MemoryRouter: ({ children }: { children: React.ReactNode }) => children,

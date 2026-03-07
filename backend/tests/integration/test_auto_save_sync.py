@@ -1,20 +1,20 @@
 import pytest
 from httpx import AsyncClient
-from app.models import User, Workspace
+from app.models import User, Project
 
 
 @pytest.mark.asyncio
 async def test_permissive_statement_sync(
     client: AsyncClient,
     test_user: User,
-    test_workspace: Workspace,
+    test_project: Project,
     auth_token_factory,
     db,
 ):
     # 1. Create a draft study first
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     study_slug = "sync-test-study"
@@ -84,12 +84,12 @@ async def test_permissive_statement_sync(
 
 @pytest.mark.asyncio
 async def test_imbalanced_grid_save(
-    client: AsyncClient, test_user: User, test_workspace: Workspace, auth_token_factory
+    client: AsyncClient, test_user: User, test_project: Project, auth_token_factory
 ):
     # Verify that we can save a study with an imbalanced grid
     headers = {
         **auth_token_factory(test_user),
-        "X-Workspace-ID": str(test_workspace.id),
+        "X-Project-ID": str(test_project.id),
     }
 
     study_slug = "imbalanced-study"

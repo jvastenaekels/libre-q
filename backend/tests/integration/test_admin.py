@@ -36,16 +36,16 @@ class TestAdminUsers:
 
 
 @pytest.mark.asyncio
-class TestAdminWorkspaces:
-    """Tests for global workspace management."""
+class TestAdminProjects:
+    """Tests for global project management."""
 
-    async def test_create_workspace_as_superuser(
+    async def test_create_project_as_superuser(
         self, client: AsyncClient, super_user: User, test_user: User
     ):
         headers = {"Authorization": f"Bearer {create_access_token(super_user.email)}"}
         payload = {"title": "Global WS", "slug": "global-ws", "owner_id": test_user.id}
         response = await client.post(
-            "/api/admin/workspaces", json=payload, headers=headers
+            "/api/admin/projects", json=payload, headers=headers
         )
         assert response.status_code == 201
         assert response.json()["slug"] == "global-ws"
