@@ -911,7 +911,7 @@ function SingleStudyCard({
                     </div>
 
                     {/* Quick-action tool links */}
-                    <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-3 border-t">
                         {tools.map((tool) => (
                             <button
                                 type="button"
