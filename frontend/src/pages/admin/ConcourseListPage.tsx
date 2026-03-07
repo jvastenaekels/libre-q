@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import {
     useListConcoursesApiAdminConcoursesGet,
@@ -24,17 +24,12 @@ export default function ConcourseListPage() {
 
     const createMutation = useCreateConcourseApiAdminConcoursesPost();
     const creatingRef = useRef(false);
+    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (isLoading || !workspace?.slug) return;
-
-        if (concourses.length > 0) {
-            navigate(`/app/${workspace.slug}/concourses/${concourses[0].id}`, { replace: true });
-            return;
-        }
-
-        if (creatingRef.current || createMutation.isPending) return;
+    const attemptCreate = useCallback(() => {
+        if (creatingRef.current || createMutation.isPending || !workspace?.slug) return;
         creatingRef.current = true;
+        setError(null);
 
         createMutation
             .mutateAsync({
@@ -48,18 +43,53 @@ export default function ConcourseListPage() {
             })
             .catch((err) => {
                 creatingRef.current = false;
-                toast.error(
+                setError(
                     parseApiErrorSync(
                         err,
                         t('admin.concourse.create_error', 'Failed to create concourse')
                     )
                 );
             });
-    }, [isLoading, concourses, workspace?.slug, navigate, t, createMutation]);
+    }, [workspace?.slug, createMutation, t, navigate]);
+
+    useEffect(() => {
+        if (isLoading || !workspace?.slug) return;
+
+        if (concourses.length > 0) {
+            navigate(`/app/${workspace.slug}/concourses/${concourses[0].id}`, { replace: true });
+            return;
+        }
+
+        attemptCreate();
+    }, [isLoading, concourses, workspace?.slug, navigate, attemptCreate]);
+
+    if (error) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center px-4">
+                <p className="text-sm text-slate-600">{error}</p>
+                <Button
+                    variant="outline"
+                    className="rounded-xl"
+                    onClick={attemptCreate}
+                    disabled={createMutation.isPending}
+                >
+                    {createMutation.isPending ? (
+                        <Loader2 className="size-4 animate-spin mr-2" />
+                    ) : (
+                        <RefreshCw className="size-4 mr-2" />
+                    )}
+                    {t('common.retry', 'Retry')}
+                </Button>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2">
             <Loader2 className="size-6 animate-spin text-slate-400" />
+            <p className="text-sm text-slate-400">
+                {t('admin.concourse.loading', 'Setting up concourse...')}
+            </p>
         </div>
     );
 }

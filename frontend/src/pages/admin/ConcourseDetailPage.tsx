@@ -125,6 +125,7 @@ export default function ConcourseDetailPage() {
     const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
     const [bulkActionPending, setBulkActionPending] = useState(false);
+    const [bulkConfirm, setBulkConfirm] = useState<ConcourseItemStatus | null>(null);
 
     // Mutations
     const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
@@ -364,12 +365,15 @@ export default function ConcourseDetailPage() {
             setEditChangeNote('');
             toast.success(t('admin.concourse.item_updated', 'Item updated'));
         } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.item_update_error', 'Failed to update item')
-                )
+            const msg = parseApiErrorSync(
+                err,
+                t('admin.concourse.item_update_error', 'Failed to update item')
             );
+            toast.error(msg);
+            if (msg.includes('modified')) {
+                await invalidate();
+                setEditingItem(null);
+            }
         }
     };
 
@@ -526,88 +530,98 @@ export default function ConcourseDetailPage() {
             />
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-                <Input
-                    placeholder={t('admin.concourse.search_placeholder', 'Search items...')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 rounded-xl w-full sm:w-64 bg-white"
-                />
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                        <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
-                        <SelectItem value="proposed">
-                            {t('admin.concourse.status.proposed', 'Proposed')}
-                        </SelectItem>
-                        <SelectItem value="accepted">
-                            {t('admin.concourse.status.accepted', 'Accepted')}
-                        </SelectItem>
-                        <SelectItem value="rejected">
-                            {t('admin.concourse.status.rejected', 'Rejected')}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                {tags && tags.length > 0 && (
-                    <Select value={filterTag} onValueChange={setFilterTag}>
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                    <Input
+                        placeholder={t('admin.concourse.search_placeholder', 'Search items...')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="h-9 rounded-xl w-full sm:w-64 bg-white"
+                    />
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
                         <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
-                            <Tag className="size-3 mr-1" />
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
                             <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
-                            {tags.map((tag) => (
-                                <SelectItem key={tag.id} value={String(tag.id)}>
-                                    {tag.name}
-                                </SelectItem>
-                            ))}
+                            <SelectItem value="proposed">
+                                {t('admin.concourse.status.proposed', 'Proposed')}
+                            </SelectItem>
+                            <SelectItem value="accepted">
+                                {t('admin.concourse.status.accepted', 'Accepted')}
+                            </SelectItem>
+                            <SelectItem value="rejected">
+                                {t('admin.concourse.status.rejected', 'Rejected')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
-                )}
-                {canEdit && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 rounded-xl text-xs font-bold"
-                        onClick={() => setTagManagerOpen(true)}
+                    {tags && tags.length > 0 && (
+                        <Select value={filterTag} onValueChange={setFilterTag}>
+                            <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
+                                <Tag className="size-3 mr-1" />
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
+                                {tags.map((tag) => (
+                                    <SelectItem key={tag.id} value={String(tag.id)}>
+                                        {tag.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    {canEdit && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 rounded-xl text-xs font-bold"
+                            onClick={() => setTagManagerOpen(true)}
+                        >
+                            <Settings2 className="size-3 mr-1" />
+                            {t('admin.concourse.manage_tags', 'Tags')}
+                        </Button>
+                    )}
+                    <Select
+                        value={activeLocale}
+                        onValueChange={(val) => {
+                            if (val === '__add__') {
+                                setAddLangOpen(true);
+                            } else {
+                                setActiveLocale(val);
+                            }
+                        }}
                     >
-                        <Settings2 className="size-3 mr-1" />
-                        {t('admin.concourse.manage_tags', 'Tags')}
-                    </Button>
-                )}
-                <Select
-                    value={activeLocale}
-                    onValueChange={(val) => {
-                        if (val === '__add__') {
-                            setAddLangOpen(true);
-                        } else {
-                            setActiveLocale(val);
-                        }
-                    }}
-                >
-                    <SelectTrigger className="h-9 w-28 rounded-xl bg-white text-xs font-bold">
-                        <Globe className="size-3 mr-1 text-slate-400" />
-                        <SelectValue
-                            placeholder={t('admin.concourse.select_language', 'Language')}
-                        />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                        {languages.map((lang) => (
-                            <SelectItem key={lang} value={lang}>
-                                {lang.toUpperCase()}
+                        <SelectTrigger
+                            className="h-9 w-28 rounded-xl bg-white text-xs font-bold"
+                            title={t(
+                                'admin.concourse.language_tooltip',
+                                'Language of statement texts'
+                            )}
+                        >
+                            <Globe className="size-3 mr-1 text-slate-400" />
+                            <SelectValue
+                                placeholder={t('admin.concourse.select_language', 'Language')}
+                            />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                            {languages.map((lang) => (
+                                <SelectItem key={lang} value={lang}>
+                                    {lang.toUpperCase()}
+                                </SelectItem>
+                            ))}
+                            <SelectItem value="__add__" className="text-indigo-600 font-bold">
+                                + {t('admin.concourse.add_language', 'Add language')}
                             </SelectItem>
-                        ))}
-                        <SelectItem value="__add__" className="text-indigo-600 font-bold">
-                            + {t('admin.concourse.add_language', 'Add language')}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <span className="text-xs text-slate-400 ml-auto">
-                    {filteredItems.length} / {concourse.items?.length ?? 0}{' '}
-                    {t('admin.concourse.items_label', 'items')}
-                </span>
+                        </SelectContent>
+                    </Select>
+                    <span className="text-xs text-slate-400 ml-auto">
+                        {filteredItems.length} / {concourse.items?.length ?? 0}{' '}
+                        {t('admin.concourse.items_label', 'items')}
+                    </span>
+                </div>
             </div>
 
             {/* Q-set Progress */}
@@ -762,9 +776,7 @@ export default function ConcourseDetailPage() {
                             variant="outline"
                             className="h-7 rounded-lg text-2xs font-bold bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"
                             disabled={bulkActionPending}
-                            onClick={() =>
-                                handleBulkStatusChange('proposed' as ConcourseItemStatus)
-                            }
+                            onClick={() => setBulkConfirm('proposed' as ConcourseItemStatus)}
                         >
                             {t('admin.concourse.status.proposed', 'Proposed')}
                         </Button>
@@ -773,9 +785,7 @@ export default function ConcourseDetailPage() {
                             variant="outline"
                             className="h-7 rounded-lg text-2xs font-bold bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
                             disabled={bulkActionPending}
-                            onClick={() =>
-                                handleBulkStatusChange('accepted' as ConcourseItemStatus)
-                            }
+                            onClick={() => setBulkConfirm('accepted' as ConcourseItemStatus)}
                         >
                             {t('admin.concourse.status.accepted', 'Accepted')}
                         </Button>
@@ -784,9 +794,7 @@ export default function ConcourseDetailPage() {
                             variant="outline"
                             className="h-7 rounded-lg text-2xs font-bold bg-red-50 border-red-200 text-red-800 hover:bg-red-100"
                             disabled={bulkActionPending}
-                            onClick={() =>
-                                handleBulkStatusChange('rejected' as ConcourseItemStatus)
-                            }
+                            onClick={() => setBulkConfirm('rejected' as ConcourseItemStatus)}
                         >
                             {t('admin.concourse.status.rejected', 'Rejected')}
                         </Button>
@@ -836,12 +844,16 @@ export default function ConcourseDetailPage() {
                                 </div>
                             )}
                             {filteredItems.map((item) => {
+                                const activeTranslation = item.translations?.find(
+                                    (tr) => tr.language_code === activeLocale
+                                );
+                                const fallbackTranslation = activeTranslation
+                                    ? null
+                                    : (item.translations?.[0] ?? null);
                                 const text =
-                                    item.translations?.find(
-                                        (tr) => tr.language_code === activeLocale
-                                    )?.text ??
-                                    item.translations?.[0]?.text ??
-                                    '';
+                                    activeTranslation?.text ?? fallbackTranslation?.text ?? '';
+                                const isMissingTranslation =
+                                    !activeTranslation && !!fallbackTranslation;
                                 const isEditing = editingItem === item.id;
 
                                 return (
@@ -1131,8 +1143,27 @@ export default function ConcourseDetailPage() {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <p className="text-sm text-slate-800 leading-normal">
-                                                        {text}
+                                                    <p
+                                                        className={cn(
+                                                            'text-sm leading-normal',
+                                                            isMissingTranslation
+                                                                ? 'text-slate-400 italic'
+                                                                : 'text-slate-800'
+                                                        )}
+                                                    >
+                                                        {isMissingTranslation && (
+                                                            <span className="text-2xs font-bold text-amber-500 mr-1.5 not-italic">
+                                                                {fallbackTranslation?.language_code?.toUpperCase()}
+                                                            </span>
+                                                        )}
+                                                        {text || (
+                                                            <span className="text-slate-300">
+                                                                {t(
+                                                                    'admin.concourse.no_translation',
+                                                                    'No text'
+                                                                )}
+                                                            </span>
+                                                        )}
                                                     </p>
                                                     {item.source && (
                                                         <p className="text-xs text-slate-500 mt-1 italic">
@@ -1214,7 +1245,7 @@ export default function ConcourseDetailPage() {
                                                         STATUS_COLORS[item.status] ?? ''
                                                     )}
                                                 >
-                                                    {item.status}
+                                                    {statusLabel(item.status)}
                                                 </Badge>
                                             ) : null}
                                         </div>
@@ -1260,7 +1291,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.history',
                                                                 'History'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() => {
                                                                 setSheetItemId(item.id);
                                                                 setSheetItemCode(item.code);
@@ -1276,7 +1307,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.comments',
                                                                 'Comments'
                                                             )}
-                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() => {
                                                                 setSheetItemId(item.id);
                                                                 setSheetItemCode(item.code);
@@ -1294,7 +1325,7 @@ export default function ConcourseDetailPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             aria-label={t('common.edit', 'Edit')}
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-300 hover:text-slate-700 transition-colors"
                                                             onClick={() => startEdit(item)}
                                                         >
                                                             <Pencil className="size-3.5" />
@@ -1306,7 +1337,7 @@ export default function ConcourseDetailPage() {
                                                                 'common.delete',
                                                                 'Delete'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 setDeleteConfirmId(item.id)
                                                             }
@@ -1407,6 +1438,56 @@ export default function ConcourseDetailPage() {
                                 <Plus className="size-4 mr-2" />
                             )}
                             {t('common.add', 'Add')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Bulk Status Confirmation Dialog */}
+            <Dialog
+                open={bulkConfirm !== null}
+                onOpenChange={(open) => {
+                    if (!open) setBulkConfirm(null);
+                }}
+            >
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900">
+                            {t('admin.concourse.bulk_confirm_title', 'Confirm status change')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500">
+                            {t(
+                                'admin.concourse.bulk_confirm_desc',
+                                'Set {{count}} items to "{{status}}"?',
+                                {
+                                    count: selectedItems.size,
+                                    status: bulkConfirm ? statusLabel(bulkConfirm) : '',
+                                }
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            className="rounded-xl"
+                            onClick={() => setBulkConfirm(null)}
+                        >
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                            disabled={bulkActionPending}
+                            onClick={async () => {
+                                if (bulkConfirm) {
+                                    await handleBulkStatusChange(bulkConfirm);
+                                    setBulkConfirm(null);
+                                }
+                            }}
+                        >
+                            {bulkActionPending ? (
+                                <Loader2 className="size-4 animate-spin mr-2" />
+                            ) : null}
+                            {t('common.confirm', 'Confirm')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

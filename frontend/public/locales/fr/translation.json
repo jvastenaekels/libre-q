@@ -4,6 +4,7 @@
             "text_response": "Saisissez votre réponse..."
         },
         "add": "Ajouter",
+        "confirm": "Confirmer",
         "all": "Tout",
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
@@ -641,7 +642,17 @@
             "qset_title": "Q-set",
             "qset_pending": "{{count}} items encore à examiner",
             "qset_complete": "Tous les items ont été examinés",
-            "show_pending": "À examiner"
+            "show_pending": "À examiner",
+            "bulk_confirm_title": "Confirmer le changement de statut",
+            "bulk_confirm_desc": "Mettre {{count}} items en \"{{status}}\" ?",
+            "no_translation": "Pas de texte",
+            "language_tooltip": "Langue des textes des énoncés",
+            "loading": "Préparation du concourse...",
+            "diff_code": "code",
+            "diff_status": "statut",
+            "diff_text": "texte",
+            "diff_tags": "étiquettes",
+            "diff_changed": "Modifié :"
         },
         "concourse_import": {
             "title": "Importer depuis un concours",
@@ -653,7 +664,7 @@
             "code_prefix_placeholder": "ex. S",
             "only_accepted": "Acceptés uniquement",
             "replace_existing": "Remplacer les énoncés existants",
-            "replace_warning": "Cela supprimera tous les énoncés existants de l'étude.",
+            "replace_warning": "Tous les énoncés existants seront définitivement supprimés et remplacés par les items sélectionnés.",
             "selected": "{{count}} sélectionnés",
             "select_all": "Tout sélectionner",
             "import_button": "Importer {{count}} énoncés",

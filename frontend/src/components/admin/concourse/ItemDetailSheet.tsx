@@ -209,52 +209,96 @@ function VersionList({
         );
     }
 
+    // Sort versions ascending so we can compare consecutive pairs
+    const sorted = [...versions].sort((a, b) => a.version_number - b.version_number);
+
+    const getChanges = (v: ConcourseItemVersionRead, idx: number) => {
+        if (idx === 0) return null;
+        const prev = sorted[idx - 1];
+        const changes: string[] = [];
+        if (prev.code !== v.code) changes.push(t('admin.concourse.diff_code', 'code'));
+        if (prev.status !== v.status) changes.push(t('admin.concourse.diff_status', 'status'));
+        const prevTexts = (prev.translations_snapshot ?? [])
+            .map((tr) => `${tr.language_code}:${tr.text}`)
+            .sort()
+            .join('|');
+        const curTexts = (v.translations_snapshot ?? [])
+            .map((tr) => `${tr.language_code}:${tr.text}`)
+            .sort()
+            .join('|');
+        if (prevTexts !== curTexts) changes.push(t('admin.concourse.diff_text', 'text'));
+        const prevTags = [...(prev.tag_ids_snapshot ?? [])].sort().join(',');
+        const curTags = [...(v.tag_ids_snapshot ?? [])].sort().join(',');
+        if (prevTags !== curTags) changes.push(t('admin.concourse.diff_tags', 'tags'));
+        return changes.length > 0 ? changes : null;
+    };
+
+    // Display newest first
+    const displayed = [...sorted].reverse();
+
     return (
         <div className="space-y-3 mt-2">
-            {versions.map((v) => (
-                <div
-                    key={v.id}
-                    className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 space-y-1.5"
-                >
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-2xs font-mono">
-                                {t('admin.concourse.version_label', 'v{{n}}', {
-                                    n: v.version_number,
-                                })}
-                            </Badge>
-                            {v.changed_by != null && (
-                                <span className="text-2xs font-medium text-slate-500">
-                                    {memberNames[v.changed_by] ?? `#${v.changed_by}`}
-                                </span>
+            {displayed.map((v) => {
+                const idx = sorted.indexOf(v);
+                const changes = getChanges(v, idx);
+                return (
+                    <div
+                        key={v.id}
+                        className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 space-y-1.5"
+                    >
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-2xs font-mono">
+                                    {t('admin.concourse.version_label', 'v{{n}}', {
+                                        n: v.version_number,
+                                    })}
+                                </Badge>
+                                {v.changed_by != null && (
+                                    <span className="text-2xs font-medium text-slate-500">
+                                        {memberNames[v.changed_by] ?? `#${v.changed_by}`}
+                                    </span>
+                                )}
+                                {changes && (
+                                    <span className="text-2xs text-indigo-500">
+                                        {t('admin.concourse.diff_changed', 'Changed:')}{' '}
+                                        {changes.join(', ')}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-2xs text-slate-400">
+                                {formatDate(v.changed_at)}
+                            </span>
+                        </div>
+                        <div className="text-sm text-slate-700">
+                            <span className="font-mono text-xs text-slate-500 mr-1.5">
+                                {v.code}
+                            </span>
+                            {v.translations_snapshot && v.translations_snapshot.length > 1 ? (
+                                <div className="mt-1 space-y-0.5">
+                                    {v.translations_snapshot.map((tr) => (
+                                        <p
+                                            key={tr.language_code}
+                                            className="text-sm text-slate-700"
+                                        >
+                                            <span className="text-2xs font-bold text-slate-400 mr-1.5">
+                                                {tr.language_code?.toUpperCase()}
+                                            </span>
+                                            {tr.text}
+                                        </p>
+                                    ))}
+                                </div>
+                            ) : (
+                                (v.translations_snapshot?.[0]?.text ?? '')
                             )}
                         </div>
-                        <span className="text-2xs text-slate-400">{formatDate(v.changed_at)}</span>
-                    </div>
-                    <div className="text-sm text-slate-700">
-                        <span className="font-mono text-xs text-slate-500 mr-1.5">{v.code}</span>
-                        {v.translations_snapshot && v.translations_snapshot.length > 1 ? (
-                            <div className="mt-1 space-y-0.5">
-                                {v.translations_snapshot.map((tr) => (
-                                    <p key={tr.language_code} className="text-sm text-slate-700">
-                                        <span className="text-2xs font-bold text-slate-400 mr-1.5">
-                                            {tr.language_code?.toUpperCase()}
-                                        </span>
-                                        {tr.text}
-                                    </p>
-                                ))}
-                            </div>
-                        ) : (
-                            (v.translations_snapshot?.[0]?.text ?? '')
+                        {v.change_comment && (
+                            <p className="text-xs text-slate-500 italic border-l-2 border-slate-200 pl-2">
+                                {v.change_comment}
+                            </p>
                         )}
                     </div>
-                    {v.change_comment && (
-                        <p className="text-xs text-slate-500 italic border-l-2 border-slate-200 pl-2">
-                            {v.change_comment}
-                        </p>
-                    )}
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 }

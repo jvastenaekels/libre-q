@@ -4,6 +4,7 @@
             "text_response": "Enter your answer..."
         },
         "add": "Add",
+        "confirm": "Confirm",
         "all": "All",
         "agree": "Somewhat agree",
         "disagree": "Somewhat disagree",
@@ -656,7 +657,17 @@
             "qset_title": "Q-set",
             "qset_pending": "{{count}} items still to review",
             "qset_complete": "All items reviewed",
-            "show_pending": "To review"
+            "show_pending": "To review",
+            "bulk_confirm_title": "Confirm status change",
+            "bulk_confirm_desc": "Set {{count}} items to \"{{status}}\"?",
+            "no_translation": "No text",
+            "language_tooltip": "Language of statement texts",
+            "loading": "Setting up concourse...",
+            "diff_code": "code",
+            "diff_status": "status",
+            "diff_text": "text",
+            "diff_tags": "tags",
+            "diff_changed": "Changed:"
         },
         "concourse_import": {
             "title": "Import from Concourse",
@@ -668,7 +679,7 @@
             "code_prefix_placeholder": "e.g. S",
             "only_accepted": "Only accepted",
             "replace_existing": "Replace existing statements",
-            "replace_warning": "This will delete all existing statements in the study.",
+            "replace_warning": "All existing statements will be permanently deleted and replaced by the selected items.",
             "selected": "{{count}} selected",
             "select_all": "Select all",
             "import_button": "Import {{count}} statements",

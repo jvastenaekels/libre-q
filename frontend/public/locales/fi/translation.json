@@ -4,6 +4,7 @@
             "text_response": "Kirjoita vastauksesi..."
         },
         "add": "Lisää",
+        "confirm": "Vahvista",
         "delete": "Poista",
         "all": "Kaikki",
         "agree": "Jokseenkin samaa mieltä",
@@ -641,7 +642,17 @@
             "qset_title": "Q-set",
             "qset_pending": "{{count}} kohdetta vielä tarkistettavana",
             "qset_complete": "Kaikki kohteet tarkistettu",
-            "show_pending": "Tarkistettavat"
+            "show_pending": "Tarkistettavat",
+            "bulk_confirm_title": "Vahvista tilan muutos",
+            "bulk_confirm_desc": "Aseta {{count}} kohdetta tilaan \"{{status}}\"?",
+            "no_translation": "Ei tekstiä",
+            "language_tooltip": "Väittämätekstien kieli",
+            "loading": "Valmistellaan concourse...",
+            "diff_code": "koodi",
+            "diff_status": "tila",
+            "diff_text": "teksti",
+            "diff_tags": "tunnisteet",
+            "diff_changed": "Muutettu:"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
@@ -653,7 +664,7 @@
             "code_prefix_placeholder": "esim. S",
             "only_accepted": "Vain hyväksytyt",
             "replace_existing": "Korvaa olemassa olevat lauseet",
-            "replace_warning": "Tämä poistaa kaikki tutkimuksen nykyiset lauseet.",
+            "replace_warning": "Kaikki nykyiset lauseet poistetaan pysyvästi ja korvataan valituilla kohteilla.",
             "selected": "{{count}} valittu",
             "select_all": "Valitse kaikki",
             "import_button": "Tuo {{count}} lausetta",

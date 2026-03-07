@@ -72,6 +72,7 @@ export function ImportFromConcourseDialog({
     }, [concourse?.items, showOnlyAccepted]);
 
     // Reset selection when filter changes
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional reset on filter change
     useEffect(() => {
         setSelectedItemIds(new Set());
     }, [showOnlyAccepted]);
@@ -310,10 +311,10 @@ export function ImportFromConcourseDialog({
 
                 <DialogFooter className="border-t pt-4">
                     {replaceExisting && (
-                        <p className="text-sm text-amber-700 font-semibold mr-auto border-l-2 border-amber-400 pl-2">
+                        <p className="text-sm text-red-700 font-semibold mr-auto border-l-2 border-red-400 pl-2">
                             {t(
                                 'admin.concourse_import.replace_warning',
-                                'This will delete all existing statements in the study.'
+                                'All existing statements will be permanently deleted and replaced by the selected items.'
                             )}
                         </p>
                     )}
@@ -323,7 +324,7 @@ export function ImportFromConcourseDialog({
                         className={cn(
                             'h-10 rounded-xl px-6 font-bold text-white',
                             replaceExisting
-                                ? 'bg-amber-600 hover:bg-amber-700'
+                                ? 'bg-red-600 hover:bg-red-700'
                                 : 'bg-indigo-600 hover:bg-indigo-700'
                         )}
                     >
