@@ -10,10 +10,11 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "c3d4e5f6a7b8"
-down_revision: Union[str, Sequence[str], None] = "2bf0f513c6c8"
+down_revision: Union[str, Sequence[str], None] = "c8d9e0f1a2b3"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -27,7 +28,7 @@ def upgrade() -> None:
         sa.Column("code", sa.String(length=50), nullable=False),
         sa.Column(
             "status",
-            sa.Enum("proposed", "accepted", "rejected", name="concourseitemstatus", create_type=False),
+            postgresql.ENUM("proposed", "accepted", "rejected", name="concourseitemstatus", create_type=False),
             nullable=False,
         ),
         sa.Column("source", sa.String(), nullable=True),
