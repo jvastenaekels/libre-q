@@ -205,18 +205,27 @@ export function AdminDashboard() {
 
     const hasStudies = studies && studies.length > 0;
     const hasConcourseItems = totalItems > 0;
+    const hasAcceptedItems = acceptedCount > 0;
     const hasActiveStudy = activeStudies.length > 0;
     const hasLaunchedStudy =
         hasActiveStudy ||
         (studies?.some((s) => s.state === 'closed' || s.state === 'paused') ?? false);
     const hasParticipants = totalParticipants > 0;
+    const hasImportedStatements = studies?.some((s) => (s.statements?.length ?? 0) > 0) ?? false;
+    const hasConfiguredFlow =
+        studies?.some((s) => {
+            const hasTranslation = s.translations?.some((tr) => tr.pre_instruction);
+            return hasTranslation;
+        }) ?? false;
 
-    // Onboarding progress
+    // Onboarding progress — follows real Q-methodology workflow
     const onboardingDone = {
         project: true,
         concourse: hasConcourseItems,
+        qset: hasAcceptedItems,
         study: !!hasStudies,
-        import: hasLaunchedStudy || hasParticipants,
+        import: hasImportedStatements || hasLaunchedStudy || hasParticipants,
+        configure: hasConfiguredFlow || hasLaunchedStudy || hasParticipants,
         launch: hasActiveStudy || hasParticipants,
     };
     const allStepsDone = Object.values(onboardingDone).every(Boolean);
@@ -226,11 +235,15 @@ export function AdminDashboard() {
         // Find next action step
         const nextStep = !onboardingDone.concourse
             ? 'concourse'
-            : !onboardingDone.study
-              ? 'study'
-              : !onboardingDone.import
-                ? 'import'
-                : 'launch';
+            : !onboardingDone.qset
+              ? 'qset'
+              : !onboardingDone.study
+                ? 'study'
+                : !onboardingDone.import
+                  ? 'import'
+                  : !onboardingDone.configure
+                    ? 'configure'
+                    : 'launch';
 
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
@@ -262,10 +275,13 @@ export function AdminDashboard() {
                             <OnboardingStep
                                 step={2}
                                 done={onboardingDone.concourse}
-                                title={t('admin.dashboard.step_concourse', 'Build your concourse')}
+                                title={t(
+                                    'admin.dashboard.step_concourse',
+                                    'Collect statements in the concourse'
+                                )}
                                 description={t(
                                     'admin.dashboard.step_concourse_desc',
-                                    'Add the candidate statements that participants will sort.'
+                                    'Add the candidate statements from your literature review.'
                                 )}
                                 action={
                                     nextStep === 'concourse'
@@ -276,11 +292,26 @@ export function AdminDashboard() {
                             />
                             <OnboardingStep
                                 step={3}
+                                done={onboardingDone.qset}
+                                title={t('admin.dashboard.step_qset', 'Select the Q-set')}
+                                description={t(
+                                    'admin.dashboard.step_qset_desc',
+                                    'Review and accept the items that will form your Q-set.'
+                                )}
+                                action={
+                                    nextStep === 'qset'
+                                        ? () => navigate(`/app/${projectSlug}/concourses`)
+                                        : undefined
+                                }
+                                actionLabel={t('admin.dashboard.go_to_concourse', 'Open concourse')}
+                            />
+                            <OnboardingStep
+                                step={4}
                                 done={onboardingDone.study}
                                 title={t('admin.dashboard.step_study', 'Create a study')}
                                 description={t(
                                     'admin.dashboard.step_study_desc',
-                                    'Configure the sorting grid, instructions, and participant flow.'
+                                    'Define the sorting grid for your Q-sort.'
                                 )}
                                 action={
                                     nextStep === 'study'
@@ -290,15 +321,15 @@ export function AdminDashboard() {
                                 actionLabel={t('admin.dashboard.create_study', 'Create study')}
                             />
                             <OnboardingStep
-                                step={4}
+                                step={5}
                                 done={onboardingDone.import}
                                 title={t(
                                     'admin.dashboard.step_import',
-                                    'Import accepted items into your study'
+                                    'Import the Q-set into your study'
                                 )}
                                 description={t(
                                     'admin.dashboard.step_import_desc',
-                                    'Select which concourse items become study statements.'
+                                    'Import the accepted concourse items as study statements.'
                                 )}
                                 action={
                                     nextStep === 'import' && hasStudies
@@ -308,7 +339,25 @@ export function AdminDashboard() {
                                 actionLabel={t('admin.dashboard.open_study', 'Open study')}
                             />
                             <OnboardingStep
-                                step={5}
+                                step={6}
+                                done={onboardingDone.configure}
+                                title={t(
+                                    'admin.dashboard.step_configure',
+                                    'Configure the participant flow'
+                                )}
+                                description={t(
+                                    'admin.dashboard.step_configure_desc',
+                                    'Set up instructions, presort, and postsort questions.'
+                                )}
+                                action={
+                                    nextStep === 'configure' && hasStudies
+                                        ? () => handleOpenStudy(studies[0].slug)
+                                        : undefined
+                                }
+                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
+                            />
+                            <OnboardingStep
+                                step={7}
                                 done={onboardingDone.launch}
                                 title={t('admin.dashboard.step_launch', 'Launch recruitment')}
                                 description={t(
