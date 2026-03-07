@@ -624,7 +624,14 @@
             "tag_deleted": "Tunniste poistettu",
             "tag_delete_error": "Tunnisteen poisto epäonnistui",
             "no_tags": "Ei tunnisteita. Luo ensimmäinen tunniste yllä.",
-            "field_tags": "Tunnisteet"
+            "field_tags": "Tunnisteet",
+            "export_csv": "Vie CSV",
+            "select_all": "Valitse kaikki",
+            "bulk_selected": "{{count}} valittu",
+            "bulk_set_status": "Aseta tila:",
+            "bulk_clear": "Tyhjennä",
+            "bulk_status_success": "{{count}} kohdetta päivitetty",
+            "bulk_status_error": "Joidenkin kohteiden päivitys epäonnistui"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",

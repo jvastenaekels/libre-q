@@ -632,7 +632,14 @@
             "tag_deleted": "Tag deleted",
             "tag_delete_error": "Failed to delete tag",
             "no_tags": "No tags yet. Create your first tag above.",
-            "field_tags": "Tags"
+            "field_tags": "Tags",
+            "export_csv": "Export CSV",
+            "select_all": "Select all",
+            "bulk_selected": "{{count}} selected",
+            "bulk_set_status": "Set status:",
+            "bulk_clear": "Clear",
+            "bulk_status_success": "{{count}} items updated",
+            "bulk_status_error": "Failed to update some items"
         },
         "concourse_import": {
             "title": "Import from Concourse",

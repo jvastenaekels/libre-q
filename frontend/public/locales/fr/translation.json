@@ -624,7 +624,14 @@
             "tag_deleted": "Étiquette supprimée",
             "tag_delete_error": "Échec de la suppression de l'étiquette",
             "no_tags": "Aucune étiquette. Créez votre première étiquette ci-dessus.",
-            "field_tags": "Étiquettes"
+            "field_tags": "Étiquettes",
+            "export_csv": "Exporter CSV",
+            "select_all": "Tout sélectionner",
+            "bulk_selected": "{{count}} sélectionné(s)",
+            "bulk_set_status": "Définir le statut :",
+            "bulk_clear": "Effacer",
+            "bulk_status_success": "{{count}} éléments mis à jour",
+            "bulk_status_error": "Échec de la mise à jour de certains éléments"
         },
         "concourse_import": {
             "title": "Importer depuis un concours",

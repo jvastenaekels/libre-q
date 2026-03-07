@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     Library,
     Plus,
     Upload,
+    Download,
     Trash2,
     Loader2,
     ArrowLeft,
@@ -105,6 +106,8 @@ export default function ConcourseDetailPage() {
     const [newTagName, setNewTagName] = useState('');
     const [newTagColor, setNewTagColor] = useState('#6366f1');
     const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
+    const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+    const [bulkActionPending, setBulkActionPending] = useState(false);
 
     // Mutations
     const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
@@ -185,6 +188,92 @@ export default function ConcourseDetailPage() {
             })
             .sort((a, b) => a.display_order - b.display_order);
     }, [concourse?.items, filterStatus, filterTag, searchQuery, activeLocale]);
+
+    const toggleSelectItem = useCallback((itemId: number) => {
+        setSelectedItems((prev) => {
+            const next = new Set(prev);
+            if (next.has(itemId)) next.delete(itemId);
+            else next.add(itemId);
+            return next;
+        });
+    }, []);
+
+    const toggleSelectAll = useCallback(() => {
+        setSelectedItems((prev) => {
+            const filteredIds = filteredItems.map((item) => item.id);
+            const allSelected = filteredIds.length > 0 && filteredIds.every((id) => prev.has(id));
+            if (allSelected) return new Set();
+            return new Set(filteredIds);
+        });
+    }, [filteredItems]);
+
+    const handleBulkStatusChange = async (status: ConcourseItemStatus) => {
+        if (selectedItems.size === 0) return;
+        setBulkActionPending(true);
+        try {
+            const items = concourse?.items?.filter((item) => selectedItems.has(item.id)) ?? [];
+            await Promise.all(
+                items.map((item) =>
+                    updateItemMutation.mutateAsync({
+                        concourseId: id,
+                        itemId: item.id,
+                        data: { version: item.version, status },
+                    })
+                )
+            );
+            await invalidate();
+            setSelectedItems(new Set());
+            toast.success(
+                t('admin.concourse.bulk_status_success', '{{count}} items updated', {
+                    count: items.length,
+                })
+            );
+        } catch (err) {
+            toast.error(
+                parseApiErrorSync(
+                    err,
+                    t('admin.concourse.bulk_status_error', 'Failed to update some items')
+                )
+            );
+            await invalidate();
+        } finally {
+            setBulkActionPending(false);
+        }
+    };
+
+    const exportCsv = useCallback(() => {
+        if (!concourse?.items?.length) return;
+        const items = filteredItems.length > 0 ? filteredItems : (concourse.items ?? []);
+        const allLangs = [
+            ...new Set(items.flatMap((i) => i.translations?.map((tr) => tr.language_code) ?? [])),
+        ].sort();
+
+        const headers = ['code', 'status', 'source', ...allLangs.map((l) => `text_${l}`), 'tags'];
+        const rows = items.map((item) => {
+            const texts = allLangs.map((lang) => {
+                const tr = item.translations?.find((t) => t.language_code === lang);
+                return tr?.text ?? '';
+            });
+            const tagNames = item.tags?.map((tag) => tag.name).join('; ') ?? '';
+            return [item.code, item.status, item.source ?? '', ...texts, tagNames];
+        });
+
+        const csvEscape = (v: string) => {
+            if (v.includes(',') || v.includes('"') || v.includes('\n')) {
+                return `"${v.replace(/"/g, '""')}"`;
+            }
+            return v;
+        };
+
+        const csv = [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n');
+        const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${concourse.title.replace(/[^a-zA-Z0-9-_ ]/g, '').trim()}_concourse.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }, [concourse, filteredItems]);
 
     // Add item
     const [newCode, setNewCode] = useState('');
@@ -398,6 +487,18 @@ export default function ConcourseDetailPage() {
                             <ArrowLeft className="size-4 sm:mr-1" />
                             <span className="hidden sm:inline">{t('common.back', 'Back')}</span>
                         </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl"
+                            onClick={exportCsv}
+                            disabled={!concourse.items?.length}
+                        >
+                            <Download className="size-4 sm:mr-1" />
+                            <span className="hidden sm:inline">
+                                {t('admin.concourse.export_csv', 'Export CSV')}
+                            </span>
+                        </Button>
                         {canEdit && (
                             <>
                                 <Button
@@ -499,6 +600,112 @@ export default function ConcourseDetailPage() {
                 </span>
             </div>
 
+            {/* Statistics Summary */}
+            {concourse.items && concourse.items.length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                    {(['proposed', 'accepted', 'rejected'] as const).map((status) => {
+                        const count =
+                            concourse.items?.filter((i) => i.status === status).length ?? 0;
+                        return (
+                            <div
+                                key={status}
+                                className={cn(
+                                    'flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold',
+                                    STATUS_COLORS[status]
+                                )}
+                            >
+                                <span>{t(`admin.concourse.status.${status}`, status)}</span>
+                                <span className="font-black">{count}</span>
+                            </div>
+                        );
+                    })}
+                    {tags && tags.length > 0 && (
+                        <>
+                            <div className="w-px bg-slate-200 self-stretch" />
+                            {tags.map((tag) => {
+                                const count =
+                                    concourse.items?.filter((i) =>
+                                        i.tags?.some((t) => t.id === tag.id)
+                                    ).length ?? 0;
+                                return (
+                                    <div
+                                        key={tag.id}
+                                        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs"
+                                    >
+                                        <div
+                                            className="size-2.5 rounded-full"
+                                            style={{ backgroundColor: tag.color ?? '#94a3b8' }}
+                                        />
+                                        <span className="text-slate-600">{tag.name}</span>
+                                        <span className="font-bold text-slate-800">{count}</span>
+                                    </div>
+                                );
+                            })}
+                        </>
+                    )}
+                </div>
+            )}
+
+            {/* Bulk Action Bar */}
+            {canEdit && selectedItems.size > 0 && (
+                <div className="flex flex-wrap items-center gap-2 rounded-xl bg-indigo-50 border border-indigo-100 px-4 py-2.5">
+                    <span className="text-xs font-bold text-indigo-700">
+                        {t('admin.concourse.bulk_selected', '{{count}} selected', {
+                            count: selectedItems.size,
+                        })}
+                    </span>
+                    <div className="flex items-center gap-1.5 ml-auto">
+                        <span className="text-xs text-indigo-600 mr-1">
+                            {t('admin.concourse.bulk_set_status', 'Set status:')}
+                        </span>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 rounded-lg text-2xs font-bold bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"
+                            disabled={bulkActionPending}
+                            onClick={() =>
+                                handleBulkStatusChange('proposed' as ConcourseItemStatus)
+                            }
+                        >
+                            {t('admin.concourse.status.proposed', 'Proposed')}
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 rounded-lg text-2xs font-bold bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
+                            disabled={bulkActionPending}
+                            onClick={() =>
+                                handleBulkStatusChange('accepted' as ConcourseItemStatus)
+                            }
+                        >
+                            {t('admin.concourse.status.accepted', 'Accepted')}
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 rounded-lg text-2xs font-bold bg-red-50 border-red-200 text-red-800 hover:bg-red-100"
+                            disabled={bulkActionPending}
+                            onClick={() =>
+                                handleBulkStatusChange('rejected' as ConcourseItemStatus)
+                            }
+                        >
+                            {t('admin.concourse.status.rejected', 'Rejected')}
+                        </Button>
+                        {bulkActionPending && (
+                            <Loader2 className="size-4 animate-spin text-indigo-600 ml-1" />
+                        )}
+                    </div>
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-xs text-indigo-500 hover:text-indigo-700"
+                        onClick={() => setSelectedItems(new Set())}
+                    >
+                        {t('admin.concourse.bulk_clear', 'Clear')}
+                    </Button>
+                </div>
+            )}
+
             {/* Item List */}
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardContent className="p-0">
@@ -513,6 +720,22 @@ export default function ConcourseDetailPage() {
                         </div>
                     ) : (
                         <div className="divide-y divide-slate-50">
+                            {canEdit && filteredItems.length > 0 && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50/80 border-b border-slate-100">
+                                    <Checkbox
+                                        checked={
+                                            filteredItems.length > 0 &&
+                                            filteredItems.every((item) =>
+                                                selectedItems.has(item.id)
+                                            )
+                                        }
+                                        onCheckedChange={toggleSelectAll}
+                                    />
+                                    <span className="text-2xs font-bold text-slate-500">
+                                        {t('admin.concourse.select_all', 'Select all')}
+                                    </span>
+                                </div>
+                            )}
                             {filteredItems.map((item) => {
                                 const text =
                                     item.translations?.find(
@@ -525,10 +748,24 @@ export default function ConcourseDetailPage() {
                                 return (
                                     <div
                                         key={item.id}
-                                        className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 px-4 py-3 hover:bg-slate-50/50 transition-colors group"
+                                        className={cn(
+                                            'flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 px-4 py-3 hover:bg-slate-50/50 transition-colors group',
+                                            selectedItems.has(item.id) && 'bg-indigo-50/50'
+                                        )}
                                     >
                                         {/* Code + Status (mobile: same row) */}
                                         <div className="flex items-center gap-2 sm:contents">
+                                            {/* Selection checkbox */}
+                                            {canEdit && (
+                                                <div className="flex-shrink-0 sm:pt-0.5">
+                                                    <Checkbox
+                                                        checked={selectedItems.has(item.id)}
+                                                        onCheckedChange={() =>
+                                                            toggleSelectItem(item.id)
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
                                             {/* Code badge */}
                                             <div className="flex-shrink-0 sm:pt-0.5">
                                                 {isEditing ? (
