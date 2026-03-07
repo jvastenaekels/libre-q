@@ -17,6 +17,7 @@ import {
     Settings2,
     CheckSquare,
     Filter,
+    Globe,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,6 +71,15 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ConcourseDetailPage() {
     const { t } = useTranslation();
+    const statusLabel = useCallback(
+        (status: string) =>
+            ({
+                proposed: t('admin.concourse.status.proposed', 'Proposed'),
+                accepted: t('admin.concourse.status.accepted', 'Accepted'),
+                rejected: t('admin.concourse.status.rejected', 'Rejected'),
+            })[status] ?? status,
+        [t]
+    );
     const { can } = usePermission();
     const { concourseId } = useParams<{ concourseId: string }>();
     const queryClient = useQueryClient();
@@ -84,7 +94,9 @@ export default function ConcourseDetailPage() {
 
     const { data: tags } = useListTagsApiAdminConcoursesTagsGet();
 
-    const [activeLocale, setActiveLocale] = useState('en');
+    const [activeLocale, setActiveLocale] = useState('');
+    const [addLangOpen, setAddLangOpen] = useState(false);
+    const [newLangCode, setNewLangCode] = useState('');
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [filterTag, setFilterTag] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -250,7 +262,7 @@ export default function ConcourseDetailPage() {
                 return tr?.text ?? '';
             });
             const tagNames = item.tags?.map((tag) => tag.name).join('; ') ?? '';
-            return [item.code, item.status, item.source ?? '', ...texts, tagNames];
+            return [item.code, statusLabel(item.status), item.source ?? '', ...texts, tagNames];
         });
 
         const csvEscape = (v: string) => {
@@ -268,7 +280,7 @@ export default function ConcourseDetailPage() {
         a.download = `${concourse.title.replace(/[^a-zA-Z0-9-_ ]/g, '').trim()}_concourse.csv`;
         a.click();
         URL.revokeObjectURL(url);
-    }, [concourse, filteredItems]);
+    }, [concourse, filteredItems, statusLabel]);
 
     // Add item
     const [newCode, setNewCode] = useState('');
@@ -320,6 +332,12 @@ export default function ConcourseDetailPage() {
 
     const saveEdit = async (item: ConcourseItemRead) => {
         try {
+            const mergedTranslations = [
+                ...(item.translations ?? [])
+                    .filter((tr) => tr.language_code !== activeLocale)
+                    .map((tr) => ({ language_code: tr.language_code, text: tr.text })),
+                { language_code: activeLocale, text: editText.trim() },
+            ];
             await updateItemMutation.mutateAsync({
                 concourseId: id,
                 itemId: item.id,
@@ -327,7 +345,7 @@ export default function ConcourseDetailPage() {
                     version: item.version,
                     code: editCode.trim() || undefined,
                     source: editSource.trim() || undefined,
-                    translations: [{ language_code: activeLocale, text: editText.trim() }],
+                    translations: mergedTranslations,
                     tag_ids: editTagIds,
                     change_comment: editChangeNote.trim() || undefined,
                 },
@@ -383,6 +401,7 @@ export default function ConcourseDetailPage() {
 
     const [importText, setImportText] = useState('');
     const [importPrefix, setImportPrefix] = useState('C');
+    const [importLocale, setImportLocale] = useState('');
 
     const handleImport = async () => {
         if (!importText.trim()) return;
@@ -391,7 +410,7 @@ export default function ConcourseDetailPage() {
                 concourseId: id,
                 data: {
                     text_block: importText,
-                    language_code: activeLocale,
+                    language_code: importLocale || activeLocale || 'en',
                     code_prefix: importPrefix,
                 },
             });
@@ -420,7 +439,7 @@ export default function ConcourseDetailPage() {
     );
 
     useEffect(() => {
-        if (!languages.includes(activeLocale) && languages.length > 0) {
+        if (!activeLocale && languages.length > 0) {
             setActiveLocale(languages[0]);
         }
     }, [languages, activeLocale]);
@@ -471,7 +490,10 @@ export default function ConcourseDetailPage() {
                                     variant="outline"
                                     size="sm"
                                     className="rounded-xl"
-                                    onClick={() => setImportOpen(true)}
+                                    onClick={() => {
+                                        setImportLocale(activeLocale || languages[0] || 'en');
+                                        setImportOpen(true);
+                                    }}
                                 >
                                     <Upload className="size-4 sm:mr-1" />
                                     <span className="hidden sm:inline">
@@ -546,20 +568,33 @@ export default function ConcourseDetailPage() {
                         {t('admin.concourse.manage_tags', 'Tags')}
                     </Button>
                 )}
-                {languages.length > 1 && (
-                    <Select value={activeLocale} onValueChange={setActiveLocale}>
-                        <SelectTrigger className="h-9 w-24 rounded-xl bg-white text-xs font-bold">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl">
-                            {languages.map((lang) => (
-                                <SelectItem key={lang} value={lang}>
-                                    {lang.toUpperCase()}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                )}
+                <Select
+                    value={activeLocale}
+                    onValueChange={(val) => {
+                        if (val === '__add__') {
+                            setAddLangOpen(true);
+                        } else {
+                            setActiveLocale(val);
+                        }
+                    }}
+                >
+                    <SelectTrigger className="h-9 w-28 rounded-xl bg-white text-xs font-bold">
+                        <Globe className="size-3 mr-1 text-slate-400" />
+                        <SelectValue
+                            placeholder={t('admin.concourse.select_language', 'Language')}
+                        />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                        {languages.map((lang) => (
+                            <SelectItem key={lang} value={lang}>
+                                {lang.toUpperCase()}
+                            </SelectItem>
+                        ))}
+                        <SelectItem value="__add__" className="text-indigo-600 font-bold">
+                            + {t('admin.concourse.add_language', 'Add language')}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
                 <span className="text-xs text-slate-400 ml-auto">
                     {filteredItems.length} / {concourse.items?.length ?? 0}{' '}
                     {t('admin.concourse.items_label', 'items')}
@@ -890,7 +925,7 @@ export default function ConcourseDetailPage() {
                                                             STATUS_COLORS[item.status] ?? ''
                                                         )}
                                                     >
-                                                        {item.status}
+                                                        {statusLabel(item.status)}
                                                     </Badge>
                                                 ) : null}
                                             </div>
@@ -1444,8 +1479,22 @@ export default function ConcourseDetailPage() {
                         </div>
                         <div className="space-y-1">
                             <Label className="text-2xs font-black text-slate-500">
+                                {t('admin.concourse.import_language', 'Language')}
+                            </Label>
+                            <Input
+                                value={importLocale}
+                                onChange={(e) =>
+                                    setImportLocale(e.target.value.toLowerCase().slice(0, 5))
+                                }
+                                placeholder="en"
+                                className="h-10 rounded-xl w-32 font-mono"
+                                maxLength={5}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-2xs font-black text-slate-500">
                                 {t('admin.concourse.import_statements', 'Statements')} (
-                                {activeLocale.toUpperCase()})
+                                {(importLocale || activeLocale).toUpperCase()})
                             </Label>
                             <Textarea
                                 value={importText}
@@ -1589,6 +1638,58 @@ export default function ConcourseDetailPage() {
                             </p>
                         )}
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Add Language Dialog */}
+            <Dialog open={addLangOpen} onOpenChange={setAddLangOpen}>
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-xs">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-black text-slate-900">
+                            {t('admin.concourse.add_language', 'Add language')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-slate-500">
+                            {t(
+                                'admin.concourse.add_language_desc',
+                                'Enter a language code (e.g. en, fr, fi).'
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Input
+                        value={newLangCode}
+                        onChange={(e) =>
+                            setNewLangCode(
+                                e.target.value
+                                    .toLowerCase()
+                                    .replace(/[^a-z-]/g, '')
+                                    .slice(0, 5)
+                            )
+                        }
+                        placeholder="en"
+                        className="h-10 rounded-xl font-mono"
+                        maxLength={5}
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && /^[a-z]{2}(-[A-Z]{2})?$/.test(newLangCode)) {
+                                setActiveLocale(newLangCode);
+                                setAddLangOpen(false);
+                                setNewLangCode('');
+                            }
+                        }}
+                    />
+                    <DialogFooter>
+                        <Button
+                            onClick={() => {
+                                setActiveLocale(newLangCode);
+                                setAddLangOpen(false);
+                                setNewLangCode('');
+                            }}
+                            disabled={!/^[a-z]{2}$/.test(newLangCode)}
+                            className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                        >
+                            {t('common.add', 'Add')}
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
 
