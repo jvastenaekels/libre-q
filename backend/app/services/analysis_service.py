@@ -313,6 +313,30 @@ def rotate_varimax(
     return rotated
 
 
+def standardize_factor_signs(
+    loadings: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Standardize factor polarity so the largest absolute loading is positive.
+
+    Follows the R ``varimax()`` convention: for each factor column, if the
+    element with the largest absolute value is negative the entire column is
+    reflected (multiplied by -1).  This eliminates arbitrary sign
+    indeterminacy introduced by eigenvector decomposition and rotation.
+
+    Args:
+        loadings: Loadings matrix (n_participants x n_factors)
+
+    Returns:
+        Sign-standardized loadings matrix (same shape, new array).
+    """
+    result = loadings.copy()
+    for f in range(result.shape[1]):
+        col = result[:, f]
+        if col[np.argmax(np.abs(col))] < 0:
+            result[:, f] = -col
+    return result
+
+
 def flag_sorts(loadings: NDArray[np.float64], n_statements: int) -> NDArray[np.bool_]:
     """Auto-flag Q-sorts to factors.
 
@@ -716,6 +740,12 @@ def run_analysis(
         rotated = rotate_varimax(unrotated)
     else:
         rotated = unrotated.copy()
+
+    # Step 4b: Standardize factor signs (largest absolute loading positive)
+    # Eliminates arbitrary sign indeterminacy from eigenvector decomposition
+    # and rotation, which otherwise causes inverted factor polarity
+    # (e.g. -5 ↔ +5 in factor arrays).
+    rotated = standardize_factor_signs(rotated)
 
     # Step 5: Flagging
     if flagging == "manual" and manual_flags_matrix is not None:
