@@ -116,8 +116,7 @@ const ProfilePage = () => {
                 data,
             });
             toast.success(t('admin.profile.personal.success', 'Profile updated successfully'));
-            // Force reload or re-fetch user would be ideal here
-            window.location.reload();
+            refetchUser();
         } catch (error) {
             toast.error(t('admin.profile.personal.error', 'Failed to update profile'));
             console.error(error);
@@ -141,7 +140,7 @@ const ProfilePage = () => {
             toast.error(
                 t(
                     'admin.profile.password.error',
-                    'Failed to change password. check current password.'
+                    'Failed to change password. Check current password.'
                 )
             );
             console.error(error);
@@ -153,7 +152,7 @@ const ProfilePage = () => {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.profile.title', 'Profile & Security')}
+                title={t('admin.profile.title', 'Profile & security')}
                 description={t(
                     'admin.profile.description',
                     'Manage your personal information and account security.'
@@ -167,7 +166,7 @@ const ProfilePage = () => {
                     <CardHeader className="border-b border-slate-50 pb-4">
                         <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                             <Key className="size-5 text-indigo-500" />
-                            {t('admin.profile.personal.title', 'Personal Information')}
+                            {t('admin.profile.personal.title', 'Personal information')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500">
                             {t(
@@ -183,7 +182,7 @@ const ProfilePage = () => {
                                     htmlFor="email"
                                     className="text-2xs font-black text-slate-500"
                                 >
-                                    Email
+                                    {t('admin.profile.personal.email', 'Email address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -203,11 +202,11 @@ const ProfilePage = () => {
                                     htmlFor="full_name"
                                     className="text-2xs font-black text-slate-500"
                                 >
-                                    Full Name
+                                    {t('admin.profile.personal.name', 'Full name')}
                                 </Label>
                                 <Input
                                     id="full_name"
-                                    placeholder="John Doe"
+                                    placeholder={t('admin.profile.personal.name', 'Full name')}
                                     {...registerProfile('full_name')}
                                     className="h-11 rounded-xl"
                                 />
@@ -221,7 +220,7 @@ const ProfilePage = () => {
                             >
                                 {isUpdating
                                     ? t('admin.profile.personal.saving', 'Saving...')
-                                    : t('admin.profile.personal.save', 'Save Changes')}
+                                    : t('admin.profile.personal.save', 'Save changes')}
                             </Button>
                         </CardFooter>
                     </form>
@@ -270,8 +269,10 @@ const ProfilePage = () => {
                                             )}
                                         </h4>
                                         <p className="text-sm text-slate-500 font-medium">
-                                            Enable two-factor authentication to protect your
-                                            sensitive data and studies.
+                                            {t(
+                                                'admin.profile.security.status_inactive_desc',
+                                                'Enable two-factor authentication to protect your sensitive data and studies.'
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -279,7 +280,7 @@ const ProfilePage = () => {
                                     onClick={() => setIs2FASetupMode(true)}
                                     className="h-11 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                 >
-                                    {t('admin.profile.security.setup_cta', 'Setup 2FA Now')}
+                                    {t('admin.profile.security.setup_cta', 'Setup 2FA now')}
                                 </Button>
                             </div>
                         )}
@@ -291,7 +292,7 @@ const ProfilePage = () => {
                                         <Key size={18} className="text-indigo-600" />
                                         {t(
                                             'admin.profile.security.configure_title',
-                                            'Configure Authenticator App'
+                                            'Configure authenticator app'
                                         )}
                                     </h4>
                                     <Button
@@ -339,8 +340,7 @@ const ProfilePage = () => {
                                             </div>
                                         ) : (
                                             <QRCodeSVG
-                                                // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
-                                                value={(totpSetup as any)?.otpauth_uri || ''}
+                                                value={totpSetup?.qr_code_uri || ''}
                                                 size={160}
                                             />
                                         )}
@@ -404,7 +404,10 @@ const ProfilePage = () => {
                                             )}
                                         </h4>
                                         <p className="text-sm text-green-700/80">
-                                            Your account is protected.
+                                            {t(
+                                                'admin.profile.security.status_active',
+                                                'Your account is secured with two-factor authentication.'
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -439,14 +442,13 @@ const ProfilePage = () => {
                                                 }
                                                 onClick={() =>
                                                     disableMutation.mutate({
-                                                        // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
-                                                        data: { password: confirmPassword } as any,
+                                                        data: { current_password: confirmPassword },
                                                     })
                                                 }
                                             >
                                                 {t(
                                                     'admin.profile.security.confirm_disable',
-                                                    'Confirm Disable'
+                                                    'Confirm disable'
                                                 )}
                                             </Button>
                                             <Button
@@ -468,10 +470,13 @@ const ProfilePage = () => {
                     <CardHeader className="border-b border-slate-50 pb-4">
                         <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                             <Shield size={20} className="text-indigo-500" />
-                            Password Management
+                            {t('admin.profile.password.title', 'Password management')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500">
-                            Change your password regularly to keep your account secure.
+                            {t(
+                                'admin.profile.password.description',
+                                'Update your password to keep your account secure.'
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
@@ -481,7 +486,7 @@ const ProfilePage = () => {
                                     htmlFor="current_password"
                                     className="text-2xs font-black text-slate-500"
                                 >
-                                    Current Password
+                                    {t('admin.profile.password.current', 'Current password')}
                                 </Label>
                                 <Input
                                     id="current_password"
@@ -503,7 +508,7 @@ const ProfilePage = () => {
                                     htmlFor="new_password"
                                     className="text-2xs font-black text-slate-500"
                                 >
-                                    New Password
+                                    {t('admin.profile.password.new', 'New password')}
                                 </Label>
                                 <Input
                                     id="new_password"
@@ -532,7 +537,7 @@ const ProfilePage = () => {
                             >
                                 {isChangingPassword
                                     ? t('admin.profile.password.updating', 'Updating...')
-                                    : t('admin.profile.password.change_btn', 'Change Password')}
+                                    : t('admin.profile.password.change_btn', 'Change password')}
                             </Button>
                         </CardFooter>
                     </form>

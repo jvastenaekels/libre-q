@@ -29,6 +29,7 @@ from app.schemas import (
     UserCreate,
     UserUpdate,
     PasswordChange,
+    PasswordConfirm,
     TOTPSetup,
     TOTPVerify,
 )
@@ -314,7 +315,7 @@ async def enable_totp(
 
 @router.post("/me/2fa/disable")
 async def disable_totp(
-    password_data: PasswordChange,  # Reuse for current password check
+    password_data: PasswordConfirm,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
 ):

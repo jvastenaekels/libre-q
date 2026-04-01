@@ -53,3 +53,9 @@ class PasswordChange(BaseModel):
 
     current_password: str
     new_password: str = Field(..., min_length=8)
+
+
+class PasswordConfirm(BaseModel):
+    """Schema for confirming identity with current password."""
+
+    current_password: str

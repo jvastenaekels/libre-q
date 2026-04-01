@@ -308,7 +308,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PasswordChange"
+                "$ref": "#/components/schemas/PasswordConfirm"
               }
             }
           },
@@ -7047,6 +7047,20 @@
         ],
         "title": "PasswordChange",
         "description": "Schema for changing password."
+      },
+      "PasswordConfirm": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "title": "Current Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_password"
+        ],
+        "title": "PasswordConfirm",
+        "description": "Schema for confirming identity with current password."
       },
       "ProcessStep": {
         "properties": {

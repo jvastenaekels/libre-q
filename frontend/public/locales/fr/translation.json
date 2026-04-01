@@ -475,12 +475,12 @@
             "admin_user": "Administrateur"
         },
         "profile": {
-            "title": "Profil et Sécurité",
+            "title": "Profil et sécurité",
             "description": "Gérez vos informations personnelles et la sécurité de votre compte.",
             "personal": {
                 "title": "Informations personnelles",
                 "description": "Vos coordonnées et détails de compte.",
-                "email": "Adresse E-mail",
+                "email": "Adresse e-mail",
                 "email_locked": "L'email ne peut pas être modifié directement. Contactez l'administrateur.",
                 "name": "Nom complet",
                 "save": "Enregistrer les modifications",
@@ -494,6 +494,7 @@
                 "description": "Ajoutez une couche de sécurité supplémentaire avec TOTP.",
                 "status_active": "La sécurité du compte est active",
                 "status_inactive": "La sécurité du compte est faible",
+                "status_inactive_desc": "Activez l'authentification à deux facteurs pour protéger vos données et vos études.",
                 "enabled": "Activé",
                 "setup_cta": "Configurer la 2FA",
                 "configure_title": "Configurer l'application d'authentification",

@@ -207,43 +207,21 @@ export function AdminDashboard() {
     const hasConcourseItems = totalItems > 0;
     const hasAcceptedItems = acceptedCount > 0;
     const hasActiveStudy = activeStudies.length > 0;
-    const hasLaunchedStudy =
-        hasActiveStudy ||
-        (studies?.some((s) => s.state === 'closed' || s.state === 'paused') ?? false);
-    const hasParticipants = totalParticipants > 0;
-    const hasImportedStatements = studies?.some((s) => (s.statements?.length ?? 0) > 0) ?? false;
-    const hasConfiguredFlow =
-        studies?.some((s) => {
-            const hasTranslation = s.translations?.some((tr) => tr.pre_instruction);
-            return hasTranslation;
-        }) ?? false;
-
-    // Onboarding progress — follows real Q-methodology workflow
+    // Onboarding progress — shown until first study is created
     const onboardingDone = {
         project: true,
         concourse: hasConcourseItems,
         qset: hasAcceptedItems,
         study: !!hasStudies,
-        import: hasImportedStatements || hasLaunchedStudy || hasParticipants,
-        configure: hasConfiguredFlow || hasLaunchedStudy || hasParticipants,
-        launch: hasActiveStudy || hasParticipants,
     };
-    const allStepsDone = Object.values(onboardingDone).every(Boolean);
 
-    // Show onboarding when not all steps are complete
-    if (!allStepsDone) {
-        // Find next action step
+    // Show onboarding only until a study is created
+    if (!hasStudies) {
         const nextStep = !onboardingDone.concourse
             ? 'concourse'
             : !onboardingDone.qset
               ? 'qset'
-              : !onboardingDone.study
-                ? 'study'
-                : !onboardingDone.import
-                  ? 'import'
-                  : !onboardingDone.configure
-                    ? 'configure'
-                    : 'launch';
+              : 'study';
 
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
@@ -320,103 +298,29 @@ export function AdminDashboard() {
                                 }
                                 actionLabel={t('admin.dashboard.create_study', 'Create study')}
                             />
-                            <OnboardingStep
-                                step={5}
-                                done={onboardingDone.import}
-                                title={t(
-                                    'admin.dashboard.step_import',
-                                    'Import the Q-set into your study'
-                                )}
-                                description={t(
-                                    'admin.dashboard.step_import_desc',
-                                    'Import the accepted concourse items as study statements.'
-                                )}
-                                action={
-                                    nextStep === 'import' && hasStudies
-                                        ? () => handleOpenStudy(studies[0].slug)
-                                        : undefined
-                                }
-                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
-                            />
-                            <OnboardingStep
-                                step={6}
-                                done={onboardingDone.configure}
-                                title={t(
-                                    'admin.dashboard.step_configure',
-                                    'Configure the participant flow'
-                                )}
-                                description={t(
-                                    'admin.dashboard.step_configure_desc',
-                                    'Set up instructions, presort, and postsort questions.'
-                                )}
-                                action={
-                                    nextStep === 'configure' && hasStudies
-                                        ? () => handleOpenStudy(studies[0].slug)
-                                        : undefined
-                                }
-                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
-                            />
-                            <OnboardingStep
-                                step={7}
-                                done={onboardingDone.launch}
-                                title={t('admin.dashboard.step_launch', 'Launch recruitment')}
-                                description={t(
-                                    'admin.dashboard.step_launch_desc',
-                                    'Generate participation links and share them.'
-                                )}
-                                action={
-                                    nextStep === 'launch' && hasStudies
-                                        ? () => handleOpenStudy(studies[0].slug)
-                                        : undefined
-                                }
-                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
-                            />
                         </ol>
                     </CardContent>
                 </Card>
 
-                {/* Still show studies/concourse below onboarding if they exist */}
-                {(hasStudies || hasConcourseItems) && (
-                    <>
-                        {/* Concourse + Team row */}
-                        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                            <ConcourseCard
-                                totalItems={totalItems}
-                                acceptedCount={acceptedCount}
-                                proposedCount={proposedCount}
-                                rejectedCount={rejectedCount}
-                                tags={tags}
-                                onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
-                                t={t}
-                            />
-                            <TeamCard
-                                members={members}
-                                canManage={can('project:settings')}
-                                onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
-                                t={t}
-                            />
-                        </div>
-
-                        {hasStudies && (
-                            <>
-                                <div className="space-y-1">
-                                    <h2 className="text-lg font-semibold">
-                                        {t('admin.dashboard.studies', 'Studies')}
-                                    </h2>
-                                </div>
-                                <StudyGroups
-                                    activeStudies={activeStudies}
-                                    pausedStudies={pausedStudies}
-                                    draftStudies={draftStudies}
-                                    closedStudies={closedStudies}
-                                    getTitle={getStudyTitle}
-                                    onOpen={handleOpenStudy}
-                                    locale={currentLocale}
-                                    t={t}
-                                />
-                            </>
-                        )}
-                    </>
+                {/* Concourse + Team row */}
+                {hasConcourseItems && (
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+                        <ConcourseCard
+                            totalItems={totalItems}
+                            acceptedCount={acceptedCount}
+                            proposedCount={proposedCount}
+                            rejectedCount={rejectedCount}
+                            tags={tags}
+                            onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
+                            t={t}
+                        />
+                        <TeamCard
+                            members={members}
+                            canManage={can('project:settings')}
+                            onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
+                            t={t}
+                        />
+                    </div>
                 )}
 
                 <CreateStudyDialog
@@ -1024,7 +928,7 @@ function StudyGroup({
         <div className="space-y-2">
             <button
                 type="button"
-                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
+                className="flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <span className={cn('transition-transform', isOpen ? 'rotate-90' : 'rotate-0')}>

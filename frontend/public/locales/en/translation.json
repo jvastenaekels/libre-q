@@ -510,6 +510,7 @@
                 "enabled": "Enabled",
                 "status_active": "Your account is secured with two-factor authentication.",
                 "status_inactive": "Account security is low",
+                "status_inactive_desc": "Enable two-factor authentication to protect your sensitive data and studies.",
                 "setup_cta": "Setup 2FA now",
                 "configure_title": "Configure authenticator app",
                 "scan_desc": "Scan this QR code with your authenticator app (google authenticator, authy, etc.)",

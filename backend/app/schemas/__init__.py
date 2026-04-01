@@ -57,7 +57,7 @@ from .studies import (
     StudyTranslationRead,
     StudyUpdate,
 )
-from .users import PasswordChange, UserBase, UserCreate, UserRead, UserUpdate
+from .users import PasswordChange, PasswordConfirm, UserBase, UserCreate, UserRead, UserUpdate
 from .concourses import (
     ConcourseCreate,
     ConcourseDetailRead,
@@ -166,6 +166,7 @@ __all__ = [
     "StudyUpdate",
     # users
     "PasswordChange",
+    "PasswordConfirm",
     "UserBase",
     "UserCreate",
     "UserRead",

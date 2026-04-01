@@ -206,7 +206,6 @@ class Test2FA:
             "/api/me/2fa/disable",
             json={
                 "current_password": TEST_PASSWORD,
-                "new_password": "newsecurepassword123",
             },
             headers=headers,
         )

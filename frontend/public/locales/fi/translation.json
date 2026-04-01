@@ -475,7 +475,7 @@
             "admin_user": "Ylläpitäjä"
         },
         "profile": {
-            "title": "Profiili & Turvallisuus",
+            "title": "Profiili ja turvallisuus",
             "description": "Hallitse henkilökohtaisia tietojasi ja turvallisuusasetuksia.",
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
@@ -495,6 +495,7 @@
                 "enabled": "Käytössä",
                 "status_active": "Tilisi on suojattu kaksivaiheisella todennuksella.",
                 "status_inactive": "Tilin turvallisuus on alhainen",
+                "status_inactive_desc": "Ota kaksivaiheinen todennus käyttöön suojataksesi tietosi ja tutkimuksesi.",
                 "setup_cta": "Ota 2FA käyttöön",
                 "configure_title": "Määritä todennussovellus",
                 "scan_desc": "Skannaa tämä QR-koodi todennussovelluksellasi (Google Authenticator, Authy, jne.)",

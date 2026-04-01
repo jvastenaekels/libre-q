@@ -53,6 +53,7 @@ import type {
     LogEntry,
     ParticipantDiscardUpdate,
     PasswordChange,
+    PasswordConfirm,
     ProgressUpdate,
     ProjectCreate,
     ProjectInvitationCreate,
@@ -795,14 +796,14 @@ export const useEnableTotpApiMe2faEnablePost = <TError = HTTPValidationError, TC
  * @summary Disable Totp
  */
 export const disableTotpApiMe2faDisablePost = (
-    passwordChange: PasswordChange,
+    passwordConfirm: PasswordConfirm,
     signal?: AbortSignal
 ) => {
     return customInstance<unknown>({
         url: `/api/me/2fa/disable`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: passwordChange,
+        data: passwordConfirm,
         signal,
     });
 };
@@ -814,13 +815,13 @@ export const getDisableTotpApiMe2faDisablePostMutationOptions = <
     mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
         TError,
-        { data: PasswordChange },
+        { data: PasswordConfirm },
         TContext
     >;
 }): UseMutationOptions<
     Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
     TError,
-    { data: PasswordChange },
+    { data: PasswordConfirm },
     TContext
 > => {
     const mutationKey = ['disableTotpApiMe2faDisablePost'];
@@ -832,7 +833,7 @@ export const getDisableTotpApiMe2faDisablePostMutationOptions = <
 
     const mutationFn: MutationFunction<
         Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
-        { data: PasswordChange }
+        { data: PasswordConfirm }
     > = (props) => {
         const { data } = props ?? {};
 
@@ -845,7 +846,7 @@ export const getDisableTotpApiMe2faDisablePostMutationOptions = <
 export type DisableTotpApiMe2faDisablePostMutationResult = NonNullable<
     Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>
 >;
-export type DisableTotpApiMe2faDisablePostMutationBody = PasswordChange;
+export type DisableTotpApiMe2faDisablePostMutationBody = PasswordConfirm;
 export type DisableTotpApiMe2faDisablePostMutationError = HTTPValidationError;
 
 /**
@@ -856,7 +857,7 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
         mutation?: UseMutationOptions<
             Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
             TError,
-            { data: PasswordChange },
+            { data: PasswordConfirm },
             TContext
         >;
     },
@@ -864,7 +865,7 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
 ): UseMutationResult<
     Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
     TError,
-    { data: PasswordChange },
+    { data: PasswordConfirm },
     TContext
 > => {
     const mutationOptions = getDisableTotpApiMe2faDisablePostMutationOptions(options);

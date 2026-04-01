@@ -126,6 +126,7 @@ export * from './participantStatus';
 export * from './partnerLogo';
 export * from './partnerLogoUrl';
 export * from './passwordChange';
+export * from './passwordConfirm';
 export * from './processStep';
 export * from './processStepColor';
 export * from './progressUpdate';
