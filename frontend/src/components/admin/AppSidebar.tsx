@@ -124,7 +124,12 @@ function NavUser({ user }: { user: any }) {
                         >
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
                                 {user?.full_name
-                                    ? user.full_name.substring(0, 2).toUpperCase()
+                                    ? user.full_name
+                                          .split(/\s+/)
+                                          .map((w) => w[0])
+                                          .join('')
+                                          .substring(0, 2)
+                                          .toUpperCase()
                                     : user?.email?.substring(0, 2).toUpperCase()}
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
@@ -146,7 +151,12 @@ function NavUser({ user }: { user: any }) {
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
                                     {user?.full_name
-                                        ? user.full_name.substring(0, 2).toUpperCase()
+                                        ? user.full_name
+                                              .split(/\s+/)
+                                              .map((w) => w[0])
+                                              .join('')
+                                              .substring(0, 2)
+                                              .toUpperCase()
                                         : user?.email?.substring(0, 2).toUpperCase()}
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">

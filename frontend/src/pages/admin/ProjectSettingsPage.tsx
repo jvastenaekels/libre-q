@@ -274,9 +274,7 @@ export default function ProjectSettingsPage() {
                                                     </div>
                                                 </FormControl>
                                                 <FormDescription className="text-2xs italic">
-                                                    {t(
-                                                        'admin.projects.settings.general.slug_hint'
-                                                    )}
+                                                    {t('admin.projects.settings.general.slug_hint')}
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -297,9 +295,7 @@ export default function ProjectSettingsPage() {
                                                 ) : (
                                                     <>
                                                         <Save className="size-4 mr-2" />
-                                                        {t(
-                                                            'admin.projects.settings.general.save'
-                                                        )}
+                                                        {t('admin.projects.settings.general.save')}
                                                     </>
                                                 )}
                                             </Button>
@@ -358,10 +354,16 @@ export default function ProjectSettingsPage() {
                                             <TableCell className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="size-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center font-bold text-slate-500 shadow-sm">
-                                                        {member.user.full_name?.charAt(0) ||
-                                                            member.user.email
-                                                                .charAt(0)
-                                                                .toUpperCase()}
+                                                        {member.user.full_name
+                                                            ? member.user.full_name
+                                                                  .split(/\s+/)
+                                                                  .map((w) => w[0])
+                                                                  .join('')
+                                                                  .substring(0, 2)
+                                                                  .toUpperCase()
+                                                            : member.user.email
+                                                                  .charAt(0)
+                                                                  .toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-bold text-slate-900">

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
+import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -74,6 +75,21 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
         },
     });
 
+    // Auto-generate slug from title unless manually edited
+    const slugTouched = useRef(false);
+    const watchedTitle = useWatch({ control: form.control, name: 'title' });
+
+    useEffect(() => {
+        if (!slugTouched.current && watchedTitle) {
+            const generated = watchedTitle
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .slice(0, 50);
+            form.setValue('slug', generated);
+        }
+    }, [watchedTitle, form]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             // Construct payload with sensible defaults
@@ -116,6 +132,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
             navigate(`/app/${projectSlug}/studies/${newStudy.slug}/design`);
             onOpenChange(false);
             form.reset();
+            slugTouched.current = false;
         } catch (error: unknown) {
             console.error('Study creation error:', error);
 
@@ -216,6 +233,10 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                                                 'e.g. ai-perspectives-2025'
                                             )}
                                             {...field}
+                                            onChange={(e) => {
+                                                slugTouched.current = true;
+                                                field.onChange(e);
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage />

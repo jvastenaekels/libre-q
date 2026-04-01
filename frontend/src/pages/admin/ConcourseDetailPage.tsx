@@ -577,7 +577,29 @@ export default function ConcourseDetailPage() {
                                 <Button
                                     size="sm"
                                     className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                    onClick={() => setAddItemOpen(true)}
+                                    onClick={() => {
+                                        // Auto-fill next code
+                                        const items = concourse?.items ?? [];
+                                        const maxNum = items.reduce((max, item) => {
+                                            const match = item.code?.match(/^(\d+)$/);
+                                            if (match) return Math.max(max, Number(match[1]));
+                                            const prefixed = item.code?.match(/^([A-Za-z]+)(\d+)$/);
+                                            if (prefixed) return Math.max(max, Number(prefixed[2]));
+                                            return max;
+                                        }, 0);
+                                        // Detect prefix pattern (e.g., "C", "S", "Q")
+                                        const prefixes = items
+                                            .map(
+                                                (item) => item.code?.match(/^([A-Za-z]+)\d+$/)?.[1]
+                                            )
+                                            .filter(Boolean);
+                                        const prefix =
+                                            prefixes.length > 0
+                                                ? prefixes[prefixes.length - 1]
+                                                : '';
+                                        setNewCode(`${prefix}${maxNum + 1}`);
+                                        setAddItemOpen(true);
+                                    }}
                                 >
                                     <Plus className="size-4 sm:mr-1" />
                                     <span className="hidden sm:inline">

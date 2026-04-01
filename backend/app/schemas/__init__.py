@@ -57,7 +57,14 @@ from .studies import (
     StudyTranslationRead,
     StudyUpdate,
 )
-from .users import PasswordChange, PasswordConfirm, UserBase, UserCreate, UserRead, UserUpdate
+from .users import (
+    PasswordChange,
+    PasswordConfirm,
+    UserBase,
+    UserCreate,
+    UserRead,
+    UserUpdate,
+)
 from .concourses import (
     ConcourseCreate,
     ConcourseDetailRead,

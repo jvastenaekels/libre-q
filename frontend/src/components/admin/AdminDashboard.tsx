@@ -22,7 +22,7 @@ import { enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -82,7 +82,6 @@ export function AdminDashboard() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showImportDialog, setShowImportDialog] = useState(false);
     const { t, i18n } = useTranslation();
-    const { can } = usePermission();
     const currentLocale = DATE_LOCALES[i18n.language] || enUS;
     const projectSlug = currentProject?.slug || '';
 
@@ -424,7 +423,6 @@ function OnboardingStep({
         </li>
     );
 }
-
 
 function SingleStudyCard({
     study,
