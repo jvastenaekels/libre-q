@@ -82,8 +82,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 })
                 .sort((a, b) => {
                     // Sort by score (asc) then row
-                    const scoreA = gridColumns[a.col].score;
-                    const scoreB = gridColumns[b.col].score;
+                    const scoreA = gridColumns[a.col]?.score ?? 0;
+                    const scoreB = gridColumns[b.col]?.score ?? 0;
                     if (scoreA !== scoreB) return scoreA - scoreB;
                     return a.row - b.row;
                 }),

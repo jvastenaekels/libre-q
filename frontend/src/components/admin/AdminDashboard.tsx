@@ -328,7 +328,7 @@ export function AdminDashboard() {
             )}
 
             {/* Studies */}
-            {studies && studies.length === 1 ? (
+            {studies && studies.length === 1 && studies[0] ? (
                 <SingleStudyCard
                     study={studies[0]}
                     title={getStudyTitle(studies[0])}

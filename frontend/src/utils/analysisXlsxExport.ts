@@ -77,7 +77,7 @@ export async function generateAnalysisXlsx(result: AnalysisResult): Promise<Blob
         ['Total Variance Explained (%)', result.total_variance_explained],
     ];
     for (let i = 0; i < result.eigenvalues.length; i++) {
-        overviewRows.push([`Eigenvalue ${i + 1}`, result.eigenvalues[i]]);
+        overviewRows.push([`Eigenvalue ${i + 1}`, result.eigenvalues[i] ?? 0]);
     }
     const wsOverview = makeSheet(overviewRows);
     formatRange(wsOverview, 5, 5, 1, 1, '0.0'); // variance
@@ -200,7 +200,8 @@ export async function generateAnalysisXlsx(result: AnalysisResult): Promise<Blob
     const wsChars = makeSheet(charData);
     freezeHeaderRow(wsChars);
     for (let i = 0; i < charMetrics.length; i++) {
-        formatRange(wsChars, i + 1, i + 1, 1, chars.length, charMetrics[i].fmt);
+        const metric = charMetrics[i];
+        if (metric) formatRange(wsChars, i + 1, i + 1, 1, chars.length, metric.fmt);
     }
     XLSX.utils.book_append_sheet(wb, wsChars, 'Factor Characteristics');
 

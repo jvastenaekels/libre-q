@@ -342,13 +342,13 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
                 const eventX =
                     event instanceof MouseEvent || event instanceof PointerEvent
                         ? event.clientX
-                        : event instanceof TouchEvent && event.touches.length > 0
+                        : event instanceof TouchEvent && event.touches[0]
                           ? event.touches[0].clientX
                           : 0;
                 const eventY =
                     event instanceof MouseEvent || event instanceof PointerEvent
                         ? event.clientY
-                        : event instanceof TouchEvent && event.touches.length > 0
+                        : event instanceof TouchEvent && event.touches[0]
                           ? event.touches[0].clientY
                           : 0;
                 return {

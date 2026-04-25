@@ -169,7 +169,7 @@ export const useFineSortDrag = ({
                 // 3. Slot Placement
                 if (overIdString.startsWith('slot_')) {
                     const parts = overIdString.split('_');
-                    if (parts.length === 3) {
+                    if (parts.length === 3 && parts[1] && parts[2]) {
                         const col = parseInt(parts[1], 10);
                         const row = parseInt(parts[2], 10);
                         handlePlacement(cardId, col, row);
