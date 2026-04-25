@@ -83,17 +83,21 @@ export class TestDatabase {
         const token = await this.login();
 
         await page.addInitScript(
-            ({ token, user, workspace }) => {
+            ({ token, user, project }) => {
+                // Inject at version 2 with the post-Phase-5D shape
+                // (workspaces → projects, currentWorkspace → currentProject).
+                // Skips the migrate path entirely; safer than injecting v1
+                // and relying on rehydration ordering during page boot.
                 window.sessionStorage.setItem(
                     'admin-auth-storage',
                     JSON.stringify({
                         state: {
                             token: token,
                             user: user,
-                            workspaces: [workspace],
-                            currentWorkspace: workspace,
+                            projects: [project],
+                            currentProject: project,
                         },
-                        version: 1,
+                        version: 2,
                     })
                 );
             },
@@ -104,10 +108,10 @@ export class TestDatabase {
                     email: this.uniqueUserEmail,
                     is_superuser: true,
                 },
-                workspace: {
+                project: {
                     id: this.workspaceId,
                     slug: this.currentWorkspaceSlug,
-                    title: `Test Workspace ${this.userId}`, // Match seed logic roughly
+                    title: `Test Project ${this.userId}`,
                     user_role: 'owner',
                 },
             }
