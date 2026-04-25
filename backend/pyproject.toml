@@ -71,9 +71,24 @@ module = [
     "app.utils.security",
     "app.utils.audit",
     "app.resume_codes",
+    # Phase 3 wave 1 — Group A pure leaves (no internal app imports)
+    "app.exceptions",
+    "app.limiter",
+    "app.utils.crypto",
+    "app.utils.email",
+    "app.utils.script_utils",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# pydantic-settings stubs expose Any in BaseSettings.__init__ signature;
+# disallow_any_explicit would flag every Settings subclass. All other
+# strict checks apply.
+module = ["app.core.config"]
+disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 

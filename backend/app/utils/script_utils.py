@@ -2,9 +2,13 @@
 
 import json
 import os
-from typing import Any
+from typing import Any  # noqa: PYI041
 
 import httpx
+
+# JSON wire data from API responses has no fixed shape at this layer;
+# dict[str, Any] is the correct type for unstructured JSON payloads.
+_JsonDict = dict[str, Any]  # type: ignore[explicit-any]  # unstructured JSON wire data
 
 
 class APIClient:
@@ -12,7 +16,7 @@ class APIClient:
 
     def __init__(
         self, base_url: str | None = None, client: httpx.AsyncClient | None = None
-    ):
+    ) -> None:
         """Initialize the API client."""
         self.base_url = base_url or os.getenv("API_BASE_URL", "http://localhost:8000")
         self.token = None
@@ -33,7 +37,7 @@ class APIClient:
         else:
             self.client = httpx.AsyncClient(base_url=str(self.base_url), timeout=30.0)
 
-    async def login(self, email: str | None = None, password: str | None = None):
+    async def login(self, email: str | None = None, password: str | None = None) -> None:
         """Authenticate and store the JWT token. Automatically fetches project context."""
         email = email or os.getenv("ADMIN_EMAIL", "admin@example.com")
         password = password or os.getenv("ADMIN_PASSWORD", "admin123")
@@ -67,44 +71,44 @@ class APIClient:
         else:
             print(f"DEBUG: Failed to fetch projects: {ws_response.text}")
 
-    async def close(self):
+    async def close(self) -> None:
         """Close the underlying HTTPX client."""
         await self.client.aclose()
 
-    async def get_study(self, slug: str) -> dict[str, Any] | None:
+    async def get_study(self, slug: str) -> _JsonDict | None:
         """Fetch study details by slug. Returns None if not found."""
         response = await self.client.get(f"/api/admin/studies/{slug}")
         if response.status_code == 200:
-            return response.json()  # type: ignore
+            return response.json()  # type: ignore[no-any-return]  # httpx.Response.json() returns Any
         if response.status_code == 404:
             return None
         raise Exception(f"Failed to fetch study {slug}: {response.text}")
 
-    async def create_study(self, data: dict[str, Any]) -> dict[str, Any]:
+    async def create_study(self, data: _JsonDict) -> _JsonDict:
         """Create a new study."""
         response = await self.client.post("/api/admin/studies", json=data)
         if response.status_code != 201:
             raise Exception(f"Failed to create study: {response.text}")
-        return response.json()  # type: ignore
+        return response.json()  # type: ignore[no-any-return]  # httpx.Response.json() returns Any
 
-    async def update_study(self, slug: str, data: dict[str, Any]) -> dict[str, Any]:
+    async def update_study(self, slug: str, data: _JsonDict) -> _JsonDict:
         """Update an existing study."""
         response = await self.client.patch(f"/api/admin/studies/{slug}", json=data)
         if response.status_code != 200:
             raise Exception(f"Failed to update study {slug}: {response.text}")
-        return response.json()  # type: ignore
+        return response.json()  # type: ignore[no-any-return]  # httpx.Response.json() returns Any
 
-    async def set_study_state(self, slug: str, state: str) -> dict[str, Any]:
+    async def set_study_state(self, slug: str, state: str) -> _JsonDict:
         """Change the state of a study."""
         response = await self.client.post(
             f"/api/admin/studies/{slug}/state", params={"new_state": state}
         )
         if response.status_code != 200:
             raise Exception(f"Failed to set state for study {slug}: {response.text}")
-        return response.json()  # type: ignore
+        return response.json()  # type: ignore[no-any-return]  # httpx.Response.json() returns Any
 
     @staticmethod
-    def transform_study_data(data: dict[str, Any]) -> dict[str, Any]:
+    def transform_study_data(data: _JsonDict) -> _JsonDict:
         """Transform JSON study data to match API StudyCreate/Update schemas."""
         # JSON has translations as a dict, API expects a list
         if "translations" in data and isinstance(data["translations"], dict):
@@ -126,7 +130,7 @@ class APIClient:
         return data
 
 
-async def sync_study_from_file(json_path: str):
+async def sync_study_from_file(json_path: str) -> None:
     """Idempotent sync of study data from JSON file.
 
     Handles creation if missing, or update if existing.
@@ -151,7 +155,7 @@ async def sync_study_from_file(json_path: str):
 
         # 2. Check if study exists
         print(f"Checking existence of study '{slug}'...")
-        existing_study = await api.get_study(slug)
+        existing_study = await api.get_study(str(slug))
 
         if not existing_study:
             # CREATE
@@ -171,11 +175,11 @@ async def sync_study_from_file(json_path: str):
             # (Note: API blocks grid_config updates unless in DRAFT)
             if original_state != "draft":
                 print("Switching study to 'draft' for safe update...")
-                await api.set_study_state(slug, "draft")
+                await api.set_study_state(str(slug), "draft")
                 needs_state_restoration = True
 
             try:
-                await api.update_study(slug, data)
+                await api.update_study(str(slug), data)
                 print(f"Successfully updated study: {slug}")
             except Exception as e:
                 print(f"Update failed: {e}")
@@ -184,7 +188,7 @@ async def sync_study_from_file(json_path: str):
             finally:
                 if needs_state_restoration:
                     print(f"Restoring study state to '{original_state}'...")
-                    await api.set_study_state(slug, original_state)
+                    await api.set_study_state(str(slug), str(original_state))
 
     finally:
         await api.close()

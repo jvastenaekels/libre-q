@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def send_invitation_email(
     email_to: str, context_name: str, invite_url: str, context_type: str = "study"
-):
+) -> None:
     """
     Send an invitation email to a collaborator.
 
