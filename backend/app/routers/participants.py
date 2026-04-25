@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -186,3 +186,54 @@ async def resume_session(
         draft_responses=participant.draft_responses or {},
         resume_code=participant.resume_code or "",
     )
+
+
+@router.delete("/personal-data", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("10/minute")
+async def participant_self_erase_personal_data(
+    request: Request,
+    session_token: UUID,
+    slug: str = Path(..., description="The slug of the study"),
+    db: AsyncSession = Depends(get_db),
+):
+    """Participant-initiated GDPR Art. 17 erasure of their own personal data.
+
+    Authentication: the session_token query parameter is the bearer of
+    the right — only someone in possession of the original token issued
+    when the participant started the Q-sort can trigger erasure for
+    that participant. This is the same model used by the resume flow.
+
+    What is erased: ip_address, user_agent, confirmation_code,
+    resume_code, consent_hash, draft_responses, presort_answers,
+    postsort_answers, all audio recordings (biometric data). The
+    session_token is rotated (the original token can never re-access).
+
+    What is preserved: the Q-sort entries themselves (statement
+    rankings) — these are anonymous research data after the PII removal
+    and represent the participant's contribution to the research.
+    Participants who want a hard delete (including the rankings) should
+    contact the researcher directly per the consent text shown at study
+    start.
+
+    Idempotent: repeated calls return 204 (already-anonymised
+    participants are no-ops).
+    """
+    from app.services.study_data_service import StudyDataService
+
+    stmt = (
+        select(Participant)
+        .join(Study)
+        .where(
+            Participant.session_token == session_token,
+            Study.slug == slug,
+        )
+    )
+    participant = (await db.execute(stmt)).scalar_one_or_none()
+    if participant is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found",
+        )
+
+    await StudyDataService.anonymise_participant(db, participant)
+    return None

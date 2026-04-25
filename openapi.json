@@ -1272,6 +1272,58 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/participants/{participant_id}/personal-data": {
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Admin Erase Participant Personal Data",
+        "description": "Admin-mediated GDPR Art. 17 erasure of a participant's personal data.\n\nUse this endpoint when a participant has emailed the researcher to\nrequest erasure (the most common channel under GDPR practice). The\nparticipant's PII is removed; their Q-sort entries are preserved as\nanonymous research data.\n\nFor participant-initiated self-erasure (using their session token),\nsee DELETE /api/study/{slug}/personal-data instead.",
+        "operationId": "admin_erase_participant_personal_data_api_admin_studies__slug__participants__participant_id__personal_data_delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "participant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Participant Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/stats": {
       "get": {
         "tags": [
@@ -4867,6 +4919,54 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}/personal-data": {
+      "delete": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Participant Self Erase Personal Data",
+        "description": "Participant-initiated GDPR Art. 17 erasure of their own personal data.\n\nAuthentication: the session_token query parameter is the bearer of\nthe right \u2014 only someone in possession of the original token issued\nwhen the participant started the Q-sort can trigger erasure for\nthat participant. This is the same model used by the resume flow.\n\nWhat is erased: ip_address, user_agent, confirmation_code,\nresume_code, consent_hash, draft_responses, presort_answers,\npostsort_answers, all audio recordings (biometric data). The\nsession_token is rotated (the original token can never re-access).\n\nWhat is preserved: the Q-sort entries themselves (statement\nrankings) \u2014 these are anonymous research data after the PII removal\nand represent the participant's contribution to the research.\nParticipants who want a hard delete (including the rankings) should\ncontact the researcher directly per the consent text shown at study\nstart.\n\nIdempotent: repeated calls return 204 (already-anonymised\nparticipants are no-ops).",
+        "operationId": "participant_self_erase_personal_data_api_study__slug__personal_data_delete",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",

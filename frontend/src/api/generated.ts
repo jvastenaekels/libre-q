@@ -54,6 +54,7 @@ import type {
     ListUsersApiAdminUsersGetParams,
     LogEntry,
     ParticipantDiscardUpdate,
+    ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams,
     PasswordChange,
     PasswordConfirm,
     ProgressUpdate,
@@ -2745,6 +2746,124 @@ export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
 
     return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * Admin-mediated GDPR Art. 17 erasure of a participant's personal data.
+
+Use this endpoint when a participant has emailed the researcher to
+request erasure (the most common channel under GDPR practice). The
+participant's PII is removed; their Q-sort entries are preserved as
+anonymous research data.
+
+For participant-initiated self-erasure (using their session token),
+see DELETE /api/study/{slug}/personal-data instead.
+ * @summary Admin Erase Participant Personal Data
+ */
+export const adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete =
+    (slug: string, participantId: number) => {
+        return customInstance<void>({
+            url: `/api/admin/studies/${slug}/participants/${participantId}/personal-data`,
+            method: 'DELETE',
+        });
+    };
+
+export const getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMutationOptions =
+    <TError = HTTPValidationError, TContext = unknown>(options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+                >
+            >,
+            TError,
+            { slug: string; participantId: number },
+            TContext
+        >;
+    }): UseMutationOptions<
+        Awaited<
+            ReturnType<
+                typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+            >
+        >,
+        TError,
+        { slug: string; participantId: number },
+        TContext
+    > => {
+        const mutationKey = [
+            'adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete',
+        ];
+        const { mutation: mutationOptions } = options
+            ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+                ? options
+                : { ...options, mutation: { ...options.mutation, mutationKey } }
+            : { mutation: { mutationKey } };
+
+        const mutationFn: MutationFunction<
+            Awaited<
+                ReturnType<
+                    typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+                >
+            >,
+            { slug: string; participantId: number }
+        > = (props) => {
+            const { slug, participantId } = props ?? {};
+
+            return adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete(
+                slug,
+                participantId
+            );
+        };
+
+        return { mutationFn, ...mutationOptions };
+    };
+
+export type AdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMutationResult =
+    NonNullable<
+        Awaited<
+            ReturnType<
+                typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+            >
+        >
+    >;
+
+export type AdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Admin Erase Participant Personal Data
+ */
+export const useAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete =
+    <TError = HTTPValidationError, TContext = unknown>(
+        options?: {
+            mutation?: UseMutationOptions<
+                Awaited<
+                    ReturnType<
+                        typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+                    >
+                >,
+                TError,
+                { slug: string; participantId: number },
+                TContext
+            >;
+        },
+        queryClient?: QueryClient
+    ): UseMutationResult<
+        Awaited<
+            ReturnType<
+                typeof adminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDelete
+            >
+        >,
+        TError,
+        { slug: string; participantId: number },
+        TContext
+    > => {
+        const mutationOptions =
+            getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMutationOptions(
+                options
+            );
+
+        return useMutation(mutationOptions, queryClient);
+    };
 
 /**
  * Get aggregated study statistics.
@@ -10311,6 +10430,123 @@ export function useResumeSessionApiStudySlugResumeCodeGet<
 }
 
 /**
+ * Participant-initiated GDPR Art. 17 erasure of their own personal data.
+
+Authentication: the session_token query parameter is the bearer of
+the right — only someone in possession of the original token issued
+when the participant started the Q-sort can trigger erasure for
+that participant. This is the same model used by the resume flow.
+
+What is erased: ip_address, user_agent, confirmation_code,
+resume_code, consent_hash, draft_responses, presort_answers,
+postsort_answers, all audio recordings (biometric data). The
+session_token is rotated (the original token can never re-access).
+
+What is preserved: the Q-sort entries themselves (statement
+rankings) — these are anonymous research data after the PII removal
+and represent the participant's contribution to the research.
+Participants who want a hard delete (including the rankings) should
+contact the researcher directly per the consent text shown at study
+start.
+
+Idempotent: repeated calls return 204 (already-anonymised
+participants are no-ops).
+ * @summary Participant Self Erase Personal Data
+ */
+export const participantSelfErasePersonalDataApiStudySlugPersonalDataDelete = (
+    slug: string,
+    params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams
+) => {
+    return customInstance<void>({
+        url: `/api/study/${slug}/personal-data`,
+        method: 'DELETE',
+        params,
+    });
+};
+
+export const getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>>,
+        TError,
+        {
+            slug: string;
+            params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams;
+        },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>>,
+    TError,
+    { slug: string; params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams },
+    TContext
+> => {
+    const mutationKey = ['participantSelfErasePersonalDataApiStudySlugPersonalDataDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>>,
+        {
+            slug: string;
+            params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams;
+        }
+    > = (props) => {
+        const { slug, params } = props ?? {};
+
+        return participantSelfErasePersonalDataApiStudySlugPersonalDataDelete(slug, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>>
+    >;
+
+export type ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Participant Self Erase Personal Data
+ */
+export const useParticipantSelfErasePersonalDataApiStudySlugPersonalDataDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>
+            >,
+            TError,
+            {
+                slug: string;
+                params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams;
+            },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof participantSelfErasePersonalDataApiStudySlugPersonalDataDelete>>,
+    TError,
+    { slug: string; params: ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams },
+    TContext
+> => {
+    const mutationOptions =
+        getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Receives logging/error data from the frontend.
  * @summary Report Log
  */
@@ -15144,6 +15380,25 @@ export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
     );
 };
 
+export const getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMockHandler =
+    (
+        overrideResponse?:
+            | void
+            | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.delete(
+            '*/api/admin/studies/:slug/participants/:participantId/personal-data',
+            async (info) => {
+                if (typeof overrideResponse === 'function') {
+                    await overrideResponse(info);
+                }
+                return new HttpResponse(null, { status: 204 });
+            },
+            options
+        );
+    };
+
 export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
     overrideResponse?:
         | StudyStatsRead
@@ -16505,6 +16760,24 @@ export const getResumeSessionApiStudySlugResumeCodeGetMockHandler = (
     );
 };
 
+export const getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/study/:slug/personal-data',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getReportLogApiLogsPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -16636,6 +16909,7 @@ export const getLibreQAPIMock = () => [
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
     getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
     getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
+    getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMockHandler(),
     getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
     getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
     getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
@@ -16696,6 +16970,7 @@ export const getLibreQAPIMock = () => [
     getUpdateProgressApiStudySlugProgressPatchMockHandler(),
     getSaveDraftApiStudySlugSaveDraftPutMockHandler(),
     getResumeSessionApiStudySlugResumeCodeGetMockHandler(),
+    getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMockHandler(),
     getReportLogApiLogsPostMockHandler(),
     getUploadAudioApiAudioUploadPostMockHandler(),
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),

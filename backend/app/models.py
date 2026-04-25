@@ -369,6 +369,14 @@ class Participant(Base):
     )
     consent_hash: Mapped[str | None] = mapped_column(String, nullable=True)
 
+    # GDPR Art. 17 — when set, this participant's PII has been anonymised
+    # (ip_address, user_agent, confirmation_code, resume_code, consent_hash,
+    # presort/postsort/draft answers cleared; audio recordings deleted; the
+    # Q-sort entries themselves are preserved as anonymous research data).
+    anonymised_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, index=True
+    )
+
     # Step progress tracking (1=consent, 2=presort, 3=rough sort, 4=fine sort, 5=post-sort)
     last_step_reached: Mapped[int | None] = mapped_column(
         SmallInteger, nullable=True, default=1

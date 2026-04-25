@@ -1,7 +1,9 @@
 """Service for study data export, statistics, and participant management."""
 
 import logging
+from datetime import UTC, datetime
 from typing import Any
+from uuid import uuid4
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -57,6 +59,96 @@ class StudyDataService:
         stmt = delete(Participant).where(Participant.study_id == study_id)
         await db.execute(stmt)
         await db.commit()
+
+    @staticmethod
+    async def anonymise_participant(
+        db: AsyncSession,
+        participant: Participant,
+    ) -> Participant:
+        """Apply GDPR Art. 17 erasure to a single participant.
+
+        Strategy: anonymise (preserve scientifically-anonymous Q-sort
+        rankings) rather than hard-delete. The Q-sort entries themselves
+        are not personal data — they are statement rank scores. Removing
+        all linkable PII while keeping the rankings honours the
+        researcher's investment in collecting the data and the
+        participant's prior consent to contribute to the study, while
+        fully satisfying the right to erasure of identifiable personal
+        data.
+
+        Concretely:
+        - PII columns nulled: ip_address, user_agent, confirmation_code,
+          resume_code, consent_hash, draft_responses
+        - Free-text answers cleared: presort_answers, postsort_answers
+          (these can contain participant-supplied free text including PII)
+        - All audio recordings (biometric data) deleted from S3 and DB
+        - session_token rotated to a new UUID (the original token can
+          never re-access this participant's data)
+        - anonymised_at timestamp set so the row is identifiable as
+          erasured for audit purposes
+        - Q-sort entries are preserved (anonymous research data)
+
+        Idempotent: re-anonymising an already-anonymised participant is
+        a no-op (anonymised_at is not overwritten).
+        """
+        from ..services.storage_service import storage_service
+
+        if participant.anonymised_at is not None:
+            logger.info(
+                "anonymise_participant: participant_id=%s already anonymised at %s, "
+                "treating as no-op",
+                participant.id,
+                participant.anonymised_at,
+            )
+            return participant
+
+        # Load audio recordings to get S3 keys before they're cascade-deleted.
+        await db.refresh(participant, attribute_names=["audio_recordings"])
+        s3_keys = [rec.s3_key for rec in participant.audio_recordings]
+
+        # Delete S3 objects first (DB cascade will then drop AudioRecording rows).
+        for key in s3_keys:
+            try:
+                await storage_service.delete_audio(key)
+            except Exception as exc:
+                # Continue: an S3-side failure must not block legal erasure.
+                # Operators can clean orphaned S3 objects via a periodic sweep.
+                logger.warning(
+                    "anonymise_participant: failed to delete S3 key %s "
+                    "(continuing with DB anonymisation): %s",
+                    key,
+                    exc,
+                )
+        # Drop the AudioRecording rows explicitly (in case S3 deletes failed
+        # we still want the DB rows gone — they reference biometric data).
+        await db.execute(
+            delete(AudioRecording).where(
+                AudioRecording.participant_id == participant.id
+            )
+        )
+
+        # Null PII + rotate token + stamp.
+        participant.ip_address = None
+        participant.user_agent = None
+        participant.confirmation_code = None
+        participant.resume_code = None
+        participant.consent_hash = None
+        participant.draft_responses = None
+        participant.presort_answers = {}
+        participant.postsort_answers = {}
+        participant.session_token = uuid4()
+        participant.anonymised_at = datetime.now(UTC)
+
+        await db.commit()
+        await db.refresh(participant)
+        logger.info(
+            "anonymise_participant: participant_id=%s anonymised "
+            "(study_id=%s, %d audio recordings removed)",
+            participant.id,
+            participant.study_id,
+            len(s3_keys),
+        )
+        return participant
 
     @staticmethod
     async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:

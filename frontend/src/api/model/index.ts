@@ -138,6 +138,7 @@ export * from './participantReadLastStepReachedAt';
 export * from './participantReadRecruitmentToken';
 export * from './participantReadSubmittedAt';
 export * from './participantReadUserAgent';
+export * from './participantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams';
 export * from './participantStatus';
 export * from './partnerLogo';
 export * from './partnerLogoUrl';

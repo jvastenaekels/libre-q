@@ -191,3 +191,52 @@ async def clear_all_participants(
     await db.execute(delete(Participant).where(Participant.study_id == study.id))
     await db.commit()
     return None
+
+
+@router.delete(
+    "/{slug}/participants/{participant_id}/personal-data",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+@limiter.limit("30/minute")
+async def admin_erase_participant_personal_data(
+    request: Request,
+    participant_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Admin-mediated GDPR Art. 17 erasure of a participant's personal data.
+
+    Use this endpoint when a participant has emailed the researcher to
+    request erasure (the most common channel under GDPR practice). The
+    participant's PII is removed; their Q-sort entries are preserved as
+    anonymous research data.
+
+    For participant-initiated self-erasure (using their session token),
+    see DELETE /api/study/{slug}/personal-data instead.
+    """
+    from app.services.study_data_service import StudyDataService
+    from app.utils.audit import log_admin_action
+
+    stmt = select(Participant).where(
+        Participant.id == participant_id, Participant.study_id == study.id
+    )
+    participant = (await db.execute(stmt)).scalar_one_or_none()
+    if participant is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Participant not found in this study",
+        )
+
+    was_already_anonymised = participant.anonymised_at is not None
+    await StudyDataService.anonymise_participant(db, participant)
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="erase_personal_data",
+        resource="participant",
+        resource_id=participant_id,
+        study_slug=study.slug,
+        already_anonymised=was_already_anonymised,
+        mode="admin_mediated",
+    )
+    return None
