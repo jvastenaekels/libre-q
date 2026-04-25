@@ -2,6 +2,7 @@
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import delete, select
@@ -34,7 +35,7 @@ async def list_study_participants(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[ParticipantRead]:
     """List participants for a specific study with pagination."""
     base = select(Participant).where(Participant.study_id == study.id)
 
@@ -49,8 +50,12 @@ async def list_study_participants(
     result = await db.execute(stmt)
     items = list(result.scalars().all())
 
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    # FastAPI serialises Participant → ParticipantRead via response_model; cast aligns mypy.
+    return cast(
+        PaginatedResponse[ParticipantRead],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -59,7 +64,7 @@ async def get_participant(
     participant_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> Participant:
     """Get detailed participant info including responses."""
     from app.services.storage_service import storage_service
 
@@ -113,7 +118,7 @@ async def discard_participant(
     discard_data: ParticipantDiscardUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> Participant:
     """Flag or unflag a participant for exclusion from stats/exports."""
     # Security: Ensure participant belongs to a study in a project user can access
     stmt = (
@@ -156,7 +161,7 @@ async def clear_test_runs(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Delete all participants flagged as is_test_run for this study."""
     from app.services.study_data_service import StudyDataService
 
@@ -178,7 +183,7 @@ async def clear_all_participants(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Delete ALL participants for this study. Only allowed in DRAFT state."""
     if study.state != StudyState.draft:
         raise HTTPException(
@@ -204,7 +209,7 @@ async def admin_erase_participant_personal_data(
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Admin-mediated GDPR Art. 17 erasure of a participant's personal data.
 
     Use this endpoint when a participant has emailed the researcher to
