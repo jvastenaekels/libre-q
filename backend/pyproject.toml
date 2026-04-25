@@ -260,6 +260,9 @@ module = [
     #   typing.Any is structurally required: get_study returns whatever
     #   StudyService.get_resolved_study_config produces (open-ended study config dict).
     "app.routers.submissions",
+    # auth: 8 return types (User x3 via response_model, Token, TOTPSetup, dict[str,str] x3).
+    #   No casts needed — all calls into utils/security and utils/audit are already strict-typed.
+    "app.routers.auth",
 ]
 disallow_untyped_defs = true
 warn_return_any = true

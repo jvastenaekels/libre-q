@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 @router.get("/me", response_model=UserRead)
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> User:
     """Get current active user."""
     return current_user
 
@@ -55,7 +55,7 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     x_totp_token: Annotated[str | None, Header()] = None,
     db: AsyncSession = Depends(get_db),
-):
+) -> Token:
     """
     OAuth2 compatible token login, getting an access token for future requests.
 
@@ -108,7 +108,7 @@ async def register_user(
     request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
-):
+) -> User:
     """
     Register a new user, optionally via an invitation token.
     """
@@ -193,7 +193,7 @@ async def update_user_me(
     user_update: UserUpdate,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-):
+) -> User:
     """Update current user profile."""
     try:
         # Check email uniqueness if changing email
@@ -237,7 +237,7 @@ async def change_password(
     password_data: PasswordChange,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Change current user password."""
     if not verify_password(
         password_data.current_password, current_user.hashed_password
@@ -264,7 +264,7 @@ async def change_password(
 async def setup_totp(
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-):
+) -> TOTPSetup:
     """Start 2FA setup by generating a secret and QR code URI."""
     if current_user.is_totp_enabled:
         raise HTTPException(status_code=400, detail="2FA already enabled")
@@ -292,7 +292,7 @@ async def enable_totp(
     verify_data: TOTPVerify,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Enable 2FA after verifying a token."""
     if not current_user.totp_secret:
         raise HTTPException(status_code=400, detail="TOTP not set up")
@@ -318,7 +318,7 @@ async def disable_totp(
     password_data: PasswordConfirm,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Disable 2FA after verifying current password."""
     if not verify_password(
         password_data.current_password, current_user.hashed_password
