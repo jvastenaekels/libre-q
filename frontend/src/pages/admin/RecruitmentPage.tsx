@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useParams, useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
 import {
     QrCode,
     Plus,
@@ -64,234 +62,41 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
-import {
-    useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost,
-    useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete,
-    getListStudiesApiAdminStudiesGetQueryKey,
-    getGetStudyApiAdminStudiesSlugGetQueryKey,
-} from '@/api/generated';
-import type { RecruitmentLinkRead, RecruitmentLinkType, StudyRead, StudyUpdate } from '@/api/model';
-import { useQueryClient } from '@tanstack/react-query';
-import { useAdminContext } from '@/hooks/useAdminContext';
-import { AdminService } from '@/api/admin';
-import { parseApiErrorSync } from '@/lib/error-utils';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import type { RecruitmentLinkType } from '@/api/model';
+import { useRecruitmentPage } from '@/hooks/admin/useRecruitmentPage';
 
-const slugFormSchema = z.object({
-    slug: z
-        .string()
-        .min(3)
-        .max(100)
-        .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
-});
-
-type SlugFormValues = z.infer<typeof slugFormSchema>;
-
-const accessRulesSchema = z.object({
-    passwordEnabled: z.boolean(),
-    accessPassword: z.string().optional().or(z.literal('')),
-    startDate: z.string().optional().or(z.literal('')),
-    endDate: z.string().optional().or(z.literal('')),
-});
-
-type AccessRulesValues = z.infer<typeof accessRulesSchema>;
-
-function toLocalDatetimeString(iso: string): string {
-    const date = new Date(iso);
-    const offset = date.getTimezoneOffset();
-    const local = new Date(date.getTime() - offset * 60000);
-    return local.toISOString().slice(0, 16);
-}
-
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from state-aware banners + multi-row table cells with per-link-type rendering; all logic lives in useRecruitmentPage
 const RecruitmentPage = () => {
-    const { studySlug: slug, projectSlug } = useParams<{
-        studySlug: string;
-        projectSlug: string;
-    }>();
-    const { links: initialLinks, study } = useLoaderData() as {
-        links: RecruitmentLinkRead[];
-        study: StudyRead;
-        slug: string;
-    };
     const { t } = useTranslation();
-    const revalidator = useRevalidator();
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const { project: currentWorkspace } = useAdminContext();
-
-    const isSlugLocked = study.state !== 'draft';
-
-    const form = useForm<SlugFormValues>({
-        resolver: zodResolver(slugFormSchema),
-        defaultValues: { slug: study?.slug || '' },
-    });
-
-    useEffect(() => {
-        if (study) {
-            form.reset({ slug: study.slug || '' });
-        }
-    }, [study, form]);
-
-    const isArchived = study.state === 'archived';
-
-    const accessForm = useForm<AccessRulesValues>({
-        resolver: zodResolver(accessRulesSchema),
-        defaultValues: {
-            passwordEnabled: study.requires_password ?? false,
-            accessPassword: '',
-            startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
-            endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
-        },
-    });
-
-    useEffect(() => {
-        if (study) {
-            accessForm.reset({
-                passwordEnabled: study.requires_password ?? false,
-                accessPassword: '',
-                startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
-                endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
-            });
-        }
-    }, [study, accessForm]);
-
-    const passwordEnabled = accessForm.watch('passwordEnabled');
-
-    const onAccessRulesSubmit = async (data: AccessRulesValues) => {
-        if (!slug) return;
-        try {
-            const update: Record<string, unknown> = {};
-
-            if (!data.passwordEnabled) {
-                update.access_password = null;
-            } else if (data.accessPassword) {
-                update.access_password = data.accessPassword;
-            }
-
-            update.start_date = data.startDate ? new Date(data.startDate).toISOString() : null;
-            update.end_date = data.endDate ? new Date(data.endDate).toISOString() : null;
-
-            await AdminService.updateStudy(slug, update as unknown as StudyUpdate);
-
-            toast.success(t('admin.recruitment.access_rules.save_success', 'Access rules updated'));
-
-            await queryClient.invalidateQueries({
-                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
-            });
-            revalidator.revalidate();
-        } catch (error) {
-            const message = parseApiErrorSync(
-                error,
-                t('admin.recruitment.access_rules.save_error', 'Failed to update access rules')
-            );
-            toast.error(
-                t('admin.recruitment.access_rules.save_error', 'Failed to update access rules'),
-                { description: message }
-            );
-        }
-    };
-
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [newLinkType, setNewLinkType] = useState<RecruitmentLinkType>('public');
-    const [newLinkCount, setNewLinkCount] = useState(1);
-    const [newLinkName, setNewLinkName] = useState('');
-
-    const links = initialLinks; // In RR7, useLoaderData remains the source of truth
-
-    const createMutation = useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost({
-        mutation: {
-            onSuccess: () => {
-                toast.success(
-                    t('admin.recruitment.toasts.created', 'Recruitment links created successfully')
-                );
-                setIsCreateModalOpen(false);
-                revalidator.revalidate(); // Refresh RR7 loader data
-                setNewLinkName('');
-                setNewLinkCount(1);
-            },
-            onError: () => {
-                toast.error(t('admin.recruitment.toasts.failed', 'Failed to create links'));
-            },
-        },
-    });
-
-    const revokeMutation = useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete({
-        mutation: {
-            onSuccess: () => {
-                toast.success(t('admin.recruitment.toasts.revoked', 'Link revoked'));
-                revalidator.revalidate();
-            },
-            onError: () => {
-                toast.error(t('admin.recruitment.toasts.revoke_failed', 'Failed to revoke link'));
-            },
-        },
-    });
-
-    const handleCreate = () => {
-        createMutation.mutate({
-            // biome-ignore lint/style/noNonNullAssertion: guaranteed by loader
-            slug: slug!,
-            params: { count: newLinkCount },
-            data: {
-                type: newLinkType,
-                name: newLinkName || undefined,
-                capacity: newLinkType === 'individual' ? 1 : undefined,
-            },
-        });
-    };
-
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-        toast.success(t('admin.recruitment.toasts.copied', 'Copied to clipboard'));
-    };
-
-    const getFullUrl = (token: string) => {
-        return `${window.location.origin}/study/${slug}?token=${token}`;
-    };
-
-    const studyUrl = `${window.location.origin}/study/${slug}`;
-
-    const onSlugSubmit = async (data: SlugFormValues) => {
-        if (!slug) return;
-        try {
-            await AdminService.updateStudy(slug, {
-                slug: data.slug,
-            } as unknown as StudyUpdate);
-
-            toast.success(t('admin.settings.save_success', 'Settings updated'), {
-                description: t(
-                    'admin.settings.save_success_desc',
-                    'Study settings have been saved.'
-                ),
-            });
-
-            await queryClient.invalidateQueries({
-                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
-            });
-            await queryClient.invalidateQueries({
-                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
-            });
-
-            if (data.slug !== slug) {
-                const ws = projectSlug || currentWorkspace?.slug;
-                navigate(`/app/${ws}/studies/${data.slug}/recruitment`);
-            } else {
-                navigate('.', { replace: true });
-            }
-        } catch (error) {
-            const message = parseApiErrorSync(
-                error,
-                t('admin.settings.save_error', 'Error updating settings')
-            );
-            toast.error(t('admin.settings.save_error', 'Error updating settings'), {
-                description: message,
-            });
-        }
-    };
+    const api = useRecruitmentPage();
+    const {
+        study,
+        links,
+        isSlugLocked,
+        isArchived,
+        studyUrl,
+        slugForm,
+        accessForm,
+        passwordEnabled,
+        onSlugSubmit,
+        onAccessRulesSubmit,
+        isCreateModalOpen,
+        setIsCreateModalOpen,
+        handleCreateModalOpenChange,
+        newLinkType,
+        setNewLinkType,
+        newLinkCount,
+        setNewLinkCount,
+        newLinkName,
+        setNewLinkName,
+        isCreatingLink,
+        isRevokingLink,
+        handleCreate,
+        handleRevoke,
+        copyToClipboard,
+        getFullUrl,
+    } = api;
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -452,10 +257,10 @@ const RecruitmentPage = () => {
                     </div>
 
                     {/* Editable slug field */}
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSlugSubmit)} className="space-y-4">
+                    <Form {...slugForm}>
+                        <form onSubmit={slugForm.handleSubmit(onSlugSubmit)} className="space-y-4">
                             <FormField
-                                control={form.control}
+                                control={slugForm.control}
                                 name="slug"
                                 render={({ field }) => (
                                     <FormItem>
@@ -503,12 +308,12 @@ const RecruitmentPage = () => {
                                     type="submit"
                                     disabled={
                                         isSlugLocked ||
-                                        form.formState.isSubmitting ||
-                                        !form.formState.isDirty
+                                        slugForm.formState.isSubmitting ||
+                                        !slugForm.formState.isDirty
                                     }
                                     className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
                                 >
-                                    {form.formState.isSubmitting ? (
+                                    {slugForm.formState.isSubmitting ? (
                                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
                                     ) : (
                                         <Save className="w-4 h-4 mr-2" />
@@ -764,14 +569,7 @@ const RecruitmentPage = () => {
                         <div className="flex items-center gap-3">
                             <Dialog
                                 open={isCreateModalOpen}
-                                onOpenChange={(open) => {
-                                    setIsCreateModalOpen(open);
-                                    if (!open) {
-                                        setNewLinkType('public');
-                                        setNewLinkCount(1);
-                                        setNewLinkName('');
-                                    }
-                                }}
+                                onOpenChange={handleCreateModalOpenChange}
                             >
                                 <DialogTrigger asChild>
                                     <Button
@@ -948,10 +746,10 @@ const RecruitmentPage = () => {
                                         </Button>
                                         <Button
                                             onClick={handleCreate}
-                                            disabled={createMutation.isPending}
+                                            disabled={isCreatingLink}
                                             className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
                                         >
-                                            {createMutation.isPending
+                                            {isCreatingLink
                                                 ? t('common.generating', 'Generating...')
                                                 : t(
                                                       'admin.recruitment.generate_links',
@@ -1044,6 +842,7 @@ const RecruitmentPage = () => {
                                     </TableCell>
                                 </TableRow>
                             ) : (
+                                // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: per-link-type rendering branches (public / individual / limited) in usage cell + status cell are intentionally inline for readability; pure JSX, no logic
                                 links?.map((link) => (
                                     <TableRow key={link.id}>
                                         <TableCell className="font-bold text-slate-900 pl-6">
@@ -1271,10 +1070,8 @@ const RecruitmentPage = () => {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-400 hover:text-red-600"
-                                                    onClick={() =>
-                                                        revokeMutation.mutate({ linkId: link.id })
-                                                    }
-                                                    disabled={revokeMutation.isPending}
+                                                    onClick={() => handleRevoke(link.id)}
+                                                    disabled={isRevokingLink}
                                                     aria-label={t(
                                                         'admin.recruitment.delete_link',
                                                         'Delete link'
