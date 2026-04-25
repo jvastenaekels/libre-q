@@ -20,7 +20,7 @@
         "e2e:debug": "playwright test --debug",
         "e2e:report": "playwright show-report",
         "test:e2e:admin": "playwright test --project='Admin E2E' --project='Admin Config Tests' --project='Integration Tests'",
-        "test:e2e:study": "playwright test --project='Study E2E' --project='Study Mobile Chrome'",
+        "test:e2e:study": "playwright test --project='Study E2E' --project='Study Mobile'",
         "i18n-check": "python3 scripts/check_i18n.py",
         "lint:duplication": "jscpd --config ../.jscpd.json",
         "lint:deadcode": "knip",
