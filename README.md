@@ -14,18 +14,11 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 
 ## Statement of need
 
-Q-methodology — Stephenson's (1953) approach to studying subjectivity by having participants rank-order a set of statements — is widely used in environmental governance, health, education, and political ecology. Its uptake in the past decade has expanded into critical research traditions that emphasise reflexivity, transparency of analytical choices, situatedness of subjectivities, and integration of participant voice (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020). This expansion has run into a tooling gap.
+Q-methodology — Stephenson's (1953) approach to studying subjectivity by having participants rank-order a set of statements — is widely used in environmental governance, health, education, and political ecology. Its uptake in the past decade has expanded into critical research traditions that emphasise reflexivity, transparency of analytical choices, situatedness of subjectivities, and integration of participant voice (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-**Existing tools split the workflow** between data-collection and analysis:
+The current Q-methodology tooling landscape typically separates data-collection tools from analysis tools, and rarely includes multi-language studies, audio post-sort responses tied to the analysis, or programmatic access to the analytical pipeline (see the capability table below for a feature-level breakdown).
 
-- **PQMethod** (Schmolck) and the **R `qmethod` package** (Zabala 2014) provide factor analysis but have no participant-facing UI; Q-sorts must be collected on paper or with a separate tool and then transcribed.
-- **FlashQ** and **HTMLQ** offer browser-based data collection but no built-in analysis.
-- **KADE** (Banasick 2019) is an open-source desktop analysis tool; like PQMethod, it does not handle data collection.
-- **Ken-Q Analysis** bundles collection and analysis but is not self-hosted and is not open source — researchers cannot inspect or modify the analytical procedures.
-
-To our knowledge, none of these tools currently support multi-language studies, post-sort participant audio responses tied to the analysis, or programmatic access to the analytical choices. We treat these as the gap Libre-Q targets; corrections welcome.
-
-**Libre-Q fills this gap as a single-platform, browser-based, multilingual, self-hosted, and open-source tool that integrates the full Q-methodology workflow** — study design, mobile-first participant recruitment and data collection, factor analysis, and export to the major analytical formats — while keeping the methodological choices visible and editable by the researcher. It is targeted at research groups practising critical Q-methodology, but it is usable for classical Q-methodology workflows as well.
+**Libre-Q is a single-platform, browser-based, multilingual, self-hosted, open-source tool that integrates the full Q-methodology workflow** — study design, mobile-first participant recruitment and data collection, factor analysis, and export to the major analytical formats — while keeping the methodological choices visible and editable by the researcher. It is targeted at research groups practising critical Q-methodology, but it is usable for classical Q-methodology workflows as well.
 
 The platform is intentionally self-hosted: data ownership remains with the researcher, and Libre-Q can be run on institutional infrastructure to satisfy GDPR data-residency requirements common in European Q research.
 
