@@ -161,7 +161,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                     className="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full"
                 >
                     <p className="text-base font-medium leading-snug italic text-indigo-600/70 text-center [hyphens:manual]">
-                        {hyphenate(tips[step])}
+                        {hyphenate(tips[step] ?? '')}
                     </p>
                 </div>
                 {hasOverflow && <ScrollIndicator />}

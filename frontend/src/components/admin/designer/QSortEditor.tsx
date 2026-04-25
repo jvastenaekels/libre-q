@@ -428,6 +428,10 @@ const QSortEditor = ({
 
         const lines = bulkText.split('\n').filter((l) => l.trim() !== '');
         const firstLine = lines[0];
+        if (!firstLine) {
+            setDetectedFormat({ type: null, langs: [], hasCode: false });
+            return;
+        }
 
         if (firstLine.includes('\t')) {
             const cells = firstLine.split('\t').map((c) => c.trim().toLowerCase());
@@ -508,9 +512,10 @@ const QSortEditor = ({
 
         if (detectedFormat.type === 'excel') {
             const rows = parseCSVOrTSV(bulkText, '\t');
-            if (rows.length === 0) return;
+            const headerRow = rows[0];
+            if (!headerRow) return;
 
-            const headers = rows[0].map((h) => h.toLowerCase());
+            const headers = headerRow.map((h) => h.toLowerCase());
             const hasCodeHeader = headers.includes('code');
             const langHeaders = headers.filter((h) =>
                 draft.translations?.some((t) => t.language_code === h)
@@ -556,7 +561,7 @@ const QSortEditor = ({
 
                 // Regex for common separators: "Code: Text" or "Code, Text" or "Code - Text"
                 const match = line.match(/^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+(.+)$/);
-                if (match) {
+                if (match && match[1] && match[2]) {
                     return { code: match[1], text: match[2].trim() };
                 }
 
@@ -650,8 +655,8 @@ const QSortEditor = ({
     const isSymmetric =
         grid.length > 0 &&
         grid.every((col, idx) => {
-            const oppositeIdx = grid.length - 1 - idx;
-            return col.capacity === grid[oppositeIdx].capacity;
+            const opposite = grid[grid.length - 1 - idx];
+            return col.capacity === opposite?.capacity;
         });
 
     const isBellShaped =
@@ -660,7 +665,7 @@ const QSortEditor = ({
         (() => {
             const centerIdx = Math.floor(grid.length / 2);
             for (let i = 0; i < centerIdx; i++) {
-                if ((grid[i].capacity || 0) > (grid[i + 1].capacity || 0)) return false;
+                if ((grid[i]?.capacity || 0) > (grid[i + 1]?.capacity || 0)) return false;
             }
             return true;
         })();
@@ -669,6 +674,7 @@ const QSortEditor = ({
         updateDraft((d) => {
             if (!d.grid_config) return;
             const col = d.grid_config[idx];
+            if (!col) return;
             col.capacity = Math.max(0, (col.capacity || 0) + delta);
 
             // Symmetry Lock Logic
@@ -774,7 +780,7 @@ const QSortEditor = ({
                 const limit = isOddCols ? centerIdx : centerIdx - 1;
 
                 for (let i = 0; i <= limit; i++) {
-                    const diff = idealCapacities[i] - newCapacities[i];
+                    const diff = (idealCapacities[i] ?? 0) - (newCapacities[i] ?? 0);
                     if (diff > maxDiff) {
                         maxDiff = diff;
                         bestIdx = i;
@@ -784,19 +790,20 @@ const QSortEditor = ({
                 if (bestIdx === -1) break;
 
                 if (isOddCols && bestIdx === centerIdx) {
-                    newCapacities[centerIdx]++;
+                    newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
                     currentTotal++;
                 } else {
                     if (N - currentTotal >= 2) {
-                        newCapacities[bestIdx]++;
-                        newCapacities[numColumns - 1 - bestIdx]++;
+                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
+                        const mirrorIdx = numColumns - 1 - bestIdx;
+                        newCapacities[mirrorIdx] = (newCapacities[mirrorIdx] ?? 0) + 1;
                         currentTotal += 2;
                     } else if (isOddCols) {
-                        newCapacities[centerIdx]++;
+                        newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
                         currentTotal++;
                     } else {
                         // Even columns parity break
-                        newCapacities[bestIdx]++;
+                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
                         currentTotal++;
                     }
                 }
@@ -804,8 +811,10 @@ const QSortEditor = ({
 
             // Apply to draft
             for (let i = 0; i < numColumns; i++) {
-                if (d.grid_config?.[i]) {
-                    d.grid_config[i].capacity = newCapacities[i];
+                const col = d.grid_config?.[i];
+                const cap = newCapacities[i];
+                if (col && cap !== undefined) {
+                    col.capacity = cap;
                 }
             }
         });
@@ -1137,35 +1146,36 @@ const QSortEditor = ({
                                 strategy={verticalListSortingStrategy}
                             >
                                 <div className="grid grid-cols-1 gap-3">
-                                    {localizedStatements.map((item, idx) => (
-                                        <SortableStatementItem
-                                            key={item.code}
-                                            item={item}
-                                            idx={idx}
-                                            statement={statements[idx]}
-                                            isEditing={editingIndex === idx}
-                                            editingCode={editingCode}
-                                            editingText={editingText}
-                                            setEditingIndex={setEditingIndex}
-                                            setEditingCode={setEditingCode}
-                                            setEditingText={setEditingText}
-                                            handleSaveStatement={handleSaveStatement}
-                                            readOnly={readOnly}
-                                            structureLocked={structureLocked}
-                                            activeLocale={activeLocale}
-                                            updateDraft={updateDraft}
-                                            staleInfo={staleByStatementId.get(statements[idx]?.id)}
-                                            onSync={() =>
-                                                statements[idx]?.id &&
-                                                handleSyncStatement(statements[idx].id)
-                                            }
-                                            isSyncing={
-                                                syncMutation.isPending &&
-                                                syncMutation.variables?.statementId ===
-                                                    statements[idx]?.id
-                                            }
-                                        />
-                                    ))}
+                                    {localizedStatements.map((item, idx) => {
+                                        const statement = statements[idx];
+                                        if (!statement) return null;
+                                        return (
+                                            <SortableStatementItem
+                                                key={item.code}
+                                                item={item}
+                                                idx={idx}
+                                                statement={statement}
+                                                isEditing={editingIndex === idx}
+                                                editingCode={editingCode}
+                                                editingText={editingText}
+                                                setEditingIndex={setEditingIndex}
+                                                setEditingCode={setEditingCode}
+                                                setEditingText={setEditingText}
+                                                handleSaveStatement={handleSaveStatement}
+                                                readOnly={readOnly}
+                                                structureLocked={structureLocked}
+                                                activeLocale={activeLocale}
+                                                updateDraft={updateDraft}
+                                                staleInfo={staleByStatementId.get(statement.id)}
+                                                onSync={() => handleSyncStatement(statement.id)}
+                                                isSyncing={
+                                                    syncMutation.isPending &&
+                                                    syncMutation.variables?.statementId ===
+                                                        statement.id
+                                                }
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </SortableContext>
                         </DndContext>
