@@ -1,5 +1,9 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+/*
+ * Libre-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import { useTranslation } from 'react-i18next';
 import {
     Library,
@@ -19,7 +23,6 @@ import {
     Filter,
     Globe,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,26 +46,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
-import { usePermission } from '@/hooks/usePermission';
-import { useAdminContext } from '@/hooks/useAdminContext';
-import {
-    useGetConcourseApiAdminConcoursesConcourseIdGet,
-    useCreateItemApiAdminConcoursesConcourseIdItemsPost,
-    useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch,
-    useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete,
-    useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost,
-    useListTagsApiAdminConcoursesTagsGet,
-    useCreateTagApiAdminConcoursesTagsPost,
-    useDeleteTagApiAdminConcoursesTagsTagIdDelete,
-    getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey,
-    getListTagsApiAdminConcoursesTagsGetQueryKey,
-} from '@/api/generated';
-import type { ConcourseItemRead, ConcourseItemStatus, ConcourseTagRead } from '@/api/model';
-import { useQueryClient } from '@tanstack/react-query';
-import { parseApiErrorSync } from '@/lib/error-utils';
+import type { ConcourseItemStatus, ConcourseTagRead } from '@/api/model';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ItemDetailSheet } from '@/components/admin/concourse/ItemDetailSheet';
+import { useConcourseDetailPage } from '@/hooks/admin/useConcourseDetailPage';
 
 const STATUS_COLORS: Record<string, string> = {
     proposed: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -70,454 +58,109 @@ const STATUS_COLORS: Record<string, string> = {
     rejected: 'bg-red-100 text-red-800 border-red-200',
 };
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: declarative shell rendering many sections (filters, list, multiple dialogs); state-and-effect logic lives in useConcourseDetailPage
 export default function ConcourseDetailPage() {
-    const { t, i18n } = useTranslation();
-    const statusLabel = useCallback(
-        (status: string) =>
-            ({
-                proposed: t('admin.concourse.status.proposed', 'Proposed'),
-                accepted: t('admin.concourse.status.accepted', 'Accepted'),
-                rejected: t('admin.concourse.status.rejected', 'Rejected'),
-            })[status] ?? status,
-        [t]
-    );
-    const { can } = usePermission();
-    const { project } = useAdminContext();
-    const memberNames = useMemo(() => {
-        const map: Record<number, string> = {};
-        for (const m of project?.members ?? []) {
-            map[m.user_id] = m.user.full_name ?? m.user.email;
-        }
-        return map;
-    }, [project?.members]);
-    const { concourseId } = useParams<{ concourseId: string }>();
-    const queryClient = useQueryClient();
-    const id = Number(concourseId);
-
-    const { data: concourse, isLoading } = useGetConcourseApiAdminConcoursesConcourseIdGet(id, {
-        query: {
-            enabled: !!id,
-            refetchInterval: 15_000,
-        },
-    });
-
-    const { data: tags } = useListTagsApiAdminConcoursesTagsGet();
-
-    const [activeLocale, setActiveLocale] = useState('');
-    const [addLangOpen, setAddLangOpen] = useState(false);
-    const [newLangCode, setNewLangCode] = useState('');
-    const [filterStatus, setFilterStatus] = useState<string>('all');
-    const [filterTag, setFilterTag] = useState<string>('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [importOpen, setImportOpen] = useState(false);
-    const [addItemOpen, setAddItemOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<number | null>(null);
-    const [editCode, setEditCode] = useState('');
-    const [editText, setEditText] = useState('');
-    const [editSource, setEditSource] = useState('');
-    const [editChangeNote, setEditChangeNote] = useState('');
-    const [sheetItemId, setSheetItemId] = useState<number | null>(null);
-    const [sheetItemCode, setSheetItemCode] = useState('');
-    const [sheetTab, setSheetTab] = useState<'history' | 'comments'>('history');
-    const [tagManagerOpen, setTagManagerOpen] = useState(false);
-    const [newTagName, setNewTagName] = useState('');
-    const [newTagColor, setNewTagColor] = useState('#6366f1');
-    const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
-    const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-    const [bulkActionPending, setBulkActionPending] = useState(false);
-    const [bulkConfirm, setBulkConfirm] = useState<ConcourseItemStatus | null>(null);
-
-    // Mutations
-    const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
-    const updateItemMutation = useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch();
-    const deleteItemMutation = useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete();
-    const importMutation = useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost();
-    const createTagMutation = useCreateTagApiAdminConcoursesTagsPost();
-    const deleteTagMutation = useDeleteTagApiAdminConcoursesTagsTagIdDelete();
-
-    const invalidate = () =>
-        queryClient.invalidateQueries({
-            queryKey: getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey(id),
-        });
-
-    const invalidateTags = () =>
-        queryClient.invalidateQueries({
-            queryKey: getListTagsApiAdminConcoursesTagsGetQueryKey(),
-        });
-
-    const handleCreateTag = async () => {
-        if (!newTagName.trim()) return;
-        try {
-            await createTagMutation.mutateAsync({
-                data: { name: newTagName.trim(), color: newTagColor },
-            });
-            await invalidateTags();
-            setNewTagName('');
-            toast.success(t('admin.concourse.tag_created', 'Tag created'));
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.tag_create_error', 'Failed to create tag')
-                )
-            );
-        }
-    };
-
-    const handleDeleteTag = async (tagId: number) => {
-        try {
-            await deleteTagMutation.mutateAsync({ tagId });
-            await Promise.all([invalidateTags(), invalidate()]);
-            setDeleteTagId(null);
-            toast.success(t('admin.concourse.tag_deleted', 'Tag deleted'));
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.tag_delete_error', 'Failed to delete tag')
-                )
-            );
-        }
-    };
-
-    // Filter items
-    const filteredItems = useMemo(() => {
-        if (!concourse?.items) return [];
-        return concourse.items
-            .filter((item) => {
-                if (filterStatus !== 'all' && item.status !== filterStatus) return false;
-                if (filterTag !== 'all' && !item.tags?.some((tag) => String(tag.id) === filterTag))
-                    return false;
-                if (searchQuery) {
-                    const text =
-                        item.translations?.find((tr) => tr.language_code === activeLocale)?.text ??
-                        item.translations?.[0]?.text ??
-                        '';
-                    const q = searchQuery.toLowerCase();
-                    if (
-                        !item.code.toLowerCase().includes(q) &&
-                        !text.toLowerCase().includes(q) &&
-                        !(item.source ?? '').toLowerCase().includes(q)
-                    )
-                        return false;
-                }
-                return true;
-            })
-            .sort((a, b) => a.display_order - b.display_order);
-    }, [concourse?.items, filterStatus, filterTag, searchQuery, activeLocale]);
-
-    const toggleSelectItem = useCallback((itemId: number) => {
-        setSelectedItems((prev) => {
-            const next = new Set(prev);
-            if (next.has(itemId)) next.delete(itemId);
-            else next.add(itemId);
-            return next;
-        });
-    }, []);
-
-    const toggleSelectAll = useCallback(() => {
-        setSelectedItems((prev) => {
-            const filteredIds = filteredItems.map((item) => item.id);
-            const allSelected = filteredIds.length > 0 && filteredIds.every((id) => prev.has(id));
-            if (allSelected) return new Set();
-            return new Set(filteredIds);
-        });
-    }, [filteredItems]);
-
-    const handleBulkStatusChange = async (status: ConcourseItemStatus) => {
-        if (selectedItems.size === 0) return;
-        setBulkActionPending(true);
-        try {
-            const items = concourse?.items?.filter((item) => selectedItems.has(item.id)) ?? [];
-            await Promise.all(
-                items.map((item) =>
-                    updateItemMutation.mutateAsync({
-                        concourseId: id,
-                        itemId: item.id,
-                        data: { version: item.version, status },
-                    })
-                )
-            );
-            await invalidate();
-            setSelectedItems(new Set());
-            toast.success(
-                t('admin.concourse.bulk_status_success', '{{count}} items updated', {
-                    count: items.length,
-                })
-            );
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.bulk_status_error', 'Failed to update some items')
-                )
-            );
-            await invalidate();
-        } finally {
-            setBulkActionPending(false);
-        }
-    };
-
-    const exportCsv = useCallback(() => {
-        if (!concourse?.items?.length) return;
-        const items = filteredItems.length > 0 ? filteredItems : (concourse.items ?? []);
-        const allLangs = [
-            ...new Set(items.flatMap((i) => i.translations?.map((tr) => tr.language_code) ?? [])),
-        ].sort();
-
-        const headers = ['code', 'status', 'source', ...allLangs.map((l) => `text_${l}`), 'tags'];
-        const rows = items.map((item) => {
-            const texts = allLangs.map((lang) => {
-                const tr = item.translations?.find((t) => t.language_code === lang);
-                return tr?.text ?? '';
-            });
-            const tagNames = item.tags?.map((tag) => tag.name).join('; ') ?? '';
-            return [item.code, statusLabel(item.status), item.source ?? '', ...texts, tagNames];
-        });
-
-        const csvEscape = (v: string) => {
-            if (v.includes(',') || v.includes('"') || v.includes('\n')) {
-                return `"${v.replace(/"/g, '""')}"`;
-            }
-            return v;
-        };
-
-        const csv = [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n');
-        const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${project?.title?.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() ?? 'project'}_concourse.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }, [concourse, filteredItems, statusLabel, project?.title]);
-
-    // Add item
-    const [newCode, setNewCode] = useState('');
-    const [newText, setNewText] = useState('');
-    const [newSource, setNewSource] = useState('');
-    const [newTagIds, setNewTagIds] = useState<number[]>([]);
-    const [newItemLocale, setNewItemLocale] = useState('');
-
-    const handleAddItem = async () => {
-        const itemLocale = activeLocale || newItemLocale;
-        if (!newCode.trim() || !newText.trim() || !itemLocale) return;
-        try {
-            await createItemMutation.mutateAsync({
-                concourseId: id,
-                data: {
-                    code: newCode.trim(),
-                    source: newSource.trim() || null,
-                    translations: [{ language_code: itemLocale, text: newText.trim() }],
-                    tag_ids: newTagIds,
-                },
-            });
-            await invalidate();
-            setAddItemOpen(false);
-            setNewCode('');
-            setNewText('');
-            setNewSource('');
-            setNewTagIds([]);
-            setNewItemLocale('');
-            toast.success(t('admin.concourse.item_created', 'Item added'));
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(err, t('admin.concourse.item_create_error', 'Failed to add item'))
-            );
-        }
-    };
-
-    // Edit item
-    const [editTagIds, setEditTagIds] = useState<number[]>([]);
-
-    const startEdit = (item: ConcourseItemRead) => {
-        setEditingItem(item.id);
-        setEditCode(item.code);
-        setEditText(
-            item.translations?.find((tr) => tr.language_code === activeLocale)?.text ??
-                item.translations?.[0]?.text ??
-                ''
-        );
-        setEditSource(item.source ?? '');
-        setEditChangeNote('');
-        setEditTagIds(item.tags?.map((tag) => tag.id) ?? []);
-    };
-
-    const saveEdit = async (item: ConcourseItemRead) => {
-        try {
-            const mergedTranslations = [
-                ...(item.translations ?? [])
-                    .filter((tr) => tr.language_code !== activeLocale)
-                    .map((tr) => ({ language_code: tr.language_code, text: tr.text })),
-                { language_code: activeLocale, text: editText.trim() },
-            ];
-            await updateItemMutation.mutateAsync({
-                concourseId: id,
-                itemId: item.id,
-                data: {
-                    version: item.version,
-                    code: editCode.trim() || undefined,
-                    source: editSource.trim() || undefined,
-                    translations: mergedTranslations,
-                    tag_ids: editTagIds,
-                    change_comment: editChangeNote.trim() || undefined,
-                },
-            });
-            await invalidate();
-            setEditingItem(null);
-            setEditChangeNote('');
-            toast.success(t('admin.concourse.item_updated', 'Item updated'));
-        } catch (err) {
-            const msg = parseApiErrorSync(
-                err,
-                t('admin.concourse.item_update_error', 'Failed to update item')
-            );
-            toast.error(msg);
-            if (msg.includes('modified')) {
-                await invalidate();
-                setEditingItem(null);
-            }
-        }
-    };
-
-    // Change status
-    const changeStatus = async (item: ConcourseItemRead, status: ConcourseItemStatus) => {
-        try {
-            await updateItemMutation.mutateAsync({
-                concourseId: id,
-                itemId: item.id,
-                data: { version: item.version, status },
-            });
-            await invalidate();
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(err, t('admin.concourse.status_error', 'Failed to change status'))
-            );
-        }
-    };
-
-    // Delete item
-    const handleDelete = async (itemId: number) => {
-        try {
-            await deleteItemMutation.mutateAsync({ concourseId: id, itemId });
-            await invalidate();
-            toast.success(t('admin.concourse.item_deleted', 'Item deleted'));
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.item_delete_error', 'Failed to delete item')
-                )
-            );
-        }
-    };
-
-    // Bulk import
-    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-
-    const [importText, setImportText] = useState('');
-    const [importPrefix, setImportPrefix] = useState('C');
-    const [importLocale, setImportLocale] = useState('');
-
-    const handleImport = async () => {
-        if (!importText.trim()) return;
-        try {
-            const result = await importMutation.mutateAsync({
-                concourseId: id,
-                data: {
-                    text_block: importText,
-                    language_code: importLocale || activeLocale || 'en',
-                    code_prefix: importPrefix,
-                },
-            });
-            await invalidate();
-            setImportOpen(false);
-            setImportText('');
-            toast.success(
-                t('admin.concourse.import_success', '{{count}} items imported', {
-                    count: result.length,
-                })
-            );
-        } catch (err) {
-            toast.error(parseApiErrorSync(err, t('admin.concourse.import_error', 'Import failed')));
-        }
-    };
-
-    const languages = useMemo(
-        () => [
-            ...new Set(
-                concourse?.items?.flatMap(
-                    (i) => i.translations?.map((tr) => tr.language_code) ?? []
-                ) ?? []
-            ),
-        ],
-        [concourse?.items]
-    );
-
-    const langDisplayName = useCallback(
-        (code: string) => {
-            try {
-                const dn = new Intl.DisplayNames([i18n.language], { type: 'language' });
-                const name = dn.of(code);
-                return name ? name.charAt(0).toUpperCase() + name.slice(1) : code.toUpperCase();
-            } catch {
-                return code.toUpperCase();
-            }
-        },
-        [i18n.language]
-    );
-
-    const missingCountByLang = useMemo(() => {
-        if (languages.length <= 1) return {};
-        const counts: Record<string, number> = {};
-        const items = concourse?.items ?? [];
-        for (const lang of languages) {
-            let missing = 0;
-            for (const item of items) {
-                if (!item.translations?.some((tr) => tr.language_code === lang)) {
-                    missing++;
-                }
-            }
-            if (missing > 0) counts[lang] = missing;
-        }
-        return counts;
-    }, [languages, concourse?.items]);
-
-    // Common languages for the "add language" picker
-    const commonLanguages = useMemo(() => {
-        const codes = [
-            'en',
-            'fr',
-            'fi',
-            'de',
-            'es',
-            'it',
-            'pt',
-            'nl',
-            'sv',
-            'da',
-            'no',
-            'pl',
-            'cs',
-            'ja',
-            'zh',
-            'ko',
-            'ar',
-            'hi',
-            'ru',
-            'tr',
-        ];
-        return codes
-            .filter((c) => !languages.includes(c))
-            .map((code) => ({ code, name: langDisplayName(code) }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [languages, langDisplayName]);
-
-    useEffect(() => {
-        if (languages.length > 0 && !languages.includes(activeLocale)) {
-            setActiveLocale(languages[0]);
-        }
-    }, [languages, activeLocale]);
+    const { t } = useTranslation();
+    const api = useConcourseDetailPage();
+    const {
+        id,
+        canEdit,
+        memberNames,
+        concourse,
+        isLoading,
+        tags,
+        statusLabel,
+        langDisplayName,
+        filterStatus,
+        setFilterStatus,
+        filterTag,
+        setFilterTag,
+        searchQuery,
+        setSearchQuery,
+        activeLocale,
+        setActiveLocale,
+        languages,
+        missingCountByLang,
+        commonLanguages,
+        addLangOpen,
+        setAddLangOpen,
+        newLangCode,
+        setNewLangCode,
+        confirmAddLanguage,
+        filteredItems,
+        selectedItems,
+        setSelectedItems,
+        toggleSelectItem,
+        toggleSelectAll,
+        bulkActionPending,
+        bulkConfirm,
+        setBulkConfirm,
+        handleBulkStatusChange,
+        addItemOpen,
+        setAddItemOpen,
+        openAddItemDialog,
+        newCode,
+        setNewCode,
+        newText,
+        setNewText,
+        newSource,
+        setNewSource,
+        newTagIds,
+        setNewTagIds,
+        newItemLocale,
+        setNewItemLocale,
+        handleAddItem,
+        isCreatingItem,
+        editingItem,
+        setEditingItem,
+        editCode,
+        setEditCode,
+        editText,
+        setEditText,
+        editSource,
+        setEditSource,
+        editChangeNote,
+        setEditChangeNote,
+        editTagIds,
+        setEditTagIds,
+        startEdit,
+        saveEdit,
+        isUpdatingItem,
+        changeStatus,
+        deleteConfirmId,
+        setDeleteConfirmId,
+        handleDelete,
+        isDeletingItem,
+        importOpen,
+        setImportOpen,
+        openImportDialog,
+        importText,
+        setImportText,
+        importPrefix,
+        setImportPrefix,
+        importLocale,
+        setImportLocale,
+        handleImport,
+        isImporting,
+        tagManagerOpen,
+        setTagManagerOpen,
+        newTagName,
+        setNewTagName,
+        newTagColor,
+        setNewTagColor,
+        deleteTagId,
+        setDeleteTagId,
+        handleCreateTag,
+        handleDeleteTag,
+        isCreatingTag,
+        isDeletingTag,
+        sheetItemId,
+        sheetItemCode,
+        sheetTab,
+        openSheet,
+        closeSheet,
+        exportCsv,
+    } = api;
 
     if (isLoading) {
         return (
@@ -535,8 +178,6 @@ export default function ConcourseDetailPage() {
             </div>
         );
     }
-
-    const canEdit = can('study:edit_design');
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -564,10 +205,7 @@ export default function ConcourseDetailPage() {
                                     variant="outline"
                                     size="sm"
                                     className="rounded-xl"
-                                    onClick={() => {
-                                        setImportLocale(activeLocale || languages[0] || 'en');
-                                        setImportOpen(true);
-                                    }}
+                                    onClick={openImportDialog}
                                 >
                                     <Upload className="size-4 sm:mr-1" />
                                     <span className="hidden sm:inline">
@@ -577,29 +215,7 @@ export default function ConcourseDetailPage() {
                                 <Button
                                     size="sm"
                                     className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                    onClick={() => {
-                                        // Auto-fill next code
-                                        const items = concourse?.items ?? [];
-                                        const maxNum = items.reduce((max, item) => {
-                                            const match = item.code?.match(/^(\d+)$/);
-                                            if (match) return Math.max(max, Number(match[1]));
-                                            const prefixed = item.code?.match(/^([A-Za-z]+)(\d+)$/);
-                                            if (prefixed) return Math.max(max, Number(prefixed[2]));
-                                            return max;
-                                        }, 0);
-                                        // Detect prefix pattern (e.g., "C", "S", "Q")
-                                        const prefixes = items
-                                            .map(
-                                                (item) => item.code?.match(/^([A-Za-z]+)\d+$/)?.[1]
-                                            )
-                                            .filter(Boolean);
-                                        const prefix =
-                                            prefixes.length > 0
-                                                ? prefixes[prefixes.length - 1]
-                                                : '';
-                                        setNewCode(`${prefix}${maxNum + 1}`);
-                                        setAddItemOpen(true);
-                                    }}
+                                    onClick={openAddItemDialog}
                                 >
                                     <Plus className="size-4 sm:mr-1" />
                                     <span className="hidden sm:inline">
@@ -1073,11 +689,9 @@ export default function ConcourseDetailPage() {
                                                                 )}
                                                                 className="size-8 p-0 text-emerald-600 hover:bg-emerald-50"
                                                                 onClick={() => saveEdit(item)}
-                                                                disabled={
-                                                                    updateItemMutation.isPending
-                                                                }
+                                                                disabled={isUpdatingItem}
                                                             >
-                                                                {updateItemMutation.isPending ? (
+                                                                {isUpdatingItem ? (
                                                                     <Loader2 className="size-3.5 animate-spin" />
                                                                 ) : (
                                                                     <Check className="size-3.5" />
@@ -1106,11 +720,9 @@ export default function ConcourseDetailPage() {
                                                                     'History'
                                                                 )}
                                                                 className="size-8 p-0 text-slate-400 hover:text-slate-700"
-                                                                onClick={() => {
-                                                                    setSheetItemId(item.id);
-                                                                    setSheetItemCode(item.code);
-                                                                    setSheetTab('history');
-                                                                }}
+                                                                onClick={() =>
+                                                                    openSheet(item, 'history')
+                                                                }
                                                             >
                                                                 <Clock className="size-3.5" />
                                                             </Button>
@@ -1122,11 +734,9 @@ export default function ConcourseDetailPage() {
                                                                     'Comments'
                                                                 )}
                                                                 className="relative size-8 p-0 text-slate-400 hover:text-slate-700"
-                                                                onClick={() => {
-                                                                    setSheetItemId(item.id);
-                                                                    setSheetItemCode(item.code);
-                                                                    setSheetTab('comments');
-                                                                }}
+                                                                onClick={() =>
+                                                                    openSheet(item, 'comments')
+                                                                }
                                                             >
                                                                 <MessageSquare className="size-3.5" />
                                                                 {(item.comment_count ?? 0) > 0 && (
@@ -1215,15 +825,15 @@ export default function ConcourseDetailPage() {
                                                                         onCheckedChange={(
                                                                             checked
                                                                         ) => {
-                                                                            setEditTagIds((prev) =>
+                                                                            setEditTagIds(
                                                                                 checked
                                                                                     ? [
-                                                                                          ...prev,
+                                                                                          ...editTagIds,
                                                                                           tag.id,
                                                                                       ]
-                                                                                    : prev.filter(
-                                                                                          (id) =>
-                                                                                              id !==
+                                                                                    : editTagIds.filter(
+                                                                                          (tid) =>
+                                                                                              tid !==
                                                                                               tag.id
                                                                                       )
                                                                             );
@@ -1369,9 +979,9 @@ export default function ConcourseDetailPage() {
                                                             aria-label={t('common.save', 'Save')}
                                                             className="size-8 p-0 text-emerald-600 hover:bg-emerald-50"
                                                             onClick={() => saveEdit(item)}
-                                                            disabled={updateItemMutation.isPending}
+                                                            disabled={isUpdatingItem}
                                                         >
-                                                            {updateItemMutation.isPending ? (
+                                                            {isUpdatingItem ? (
                                                                 <Loader2 className="size-3.5 animate-spin" />
                                                             ) : (
                                                                 <Check className="size-3.5" />
@@ -1400,11 +1010,9 @@ export default function ConcourseDetailPage() {
                                                                 'History'
                                                             )}
                                                             className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
-                                                            onClick={() => {
-                                                                setSheetItemId(item.id);
-                                                                setSheetItemCode(item.code);
-                                                                setSheetTab('history');
-                                                            }}
+                                                            onClick={() =>
+                                                                openSheet(item, 'history')
+                                                            }
                                                         >
                                                             <Clock className="size-3.5" />
                                                         </Button>
@@ -1416,11 +1024,9 @@ export default function ConcourseDetailPage() {
                                                                 'Comments'
                                                             )}
                                                             className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
-                                                            onClick={() => {
-                                                                setSheetItemId(item.id);
-                                                                setSheetItemCode(item.code);
-                                                                setSheetTab('comments');
-                                                            }}
+                                                            onClick={() =>
+                                                                openSheet(item, 'comments')
+                                                            }
                                                         >
                                                             <MessageSquare className="size-3.5" />
                                                             {(item.comment_count ?? 0) > 0 && (
@@ -1567,11 +1173,11 @@ export default function ConcourseDetailPage() {
                                 !newCode.trim() ||
                                 !newText.trim() ||
                                 (!activeLocale && !newItemLocale) ||
-                                createItemMutation.isPending
+                                isCreatingItem
                             }
                             className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
-                            {createItemMutation.isPending ? (
+                            {isCreatingItem ? (
                                 <Loader2 className="size-4 animate-spin mr-2" />
                             ) : (
                                 <Plus className="size-4 mr-2" />
@@ -1662,7 +1268,7 @@ export default function ConcourseDetailPage() {
                         <Button
                             variant="destructive"
                             className="rounded-xl"
-                            disabled={deleteItemMutation.isPending}
+                            disabled={isDeletingItem}
                             onClick={async () => {
                                 if (deleteConfirmId !== null) {
                                     await handleDelete(deleteConfirmId);
@@ -1670,7 +1276,7 @@ export default function ConcourseDetailPage() {
                                 }
                             }}
                         >
-                            {deleteItemMutation.isPending ? (
+                            {isDeletingItem ? (
                                 <Loader2 className="size-4 animate-spin mr-2" />
                             ) : (
                                 <Trash2 className="size-4 mr-2" />
@@ -1757,10 +1363,10 @@ export default function ConcourseDetailPage() {
                     <DialogFooter>
                         <Button
                             onClick={handleImport}
-                            disabled={!importText.trim() || importMutation.isPending}
+                            disabled={!importText.trim() || isImporting}
                             className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
-                            {importMutation.isPending ? (
+                            {isImporting ? (
                                 <Loader2 className="size-4 animate-spin mr-2" />
                             ) : (
                                 <Upload className="size-4 mr-2" />
@@ -1807,10 +1413,10 @@ export default function ConcourseDetailPage() {
                             <Button
                                 size="sm"
                                 className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                disabled={!newTagName.trim() || createTagMutation.isPending}
+                                disabled={!newTagName.trim() || isCreatingTag}
                                 onClick={handleCreateTag}
                             >
-                                {createTagMutation.isPending ? (
+                                {isCreatingTag ? (
                                     <Loader2 className="size-3.5 animate-spin" />
                                 ) : (
                                     <Plus className="size-3.5" />
@@ -1839,10 +1445,10 @@ export default function ConcourseDetailPage() {
                                                     variant="ghost"
                                                     size="sm"
                                                     className="h-7 px-2 text-red-600 hover:bg-red-50 text-xs"
-                                                    disabled={deleteTagMutation.isPending}
+                                                    disabled={isDeletingTag}
                                                     onClick={() => handleDeleteTag(tag.id)}
                                                 >
-                                                    {deleteTagMutation.isPending ? (
+                                                    {isDeletingTag ? (
                                                         <Loader2 className="size-3 animate-spin" />
                                                     ) : (
                                                         t('common.confirm', 'Confirm')
@@ -1915,11 +1521,7 @@ export default function ConcourseDetailPage() {
                     </Select>
                     <DialogFooter>
                         <Button
-                            onClick={() => {
-                                setActiveLocale(newLangCode);
-                                setAddLangOpen(false);
-                                setNewLangCode('');
-                            }}
+                            onClick={confirmAddLanguage}
                             disabled={!newLangCode}
                             className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
@@ -1933,7 +1535,7 @@ export default function ConcourseDetailPage() {
             <ItemDetailSheet
                 open={sheetItemId !== null}
                 onOpenChange={(open) => {
-                    if (!open) setSheetItemId(null);
+                    if (!open) closeSheet();
                 }}
                 concourseId={id}
                 itemId={sheetItemId}
