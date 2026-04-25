@@ -110,7 +110,7 @@
 - **Location:** `docs/contributing/agent-instructions.md:17, 54` (links to `backend/app/schemas.py` which does not exist)
 - **Observation:** Lychee link checker (`.raw/lychee-links.json`) reports 2 errors, both pointing to `file:///home/julien/libre-q/backend/app/schemas.py` from `agent-instructions.md`. The file `backend/app/schemas.py` was apparently split or renamed; schemas now live under `backend/app/schemas/`. This is a stale internal link.
 - **Impact:** The link checker fails on this file (2 errors total). If lychee is integrated into CI and run on the submitted tag, this would cause a CI failure visible to reviewers. Also misleading for contributors reading agent instructions.
-- **Recommendation:** Update links in `agent-instructions.md` to point to the correct location (e.g., `backend/app/schemas/` directory or a specific schema file). [parent: F-10-XXX if a documentation axis finding covers this]
+- **Recommendation:** Update links in `agent-instructions.md` to point to the correct location (e.g., `backend/app/schemas/` directory or a specific schema file). [parent: F-10-006 — same broken link surfaced from documentation angle]
 - **Effort:** S
 
 ---
