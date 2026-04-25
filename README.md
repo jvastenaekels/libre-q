@@ -97,28 +97,57 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - [Node.js](https://nodejs.org/) v24+
-- PostgreSQL 15+
+- PostgreSQL 15+ (running locally or reachable by URL)
 
-### Install & Run
+### From zero
 
 ```bash
+# 1. Clone and enter
 git clone https://github.com/jvastenaekels/libre-q.git
 cd libre-q
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env to set:
+#   - DATABASE_URL  (your local Postgres connection string)
+#   - SECRET_KEY    (generate: python -c 'import secrets; print(secrets.token_urlsafe(48))')
+#   - IP_HASH_SALT  (same generation as SECRET_KEY)
+#   - ENVIRONMENT=development  (enables tutorial / E2E test routes)
+
+# 3. Install dependencies (Python via uv, Node via npm)
 make install
 
-# Terminal 1 — Backend (FastAPI)
-make run-backend
+# 4. Create the database schema
+make migrate
 
-# Terminal 2 — Frontend (React/Vite)
-make run-frontend
+# 5. Initialize the database (creates an admin user from ADMIN_EMAIL/PASSWORD)
+cd backend && uv run python init_db.py && cd ..
+
+# 6. (Optional) Seed an example study to explore the participant flow
+cd backend && uv run python seed.py data/example-study.json && cd ..
+
+# 7. Run the app (two terminals)
+make run-backend     # Terminal 1 — FastAPI on :8000
+make run-frontend    # Terminal 2 — Vite dev server on :5173
 ```
 
-Visit [http://localhost:5173](http://localhost:5173) to open the app.
+Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
+
+If you seeded the example study (step 6), you can also visit `http://localhost:5173/remote-work-perspectives` to walk the participant flow.
+
+### Verifying your setup
 
 ```bash
-# Run the full CI pipeline locally (lint + type check + test + build)
+# Run the full CI pipeline locally (lint + type check + test + build, ~3 min)
 make ci
+
+# Or run only the tests
+make test
 ```
+
+### Docker alternative
+
+A `docker-compose.yml` is provided for a self-contained Postgres + app stack. See [`docs/guides/deployment.md`](docs/guides/deployment.md) for the supported invocation.
 
 ### Deploy
 
