@@ -1,6 +1,9 @@
 """Analysis schemas for Q-method factor analysis."""
 
-from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AnalysisRequest(BaseModel):
@@ -123,4 +126,44 @@ class EigenvalueResult(BaseModel):
     eigenvalues: list[float]
     suggested_n_factors: int = Field(
         description="Suggested number of factors (Kaiser criterion: eigenvalue > 1)"
+    )
+
+
+# ---- AnalysisRun (persisted analysis history) ----
+
+
+class AnalysisRunSummary(BaseModel):
+    """Lightweight summary of a persisted analysis run, used in list views."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    ran_at: datetime
+    ran_by_user_id: int | None = None
+    ran_by_email: str | None = Field(
+        None,
+        description="Email of the user who ran the analysis (joined from User; None if user deleted).",
+    )
+    extraction_method: str
+    n_factors: int
+    rotation_method: str
+    flagging_mode: str
+    notes: str | None = None
+
+
+class AnalysisRunRead(AnalysisRunSummary):
+    """Full persisted run including the result payload."""
+
+    result: dict[str, Any] = Field(
+        description="Full AnalysisResult payload as it was returned at run time."
+    )
+
+
+class AnalysisRunPatch(BaseModel):
+    """Partial update for a persisted run. Only `notes` is editable."""
+
+    notes: str | None = Field(
+        None,
+        max_length=2000,
+        description="Researcher annotation, e.g. 'final analysis used in submission'.",
     )

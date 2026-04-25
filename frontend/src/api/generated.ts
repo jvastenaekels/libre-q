@@ -22,6 +22,7 @@ import type {
 
 import type {
     AnalysisRequest,
+    AnalysisRunPatch,
     BodyLoginForAccessTokenApiTokenPost,
     BodyUploadAudioApiAudioUploadPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
@@ -65,8 +66,6 @@ import type {
     StudyUpdate,
     SubmissionInput,
     TOTPVerify,
-    TestMemberData,
-    TestSeedData,
     UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
     UserUpdate,
@@ -88,6 +87,8 @@ import {
 } from './model';
 import type {
     AnalysisResult,
+    AnalysisRunRead,
+    AnalysisRunSummary,
     AudioRecordingRead,
     AudioUploadResponse,
     ConcourseDetailRead,
@@ -3551,7 +3552,12 @@ export function useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet<
 }
 
 /**
- * Run a complete Q-method factor analysis.
+ * Run a complete Q-method factor analysis and persist it as an AnalysisRun.
+
+Every successful run is saved to `analysis_runs` for audit-trail purposes
+(critical Q-methodology transparency requirement). The returned payload
+is unchanged for backward compatibility; the persisted run is retrievable
+via the list / get endpoints below.
  * @summary Run Factor Analysis
  */
 export const runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost = (
@@ -3633,6 +3639,511 @@ export const useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost = <
 > => {
     const mutationOptions =
         getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all persisted analysis runs for this study, newest first.
+ * @summary List Analysis Runs
+ */
+export const listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<AnalysisRunSummary[]>({
+        url: `/api/admin/studies/${slug}/analysis/runs`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey = (slug?: string) => {
+    return [`/api/admin/studies/${slug}/analysis/runs`] as const;
+};
+
+export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>
+    > = ({ signal }) => listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>
+>;
+export type ListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryError = HTTPValidationError;
+
+export function useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet<
+    TData = Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet<
+    TData = Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet<
+    TData = Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Analysis Runs
+ */
+
+export function useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet<
+    TData = Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Retrieve a single persisted run including its full result payload.
+ * @summary Get Analysis Run
+ */
+export const getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet = (
+    slug: string,
+    runId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<AnalysisRunRead>({
+        url: `/api/admin/studies/${slug}/analysis/runs/${runId}`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryKey = (
+    slug?: string,
+    runId?: number
+) => {
+    return [`/api/admin/studies/${slug}/analysis/runs/${runId}`] as const;
+};
+
+export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    runId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryKey(slug, runId);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>
+    > = ({ signal }) => getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet(slug, runId, signal);
+
+    return { queryKey, queryFn, enabled: !!(slug && runId), ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>
+>;
+export type GetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryError = HTTPValidationError;
+
+export function useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet<
+    TData = Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    runId: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet<
+    TData = Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    runId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet<
+    TData = Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    runId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Analysis Run
+ */
+
+export function useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet<
+    TData = Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    runId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetQueryOptions(
+        slug,
+        runId,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Update the researcher annotation (`notes`) on a persisted run.
+
+Only `notes` is editable; analytical choices and the result payload
+are immutable for audit-trail integrity.
+ * @summary Update Analysis Run
+ */
+export const updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch = (
+    slug: string,
+    runId: number,
+    analysisRunPatch: AnalysisRunPatch
+) => {
+    return customInstance<AnalysisRunSummary>({
+        url: `/api/admin/studies/${slug}/analysis/runs/${runId}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: analysisRunPatch,
+    });
+};
+
+export const getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>,
+        TError,
+        { slug: string; runId: number; data: AnalysisRunPatch },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>,
+    TError,
+    { slug: string; runId: number; data: AnalysisRunPatch },
+    TContext
+> => {
+    const mutationKey = ['updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>,
+        { slug: string; runId: number; data: AnalysisRunPatch }
+    > = (props) => {
+        const { slug, runId, data } = props ?? {};
+
+        return updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch(slug, runId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>
+>;
+export type UpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMutationBody =
+    AnalysisRunPatch;
+export type UpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Update Analysis Run
+ */
+export const useUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>,
+            TError,
+            { slug: string; runId: number; data: AnalysisRunPatch },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch>>,
+    TError,
+    { slug: string; runId: number; data: AnalysisRunPatch },
+    TContext
+> => {
+    const mutationOptions =
+        getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Delete a persisted run.
+
+Use sparingly: deleting a run removes evidence of an analytical choice
+from the audit trail. Researchers should normally annotate (via PATCH)
+rather than delete.
+ * @summary Delete Analysis Run
+ */
+export const deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete = (
+    slug: string,
+    runId: number
+) => {
+    return customInstance<void>({
+        url: `/api/admin/studies/${slug}/analysis/runs/${runId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>,
+        TError,
+        { slug: string; runId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>,
+    TError,
+    { slug: string; runId: number },
+    TContext
+> => {
+    const mutationKey = ['deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>,
+        { slug: string; runId: number }
+    > = (props) => {
+        const { slug, runId } = props ?? {};
+
+        return deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete(slug, runId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>
+>;
+
+export type DeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Delete Analysis Run
+ */
+export const useDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>,
+            TError,
+            { slug: string; runId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete>>,
+    TError,
+    { slug: string; runId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -10032,502 +10543,6 @@ export function useGetAudioUrlApiAudioRecordingIdUrlGet<
 }
 
 /**
- * Initialize test database - ensure tables exist
-This is typically handled by app startup, but useful for explicit initialization
- * @summary Init Test Db
- */
-export const initTestDbApiTestInitPost = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/api/test/init`, method: 'POST', signal });
-};
-
-export const getInitTestDbApiTestInitPostMutationOptions = <
-    TError = unknown,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
-        TError,
-        void,
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationKey = ['initTestDbApiTestInitPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
-        void
-    > = () => {
-        return initTestDbApiTestInitPost();
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type InitTestDbApiTestInitPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>
->;
-
-export type InitTestDbApiTestInitPostMutationError = unknown;
-
-/**
- * @summary Init Test Db
- */
-export const useInitTestDbApiTestInitPost = <TError = unknown, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
-            TError,
-            void,
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationOptions = getInitTestDbApiTestInitPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Seed base test data: user and project
-Idempotent - won't create duplicates
- * @summary Seed Test Data
- */
-export const seedTestDataApiTestSeedPost = (testSeedData: TestSeedData, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/api/test/seed`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: testSeedData,
-        signal,
-    });
-};
-
-export const getSeedTestDataApiTestSeedPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
-        TError,
-        { data: TestSeedData },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
-    TError,
-    { data: TestSeedData },
-    TContext
-> => {
-    const mutationKey = ['seedTestDataApiTestSeedPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
-        { data: TestSeedData }
-    > = (props) => {
-        const { data } = props ?? {};
-
-        return seedTestDataApiTestSeedPost(data);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type SeedTestDataApiTestSeedPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>
->;
-export type SeedTestDataApiTestSeedPostMutationBody = TestSeedData;
-export type SeedTestDataApiTestSeedPostMutationError = HTTPValidationError;
-
-/**
- * @summary Seed Test Data
- */
-export const useSeedTestDataApiTestSeedPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
-            TError,
-            { data: TestSeedData },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
-    TError,
-    { data: TestSeedData },
-    TContext
-> => {
-    const mutationOptions = getSeedTestDataApiTestSeedPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Add a user to a project for testing purposes
- * @summary Add Test Member
- */
-export const addTestMemberApiTestMembersPost = (
-    testMemberData: TestMemberData,
-    signal?: AbortSignal
-) => {
-    return customInstance<unknown>({
-        url: `/api/test/members`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: testMemberData,
-        signal,
-    });
-};
-
-export const getAddTestMemberApiTestMembersPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
-        TError,
-        { data: TestMemberData },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
-    TError,
-    { data: TestMemberData },
-    TContext
-> => {
-    const mutationKey = ['addTestMemberApiTestMembersPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
-        { data: TestMemberData }
-    > = (props) => {
-        const { data } = props ?? {};
-
-        return addTestMemberApiTestMembersPost(data);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type AddTestMemberApiTestMembersPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>
->;
-export type AddTestMemberApiTestMembersPostMutationBody = TestMemberData;
-export type AddTestMemberApiTestMembersPostMutationError = HTTPValidationError;
-
-/**
- * @summary Add Test Member
- */
-export const useAddTestMemberApiTestMembersPost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
-            TError,
-            { data: TestMemberData },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
-    TError,
-    { data: TestMemberData },
-    TContext
-> => {
-    const mutationOptions = getAddTestMemberApiTestMembersPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Cleanup test data between tests
-Removes all data except the base test user and project
- * @summary Cleanup Test Data
- */
-export const cleanupTestDataApiTestCleanupPost = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/api/test/cleanup`, method: 'POST', signal });
-};
-
-export const getCleanupTestDataApiTestCleanupPostMutationOptions = <
-    TError = unknown,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
-        TError,
-        void,
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationKey = ['cleanupTestDataApiTestCleanupPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
-        void
-    > = () => {
-        return cleanupTestDataApiTestCleanupPost();
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type CleanupTestDataApiTestCleanupPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>
->;
-
-export type CleanupTestDataApiTestCleanupPostMutationError = unknown;
-
-/**
- * @summary Cleanup Test Data
- */
-export const useCleanupTestDataApiTestCleanupPost = <TError = unknown, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
-            TError,
-            void,
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationOptions = getCleanupTestDataApiTestCleanupPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Full cleanup including users and projects
-Use at end of test suite
- * @summary Cleanup All Test Data
- */
-export const cleanupAllTestDataApiTestCleanupAllPost = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/api/test/cleanup-all`, method: 'POST', signal });
-};
-
-export const getCleanupAllTestDataApiTestCleanupAllPostMutationOptions = <
-    TError = unknown,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
-        TError,
-        void,
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationKey = ['cleanupAllTestDataApiTestCleanupAllPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
-        void
-    > = () => {
-        return cleanupAllTestDataApiTestCleanupAllPost();
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type CleanupAllTestDataApiTestCleanupAllPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>
->;
-
-export type CleanupAllTestDataApiTestCleanupAllPostMutationError = unknown;
-
-/**
- * @summary Cleanup All Test Data
- */
-export const useCleanupAllTestDataApiTestCleanupAllPost = <TError = unknown, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
-            TError,
-            void,
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
-    TError,
-    void,
-    TContext
-> => {
-    const mutationOptions = getCleanupAllTestDataApiTestCleanupAllPostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Simple health check for test router
- * @summary Test Health
- */
-export const testHealthApiTestHealthGet = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/api/test/health`, method: 'GET', signal });
-};
-
-export const getTestHealthApiTestHealthGetQueryKey = () => {
-    return [`/api/test/health`] as const;
-};
-
-export const getTestHealthApiTestHealthGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getTestHealthApiTestHealthGetQueryKey();
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>> = ({
-        signal,
-    }) => testHealthApiTestHealthGet(signal);
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type TestHealthApiTestHealthGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
->;
-export type TestHealthApiTestHealthGetQueryError = unknown;
-
-export function useTestHealthApiTestHealthGet<
-    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useTestHealthApiTestHealthGet<
-    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useTestHealthApiTestHealthGet<
-    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary Test Health
- */
-
-export function useTestHealthApiTestHealthGet<
-    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getTestHealthApiTestHealthGetQueryOptions(options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
-
-    query.queryKey = queryOptions.queryKey;
-
-    return query;
-}
-
-/**
  * Health check endpoint to verify API availability.
  * @summary Health Check
  */
@@ -13358,6 +13373,87 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
     ...overrideResponse,
 });
 
+export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetResponseMock =
+    (): AnalysisRunSummary[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            ran_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            ran_by_user_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ran_by_email: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            extraction_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            n_factors: faker.number.int({ min: undefined, max: undefined }),
+            rotation_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            flagging_mode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            notes: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+        }));
+
+export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetResponseMock = (
+    overrideResponse: Partial<AnalysisRunRead> = {}
+): AnalysisRunRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    ran_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ran_by_user_id: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    ran_by_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    extraction_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    n_factors: faker.number.int({ min: undefined, max: undefined }),
+    rotation_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    flagging_mode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    result: {},
+    ...overrideResponse,
+});
+
+export const getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchResponseMock = (
+    overrideResponse: Partial<AnalysisRunSummary> = {}
+): AnalysisRunSummary => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    ran_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ran_by_user_id: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    ran_by_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    extraction_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    n_factors: faker.number.int({ min: undefined, max: undefined }),
+    rotation_method: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    flagging_mode: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    notes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getListUsersApiAdminUsersGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseUserRead> = {}
 ): PaginatedResponseUserRead => ({
@@ -14957,6 +15053,102 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler =
     );
 };
 
+export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetMockHandler = (
+    overrideResponse?:
+        | AnalysisRunSummary[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<AnalysisRunSummary[]> | AnalysisRunSummary[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/analysis/runs',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetMockHandler = (
+    overrideResponse?:
+        | AnalysisRunRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<AnalysisRunRead> | AnalysisRunRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/analysis/runs/:runId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler = (
+    overrideResponse?:
+        | AnalysisRunSummary
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<AnalysisRunSummary> | AnalysisRunSummary),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/studies/:slug/analysis/runs/:runId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug/analysis/runs/:runId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -16118,114 +16310,6 @@ export const getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler = (
     );
 };
 
-export const getInitTestDbApiTestInitPostMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        '*/api/test/init',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
-export const getSeedTestDataApiTestSeedPostMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        '*/api/test/seed',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
-export const getAddTestMemberApiTestMembersPostMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        '*/api/test/members',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
-export const getCleanupTestDataApiTestCleanupPostMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        '*/api/test/cleanup',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
-export const getCleanupAllTestDataApiTestCleanupAllPostMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        '*/api/test/cleanup-all',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
-export const getTestHealthApiTestHealthGetMockHandler = (
-    overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
-    options?: RequestHandlerOptions
-) => {
-    return http.get(
-        '*/api/test/health',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
-        },
-        options
-    );
-};
-
 export const getHealthCheckHealthGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -16276,6 +16360,10 @@ export const getLibreQAPIMock = () => [
     getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler(),
     getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetMockHandler(),
     getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler(),
+    getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetMockHandler(),
+    getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetMockHandler(),
+    getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler(),
+    getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
@@ -16328,11 +16416,5 @@ export const getLibreQAPIMock = () => [
     getUploadAudioApiAudioUploadPostMockHandler(),
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),
     getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler(),
-    getInitTestDbApiTestInitPostMockHandler(),
-    getSeedTestDataApiTestSeedPostMockHandler(),
-    getAddTestMemberApiTestMembersPostMockHandler(),
-    getCleanupTestDataApiTestCleanupPostMockHandler(),
-    getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
-    getTestHealthApiTestHealthGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
 ];

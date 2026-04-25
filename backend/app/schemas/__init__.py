@@ -7,6 +7,9 @@ New code should import from the specific submodule.
 from .analysis import (
     AnalysisRequest,
     AnalysisResult,
+    AnalysisRunPatch,
+    AnalysisRunRead,
+    AnalysisRunSummary,
     EigenvalueResult,
     FactorCharacteristic,
     ParticipantLoading,
@@ -99,6 +102,9 @@ __all__ = [
     # analysis
     "AnalysisRequest",
     "AnalysisResult",
+    "AnalysisRunPatch",
+    "AnalysisRunRead",
+    "AnalysisRunSummary",
     "EigenvalueResult",
     "FactorCharacteristic",
     "ParticipantLoading",

@@ -256,3 +256,217 @@ class TestAnalysisRun:
             },
         )
         assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+class TestAnalysisRunHistory:
+    """Tests for the persisted-run audit-trail endpoints."""
+
+    async def test_run_persists_to_db_and_appears_in_list(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Run analysis
+        run_response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        assert run_response.status_code == 200
+
+        # List runs — should contain exactly one
+        list_response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/runs",
+            headers=headers,
+        )
+        assert list_response.status_code == 200
+        runs = list_response.json()
+        assert len(runs) == 1
+        run = runs[0]
+        assert run["extraction_method"] == "pca"
+        assert run["n_factors"] == 2
+        assert run["rotation_method"] == "varimax"
+        assert run["flagging_mode"] == "auto"
+        assert run["ran_by_email"] == test_user.email
+        assert run["notes"] is None
+
+    async def test_get_run_returns_full_result(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Run analysis to create a run
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+
+        # Find the run id
+        runs = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()
+        run_id = runs[0]["id"]
+
+        # Get full result
+        get_response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            headers=headers,
+        )
+        assert get_response.status_code == 200
+        full = get_response.json()
+        assert full["id"] == run_id
+        assert "result" in full
+        # The result payload should include the full AnalysisResult shape
+        assert full["result"]["n_factors"] == 2
+        assert "rotated_loadings" in full["result"]
+        assert "factor_characteristics" in full["result"]
+
+    async def test_patch_run_notes(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Run analysis
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        run_id = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()[0]["id"]
+
+        # Patch notes
+        patch_response = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"notes": "final analysis used in submission"},
+            headers=headers,
+        )
+        assert patch_response.status_code == 200
+        assert (
+            patch_response.json()["notes"]
+            == "final analysis used in submission"
+        )
+
+    async def test_delete_run(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Run analysis
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        run_id = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()[0]["id"]
+
+        # Delete
+        del_response = await client.delete(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            headers=headers,
+        )
+        assert del_response.status_code == 204
+
+        # List should now be empty
+        list_response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/runs",
+            headers=headers,
+        )
+        assert list_response.status_code == 200
+        assert list_response.json() == []
+
+    async def test_get_run_404_for_other_study(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """Runs are scoped to their study — accessing by id under a wrong slug
+        must 404, not leak across studies."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        run_id = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()[0]["id"]
+
+        # Same run id under a slug that does not exist → must be 404
+        bad = await client.get(
+            f"/api/admin/studies/no-such-slug/analysis/runs/{run_id}",
+            headers=headers,
+        )
+        assert bad.status_code == 404

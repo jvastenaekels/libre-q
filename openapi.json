@@ -1608,7 +1608,7 @@
           "Admin Analysis"
         ],
         "summary": "Run Factor Analysis",
-        "description": "Run a complete Q-method factor analysis.",
+        "description": "Run a complete Q-method factor analysis and persist it as an AnalysisRun.\n\nEvery successful run is saved to `analysis_runs` for audit-trail purposes\n(critical Q-methodology transparency requirement). The returned payload\nis unchanged for backward compatibility; the persisted run is retrievable\nvia the list / get endpoints below.",
         "operationId": "run_factor_analysis_api_admin_studies__slug__analysis_run_post",
         "security": [
           {
@@ -1648,6 +1648,240 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/analysis/runs": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "List Analysis Runs",
+        "description": "List all persisted analysis runs for this study, newest first.",
+        "operationId": "list_analysis_runs_api_admin_studies__slug__analysis_runs_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnalysisRunSummary"
+                  },
+                  "title": "Response List Analysis Runs Api Admin Studies  Slug  Analysis Runs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/analysis/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Get Analysis Run",
+        "description": "Retrieve a single persisted run including its full result payload.",
+        "operationId": "get_analysis_run_api_admin_studies__slug__analysis_runs__run_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRunRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Update Analysis Run",
+        "description": "Update the researcher annotation (`notes`) on a persisted run.\n\nOnly `notes` is editable; analytical choices and the result payload\nare immutable for audit-trail integrity.",
+        "operationId": "update_analysis_run_api_admin_studies__slug__analysis_runs__run_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRunPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRunSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Delete Analysis Run",
+        "description": "Delete a persisted run.\n\nUse sparingly: deleting a run removes evidence of an analytical choice\nfrom the audit trail. Researchers should normally annotate (via PATCH)\nrather than delete.",
+        "operationId": "delete_analysis_run_api_admin_studies__slug__analysis_runs__run_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -4769,166 +5003,6 @@
         }
       }
     },
-    "/api/test/init": {
-      "post": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Init Test Db",
-        "description": "Initialize test database - ensure tables exist\nThis is typically handled by app startup, but useful for explicit initialization",
-        "operationId": "init_test_db_api_test_init_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/seed": {
-      "post": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Seed Test Data",
-        "description": "Seed base test data: user and project\nIdempotent - won't create duplicates",
-        "operationId": "seed_test_data_api_test_seed_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestSeedData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/members": {
-      "post": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Add Test Member",
-        "description": "Add a user to a project for testing purposes",
-        "operationId": "add_test_member_api_test_members_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestMemberData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/cleanup": {
-      "post": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Cleanup Test Data",
-        "description": "Cleanup test data between tests\nRemoves all data except the base test user and project",
-        "operationId": "cleanup_test_data_api_test_cleanup_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/cleanup-all": {
-      "post": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Cleanup All Test Data",
-        "description": "Full cleanup including users and projects\nUse at end of test suite",
-        "operationId": "cleanup_all_test_data_api_test_cleanup_all_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/test/health": {
-      "get": {
-        "tags": [
-          "test"
-        ],
-        "summary": "Test Health",
-        "description": "Simple health check for test router",
-        "operationId": "test_health_api_test_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
     "/health": {
       "get": {
         "summary": "Health Check",
@@ -5131,6 +5205,181 @@
         ],
         "title": "AnalysisResult",
         "description": "Complete result of a Q-method factor analysis."
+      },
+      "AnalysisRunPatch": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes",
+            "description": "Researcher annotation, e.g. 'final analysis used in submission'."
+          }
+        },
+        "type": "object",
+        "title": "AnalysisRunPatch",
+        "description": "Partial update for a persisted run. Only `notes` is editable."
+      },
+      "AnalysisRunRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "ran_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ran At"
+          },
+          "ran_by_user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran By User Id"
+          },
+          "ran_by_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran By Email",
+            "description": "Email of the user who ran the analysis (joined from User; None if user deleted)."
+          },
+          "extraction_method": {
+            "type": "string",
+            "title": "Extraction Method"
+          },
+          "n_factors": {
+            "type": "integer",
+            "title": "N Factors"
+          },
+          "rotation_method": {
+            "type": "string",
+            "title": "Rotation Method"
+          },
+          "flagging_mode": {
+            "type": "string",
+            "title": "Flagging Mode"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "result": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Result",
+            "description": "Full AnalysisResult payload as it was returned at run time."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ran_at",
+          "extraction_method",
+          "n_factors",
+          "rotation_method",
+          "flagging_mode",
+          "result"
+        ],
+        "title": "AnalysisRunRead",
+        "description": "Full persisted run including the result payload."
+      },
+      "AnalysisRunSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "ran_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ran At"
+          },
+          "ran_by_user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran By User Id"
+          },
+          "ran_by_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran By Email",
+            "description": "Email of the user who ran the analysis (joined from User; None if user deleted)."
+          },
+          "extraction_method": {
+            "type": "string",
+            "title": "Extraction Method"
+          },
+          "n_factors": {
+            "type": "integer",
+            "title": "N Factors"
+          },
+          "rotation_method": {
+            "type": "string",
+            "title": "Rotation Method"
+          },
+          "flagging_mode": {
+            "type": "string",
+            "title": "Flagging Mode"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ran_at",
+          "extraction_method",
+          "n_factors",
+          "rotation_method",
+          "flagging_mode"
+        ],
+        "title": "AnalysisRunSummary",
+        "description": "Lightweight summary of a persisted analysis run, used in list views."
       },
       "AudioRecordingRead": {
         "properties": {
@@ -8903,86 +9152,6 @@
         ],
         "title": "TOTPVerify",
         "description": "Schema for TOTP verification."
-      },
-      "TestMemberData": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "project_slug": {
-            "type": "string",
-            "title": "Project Slug"
-          },
-          "role": {
-            "type": "string",
-            "title": "Role"
-          }
-        },
-        "type": "object",
-        "required": [
-          "email",
-          "project_slug",
-          "role"
-        ],
-        "title": "TestMemberData"
-      },
-      "TestProjectData": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "slug": {
-            "type": "string",
-            "title": "Slug"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "slug"
-        ],
-        "title": "TestProjectData"
-      },
-      "TestSeedData": {
-        "properties": {
-          "user": {
-            "$ref": "#/components/schemas/TestUserData"
-          },
-          "project": {
-            "$ref": "#/components/schemas/TestProjectData"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user",
-          "project"
-        ],
-        "title": "TestSeedData"
-      },
-      "TestUserData": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "password": {
-            "type": "string",
-            "title": "Password"
-          },
-          "is_superuser": {
-            "type": "boolean",
-            "title": "Is Superuser",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
-        "title": "TestUserData"
       },
       "Token": {
         "properties": {

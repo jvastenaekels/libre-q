@@ -5,16 +5,21 @@ import logging
 from typing import Any
 
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ...database import get_db
-from ...dependencies import check_study_permission
+from ...dependencies import check_study_permission, get_current_user
 from ...limiter import limiter
-from ...models import Study, StudyRole
+from ...models import AnalysisRun, Study, StudyRole, User
 from ...schemas import (
     AnalysisRequest,
     AnalysisResult,
+    AnalysisRunPatch,
+    AnalysisRunRead,
+    AnalysisRunSummary,
     EigenvalueResult,
     FactorCharacteristic,
     ParticipantLoading,
@@ -101,9 +106,16 @@ async def run_factor_analysis(
     request: Request,
     body: AnalysisRequest,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> AnalysisResult:
-    """Run a complete Q-method factor analysis."""
+    """Run a complete Q-method factor analysis and persist it as an AnalysisRun.
+
+    Every successful run is saved to `analysis_runs` for audit-trail purposes
+    (critical Q-methodology transparency requirement). The returned payload
+    is unchanged for backward compatibility; the persisted run is retrievable
+    via the list / get endpoints below.
+    """
     dump = await _get_analysis_dump(db, study.id)
 
     try:
@@ -229,7 +241,7 @@ async def run_factor_analysis(
             )
         )
 
-    return AnalysisResult(
+    analysis_result = AnalysisResult(
         n_participants=result["n_participants"],
         n_statements=result["n_statements"],
         n_factors=result["n_factors"],
@@ -252,4 +264,150 @@ async def run_factor_analysis(
         correlation_matrix=[
             [float(v) for v in row] for row in result["factor_correlation"]
         ],
+    )
+
+    # Persist the run as part of the audit trail. We persist on the success
+    # path only; failed analyses do not create runs (the user already saw
+    # the error and can retry with different parameters).
+    run = AnalysisRun(
+        study_id=study.id,
+        ran_by_user_id=current_user.id,
+        extraction_method=body.extraction,
+        n_factors=body.n_factors,
+        rotation_method=body.rotation,
+        flagging_mode=body.flagging,
+        notes=None,
+        result=analysis_result.model_dump(mode="json"),
+    )
+    db.add(run)
+    await db.commit()
+    logger.info(
+        "AnalysisRun persisted: study=%s run_id=%s by user_id=%s "
+        "(extraction=%s, rotation=%s, n_factors=%d, flagging=%s)",
+        study.slug,
+        run.id,
+        current_user.id,
+        body.extraction,
+        body.rotation,
+        body.n_factors,
+        body.flagging,
+    )
+
+    return analysis_result
+
+
+# ---- AnalysisRun history endpoints (audit trail) ----
+
+
+async def _load_run(
+    db: AsyncSession, study_id: int, run_id: int
+) -> AnalysisRun:
+    """Load a run scoped to the study, with `ran_by` user joined for email."""
+    stmt = (
+        select(AnalysisRun)
+        .options(selectinload(AnalysisRun.ran_by))
+        .where(AnalysisRun.id == run_id, AnalysisRun.study_id == study_id)
+    )
+    result = await db.execute(stmt)
+    run = result.scalar_one_or_none()
+    if run is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analysis run not found",
+        )
+    return run
+
+
+def _to_summary(run: AnalysisRun) -> AnalysisRunSummary:
+    return AnalysisRunSummary(
+        id=run.id,
+        ran_at=run.ran_at,
+        ran_by_user_id=run.ran_by_user_id,
+        ran_by_email=run.ran_by.email if run.ran_by else None,
+        extraction_method=run.extraction_method,
+        n_factors=run.n_factors,
+        rotation_method=run.rotation_method,
+        flagging_mode=run.flagging_mode,
+        notes=run.notes,
+    )
+
+
+@router.get("/{slug}/analysis/runs")
+async def list_analysis_runs(
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> list[AnalysisRunSummary]:
+    """List all persisted analysis runs for this study, newest first."""
+    stmt = (
+        select(AnalysisRun)
+        .options(selectinload(AnalysisRun.ran_by))
+        .where(AnalysisRun.study_id == study.id)
+        .order_by(desc(AnalysisRun.ran_at))
+    )
+    result = await db.execute(stmt)
+    runs = result.scalars().all()
+    return [_to_summary(r) for r in runs]
+
+
+@router.get("/{slug}/analysis/runs/{run_id}")
+async def get_analysis_run(
+    run_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> AnalysisRunRead:
+    """Retrieve a single persisted run including its full result payload."""
+    run = await _load_run(db, study.id, run_id)
+    return AnalysisRunRead(
+        id=run.id,
+        ran_at=run.ran_at,
+        ran_by_user_id=run.ran_by_user_id,
+        ran_by_email=run.ran_by.email if run.ran_by else None,
+        extraction_method=run.extraction_method,
+        n_factors=run.n_factors,
+        rotation_method=run.rotation_method,
+        flagging_mode=run.flagging_mode,
+        notes=run.notes,
+        result=run.result,
+    )
+
+
+@router.patch("/{slug}/analysis/runs/{run_id}")
+async def update_analysis_run(
+    run_id: int,
+    body: AnalysisRunPatch,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> AnalysisRunSummary:
+    """Update the researcher annotation (`notes`) on a persisted run.
+
+    Only `notes` is editable; analytical choices and the result payload
+    are immutable for audit-trail integrity.
+    """
+    run = await _load_run(db, study.id, run_id)
+    if body.notes is not None:
+        run.notes = body.notes
+    await db.commit()
+    await db.refresh(run)
+    return _to_summary(run)
+
+
+@router.delete("/{slug}/analysis/runs/{run_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_analysis_run(
+    run_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Delete a persisted run.
+
+    Use sparingly: deleting a run removes evidence of an analytical choice
+    from the audit trail. Researchers should normally annotate (via PATCH)
+    rather than delete.
+    """
+    run = await _load_run(db, study.id, run_id)
+    await db.delete(run)
+    await db.commit()
+    logger.info(
+        "AnalysisRun deleted: study=%s run_id=%s",
+        study.slug,
+        run_id,
     )
