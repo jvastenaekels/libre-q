@@ -1,5 +1,6 @@
 """API router for study submissions."""
 
+from typing import Any
 from uuid import UUID
 import logging
 
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 @limiter.limit("60/minute")
 async def submit_study(
     request: Request, data: SubmissionInput, db: AsyncSession = Depends(get_db)
-):
+) -> dict[str, Any]:
     """Submits or updates a study participation.
 
     Logic moved to StudyService for maintainability.
@@ -75,7 +76,7 @@ async def get_study(
     link_token: str | None = Query(None, description="Recruitment link token"),
     password: str | None = Query(None, description="Study access password"),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """Fetches study configuration for the frontend, including language resolution.
 
     If the study has randomize_statement_order=True and a session_token is provided,
@@ -120,7 +121,7 @@ async def unlock_study(
     password: str = Query(...),
     slug: str = Path(..., pattern="^[a-z0-9-]+$"),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Validate study access password."""
     study = await StudyService.get_study_by_slug(db, slug)
     if not study:

@@ -11,7 +11,6 @@ import {
 } from '@/api/generated';
 import type { AnalysisRunSummary, AnalysisResult } from '@/api/model';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -405,4 +404,3 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
         </div>
     );
 }
-
