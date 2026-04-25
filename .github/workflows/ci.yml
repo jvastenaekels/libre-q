@@ -192,6 +192,7 @@ jobs:
       PYTHONUNBUFFERED: "1"
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q
       ENVIRONMENT: test
+      IP_HASH_SALT: ci-deterministic-salt-not-secret
     steps:
       - uses: actions/checkout@v4
 
@@ -275,6 +276,7 @@ jobs:
       PYTHONUNBUFFERED: "1"
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q
       ENVIRONMENT: test
+      IP_HASH_SALT: ci-deterministic-salt-not-secret
     steps:
       - uses: actions/checkout@v4
 
