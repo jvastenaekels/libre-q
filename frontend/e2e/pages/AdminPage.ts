@@ -177,7 +177,7 @@ export class AdminPage extends BasePage {
         await this.page.getByRole('button', { name: /Close Study/i }).click();
 
         // Wait for status badge to update
-        await expect(this.page.getByRole('status')).toHaveText(/Closed/i);
+        await expect(this.page.getByTestId('study-status')).toHaveText(/Closed/i);
     }
 
     async verifyParticipant(text: string | RegExp) {
