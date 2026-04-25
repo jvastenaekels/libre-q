@@ -273,3 +273,25 @@ skipped_already_anonymous
 # RGPD erasure endpoints
 admin_erase_participant_personal_data
 participant_self_erase_personal_data
+
+# --- app/types/wire.py (TypedDict wire shapes — fields used at JSON boundary) ---
+# StepHelpEntry — what/why pair surfaced in DEFAULT_TRANSLATION_CONTENT
+what
+why
+# DeviceBreakdown — study stats device split
+mobile
+desktop
+
+# --- app/services/analysis_service.py (intermediate scientific values) ---
+# GridSlot — TypedDict consumed by build_sort_matrix wire boundary
+GridSlot
+# Loop bookkeeping retained for clarity of stat indices
+statement_idx
+# Outputs of factor_analyzer kept for parity with reference R kit even
+# when downstream consumers prefer rotated forms
+unrotated_loadings
+factor_correlation
+
+# --- app/services/export_service.py ---
+# Reported in export manifest for human review
+size_kb
