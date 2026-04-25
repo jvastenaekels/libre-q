@@ -4,6 +4,7 @@ import io
 import json
 import logging
 import zipfile
+from typing import Any, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -36,7 +37,7 @@ async def export_csv(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Export study results as CSV."""
     slug = study.slug
 
@@ -77,7 +78,7 @@ async def export_pqmethod(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Export study results in PQMethod format (ZIP)."""
     slug = study.slug
 
@@ -120,7 +121,7 @@ async def export_r_kit(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Export study results as R-Kit (ZIP with CSV + R Script)."""
     slug = study.slug
 
@@ -163,11 +164,13 @@ async def get_study_dump(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """Get complete study data and participant placements for client-side export generation."""
     from ...services.study_service import StudyService
 
-    return await StudyService.get_study_full_dump(db, study.id)
+    # StudyService.get_study_full_dump is a *args/**kwargs proxy returning Any;
+    # the underlying StudyDataService method is fully typed as StudyDump.
+    return cast(dict[str, Any], await StudyService.get_study_full_dump(db, study.id))
 
 
 @router.get("/{slug}/participants/{participant_id}/export/csv")
@@ -177,7 +180,7 @@ async def export_participant_csv(
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Export single participant results as CSV."""
     slug = study.slug
 
@@ -226,7 +229,7 @@ async def export_participant_json(
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """Export single participant results as JSON."""
     from ...services.study_service import StudyService
 
@@ -256,7 +259,7 @@ async def export_participant_audio(
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Export all audio recordings for a participant as a ZIP with metadata."""
     # Fetch participant with audio recordings
     query = (
@@ -346,7 +349,7 @@ async def get_research_package(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> StreamingResponse:
     """Get complete research package (ZIP) including CSV, JSON, codebook, etc."""
     # Fetch study with all relations needed for ExportService
     # ExportService needs participants and statements
