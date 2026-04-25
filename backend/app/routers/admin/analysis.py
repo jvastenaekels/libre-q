@@ -2,10 +2,9 @@
 
 import asyncio
 import logging
-from typing import Any
-
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from numpy.typing import NDArray
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -37,23 +36,24 @@ from ...services.analysis_service import (
     run_analysis,
 )
 from ...services.storage_service import storage_service
+from ...types.wire import SortDataDump, StatementDumpRecord
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Admin Analysis"])
 
 
-def _get_statement_text(stmt: dict, lang: str = "en") -> str:
+def _get_statement_text(stmt: StatementDumpRecord, lang: str = "en") -> str:
     """Get statement text for the preferred language, fallback to first available."""
-    for t in stmt.get("translations", []):
+    for t in stmt["translations"]:
         if t["lang"] == lang:
             return t["text"]
-    translations = stmt.get("translations", [])
-    return translations[0]["text"] if translations else stmt.get("code", "")
+    translations = stmt["translations"]
+    return translations[0]["text"] if translations else stmt["code"]
 
 
 def _build_z_scores_list(
-    z_scores: np.ndarray, s_idx: int, n_factors: int
+    z_scores: NDArray[np.float64], s_idx: int, n_factors: int
 ) -> list[float]:
     """Extract z-scores for a statement, replacing NaN with 0.0."""
     return [
@@ -63,17 +63,17 @@ def _build_z_scores_list(
 
 
 def _build_factor_arrays_list(
-    factor_arrays: np.ndarray, s_idx: int, n_factors: int
+    factor_arrays: NDArray[np.int64], s_idx: int, n_factors: int
 ) -> list[int]:
     """Extract factor array values for a statement."""
     return [int(factor_arrays[s_idx, f]) for f in range(n_factors)]
 
 
-async def _get_analysis_dump(db: AsyncSession, study_id: int) -> dict[str, Any]:
+async def _get_analysis_dump(db: AsyncSession, study_id: int) -> SortDataDump:
     """Get a lightweight study dump for analysis (no audio/presigned URLs)."""
-    from ...services.study_service import StudyService
+    from ...services.study_data_service import StudyDataService
 
-    return await StudyService.get_study_sort_data(db, study_id)
+    return await StudyDataService.get_study_sort_data(db, study_id)
 
 
 @router.get("/{slug}/analysis/eigenvalues")

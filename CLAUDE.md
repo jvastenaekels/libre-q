@@ -59,11 +59,15 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.storage_service` — boto3 stubs now ship; AudioUploadMetadata TypedDict eliminates Any
 - `app.services.concourse_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.recruitment_service` — ORM stub propagation resolved by models.py fix (wave 3b)
-- `app.services.analysis_service` — wave 3b post-mortem: AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry TypedDicts; build_sort_matrix keeps dict[str, Any] at wire boundary (type: ignore[explicit-any] with rationale)
+- `app.services.analysis_service` — wave 3b: AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry TypedDicts; wave 4: build_sort_matrix now typed SortDataDump|StudyDump → list[SortParticipantRecord], list[StatementDumpRecord]
 - `app.services.study_defaults` — wave 3b post-mortem: TranslationDefaults TypedDict replaces dict[str, Any]
 - `app.services.study_data_service` — wave 3b post-mortem: StudyDump, SortDataDump, StudyStats TypedDicts
 - `app.services.export_service` — wave 3b post-mortem: _AudioMapEntry TypedDict; presort/postsort config helpers keep dict[str, Any] (type: ignore[explicit-any], open-ended schema)
 - `app.types.wire`, `app.types` — new package: shared TypedDict wire shapes (Clusters 2-4)
+- `app.routers.audio` — wave 4 batch 1: 3 return types added
+- `app.routers.admin.recruitment` — wave 4 batch 1: List[T] → list[T], 3 return types
+- `app.routers.admin.users` — wave 4 batch 1: cast(PaginatedResponse[UserRead], …) aligns mypy with FastAPI serialisation
+- `app.routers.admin.analysis` — wave 4 batch 2: _get_analysis_dump returns SortDataDump; _get_statement_text typed StatementDumpRecord; typing.Any removed entirely
 
 **Strict without disallow_any_explicit** (Pydantic/SQLAlchemy stubs or load-bearing Any at JSON boundaries):
 - `app.core.config` — pydantic-settings BaseSettings stubs
@@ -71,11 +75,16 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.database`, `app.schema_validation`
 - All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
 - `app.models` — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary
+- `app.dependencies` — wave 4: Callable[…, Coroutine[Any,Any,T]] factory deps; Coroutine yield/send are always Any
+- `app.routers.logs` — wave 4 batch 1: LogEntry.context is dict[str, Any] (open-ended frontend error data)
+- `app.routers.admin.lifecycle` — wave 4 batch 1: Pydantic BaseModel classes in router (DataInventory etc.)
+- `app.routers.admin.invitations` — wave 4 batch 1: InvitationAccept Pydantic model; get_db import corrected
+- `app.routers.test` — wave 4 batch 1: 4 Pydantic model classes; 6 return types added
 
-Total: 40 modules under strict overrides (Phase 3 wave 3b post-mortem complete).
-Previous: 34 modules. Added 6: 4 services graduated + app.types.wire + app.types.
-Wave 3b post-mortem: TypedDicts introduced in app/types/wire.py (StudyDump, SortDataDump, StudyStats, TranslationDefaults etc.) and inline in analysis_service (AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry). Bug surfaced: study_service used DEFAULT_TRANSLATION_CONTENT.get("en", {}) — now fixed to use DEFAULT_TRANSLATION_CONTENT["en"] (guaranteed key).
-Next wave: heavy services (study_service, submission_service) and routers — typed JSON foundation laid here makes those easier (service→router boundaries are now TypedDict-precise).
+Total: 49 modules under strict overrides (Phase 3 wave 4 batches 1-2 complete).
+Previous: 40 modules. Added 9: dependencies + 7 routers + analysis_service update.
+Wave 4 highlights: build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict (had 31 errors — all annotation gaps).
+Next wave: remaining routers (studies, projects, studies_import_export, auth, participants, submissions, concourses, exports, studies_participants); then heavy services (study_service, submission_service).
 
 Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads, httpx.Response.json() wire data).
 

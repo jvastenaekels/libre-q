@@ -14,10 +14,17 @@ References:
 
 import logging
 from itertools import combinations
-from typing import Any, TypedDict, cast
+from typing import TypedDict, cast
 
 import numpy as np
 from numpy.typing import NDArray
+
+from app.types.wire import (
+    SortDataDump,
+    SortParticipantRecord,
+    StatementDumpRecord,
+    StudyDump,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -79,20 +86,12 @@ class AnalysisRunResult(TypedDict):
     consensus: list[StatementClassEntry]
 
 
-def build_sort_matrix(  # type: ignore[explicit-any]
-    dump: dict[str, Any],
-    # dict[str, Any] is the correct type here: this function sits at the boundary
-    # between the typed TypedDict world (SortDataDump/StudyDump) and the router's
-    # field-level access.  TypedDicts ARE structurally compatible with dict[str, Any],
-    # and the router accesses returned participant/statement dicts by known field names.
-    # Replacing with dict[str, object] would propagate object→ int/str errors into the
-    # router (wave 4 territory); Any at this one boundary avoids premature cascade.
-) -> tuple[NDArray[np.float64], list[dict[str, Any]], list[dict[str, Any]]]:  # type: ignore[explicit-any]
+def build_sort_matrix(
+    dump: "SortDataDump | StudyDump",
+) -> tuple[NDArray[np.float64], list[SortParticipantRecord], list[StatementDumpRecord]]:
     """Build the (n_statements x n_participants) sort matrix from a study dump.
 
-    Accepts a ``SortDataDump`` (or ``StudyDump``) TypedDict.  The TypedDicts
-    are the typed contracts; this function receives them as ``dict[str, Any]``
-    to avoid a mypy narrowing issue on TypedDict subscript in the union case.
+    Accepts a ``SortDataDump`` or ``StudyDump`` TypedDict.
 
     Only includes completed, non-discarded, non-test participants with
     complete Q-sort data (no missing scores).
@@ -100,13 +99,13 @@ def build_sort_matrix(  # type: ignore[explicit-any]
     Returns:
         Tuple of (matrix, valid_participants, statements) where:
         - matrix: shape (n_statements, n_participants)
-        - valid_participants: list of participant dicts that were included
-        - statements: list of statement dicts from the study
+        - valid_participants: list of SortParticipantRecord dicts that were included
+        - statements: list of StatementDumpRecord dicts from the study
     """
-    statements: list[dict[str, Any]] = dump["study"]["statements"]  # type: ignore[explicit-any]
+    statements: list[StatementDumpRecord] = dump["study"]["statements"]
     n_statements = len(statements)
 
-    valid_participants: list[dict[str, Any]] = []  # type: ignore[explicit-any]
+    valid_participants: list[SortParticipantRecord] = []
     columns: list[list[float]] = []
 
     for p in dump["participants"]:
@@ -123,12 +122,12 @@ def build_sort_matrix(  # type: ignore[explicit-any]
         if any(s is None for s in scores):
             continue
 
-        columns.append([float(s) for s in scores])
+        columns.append([float(s) for s in scores if s is not None])
         valid_participants.append(p)
 
     # Filter out zero-variance participants (all scores identical)
     filtered_columns: list[list[float]] = []
-    filtered_participants: list[dict[str, Any]] = []  # type: ignore[explicit-any]
+    filtered_participants: list[SortParticipantRecord] = []
     for col, p in zip(columns, valid_participants):
         if len(set(col)) > 1:
             filtered_columns.append(col)

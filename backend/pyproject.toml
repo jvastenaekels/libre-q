@@ -177,8 +177,8 @@ strict_equality = true
 # Residual Any rationale per service:
 #   analysis_service: _distribution_from_grid_config receives ORM JSON column
 #     (list[dict[str,object]]) — cast via int() with type: ignore[arg-type].
-#     build_sort_matrix stays dict[str,Any] to accept both SortDataDump and
-#     StudyDump without a union narrowing issue on TypedDict subscript.
+#     build_sort_matrix updated in wave 4 to accept SortDataDump | StudyDump
+#     (typed union) and return list[SortParticipantRecord], list[StatementDumpRecord].
 #   study_defaults: (no Any remaining — all eliminated by TranslationDefaults)
 #   study_data_service: presort/postsort answers are dict[str,object] (open
 #     survey responses) — kept as object, not Any.
@@ -192,6 +192,23 @@ module = [
     "app.services.export_service",
     "app.types.wire",
     "app.types",
+]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# Phase 3 wave 4 — batch 2 routers (full strict)
+# analysis: _get_analysis_dump now returns SortDataDump (calls StudyDataService directly,
+#   bypassing the untyped StudyService proxy); _get_statement_text typed to StatementDumpRecord;
+#   _build_z_scores_list / _build_factor_arrays_list typed to NDArray[np.float64/int64].
+#   build_sort_matrix cleanup: accepts SortDataDump | StudyDump, returns
+#   list[SortParticipantRecord] and list[StatementDumpRecord] — removing the last
+#   dict[str,Any] barrier in the analysis pipeline (wave 3b deferred item).
+#   typing.Any import removed entirely from the router.
+module = [
+    "app.routers.admin.analysis",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
