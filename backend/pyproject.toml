@@ -109,6 +109,28 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Phase 3 wave 1 — Group C schemas (Pydantic models)
+# disallow_any_explicit is omitted: Pydantic v2 BaseModel stubs expose Any
+# in __init_subclass__ / metaclass, so every class Foo(BaseModel) would be
+# flagged. Structurally-required Any fields (JSON blobs: presort_answers,
+# ui_labels, engine_kwargs) are acceptable at the schema boundary.
+module = [
+    "app.schemas.analysis",
+    "app.schemas.audio",
+    "app.schemas.auth",
+    "app.schemas.common",
+    "app.schemas.concourses",
+    "app.schemas.participants",
+    "app.schemas.projects",
+    "app.schemas.recruitment",
+    "app.schemas.studies",
+    "app.schemas.users",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

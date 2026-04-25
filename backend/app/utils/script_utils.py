@@ -37,7 +37,9 @@ class APIClient:
         else:
             self.client = httpx.AsyncClient(base_url=str(self.base_url), timeout=30.0)
 
-    async def login(self, email: str | None = None, password: str | None = None) -> None:
+    async def login(
+        self, email: str | None = None, password: str | None = None
+    ) -> None:
         """Authenticate and store the JWT token. Automatically fetches project context."""
         email = email or os.getenv("ADMIN_EMAIL", "admin@example.com")
         password = password or os.getenv("ADMIN_PASSWORD", "admin123")
