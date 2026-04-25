@@ -1,16 +1,16 @@
-# Q-Methodology: A Researcher's Guide
+# Q-methodology: a researcher's guide
 
-Q-methodology is a research approach for studying **subjectivity** — how people think about topics from their own perspective. Libre-Q provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
+Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Libre-Q provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-If you're new to Q-methodology, the rest of this document is a guided tour. If you already practice Q-methodology, the most useful section for you is probably ["Critical Q-methodology in Libre-Q"](#critical-q-methodology-in-libre-q) below, which states what Libre-Q implements, what it deliberately defers, and why.
+If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Libre-Q"](#critical-q-methodology-in-libre-q) below, which states what Libre-Q implements, what it defers, and why.
 
 ---
 
-## What is Q-Methodology?
+## What is Q-methodology?
 
 Q-methodology was developed by psychologist **William Stephenson** in 1935 as a way to study human subjectivity scientifically. Unlike surveys that count how many people agree with statements, Q-methodology reveals **patterns of viewpoints** across a population. The factor analysis is performed on the *participants* (not the variables), grouping individuals who share a similar pattern of preferences across the statement set.
 
-### Key Concepts
+### Key concepts
 
 | Term          | Definition                                                                                            |
 | ------------- | ----------------------------------------------------------------------------------------------------- |
@@ -27,7 +27,7 @@ Q-methodology was developed by psychologist **William Stephenson** in 1935 as a 
 
 ---
 
-## How Q-Methodology Works
+## How Q-methodology works
 
 ```mermaid
 flowchart TD
@@ -60,11 +60,11 @@ flowchart TD
 
 ---
 
-## The Q-Grid
+## The Q-grid
 
 The **Q-grid** is a forced quasi-normal distribution where participants place statements. The most common grid shapes are:
 
-### Standard Distribution (11-point scale, 36 statements)
+### Standard distribution (11-point scale, 36 statements)
 
 ```
      -5  -4  -3  -2  -1   0  +1  +2  +3  +4  +5
@@ -77,7 +77,7 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
       2   3   4   5   6   7   6   5   4   3   2  = 47 places
 ```
 
-### Compact Distribution (7-point scale, 20 statements)
+### Compact distribution (7-point scale, 20 statements)
 
 ```
          -3  -2  -1   0  +1  +2  +3
@@ -91,37 +91,37 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
 
 ---
 
-## Libre-Q Study Phases
+## Libre-Q study phases
 
 Libre-Q breaks the Q-sort into manageable phases:
 
-### 1. Pre-Sort (Optional)
+### 1. Pre-sort (optional)
 
 Collect demographic or contextual information about participants.
 
-### 2. Rough Sort
+### 2. Rough sort
 
 Participants quickly categorize all statements into three piles:
 
-- **Agree** — Statements that resonate with their view
-- **Neutral** — No strong opinion
-- **Disagree** — Statements that don't represent their view
+- **Agree:** statements that resonate with their view
+- **Neutral:** no strong opinion
+- **Disagree:** statements that don't represent their view
 
-### 3. Fine Sort
+### 3. Fine sort
 
 Participants place cards from each pile onto the Q-grid pyramid, forcing nuanced distinctions.
 
-### 4. Post-Sort
+### 4. Post-sort
 
 Participants explain why they placed their most extreme statements (e.g., +5 and -5) where they did.
 
 ---
 
-## Configuring Your Study
+## Configuring your study
 
 Libre-Q uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
 
-### Example Grid Configuration
+### Example grid configuration
 
 ```json
 {
@@ -143,16 +143,16 @@ Libre-Q uses JSON configuration to define studies. See the [Configuration Refere
 
 Q-methodology has historically split into two strands. **Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. **Critical Q** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
 
-Libre-Q is designed for the critical strand. The platform supports classical workflows as well — the underlying factor analysis is the same — but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
+Libre-Q is designed for the critical strand. The platform supports classical workflows too (the underlying factor analysis is the same), but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
 
 ### What this means in practice
 
 | Critical Q principle | How Libre-Q supports it |
 |----------------------|--------------------------|
-| Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`) — researchers can audit what was changed when, and explain those changes in their methods section. (See [Implemented and planned features](#implemented-and-planned-features) below for current state.) |
-| Researcher control over flagging | Auto-flagging is a starting point, not the final word. Flagging is exposed and editable per study; researcher decisions are part of the audit trail. |
-| Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface — supporting the critical Q practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
-| Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel — making the constructed nature of the P-set visible rather than implicit. |
+| Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. (See [Implemented and planned features](#implemented-and-planned-features) below for current state.) |
+| Researcher control over flagging | Auto-flagging is a starting point. Flagging is exposed and editable per study, and researcher decisions are part of the audit trail. |
+| Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the critical Q practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
+| Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel. The constructed nature of the P-set is visible rather than implicit. |
 | Multilingual studies | Statements, instructions, consent text, and the participant UI can be translated. Critical Q research often crosses language and cultural boundaries; this should not require reverse-engineering the platform. |
 | Self-hosted data residency | Libre-Q runs on the researcher's infrastructure; participant data does not transit through a third-party SaaS. Important for GDPR compliance, ethics committees, and the trust relationship with participants. |
 
@@ -175,19 +175,19 @@ Libre-Q is designed for the critical strand. The platform supports classical wor
 
 ### Deliberate limitations
 
-These are not oversights; they are scoped-out for the v0.1 release with explicit rationale.
+These are scoped out of the v0.1 release with explicit rationale.
 
-**Manual (judgmental) rotation is not currently supported.** Stainton Rogers (1997) and Watts & Stenner (2012) cite manual rotation as a moment where the researcher exercises explicit interpretive judgment, and Libre-Q's omission is a real gap from a strict critical Q standpoint. The reasoning for deferring it to v0.2:
+**Manual (judgmental) rotation is not currently supported.** Stainton Rogers (1997) and Watts & Stenner (2012) cite manual rotation as a moment where the researcher exercises explicit interpretive judgment, so the omission is a real gap from a strict critical Q standpoint. The reasoning for deferring it to v0.2:
 
-1. The mathematics is well-established but exposing it in a usable interface (interactive loadings table, paired-factor angle controls, real-time recomputation) is a substantial UX undertaking that we did not want to ship half-finished.
-2. Once the **AnalysisRun audit trail** is in place (v0.1 roadmap above), researchers using varimax can still fully document and justify their choice of rotation, partially compensating for the lack of judgmental rotation.
-3. As a workaround for v0.1, researchers requiring judgmental rotation can export their Q-sort matrix from Libre-Q in PQMethod or R `qmethod` format, perform the rotation in those tools, and document the choice in their methods section.
+1. The mathematics is well-established, but exposing it in a usable interface (interactive loadings table, paired-factor angle controls, real-time recomputation) is a substantial UX undertaking we did not want to ship half-finished.
+2. Once the **AnalysisRun audit trail** is in place (v0.1 roadmap above), researchers using varimax can fully document and justify their choice of rotation. This partially compensates for the lack of judgmental rotation.
+3. As a workaround for v0.1, researchers needing judgmental rotation can export their Q-sort matrix in PQMethod or R `qmethod` format, perform the rotation in those tools, and document the choice in their methods section.
 
-We acknowledge this gap and are committed to addressing it in v0.2.
+The gap is on the v0.2 plan.
 
 ---
 
-## Further Reading
+## Further reading
 
 ### Classical Q-methodology
 
@@ -206,14 +206,14 @@ We acknowledge this gap and are committed to addressing it in v0.2.
 
 ### Software references
 
-- Schmolck, P. — PQMethod manual (canonical desktop analysis software, classical lineage).
+- Schmolck, P. PQMethod manual (canonical desktop analysis software, classical lineage).
 - Banasick, S. (2019). KADE: A desktop application for Q methodology. _Journal of Open Source Software_, 4(36), 1360. https://doi.org/10.21105/joss.01360
 - Zabala, A. (2014). qmethod: A Package to Explore Human Perspectives Using Q Methodology. _The R Journal_, 6(2), 163–173. https://doi.org/10.32614/rj-2014-032
 - [Q Methodology Network](https://qmethod.org/)
 
 ---
 
-## Next Steps
+## Next steps
 
 - [Creating Studies](../guides/conducting-studies.md)
 - [Study Configuration](../reference/configuration.md)
