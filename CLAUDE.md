@@ -23,6 +23,7 @@ frontend/       # React SPA
 
 ```bash
 make install          # Install all dependencies
+make ci-fast          # Tight feedback loop: lint + types + unit tests (~30-90s)
 make ci               # Full local CI: lint + check + test + build (run before pushing)
 make lint             # Linting only (backend + frontend)
 make check            # Type checking, security, dead code, API sync, i18n
@@ -32,6 +33,9 @@ make generate-api     # Regenerate frontend API client from OpenAPI spec
 make migrate          # Run database migrations
 make migration-new    # Create a new Alembic migration
 ```
+
+**Inner-loop discipline:** `make ci-fast` between every change (~38s wall-clock).
+`make ci` before push (~3-5min). E2E only when touching admin-flow code.
 
 ## Python environment rules
 - This project uses a virtual environment strictly located in the `.venv` directory.

@@ -75,6 +75,21 @@ build:
 ci: lint check test build
 	@echo "\n--- Fast CI checks passed locally! (Skipped E2E) ---"
 
+# ci-fast — tight inner-loop feedback (~30-90s)
+# Skips: bandit, radon, vulture, pip-audit, deptry, schema-validation,
+#        check-relationships, check-api, i18n-check, build, e2e, integration tests.
+# Run this between every change. Use `make ci` before pushing.
+.PHONY: ci-fast
+ci-fast:
+	cd backend && uv run ruff check app/
+	cd backend && uv run ruff format --check app/
+	cd frontend && npm run lint
+	cd backend && uv run mypy app/
+	cd frontend && npm run type-check
+	cd backend && uv run pytest tests/unit/ -q
+	cd frontend && npm run test -- --run
+	@echo "\n--- ci-fast OK — run \`make ci\` before push. ---"
+
 db-reset:
 	cd backend && uv run python init_db.py --reset
 
