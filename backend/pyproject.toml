@@ -131,6 +131,26 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Phase 3 wave 2 — Batch 1 services (relaxed tier)
+# analysis_service: pure Python + NumPy; 3 casts added for numpy 2.x stub
+# gaps (arithmetic/bitwise ops return Any). Uses dict[str, Any] for JSON wire
+# data (study dump, grid_config, participant records) — structurally required.
+# study_defaults: pure i18n constants; uses dict[str, Any] for translation
+# content blobs (step_help nested structure) — structurally required.
+# recruitment_service: touches SQLAlchemy models; Mapped[dict] in models.py
+# lacks type params. One no-untyped-def fixed (record_start -> None).
+# disallow_any_explicit is omitted for all three: Any is load-bearing at the
+# JSON/ORM boundary.
+module = [
+    "app.services.analysis_service",
+    "app.services.study_defaults",
+    "app.services.recruitment_service",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

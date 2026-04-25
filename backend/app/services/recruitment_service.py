@@ -108,7 +108,7 @@ class RecruitmentService:
         return True
 
     @staticmethod
-    async def record_start(db: AsyncSession, link_id: int):
+    async def record_start(db: AsyncSession, link_id: int) -> None:
         """Increment start count for an individual or limited link."""
         stmt = (
             select(RecruitmentLink)

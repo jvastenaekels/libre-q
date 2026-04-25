@@ -14,7 +14,7 @@ References:
 
 import logging
 from itertools import combinations
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -135,7 +135,7 @@ def extract_pca(cor_mat: NDArray[np.float64], n_factors: int) -> NDArray[np.floa
 
     # Loadings = eigenvectors * sqrt(eigenvalues)
     loadings = eigenvectors * np.sqrt(eigenvalues)[np.newaxis, :]
-    return loadings
+    return cast(NDArray[np.float64], loadings)
 
 
 def extract_centroid(
@@ -310,7 +310,7 @@ def rotate_varimax(
 
     # Denormalize: restore original communalities
     rotated = rotated * communalities
-    return rotated
+    return cast(NDArray[np.float64], rotated)
 
 
 def standardize_factor_signs(
@@ -361,7 +361,7 @@ def flag_sorts(loadings: NDArray[np.float64], n_statements: int) -> NDArray[np.b
     # Condition 2: squared loading > sum of all other squared loadings
     cond2 = squared > (row_sums - squared)
 
-    return cond1 & cond2
+    return cast(NDArray[np.bool_], cond1 & cond2)
 
 
 def apply_manual_flags(
