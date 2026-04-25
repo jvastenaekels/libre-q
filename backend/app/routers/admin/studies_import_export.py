@@ -5,6 +5,7 @@ import logging
 import re
 import secrets
 from datetime import datetime, timezone
+from typing import Any, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
@@ -51,11 +52,12 @@ logger = logging.getLogger(__name__)
 async def get_study_stats(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """Get aggregated study statistics."""
     from app.services.study_data_service import StudyDataService
 
-    return await StudyDataService.get_study_stats(db, study.id)
+    # Service returns the StudyStats TypedDict; FastAPI serialises via response_model.
+    return cast(dict[str, Any], await StudyDataService.get_study_stats(db, study.id))
 
 
 # ------------------------------------------------------------------
@@ -68,7 +70,7 @@ async def export_study_config(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> JSONResponse:
     """
     Export study configuration without participant data.
     Returns clean JSON suitable for import.
@@ -199,11 +201,11 @@ def _get_grid_range(grid_config: list) -> str:
 @limiter.limit("30/minute")
 async def validate_study_import(
     request: Request,
-    config: dict,
+    config: dict[str, Any],
     current_user: User = Depends(get_current_user),
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
-):
+) -> "ValidationResult":
     """
     Validate imported configuration without creating study.
     Returns validation results and warnings.
@@ -211,12 +213,12 @@ async def validate_study_import(
     warnings = []
     errors = []
 
-    def add_error(key: str, **kwargs):
+    def add_error(key: str, **kwargs: Any) -> None:
         errors.append(
             json.dumps({"key": f"admin.import.validation.errors.{key}", **kwargs})
         )
 
-    def add_warning(key: str, **kwargs):
+    def add_warning(key: str, **kwargs: Any) -> None:
         warnings.append(
             json.dumps({"key": f"admin.import.validation.warnings.{key}", **kwargs})
         )
@@ -397,7 +399,7 @@ async def import_study_config(
         require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> "StudyImportResponse":
     """
     Import study configuration from exported JSON.
     Creates a new study in draft state.
@@ -514,7 +516,7 @@ async def get_study_storage_usage(
     slug: str,
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, Any]:
     """
     Get audio storage usage statistics for a study.
 

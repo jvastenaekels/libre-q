@@ -279,6 +279,11 @@ module = [
     # admin/projects: 5 return types (PaginatedResponse[ProjectWithRole|ProjectMemberRead]
     #   via cast, None x2 for delete endpoints, InvitationLink for invite creation).
     "app.routers.admin.projects",
+    # admin/studies_import_export: 7 return types + 2 inner helper functions typed.
+    #   dict[str, Any] x4 for service-derived stats / open-ended export config;
+    #   ValidationResult / StudyImportResponse for the validation + import endpoints.
+    #   inner add_error/add_warning use **kwargs: Any (mixed wire types).
+    "app.routers.admin.studies_import_export",
 ]
 disallow_untyped_defs = true
 warn_return_any = true
