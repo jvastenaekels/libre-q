@@ -1,0 +1,62 @@
+cff-version: 1.2.0
+message: "If you use Libre-Q in your research, please cite both the software (this entry) and the SoftwareX paper (preferred-citation below)."
+type: software
+title: "Libre-Q: An open-source platform for Q-methodology research"
+abstract: >-
+  Libre-Q is a self-hosted, open-source web application that integrates
+  the complete Q-methodology workflow — study design, recruitment,
+  online data collection, factor analysis, and export — into a single
+  platform. It supports any device, multilingual studies, and exports
+  to PQMethod, Ken-Q Analysis, and the R qmethod package. Designed for
+  critical Q-methodology practice, with attention to transparency of
+  analytical choices and integration of post-sort participant voice.
+version: "0.1.0"
+date-released: "2026-04-25"
+url: "https://github.com/jvastenaekels/libre-q"
+repository-code: "https://github.com/jvastenaekels/libre-q"
+license: "AGPL-3.0-or-later"
+# After tagging v0.1.0-softwarex and the Zenodo webhook archives the release,
+# replace the placeholder below with the assigned DOI.
+# doi: "10.5281/zenodo.XXXXXXX"
+authors:
+  - family-names: "Vastenaekels"
+    given-names: "Julien"
+    email: "julien.vastenaekels@univ-reims.fr"
+    affiliation: "Université de Reims Champagne-Ardenne"
+    # Replace with real ORCID before submission:
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Dedinger"
+    given-names: "Clémence"
+    email: "clemence.dedinger@univ-reims.fr"
+    affiliation: "Université de Reims Champagne-Ardenne"
+    # Replace with real ORCID before submission:
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+# CFF 1.2.0 has no per-author "roles" field. The contribution distribution is:
+#   J. Vastenaekels — software design, implementation, documentation, maintenance
+#   C. Dedinger — methodological design, testing, conceptual feedback, and co-author
+#                 of the accompanying SoftwareX paper (no direct code contribution)
+# This distinction is documented in the README ## Acknowledgments section.
+keywords:
+  - "Q methodology"
+  - "critical Q methodology"
+  - "factor analysis"
+  - "subjectivity research"
+  - "online data collection"
+  - "open science"
+  - "research software"
+preferred-citation:
+  type: article
+  title: "Libre-Q: An open-source platform for Q-methodology research"
+  authors:
+    - family-names: "Vastenaekels"
+      given-names: "Julien"
+      email: "julien.vastenaekels@univ-reims.fr"
+      affiliation: "Université de Reims Champagne-Ardenne"
+    - family-names: "Dedinger"
+      given-names: "Clémence"
+      email: "clemence.dedinger@univ-reims.fr"
+      affiliation: "Université de Reims Champagne-Ardenne"
+  journal: "SoftwareX"
+  year: 2026
+  # Replace on acceptance:
+  # doi: "10.1016/j.softx.2026.XXXXXX"

@@ -162,6 +162,53 @@ Contributions are welcome. Please read the guidelines before submitting a PR:
 
 ---
 
+## Citation
+
+If you use Libre-Q in your research, please cite both the software and the accompanying paper. Machine-readable metadata is in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar).
+
+**Software (Zenodo archive):**
+
+> Vastenaekels, J., & Dedinger, C. (2026). *Libre-Q: An open-source platform for Q-methodology research* (Version 0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+
+(DOI assigned automatically by Zenodo at the first tagged release; will be filled in here once available.)
+
+**Paper (SoftwareX):**
+
+> Vastenaekels, J., & Dedinger, C. (2026). Libre-Q: An open-source platform for Q-methodology research. *SoftwareX*. https://doi.org/10.1016/j.softx.2026.XXXXXX
+
+(DOI assigned by Elsevier on acceptance.)
+
+---
+
+## Acknowledgments
+
+**Author contributions:**
+
+- **Julien Vastenaekels** — software architecture, implementation, documentation, maintenance, paper co-author.
+- **Clémence Dedinger** (Université de Reims Champagne-Ardenne) — methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology, paper co-author. No direct code contribution.
+
+**Methodological grounding:** Libre-Q's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
+
+**Tools and dependencies:** Libre-Q would not exist without the open-source ecosystem it builds on — FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many others. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
+
+---
+
+## AI usage disclosure
+
+In the spirit of [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Libre-Q's development:
+
+Generative AI assistants (primarily Anthropic Claude, with occasional cross-checks via OpenAI Codex) were used during development and documentation:
+
+- **Code generation and refactoring:** AI assistants drafted parts of the implementation (notably some boilerplate FastAPI routers, React components, and test scaffolding), which were then reviewed, edited, and integrated by the human author.
+- **Documentation drafting:** README, tutorials, and inline documentation were partially drafted with AI assistance and edited for accuracy and tone.
+- **Code review and audit:** A multi-axis pre-submission code audit was conducted with AI sub-agents (see `docs/audits/`); findings were reviewed and prioritised by the human author before remediation.
+
+**Human responsibility:** All architectural decisions, methodological choices (extraction method, rotation, flagging logic), security-sensitive code paths, and the final published version are the responsibility of the listed authors. AI-generated content was reviewed and edited prior to inclusion.
+
+**Reproducibility:** This disclosure is also recorded in the SoftwareX submission letter and in the project's commit history (commits co-authored with `Claude Opus 4.7` and `Codex` markers in trailer lines).
+
+---
+
 ## License
 
 This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
