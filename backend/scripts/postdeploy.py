@@ -59,7 +59,14 @@ def main():
     run_task("scripts/migrate.py", "Database Schema Migration")
 
     # 2. Initialize Database (Create missing tables)
-    run_task("init_db.py", "Infrastructure Initialization")
+    # `--skip-migrations` because step 1 above already ran alembic upgrade.
+    # Without this flag, postdeploy would call alembic twice on every
+    # deploy (audit F-09-007).
+    run_task(
+        "init_db.py",
+        "Infrastructure Initialization",
+        args=["--skip-migrations"],
+    )
 
     # 3. Sync Study Configuration (User Managed)
     # Automatic seeding is disabled to respect researcher-controlled environments.

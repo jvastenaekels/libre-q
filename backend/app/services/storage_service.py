@@ -7,7 +7,7 @@
 import asyncio
 import logging
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -105,7 +105,7 @@ class StorageService:
         # Generate S3 key with timestamp for uniqueness.
         # question_key is sanitised before being concatenated into the path
         # — see _sanitise_question_key for the threat model.
-        timestamp = int(datetime.utcnow().timestamp())
+        timestamp = int(datetime.now(UTC).timestamp())
         extension = self._get_extension(content_type)
         safe_question_key = _sanitise_question_key(question_key)
         s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{safe_question_key}{extension}"

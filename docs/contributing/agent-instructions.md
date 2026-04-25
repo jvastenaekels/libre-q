@@ -14,7 +14,7 @@
 ### Backend (Python/FastAPI)
 - **Entry:** [backend/app/main.py](../../backend/app/main.py) — FastAPI app with middleware, exception handlers, CORS.
 - **Models:** [backend/app/models.py](../../backend/app/models.py) — SQLAlchemy async models (Projects, Studies, Participants, Submissions).
-- **Schemas:** [backend/app/schemas.py](../../backend/app/schemas.py) — Pydantic validation schemas; all HTTP I/O uses these.
+- **Schemas:** [backend/app/schemas/](../../backend/app/schemas/) — Pydantic validation schemas; all HTTP I/O uses these.
 - **Services:** [backend/app/services/](../../backend/app/services/) — Business logic layer (study_service, export_service, recruitment_service).
 - **Routers:** [backend/app/routers/](../../backend/app/routers/) — HTTP endpoint definitions; delegate to services.
 - **Database:** PostgreSQL with Alembic migrations; use `python init_db.py` to reset locally.
@@ -51,7 +51,7 @@ cd backend && uv run python scripts/migrate.py
 ```
 
 ### 2. Backend Feature Workflow (Architect-Builder Pattern)
-1. **Define the Type:** Update [backend/app/schemas.py](../../backend/app/schemas.py) with Pydantic models (no `Any` types).
+1. **Define the Type:** Update [backend/app/schemas/](../../backend/app/schemas/) with Pydantic models (no `Any` types).
 2. **Define the Endpoint:** Add router in [backend/app/routers/](../../backend/app/routers/) or [backend/app/routers/admin/](../../backend/app/routers/admin/).
 3. **Write the Trap (Failing Test):** [backend/tests/integration/](../../backend/tests/integration/) or [backend/tests/unit/](../../backend/tests/unit/).
 4. **Implement Logic:** [backend/app/services/](../../backend/app/services/) using SQLAlchemy models.

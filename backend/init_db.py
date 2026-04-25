@@ -120,14 +120,25 @@ async def seed_data():
 def main():
     print("--- Initializing Database Infrastructure ---")
     reset_flag = "--reset" in sys.argv
+    # When called from postdeploy, migrations have already run via
+    # scripts/migrate.py — passing --skip-migrations avoids running
+    # `alembic upgrade head` a second time on every deploy
+    # (audit F-09-007).
+    skip_migrations = "--skip-migrations" in sys.argv
 
     if reset_flag:
         print("⚠️  WARNING: This will drop all existing data!")
         # 1. Reset Schema (Async)
         asyncio.run(reset_schema())
 
-    # 2. Run Migrations (Sync - creates new loop internally)
-    run_migrations()
+    if not skip_migrations:
+        # 2. Run Migrations (Sync - creates new loop internally)
+        run_migrations()
+    else:
+        print(
+            "1. Skipping migrations (--skip-migrations); assuming caller "
+            "already ran `alembic upgrade head`."
+        )
 
     # 3. Seed Data (Async)
     asyncio.run(seed_data())
