@@ -53,11 +53,20 @@ make migration-new    # Create a new Alembic migration
 
 The following backend modules are under `mypy --strict` (see `[[tool.mypy.overrides]]` in `backend/pyproject.toml`). When you add a new utility/leaf module, opt into the same bar by adding it to the overrides list:
 
-- `app.utils.security`
-- `app.utils.audit`
-- `app.resume_codes`
+**Full strict (disallow_any_explicit + disallow_untyped_defs + warn_return_any + strict_equality):**
+- `app.utils.security`, `app.utils.audit`, `app.resume_codes`
+- `app.exceptions`, `app.limiter`, `app.utils.crypto`, `app.utils.email`, `app.utils.script_utils`
 
-Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads).
+**Strict without disallow_any_explicit** (pydantic-settings or Pydantic BaseModel stubs expose Any at class definition level):
+- `app.core.config` — pydantic-settings BaseSettings stubs
+- `app.middleware.security`, `app.middleware.errors`, `app.middleware.spa`
+- `app.database`, `app.schema_validation`
+- All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
+
+Total: 25 modules under strict overrides (Phase 3 wave 1 complete).
+Services and routers are future waves (Phase 3 wave 2-3).
+
+Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads, httpx.Response.json() wire data).
 
 ### Internationalization
 - All user-facing strings must use `useTranslation()` / `t()` with a key and English fallback: `t('key', 'Fallback')`
