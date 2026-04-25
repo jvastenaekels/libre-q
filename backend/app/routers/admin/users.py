@@ -10,6 +10,7 @@ from ...limiter import limiter
 from ...models import User
 from ...schemas import UserCreate, UserRead
 from ...schemas.common import PaginatedResponse
+from ...utils.audit import log_admin_action
 from ...utils.security import get_password_hash
 
 router = APIRouter(tags=["Admin Users"])
@@ -41,7 +42,7 @@ async def create_user(
     request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
-    _admin: User = Depends(check_superuser),
+    admin: User = Depends(check_superuser),
 ):
     """Create a new user."""
     # Check if user already exists
@@ -61,6 +62,14 @@ async def create_user(
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    log_admin_action(
+        actor_user_id=admin.id,
+        action="create",
+        resource="user",
+        resource_id=new_user.id,
+        is_superuser=new_user.is_superuser,
+        is_active=new_user.is_active,
+    )
     return new_user
 
 
@@ -86,4 +95,11 @@ async def delete_user(
 
     await db.execute(delete(User).where(User.id == user_id))
     await db.commit()
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="delete",
+        resource="user",
+        resource_id=user_id,
+        target_email=user.email,
+    )
     return None

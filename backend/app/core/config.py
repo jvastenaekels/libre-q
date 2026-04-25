@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Error reporting (optional). Leave SENTRY_DSN empty to disable.
+    # When set, errors are reported to Sentry tagged with ENVIRONMENT.
+    SENTRY_DSN: str | None = None
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.0  # 0 = no perf traces; raise to ~0.1 in prod
+
     # CORS — comma-separated origin list. Defaults cover local dev (Vite + preview).
     # In production set explicit origins via env, e.g.
     #   ALLOWED_ORIGINS=https://libre-q.example.org,https://staging.libre-q.example.org

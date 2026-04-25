@@ -32,7 +32,7 @@ async def test_create_user_success(db: AsyncSession):
     admin_user = User(id=1, email="admin@example.com", is_superuser=True)
 
     result = await create_user(
-        request=_mock_request(), user_in=user_in, db=db, _admin=admin_user
+        request=_mock_request(), user_in=user_in, db=db, admin=admin_user
     )
 
     assert result.email == "newuser@example.com"
@@ -70,7 +70,7 @@ async def test_create_duplicate_user_fails(db: AsyncSession):
 
     with pytest.raises(HTTPException) as excinfo:
         await create_user(
-            request=_mock_request(), user_in=user_in, db=db, _admin=admin_user
+            request=_mock_request(), user_in=user_in, db=db, admin=admin_user
         )
 
     assert excinfo.value.status_code == status.HTTP_400_BAD_REQUEST

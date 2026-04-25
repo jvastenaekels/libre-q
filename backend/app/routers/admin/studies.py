@@ -34,6 +34,7 @@ from app.schemas import StudyCreate, StudyRead, StudyUpdate
 from app.schemas.concourses import ConcourseImportToStudy, StaleStatementRead
 from app.schemas.common import PaginatedResponse
 from app.services.study_service import StudyService
+from app.utils.audit import log_admin_action
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -158,6 +159,7 @@ async def change_study_state(
     request: Request,
     new_state: StudyState,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Change study state (Draft <-> Active <-> Closed <-> Archived)."""
@@ -176,6 +178,7 @@ async def change_study_state(
                 },
             )
 
+    previous_state = study.state
     try:
         study.state = new_state
         await db.commit()
@@ -186,6 +189,16 @@ async def change_study_state(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while changing study state",
         )
+
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="state_change",
+        resource="study",
+        resource_id=study.id,
+        slug=study.slug,
+        previous_state=previous_state.value,
+        new_state=new_state.value,
+    )
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
     if updated_study is None:
@@ -207,6 +220,13 @@ async def reset_study_participants(
     from app.services.study_data_service import StudyDataService
 
     await StudyDataService.reset_study_participants(db, study.id)
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="reset_participants",
+        resource="study",
+        resource_id=study.id,
+        slug=study.slug,
+    )
     return None
 
 
@@ -233,9 +253,18 @@ async def delete_study(
 
     from app.services.study_data_service import StudyDataService
 
+    deleted_slug = study.slug
+    deleted_id = study.id
     await StudyDataService.delete_audio_files_for_study(db, study.id)
     await db.delete(study)
     await db.commit()
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="delete",
+        resource="study",
+        resource_id=deleted_id,
+        slug=deleted_slug,
+    )
     return None
 
 

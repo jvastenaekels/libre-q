@@ -24,6 +24,7 @@ from app.schemas import (
     ProjectWithRole,
 )
 from app.schemas.common import PaginatedResponse
+from app.utils.audit import log_admin_action
 from app.utils.security import create_invitation_token
 from app.utils.email import send_invitation_email
 from app.core.config import settings
@@ -252,6 +253,7 @@ async def update_project_member(
     user_id: int,
     member_in: ProjectMemberUpdate,
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ) -> ProjectMember:
     """
@@ -273,6 +275,7 @@ async def update_project_member(
             status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
         )
 
+    previous_role = member.role
     try:
         member.role = member_in.role
         await db.commit()
@@ -284,6 +287,16 @@ async def update_project_member(
             detail="An unexpected error occurred while updating member role",
         )
     await db.refresh(member, attribute_names=["role"])
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="role_change",
+        resource="project_member",
+        resource_id=member.id,
+        project_slug=project.slug,
+        target_user_id=user_id,
+        previous_role=previous_role.value,
+        new_role=member.role.value,
+    )
     return member
 
 
@@ -316,6 +329,7 @@ async def remove_project_member(
             status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
         )
 
+    removed_role = member.role
     try:
         await db.delete(member)
         await db.commit()
@@ -327,12 +341,23 @@ async def remove_project_member(
             detail="An unexpected error occurred while removing the member",
         )
 
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="remove_member",
+        resource="project_member",
+        resource_id=member.id,
+        project_slug=project.slug,
+        target_user_id=user_id,
+        previous_role=removed_role.value,
+    )
+
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
 async def delete_project(
     request: Request,
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -356,6 +381,8 @@ async def delete_project(
             detail=f"Cannot delete project with {study_count} existing studies. Please delete them first.",
         )
 
+    deleted_id = project.id
+    deleted_slug = project.slug
     try:
         await db.delete(project)
         await db.commit()
@@ -366,6 +393,13 @@ async def delete_project(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while deleting the project",
         )
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="delete",
+        resource="project",
+        resource_id=deleted_id,
+        slug=deleted_slug,
+    )
 
 
 @router.post("/{slug}/invitations", response_model=InvitationLink)
