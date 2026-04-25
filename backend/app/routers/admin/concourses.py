@@ -1,6 +1,7 @@
 """Admin routes for concourse management."""
 
 import logging
+from typing import cast
 
 from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +14,17 @@ from app.dependencies import (
     require_project_role,
 )
 from app.limiter import limiter
-from app.models import User, Project, ProjectMember, ProjectRole
+from app.models import (
+    Concourse,
+    ConcourseItem,
+    ConcourseItemComment,
+    ConcourseItemVersion,
+    ConcourseTag,
+    Project,
+    ProjectMember,
+    ProjectRole,
+    User,
+)
 from app.schemas.common import PaginatedResponse
 from app.schemas.concourses import (
     ConcourseCreate,
@@ -46,7 +57,7 @@ logger = logging.getLogger(__name__)
 async def list_tags(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[ConcourseTag]:
     project, _ = project_ctx
     return await ConcourseService.list_tags(db, project.id)
 
@@ -64,7 +75,7 @@ async def create_tag(
         require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> ConcourseTag:
     project, _ = project_ctx
     return await ConcourseService.create_tag(db, project.id, data)
 
@@ -78,7 +89,7 @@ async def delete_tag(
         require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     project, _ = project_ctx
     await ConcourseService.delete_tag(db, project.id, tag_id)
     return None
@@ -121,7 +132,7 @@ async def list_concourses(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[ConcourseRead]:
     project, _ = project_ctx
     concourses, total = await ConcourseService.list_concourses(
         db, project.id, pagination.limit, pagination.offset
@@ -139,8 +150,11 @@ async def list_concourses(
         )
         for c in concourses
     ]
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    return cast(
+        PaginatedResponse[ConcourseRead],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -149,7 +163,7 @@ async def get_concourse(
     concourse_id: int,
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
-):
+) -> Concourse:
     project, _ = project_ctx
     concourse = await ConcourseService.get_concourse(db, concourse_id)
     # Verify project ownership
@@ -176,7 +190,7 @@ async def update_concourse(
         require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> Concourse:
     project, _ = project_ctx
     return await ConcourseService.update_concourse(db, project.id, concourse_id, data)
 
@@ -190,7 +204,7 @@ async def delete_concourse(
         require_project_role(ProjectRole.owner)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     project, _ = project_ctx
     concourse = await ConcourseService.get_concourse(db, concourse_id)
     if concourse.project_id != project.id:
@@ -221,7 +235,7 @@ async def create_item(
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> ConcourseItem:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     return await ConcourseService.create_item(db, concourse_id, data, current_user.id)
@@ -242,7 +256,7 @@ async def bulk_create_items(
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[ConcourseItem]:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     return await ConcourseService.bulk_create_items(
@@ -265,7 +279,7 @@ async def import_items_from_text(
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[ConcourseItem]:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     return await ConcourseService.bulk_import_text(
@@ -288,7 +302,7 @@ async def update_item(
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> ConcourseItem:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     return await ConcourseService.update_item(
@@ -309,7 +323,7 @@ async def delete_item(
         require_project_role(ProjectRole.researcher)
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     await ConcourseService.delete_item(db, concourse_id, item_id)
@@ -331,7 +345,7 @@ async def list_item_versions(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> list[ConcourseItemVersion]:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
@@ -350,7 +364,7 @@ async def list_item_comments(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> list[ConcourseItemComment]:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
@@ -375,7 +389,7 @@ async def create_item_comment(
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> ConcourseItemComment:
     project, _ = project_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, project.id)
     await ConcourseService._verify_item_ownership(db, item_id, concourse_id)

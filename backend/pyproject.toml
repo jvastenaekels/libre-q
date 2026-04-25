@@ -267,6 +267,10 @@ module = [
     #   StaleStatementEntry TypedDict imported from concourse_service (Phase 3 wave 3b strict);
     #   FastAPI serialises to StaleStatementRead via response_model.
     "app.routers.admin.studies",
+    # admin/concourses: 15 return types (Concourse, ConcourseItem, ConcourseItemComment,
+    #   ConcourseItemVersion, ConcourseTag x2, list[ORM] x4, None x3, PaginatedResponse[ConcourseRead]).
+    #   FastAPI serialises ORM models to their Pydantic Read counterparts via response_model.
+    "app.routers.admin.concourses",
 ]
 disallow_untyped_defs = true
 warn_return_any = true
