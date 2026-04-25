@@ -4,6 +4,7 @@
 
 """Database configuration and session management."""
 
+from collections.abc import AsyncGenerator
 from typing import Any, cast
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -72,7 +73,7 @@ class Base(DeclarativeBase):
     pass
 
 
-async def get_db():
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency that provides an async database session."""
     async with SessionLocal() as db:
         yield db

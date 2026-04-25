@@ -5,6 +5,7 @@ by falling back to index.html for non-API, non-asset paths.
 """
 
 import os
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -41,7 +42,7 @@ def mount_spa(app: FastAPI) -> None:
     if not os.path.exists(FRONTEND_DIST):
 
         @app.get("/", include_in_schema=False)
-        def read_root():
+        def read_root() -> dict[str, str]:
             """Root endpoint when frontend is not mounted."""
             return {"Hello": "Frontend build not found. API is running."}
 
@@ -55,7 +56,7 @@ def mount_spa(app: FastAPI) -> None:
     )
 
     @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_spa(full_path: str):
+    async def serve_spa(full_path: str) -> Any:  # type: ignore[explicit-any]  # FastAPI route returns FileResponse or raises
         """Serve SPA static files and handle client-side routing."""
         # 1. Never serve SPA for missing API routes
         if full_path.startswith("api"):

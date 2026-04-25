@@ -10,7 +10,7 @@ import logging
 import sys
 from typing import List, Tuple
 
-from sqlalchemy import inspect
+from sqlalchemy import Connection, inspect
 
 from app.database import engine
 
@@ -32,7 +32,7 @@ async def validate_schema() -> None:
     async with engine.connect() as conn:
         issues: List[Tuple[str, str]] = []
 
-        def _check(connection):
+        def _check(connection: Connection) -> None:
             inspector = inspect(connection)
             tables = inspector.get_table_names()
 

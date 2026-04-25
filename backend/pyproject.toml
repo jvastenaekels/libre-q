@@ -92,6 +92,23 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Phase 3 wave 1 — Group B domain leaves
+# middleware.errors uses Any for generic HTTP error detail payloads;
+# database uses dict[str, Any] for SQLAlchemy engine kwargs.
+# disallow_any_explicit is omitted here because some Any is structurally
+# required (HTTP error detail is truly untyped, engine_kwargs is a catch-all).
+module = [
+    "app.middleware.security",
+    "app.middleware.errors",
+    "app.middleware.spa",
+    "app.database",
+    "app.schema_validation",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3
