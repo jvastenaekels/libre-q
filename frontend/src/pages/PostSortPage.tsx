@@ -14,6 +14,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 
+import { EraseMyDataDialog } from '../components/EraseMyDataDialog';
 import { ShareStudyLinks } from '../components/postsort/ShareStudyLinks';
 import { Step1_Feedback } from '../components/postsort/Step1_Feedback';
 import { Step2_Questionnaire } from '../components/postsort/Step2_Questionnaire';
@@ -132,6 +133,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 <ShareStudyLinks
                     studyUrl={`${window.location.origin}/study/${slug}`}
                     studyTitle={config.title}
+                />
+                <EraseMyDataDialog
+                    slug={slug || ''}
+                    sessionToken={useSessionStore.getState().token}
                 />
             </div>
         );

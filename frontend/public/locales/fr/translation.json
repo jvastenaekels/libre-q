@@ -2227,5 +2227,19 @@
     "study_code_placeholder": "ex. mon-etude",
     "go_to_study": "Accéder à l'étude",
     "resetting_session": "Réinitialisation de la session…"
+  },
+  "erasure": {
+    "section_title": "Votre droit à l'effacement (RGPD Art. 17)",
+    "section_intro": "Vous pouvez demander la suppression de vos données personnelles à tout moment. Vos classements anonymes d'énoncés seront conservés comme données de recherche ; tout ce qui pourrait permettre de vous identifier sera supprimé.",
+    "button": "Demander la suppression de mes données",
+    "confirm_title": "Effacer vos données personnelles ?",
+    "confirm_what_erased": "Seront supprimés définitivement : l'adresse IP enregistrée avec votre session, l'identifiant de votre navigateur, vos réponses textuelles (pré- et post-tri), et tout enregistrement audio que vous avez fourni.",
+    "confirm_what_kept": "Vos classements d'énoncés seront conservés comme données de recherche anonymes — ils ne seront plus reliés à vous.",
+    "confirm_irreversible": "Cette action est immédiate et irréversible.",
+    "confirm_action": "Oui, effacer mes données",
+    "confirm_in_progress": "Effacement…",
+    "success": "Vos données personnelles ont été supprimées. Vos classements anonymes restent dans l'étude.",
+    "error": "Nous n'avons pas pu traiter votre demande. Réessayez ou contactez la chercheuse.",
+    "already_erased": "Vos données personnelles ont été supprimées pour cette session."
   }
 }
