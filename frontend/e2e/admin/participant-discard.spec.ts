@@ -58,7 +58,10 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         testDb,
     }) => {
         await testDb.loginToAdminUI(page);
-        await page.goto(`/admin/studies/${studySlug}/exports`);
+        // Phase 5D rename: /admin/studies/{slug}/exports → /app/{project}/studies/{slug}/data.
+        // (LegacyRedirect handles /admin/* but the segment "exports" no longer exists.)
+        const projectSlug = testDb.getWorkspaceSlug();
+        await page.goto(`/app/${projectSlug}/studies/${studySlug}/data`);
 
         // Verify table loads with 2 records
         await expect(page.locator('table')).toBeVisible({ timeout: 15000 });

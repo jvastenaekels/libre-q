@@ -15,23 +15,31 @@ export class AdminPage extends BasePage {
     }
 
     async createStudy(title: string, slug: string) {
-        // Handle sidebar if mobile
-        // Need to know if mobile? Can check page viewport or try/catch.
-        // Assuming desktop for now based on original test structure, or can add logic.
+        // Post-Phase-5D: study creation moved from the sidebar's study-switcher
+        // dropdown to a "Create study" button on the project dashboard.
+        // The user is dropped on /app/{projectSlug}/dashboard after login.
         const sidebarTrigger = this.page.locator('[data-sidebar="trigger"]');
         if (await sidebarTrigger.isVisible()) {
             await sidebarTrigger.click().catch(() => {});
         }
 
-        await this.page.getByTestId('study-switcher').click();
-        await this.page.getByRole('menuitem', { name: /add study/i }).click();
+        await this.page
+            .getByRole('button', { name: /create study/i })
+            .first()
+            .click();
+        // CreateStudyDialog opens. Form labels: "Study Title", "URL Slug", language checkboxes.
         await this.page.getByLabel(/study title/i).fill(title);
         await this.page.getByLabel(/url slug/i).fill(slug);
 
         const createResponsePromise = this.page.waitForResponse(
             (resp) => resp.url().includes('/api/admin/studies') && resp.status() === 201
         );
-        await this.page.getByRole('button', { name: /create/i }).click();
+        // The dialog's submit button reads "Create Study" (same string as the
+        // dashboard trigger). Scope to the dialog with role=dialog parent to disambiguate.
+        await this.page
+            .getByRole('dialog')
+            .getByRole('button', { name: /create study/i })
+            .click();
         await createResponsePromise;
         await expect(this.page).toHaveURL(new RegExp(`/studies/${slug}`));
     }
@@ -186,5 +194,4 @@ export class AdminPage extends BasePage {
         await this.page.keyboard.press('Enter');
         await expect(this.page).toHaveURL('/login');
     }
-
 }

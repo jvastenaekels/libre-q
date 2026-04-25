@@ -31,7 +31,8 @@ test.describe('Admin Profile Management', () => {
         // Validate password change — short password
         await page.getByLabel('New Password').fill('123');
         await page.getByRole('button', { name: 'Change Password' }).click();
-        await expect(page.getByText('Min 8 characters required')).toBeVisible();
+        // Locale renders "Min 8 characters" (admin.profile.password.validation.min_length).
+        await expect(page.getByText('Min 8 characters')).toBeVisible();
 
         // Validate password change — wrong current password
         await page.getByLabel('Current Password').fill('wrongpass');
