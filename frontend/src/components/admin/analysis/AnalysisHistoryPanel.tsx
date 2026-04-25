@@ -406,5 +406,3 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
     );
 }
 
-// Re-export Button for convenience in parent if needed
-export { Button };

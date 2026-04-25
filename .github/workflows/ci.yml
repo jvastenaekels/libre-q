@@ -91,7 +91,11 @@ jobs:
       - name: Install dependencies
         run: cd backend && uv sync
       - name: Unit Tests (Pytest)
-        run: cd backend && uv run pytest -n auto tests
+        # -n auto disabled in CI: parallel workers race on CREATE TYPE for
+        # the same enum (UniqueViolationError on pg_type_typname_nsp_index).
+        # Local dev still uses -n auto via Makefile; the safety margin in CI
+        # is not worth the wall-clock saving.
+        run: cd backend && uv run pytest tests
 
   frontend-lint:
     name: Frontend Lint & Quality

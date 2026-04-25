@@ -16,8 +16,10 @@
         "src/api/model/**",
         "src/components/ui/**",
         "src/styles/**",
+        "src/types/*.d.ts",
         "e2e/**"
     ],
+    "ignoreExportsUsedInFile": true,
     "ignoreBinaries": [
         "python3"
     ],
