@@ -12,14 +12,29 @@ vi.mock('sonner', () => ({
 }));
 
 // Hoisted mocks for the generated API hooks
-const { mockEigenvaluesHook, mockAnalysisMutationHook } = vi.hoisted(() => ({
+const {
+    mockEigenvaluesHook,
+    mockAnalysisMutationHook,
+    mockListRunsHook,
+    mockUpdateRunMutation,
+    mockDeleteRunMutation,
+} = vi.hoisted(() => ({
     mockEigenvaluesHook: vi.fn(),
     mockAnalysisMutationHook: vi.fn(),
+    mockListRunsHook: vi.fn(),
+    mockUpdateRunMutation: vi.fn(),
+    mockDeleteRunMutation: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
     useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet: mockEigenvaluesHook,
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost: mockAnalysisMutationHook,
+    useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet: mockListRunsHook,
+    useUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch: mockUpdateRunMutation,
+    useDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete: mockDeleteRunMutation,
+    getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: vi.fn(() => [
+        '/api/admin/studies/test-study/analysis/runs',
+    ]),
 }));
 
 // Mock react-router-dom
@@ -150,6 +165,15 @@ describe('AnalysisPage', () => {
             mutate: vi.fn(),
             isPending: false,
         });
+        // History panel hooks — return empty state by default so they don't interfere
+        mockListRunsHook.mockReturnValue({
+            data: [],
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+        });
+        mockUpdateRunMutation.mockReturnValue({ mutate: vi.fn(), isPending: false });
+        mockDeleteRunMutation.mockReturnValue({ mutate: vi.fn(), isPending: false });
     });
 
     it('renders loading state while eigenvalues fetch', () => {

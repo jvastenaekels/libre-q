@@ -13,6 +13,8 @@ import {
     AlertTriangle,
     Download,
     RefreshCw,
+    History,
+    X,
 } from 'lucide-react';
 import { ApiError } from '@/api/client';
 
@@ -40,7 +42,7 @@ import {
     useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet,
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost,
 } from '@/api/generated';
-import type { AnalysisResult } from '@/api/model';
+import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
 
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 import { GuidanceCard } from '@/components/admin/GuidanceCard';
@@ -49,6 +51,7 @@ import { FactorLoadingsTable } from '@/components/admin/analysis/FactorLoadingsT
 import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
 import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
 import { FactorCharacteristicsTable } from '@/components/admin/analysis/FactorCharacteristicsTable';
+import { AnalysisHistoryPanel } from '@/components/admin/analysis/AnalysisHistoryPanel';
 
 function downloadBlob(blob: Blob, filename: string) {
     const url = window.URL.createObjectURL(blob);
@@ -115,6 +118,9 @@ export default function AnalysisPage() {
 
     // Analysis result state
     const [result, setResult] = useState<AnalysisResult | null>(null);
+
+    // Historical run view state: when a past run is loaded, track which run it is
+    const [viewingRun, setViewingRun] = useState<AnalysisRunSummary | null>(null);
 
     // Persist control state to URL params
     const syncParams = useCallback(
@@ -186,6 +192,7 @@ export default function AnalysisPage() {
             {
                 onSuccess: (data) => {
                     setResult(data);
+                    setViewingRun(null); // clear historical view when fresh analysis runs
                     syncParams(extraction, nFactors, rotation, flagging);
                     toast.success(
                         t('admin.analysis.success', 'Analysis complete — {{n}} factors extracted', {
@@ -212,6 +219,23 @@ export default function AnalysisPage() {
         syncParams,
         t,
     ]);
+
+    const handleLoadHistoricalRun = useCallback(
+        (historicalResult: AnalysisResult, run: AnalysisRunSummary) => {
+            if (!historicalResult || !run) {
+                // Called when the currently-viewed historical run was deleted
+                setViewingRun(null);
+                return;
+            }
+            setResult(historicalResult);
+            setViewingRun(run);
+        },
+        []
+    );
+
+    const handleClearHistoricalView = useCallback(() => {
+        setViewingRun(null);
+    }, []);
 
     const handleToggleFlag = useCallback((participantDbId: number, factorNumber: number) => {
         setManualFlags((prev) => {
@@ -554,6 +578,47 @@ export default function AnalysisPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Analysis history */}
+            <AnalysisHistoryPanel
+                slug={slug}
+                currentRunId={viewingRun?.id ?? null}
+                onLoadRun={handleLoadHistoricalRun}
+            />
+
+            {/* Historical run banner */}
+            {viewingRun && (
+                <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+                    <History className="size-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1">
+                        {t(
+                            'admin.analysis.history.viewing_banner',
+                            'Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}',
+                            {
+                                date: new Date(viewingRun.ran_at).toLocaleString(undefined, {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                }),
+                                extraction: viewingRun.extraction_method.toUpperCase(),
+                                n: viewingRun.n_factors,
+                                rotation: viewingRun.rotation_method,
+                            }
+                        )}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearHistoricalView}
+                        className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    >
+                        <X className="size-3.5" aria-hidden="true" />
+                        {t('admin.analysis.history.back_to_current', 'Back to current')}
+                    </Button>
+                </div>
+            )}
 
             {/* Results */}
             {result && (
