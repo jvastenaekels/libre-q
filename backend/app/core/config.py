@@ -24,6 +24,19 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # CORS — comma-separated origin list. Defaults cover local dev (Vite + preview).
+    # In production set explicit origins via env, e.g.
+    #   ALLOWED_ORIGINS=https://libre-q.example.org,https://staging.libre-q.example.org
+    ALLOWED_ORIGINS: str = (
+        "http://localhost:5173,http://localhost:4173,"
+        "http://127.0.0.1:5173,http://127.0.0.1:4173"
+    )
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Parsed CORS origin list — used by CORSMiddleware."""
+        return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
+
     # Mail
     SMTP_TLS: bool = True
     SMTP_PORT: int | None = 587

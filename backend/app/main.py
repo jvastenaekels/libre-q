@@ -1,7 +1,6 @@
 """Main FastAPI application entry point."""
 
 import logging
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
@@ -111,16 +110,11 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Rate Limiter Middleware
 app.add_middleware(SlowAPIMiddleware)
 
-# CORS configuration
-origins_raw = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:4173",
-)
-origins = [o.strip() for o in origins_raw.split(",")]
-
+# CORS configuration — origin list is sourced from Settings.ALLOWED_ORIGINS
+# (see backend/app/core/config.py and .env.example).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
