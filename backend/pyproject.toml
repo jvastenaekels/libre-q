@@ -57,6 +57,25 @@ target-version = "py313"
 [tool.deptry]
 known_first_party = ["app"]
 
+# mypy — global config is permissive (project default).
+# Per-module strict overrides build up incrementally per the v0.2 quality
+# roadmap (Phase 1H, Phase 3F). Strict modules are the documented
+# higher-bar surface; new modules should opt in here.
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "app.utils.security",
+    "app.utils.audit",
+    "app.resume_codes",
+]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

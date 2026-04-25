@@ -19,7 +19,6 @@ participant data, plaintext passwords, or token values.
 """
 
 import logging
-from typing import Any
 
 audit_logger = logging.getLogger("app.audit")
 
@@ -30,7 +29,7 @@ def log_admin_action(
     action: str,
     resource: str,
     resource_id: int | str | None = None,
-    **details: Any,
+    **details: object,
 ) -> None:
     """Emit a structured audit entry for a security-relevant admin operation.
 

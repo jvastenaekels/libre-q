@@ -49,6 +49,16 @@ make migration-new    # Create a new Alembic migration
 - No non-null assertions (`!`) — handle null values explicitly.
 - Run `npm run lint:fix` (frontend) or `uv run ruff format` (backend) to auto-fix formatting.
 
+### Strict-typed Python modules
+
+The following backend modules are under `mypy --strict` (see `[[tool.mypy.overrides]]` in `backend/pyproject.toml`). When you add a new utility/leaf module, opt into the same bar by adding it to the overrides list:
+
+- `app.utils.security`
+- `app.utils.audit`
+- `app.resume_codes`
+
+Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads).
+
 ### Internationalization
 - All user-facing strings must use `useTranslation()` / `t()` with a key and English fallback: `t('key', 'Fallback')`
 - Three locales: `en`, `fr`, `fi` — keep all translation files in sync

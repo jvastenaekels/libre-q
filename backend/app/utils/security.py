@@ -32,7 +32,7 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(
-    subject: str | Any, expires_delta: timedelta | None = None
+    subject: str | object, expires_delta: timedelta | None = None
 ) -> str:
     """Create a JWT access token."""
     if expires_delta:
@@ -78,12 +78,17 @@ def create_invitation_token(
     return cast(str, encoded_jwt)
 
 
-def decode_invitation_token(token: str) -> dict[str, Any]:
-    """Decode and validate an invitation token."""
+def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
+    """Decode and validate an invitation token.
+
+    The return type is `dict[str, Any]` because JWT payloads carry
+    untyped wire data; callers downcast individual fields. Using
+    `Any` here is a deliberate exception to the strict module rule.
+    """
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
-    return cast(dict[str, Any], payload)
+    return cast(dict[str, Any], payload)  # type: ignore[explicit-any]
 
 
 def generate_totp_secret() -> str:
