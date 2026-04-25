@@ -17,6 +17,7 @@ import {
     Settings2,
     Wand2,
     Table,
+    ShieldCheck,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { ProjectSwitcher } from './ProjectSwitcher';
@@ -276,6 +277,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: can('study:view_data'),
                   },
                   {
+                      title: t('admin.sidebar.lifecycle', 'Data lifecycle'),
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/lifecycle`,
+                      icon: ShieldCheck,
+                      show: can('study:edit_settings'),
+                  },
+                  {
                       title: t('admin.sidebar.analysis', 'Analysis'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/analysis`,
                       icon: ChartColumnStacked,
@@ -341,6 +348,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/data`
                                     : `/admin/studies/${activeStudyId}/exports`,
                           icon: Table,
+                      },
+                      {
+                          title: t('admin.sidebar.lifecycle', 'Data lifecycle'),
+                          url:
+                              projectSlug && activeStudyId
+                                  ? `/app/${projectSlug}/studies/${activeStudyId}/lifecycle`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/lifecycle`
+                                    : `/admin/studies/${activeStudyId}/lifecycle`,
+                          icon: ShieldCheck,
                       },
                       {
                           title: t('admin.sidebar.analysis', 'Analysis'),
