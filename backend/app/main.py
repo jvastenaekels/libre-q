@@ -28,6 +28,7 @@ from app.routers.admin import concourses as admin_concourses
 from app.routers.admin import analysis as admin_analysis
 from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
+from app.routers.admin import lifecycle as admin_lifecycle
 from app.routers.admin import recruitment as admin_recruitment
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
@@ -146,6 +147,9 @@ app.include_router(
 )
 app.include_router(
     admin_analysis.router, prefix="/api/admin/studies", tags=["admin-analysis"]
+)
+app.include_router(
+    admin_lifecycle.router, prefix="/api/admin/studies", tags=["admin-lifecycle"]
 )
 app.include_router(
     admin_exports.router, prefix="/api/admin/studies", tags=["admin-exports"]

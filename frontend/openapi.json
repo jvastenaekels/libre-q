@@ -2012,6 +2012,118 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/data-inventory": {
+      "get": {
+        "tags": [
+          "admin-lifecycle",
+          "Admin Lifecycle"
+        ],
+        "summary": "Get Data Inventory",
+        "description": "Read-only snapshot of the study's data footprint.\n\nDesigned to be cheap (a handful of aggregated counts); refreshes on\nevery page load. Refresh frequency is up to the operator.",
+        "operationId": "get_data_inventory_api_admin_studies__slug__data_inventory_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataInventory"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/anonymise-bulk": {
+      "post": {
+        "tags": [
+          "admin-lifecycle",
+          "Admin Lifecycle"
+        ],
+        "summary": "Bulk Anonymise Old Participants",
+        "description": "Anonymise completed participants whose submitted_at is older\nthan `submitted_before`.\n\nUse case: end-of-project retention enforcement. Researcher sets a\ncutoff (e.g., 18 months post-publication) and the platform removes\nPII from older participants while preserving their Q-sort rankings\nas anonymous research data.\n\nAlready-anonymised participants are skipped (counted separately\nin the response).\n\nAudit-trail logged with the cutoff and the count.",
+        "operationId": "bulk_anonymise_old_participants_api_admin_studies__slug__anonymise_bulk_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAnonymiseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkAnonymiseResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -5545,6 +5657,29 @@
         "title": "AnalysisRunSummary",
         "description": "Lightweight summary of a persisted analysis run, used in list views."
       },
+      "AudioInventory": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "total_bytes": {
+            "type": "integer",
+            "title": "Total Bytes"
+          },
+          "total_mb": {
+            "type": "number",
+            "title": "Total Mb"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "total_bytes",
+          "total_mb"
+        ],
+        "title": "AudioInventory"
+      },
       "AudioRecordingRead": {
         "properties": {
           "question_key": {
@@ -5798,6 +5933,45 @@
         "type": "object",
         "title": "BrandingBase",
         "description": "Schema for study branding."
+      },
+      "BulkAnonymiseRequest": {
+        "properties": {
+          "submitted_before": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted Before",
+            "description": "ISO timestamp; only completed participants with submitted_at strictly before this are anonymised."
+          }
+        },
+        "type": "object",
+        "required": [
+          "submitted_before"
+        ],
+        "title": "BulkAnonymiseRequest",
+        "description": "Bulk anonymise completed participants whose submitted_at is older\nthan the given cutoff."
+      },
+      "BulkAnonymiseResult": {
+        "properties": {
+          "candidates": {
+            "type": "integer",
+            "title": "Candidates"
+          },
+          "anonymised": {
+            "type": "integer",
+            "title": "Anonymised"
+          },
+          "skipped_already_anonymous": {
+            "type": "integer",
+            "title": "Skipped Already Anonymous"
+          }
+        },
+        "type": "object",
+        "required": [
+          "candidates",
+          "anonymised",
+          "skipped_already_anonymous"
+        ],
+        "title": "BulkAnonymiseResult"
       },
       "ConcourseCreate": {
         "properties": {
@@ -6649,6 +6823,46 @@
         "title": "ConsentResponse",
         "description": "Schema for the consent endpoint response."
       },
+      "DataInventory": {
+        "properties": {
+          "study_slug": {
+            "type": "string",
+            "title": "Study Slug"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "participants": {
+            "$ref": "#/components/schemas/ParticipantBuckets"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioInventory"
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/TimelineSnapshot"
+          },
+          "locales": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Locales",
+            "description": "Participant count by language_used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "study_slug",
+          "generated_at",
+          "participants",
+          "audio",
+          "timeline"
+        ],
+        "title": "DataInventory",
+        "description": "Per-study data inventory snapshot."
+      },
       "DraftSaveInput": {
         "properties": {
           "session_token": {
@@ -7144,6 +7358,44 @@
         ],
         "title": "ParticipantAudioRecording",
         "description": "Audio recording with the owning participant's id, used in admin\nmulti-participant fetches (e.g., the per-factor voice panel in the\nanalysis page)."
+      },
+      "ParticipantBuckets": {
+        "properties": {
+          "started": {
+            "type": "integer",
+            "title": "Started"
+          },
+          "completed": {
+            "type": "integer",
+            "title": "Completed"
+          },
+          "discarded": {
+            "type": "integer",
+            "title": "Discarded"
+          },
+          "test_runs": {
+            "type": "integer",
+            "title": "Test Runs"
+          },
+          "anonymised": {
+            "type": "integer",
+            "title": "Anonymised"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "started",
+          "completed",
+          "discarded",
+          "test_runs",
+          "anonymised",
+          "total"
+        ],
+        "title": "ParticipantBuckets"
       },
       "ParticipantDetailRead": {
         "properties": {
@@ -9395,6 +9647,65 @@
         ],
         "title": "TOTPVerify",
         "description": "Schema for TOTP verification."
+      },
+      "TimelineSnapshot": {
+        "properties": {
+          "first_submission_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Submission At"
+          },
+          "last_submission_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Submission At"
+          },
+          "last_anonymisation_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Anonymisation At"
+          },
+          "completed_older_than_1y": {
+            "type": "integer",
+            "title": "Completed Older Than 1Y",
+            "description": "Completed participants whose submitted_at is more than 1 year ago"
+          },
+          "completed_older_than_2y": {
+            "type": "integer",
+            "title": "Completed Older Than 2Y",
+            "description": "Completed participants whose submitted_at is more than 2 years ago"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_submission_at",
+          "last_submission_at",
+          "last_anonymisation_at",
+          "completed_older_than_1y",
+          "completed_older_than_2y"
+        ],
+        "title": "TimelineSnapshot"
       },
       "Token": {
         "properties": {

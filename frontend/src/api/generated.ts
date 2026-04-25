@@ -25,6 +25,7 @@ import type {
     AnalysisRunPatch,
     BodyLoginForAccessTokenApiTokenPost,
     BodyUploadAudioApiAudioUploadPost,
+    BulkAnonymiseRequest,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
     ConcourseCreate,
     ConcourseImportToStudy,
@@ -93,6 +94,7 @@ import type {
     AnalysisRunSummary,
     AudioRecordingRead,
     AudioUploadResponse,
+    BulkAnonymiseResult,
     ConcourseDetailRead,
     ConcourseItemCommentRead,
     ConcourseItemRead,
@@ -100,6 +102,7 @@ import type {
     ConcourseRead,
     ConcourseTagRead,
     ConsentResponse,
+    DataInventory,
     EigenvalueResult,
     InvitationLink,
     PaginatedResponseConcourseRead,
@@ -4490,6 +4493,270 @@ export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
 
     return query;
 }
+
+/**
+ * Read-only snapshot of the study's data footprint.
+
+Designed to be cheap (a handful of aggregated counts); refreshes on
+every page load. Refresh frequency is up to the operator.
+ * @summary Get Data Inventory
+ */
+export const getDataInventoryApiAdminStudiesSlugDataInventoryGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<DataInventory>({
+        url: `/api/admin/studies/${slug}/data-inventory`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryKey = (slug?: string) => {
+    return [`/api/admin/studies/${slug}/data-inventory`] as const;
+};
+
+export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>
+    > = ({ signal }) => getDataInventoryApiAdminStudiesSlugDataInventoryGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>
+>;
+export type GetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryError = HTTPValidationError;
+
+export function useGetDataInventoryApiAdminStudiesSlugDataInventoryGet<
+    TData = Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDataInventoryApiAdminStudiesSlugDataInventoryGet<
+    TData = Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDataInventoryApiAdminStudiesSlugDataInventoryGet<
+    TData = Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Data Inventory
+ */
+
+export function useGetDataInventoryApiAdminStudiesSlugDataInventoryGet<
+    TData = Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getDataInventoryApiAdminStudiesSlugDataInventoryGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Anonymise completed participants whose submitted_at is older
+than `submitted_before`.
+
+Use case: end-of-project retention enforcement. Researcher sets a
+cutoff (e.g., 18 months post-publication) and the platform removes
+PII from older participants while preserving their Q-sort rankings
+as anonymous research data.
+
+Already-anonymised participants are skipped (counted separately
+in the response).
+
+Audit-trail logged with the cutoff and the count.
+ * @summary Bulk Anonymise Old Participants
+ */
+export const bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost = (
+    slug: string,
+    bulkAnonymiseRequest: BulkAnonymiseRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<BulkAnonymiseResult>({
+        url: `/api/admin/studies/${slug}/anonymise-bulk`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: bulkAnonymiseRequest,
+        signal,
+    });
+};
+
+export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<
+            ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>
+        >,
+        TError,
+        { slug: string; data: BulkAnonymiseRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>>,
+    TError,
+    { slug: string; data: BulkAnonymiseRequest },
+    TContext
+> => {
+    const mutationKey = ['bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<
+            ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>
+        >,
+        { slug: string; data: BulkAnonymiseRequest }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type BulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>>
+    >;
+export type BulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMutationBody =
+    BulkAnonymiseRequest;
+export type BulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Bulk Anonymise Old Participants
+ */
+export const useBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>
+            >,
+            TError,
+            { slug: string; data: BulkAnonymiseRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof bulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost>>,
+    TError,
+    { slug: string; data: BulkAnonymiseRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Export study results as CSV.
@@ -13947,6 +14214,58 @@ export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetRes
             participant_db_id: faker.number.int({ min: undefined, max: undefined }),
         }));
 
+export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetResponseMock = (
+    overrideResponse: Partial<DataInventory> = {}
+): DataInventory => ({
+    study_slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    generated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    participants: {
+        started: faker.number.int({ min: undefined, max: undefined }),
+        completed: faker.number.int({ min: undefined, max: undefined }),
+        discarded: faker.number.int({ min: undefined, max: undefined }),
+        test_runs: faker.number.int({ min: undefined, max: undefined }),
+        anonymised: faker.number.int({ min: undefined, max: undefined }),
+        total: faker.number.int({ min: undefined, max: undefined }),
+    },
+    audio: {
+        count: faker.number.int({ min: undefined, max: undefined }),
+        total_bytes: faker.number.int({ min: undefined, max: undefined }),
+        total_mb: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    },
+    timeline: {
+        first_submission_at: faker.helpers.arrayElement([
+            `${faker.date.past().toISOString().split('.')[0]}Z`,
+            null,
+        ]),
+        last_submission_at: faker.helpers.arrayElement([
+            `${faker.date.past().toISOString().split('.')[0]}Z`,
+            null,
+        ]),
+        last_anonymisation_at: faker.helpers.arrayElement([
+            `${faker.date.past().toISOString().split('.')[0]}Z`,
+            null,
+        ]),
+        completed_older_than_1y: faker.number.int({ min: undefined, max: undefined }),
+        completed_older_than_2y: faker.number.int({ min: undefined, max: undefined }),
+    },
+    locales: faker.helpers.arrayElement([
+        {
+            [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
+        },
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostResponseMock = (
+    overrideResponse: Partial<BulkAnonymiseResult> = {}
+): BulkAnonymiseResult => ({
+    candidates: faker.number.int({ min: undefined, max: undefined }),
+    anonymised: faker.number.int({ min: undefined, max: undefined }),
+    skipped_already_anonymous: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
+
 export const getListUsersApiAdminUsersGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseUserRead> = {}
 ): PaginatedResponseUserRead => ({
@@ -15687,6 +16006,58 @@ export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMoc
     );
 };
 
+export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler = (
+    overrideResponse?:
+        | DataInventory
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<DataInventory> | DataInventory),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/data-inventory',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetDataInventoryApiAdminStudiesSlugDataInventoryGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMockHandler = (
+    overrideResponse?:
+        | BulkAnonymiseResult
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<BulkAnonymiseResult> | BulkAnonymiseResult),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/anonymise-bulk',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -16922,6 +17293,8 @@ export const getLibreQAPIMock = () => [
     getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler(),
     getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockHandler(),
     getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMockHandler(),
+    getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler(),
+    getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
