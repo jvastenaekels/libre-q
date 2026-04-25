@@ -2568,7 +2568,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Verify Invitation Api Admin Invitations Verify Get"
+                }
               }
             }
           },
@@ -2609,7 +2613,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Accept Invitation Api Admin Invitations Accept Post"
+                }
               }
             }
           },
@@ -2940,7 +2948,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Revoke Recruitment Link Api Admin Recruitment Links  Link Id  Delete"
+                }
               }
             }
           },
@@ -5116,7 +5130,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Report Log Api Logs Post"
+                }
               }
             }
           },
@@ -5209,7 +5229,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Audio Recording Api Audio  Recording Id  Delete"
+                }
               }
             }
           },

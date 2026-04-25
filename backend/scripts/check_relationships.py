@@ -84,9 +84,14 @@ def check_models_file(file_path: Path) -> int:
 
 
 if __name__ == "__main__":
-    models_path = Path("backend/app/models.py")
-    if not models_path.exists():
-        print(f"Error: {models_path} not found.")
+    models_dir = Path("backend/app/models")
+    if not models_dir.is_dir():
+        print(f"Error: {models_dir} not found.")
         sys.exit(1)
 
-    sys.exit(check_models_file(models_path))
+    exit_code = 0
+    for module in sorted(models_dir.glob("*.py")):
+        if module.name == "__init__.py":
+            continue
+        exit_code |= check_models_file(module)
+    sys.exit(exit_code)

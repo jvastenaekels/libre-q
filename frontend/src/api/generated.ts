@@ -89,6 +89,7 @@ import {
     StudyState,
 } from './model';
 import type {
+    AcceptInvitationApiAdminInvitationsAcceptPost200,
     AnalysisResult,
     AnalysisRunRead,
     AnalysisRunSummary,
@@ -103,6 +104,7 @@ import type {
     ConcourseTagRead,
     ConsentResponse,
     DataInventory,
+    DeleteAudioRecordingApiAudioRecordingIdDelete200,
     EigenvalueResult,
     InvitationLink,
     PaginatedResponseConcourseRead,
@@ -118,7 +120,9 @@ import type {
     ProjectRead,
     ProjectWithRole,
     RecruitmentLinkRead,
+    ReportLogApiLogsPost200,
     ResumeResponse,
+    RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200,
     StaleStatementRead,
     StudyImportResponse,
     StudyRead,
@@ -127,6 +131,7 @@ import type {
     Token,
     UserRead,
     ValidationResult,
+    VerifyInvitationApiAdminInvitationsVerifyGet200,
 } from './model';
 
 import { customInstance } from './mutator';
@@ -6264,7 +6269,7 @@ export const verifyInvitationApiAdminInvitationsVerifyGet = (
     params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<VerifyInvitationApiAdminInvitationsVerifyGet200>({
         url: `/api/admin/invitations/verify`,
         method: 'GET',
         params,
@@ -6421,7 +6426,7 @@ export const acceptInvitationApiAdminInvitationsAcceptPost = (
     invitationAccept: InvitationAccept,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<AcceptInvitationApiAdminInvitationsAcceptPost200>({
         url: `/api/admin/invitations/accept`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -7053,7 +7058,7 @@ export const useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost = <
  * @summary Revoke Recruitment Link
  */
 export const revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = (linkId: number) => {
-    return customInstance<unknown>({
+    return customInstance<RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200>({
         url: `/api/admin/recruitment/links/${linkId}`,
         method: 'DELETE',
     });
@@ -10818,7 +10823,7 @@ export const useParticipantSelfErasePersonalDataApiStudySlugPersonalDataDelete =
  * @summary Report Log
  */
 export const reportLogApiLogsPost = (logEntry: LogEntry, signal?: AbortSignal) => {
-    return customInstance<unknown>({
+    return customInstance<ReportLogApiLogsPost200>({
         url: `/api/logs`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -11022,7 +11027,11 @@ export const deleteAudioRecordingApiAudioRecordingIdDelete = (
     recordingId: number,
     params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams
 ) => {
-    return customInstance<unknown>({ url: `/api/audio/${recordingId}`, method: 'DELETE', params });
+    return customInstance<DeleteAudioRecordingApiAudioRecordingIdDelete200>({
+        url: `/api/audio/${recordingId}`,
+        method: 'DELETE',
+        params,
+    });
 };
 
 export const getDeleteAudioRecordingApiAudioRecordingIdDeleteMutationOptions = <
@@ -14266,6 +14275,12 @@ export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost
     ...overrideResponse,
 });
 
+export const getVerifyInvitationApiAdminInvitationsVerifyGetResponseMock =
+    (): VerifyInvitationApiAdminInvitationsVerifyGet200 => ({});
+
+export const getAcceptInvitationApiAdminInvitationsAcceptPostResponseMock =
+    (): AcceptInvitationApiAdminInvitationsAcceptPost200 => ({});
+
 export const getListUsersApiAdminUsersGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseUserRead> = {}
 ): PaginatedResponseUserRead => ({
@@ -14379,6 +14394,11 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMo
             is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         }));
+
+export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteResponseMock =
+    (): RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200 => ({
+        [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    });
 
 export const getListProjectsApiAdminProjectsGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseProjectWithRole> = {}
@@ -15076,6 +15096,10 @@ export const getResumeSessionApiStudySlugResumeCodeGetResponseMock = (
     ...overrideResponse,
 });
 
+export const getReportLogApiLogsPostResponseMock = (): ReportLogApiLogsPost200 => ({
+    [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
+});
+
 export const getUploadAudioApiAudioUploadPostResponseMock = (
     overrideResponse: Partial<AudioUploadResponse> = {}
 ): AudioUploadResponse => ({
@@ -15089,6 +15113,11 @@ export const getUploadAudioApiAudioUploadPostResponseMock = (
     ]),
     ...overrideResponse,
 });
+
+export const getDeleteAudioRecordingApiAudioRecordingIdDeleteResponseMock =
+    (): DeleteAudioRecordingApiAudioRecordingIdDelete200 => ({
+        [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    });
 
 export const getGetAudioUrlApiAudioRecordingIdUrlGetResponseMock = (
     overrideResponse: Partial<AudioRecordingRead> = {}
@@ -16207,17 +16236,27 @@ export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetMockHandler
 
 export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        | VerifyInvitationApiAdminInvitationsVerifyGet200
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) =>
+              | Promise<VerifyInvitationApiAdminInvitationsVerifyGet200>
+              | VerifyInvitationApiAdminInvitationsVerifyGet200),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
         '*/api/admin/invitations/verify',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getVerifyInvitationApiAdminInvitationsVerifyGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -16225,17 +16264,27 @@ export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
 
 export const getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | AcceptInvitationApiAdminInvitationsAcceptPost200
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) =>
+              | Promise<AcceptInvitationApiAdminInvitationsAcceptPost200>
+              | AcceptInvitationApiAdminInvitationsAcceptPost200),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/admin/invitations/accept',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getAcceptInvitationApiAdminInvitationsAcceptPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -16363,17 +16412,27 @@ export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandle
 
 export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<unknown> | unknown),
+        | RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200
+        | ((
+              info: Parameters<Parameters<typeof http.delete>[1]>[0]
+          ) =>
+              | Promise<RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200>
+              | RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200),
     options?: RequestHandlerOptions
 ) => {
     return http.delete(
         '*/api/admin/recruitment/links/:linkId',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17151,17 +17210,25 @@ export const getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMo
 
 export const getReportLogApiLogsPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | ReportLogApiLogsPost200
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ReportLogApiLogsPost200> | ReportLogApiLogsPost200),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/logs',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getReportLogApiLogsPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17195,17 +17262,27 @@ export const getUploadAudioApiAudioUploadPostMockHandler = (
 
 export const getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<unknown> | unknown),
+        | DeleteAudioRecordingApiAudioRecordingIdDelete200
+        | ((
+              info: Parameters<Parameters<typeof http.delete>[1]>[0]
+          ) =>
+              | Promise<DeleteAudioRecordingApiAudioRecordingIdDelete200>
+              | DeleteAudioRecordingApiAudioRecordingIdDelete200),
     options?: RequestHandlerOptions
 ) => {
     return http.delete(
         '*/api/audio/:recordingId',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getDeleteAudioRecordingApiAudioRecordingIdDeleteResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
