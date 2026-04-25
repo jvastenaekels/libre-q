@@ -121,3 +121,36 @@ Inside a strict module: every function declares its return type, no implicit `An
 ### API Changes
 - After modifying backend schemas/routes, run `make generate-api` to regenerate the frontend client
 - Run `make check-api` to verify the generated client is committed and up to date
+
+### Hook-driven components (Phase 5 item G)
+
+Pages and complex components delegate state-and-effect logic to a hook in
+`frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value
+and renders JSX from it.
+
+**Why:** logic becomes unit-testable without rendering; LLM can reason about logic
+independently from JSX; the component file stays small and declarative.
+
+**Boundary rules:**
+- The hook owns: `useState`, `useEffect`, `useCallback`, `useMemo`, store subscriptions,
+  navigation guards, keyboard handlers, event handlers, derived data.
+- The component keeps: JSX, `useRef` for DOM elements, framer-motion `MotionValue`s and
+  derived transforms (they must be passed to JSX elements), visual-only state
+  (`cardDimensions`, `zoomLevel`, animation callbacks).
+
+**Examples already following this pattern:**
+- `useFineSort` ← `FineSortPage` (hooks/participant/useFineSort.ts)
+- `useRoughSort` ← `RoughSortPage` (hooks/participant/useRoughSort.ts)
+
+**Test convention:** add `hooks/participant/use<Name>.test.ts` covering ≥5 pure logic
+paths without rendering. The existing page test files remain in place as integration
+tests covering hook+JSX glue.
+
+**When you author a new page or refactor an existing one:** if the component body grows
+beyond ~100 LOC of non-JSX logic, extract a `use<Name>` hook before adding more logic.
+
+**Deferred pages** (future sessions, in estimated difficulty order):
+1. `AnalysisPage.tsx` (857 LOC) — ~2h; admin-only, no touch/DnD
+2. `StudyDesignPage.tsx` (1199 LOC) — ~3h; complex form state, Zustand designer store
+3. `RecruitmentPage.tsx` (1298 LOC) — ~3h; table + modal interactions
+4. `ConcourseDetailPage.tsx` (1994 LOC) — ~4h; most complex, tabbed UI + item management
