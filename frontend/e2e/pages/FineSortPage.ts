@@ -103,10 +103,9 @@ export class FineSortPage extends BasePage {
             }
         }
 
-        // Wait for the finish/next button to enable and click it
-        const nextButton = this.page.getByRole('button', {
-            name: /next|finish|continue|confirm|submit/i,
-        });
+        // Wait for the validate button to enable and click it.
+        // We use the testid to avoid strict-mode conflicts with "Continue later".
+        const nextButton = this.page.getByTestId('fine-sort-validate-btn');
         await expect(nextButton).toBeEnabled();
         await nextButton.evaluate((node: HTMLElement) => node.click());
     }
