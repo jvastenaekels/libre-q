@@ -281,7 +281,7 @@
       "zoom_in": "Lähennä",
       "zoom_out": "Loitonna",
       "fit_screen": "Sovita näyttöön",
-      "label": "Grid controls"
+      "label": "Ruudukon hallinta"
     },
     "grid": {
       "label": "Q-lajitteluruudukko",
@@ -1589,8 +1589,8 @@
           "cleared": "Kaikki väittämät poistettu",
           "imported": "{{count}} väittämää tuotu onnistuneesti",
           "reset_codes": "Reset Codes",
-          "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
-          "codes_reset": "Statement codes re-sequenced"
+          "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väitekoodit (s1, s2, s3…)?",
+          "codes_reset": "Väitekoodit uudelleennumeroitu"
         },
         "settings": {
           "title": "Tutkimusasetukset",
@@ -2190,7 +2190,7 @@
         }
       },
       "tabs": {
-        "session": "Metadata",
+        "session": "Metatiedot",
         "grid": "Lajitteluruudukko",
         "postsort": "Jälkilajittelu",
         "presort": "Esilajittelu"
