@@ -133,12 +133,21 @@ app.add_middleware(SlowAPIMiddleware)
 
 # CORS configuration — origin list is sourced from Settings.ALLOWED_ORIGINS
 # (see backend/app/core/config.py and .env.example).
+# Allow-list of headers replaces the wildcard (audit F-01-007). Cookies/origin
+# are still supported via allow_credentials=True.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_headers=[
+        "Authorization",       # JWT bearer
+        "Content-Type",        # JSON / multipart bodies
+        "Accept",              # content negotiation
+        "Accept-Language",     # i18n preference
+        "X-Project-ID",        # current project context for admin requests
+        "X-Requested-With",    # XHR sentinel some clients still send
+    ],
 )
 
 app.include_router(auth.router, prefix="/api", tags=["auth"])
