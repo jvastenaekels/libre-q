@@ -14,7 +14,7 @@ References:
 
 import logging
 from itertools import combinations
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -22,10 +22,77 @@ from numpy.typing import NDArray
 logger = logging.getLogger(__name__)
 
 
-def build_sort_matrix(
+# ---------------------------------------------------------------------------
+# Cluster 1 — Analysis wire types (private to this module)
+# ---------------------------------------------------------------------------
+
+
+class GridSlot(TypedDict):
+    """One entry in a study's grid_config: {"score": int, "capacity": int}."""
+
+    score: int
+    capacity: int
+
+
+class FactorCharacteristicDict(TypedDict):
+    """Per-factor statistical characteristics built by compute_factor_characteristics."""
+
+    factor: int
+    eigenvalue: float
+    variance_explained: float
+    n_flagged: int
+    avg_rel_coef: float
+    composite_reliability: float
+    se_factor_scores: float
+    cumulative_variance: float
+
+
+class StatementClassEntry(TypedDict):
+    """One entry in the distinguishing/consensus lists from classify_statements."""
+
+    statement_idx: int
+    significance: dict[str, str]
+
+
+class AnalysisRunResult(TypedDict):
+    """Return type of run_analysis().
+
+    All numpy arrays are kept as NDArray here; the router converts them to
+    Python lists before serialisation (see admin/analysis.py).
+    """
+
+    n_participants: int
+    n_statements: int
+    n_factors: int
+    extraction: str
+    rotation: str
+    eigenvalues: list[float]
+    total_variance_explained: float
+    unrotated_loadings: NDArray[np.float64]
+    rotated_loadings: NDArray[np.float64]
+    flags: NDArray[np.bool_]
+    z_scores: NDArray[np.float64]
+    factor_arrays: NDArray[np.int64]
+    factor_characteristics: list[FactorCharacteristicDict]
+    factor_correlation: NDArray[np.float64]
+    distinguishing: list[StatementClassEntry]
+    consensus: list[StatementClassEntry]
+
+
+def build_sort_matrix(  # type: ignore[explicit-any]
     dump: dict[str, Any],
-) -> tuple[NDArray[np.float64], list[dict[str, Any]], list[dict[str, Any]]]:
+    # dict[str, Any] is the correct type here: this function sits at the boundary
+    # between the typed TypedDict world (SortDataDump/StudyDump) and the router's
+    # field-level access.  TypedDicts ARE structurally compatible with dict[str, Any],
+    # and the router accesses returned participant/statement dicts by known field names.
+    # Replacing with dict[str, object] would propagate object→ int/str errors into the
+    # router (wave 4 territory); Any at this one boundary avoids premature cascade.
+) -> tuple[NDArray[np.float64], list[dict[str, Any]], list[dict[str, Any]]]:  # type: ignore[explicit-any]
     """Build the (n_statements x n_participants) sort matrix from a study dump.
+
+    Accepts a ``SortDataDump`` (or ``StudyDump``) TypedDict.  The TypedDicts
+    are the typed contracts; this function receives them as ``dict[str, Any]``
+    to avoid a mypy narrowing issue on TypedDict subscript in the union case.
 
     Only includes completed, non-discarded, non-test participants with
     complete Q-sort data (no missing scores).
@@ -36,10 +103,10 @@ def build_sort_matrix(
         - valid_participants: list of participant dicts that were included
         - statements: list of statement dicts from the study
     """
-    statements = dump["study"]["statements"]
+    statements: list[dict[str, Any]] = dump["study"]["statements"]  # type: ignore[explicit-any]
     n_statements = len(statements)
 
-    valid_participants: list[dict[str, Any]] = []
+    valid_participants: list[dict[str, Any]] = []  # type: ignore[explicit-any]
     columns: list[list[float]] = []
 
     for p in dump["participants"]:
@@ -61,7 +128,7 @@ def build_sort_matrix(
 
     # Filter out zero-variance participants (all scores identical)
     filtered_columns: list[list[float]] = []
-    filtered_participants: list[dict[str, Any]] = []
+    filtered_participants: list[dict[str, Any]] = []  # type: ignore[explicit-any]
     for col, p in zip(columns, valid_participants):
         if len(set(col)) > 1:
             filtered_columns.append(col)
@@ -484,7 +551,7 @@ def compute_factor_characteristics(
     flagged: NDArray[np.bool_],
     z_scores: NDArray[np.float64],
     av_rel_coef: float = 0.8,
-) -> tuple[list[dict[str, Any]], NDArray[np.float64], NDArray[np.float64]]:
+) -> tuple[list[FactorCharacteristicDict], NDArray[np.float64], NDArray[np.float64]]:
     """Compute factor characteristics, correlation, and SED matrix.
 
     Args:
@@ -497,7 +564,7 @@ def compute_factor_characteristics(
         Tuple of (characteristics, factor_correlation, sed_matrix)
     """
     n_participants, n_factors = loadings.shape
-    characteristics: list[dict[str, Any]] = []
+    characteristics: list[FactorCharacteristicDict] = []
 
     se_scores = np.zeros(n_factors)
 
@@ -525,15 +592,16 @@ def compute_factor_characteristics(
         se_scores[f] = se
 
         characteristics.append(
-            {
-                "factor": f + 1,
-                "eigenvalue": eigenvalue,
-                "variance_explained": expl_var,
-                "n_flagged": n_flagged,
-                "avg_rel_coef": av_rel_coef,
-                "composite_reliability": reliability,
-                "se_factor_scores": se,
-            }
+            FactorCharacteristicDict(
+                factor=f + 1,
+                eigenvalue=eigenvalue,
+                variance_explained=expl_var,
+                n_flagged=n_flagged,
+                avg_rel_coef=av_rel_coef,
+                composite_reliability=reliability,
+                se_factor_scores=se,
+                cumulative_variance=0.0,  # filled below
+            )
         )
 
     # Cumulative variance
@@ -571,7 +639,7 @@ def classify_statements(
     z_scores: NDArray[np.float64],
     sed: NDArray[np.float64],
     n_factors: int,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+) -> tuple[list[StatementClassEntry], list[StatementClassEntry]]:
     """Classify statements as distinguishing or consensus.
 
     Uses the Standard Error of Differences (SED) to test whether
@@ -596,8 +664,8 @@ def classify_statements(
         "p<0.000001": 4.8916,
     }
 
-    distinguishing: list[dict[str, Any]] = []
-    consensus: list[dict[str, Any]] = []
+    distinguishing: list[StatementClassEntry] = []
+    consensus: list[StatementClassEntry] = []
 
     for s in range(n_statements):
         sig_pairs: dict[str, str] = {}
@@ -629,7 +697,7 @@ def classify_statements(
                 sig_pairs[pair_key] = "p<0.05"
                 any_significant = True
 
-        entry = {"statement_idx": s, "significance": sig_pairs}
+        entry = StatementClassEntry(statement_idx=s, significance=sig_pairs)
 
         if any_significant:
             distinguishing.append(entry)
@@ -661,7 +729,7 @@ def compute_eigenvalues(
 
 
 def _distribution_from_grid_config(
-    grid_config: list[dict[str, Any]],
+    grid_config: list[dict[str, object]],
 ) -> NDArray[np.int64]:
     """Build the forced distribution array from the study's grid_config.
 
@@ -670,12 +738,25 @@ def _distribution_from_grid_config(
 
     Raises:
         ValueError: If grid_config entries are missing required keys.
+
+    ``grid_config`` uses ``dict[str, object]`` (not ``dict[str, Any]``) because
+    values arrive from the ORM JSON column as plain Python objects.  The
+    ``int()`` casts below are defensive; ``GridSlot`` is the semantic shape
+    but cannot be used here because ORM JSON bypass mypy's narrowing.
     """
     dist: list[int] = []
     for i, entry in enumerate(grid_config):
         if "score" not in entry or "capacity" not in entry:
             raise ValueError(f"grid_config entry {i} missing 'score' or 'capacity' key")
-        dist.extend([int(entry["score"])] * int(entry["capacity"]))
+        score = entry["score"]
+        capacity = entry["capacity"]
+        if not isinstance(score, (int, float)) or not isinstance(
+            capacity, (int, float)
+        ):
+            raise ValueError(
+                f"grid_config entry {i} 'score' and 'capacity' must be numeric"
+            )
+        dist.extend([int(score)] * int(capacity))
     if not dist:
         raise ValueError("grid_config produced an empty distribution")
     return np.sort(np.array(dist, dtype=np.int64))
@@ -688,8 +769,8 @@ def run_analysis(
     rotation: str = "varimax",
     flagging: str = "auto",
     manual_flags_matrix: NDArray[np.bool_] | None = None,
-    grid_config: list[dict[str, Any]] | None = None,
-) -> dict[str, Any]:
+    grid_config: list[dict[str, object]] | None = None,
+) -> AnalysisRunResult:
     """Run the complete Q-method factor analysis pipeline.
 
     Orchestrates: correlation → extraction → rotation → flagging →
@@ -770,21 +851,21 @@ def run_analysis(
     # Total variance explained
     total_var = sum(c["variance_explained"] for c in characteristics)
 
-    return {
-        "n_participants": n_participants,
-        "n_statements": n_statements,
-        "n_factors": n_factors,
-        "extraction": extraction,
-        "rotation": rotation,
-        "eigenvalues": all_eigenvalues,
-        "total_variance_explained": total_var,
-        "unrotated_loadings": unrotated,
-        "rotated_loadings": rotated,
-        "flags": flags,
-        "z_scores": z_scores,
-        "factor_arrays": factor_arrays,
-        "factor_characteristics": characteristics,
-        "factor_correlation": factor_cor,
-        "distinguishing": dist_list,
-        "consensus": cons_list,
-    }
+    return AnalysisRunResult(
+        n_participants=n_participants,
+        n_statements=n_statements,
+        n_factors=n_factors,
+        extraction=extraction,
+        rotation=rotation,
+        eigenvalues=all_eigenvalues,
+        total_variance_explained=total_var,
+        unrotated_loadings=unrotated,
+        rotated_loadings=rotated,
+        flags=flags,
+        z_scores=z_scores,
+        factor_arrays=factor_arrays,
+        factor_characteristics=characteristics,
+        factor_correlation=factor_cor,
+        distinguishing=dist_list,
+        consensus=cons_list,
+    )

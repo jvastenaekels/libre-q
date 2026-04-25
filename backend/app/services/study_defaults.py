@@ -4,7 +4,7 @@ These constants provide sensible defaults in English, French, and Finnish
 for consent text, methodology tips, step descriptions, etc.
 """
 
-from typing import Any
+from ..types.wire import TranslationDefaults
 
 DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
     "en": [
@@ -98,7 +98,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         },
     ],
 }
-DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
+DEFAULT_TRANSLATION_CONTENT: dict[str, TranslationDefaults] = {
     "en": {
         "instructions": "This study involves expressing your personal viewpoint through a sorting process. There are no right or wrong answers; we are simply interested in your perspective.",
         "consent_title": "Informed Consent",

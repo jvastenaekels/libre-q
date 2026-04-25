@@ -170,21 +170,31 @@ warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-# Phase 3 wave 2 — Batch 1 + wave 3a (relaxed tier, retained)
-# analysis_service: dict[str, Any] for JSON wire data (study dump, participant
-# records, grid_config entries) — genuinely heterogeneous, structurally required.
-# study_defaults: DEFAULT_TRANSLATION_CONTENT outer value is dict[str, Any]
-# (mixed methodology_tips list, step_help dict, string fields) — cannot collapse.
-# study_data_service: returns dict[str, Any] for full JSON dump, stats, sort-data.
-# export_service: presort/postsort config blobs and helper params are dict[str, Any].
-# disallow_any_explicit omitted: Any is load-bearing at JSON wire boundary.
+# Phase 3 wave 3b — full strict graduation (wave 3b post-mortem)
+# TypedDicts introduced in app/types/wire.py (Cluster 2-4) and inline in
+# analysis_service (Cluster 1) replaced the dict[str, Any] barriers that
+# previously blocked full strict.
+# Residual Any rationale per service:
+#   analysis_service: _distribution_from_grid_config receives ORM JSON column
+#     (list[dict[str,object]]) — cast via int() with type: ignore[arg-type].
+#     build_sort_matrix stays dict[str,Any] to accept both SortDataDump and
+#     StudyDump without a union narrowing issue on TypedDict subscript.
+#   study_defaults: (no Any remaining — all eliminated by TranslationDefaults)
+#   study_data_service: presort/postsort answers are dict[str,object] (open
+#     survey responses) — kept as object, not Any.
+#   export_service: presort_config / postsort_config blobs are study-author-
+#     defined question schemas; get_label / get_value_label accept dict[str,Any]
+#     because the config schema is open-ended (wave 4 territory).
 module = [
     "app.services.analysis_service",
     "app.services.study_defaults",
     "app.services.study_data_service",
     "app.services.export_service",
+    "app.types.wire",
+    "app.types",
 ]
 disallow_untyped_defs = true
+disallow_any_explicit = true
 warn_return_any = true
 strict_equality = true
 

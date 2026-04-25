@@ -5,12 +5,23 @@ import io
 import logging
 import zipfile
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..models import Participant, Study, Statement
 from .storage_service import storage_service
 
+if TYPE_CHECKING:
+    from ..types.wire import StudyDump
+
 logger = logging.getLogger(__name__)
+
+
+class _AudioMapEntry(TypedDict):
+    """Audio metadata built in generate_csv for a single audio recording."""
+
+    url: str
+    duration: float | None
+    size_kb: float
 
 
 class ExportService:
@@ -25,8 +36,11 @@ class ExportService:
         # Use study's default language for headers/labels if available, else English
         header_lang = study.default_language or "en"
 
-        # Helper to get human label for a question ID or option value from config
-        def get_label(config_dict: dict[str, Any], q_id: str, lang: str = "en") -> str:
+        # Helper to get human label for a question ID or option value from config.
+        # presort_config / postsort_config are study-author-defined question schemas
+        # with an open-ended structure (field IDs, label dicts, option lists, …).
+        # TypedDict is not appropriate here; dict[str, Any] is structurally required.
+        def get_label(config_dict: dict[str, Any], q_id: str, lang: str = "en") -> str:  # type: ignore[explicit-any]
             q_config = config_dict.get(q_id, {})
             label_obj = q_config.get("label", q_id)
             if isinstance(label_obj, dict):
@@ -37,8 +51,8 @@ class ExportService:
                 )
             return str(label_obj)
 
-        def get_value_label(
-            config_dict: dict[str, Any], q_id: str, value: Any, lang: str = "en"
+        def get_value_label(  # type: ignore[explicit-any]
+            config_dict: dict[str, Any], q_id: str, value: object, lang: str = "en"
         ) -> str:
             """Resolves internal value (like 'm') to its label (like 'Male')."""
             if value is None or value == "":
@@ -164,18 +178,18 @@ class ExportService:
                 row.append(get_value_label(presort_fields, k, val, header_lang))
 
             # Build audio recordings map by question_key
-            audio_map = {}
+            audio_map: dict[str, _AudioMapEntry] = {}
             for audio_rec in p.audio_recordings:
                 # Generate fresh presigned URL (valid for 24 hours)
                 try:
                     presigned_url = storage_service.generate_presigned_url(
                         audio_rec.s3_key, expiration=3600
                     )
-                    audio_map[audio_rec.question_key] = {
-                        "url": presigned_url,
-                        "duration": audio_rec.duration_seconds,
-                        "size_kb": round(audio_rec.file_size_bytes / 1024, 2),
-                    }
+                    audio_map[audio_rec.question_key] = _AudioMapEntry(
+                        url=presigned_url,
+                        duration=audio_rec.duration_seconds,
+                        size_kb=round(audio_rec.file_size_bytes / 1024, 2),
+                    )
                 except Exception as e:
                     # Log error but don't fail export
                     logger.warning(
@@ -283,7 +297,7 @@ class ExportService:
     def generate_research_package(
         study: Study,
         participants: list[Participant],
-        full_dump: dict[str, Any] | None = None,
+        full_dump: "StudyDump | None" = None,
     ) -> bytes:
         """Generates a ZIP containing the complete research data package."""
         zip_buffer = io.BytesIO()
@@ -355,7 +369,8 @@ class ExportService:
         ]
 
         for section, config in configs:
-            fields: dict[str, Any] = {}
+            fields: dict[str, Any] = {}  # type: ignore[explicit-any]
+            # presort/postsort config schemas are open-ended (wave 4 territory).
             if section == "PRESORT":
                 fields = config.get("fields", {}) if "fields" in config else config
             else:

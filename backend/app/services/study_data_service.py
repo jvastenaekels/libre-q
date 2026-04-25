@@ -2,7 +2,6 @@
 
 import logging
 from datetime import UTC, datetime
-from typing import Any
 from uuid import uuid4
 
 from sqlalchemy import delete, select
@@ -16,6 +15,20 @@ from ..models import (
     ParticipantStatus,
     Statement,
     Study,
+)
+from ..types.wire import (
+    AudioRecordingEntry,
+    DeviceBreakdown,
+    ParticipantDumpRecord,
+    SortDataDump,
+    SortDataStudy,
+    SortParticipantRecord,
+    StatementDumpRecord,
+    StatementTranslation,
+    StudyDump,
+    StudyDumpStudy,
+    StudyStats,
+    StudyTranslationEntry,
 )
 
 logger = logging.getLogger(__name__)
@@ -151,7 +164,7 @@ class StudyDataService:
         return participant
 
     @staticmethod
-    async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:
+    async def get_study_stats(db: AsyncSession, study_id: int) -> StudyStats:
         """Calculates aggregated statistics for a study."""
         # 1. Get all participants for this study (excluding discarded)
         stmt = select(Participant).where(
@@ -186,7 +199,7 @@ class StudyDataService:
             median_duration = statistics.median(durations)
 
         # 4. Device Breakdown (Simple Heuristic)
-        device_breakdown = {"mobile": 0, "desktop": 0}
+        device_breakdown: DeviceBreakdown = {"mobile": 0, "desktop": 0}
         for p in participants:
             ua = (p.user_agent or "").lower()
             if any(x in ua for x in ["mobile", "android", "iphone", "ipad"]):
@@ -194,16 +207,16 @@ class StudyDataService:
             else:
                 device_breakdown["desktop"] += 1
 
-        return {
-            "started_count": started_count,
-            "completed_count": completed_count,
-            "completion_rate": completion_rate,
-            "median_duration_seconds": median_duration,
-            "device_breakdown": device_breakdown,
-        }
+        return StudyStats(
+            started_count=started_count,
+            completed_count=completed_count,
+            completion_rate=completion_rate,
+            median_duration_seconds=median_duration,
+            device_breakdown=device_breakdown,
+        )
 
     @staticmethod
-    async def get_study_full_dump(db: AsyncSession, study_id: int) -> dict[str, Any]:
+    async def get_study_full_dump(db: AsyncSession, study_id: int) -> StudyDump:
         """Extracts complete study data and valid participant sorts for export."""
         # 1. Get Study with statements (ordered by ID for consistency)
         stmt = (
@@ -239,40 +252,46 @@ class StudyDataService:
         sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
         statement_id_to_index = {s.id: i for i, s in enumerate(sorted_statements)}
 
-        participant_data = []
+        participant_data: list[ParticipantDumpRecord] = []
         for p in participants:
             # Edge case: Handle missing or None qsort_entries
-            placements = {}
+            placements: dict[int, int] = {}
             if p.qsort_entries:
                 placements = {
                     entry.statement_id: entry.grid_score for entry in p.qsort_entries
                 }
 
             # Create a score list in the exact order of sorted_statements
-            scores = [placements.get(s.id, None) for s in sorted_statements]
+            scores: list[int | None] = [
+                placements.get(s.id, None) for s in sorted_statements
+            ]
 
             # Edge case: Ensure presort and postsort are not None
-            presort = p.presort_answers if p.presort_answers is not None else {}
-            postsort = p.postsort_answers if p.postsort_answers is not None else {}
+            presort: dict[str, object] = (
+                dict(p.presort_answers) if p.presort_answers is not None else {}
+            )
+            postsort: dict[str, object] = (
+                dict(p.postsort_answers) if p.postsort_answers is not None else {}
+            )
 
             # Build audio recordings map with presigned URLs
-            audio_recordings = {}
+            audio_recordings: dict[str, AudioRecordingEntry] = {}
             from ..services.storage_service import storage_service
 
             for audio_rec in p.audio_recordings:
                 try:
                     # Generate fresh presigned URL (24h expiration for exports)
-                    presigned_url = storage_service.generate_presigned_url(
+                    presigned_url: str | None = storage_service.generate_presigned_url(
                         audio_rec.s3_key, expiration=86400
                     )
-                    audio_recordings[audio_rec.question_key] = {
-                        "id": audio_rec.id,
-                        "duration_seconds": audio_rec.duration_seconds,
-                        "file_size_bytes": audio_rec.file_size_bytes,
-                        "mime_type": audio_rec.mime_type,
-                        "created_at": audio_rec.created_at.isoformat(),
-                        "presigned_url": presigned_url,
-                    }
+                    audio_recordings[audio_rec.question_key] = AudioRecordingEntry(
+                        id=audio_rec.id,
+                        duration_seconds=audio_rec.duration_seconds,
+                        file_size_bytes=audio_rec.file_size_bytes,
+                        mime_type=audio_rec.mime_type,
+                        created_at=audio_rec.created_at.isoformat(),
+                        presigned_url=presigned_url,
+                    )
                 except Exception as e:
                     # Log but don't fail export
                     logger.warning(
@@ -282,68 +301,65 @@ class StudyDataService:
                     )
 
             participant_data.append(
-                {
-                    "id": str(p.session_token)[:8].upper(),
-                    "db_id": p.id,
-                    "duration_seconds": (
-                        p.submitted_at - p.consented_at
-                    ).total_seconds()
+                ParticipantDumpRecord(
+                    id=str(p.session_token)[:8].upper(),
+                    db_id=p.id,
+                    duration_seconds=(p.submitted_at - p.consented_at).total_seconds()
                     if p.submitted_at and p.consented_at
                     else None,
-                    "scores": scores,
-                    # For raw CSV/KenQ
-                    "placements": placements,
-                    "presort": presort,
-                    "postsort": postsort,
-                    "audio_recordings": audio_recordings,
-                    "language": p.language_used,
-                    "is_discarded": p.is_discarded,
-                    "discard_reason": p.discard_reason,
-                    "is_test_run": p.is_test_run,
-                    "status": p.status.value,
-                    "recruitment_token": getattr(p, "recruitment_token", None),
-                    "ip_address": p.ip_address,
-                    "user_agent": p.user_agent,
-                    "submitted_at": p.submitted_at.isoformat()
-                    if p.submitted_at
-                    else None,
-                    "created_at": p.created_at.isoformat() if p.created_at else None,
-                    "last_step_reached": p.last_step_reached,
-                    "last_step_reached_at": p.last_step_reached_at.isoformat()
+                    scores=scores,
+                    placements=placements,
+                    presort=presort,
+                    postsort=postsort,
+                    audio_recordings=audio_recordings,
+                    language=p.language_used,
+                    is_discarded=p.is_discarded,
+                    discard_reason=p.discard_reason,
+                    is_test_run=p.is_test_run,
+                    status=p.status.value,
+                    recruitment_token=getattr(p, "recruitment_token", None),
+                    ip_address=p.ip_address,
+                    user_agent=p.user_agent,
+                    submitted_at=p.submitted_at.isoformat() if p.submitted_at else None,
+                    created_at=p.created_at.isoformat() if p.created_at else None,
+                    last_step_reached=p.last_step_reached,
+                    last_step_reached_at=p.last_step_reached_at.isoformat()
                     if p.last_step_reached_at
                     else None,
-                }
+                )
             )
 
-        return {
-            "study": {
-                "slug": study.slug,
-                "state": study.state.value,
-                "grid_config": study.grid_config,
-                "presort_config": study.presort_config,
-                "postsort_config": study.postsort_config,
-                "statements": [
-                    {
-                        "id": s.id,
-                        "code": s.code,
-                        "translations": [
-                            {"lang": t.language_code, "text": t.text}
-                            for t in s.translations
-                        ],
-                    }
-                    for s in sorted_statements
+        statements_out: list[StatementDumpRecord] = [
+            StatementDumpRecord(
+                id=s.id,
+                code=s.code,
+                translations=[
+                    StatementTranslation(lang=t.language_code, text=t.text)
+                    for t in s.translations
                 ],
-                "translations": [
-                    {"lang": t.language_code, "title": t.title}
-                    for t in study.translations
-                ],
-            },
-            "participants": participant_data,
-            "statement_id_to_index": statement_id_to_index,
-        }
+            )
+            for s in sorted_statements
+        ]
+        study_translations: list[StudyTranslationEntry] = [
+            StudyTranslationEntry(lang=t.language_code, title=t.title)
+            for t in study.translations
+        ]
+        return StudyDump(
+            study=StudyDumpStudy(
+                slug=study.slug,
+                state=study.state.value,
+                grid_config=study.grid_config,
+                presort_config=study.presort_config,
+                postsort_config=study.postsort_config,
+                statements=statements_out,
+                translations=study_translations,
+            ),
+            participants=participant_data,
+            statement_id_to_index=statement_id_to_index,
+        )
 
     @staticmethod
-    async def get_study_sort_data(db: AsyncSession, study_id: int) -> dict[str, Any]:
+    async def get_study_sort_data(db: AsyncSession, study_id: int) -> SortDataDump:
         """Lightweight version of get_study_full_dump for analysis.
 
         Skips audio recordings, presigned URLs, presort/postsort answers,
@@ -380,40 +396,43 @@ class StudyDataService:
         # 3. Build lightweight structure
         sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
 
-        participant_data = []
+        sort_participant_data: list[SortParticipantRecord] = []
         for p in participants:
-            placements = {}
+            placements: dict[int, int] = {}
             if p.qsort_entries:
                 placements = {
                     entry.statement_id: entry.grid_score for entry in p.qsort_entries
                 }
-            scores = [placements.get(s.id, None) for s in sorted_statements]
+            scores: list[int | None] = [
+                placements.get(s.id, None) for s in sorted_statements
+            ]
 
-            participant_data.append(
-                {
-                    "id": str(p.session_token)[:8].upper(),
-                    "db_id": p.id,
-                    "scores": scores,
-                    "is_discarded": False,
-                    "is_test_run": False,
-                    "status": "completed",
-                }
+            sort_participant_data.append(
+                SortParticipantRecord(
+                    id=str(p.session_token)[:8].upper(),
+                    db_id=p.id,
+                    scores=scores,
+                    is_discarded=False,
+                    is_test_run=False,
+                    status="completed",
+                )
             )
 
-        return {
-            "study": {
-                "statements": [
-                    {
-                        "id": s.id,
-                        "code": s.code,
-                        "translations": [
-                            {"lang": t.language_code, "text": t.text}
-                            for t in s.translations
-                        ],
-                    }
-                    for s in sorted_statements
+        sort_statements: list[StatementDumpRecord] = [
+            StatementDumpRecord(
+                id=s.id,
+                code=s.code,
+                translations=[
+                    StatementTranslation(lang=t.language_code, text=t.text)
+                    for t in s.translations
                 ],
-                "grid_config": study.grid_config,
-            },
-            "participants": participant_data,
-        }
+            )
+            for s in sorted_statements
+        ]
+        return SortDataDump(
+            study=SortDataStudy(
+                statements=sort_statements,
+                grid_config=study.grid_config,
+            ),
+            participants=sort_participant_data,
+        )

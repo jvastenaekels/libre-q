@@ -411,7 +411,7 @@ class StudyService:
         lang_defaults = (
             DEFAULT_TRANSLATION_CONTENT.get(resolved_lang)
             or DEFAULT_TRANSLATION_CONTENT.get(base_lang)
-            or DEFAULT_TRANSLATION_CONTENT.get("en", {})
+            or DEFAULT_TRANSLATION_CONTENT["en"]
         )
 
         title = getattr(translation, "title", "") or study.slug

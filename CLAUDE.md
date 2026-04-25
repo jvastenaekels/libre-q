@@ -59,6 +59,11 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.storage_service` — boto3 stubs now ship; AudioUploadMetadata TypedDict eliminates Any
 - `app.services.concourse_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.recruitment_service` — ORM stub propagation resolved by models.py fix (wave 3b)
+- `app.services.analysis_service` — wave 3b post-mortem: AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry TypedDicts; build_sort_matrix keeps dict[str, Any] at wire boundary (type: ignore[explicit-any] with rationale)
+- `app.services.study_defaults` — wave 3b post-mortem: TranslationDefaults TypedDict replaces dict[str, Any]
+- `app.services.study_data_service` — wave 3b post-mortem: StudyDump, SortDataDump, StudyStats TypedDicts
+- `app.services.export_service` — wave 3b post-mortem: _AudioMapEntry TypedDict; presort/postsort config helpers keep dict[str, Any] (type: ignore[explicit-any], open-ended schema)
+- `app.types.wire`, `app.types` — new package: shared TypedDict wire shapes (Clusters 2-4)
 
 **Strict without disallow_any_explicit** (Pydantic/SQLAlchemy stubs or load-bearing Any at JSON boundaries):
 - `app.core.config` — pydantic-settings BaseSettings stubs
@@ -66,15 +71,11 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.database`, `app.schema_validation`
 - All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
 - `app.models` — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary
-- `app.services.analysis_service` — dict[str, Any] is load-bearing JSON wire data (study dump, grid_config)
-- `app.services.study_defaults` — dict[str, Any] for nested i18n content blobs (heterogeneous value types)
-- `app.services.study_data_service` — dict[str, Any] load-bearing JSON wire data (full dump, stats, sort-data)
-- `app.services.export_service` — dict[str, Any] config blobs (presort/postsort JSON); helper params
 
-Total: 34 modules under strict overrides (Phase 3 wave 3b complete).
-Wave 3b keystone: models.py bare Mapped[dict] tightened to Mapped[dict[str, dict[str, str]]] → 2 cascade promotions.
-Remaining relaxed-tier services: analysis_service, study_defaults, study_data_service, export_service — all use dict[str, Any] for genuinely heterogeneous JSON wire data. Cannot promote without major refactor (TypedDict per JSON shape).
-Next wave: heavy services (study_service, submission_service) and routers.
+Total: 40 modules under strict overrides (Phase 3 wave 3b post-mortem complete).
+Previous: 34 modules. Added 6: 4 services graduated + app.types.wire + app.types.
+Wave 3b post-mortem: TypedDicts introduced in app/types/wire.py (StudyDump, SortDataDump, StudyStats, TranslationDefaults etc.) and inline in analysis_service (AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry). Bug surfaced: study_service used DEFAULT_TRANSLATION_CONTENT.get("en", {}) — now fixed to use DEFAULT_TRANSLATION_CONTENT["en"] (guaranteed key).
+Next wave: heavy services (study_service, submission_service) and routers — typed JSON foundation laid here makes those easier (service→router boundaries are now TypedDict-precise).
 
 Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads, httpx.Response.json() wire data).
 
