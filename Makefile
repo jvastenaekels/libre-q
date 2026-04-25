@@ -66,6 +66,9 @@ test:
 	cd backend && uv run pytest tests/
 	cd frontend && npm run test -- --run --coverage
 
+test-property:
+	cd backend && uv run pytest tests/property/ -v --hypothesis-show-statistics
+
 e2e:
 	cd frontend && ENVIRONMENT=test npm run e2e
 
