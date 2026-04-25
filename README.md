@@ -16,14 +16,14 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 
 Q-methodology — Stephenson's (1953) approach to studying subjectivity by having participants rank-order a set of statements — is widely used in environmental governance, health, education, and political ecology. Its uptake in the past decade has expanded into critical research traditions that emphasise reflexivity, transparency of analytical choices, situatedness of subjectivities, and integration of participant voice (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020). This expansion has run into a tooling gap.
 
-**Existing tools force a tradeoff** between data-collection ergonomics and analytical depth:
+**Existing tools split the workflow** between data-collection and analysis:
 
-- **PQMethod** (Schmolck) and the **R `qmethod` package** (Zabala 2014) provide rigorous factor analysis but no participant-facing UI; researchers must collect Q-sorts on paper or with a separate tool, then transcribe.
-- **FlashQ** and **HTMLQ** offer browser-based data collection but no analysis capability and limited mobile support.
-- **KADE** (Banasick 2019) is a polished open-source desktop analysis tool but, like PQMethod, leaves the data-collection problem to the researcher.
-- **Ken-Q Analysis** (the older online tool) bundles collection and analysis but is not self-hosted, has limited mobile support, and is not open source — researchers cannot inspect or modify the analytical procedures.
+- **PQMethod** (Schmolck) and the **R `qmethod` package** (Zabala 2014) provide factor analysis but have no participant-facing UI; Q-sorts must be collected on paper or with a separate tool and then transcribed.
+- **FlashQ** and **HTMLQ** offer browser-based data collection but no built-in analysis.
+- **KADE** (Banasick 2019) is an open-source desktop analysis tool; like PQMethod, it does not handle data collection.
+- **Ken-Q Analysis** bundles collection and analysis but is not self-hosted and is not open source — researchers cannot inspect or modify the analytical procedures.
 
-None of these tools support multi-language studies natively, integrate post-sort participant audio responses with the analysis, or expose the analytical choices in a way that supports critical Q-methodology's transparency requirements.
+To our knowledge, none of these tools currently support multi-language studies, post-sort participant audio responses tied to the analysis, or programmatic access to the analytical choices. We treat these as the gap Libre-Q targets; corrections welcome.
 
 **Libre-Q fills this gap as a single-platform, browser-based, multilingual, self-hosted, and open-source tool that integrates the full Q-methodology workflow** — study design, mobile-first participant recruitment and data collection, factor analysis, and export to the major analytical formats — while keeping the methodological choices visible and editable by the researcher. It is targeted at research groups practising critical Q-methodology, but it is usable for classical Q-methodology workflows as well.
 
@@ -36,18 +36,18 @@ The platform is intentionally self-hosted: data ownership remains with the resea
 | Capability | FlashQ / HTMLQ | PQMethod | Ken-Q (online) | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Libre-Q |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | Browser-based data collection | Yes | No | Yes | No | No | **Yes** |
-| Mobile & tablet support | Limited | No | Limited | No | N/A | **Yes** |
+| Documented mobile & tablet support | — | No | — | No | N/A | **Yes** |
 | Built-in factor analysis | No | Yes | Yes | Yes | Yes | **Yes** |
-| Enforced forced distribution | Partial | N/A | N/A | N/A | N/A | **Yes** |
+| Documented forced-distribution enforcement | — | N/A | N/A | N/A | N/A | **Yes** |
 | Multi-language studies | No | No | No | No | N/A | **Yes** |
 | Audio post-sort responses | No | No | No | No | No | **Yes** |
 | Recruitment tracking & funnels | No | No | No | No | No | **Yes** |
 | Team collaboration (roles) | No | No | No | No | No | **Yes** |
 | Export to PQMethod / R / Ken-Q | N/A | N/A | N/A | Yes | N/A | **Yes** |
-| Self-hosted / data ownership | Partial | Desktop | No | Desktop | Yes (local R) | **Yes** |
+| Self-hosted | Yes | Desktop | No | Desktop | Yes (local R) | **Yes** |
 | Open source | Yes | No | No | Yes | Yes | **Yes** |
 
-*"N/A" indicates the capability does not apply to the tool category (e.g., R packages have no participant-facing UI, so "mobile support" is not applicable).*
+*"N/A" indicates the capability does not apply to the tool category (e.g., R packages have no participant-facing UI, so "mobile support" is not applicable). "—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR.*
 
 ---
 
