@@ -734,6 +734,7 @@
             "composite_reliability": "Komposiittireliabiliteetti",
             "se_factor_scores": "Faktoripisteiden keskivirhe",
             "factor_correlations": "Faktorikorrelaatiot",
+            "high_correlation": "Korkea korrelaatio",
             "total_variance": "Kokonaisvarianssi selitetty",
             "method_used": "Menetelmä",
             "statements_label": "väittämää",

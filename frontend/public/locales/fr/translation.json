@@ -734,6 +734,7 @@
       "composite_reliability": "Fiabilité composite",
       "se_factor_scores": "ET des scores factoriels",
       "factor_correlations": "Corrélations entre facteurs",
+      "high_correlation": "Corrélation élevée",
       "total_variance": "Variance totale expliquée",
       "method_used": "Méthode",
       "statements_label": "énoncés",

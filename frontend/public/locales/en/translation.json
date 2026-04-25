@@ -749,6 +749,7 @@
       "composite_reliability": "Composite Reliability",
       "se_factor_scores": "SE of Factor Scores",
       "factor_correlations": "Factor Correlations",
+      "high_correlation": "High correlation",
       "total_variance": "Total Variance Explained",
       "method_used": "Method",
       "statements_label": "statements",

@@ -42,7 +42,8 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                     groups.get(score)?.push(stmt);
                 }
 
-                const sortedScores = [...groups.keys()].sort((a, b) => b - a);
+                // Sort ascending: left (most disagree) to right (most agree)
+                const sortedScores = [...groups.keys()].sort((a, b) => a - b);
 
                 // Find max count per column for table rows
                 const maxRows = Math.max(...sortedScores.map((s) => groups.get(s)?.length ?? 0));

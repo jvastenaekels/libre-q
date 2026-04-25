@@ -251,7 +251,12 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                                                         {isHigh && (
                                                             <span className="sr-only">
                                                                 {' '}
-                                                                ({belowLabel})
+                                                                (
+                                                                {t(
+                                                                    'admin.analysis.high_correlation',
+                                                                    'High correlation'
+                                                                )}
+                                                                )
                                                             </span>
                                                         )}
                                                     </td>
