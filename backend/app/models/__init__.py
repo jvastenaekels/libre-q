@@ -2,84 +2,43 @@
 # Copyright (C) 2025 Julien Vastenekels
 # Licensed under the GNU Affero General Public License v3.0 or later.
 
-"""SQLAlchemy database models."""
+"""SQLAlchemy database models — re-export facade.
 
-from datetime import datetime, timedelta, timezone
-from enum import Enum
-from typing import Any
-from uuid import UUID, uuid4
+All public names are re-exported from sub-modules so that existing
+``from app.models import X`` imports continue to work unchanged.
+"""
 
-from sqlalchemy import (
-    JSON,
-    Boolean,
-    DateTime,
-    Float,
-    ForeignKey,
-    Integer,
-    SmallInteger,
-    String,
-    UniqueConstraint,
-    CheckConstraint,
-    select,
-)
-from sqlalchemy import Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
-from sqlalchemy.sql import func
-
-from ..database import Base
-
-# Sessions expire after this many days of inactivity (based on last_step_reached_at)
-SESSION_TTL_DAYS: int = 60
-
-
-# Enums
-class StudyState(str, Enum):
-    """Enum for study lifecycle states."""
-
-    draft = "draft"
-    active = "active"
-    paused = "paused"
-    closed = "closed"
-    archived = "archived"
-
-
-class ConcourseItemStatus(str, Enum):
-    """Enum for concourse item curation status."""
-
-    proposed = "proposed"
-    accepted = "accepted"
-    rejected = "rejected"
-
-
-class ParticipantStatus(str, Enum):
-    """Enum for participant progress status."""
-
-    started = "started"
-    completed = "completed"
-
-
-class ProjectRole(str, Enum):
-    """Enum for project roles."""
-
-    owner = "owner"  # Renamed from 'admin' for consistency with StudyRole
-    researcher = "researcher"
-    viewer = "viewer"
-
-
-class StudyRole(str, Enum):
-    """Enum for study-specific roles."""
-
-    owner = "owner"
-    editor = "editor"
-    viewer = "viewer"
-
-
-class RecruitmentLinkType(str, Enum):
-    """Enum for types of recruitment links."""
-
-    public = "public"
-    individual = "individual"
-    limited = "limited"
+from .base import Any as Any
+from .base import Base as Base
+from .base import Boolean as Boolean
+from .base import CheckConstraint as CheckConstraint
+from .base import ConcourseItemStatus as ConcourseItemStatus
+from .base import DateTime as DateTime
+from .base import Float as Float
+from .base import ForeignKey as ForeignKey
+from .base import Integer as Integer
+from .base import JSON as JSON
+from .base import Mapped as Mapped
+from .base import ParticipantStatus as ParticipantStatus
+from .base import ProjectRole as ProjectRole
+from .base import RecruitmentLinkType as RecruitmentLinkType
+from .base import SAEnum as SAEnum
+from .base import SESSION_TTL_DAYS as SESSION_TTL_DAYS
+from .base import SmallInteger as SmallInteger
+from .base import String as String
+from .base import StudyRole as StudyRole
+from .base import StudyState as StudyState
+from .base import UUID as UUID
+from .base import UniqueConstraint as UniqueConstraint
+from .base import column_property as column_property
+from .base import datetime as datetime
+from .base import func as func
+from .base import mapped_column as mapped_column
+from .base import relationship as relationship
+from .base import select as select
+from .base import timedelta as timedelta
+from .base import timezone as timezone
+from .base import uuid4 as uuid4
 
 
 # Project Models
