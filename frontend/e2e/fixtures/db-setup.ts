@@ -154,7 +154,7 @@ export class TestDatabase {
     }
 
     /**
-     * Seed unique data: user and workspace for this specific test instance
+     * Seed unique data: user and project for this specific test instance
      */
     private async seedUniqueData(testId: string) {
         try {
@@ -168,7 +168,7 @@ export class TestDatabase {
                         password: this.uniqueUserPass,
                         is_superuser: true,
                     },
-                    workspace: {
+                    project: {
                         name: `Test Workspace ${testId}`,
                         slug: workspaceSlug,
                     },
@@ -181,7 +181,7 @@ export class TestDatabase {
             }
 
             const data = await response.json();
-            this.workspaceId = data.workspace_id;
+            this.workspaceId = data.project_id;
             this.userId = data.user_id;
             this.currentWorkspaceSlug = workspaceSlug;
         } catch (error) {
@@ -230,10 +230,10 @@ export class TestDatabase {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
-                'X-Workspace-ID': this.workspaceId.toString(),
+                'X-Project-ID': this.workspaceId.toString(),
             },
             body: JSON.stringify({
-                workspace_id: this.workspaceId,
+                project_id: this.workspaceId,
                 slug: config.slug || `test-${Date.now()}`,
                 translations: config.translations || [
                     {
@@ -336,7 +336,8 @@ export class TestDatabase {
     }
 
     /**
-     * Create participant session and submit data
+     * Create participant session and submit data.
+     * Consent must be recorded before submission — this method handles both steps.
      */
     async createParticipant(_token: string, studySlug: string, overrides: any = {}) {
         // Generate a session token for this participant
@@ -357,7 +358,25 @@ export class TestDatabase {
             );
         }
 
-        // Build qsort as list of QSortEntryInput objects using REAL statement IDs
+        // Step 1: Record consent (required before submission)
+        const consentRes = await this.fetchWithRetry(
+            `${this.baseUrl}/api/study/${studySlug}/consent`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    study_slug: studySlug,
+                    session_token: sessionToken,
+                    language_code: 'en',
+                    consent_hash: null,
+                    is_test_run: false,
+                }),
+            }
+        );
+        if (!consentRes.ok) {
+            throw new Error(`Failed to record consent: ${await consentRes.text()}`);
+        }
+
         // Build qsort as list of QSortEntryInput objects using REAL statement IDs and grid limits
         const targetDist = publicConfig.grid_config || [];
         const scorePool: number[] = [];
@@ -375,7 +394,7 @@ export class TestDatabase {
                 return { statement_id: s.id, grid_score: score };
             });
 
-        // Build a complete submission with the study's expected format
+        // Step 2: Build a complete submission with the study's expected format
         const submission = {
             study_slug: studySlug,
             session_token: sessionToken,
