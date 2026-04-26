@@ -2,13 +2,13 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: libre_q
-      POSTGRES_USER: libre_q
-      POSTGRES_PASSWORD: libre_q
+      POSTGRES_DB: qualis
+      POSTGRES_USER: qualis
+      POSTGRES_PASSWORD: qualis
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U libre_q"]
+      test: ["CMD-SHELL", "pg_isready -U qualis"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -16,7 +16,7 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql+asyncpg://libre_q:libre_q@db:5432/libre_q
+      DATABASE_URL: postgresql+asyncpg://qualis:qualis@db:5432/qualis
       SECRET_KEY: docker-dev-secret-change-in-production
       IP_HASH_SALT: docker-dev-salt-change-in-production
       FRONTEND_URL: http://localhost:3000

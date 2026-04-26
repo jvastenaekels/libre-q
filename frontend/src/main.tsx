@@ -10,6 +10,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './i18n';
 import './index.css';
+import { migrateLegacyStorage } from './utils/migrateLegacyStorage';
+
+// Run the libre-q-* → qualis-* storage rename before any code touches the
+// new namespace. Idempotent; no-op once the legacy keys are gone.
+migrateLegacyStorage();
 
 // ---------------------------------------------------------------------------
 // Sentry — initialised here (before React render) so the SDK captures errors

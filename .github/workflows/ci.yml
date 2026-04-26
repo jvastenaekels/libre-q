@@ -71,7 +71,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: libre_q_test
+          POSTGRES_DB: qualis_test
         ports:
           - 5432:5432
         options: >-
@@ -80,7 +80,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q_test
+      TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/qualis_test
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -180,7 +180,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: libre_q
+          POSTGRES_DB: qualis
         ports:
           - 5432:5432
         options: >-
@@ -190,7 +190,7 @@ jobs:
           --health-retries 5
     env:
       PYTHONUNBUFFERED: "1"
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/qualis
       ENVIRONMENT: test
       IP_HASH_SALT: ci-deterministic-salt-not-secret
     steps:
@@ -270,7 +270,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: libre_q
+          POSTGRES_DB: qualis
         ports:
           - 5432:5432
         options: >-
@@ -280,7 +280,7 @@ jobs:
           --health-retries 5
     env:
       PYTHONUNBUFFERED: "1"
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/libre_q
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/qualis
       ENVIRONMENT: test
       IP_HASH_SALT: ci-deterministic-salt-not-secret
     steps:

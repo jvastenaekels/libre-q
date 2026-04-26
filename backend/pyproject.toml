@@ -1,5 +1,5 @@
 [project]
-name = "libre-q-backend"
+name = "qualis-backend"
 version = "0.1.0"
 description = "Backend for Qualis"
 readme = "README.md"

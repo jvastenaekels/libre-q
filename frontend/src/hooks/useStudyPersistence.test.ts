@@ -133,7 +133,7 @@ describe('useStudyPersistence', () => {
             vi.advanceTimersByTime(1000);
         });
 
-        const backup = localStorage.getItem('libre-q-draft-backup-test-study');
+        const backup = localStorage.getItem('qualis-draft-backup-test-study');
         expect(backup).toContain('"slug":"test-study"');
         expect(backup).toContain('"_study_id":"orig-id"');
         vi.useRealTimers();

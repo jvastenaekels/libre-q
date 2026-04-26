@@ -265,7 +265,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
         }),
         {
-            name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',
+            name: isPilot() ? 'qualis-pilot-responses' : 'qualis-responses',
             version: 2,
             storage: safeLocalStorage,
             migrate: (persisted: unknown, version: number) => {

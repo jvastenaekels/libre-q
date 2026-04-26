@@ -50,7 +50,7 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (slug && isTestMode && !isPilotMode) {
             // Set flag for storage isolation in this tab
-            sessionStorage.setItem('libre-q-pilot-mode', 'true');
+            sessionStorage.setItem('qualis-pilot-mode', 'true');
             setPilotMode(true);
         }
     }, [isTestMode, slug, isPilotMode, setPilotMode]);
@@ -64,14 +64,14 @@ export const useStudyConfig = () => {
             setConfigLoading(true);
 
             // Check if we need a fresh start (set by StudyDesignPage)
-            const resetKey = `libre-q-pilot-reset-${slug}`;
+            const resetKey = `qualis-pilot-reset-${slug}`;
             if (localStorage.getItem(resetKey)) {
                 resetAllStores({ skipConfig: true });
                 localStorage.removeItem(resetKey);
             }
 
-            const draftKey = `libre-q-test-draft-${slug}`;
-            const legacyKey = `libre-q-test-config-${slug}`;
+            const draftKey = `qualis-test-draft-${slug}`;
+            const legacyKey = `qualis-test-config-${slug}`;
 
             const draftJson = localStorage.getItem(draftKey);
             const legacyJson = localStorage.getItem(legacyKey);
@@ -187,7 +187,7 @@ export const useStudyConfig = () => {
 
         // Listen for changes from other tabs (Designer)
         const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === `libre-q-test-draft-${slug}` || e.key === `libre-q-pilot-reset-${slug}`) {
+            if (e.key === `qualis-test-draft-${slug}` || e.key === `qualis-pilot-reset-${slug}`) {
                 loadFromStorage();
             }
         };

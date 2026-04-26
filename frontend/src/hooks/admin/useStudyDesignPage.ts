@@ -520,12 +520,12 @@ export function useStudyDesignPage(): StudyDesignPageApi {
             }),
         };
 
-        localStorage.setItem(`libre-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
+        localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
         localStorage.setItem(
-            `libre-q-test-config-${effectiveSlug}`,
+            `qualis-test-config-${effectiveSlug}`,
             JSON.stringify(syntheticConfig)
         );
-        localStorage.setItem(`libre-q-pilot-reset-${effectiveSlug}`, 'true');
+        localStorage.setItem(`qualis-pilot-reset-${effectiveSlug}`, 'true');
 
         const testUrl = `/study/${effectiveSlug}?mode=test`;
         window.open(testUrl, '_blank');

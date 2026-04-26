@@ -106,7 +106,7 @@ flowchart TD
 
 When a participant navigates between studies (or the URL slug changes), all participant-facing stores (`useSessionStore`, `useConfigStore`, `useResponseStore`) are automatically reset and the TanStack Query cache is cleared. This prevents cross-contamination of data between studies.
 
-In pilot/test mode, stores use separate localStorage keys (e.g., `libre-q-pilot-session` instead of `libre-q-session`) to isolate test data from real participant sessions.
+In pilot/test mode, stores use separate localStorage keys (e.g., `qualis-pilot-session` instead of `qualis-session`) to isolate test data from real participant sessions.
 
 ### Context Providers
 

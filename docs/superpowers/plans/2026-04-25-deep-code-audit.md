@@ -135,7 +135,7 @@ docs/audits/2026-04-25-deep-audit/
 - [ ] **Step 1: Verify clean working tree (audit edits should not mix with WIP)**
 
 ```bash
-git -C /home/julien/libre-q status --short
+git -C /home/julien/qualis status --short
 ```
 
 Expected: only frontend WIP files (`FactorArraysView.tsx`, `FactorCharacteristicsTable.tsx`) and untracked `CITATION.cff`. If anything else appears unexpected, stop and ask user.
@@ -143,12 +143,12 @@ Expected: only frontend WIP files (`FactorArraysView.tsx`, `FactorCharacteristic
 - [ ] **Step 2: Create audit directory structure**
 
 ```bash
-mkdir -p /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw
+mkdir -p /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw
 ```
 
 - [ ] **Step 3: Add `.raw/` and audit venvs to `.gitignore`**
 
-Append to `/home/julien/libre-q/.gitignore`:
+Append to `/home/julien/qualis/.gitignore`:
 
 ```
 # Audit artifacts (raw tool outputs, not for git)
@@ -227,7 +227,7 @@ Expected: every command prints a version, no `command not found`. If any fails, 
 - [ ] **Step 9: Commit workspace setup**
 
 ```bash
-cd /home/julien/libre-q
+cd /home/julien/qualis
 git add .gitignore
 git commit -m "audit(setup): create deep-audit workspace and gitignore raw outputs"
 ```
@@ -245,7 +245,7 @@ runs its tools, captures output to `.raw/`, and reports a 1-line summary.
 - [ ] **Step 1: Pre-flight — verify backend venv and frontend deps are installed**
 
 ```bash
-cd /home/julien/libre-q
+cd /home/julien/qualis
 ls backend/.venv/bin/pytest && ls frontend/node_modules/.bin/vitest
 ```
 
@@ -260,8 +260,8 @@ and writes to `.raw/`.
 **Sub-agent A — Existing CI suite + coverage:**
 
 ```
-Run /home/julien/libre-q/Makefile target `ci-full` and capture output to
-/home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/ci-full-output.log.
+Run /home/julien/qualis/Makefile target `ci-full` and capture output to
+/home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/ci-full-output.log.
 Then run backend coverage to .raw/pytest-coverage.xml (use
 `backend/.venv/bin/pytest --cov=backend/app --cov-report=xml:docs/audits/2026-04-25-deep-audit/.raw/pytest-coverage.xml`)
 and frontend coverage (use
@@ -274,7 +274,7 @@ Report: ci-full pass/fail, backend coverage %, frontend coverage %.
 
 ```
 Run gitleaks on full git history, capture to .raw/gitleaks-report.json:
-`gitleaks detect --source /home/julien/libre-q --report-path
+`gitleaks detect --source /home/julien/qualis --report-path
 docs/audits/2026-04-25-deep-audit/.raw/gitleaks-report.json
 --report-format json --no-banner`.
 Run npm audit: `cd frontend && npm audit --json >
@@ -293,15 +293,15 @@ high-severity count.
 ```
 Run madge for circular deps in frontend:
 `/tmp/audit-node/node_modules/.bin/madge --circular --json
-/home/julien/libre-q/frontend/src >
-/home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/madge-circular.json`.
+/home/julien/qualis/frontend/src >
+/home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/madge-circular.json`.
 Run pydeps for backend dep graph:
-`/tmp/audit-venv/bin/pydeps /home/julien/libre-q/backend/app --max-bacon=2
+`/tmp/audit-venv/bin/pydeps /home/julien/qualis/backend/app --max-bacon=2
 --cluster --noshow -o
-/home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/pydeps-graph.svg
+/home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/pydeps-graph.svg
 || true`.
 Run knip for dead exports:
-`cd /home/julien/libre-q/frontend &&
+`cd /home/julien/qualis/frontend &&
 /tmp/audit-node/node_modules/.bin/knip --reporter json >
 ../docs/audits/2026-04-25-deep-audit/.raw/knip-report.json || true`.
 Run radon (already in CI, capture json):
@@ -319,12 +319,12 @@ Run interrogate on backend:
 docs/audits/2026-04-25-deep-audit/.raw/interrogate-coverage.txt`.
 Run lychee on all .md files (excluding library/, node_modules/, .venv/):
 `lychee --no-progress --format json
-$(find /home/julien/libre-q -name "*.md" -not -path "*/node_modules/*"
+$(find /home/julien/qualis -name "*.md" -not -path "*/node_modules/*"
 -not -path "*/.venv/*" -not -path "*/library/*") >
-/home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/lychee-links.json
+/home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/lychee-links.json
 || true`.
 Validate CITATION.cff if present:
-`/tmp/audit-venv/bin/cffconvert --validate -i /home/julien/libre-q/CITATION.cff >
+`/tmp/audit-venv/bin/cffconvert --validate -i /home/julien/qualis/CITATION.cff >
 docs/audits/2026-04-25-deep-audit/.raw/citation-validation.txt 2>&1 || echo
 "CITATION.cff missing or invalid" >>
 docs/audits/2026-04-25-deep-audit/.raw/citation-validation.txt`.
@@ -334,12 +334,12 @@ Report: docstring coverage %, broken links count, citation valid yes/no.
 **Sub-agent E — Frontend a11y + perf (requires browser):**
 
 ```
-Start the dev server: `cd /home/julien/libre-q && make run-frontend &` and
+Start the dev server: `cd /home/julien/qualis && make run-frontend &` and
 wait for http://localhost:5173 to respond (max 30s).
 Run axe-core on 3 key pages (landing, /admin, sample participant Q-sort URL
 from seed):
 `/tmp/audit-node/node_modules/.bin/axe http://localhost:5173 --save
-/home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/axe-landing.json`
+/home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/axe-landing.json`
 (repeat for each URL with appropriate filenames).
 Run lighthouse on the same 3 pages, both desktop and mobile:
 `/tmp/audit-node/node_modules/.bin/lighthouse <url> --output=json
@@ -377,8 +377,8 @@ whether qmethod-R was available for comparison.
 - [ ] **Step 4: Verify expected raw outputs exist**
 
 ```bash
-ls -la /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/ | wc -l
-ls /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/
+ls -la /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/ | wc -l
+ls /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/
 ```
 
 Expected: ≥15 files. If any sub-agent reported missing tool, install and re-run that agent.
@@ -391,7 +391,7 @@ when it was generated. Format: small table.
 - [ ] **Step 6: Commit Wave 1 completion marker**
 
 ```bash
-cd /home/julien/libre-q
+cd /home/julien/qualis
 git add docs/audits/2026-04-25-deep-audit/.raw/README.md
 git commit -m "audit(wave1): tool outputs captured to .raw (gitignored), index committed"
 ```
@@ -467,7 +467,7 @@ Severity guidance for this axis:
 - [ ] **Step 2: Wait for sub-agent and verify output file exists**
 
 ```bash
-ls -la /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/01-security.md
+ls -la /home/julien/qualis/docs/audits/2026-04-25-deep-audit/01-security.md
 ```
 
 - [ ] **Step 3: Sanity-check the file (count findings by severity)**
@@ -486,8 +486,8 @@ user and ask whether to continue Wave 2 or pause for immediate triage.
 - [ ] **Step 5: Commit axis 01 output**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/01-security.md
-git -C /home/julien/libre-q commit -m "audit(01-security): {N} findings ({A} blocker, {B} major, {C} minor)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/01-security.md
+git -C /home/julien/qualis commit -m "audit(01-security): {N} findings ({A} blocker, {B} major, {C} minor)"
 ```
 
 ---
@@ -534,8 +534,8 @@ produce more, group into thematic findings instead.
 
 ```bash
 ls docs/audits/2026-04-25-deep-audit/02-code-quality.md
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/02-code-quality.md
-git -C /home/julien/libre-q commit -m "audit(02-code-quality): {N} findings (light-pass)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/02-code-quality.md
+git -C /home/julien/qualis commit -m "audit(02-code-quality): {N} findings (light-pass)"
 ```
 
 ---
@@ -599,8 +599,8 @@ get cross-references only.
 
 ```bash
 ls docs/audits/2026-04-25-deep-audit/03-architecture.md
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/03-architecture.md
-git -C /home/julien/libre-q commit -m "audit(03-architecture): {N} findings"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/03-architecture.md
+git -C /home/julien/qualis commit -m "audit(03-architecture): {N} findings"
 ```
 
 ---
@@ -615,12 +615,12 @@ git -C /home/julien/libre-q commit -m "audit(03-architecture): {N} findings"
 - [ ] **Step 1: Run mutmut on the analysis service (Wave 1 may not have completed it)**
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 /tmp/audit-venv/bin/mutmut run \
   --paths-to-mutate=app/services/analysis_service.py \
   --runner="../backend/.venv/bin/pytest tests/" \
   --no-progress 2>&1 | tee \
-  /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/mutmut-results.txt
+  /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/mutmut-results.txt
 ```
 
 If mutmut takes >15min, kill it (`Ctrl-C`) and capture the partial results
@@ -681,8 +681,8 @@ Severity guidance:
 
 ```bash
 ls docs/audits/2026-04-25-deep-audit/04-tests.md
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/04-tests.md
-git -C /home/julien/libre-q commit -m "audit(04-tests): {N} findings ({A} blocker, {B} major)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/04-tests.md
+git -C /home/julien/qualis commit -m "audit(04-tests): {N} findings ({A} blocker, {B} major)"
 ```
 
 ---
@@ -696,11 +696,11 @@ git -C /home/julien/libre-q commit -m "audit(04-tests): {N} findings ({A} blocke
 - [ ] **Step 1: Generate ORM ↔ DB ↔ Alembic diff to .raw**
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 .venv/bin/alembic check 2>&1 | tee \
-  /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/alembic-check.log
+  /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/alembic-check.log
 .venv/bin/python scripts/check_relationships.py 2>&1 | tee \
-  /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/check-relationships.log
+  /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/check-relationships.log
 ```
 
 - [ ] **Step 2: Dispatch data & migrations sub-agent (standard, 60min)**
@@ -748,8 +748,8 @@ Severity:
 - [ ] **Step 3: Verify and commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/05-data-and-migrations.md
-git -C /home/julien/libre-q commit -m "audit(05-data): {N} findings"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/05-data-and-migrations.md
+git -C /home/julien/qualis commit -m "audit(05-data): {N} findings"
 ```
 
 ---
@@ -765,8 +765,8 @@ git -C /home/julien/libre-q commit -m "audit(05-data): {N} findings"
 - [ ] **Step 1: Verify Wave 1 sub-agent F produced the Layer 1 outputs**
 
 ```bash
-ls /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/qmethod-*
-cat /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/qmethod-comparison-NOTE.txt 2>/dev/null
+ls /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/qmethod-*
+cat /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/qmethod-comparison-NOTE.txt 2>/dev/null
 ```
 
 If qmethod-zabala-*.json missing (R not available), document this in the
@@ -782,7 +782,7 @@ save to `.raw/synthetic-datasets/{case}.csv`. Document the construction.
 - [ ] **Step 3: Run Qualis analysis on each synthetic dataset, capture intermediates**
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 for case in bipolar confounded forced unforced; do
     .venv/bin/python -c "
 from app.services.analysis_service import {entry_point};
@@ -890,8 +890,8 @@ report to user immediately with full finding text.
 - [ ] **Step 6: Commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/06-q-methodology-validity.md
-git -C /home/julien/libre-q commit -m "audit(06-qmethod): {N} findings ({A} blocker, {B} major) — Layer 1/2/3 validation"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/06-q-methodology-validity.md
+git -C /home/julien/qualis commit -m "audit(06-qmethod): {N} findings ({A} blocker, {B} major) — Layer 1/2/3 validation"
 ```
 
 ---
@@ -905,7 +905,7 @@ git -C /home/julien/libre-q commit -m "audit(06-qmethod): {N} findings ({A} bloc
 - [ ] **Step 1: Run i18n-check extended scan**
 
 ```bash
-cd /home/julien/libre-q/frontend && \
+cd /home/julien/qualis/frontend && \
 npm run i18n-check 2>&1 | tee \
   ../docs/audits/2026-04-25-deep-audit/.raw/i18n-check.log
 ```
@@ -914,10 +914,10 @@ Then a quick custom check for "values identical across locales" (a
 common bug — fr keys with English values):
 
 ```bash
-python3 - <<'EOF' > /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/i18n-identical-values.txt
+python3 - <<'EOF' > /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/i18n-identical-values.txt
 import json, glob
 locales = {}
-for path in glob.glob('/home/julien/libre-q/frontend/public/locales/*/'):
+for path in glob.glob('/home/julien/qualis/frontend/public/locales/*/'):
     locale = path.rstrip('/').split('/')[-1]
     locales[locale] = {}
     for f in glob.glob(path + '*.json'):
@@ -990,8 +990,8 @@ Severity:
 - [ ] **Step 3: Verify and commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/07-frontend-ux.md
-git -C /home/julien/libre-q commit -m "audit(07-frontend-ux): {N} findings"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/07-frontend-ux.md
+git -C /home/julien/qualis commit -m "audit(07-frontend-ux): {N} findings"
 ```
 
 ---
@@ -1007,11 +1007,11 @@ git -C /home/julien/libre-q commit -m "audit(07-frontend-ux): {N} findings"
 Run the seed setup, then a representative endpoint with SQL echo:
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 SQLALCHEMY_ECHO=1 .venv/bin/python -m pytest \
   tests/unit/test_analysis_service.py -v -s 2>&1 | \
   grep -E "SELECT|INSERT|UPDATE" | head -100 > \
-  /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/sql-trace-analysis.log
+  /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/sql-trace-analysis.log
 ```
 
 (Adapt the test path to one that exercises a realistic flow.)
@@ -1019,7 +1019,7 @@ SQLALCHEMY_ECHO=1 .venv/bin/python -m pytest \
 - [ ] **Step 2: Generate bundle analyzer report**
 
 ```bash
-cd /home/julien/libre-q/frontend && \
+cd /home/julien/qualis/frontend && \
 ROLLUP_VISUALIZE=1 npm run build 2>&1 | tail -30 > \
   ../docs/audits/2026-04-25-deep-audit/.raw/build-output.log
 mv stats.html ../docs/audits/2026-04-25-deep-audit/.raw/bundle-stats.html 2>/dev/null
@@ -1061,8 +1061,8 @@ Severity:
 - [ ] **Step 4: Verify and commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/08-performance.md
-git -C /home/julien/libre-q commit -m "audit(08-performance): {N} findings (light-pass)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/08-performance.md
+git -C /home/julien/qualis commit -m "audit(08-performance): {N} findings (light-pass)"
 ```
 
 ---
@@ -1076,7 +1076,7 @@ git -C /home/julien/libre-q commit -m "audit(08-performance): {N} findings (ligh
 - [ ] **Step 1: Test build-from-zero in fresh container**
 
 ```bash
-cd /home/julien/libre-q && \
+cd /home/julien/qualis && \
 docker compose down -v 2>/dev/null; \
 docker compose build --no-cache 2>&1 | tee \
   docs/audits/2026-04-25-deep-audit/.raw/docker-build.log
@@ -1093,10 +1093,10 @@ Capture pass/fail clearly.
 - [ ] **Step 2: Verify lockfile integrity**
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 .venv/bin/uv lock --check 2>&1 | tee \
   ../docs/audits/2026-04-25-deep-audit/.raw/uv-lock-check.log
-cd /home/julien/libre-q/frontend && \
+cd /home/julien/qualis/frontend && \
 npm ci --dry-run 2>&1 | tee \
   ../docs/audits/2026-04-25-deep-audit/.raw/npm-ci-check.log
 ```
@@ -1104,7 +1104,7 @@ npm ci --dry-run 2>&1 | tee \
 - [ ] **Step 3: Test seed + init_db reset**
 
 ```bash
-cd /home/julien/libre-q/backend && \
+cd /home/julien/qualis/backend && \
 .venv/bin/python init_db.py --reset 2>&1 | tee \
   ../docs/audits/2026-04-25-deep-audit/.raw/init-db-reset.log
 .venv/bin/python seed.py 2>&1 | tee \
@@ -1169,8 +1169,8 @@ A blocker here is also critical for SoftwareX. Report immediately if found.
 - [ ] **Step 6: Commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/09-reproducibility.md
-git -C /home/julien/libre-q commit -m "audit(09-reproducibility): {N} findings ({A} blocker)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/09-reproducibility.md
+git -C /home/julien/qualis commit -m "audit(09-reproducibility): {N} findings ({A} blocker)"
 ```
 
 ---
@@ -1185,7 +1185,7 @@ git -C /home/julien/libre-q commit -m "audit(09-reproducibility): {N} findings (
 - [ ] **Step 1: Check OpenAPI ↔ code sync**
 
 ```bash
-cd /home/julien/libre-q && \
+cd /home/julien/qualis && \
 make check-api 2>&1 | tee \
   docs/audits/2026-04-25-deep-audit/.raw/openapi-sync.log
 ```
@@ -1236,8 +1236,8 @@ Severity:
 - [ ] **Step 3: Verify and commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/10-documentation.md
-git -C /home/julien/libre-q commit -m "audit(10-documentation): {N} findings"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/10-documentation.md
+git -C /home/julien/qualis commit -m "audit(10-documentation): {N} findings"
 ```
 
 ---
@@ -1251,7 +1251,7 @@ git -C /home/julien/libre-q commit -m "audit(10-documentation): {N} findings"
 - [ ] **Step 1: Grep for logging patterns**
 
 ```bash
-cd /home/julien/libre-q && \
+cd /home/julien/qualis && \
 echo "=== print() calls in backend ===" > \
   docs/audits/2026-04-25-deep-audit/.raw/observability-grep.txt
 grep -rn "print(" backend/app | grep -v "#" >> \
@@ -1306,8 +1306,8 @@ Severity:
 - [ ] **Step 3: Verify and commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/11-observability.md
-git -C /home/julien/libre-q commit -m "audit(11-observability): {N} findings (light-pass)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/11-observability.md
+git -C /home/julien/qualis commit -m "audit(11-observability): {N} findings (light-pass)"
 ```
 
 ---
@@ -1323,7 +1323,7 @@ git -C /home/julien/libre-q commit -m "audit(11-observability): {N} findings (li
 
 ```bash
 # Save reference URLs to consult
-cat > /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/journal-criteria-refs.txt <<'EOF'
+cat > /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/journal-criteria-refs.txt <<'EOF'
 SoftwareX Guide for Authors:
 https://www.sciencedirect.com/journal/softwarex/publish/guide-for-authors
 JOSS review criteria (parallel reference):
@@ -1336,7 +1336,7 @@ The sub-agent will WebFetch these.
 - [ ] **Step 2: Check repo state (frozen version readiness)**
 
 ```bash
-cd /home/julien/libre-q && \
+cd /home/julien/qualis && \
 echo "=== Current tags ===" > \
   docs/audits/2026-04-25-deep-audit/.raw/repo-state.txt
 git tag -l >> docs/audits/2026-04-25-deep-audit/.raw/repo-state.txt
@@ -1428,8 +1428,8 @@ Any blocker here is a desk-reject risk. Surface to user with full text.
 - [ ] **Step 5: Commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/12-submission-package.md
-git -C /home/julien/libre-q commit -m "audit(12-submission): {N} findings ({A} blocker, {B} major)"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/12-submission-package.md
+git -C /home/julien/qualis commit -m "audit(12-submission): {N} findings ({A} blocker, {B} major)"
 ```
 
 ---
@@ -1443,7 +1443,7 @@ git -C /home/julien/libre-q commit -m "audit(12-submission): {N} findings ({A} b
 - [ ] **Step 1: Aggregate findings into a single working table**
 
 ```bash
-cd /home/julien/libre-q/docs/audits/2026-04-25-deep-audit && \
+cd /home/julien/qualis/docs/audits/2026-04-25-deep-audit && \
 echo "axis|id|severity|audience|title" > .raw/all-findings.csv
 for f in 01-*.md 02-*.md 03-*.md 04-*.md 05-*.md 06-*.md 07-*.md \
          08-*.md 09-*.md 10-*.md 11-*.md 12-*.md; do
@@ -1473,7 +1473,7 @@ Edit the affected files to apply the demotion.
 - [ ] **Step 3: Verify uniform format compliance**
 
 ```bash
-cd /home/julien/libre-q/docs/audits/2026-04-25-deep-audit
+cd /home/julien/qualis/docs/audits/2026-04-25-deep-audit
 for f in 01-*.md 02-*.md 03-*.md 04-*.md 05-*.md 06-*.md 07-*.md \
          08-*.md 09-*.md 10-*.md 11-*.md 12-*.md; do
     bad=$(grep -c "TBD\|TODO" "$f")
@@ -1489,8 +1489,8 @@ If any file has TBD/TODO, dispatch a small fix sub-agent to resolve them
 - [ ] **Step 4: Commit synthesis adjustments**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/0*-*.md
-git -C /home/julien/libre-q commit -m "audit(synthesis): apply causal grouping, resolve TBDs"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/0*-*.md
+git -C /home/julien/qualis commit -m "audit(synthesis): apply causal grouping, resolve TBDs"
 ```
 
 ---
@@ -1611,7 +1611,7 @@ Fill in every X with actual numbers and content.
 - [ ] **Step 3: Verify no placeholders remain**
 
 ```bash
-grep -n "TBD\|TODO\|XXX\|^X$\| X " /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/00-executive-summary.md
+grep -n "TBD\|TODO\|XXX\|^X$\| X " /home/julien/qualis/docs/audits/2026-04-25-deep-audit/00-executive-summary.md
 ```
 
 Expected: no output (all placeholders filled).
@@ -1619,8 +1619,8 @@ Expected: no output (all placeholders filled).
 - [ ] **Step 4: Commit**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/00-executive-summary.md
-git -C /home/julien/libre-q commit -m "audit(summary): executive verdict for 3 audiences"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/00-executive-summary.md
+git -C /home/julien/qualis commit -m "audit(summary): executive verdict for 3 audiences"
 ```
 
 ---
@@ -1700,8 +1700,8 @@ For example:
 - [ ] **Step 2: Verify backlog completeness**
 
 ```bash
-total=$(grep -c "^- \[ \] \[F-" /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/99-action-backlog.md)
-findings=$(wc -l < /home/julien/libre-q/docs/audits/2026-04-25-deep-audit/.raw/all-findings.csv)
+total=$(grep -c "^- \[ \] \[F-" /home/julien/qualis/docs/audits/2026-04-25-deep-audit/99-action-backlog.md)
+findings=$(wc -l < /home/julien/qualis/docs/audits/2026-04-25-deep-audit/.raw/all-findings.csv)
 findings=$((findings - 1))  # subtract header
 echo "Backlog entries: $total | Total findings: $findings"
 ```
@@ -1713,8 +1713,8 @@ sense.
 - [ ] **Step 3: Commit backlog**
 
 ```bash
-git -C /home/julien/libre-q add docs/audits/2026-04-25-deep-audit/99-action-backlog.md
-git -C /home/julien/libre-q commit -m "audit(backlog): sequenced action plan for 3-week remediation"
+git -C /home/julien/qualis add docs/audits/2026-04-25-deep-audit/99-action-backlog.md
+git -C /home/julien/qualis commit -m "audit(backlog): sequenced action plan for 3-week remediation"
 ```
 
 - [ ] **Step 4: Cleanup throwaway tools (no permanent install without approval)**
@@ -1732,7 +1732,7 @@ permanently inside this audit.
 - [ ] **Step 5: Final audit completion check (definition of done)**
 
 ```bash
-cd /home/julien/libre-q/docs/audits/2026-04-25-deep-audit
+cd /home/julien/qualis/docs/audits/2026-04-25-deep-audit
 ls -1 *.md | sort
 ```
 

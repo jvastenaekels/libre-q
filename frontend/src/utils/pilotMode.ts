@@ -2,10 +2,10 @@ export const isPilot = (): boolean => {
     try {
         const params = new URLSearchParams(window.location.search);
         if (params.get('mode') === 'test') {
-            sessionStorage.setItem('libre-q-pilot-mode', 'true');
+            sessionStorage.setItem('qualis-pilot-mode', 'true');
             return true;
         }
-        return sessionStorage.getItem('libre-q-pilot-mode') === 'true';
+        return sessionStorage.getItem('qualis-pilot-mode') === 'true';
     } catch {
         return false;
     }
@@ -13,7 +13,7 @@ export const isPilot = (): boolean => {
 
 export const clearPilotFlag = (): void => {
     try {
-        sessionStorage.removeItem('libre-q-pilot-mode');
+        sessionStorage.removeItem('qualis-pilot-mode');
     } catch {
         /* ignore */
     }

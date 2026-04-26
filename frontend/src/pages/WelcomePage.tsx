@@ -55,15 +55,15 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             if (!currentPilotMode) {
                 setPilotMode(true);
             }
-            if (sessionStorage.getItem('libre-q-pilot-mode') !== 'true') {
-                sessionStorage.setItem('libre-q-pilot-mode', 'true');
+            if (sessionStorage.getItem('qualis-pilot-mode') !== 'true') {
+                sessionStorage.setItem('qualis-pilot-mode', 'true');
             }
         } else {
             if (currentPilotMode) {
                 setPilotMode(false);
             }
-            if (sessionStorage.getItem('libre-q-pilot-mode')) {
-                sessionStorage.removeItem('libre-q-pilot-mode');
+            if (sessionStorage.getItem('qualis-pilot-mode')) {
+                sessionStorage.removeItem('qualis-pilot-mode');
             }
         }
     }, [setStep, setPilotMode, location.search]);

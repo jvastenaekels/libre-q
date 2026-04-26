@@ -56,7 +56,7 @@ describe('GeneralSettingsPage', () => {
         });
 
         useAuthStore.setState({
-            user: { id: 1, email: 'admin@libre-q.dev', is_superuser: true },
+            user: { id: 1, email: 'admin@qualis.dev', is_superuser: true },
             isAuthenticated: true,
         });
 
@@ -124,7 +124,7 @@ describe('GeneralSettingsPage', () => {
 
     it('does not render delete button for non-superuser', async () => {
         useAuthStore.setState({
-            user: { id: 2, email: 'user@libre-q.dev', is_superuser: false },
+            user: { id: 2, email: 'user@qualis.dev', is_superuser: false },
         });
 
         const router = await import('react-router-dom');

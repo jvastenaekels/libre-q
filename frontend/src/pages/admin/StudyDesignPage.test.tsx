@@ -75,7 +75,7 @@ describe('StudyDesignPage Feature Tests', () => {
 
     beforeEach(() => {
         useAuthStore.setState({
-            user: { id: 1, email: 'admin@libre-q.dev' },
+            user: { id: 1, email: 'admin@qualis.dev' },
             isAuthenticated: true,
         });
         useStudyDesigner.getState().resetDraft();

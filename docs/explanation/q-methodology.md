@@ -2,7 +2,7 @@
 
 Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Qualis provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Qualis"](#critical-q-methodology-in-libre-q) below, which states what Qualis implements, what it defers, and why.
+If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Qualis"](#critical-q-methodology-in-qualis) below, which states what Qualis implements, what it defers, and why.
 
 ---
 

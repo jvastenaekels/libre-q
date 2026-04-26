@@ -15,7 +15,7 @@
 3. Créez un add-on Cellar:
    - Cliquez "Create..." → "an add-on" → "Cellar"
    - Région: `eu-west-1` (Paris) ou `us-east-1` (Montréal)
-   - Nom: `libre-q-audio-storage`
+   - Nom: `qualis-audio-storage`
 
 4. Une fois créé, notez les informations de connexion:
    - **Host**: `cellar-c2.services.clever-cloud.com`
@@ -55,7 +55,7 @@ s3_client = boto3.client(
     aws_secret_access_key=os.getenv('CELLAR_ADDON_KEY_SECRET')
 )
 
-bucket_name = 'libre-q-audio'
+bucket_name = 'qualis-audio'
 
 try:
     s3_client.create_bucket(Bucket=bucket_name)
@@ -110,7 +110,7 @@ aws configure --profile clever-cellar
 # Default output format: json
 
 # Créer le bucket
-aws s3 mb s3://libre-q-audio \
+aws s3 mb s3://qualis-audio \
   --endpoint-url https://cellar-c2.services.clever-cloud.com \
   --profile clever-cellar
 
@@ -127,7 +127,7 @@ Modifiez `/home/julien/open-q/backend/.env`:
 # S3/Cellar Storage
 S3_ENDPOINT_URL=https://cellar-c2.services.clever-cloud.com
 S3_REGION=us-east-1
-S3_BUCKET_NAME=libre-q-audio
+S3_BUCKET_NAME=qualis-audio
 S3_ACCESS_KEY_ID=${CELLAR_ADDON_KEY_ID}
 S3_SECRET_ACCESS_KEY=${CELLAR_ADDON_KEY_SECRET}
 
@@ -237,7 +237,7 @@ Le bucket doit être **privé** (pas d'accès public):
 
 ```python
 s3_client.put_bucket_acl(
-    Bucket='libre-q-audio',
+    Bucket='qualis-audio',
     ACL='private'
 )
 ```
@@ -248,13 +248,13 @@ En production, restreindre les origines autorisées:
 
 ```python
 s3_client.put_bucket_cors(
-    Bucket='libre-q-audio',
+    Bucket='qualis-audio',
     CORSConfiguration={
         'CORSRules': [
             {
                 'AllowedOrigins': [
-                    'https://libre-q.com',
-                    'https://www.libre-q.com'
+                    'https://qualis.com',
+                    'https://www.qualis.com'
                 ],
                 'AllowedMethods': ['GET'],  # Seulement lecture via presigned URLs
                 'AllowedHeaders': ['*'],
@@ -273,7 +273,7 @@ Supprimer automatiquement les uploads incomplets après 7 jours:
 
 ```python
 s3_client.put_bucket_lifecycle_configuration(
-    Bucket='libre-q-audio',
+    Bucket='qualis-audio',
     LifecycleConfiguration={
         'Rules': [
             {
@@ -370,7 +370,7 @@ Si vous migrez depuis AWS S3, DigitalOcean Spaces, ou Minio:
 
 ```bash
 # Synchroniser les fichiers
-aws s3 sync s3://old-bucket s3://libre-q-audio \
+aws s3 sync s3://old-bucket s3://qualis-audio \
   --source-region us-east-1 \
   --source-endpoint-url https://old-provider.com \
   --endpoint-url https://cellar-c2.services.clever-cloud.com
@@ -379,7 +379,7 @@ aws s3 sync s3://old-bucket s3://libre-q-audio \
 Puis mettez à jour les clés S3 dans la base de données:
 ```sql
 UPDATE audio_recordings
-SET s3_bucket = 'libre-q-audio'
+SET s3_bucket = 'qualis-audio'
 WHERE s3_bucket = 'old-bucket';
 ```
 

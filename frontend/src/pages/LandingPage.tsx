@@ -28,7 +28,7 @@ const LandingPage: React.FC = () => {
                 <div className="text-center space-y-2">
                     <div className="flex justify-center mb-6">
                         <img
-                            src="/libre-q-logo.svg"
+                            src="/qualis-logo.svg"
                             alt="Qualis"
                             className="h-20 w-auto object-contain"
                         />

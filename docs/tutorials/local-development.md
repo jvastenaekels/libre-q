@@ -26,7 +26,7 @@ cd qualis
 The repository is a monorepo:
 
 ```
-libre-q/
+qualis/
   backend/        # FastAPI application (Python)
   frontend/       # React SPA (TypeScript)
   docs/           # Documentation

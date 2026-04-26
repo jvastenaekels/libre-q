@@ -383,7 +383,7 @@ describe('Pilot Mode Logic', () => {
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() } as any);
         // Default not in pilot mode
         useSessionStore.setState({ isPilotMode: false });
-        sessionStorage.removeItem('libre-q-pilot-mode');
+        sessionStorage.removeItem('qualis-pilot-mode');
     });
 
     it('Renders hard loading state when in pilot mode and config is missing', () => {

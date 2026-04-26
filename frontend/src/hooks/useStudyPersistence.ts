@@ -92,11 +92,11 @@ export function useStudyPersistence() {
                     _backup_at: new Date().toISOString(),
                 };
                 localStorage.setItem(
-                    `libre-q-draft-backup-${effectiveSlug}`,
+                    `qualis-draft-backup-${effectiveSlug}`,
                     JSON.stringify(backupData)
                 );
                 // Also update the test draft key so open test tabs can react via 'storage' event
-                localStorage.setItem(`libre-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
+                localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
             }
         }, 1000); // Debounce backup
 
@@ -133,7 +133,7 @@ export function useStudyPersistence() {
             setStudy(result);
 
             // Ensure test draft is synced on successful save
-            localStorage.setItem(`libre-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
+            localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
 
             toast.success(t('admin.study.save.success'));
         } catch (error) {

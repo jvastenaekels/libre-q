@@ -140,7 +140,7 @@ make e2e         # playwright (study + admin flows)
 
 Before marking a task done:
 ```bash
-cd /home/julien/libre-q
+cd /home/julien/qualis
 make ci              # Fast verification (~2-3 min)
 # OR for full validation:
 make ci-full         # Includes E2E (~10-15 min)

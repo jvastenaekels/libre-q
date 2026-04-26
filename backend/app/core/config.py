@@ -44,7 +44,7 @@ class Settings(BaseSettings):
 
     # CORS — comma-separated origin list. Defaults cover local dev (Vite + preview).
     # In production set explicit origins via env, e.g.
-    #   ALLOWED_ORIGINS=https://libre-q.example.org,https://staging.libre-q.example.org
+    #   ALLOWED_ORIGINS=https://qualis.example.org,https://staging.qualis.example.org
     ALLOWED_ORIGINS: str = (
         "http://localhost:5173,http://localhost:4173,"
         "http://127.0.0.1:5173,http://127.0.0.1:4173"
@@ -87,7 +87,7 @@ class Settings(BaseSettings):
         if not v:
             # For static analysis, OpenAPI generation, and CI checks that don't need a real DB,
             # we provide a dummy PostgreSQL URL. Connection will fail later if actually needed.
-            return "postgresql+asyncpg://localhost/libre_q_dummy"
+            return "postgresql+asyncpg://localhost/qualis_dummy"
 
         # 1. Handle postgres/postgresql prefix for asyncpg
         if v.startswith("postgres://"):

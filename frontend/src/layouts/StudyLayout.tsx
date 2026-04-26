@@ -347,8 +347,8 @@ const StudyLayoutContent: React.FC = () => {
         ) {
             hasShownWelcomeBack.current = true;
             try {
-                if (sessionStorage.getItem('libre-q-resumed-via-link') === '1') {
-                    sessionStorage.removeItem('libre-q-resumed-via-link');
+                if (sessionStorage.getItem('qualis-resumed-via-link') === '1') {
+                    sessionStorage.removeItem('qualis-resumed-via-link');
                     return; // ResumePage already showed a toast
                 }
             } catch {
@@ -422,7 +422,7 @@ const StudyLayoutContent: React.FC = () => {
     const isPilotModePersistent =
         isPilotMode ||
         new URLSearchParams(location.search).get('mode') === 'test' ||
-        sessionStorage.getItem('libre-q-pilot-mode') === 'true';
+        sessionStorage.getItem('qualis-pilot-mode') === 'true';
 
     // Hard Loading State (Initial Fetch)
     // In pilot mode, treat missing config as loading to prevent flash of raw keys
@@ -600,7 +600,7 @@ const StudyLayoutContent: React.FC = () => {
                             !(branding?.partners && branding.partners.length > 0) &&
                             (currentStep === 1 ? (
                                 <img
-                                    src="/libre-q-logo.svg"
+                                    src="/qualis-logo.svg"
                                     alt={t('layout.title')}
                                     className="h-8 w-auto object-contain"
                                 />

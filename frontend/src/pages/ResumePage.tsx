@@ -46,7 +46,7 @@ export default function ResumePage() {
 
                 // Clear pilot-mode flag so stores use normal persistence keys
                 try {
-                    sessionStorage.removeItem('libre-q-pilot-mode');
+                    sessionStorage.removeItem('qualis-pilot-mode');
                 } catch {
                     // Ignore storage errors
                 }
@@ -108,7 +108,7 @@ export default function ResumePage() {
 
                 // Flag so StudyLayout skips its welcome-back toast (we show our own)
                 try {
-                    sessionStorage.setItem('libre-q-resumed-via-link', '1');
+                    sessionStorage.setItem('qualis-resumed-via-link', '1');
                 } catch {
                     // Ignore storage errors
                 }

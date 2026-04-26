@@ -92,7 +92,7 @@ export const useSessionStore = create<SessionState>()(
             },
         }),
         {
-            name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
+            name: isPilot() ? 'qualis-pilot-session' : 'qualis-session',
             version: 2,
             storage: safeLocalStorage,
             partialize: (state) => {

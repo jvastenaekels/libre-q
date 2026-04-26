@@ -23,7 +23,7 @@ If S3 is not configured, audio recording features are disabled and text-only res
 ## Step 1: Create an S3 Bucket
 
 ```bash
-aws s3 mb s3://libre-q-audio --region eu-west-1
+aws s3 mb s3://qualis-audio --region eu-west-1
 ```
 
 ### Recommended Bucket Settings
@@ -51,8 +51,8 @@ Create an IAM user or role with the following policy:
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::libre-q-audio",
-        "arn:aws:s3:::libre-q-audio/*"
+        "arn:aws:s3:::qualis-audio",
+        "arn:aws:s3:::qualis-audio/*"
       ]
     }
   ]
@@ -66,7 +66,7 @@ Create an IAM user or role with the following policy:
 Set the following environment variables in your deployment:
 
 ```bash
-S3_BUCKET_NAME=libre-q-audio
+S3_BUCKET_NAME=qualis-audio
 S3_REGION=eu-west-1
 S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -75,10 +75,10 @@ S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 For Scalingo:
 
 ```bash
-scalingo --app libre-q env-set S3_BUCKET_NAME=libre-q-audio
-scalingo --app libre-q env-set S3_REGION=eu-west-1
-scalingo --app libre-q env-set S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-scalingo --app libre-q env-set S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+scalingo --app qualis env-set S3_BUCKET_NAME=qualis-audio
+scalingo --app qualis env-set S3_REGION=eu-west-1
+scalingo --app qualis env-set S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+scalingo --app qualis env-set S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 
 ---

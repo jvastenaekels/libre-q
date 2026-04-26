@@ -12,7 +12,7 @@
  *
  * Strategy: We seed a completed participant via the API, capturing the
  * session_token. We then inject the correct Zustand-persist state into
- * localStorage using the exact key 'libre-q-session' (version 2) that the
+ * localStorage using the exact key 'qualis-session' (version 2) that the
  * useSessionStore uses. This lets us jump straight to the post-sort success
  * screen without navigating the whole study flow.
  *
@@ -61,7 +61,7 @@ test.describe
             // ------------------------------------------------------------------ //
             // 2. Navigate to the post-sort success screen as that participant       //
             //    by injecting the completed session state into localStorage.        //
-            //    Key: 'libre-q-session' (from useSessionStore, version 2).         //
+            //    Key: 'qualis-session' (from useSessionStore, version 2).         //
             //    The studyLayoutLoader will fetch the study config; once the config //
             //    is loaded and isCompleted=true, PostSortPage shows the success     //
             //    screen including EraseMyDataDialog.                                //
@@ -69,10 +69,10 @@ test.describe
             await page.addInitScript(
                 ({ token, slug, confirmationCode }) => {
                     // Zustand `persist` middleware stores state under the `name` option.
-                    // useSessionStore uses name = 'libre-q-session', version = 2.
+                    // useSessionStore uses name = 'qualis-session', version = 2.
                     // Field names must match the store interface exactly.
                     window.localStorage.setItem(
-                        'libre-q-session',
+                        'qualis-session',
                         JSON.stringify({
                             state: {
                                 token,

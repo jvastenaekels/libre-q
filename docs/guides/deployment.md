@@ -40,21 +40,21 @@ graph LR
 1. **Create the App**
 
    ```bash
-   scalingo create libre-q
+   scalingo create qualis
    ```
 
 2. **Add PostgreSQL Resource**
 
    ```bash
-   scalingo --app libre-q addons-add postgresql postgresql-starter-512
+   scalingo --app qualis addons-add postgresql postgresql-starter-512
    ```
 
 3. **Set Environment Variables**
 
    ```bash
-   scalingo --app libre-q env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
-   scalingo --app libre-q env-set SECRET_KEY=$(openssl rand -hex 32)
-   scalingo --app libre-q env-set ALLOWED_ORIGINS=https://libre-q.osc-fr1.scalingo.io
+   scalingo --app qualis env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
+   scalingo --app qualis env-set SECRET_KEY=$(openssl rand -hex 32)
+   scalingo --app qualis env-set ALLOWED_ORIGINS=https://qualis.osc-fr1.scalingo.io
    ```
 
 4. **Deploy**
@@ -73,7 +73,7 @@ Qualis uses the `postdeploy` phase in `Procfile` to automate critical tasks afte
 You can monitor these tasks in the deployment logs:
 
 ```bash
-scalingo --app libre-q logs --n 100
+scalingo --app qualis logs --n 100
 ```
 
 ---
@@ -110,13 +110,13 @@ Use `--` to separate Scalingo CLI flags from the command arguments.
 ### Run Database Migrations
 
 ```bash
-scalingo --app libre-q run -- python backend/scripts/migrate.py
+scalingo --app qualis run -- python backend/scripts/migrate.py
 ```
 
 ### Sync Study Configuration
 
 ```bash
-scalingo --app libre-q run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
+scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
 ```
 
 ---
@@ -132,20 +132,20 @@ If you need to perform a full "factory reset" of the database (e.g., during init
    Wipe all tables and recreate the schema with default admin account:
 
    ```bash
-   scalingo --app libre-q run -- python backend/init_db.py --reset
+   scalingo --app qualis run -- python backend/init_db.py --reset
    ```
 
 2. **Repopulate Content**
    Seed the default study data using the internal API bypass:
    ```bash
-   scalingo --app libre-q run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
+   scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
    ```
 
 > [!TIP]
 > You can combine both steps:
 >
 > ```bash
-> scalingo --app libre-q run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
+> scalingo --app qualis run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
 > ```
 
 ---
