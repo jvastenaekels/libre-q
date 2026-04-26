@@ -23,7 +23,11 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/submit", response_model=SubmissionResultResponse)
+@router.post(
+    "/submit",
+    response_model=SubmissionResultResponse,
+    response_model_exclude_none=True,
+)
 @limiter.limit("60/minute")
 async def submit_study(
     request: Request, data: SubmissionInput, db: AsyncSession = Depends(get_db)
