@@ -38,6 +38,7 @@ from app.models import (
     ProjectRole,
 )
 from app.schemas import StudyStatsRead
+from app.schemas.responses import StorageUsageResponse
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -511,12 +512,12 @@ async def import_study_config(
 # ------------------------------------------------------------------
 
 
-@router.get("/{slug}/storage-usage")
+@router.get("/{slug}/storage-usage", response_model=StorageUsageResponse)
 async def get_study_storage_usage(
     slug: str,
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
+) -> StorageUsageResponse:
     """
     Get audio storage usage statistics for a study.
 
@@ -544,13 +545,13 @@ async def get_study_storage_usage(
     total_bytes = stats.total_bytes if stats else 0
     file_count = stats.file_count if stats else 0
 
-    return {
-        "total_bytes": total_bytes,
-        "total_mb": round(total_bytes / 1024 / 1024, 2),
-        "file_count": file_count,
-        "quota_mb": quota_mb,
-        "quota_bytes": quota_mb * 1024 * 1024,
-        "usage_percent": round((total_bytes / (quota_mb * 1024 * 1024)) * 100, 2)
+    return StorageUsageResponse(
+        total_bytes=total_bytes,
+        total_mb=round(total_bytes / 1024 / 1024, 2),
+        file_count=file_count,
+        quota_mb=quota_mb,
+        quota_bytes=quota_mb * 1024 * 1024,
+        usage_percent=round((total_bytes / (quota_mb * 1024 * 1024)) * 100, 2)
         if quota_mb > 0
         else 0,
-    }
+    )
