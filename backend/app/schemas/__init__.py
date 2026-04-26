@@ -51,6 +51,7 @@ from .responses import (
     ResolvedStudyConfigResponse,
     StorageUsageResponse,
     StudyDumpResponse,
+    SubmissionResultResponse,
     TOTPEnableResponse,
 )
 from .studies import (
@@ -161,6 +162,7 @@ __all__ = [
     "ResolvedStudyConfigResponse",
     "StorageUsageResponse",
     "StudyDumpResponse",
+    "SubmissionResultResponse",
     "TOTPEnableResponse",
     # concourses
     "ConcourseCreate",

@@ -4,7 +4,6 @@ import io
 import json
 import logging
 import zipfile
-from typing import Any, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -23,6 +22,7 @@ from ...models import (
     Study,
     StudyRole,
 )
+from ...schemas.responses import ParticipantExportResponse, StudyDumpResponse
 from ...services.export_service import ExportService
 from ...services.storage_service import get_storage_service
 
@@ -158,19 +158,18 @@ async def export_r_kit(
     )
 
 
-@router.get("/{slug}/dump")
+@router.get("/{slug}/dump", response_model=StudyDumpResponse)
 @limiter.limit("10/minute")
 async def get_study_dump(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
+) -> StudyDumpResponse:
     """Get complete study data and participant placements for client-side export generation."""
     from ...services.study_service import StudyService
 
-    # StudyService.get_study_full_dump is a *args/**kwargs proxy returning Any;
-    # the underlying StudyDataService method is fully typed as StudyDump.
-    return cast(dict[str, Any], await StudyService.get_study_full_dump(db, study.id))
+    dump = await StudyService.get_study_full_dump(db, study.id)
+    return StudyDumpResponse.model_validate(dump)
 
 
 @router.get("/{slug}/participants/{participant_id}/export/csv")
@@ -222,14 +221,17 @@ async def export_participant_csv(
     )
 
 
-@router.get("/{slug}/participants/{participant_id}/export/json")
+@router.get(
+    "/{slug}/participants/{participant_id}/export/json",
+    response_model=ParticipantExportResponse,
+)
 @limiter.limit("10/minute")
 async def export_participant_json(
     request: Request,
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
+) -> ParticipantExportResponse:
     """Export single participant results as JSON."""
     from ...services.study_service import StudyService
 
@@ -245,11 +247,13 @@ async def export_participant_json(
     if not participant:
         raise HTTPException(status_code=404, detail="Participant not found")
 
-    return {
-        "study": full_dump["study"],
-        "participant": participant,
-        "statement_id_to_index": full_dump["statement_id_to_index"],
-    }
+    return ParticipantExportResponse.model_validate(
+        {
+            "study": full_dump["study"],
+            "participant": participant,
+            "statement_id_to_index": full_dump["statement_id_to_index"],
+        }
+    )
 
 
 @router.get("/{slug}/participants/{participant_id}/export/audio")

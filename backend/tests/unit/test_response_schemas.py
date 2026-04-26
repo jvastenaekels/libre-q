@@ -71,4 +71,57 @@ def test_study_dump_response_rejects_missing_required_fields():
     from app.schemas.responses import StudyDumpResponse
 
     with pytest.raises(ValidationError):
-        StudyDumpResponse(slug="x")  # missing required `id`
+        # missing required `participants` and `statement_id_to_index`
+        StudyDumpResponse(study={"slug": "x"})
+
+
+def test_study_dump_response_round_trip():
+    """The runtime payload from StudyDataService.get_study_full_dump uses keys
+    `study`, `participants`, `statement_id_to_index`. Pin that shape."""
+    from app.schemas.responses import StudyDumpResponse
+
+    payload = {
+        "study": {"slug": "demo", "state": "active", "statements": []},
+        "participants": [{"db_id": 1, "scores": []}],
+        "statement_id_to_index": {1: 0, 2: 1},
+        # extra dynamic key — must round-trip via extra='allow'
+        "build_id": "abc",
+    }
+    dump = StudyDumpResponse.model_validate(payload)
+    out = dump.model_dump()
+    assert out["study"]["slug"] == "demo"
+    assert out["participants"][0]["db_id"] == 1
+    assert out["build_id"] == "abc"
+
+
+def test_participant_export_response_shape():
+    """Round-trip the participant JSON export shape."""
+    from app.schemas.responses import ParticipantExportResponse
+
+    payload = {
+        "study": {"slug": "demo"},
+        "participant": {"db_id": 5, "scores": [1, 2]},
+        "statement_id_to_index": {42: 0},
+    }
+    export = ParticipantExportResponse.model_validate(payload)
+    assert export.participant["db_id"] == 5
+
+
+def test_submission_result_response_shape():
+    """Submit endpoint returns status + confirmation_code + id, with optional
+    already_submitted when re-submitting a completed participation."""
+    from app.schemas.responses import SubmissionResultResponse
+
+    fresh = SubmissionResultResponse(
+        status="success", confirmation_code="ABCD1234", id=7
+    )
+    assert fresh.status == "success"
+    assert fresh.already_submitted is None
+
+    repeat = SubmissionResultResponse(
+        status="success", confirmation_code="ABCD1234", id=7, already_submitted=True
+    )
+    assert repeat.already_submitted is True
+
+    with pytest.raises(ValidationError):
+        SubmissionResultResponse(status="success")  # missing confirmation_code, id

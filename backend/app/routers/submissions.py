@@ -1,6 +1,5 @@
 """API router for study submissions."""
 
-from typing import Any
 from uuid import UUID
 import logging
 
@@ -11,7 +10,11 @@ from app.database import get_db
 from app.exceptions import ServiceError
 from app.limiter import limiter
 from app.schemas import SubmissionInput
-from app.schemas.responses import AckResponse, ResolvedStudyConfigResponse
+from app.schemas.responses import (
+    AckResponse,
+    ResolvedStudyConfigResponse,
+    SubmissionResultResponse,
+)
 from app.services.study_service import StudyService
 from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password
@@ -20,11 +23,11 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/submit")
+@router.post("/submit", response_model=SubmissionResultResponse)
 @limiter.limit("60/minute")
 async def submit_study(
     request: Request, data: SubmissionInput, db: AsyncSession = Depends(get_db)
-) -> dict[str, Any]:
+) -> SubmissionResultResponse:
     """Submits or updates a study participation.
 
     Logic moved to StudyService for maintainability.
@@ -39,14 +42,12 @@ async def submit_study(
     try:
         result = await StudyService.process_submission(db, data, client_ip, user_agent)
         await db.commit()
-        response = {
-            "status": "success",
-            "confirmation_code": result["confirmation_code"],
-            "id": result["id"],
-        }
-        if result.get("already_submitted"):
-            response["already_submitted"] = True
-        return response
+        return SubmissionResultResponse(
+            status="success",
+            confirmation_code=result["confirmation_code"],
+            id=result["id"],
+            already_submitted=True if result.get("already_submitted") else None,
+        )
     except HTTPException:
         # Re-raise HTTP exceptions (they're already properly formatted)
         raise

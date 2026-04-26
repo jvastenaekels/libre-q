@@ -66,17 +66,48 @@ class ResolvedStudyConfigResponse(BaseModel):
 
 
 class StudyDumpResponse(BaseModel):
-    """Admin full-study dump (GET /admin/studies/{slug}/dump). Open shape."""
+    """Admin full-study dump (GET /admin/studies/{slug}/dump).
+
+    Open shape — the runtime payload is the StudyDump TypedDict from
+    `app.types.wire`: `{study, participants, statement_id_to_index}`. We
+    declare the well-known top-level keys as `dict` / `list` and accept
+    additional keys via `extra='allow'` so orval emits a named interface
+    rather than an opaque dict.
+    """
 
     model_config = ConfigDict(extra="allow")
 
-    slug: str
-    id: int
+    study: dict[str, object]
+    participants: list[dict[str, object]]
+    statement_id_to_index: dict[int, int]
 
 
 class ParticipantExportResponse(BaseModel):
-    """Admin participant JSON export. Open shape."""
+    """Admin participant JSON export (GET /admin/.../participants/{id}/export/json).
+
+    Open shape — the payload is `{study, participant, statement_id_to_index}`,
+    a single-participant slice of the full StudyDump. `extra='allow'` lets
+    additional dynamic keys survive round-tripping.
+    """
 
     model_config = ConfigDict(extra="allow")
 
-    participant_id: int
+    study: dict[str, object]
+    participant: dict[str, object]
+    statement_id_to_index: dict[int, int]
+
+
+class SubmissionResultResponse(BaseModel):
+    """Result of a participant Q-sort submission (POST /api/submit).
+
+    Returned by the submit endpoint after StudyService.process_submission
+    completes. `already_submitted` is only present when re-submitting a
+    completed participation. `extra='allow'` covers any future additions.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    status: str
+    confirmation_code: str
+    id: int
+    already_submitted: bool | None = None
