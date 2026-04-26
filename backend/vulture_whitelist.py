@@ -15,7 +15,7 @@ serve_spa
 read_root
 
 # --- app/core/config.py (Settings & Validation) ---
-API_V1_STR
+API_PREFIX
 IP_HASH_SALT
 assemble_db_url
 cls

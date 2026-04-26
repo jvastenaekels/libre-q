@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 class Settings(BaseSettings):
     """Application configuration."""
 
-    API_V1_STR: str = "/api"
+    API_PREFIX: str = "/api"
     PROJECT_NAME: str = "Qualis API"
     ENVIRONMENT: str = "production"
 

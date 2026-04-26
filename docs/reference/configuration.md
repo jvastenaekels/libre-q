@@ -135,7 +135,7 @@ All settings are read from the `Settings` Pydantic class in `backend/app/core/co
 
 | ENV_VAR | Type | Default | Description |
 | ------- | ---- | ------- | ----------- |
-| `API_V1_STR` | string | `/api` | Prefix for versioned routes. |
+| `API_PREFIX` | string | `/api` | Prefix for API routes. |
 | `PROJECT_NAME` | string | `Qualis API` | Application display name. |
 | `ENVIRONMENT` | string | `production` | One of `production`, `development`, `test`. Controls test-router registration and a few defaults. |
 | `FRONTEND_URL` | string | `http://localhost:5173` | Public frontend URL; used in outgoing emails. |
