@@ -208,7 +208,7 @@ Contributions are welcome. Please read the guidelines before submitting a PR:
 
 ## Citation
 
-If you use Qualis in your research, please refer to the machine-readable metadata in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar). Full software (Zenodo) and paper (SoftwareX) citations will be added here once their DOIs are assigned.
+If you use Qualis in your research, please refer to the machine-readable metadata in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar).
 
 ---
 
