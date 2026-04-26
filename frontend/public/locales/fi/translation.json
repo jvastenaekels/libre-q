@@ -658,7 +658,15 @@
             "diff_status": "tila",
             "diff_text": "teksti",
             "diff_tags": "tunnisteet",
-            "diff_changed": "Muutettu:"
+            "diff_changed": "Muutettu:",
+            "construction_memo": {
+                "title": "Rakentamisen muistio",
+                "helper": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: mitä lähteitä kartoitettiin, mitkä äänet säilytettiin tai jätettiin pois ja millä perusteella otanta tehtiin. Lausekokoelma on kuratoiva teko, ei neutraali inventaario (Sneegas 2020; Robbins & Krueger 2000) — rakennusprosessin näkyväksi tekeminen on osa analyysiä.",
+                "placeholder": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste…",
+                "save": "Tallenna muistio",
+                "saved": "Rakentamisen muistio tallennettu",
+                "save_error": "Rakentamisen muistion tallennus epäonnistui"
+            }
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",

@@ -120,6 +120,7 @@ class ConcourseCreate(BaseModel):
 
     title: str = Field(..., max_length=200, min_length=1)
     description: str | None = Field(None, max_length=2000)
+    construction_memo: str | None = Field(None, max_length=10000)
 
 
 class ConcourseUpdate(BaseModel):
@@ -127,6 +128,7 @@ class ConcourseUpdate(BaseModel):
 
     title: str | None = Field(None, max_length=200, min_length=1)
     description: str | None = Field(None, max_length=2000)
+    construction_memo: str | None = Field(None, max_length=10000)
 
 
 class ConcourseRead(BaseModel):
@@ -136,6 +138,7 @@ class ConcourseRead(BaseModel):
     project_id: int
     title: str
     description: str | None = None
+    construction_memo: str | None = None
     item_count: int = 0
     created_by: int | None = None
     created_at: datetime

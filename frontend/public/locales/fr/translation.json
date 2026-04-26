@@ -658,7 +658,15 @@
       "diff_status": "statut",
       "diff_text": "texte",
       "diff_tags": "étiquettes",
-      "diff_changed": "Modifié :"
+      "diff_changed": "Modifié :",
+      "construction_memo": {
+        "title": "Mémo de construction",
+        "helper": "Documentez comment ce concours a été constitué : sources mobilisées, voix retenues ou écartées, rationnel de l'échantillonnage. Un concours est un acte curatorial, non un inventaire neutre (Sneegas 2020 ; Robbins & Krueger 2000) — rendre cette construction visible fait partie de l'analyse.",
+        "placeholder": "Documentez comment ce concours a été construit : sources, voix retenues ou écartées, rationnel de l'échantillonnage…",
+        "save": "Enregistrer le mémo",
+        "saved": "Mémo de construction enregistré",
+        "save_error": "Échec de l'enregistrement du mémo de construction"
+      }
     },
     "concourse_import": {
       "title": "Importer depuis un concours",

@@ -97,6 +97,7 @@ class ConcourseService:
             project_id=project_id,
             title=data.title,
             description=data.description,
+            construction_memo=data.construction_memo,
             created_by=user_id,
         )
         db.add(concourse)

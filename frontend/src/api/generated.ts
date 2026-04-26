@@ -14911,6 +14911,10 @@ export const getCreateConcourseApiAdminConcoursesPostResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
+    construction_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     item_count: faker.helpers.arrayElement([
         faker.number.int({ min: undefined, max: undefined }),
         undefined,
@@ -14933,6 +14937,13 @@ export const getListConcoursesApiAdminConcoursesGetResponseMock = (
             project_id: faker.number.int({ min: undefined, max: undefined }),
             title: faker.string.alpha({ length: { min: 10, max: 20 } }),
             description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            construction_memo: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
@@ -14967,6 +14978,10 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
@@ -15048,6 +15063,10 @@ export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock = 
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),

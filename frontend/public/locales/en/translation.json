@@ -673,7 +673,15 @@
       "diff_status": "status",
       "diff_text": "text",
       "diff_tags": "tags",
-      "diff_changed": "Changed:"
+      "diff_changed": "Changed:",
+      "construction_memo": {
+        "title": "Construction memo",
+        "helper": "Document how this concourse was constructed: which sources you canvassed, which voices you retained or set aside, and the rationale for sampling. A concourse is a curatorial act, not a neutral inventory (Sneegas 2020; Robbins & Krueger 2000) — making the construction visible is part of the analysis.",
+        "placeholder": "Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...",
+        "save": "Save memo",
+        "saved": "Construction memo saved",
+        "save_error": "Failed to save construction memo"
+      }
     },
     "concourse_import": {
       "title": "Import from Concourse",

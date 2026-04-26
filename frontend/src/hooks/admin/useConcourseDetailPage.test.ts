@@ -27,6 +27,7 @@ vi.mock('sonner', () => ({
 
 const {
     mockConcourseQueryHook,
+    mockUpdateConcourseHook,
     mockTagsQueryHook,
     mockCreateItemHook,
     mockUpdateItemHook,
@@ -37,6 +38,7 @@ const {
     mockInvalidateQueries,
 } = vi.hoisted(() => ({
     mockConcourseQueryHook: vi.fn(),
+    mockUpdateConcourseHook: vi.fn(),
     mockTagsQueryHook: vi.fn(),
     mockCreateItemHook: vi.fn(),
     mockUpdateItemHook: vi.fn(),
@@ -49,6 +51,7 @@ const {
 
 vi.mock('@/api/generated', () => ({
     useGetConcourseApiAdminConcoursesConcourseIdGet: mockConcourseQueryHook,
+    useUpdateConcourseApiAdminConcoursesConcourseIdPatch: mockUpdateConcourseHook,
     useListTagsApiAdminConcoursesTagsGet: mockTagsQueryHook,
     useCreateItemApiAdminConcoursesConcourseIdItemsPost: mockCreateItemHook,
     useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch: mockUpdateItemHook,
@@ -184,6 +187,7 @@ beforeEach(() => {
     mockConcourseQueryHook.mockReturnValue({ data: mockConcourse, isLoading: false });
     mockTagsQueryHook.mockReturnValue({ data: mockTags });
     mockCreateItemHook.mockReturnValue(makeIdleMutation());
+    mockUpdateConcourseHook.mockReturnValue(makeIdleMutation());
     mockUpdateItemHook.mockReturnValue(makeIdleMutation());
     mockDeleteItemHook.mockReturnValue(makeIdleMutation());
     mockImportItemsHook.mockReturnValue(makeIdleMutation());
@@ -539,6 +543,71 @@ describe('useConcourseDetailPage', () => {
         expect(result.current.activeLocale).toBe('fr');
         expect(result.current.addLangOpen).toBe(false);
         expect(result.current.newLangCode).toBe('');
+    });
+
+    it('saveConstructionMemo dispatches a PATCH with the typed value and invalidates the concourse query', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue({});
+        mockUpdateConcourseHook.mockReturnValue({ mutateAsync, isPending: false });
+
+        const { result } = renderHook(() => useConcourseDetailPage(), {
+            wrapper: AllTheProviders,
+        });
+
+        // Starts empty (mockConcourse has no construction_memo) and not dirty
+        expect(result.current.constructionMemo).toBe('');
+        expect(result.current.isConstructionMemoDirty).toBe(false);
+
+        act(() =>
+            result.current.setConstructionMemo(
+                'Sources: 12 interviews. Voices set aside: industrial agribusiness. Rationale: maximum variation.'
+            )
+        );
+        expect(result.current.isConstructionMemoDirty).toBe(true);
+
+        await act(async () => {
+            await result.current.saveConstructionMemo();
+        });
+
+        expect(mutateAsync).toHaveBeenCalledWith({
+            concourseId: 42,
+            data: {
+                construction_memo:
+                    'Sources: 12 interviews. Voices set aside: industrial agribusiness. Rationale: maximum variation.',
+            },
+        });
+        expect(mockInvalidateQueries).toHaveBeenCalledWith({
+            queryKey: ['get-concourse', 42],
+        });
+        // After saving the same value it is no longer dirty
+        expect(result.current.isConstructionMemoDirty).toBe(false);
+    });
+
+    it('saveConstructionMemo sends null when the textarea is cleared', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue({});
+        mockUpdateConcourseHook.mockReturnValue({ mutateAsync, isPending: false });
+        // Concourse already has a memo on the wire
+        mockConcourseQueryHook.mockReturnValue({
+            data: { ...mockConcourse, construction_memo: 'old memo' },
+            isLoading: false,
+        });
+
+        const { result } = renderHook(() => useConcourseDetailPage(), {
+            wrapper: AllTheProviders,
+        });
+
+        await waitFor(() => expect(result.current.constructionMemo).toBe('old memo'));
+
+        act(() => result.current.setConstructionMemo(''));
+        expect(result.current.isConstructionMemoDirty).toBe(true);
+
+        await act(async () => {
+            await result.current.saveConstructionMemo();
+        });
+
+        expect(mutateAsync).toHaveBeenCalledWith({
+            concourseId: 42,
+            data: { construction_memo: null },
+        });
     });
 
     it('exportCsv produces a CSV blob and triggers a download', () => {
