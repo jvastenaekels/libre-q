@@ -27,7 +27,7 @@ _Do not ask the agent to do everything at once. Split it into two phases._
 >
 > **Task:**
 >
-> 1.  Define the strict Pydantic models in `backend/app/schemas.py`. No `Any` types allowed.
+> 1.  Define the strict Pydantic models in `backend/app/schemas/<subdomain>.py`. No `Any` types allowed.
 > 2.  Define the API endpoint signature in `backend/app/routers/`.
 > 3.  **Crucial:** Write a failing integration test in `backend/tests/integration/` that strictly asserts the business rule. The test must fail because the logic is not implemented yet.
 >

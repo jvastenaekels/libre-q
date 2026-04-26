@@ -1,137 +1,87 @@
-# Data Export Guide
+# Data Export
 
-This guide explains how Qualis stores participant data and how researchers can export and interpret it for analysis.
+How to export Qualis study data for downstream analysis or archiving. All export actions are available from **Study → Data → Export** in the admin dashboard, and equivalently from the API for scripted workflows.
 
----
-
-## Database Structure for Analysis
-
-The most critical table for analysis is `qsort_entries`. Each row represents one statement's position for one participant.
-
-### `participants` Table
-
-Records the metadata for a sorting session:
-
-- `language_used`: The locale the participant used.
-- `submitted_at`: Timestamp of completion.
-- `presort_answers`: JSON object containing demographic data.
-- `postsort_answers`: JSON object containing qualitative comments.
-- `is_test_run`: Boolean flag for test submissions.
-- `is_discarded`: Boolean flag for excluded responses.
-- `discard_reason`: Optional text explaining why a response was discarded.
-
-### `qsort_entries` Table
-
-Records the actual sort data:
-
-- `participant_id`: Links back to the participant.
-- `statement_id`: Links to the statement text.
-- `grid_score`: The numerical score (-4 to +4) where the card was placed.
-- `card_comment`: (Optional) Individual comment on that specific card.
-
-### `audio_recordings` Table
-
-Stores metadata for audio responses recorded during the post-sort phase (actual audio files are stored in S3):
-
-- `participant_id`: Links to the participant.
-- `question_key`: Identifies which question or card the recording is for.
-- `s3_bucket` / `s3_key`: S3 storage location.
-- `mime_type`: Audio format (e.g., `audio/webm`).
-- `duration_seconds`: Length of the recording.
+For the corresponding API endpoints (with rate limits and authorisation), see [`../reference/api.md#admin--exports-apiadminstudiesslug`](../reference/api.md#admin--exports-apiadminstudiesslug).
 
 ---
 
-## Export Formats
+## Choose a format
 
-A researcher can export results via the admin dashboard or the API (requires authentication).
+| Format | When to use it | Output |
+| ------ | -------------- | ------ |
+| **CSV (wide)** | Spreadsheet inspection, Excel / SPSS / Stata. | One row per non-discarded participant. |
+| **PQMethod ZIP** | PQMethod or Ken-Q desktop analysis. | `.dat` + `.sta`, completed participants only. |
+| **R-Kit ZIP** | R analysis with the `qmethod` package. | CSV + auto-generated R script. |
+| **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata. |
+| **JSON dump** | Backups; bespoke pipelines. | Complete study + every participant placement. |
 
-### 1. CSV Export
+Test runs and discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump.
 
-**API**: `GET /api/admin/studies/{slug}/export/csv`
+## Export the whole study
 
-Returns a wide-format file ready for spreadsheet software (Excel, Numbers, SPSS).
+In the dashboard:
 
-- One row per participant.
-- Columns include: participant metadata, presort answers, Q-sort scores per statement, and postsort answers.
-- Test runs and discarded participants are excluded by default.
+1. Open **Study → Data**.
+2. Click **Export**.
+3. Pick a format. The file downloads immediately.
 
-### 2. PQMethod Export
+For scripted exports, the equivalent endpoints (Editor role required) are:
 
-**API**: `GET /api/admin/studies/{slug}/export/pqmethod`
+| Format | Endpoint |
+| ------ | -------- |
+| CSV (wide) | `GET /api/admin/studies/{slug}/export/csv` |
+| PQMethod | `GET /api/admin/studies/{slug}/export/pqmethod` |
+| R-Kit | `GET /api/admin/studies/{slug}/export/r-kit` |
+| Research package | `GET /api/admin/studies/{slug}/export/package` |
+| JSON dump | `GET /api/admin/studies/{slug}/dump` |
 
-Returns a ZIP containing `.dat` and `.sta` files specifically formatted for **PQMethod** and **Ken-Q Analysis** software. This is the industry-standard format for Q-methodology factor analysis.
+## Export a single participant
 
-### 3. KenQ JSON
+From the participant detail view (Data → click any row), use the **Export** menu:
 
-**API**: `GET /api/admin/studies/{slug}/dump`
+- **CSV** — one row, this participant only.
+- **JSON** — complete structured data.
+- **Audio ZIP** — every recording for this participant, with metadata.
 
-Complete JSON structure containing the full study configuration and all participant data. Compatible with web-based analysis tools and useful for backups.
+## Audio storage usage
 
-### 4. R-Kit Export
+To check whether the per-study audio quota is being approached:
 
-**API**: `GET /api/admin/studies/{slug}/export/rkit`
+- Dashboard: **Study → Settings → Storage usage**.
+- API: `GET /api/admin/studies/{slug}/storage-usage`.
 
-Returns a ZIP file containing:
-- A CSV data file formatted for R.
-- A ready-to-run R script that loads the data and performs analysis using the `qmethod` R package.
-
-### 5. Research Package
-
-A comprehensive ZIP containing all of the above formats plus:
-- A codebook documenting all variables and their meanings.
-- Statement translations and study metadata.
-- Audio recording metadata (if applicable).
-
-Ideal for archiving, reproducibility, and journal submission.
-
-### 6. Individual Participant Exports
-
-From a participant's detail view, you can export:
-- **CSV**: That participant's data only.
-- **JSON**: Complete structured data for the participant.
-- **Audio ZIP**: All audio recordings with metadata (if applicable).
+Configure the per-study quota under `postsort_config.audio.max_storage_mb` (see [configuration reference](../reference/configuration.md#postsort_config)).
 
 ---
 
-## Interpreting Results
+## Built-in analysis
 
-### Flattening for Analysis Tools
+For PCA or centroid extraction with varimax rotation, you do not need to export at all — open **Study → Analysis** and run a factor analysis in the browser. Each run is persisted to the audit trail. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis).
 
-To use tools like **PQMethod** or **Ken-Q**, you usually need data in a horizontal format (one row per participant, columns for each statement). The CSV and PQMethod exports handle this transformation automatically.
-
-**Example SQL for manual flattening:**
-
-```sql
-SELECT
-    p.id as participant_id,
-    s.code as statement_code,
-    qe.grid_score
-FROM participants p
-JOIN qsort_entries qe ON p.id = qe.participant_id
-JOIN statements s ON qe.statement_id = s.id
-WHERE p.status = 'completed'
-  AND p.is_test_run = false
-  AND p.is_discarded = false;
-```
+Use exports when you need a tool that Qualis does not provide (manual / judgmental rotation, custom scripts, journal-required formats).
 
 ---
 
-## Built-in Analysis
+## Interactive inspection before export
 
-Qualis includes a built-in factor analysis engine accessible from the **Analysis** page. This allows you to run PCA or centroid extraction with varimax rotation directly in the browser without exporting data first. See the [Analysis section of the Admin Features guide](admin-features.md#analysis) for details.
+Before exporting, audit responses to decide which to keep:
 
----
+1. **Grid reconstruction** — Clicking a participant opens a high-fidelity visual of their final Q-sort.
+2. **Quality flags** — Completion duration, device type, and test-run flag are surfaced in the participant table.
+3. **Qualitative context** — Card comments and audio responses are shown alongside the grid.
 
-## Interactive Data Inspection
-
-Before performing full factor analysis, researchers can audit individual results directly in the Qualis dashboard.
-
-1. **Grid Reconstruction**: Clicking on any participant in the Data page opens a high-fidelity visual of their final Q-sort grid.
-2. **Quality Audit**: The dashboard shows completion duration and flags test runs. You can manually discard suspicious responses.
-3. **Qualitative Context**: View participant-level comments and audio recordings side-by-side with their grid placements to understand the "why" behind their rankings.
+Mark problematic rows with **Discard** (a reason is required). Discarded rows are excluded from analysis and from the CSV / PQMethod / R-Kit / Package exports, but are preserved in the database for audit.
 
 ---
 
-## Data Privacy
+## Data privacy
 
-Qualis is designed with privacy in mind. No PII (Personally Identifiable Information) is stored unless specifically requested in the `presort_config`. IP addresses are hashed by default. Researchers are encouraged to only collect necessary data.
+What ends up in an export depends on what the study collected:
+
+- **No PII by default.** Only fields explicitly added to `presort_config` (e.g. an email field) appear in exports.
+- **IP addresses are hashed.** The `participants` table stores SHA-256 hashes salted with `IP_HASH_SALT`. Plaintext IPs are never persisted, never exported.
+- **Consent versions are hashed.** Each participant's row records the hash of the consent text they actually saw, so audit reviewers can prove which version was in force.
+- **Language resolution.** Multilingual studies resolve option labels to the participant's language at export time, falling back to the study's `default_language`, then the first available translation.
+
+For GDPR Art. 17 erasure of an individual participant, use the **Erase personal data** action on the participant detail view (or `DELETE /api/admin/studies/{slug}/participants/{participant_id}/personal-data`). For bulk anonymisation by cutoff date, use **Study → Settings → Bulk anonymise** (`POST /api/admin/studies/{slug}/anonymise-bulk`).

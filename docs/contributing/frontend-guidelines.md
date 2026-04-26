@@ -1,75 +1,112 @@
-# Frontend Best Practices
+# Frontend Guidelines
 
-This document outlines the coding standards and best practices for the Qualis frontend, optimized for **React v19** and **Tailwind CSS**.
+Coding patterns specific to the Qualis frontend. The cross-cutting standards (no `any`, contract-first, test-first, no magic) live in [`coding-standards.md`](coding-standards.md).
 
-## 1. React v19 Integration
+Stack: **React 19** + **TypeScript strict** + **Tailwind CSS** + **Zustand** + **TanStack Query** (consumed via Orval-generated hooks) + **react-i18next**.
 
-### Ref as a Prop
+## 1. Hook-driven pages
 
-React v19 allows passing `ref` as a standard prop. You no longer need `forwardRef`.
+Pages and complex components delegate state-and-effect logic to a colocated hook in `frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value and renders JSX.
+
+**Boundary:**
+
+- The hook owns: `useState`, `useEffect`, `useCallback`, `useMemo`, store subscriptions, navigation guards, keyboard handlers, event handlers, derived data.
+- The component keeps: JSX, `useRef` for DOM elements, framer-motion `MotionValue`s and their derived transforms (these must be passed to JSX elements), purely visual state (zoom level, animation callbacks).
+
+**Test convention:** add `hooks/<area>/use<Name>.test.ts` covering ≥5 pure logic paths without rendering. The page test file remains as integration coverage for the hook + JSX glue.
+
+**Trigger:** if a component body grows past ~100 LOC of non-JSX logic, extract a hook before adding more.
+
+**JSX shell complexity:** when a page is mostly large declarative JSX (multiple GuidanceCard panels, tabbed UI, modals), the `noExcessiveCognitiveComplexity` rule fires on the JSX shell itself. Add `// biome-ignore lint/complexity/noExcessiveCognitiveComplexity` on the page component as the documented exception (precedent: AnalysisPage, StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Never suppress inside the hook.
+
+For the canonical list of pages already converted and the conventions around them, see the "Hook-driven components" section in [`CLAUDE.md`](../../CLAUDE.md).
+
+## 2. Internationalization
+
+Every user-facing string passes through `useTranslation()` / `t()` with a key and a sensible English fallback:
 
 ```tsx
-// Instead of forwardRef((props, ref) => ...)
-const MyComponent = ({ ref, ...props }) => {
-  return <div ref={ref} />;
-};
+const { t } = useTranslation();
+return <button>{t('study.activate', 'Activate Study')}</button>;
 ```
 
-### Concurrent Rendering & startTransition
+- Three locales: `en`, `fr`, `fi`. Keep them in sync.
+- `npm run i18n-check` verifies key parity. CI runs it; do not let it drift.
+- Translation files live under `frontend/public/locales/<lang>/translation.json`. Add the new key in `en` first, then mirror it to `fr` and `fi`.
 
-Use `startTransition` to wrap state updates that are not urgent (e.g., navigation, non-critical UI shifts) to keep the interaction loop responsive.
+## 3. Generated API client
+
+The frontend never hand-writes `fetch` or `axios` calls. Use the Orval-generated hooks under `src/api/`. The cycle when changing a backend route or schema:
+
+1. Update the backend Pydantic schema or router.
+2. Run `make generate-api`.
+3. Use the regenerated hook (e.g. `useGetStudyQuery`).
+4. Commit the regenerated `frontend/src/api/generated.ts`.
+
+CI runs `make check-api` and fails if the committed client is out of sync with the backend.
+
+## 4. State management (Zustand)
+
+Use stable, granular selectors to avoid extra re-renders:
 
 ```tsx
-import { startTransition } from "react";
-
-const handleAction = () => {
-  startTransition(() => {
-    setAppState(newState);
-  });
-};
-```
-
-### State Management (Zustand)
-
-Use **stable selectors** to prevent unnecessary re-renders.
-
-```tsx
-// Good: Stable and granular
+// Good — primitive, narrow selector
 const agreeCount = useResponseStore((state) => state.rough?.agree?.length ?? 0);
 
-// Bad: Creating new objects on every render
+// Bad — new object every render, every consumer re-renders
 const rough = useResponseStore((state) => ({ agree: state.rough.agree }));
 ```
 
-## 2. Tailwind CSS & Styling
+There are seven atomic stores (auth, admin, study designer, config, session, response, UI). See [`../explanation/architecture.md#state-management`](../explanation/architecture.md#state-management) for the rationale.
 
-### Class Merging
+## 5. React 19
 
-Always use the `cn()` utility (based on `clsx` and `tailwind-merge`) for conditional class application.
+### `ref` as a prop
 
-```tsx
-<div className={cn("base-class", isActive && "active-class", className)} />
-```
-
-### Responsive Design
-
-Qualis is mobile-first. Ensure all complex interactions are optimized for touch.
-
-- Use `touch-manipulation` on buttons to remove click delays.
-- Use responsive prefixes: `sm:` (tablet), `lg:` (desktop).
-
-### Design Tokens
-
-Use CSS variables defined in the theme for consistent branding.
+`forwardRef` is no longer required:
 
 ```tsx
-<button style={{ backgroundColor: "var(--brand-accent)" }} />
+const MyComponent = ({ ref, ...props }: Props) => <div ref={ref} {...props} />;
 ```
 
-## 3. Performance & Memoization
+### `startTransition`
 
-While the React Compiler (React 19) automates much of the memoization, manual `useMemo` and `useCallback` are still valuable for:
+Wrap non-urgent state updates so they do not block the interaction loop:
 
-1. Calculations that are exceptionally expensive.
-2. Stability for dependency arrays of other hooks (useEffect, etc.).
-3. When external libraries (like `framer-motion`) rely on stable references.
+```tsx
+import { startTransition } from 'react';
+
+const handleAction = () => {
+  startTransition(() => setAppState(newState));
+};
+```
+
+### Memoisation
+
+The React Compiler covers most cases. Reach for manual `useMemo` / `useCallback` only when:
+
+1. A computation is genuinely expensive.
+2. A dependency array of another hook needs a stable reference.
+3. An external library (notably framer-motion) requires stable references.
+
+## 6. Tailwind CSS
+
+### Class merging
+
+Always go through `cn()` (built on `clsx` + `tailwind-merge`):
+
+```tsx
+<div className={cn('base-class', isActive && 'active-class', className)} />
+```
+
+### Mobile-first
+
+Touch first, then desktop. Use `touch-manipulation` on buttons to remove click delays. Use responsive prefixes (`sm:`, `lg:`) only to layer desktop on top of the mobile baseline, not the other way around.
+
+### Design tokens
+
+Use CSS variables defined in the theme for branding:
+
+```tsx
+<button style={{ backgroundColor: 'var(--brand-accent)' }} />
+```

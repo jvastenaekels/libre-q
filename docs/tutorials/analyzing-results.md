@@ -1,151 +1,112 @@
 # Analyzing Results
 
-In this tutorial, you will learn how to use Qualis's built-in factor analysis tools to extract viewpoints from your Q-sort data, interpret the results, and export data for further analysis in PQMethod, R, or KADE.
+In this tutorial, you will run a factor analysis on the study you built in the previous tutorials and see what each results tab shows. The goal is to learn the workflow — *which buttons, in what order, expecting what on screen* — not to do an in-depth methodological interpretation.
+
+For the *why* behind extraction methods, rotation, distinguishing statements, and reliability, see [`../explanation/q-methodology.md`](../explanation/q-methodology.md).
 
 This tutorial continues from [Collecting Responses](collecting-responses.md).
 
 **What you will learn:**
 
-- How to read the scree plot and choose the number of factors
-- How to configure and run a factor analysis (PCA or centroid extraction)
-- How to interpret factor loadings, factor arrays, and statement scores
-- How to identify distinguishing and consensus statements
-- How to export results
+- How to run a factor analysis with sensible defaults
+- What each of the four results tabs shows
+- How to spot when a result is too thin to interpret (too few participants)
+- Where to find exports
 
 **Time required:** ~20 minutes
 
-**Prerequisites:** A Qualis study with at least 2 completed participant responses.
+**Prerequisites:** A Qualis study with **at least ~10 completed participant responses**. You can generate them by repeatedly opening your public link in a private window and walking through the participant flow (see [Collecting Responses, Step 6](collecting-responses.md#step-6-walk-one-link-yourself)). Below ~10 responses, factor analysis runs will not produce a meaningful structure and the results below will look noisy.
 
 ---
 
-## Step 1: Navigate to the Analysis Page
+## Step 1: Open the Analysis page
 
-1. In the admin sidebar, click **Analysis**.
+In the admin sidebar, click **Analysis**. The page shows a **Configuration** card and, if you have enough completed participants, a **Scree plot** above it.
 
-The Analysis page shows a **Configuration** card at the top. If you have enough completed participants, Qualis computes eigenvalues and displays a scree plot.
-
----
-
-## Step 2: Read the Scree Plot
-
-The scree plot shows eigenvalues for each potential factor in descending order.
-
-Key things to look for:
-- **Kaiser criterion (eigenvalue > 1)**: Factors above this line explain more variance than a single variable. Qualis draws this reference line automatically.
-- **The "elbow"**: The point where the curve flattens out. Factors before the elbow are generally worth retaining.
+If you see a warning about insufficient data, return to your study link and complete a few more sessions before continuing.
 
 ---
 
-## Step 3: Configure the Analysis Parameters
+## Step 2: Run the analysis with defaults
 
-Below the scree plot, configure four parameters:
+The configuration card exposes four parameters:
 
-### Extraction Method
-- **PCA (Principal Component Analysis)**: Maximizes explained variance. Most common choice.
-- **Centroid**: Less mathematically constrained factors. Preferred by some Q researchers for theoretical reasons.
+- **Extraction method** — leave on **PCA**.
+- **Number of factors** — leave on the suggested value (Qualis suggests one based on the Kaiser criterion, eigenvalue > 1).
+- **Rotation** — leave on **Varimax**.
+- **Flagging** — leave on **Auto**.
 
-### Number of Factors
-Select how many factors to extract. Each factor represents a distinct shared viewpoint.
+Click **Run Analysis**. Processing takes a few seconds. Four result tabs appear: **Loadings**, **Factor Arrays**, **Statements**, **Characteristics**.
 
-### Rotation
-- **Varimax**: Maximizes separation between factors. Standard choice in Q methodology.
-- **None**: Preserves the original mathematical solution.
-
-### Flagging
-- **Auto**: Qualis flags participants whose loading exceeds the significance threshold (`1.96 / sqrt(n_statements)`) on exactly one factor.
-- **Manual**: You manually select which participants define each factor.
+> The defaults you just used are the standard Q-methodology baseline (Brown 1980; Watts & Stenner 2012). When you are ready to vary them, see [`../explanation/q-methodology.md`](../explanation/q-methodology.md) for the trade-offs between PCA / centroid extraction, varimax / no rotation, and auto / manual flagging.
 
 ---
 
-## Step 4: Run the Analysis
+## Step 3: Loadings tab
 
-1. Click the **Run Analysis** button.
-2. Wait for processing to complete.
-3. Results appear below the configuration with four tabs: **Loadings**, **Factor Arrays**, **Statements**, and **Characteristics**.
+You see a table where each **row** is a participant and each **column** is a factor. Each cell holds a loading between −1 and +1.
 
----
+What to look for in a healthy result:
 
-## Step 5: Interpret Factor Loadings (Loadings Tab)
+- Cells exceeding the significance threshold are highlighted.
+- Some rows are **flagged** (starred): they load significantly on exactly one factor and "define" that factor.
+- A clean structure shows most participants loading high on one factor and low on the others.
 
-The Loadings tab shows a table where:
-- Each **row** is a participant
-- Each **column** is a factor
-- Each **cell** contains the loading (correlation from -1 to +1)
+If everything looks noisy and nothing is flagged, you almost certainly do not have enough participants yet. This is expected on a tutorial-sized dataset.
 
-**How to read it:**
-- **Highlighted values** exceed the significance threshold.
-- **Flagged participants** (starred rows) load significantly on exactly one factor -- they "define" that viewpoint.
-- Look for clean structure: most participants loading high on one factor and low on others.
-
-To override auto-flagging, switch to **Manual** mode and click individual cells.
+To override the auto-flagging, switch the **Flagging** control to **Manual** and click cells to flag them by hand.
 
 ---
 
-## Step 6: Examine Factor Arrays (Factor Arrays Tab)
+## Step 4: Factor Arrays tab
 
-Factor arrays show the composite Q-sort for each factor -- the idealized sort representing the shared viewpoint.
+The factor array is the composite Q-sort for each factor — the idealised sort of the shared viewpoint.
 
-Statements are arranged from most disagreed (left) to most agreed (right).
-
-- **Amber-highlighted statements** are distinguishing -- placed significantly differently compared to other factors.
-- Compare arrays across factors to see where viewpoints diverge.
+Statements are arranged from most disagreed (left) to most agreed (right). Statements highlighted in amber are *distinguishing*: they sit at significantly different positions across factors. Comparing arrays side-by-side is the fastest way to see where the viewpoints diverge.
 
 ---
 
-## Step 7: Review Statement Scores (Statements Tab)
+## Step 5: Statements tab
 
-This table lists every statement with:
-- **Z-scores** for each factor
-- **Factor array position** for each factor
-- **Classification**:
-  - **D (Distinguishing)**: Placed significantly differently across factors. Stars indicate significance level.
-  - **C (Consensus)**: All factors agree on placement.
+Every statement is listed with:
 
-Focus on D statements when writing your interpretation narrative.
+- **Z-score** per factor.
+- **Factor array position** per factor.
+- **Classification**: **D** (distinguishing — significantly different across factors; stars indicate the significance level: p < 0.05 / 0.01 / 0.001) or **C** (consensus — agreed across all factors).
 
----
-
-## Step 8: Review Factor Characteristics
-
-The Characteristics tab provides:
-- **Eigenvalue** and **variance explained** for each factor
-- **Number of flagged participants** per factor
-- **Composite reliability**
-- **Standard error** of factor scores
-- **Factor correlation matrix**
-
-A good solution typically explains 35-60% of total variance with composite reliability above 0.90.
+When you are interpreting a real study, distinguishing statements are usually where the factor's character lives.
 
 ---
 
-## Step 9: Export Data
+## Step 6: Characteristics tab
 
-### From the Analysis Page
+A summary card per factor:
 
-Click the **Export** dropdown next to Run Analysis:
-- **CSV -- Factor Loadings**: Participant labels, loadings, and flagging status
-- **CSV -- Statement Scores**: Z-scores, array positions, and classifications
+- Eigenvalue and variance explained.
+- Number of flagged participants.
+- Composite reliability (Spearman-Brown).
+- Standard error of factor scores.
+- Factor correlation matrix.
 
-### From the Data Page
-
-Navigate to **Data** for broader export options:
-- **CSV**: Full participant data (metadata, presort, Q-sort scores, postsort)
-- **PQMethod ZIP**: `.dat` and `.sta` files for PQMethod software
-- **R-Kit ZIP**: CSV data with a ready-to-run R script
-- **KenQ JSON**: Complete JSON for web-based analysis tools
-- **Research Package**: Comprehensive ZIP for archiving and reproducibility
+For tutorial-sized data, do not be alarmed if reliability is low or variance explained is patchy — that is a function of N, not of your study design.
 
 ---
 
-## Tips for a Good Analysis
+## Step 7: Export
 
-- **Start with the scree plot** to get a sense of how many meaningful factors exist.
-- **Try different numbers of factors** and compare solutions.
-- **PCA with varimax rotation and auto-flagging** is a solid default.
-- **Focus on distinguishing statements** when interpreting factors.
-- **Name your factors** based on the pattern of extreme statements.
-- **Cross-reference with post-sort qualitative data** to understand the "why" behind the numbers.
+Two ways to get the data out:
 
-## Next Steps
+- **From this page**, the Export dropdown gives you `CSV — Factor Loadings` and `CSV — Statement Scores`.
+- **From the Data page** (`Data → Export`), you get the full participant data in CSV, PQMethod, R-Kit, JSON dump, and the Research Package. See the [Data Export guide](../guides/data-export.md) for which format fits which downstream tool.
 
-You have now completed the full researcher workflow. For developer-oriented content, see the [Local Development Setup](local-development.md) tutorial.
+Each analysis you ran is also persisted to the **history panel** at the top of the Analysis page. You can reload a past run, edit your researcher notes on it, or delete it.
+
+---
+
+## What you built
+
+You ran a complete factor analysis end-to-end and saw what each tab surfaces. With a real study (40+ participants is typical for Q-methodology), the same workflow will produce interpretable factors — and the same exports plug into PQMethod, Ken-Q, KADE, and the R `qmethod` package.
+
+## Next steps
+
+You have now finished the researcher workflow. For developer-oriented content, see the [Local Development Setup](local-development.md) tutorial.

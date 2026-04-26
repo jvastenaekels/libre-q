@@ -7,9 +7,10 @@ Task-oriented guides for accomplishing specific goals with Qualis.
 | Guide | Description |
 |-------|-------------|
 | [Conducting Studies](conducting-studies.md) | Researcher handbook for the Q-methodology workflow |
-| [Admin Dashboard Features](admin-features.md) | Overview of all admin dashboard pages and features |
 | [Admin & Team Management](admin-management.md) | Managing accounts, teams, roles, and study lifecycle |
 | [Data Export](data-export.md) | Export formats, interactive inspection, and data privacy |
+
+For the page-by-page catalog of the admin UI, see [`../reference/admin-dashboard.md`](../reference/admin-dashboard.md).
 
 ## For Operators
 

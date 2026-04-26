@@ -26,7 +26,6 @@ Practical guides for accomplishing specific goals.
 | Guide | Description |
 |-------|-------------|
 | [Conducting Studies](guides/conducting-studies.md) | Researcher handbook for the Q-methodology workflow |
-| [Admin Dashboard Features](guides/admin-features.md) | Overview of all admin dashboard pages and features |
 | [Admin and Team Management](guides/admin-management.md) | Managing accounts, teams, roles, and study lifecycle |
 | [Data Export](guides/data-export.md) | Export formats, interactive inspection, and data privacy |
 
@@ -53,9 +52,11 @@ Dry, accurate technical descriptions of the system.
 
 | Reference | Description |
 |-----------|-------------|
-| [API Reference](reference/api.md) | All endpoints with methods, auth requirements, and request/response shapes |
-| [Configuration Options](reference/configuration.md) | Study configuration JSON schema |
-| [Frontend Components](reference/components.md) | Component architecture and page structure |
+| [API Reference](reference/api.md) | All endpoints with methods, auth requirements, and rate limits |
+| [Configuration Options](reference/configuration.md) | Study fields and application environment variables |
+| [Admin Dashboard](reference/admin-dashboard.md) | Page-by-page catalog of the admin UI |
+| [Frontend Components](reference/components.md) | Sorting primitives + component index |
+| [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export wrapper |
 | [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export format specification |
 
 ---

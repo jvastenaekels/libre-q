@@ -422,113 +422,20 @@ sequenceDiagram
 
 ---
 
-## Project Structure
+## Where to find what
 
-```
-frontend/src/
-├── api/                # API Client (Orval-generated)
-│   ├── generated.ts    # Generated hooks & types
-│   ├── model/          # Generated Pydantic-to-TS schemas
-│   └── mutator.ts      # Custom fetch wrapper
-├── components/         # Reusable UI
-│   ├── admin/          # Admin-specific UI
-│   │   ├── analysis/   # ScreePlot, FactorLoadings, FactorArrays, Statements, Characteristics
-│   │   ├── dashboard/  # InteractiveDataView, ParticipantDetail, charts/
-│   │   ├── designer/   # Study design editor components
-│   │   └── layout/     # Admin layout (sidebar, header)
-│   ├── audio/          # Audio recording & playback
-│   ├── postsort/       # Post-sort specific components
-│   ├── survey/         # Survey form components
-│   ├── ui/             # UI primitives (shadcn-style)
-│   ├── GridSort.tsx    # Q-grid with zoom/pan
-│   ├── CardStack.tsx   # Swipeable card deck
-│   ├── SortableCard.tsx
-│   ├── DroppableSlot.tsx
-│   └── ReadingZone.tsx # Zoomed card display
-├── contexts/           # React contexts (ViewportContext)
-├── hooks/              # Custom React hooks
-├── layouts/            # Shared layouts
-├── lib/                # Utility functions (cn, etc.)
-├── pages/              # Route components
-│   ├── WelcomePage.tsx
-│   ├── PreSortPage.tsx
-│   ├── RoughSortPage.tsx
-│   ├── FineSortPage.tsx
-│   ├── PostSortPage.tsx
-│   └── admin/          # Admin pages (Overview, Design, Data, Analysis, etc.)
-├── schemas/            # Zod validation schemas
-├── store/              # Zustand stores
-│   ├── useAuthStore.ts
-│   ├── useAdminStore.ts
-│   ├── useStudyDesigner.ts
-│   ├── useConfigStore.ts
-│   ├── useSessionStore.ts
-│   ├── useResponseStore.ts
-│   └── useUIStore.ts
-├── styles/             # Global CSS (typography, themes)
-├── types/              # TypeScript type definitions
-└── utils/              # Shared utilities
-
-frontend/public/
-└── locales/            # i18n translations
-    ├── en/translation.json
-    ├── fr/translation.json
-    └── fi/translation.json
-```
+Conventions for the code layout live in the contributing guides, not here. See [`../contributing/backend-guidelines.md`](../contributing/backend-guidelines.md) for the backend's three-tier organisation (`routers` → `services` → `models`/`schemas`) and [`../reference/components.md`](../reference/components.md) for the frontend component map. The full HTTP API surface is documented in [`../reference/api.md`](../reference/api.md).
 
 ---
 
-## API Endpoints
+## Why this shape
 
-| Method | Endpoint           | Description                   |
-| ------ | ------------------ | ----------------------------- |
-| `GET`  | `/api/study/:slug` | Fetch study configuration     |
-| `POST` | `/api/submit`      | Submit participant data       |
-| `GET`  | `/api/admin/*`     | Administrative API (auth required) |
-| `POST` | `/api/audio/*`     | Audio recording management    |
-| `GET`  | `/docs`            | Interactive API documentation |
+The architectural choices visible above (project-scoped requests, hybrid Zustand + TanStack Query, contract-first OpenAPI generation, async SQLAlchemy, JSON columns for open-ended config, hashed IPs, persisted analysis runs) are not neutral. They follow from three commitments that override the "default" answer at each junction:
 
-For the complete API reference, see [docs/reference/api.md](../reference/api.md) or visit `/docs` when the backend is running.
+1. **Self-hosting under a researcher's institution.** A SaaS architecture would have made several design decisions easier (centralised auth, shared object storage, fewer env vars). Self-hosting with GDPR data-residency in mind dictates that secrets, hashing salts, S3 endpoints, and SMTP routing all stay configurable per deployment, and that the participant flow contains no third-party calls.
 
----
+2. **Critical Q-methodology rather than classical Q-as-a-tool.** The persistence of every analysis run with its parameters, the editability of researcher notes on a run, the per-statement audit of who flagged what — these only make sense if you treat analytical choices as part of the result, rather than as a one-shot computation. The schema is shaped to keep the trail.
 
-## Error Handling
+3. **Auditable handling of participant data.** IP hashing with a per-deployment salt, consent-version hashes per participant, forward-only `last_step_reached`, deterministic randomisation seeded by the session token, and admin- and participant-mediated GDPR Art. 17 erasure are not features added on top — they are constraints that ruled out simpler implementations from the start.
 
-### Backend
-
-All errors are handled by a global exception middleware that returns a standardized JSON format:
-
-```json
-{
-  "code": 422,
-  "message": "Validation Error",
-  "details": [ ... ]
-}
-```
-
-Error categories:
-- **HTTP exceptions**: Returned with their status code and message.
-- **Validation errors**: Include Pydantic field-level details.
-- **Database integrity errors**: Return conflict details (e.g., duplicate slug).
-- **Unhandled exceptions**: Logged with full traceback; clients receive a generic 500.
-
-### Frontend
-
-Frontend JavaScript errors are captured and sent to `POST /api/logs` with stack trace, URL, and context metadata. The backend logs these to a dedicated `frontend_error` logger for monitoring.
-
----
-
-## Security
-
-### Security Headers
-
-The backend injects security headers on all responses:
-
-- **HSTS**: Enforces HTTPS connections.
-- **CSP (Content Security Policy)**: Restricts script sources; dynamically includes S3 endpoint for audio playback.
-- **X-Frame-Options**: Prevents clickjacking (DENY).
-- **Permissions-Policy**: Restricts camera access; enables microphone for audio recording.
-
-### Password Security
-
-User passwords are hashed with bcrypt using auto-generated salts. TOTP 2FA codes use a 1-second time window tolerance for clock skew.
+For the runtime defaults that fall out of these commitments (rate-limiting modes, connection pool sizing, security headers, error response shape), see [`../guides/deployment.md#runtime-behaviour-reference`](../guides/deployment.md#runtime-behaviour-reference) and [`../reference/api.md#error-response-format`](../reference/api.md#error-response-format).

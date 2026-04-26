@@ -1,158 +1,66 @@
-# Qualis AI-First Development Guidelines
+# Qualis Coding Standards
 
-## 1. Philosophy: The Agent-First Paradigm
+Cross-cutting rules that apply to every contribution. Backend- and frontend-specific patterns live in [`backend-guidelines.md`](backend-guidelines.md) and [`frontend-guidelines.md`](frontend-guidelines.md). For the documentation taxonomy (Diátaxis quadrants), see [`../README.md`](../README.md).
 
-**Qualis is an "Agent-First" project.** This means the codebase is optimized for generation, reading, and refactoring by Large Language Models (LLMs) under human supervision.
+## 1. Type-driven, contract-first
 
-Unlike traditional development where code is optimized for human brevity, here **we prioritize explicitness, strict typing, and deductive logic.** We avoid "magic" behavior, implicit state, or dynamic metaprogramming that creates hallucinations in AI reasoning.
+Define the shape of data before writing logic.
 
-### Core Principles
+- **Pydantic schemas** (backend) and **TypeScript types** (frontend) are not afterthoughts; they pin the contract.
+- The frontend never hand-writes API calls. The OpenAPI schema generated from the backend is the single source of truth, and the frontend consumes the regenerated client (`make generate-api`).
+- Most backend modules are under `mypy --strict` (see the strict-modules list in [`CLAUDE.md`](../../CLAUDE.md)). New utilities should opt in.
+- TypeScript: no `any`. Use `unknown` and narrow, or write the right type.
 
-1.  **Type-Driven Development (TyDD):** Types are the prompt. Define the shape of data (Pydantic/TypeScript Interfaces) _before_ writing any logic.
-2.  **Contract-First Architecture:** The OpenAPI schema is the single source of truth. The frontend never guesses endpoints; it consumes generated clients.
-3.  **Inverse TDD (Specification by Failure):** Tests describe the intent. We write the test case first to define the "Definition of Done" for the agent.
+## 2. Test-first
 
----
+Write a failing test before the implementation. The test fixes the intent and the "definition of done" before any code is generated.
 
-## 2. Backend Guidelines (Python/FastAPI)
+- **Frontend**: Vitest for hooks and pure logic; testing-library for component interactions. Test behaviour, not implementation details.
+- **Backend**: pytest with `conftest.py` fixtures. Database tests run inside transactions that roll back between tests.
+- **E2E**: Playwright for critical happy paths only — execution is slow.
 
-We use **Python 3.13+** with strict adherence to type hinting.
+See [`../guides/contributing/testing.md`](../guides/contributing/testing.md) for the test stack and conventions.
 
-### 2.1 Typing & Pydantic
+## 3. No magic
 
-- **No `Any`:** Every variable, argument, and return value must have a strict type.
-- **Pydantic Models as Logic Containers:** Do not pass raw dictionaries. Use Pydantic schemas for all data moving through layers.
-- **Explicit Returns:** Every function must declare its return type (e.g., `def get_user() -> UserRead:`).
+- No `__getattr__` / `__setattr__` / dynamic class generation in Python.
+- No `as` casts in TypeScript except at clearly-marked external boundaries.
+- No implicit cross-module state. Imports are explicit; dependencies are passed in.
+- Logic lives in `services/` (backend) and in colocated `use…` hooks (frontend), not in routers or page components.
 
-### 2.2 SQLAlchemy & Database
+## 4. Quality gate
 
-- **Async Core:** We use async SQLAlchemy (`AsyncSession`) for all database interactions. Use `await` for all DB calls.
-- **Explicit Relationships:** Define foreign keys and relationships explicitly in models. Avoid implicit joins.
+`make ci` is the gate. Run it locally before pushing.
 
-### 2.3 Style & Structure
+| Layer | Tool |
+| ----- | ---- |
+| Lint | Ruff (backend), Biome (frontend) |
+| Types | mypy (backend), tsc (frontend) |
+| Security / dead code | bandit, deptry, vulture (backend) |
+| Unit tests | pytest, Vitest |
+| Build | Frontend production build |
 
-- **No "Magic" Methods:** Avoid `__getattr__`, `__setattr__`, or dynamic class generation. Agents struggle to trace these.
-- **Service Layer Pattern:** Logic resides in `services/`, not in `routers/`. Routers only handle HTTP Request/Response mapping.
-- **Sentence Case:** Use "Sentence case" for all logging messages and error descriptions (e.g., "User not found in database", not "User Not Found").
+`make ci-fast` (~30–90 s) is the inner-loop equivalent. CI runs the same checks; local failures will fail in CI.
 
----
+## 5. Q-methodology invariants
 
-## 3. Frontend Guidelines (React/TypeScript)
+A handful of domain rules must hold in every change that touches the participant flow or the analytical pipeline. Background and rationale: [`../explanation/q-methodology.md`](../explanation/q-methodology.md).
 
-We use **React 19+** with **TypeScript** in strict mode.
+- **Forced distribution.** A submitted Q-sort must fill every grid slot with exactly one card. Never accept a partial sort.
+- **Stage order.** Consent → Presort → Rough Sort → Fine Sort → Postsort → Submission. Never let a participant skip a stage.
+- **Statement immutability after activation.** Once a study is Active, do not add or remove statements; that would invalidate cross-participant comparison.
 
-### 3.1 The "Generated Client" Rule
+## 6. Style
 
-- **Zero Manual Fetching:** Do not use `fetch` or `axios` directly.
-- **Workflow:**
-  1.  Update Backend Pydantic Schema.
-  2.  Update Backend Router.
-  3.  Run `./export_openapi.py`.
-  4.  Run Frontend generator (Orval) to update hooks.
-  5.  Use the generated hook (e.g., `useGetStudyQuery`).
+- US English in code, comments, commit messages, and docs.
+- Sentence case in log messages and error descriptions.
+- Mobile-first CSS: design for touch, then desktop breakpoints.
+- A code change that affects user-visible behaviour or developer-visible API must be accompanied by a doc update in the right Diataxis quadrant.
 
-### 3.2 Component Philosophy
+## 7. Conventional checklist before opening a PR
 
-- **Logic Extraction:** Complex logic (sorting algorithms, matrix sizing) must be extracted into custom hooks (`useGridCalculations.ts`) and tested in isolation via Vitest.
-- **Dumb Components:** UI components should receive data via props and emit events. They should contain minimal business logic.
-- **Tailwind CSS:** Use utility classes. Avoid CSS-in-JS complexities unless necessary for dynamic values.
-
----
-
-## 4. The "Inverse TDD" Workflow
-
-When contributing a new feature, follow this sequence to minimize hallucination:
-
-1.  **Phase 1: The Contract (Human or Agent)**
-    - Define the Interface (Pydantic Schema or TS Type).
-    - _Example:_ Define `class SortSubmission(BaseModel): ...`
-
-2.  **Phase 2: The Trap (Human)**
-    - Write a failing test case that asserts the business rule.
-    - _Example:_ "Ensure a user cannot submit a Q-Sort if 2 cards are missing."
-
-3.  **Phase 3: The Generation (Agent)**
-    - Implement the logic to satisfy the Type signature and pass the Test.
-
----
-
-## 5. Domain Knowledge: Q-Methodology
-
-_Context for the Agent:_
-Qualis implements **Q-Methodology**, a research method used in psychology and social sciences to study human subjectivity. Unlike standard surveys (R-methodology) that treat people as variables, Q-methodology treats _items_ as variables and people as the correlation matrix (Inverted Factor Analysis).
-
-### 5.1 The Core Mechanism: Forced Distribution
-
-- **The Grid (Q-Grid):** Users must sort items (statements) into a fixed grid shaped like a normal distribution (Bell curve).
-- **Ipsative Data:** The data is relative, not absolute. Placing a card in the "+3" slot forces another card out. A card's value is defined solely by its relationship to other cards in that specific user's sort.
-- **Validation Rule:** A Q-Sort is mathematically invalid and **cannot be submitted** unless every single slot in the grid is filled with exactly one card. There are no "missing values" allowed in the grid.
-
-### 5.2 The User Workflow (Stages)
-
-The application must guide the participant through strictly ordered stages. The Agent must preserve this linearity:
-
-1.  **Introduction & Consent:** Legal and instructional context.
-2.  **Rough Sort (Presort):** A cognitive easing step. Users drag cards into three buckets: "Agree", "Disagree", and "Neutral". This reduces cognitive load before the grid.
-3.  **Fine Sort (The Grid):** The core task. Users move cards from the three buckets into the specific slots of the Q-Grid.
-4.  **Post-Sort Survey:** Standard Likert/Text questions to contextualize the sort (e.g., "Why did you place Card X at +3?").
-5.  **Submission:** Final hashing and storage.
-
-### 5.3 Key Terminology
-
-- **Concourse:** The full set of possible statements about a topic.
-- **Q-Set:** The selected subset of statements presented to the participant (the cards).
-- **P-Set:** The participants.
-- **Condition of Instruction:** The specific prompt given to the user (e.g., "Sort these cards based on how you feel _right now_").
-
----
-
-## 6. Documentation Standards
-
-We strictly adhere to the **Diátaxis Framework**. All documentation must fall into one of four quadrants. Do not mix them.
-
-### 6.1 Structure & Location
-
-- **Tutorials (`../tutorials/`):** Lesson-oriented. Learning by doing.
-  - _Goal:_ Guide the user through a specific project to achieve a tangible result.
-  - _Tone:_ Instructional, hand-holding. "Let's build X."
-- **How-To Guides (`../guides/`):** Problem-oriented. Steps to solve a specific problem.
-  - _Goal:_ Show how to perform a specific task (e.g., "How to export data to CSV").
-  - _Tone:_ Practical, concise. "Run command Y."
-- **Reference (`../reference/`):** Information-oriented. Technical descriptions.
-  - _Goal:_ Describe the machinery (API Endpoints, Component Props, Configuration variables).
-  - _Tone:_ Dry, accurate, exhaustive.
-- **Explanation (`../explanation/`):** Understanding-oriented. Theoretical background.
-  - _Goal:_ Explain _why_ things are the way they are (Architecture decisions, Q-Methodology theory).
-  - _Tone:_ Discursive, clarifying.
-
-### 6.2 Writing Rules
-
-- **Language:** US English.
-- **Updates:** Any code change affecting functionality MUST be accompanied by a documentation update in the relevant quadrant.
-
----
-
-## 7. Quality Assurance & Definition of Done
-
-We practice **Rigorous CI (Continuous Integration)**. No code is considered "complete" until it passes the full CI suite locally.
-
-### 7.1 The Golden Rule: `make ci`
-
-Before submitting any changes or marking a task as done, you typically must run the full quality suite via the Makefile.
-
-- **Command:** `make ci` (or equivalent in the environment).
-- **What it entails:**
-  1.  **Linting:** `ruff` (backend) and `biome` (frontend) checks for code style and potential errors.
-  2.  **Type Checking:** `mypy` (backend) and `tsc` (frontend) ensure strict typing compliance.
-  3.  **Unit Tests:** `pytest` (backend) and `vitest` (frontend) validate logic isolation.
-  4.  **Integration Tests:** API contract tests to ensure backend/frontend alignment.
-
-### 7.2 Testing Strategy
-
-- **Frontend:** prefer `vitest` for logic/hooks and `testing-library` for component interactions. Avoid testing implementation details; test user behavior.
-- **Backend:** Use `pytest` with `conftest.py` fixtures. Database tests must use transactions that roll back after each test to ensure a clean state.
-- **E2E:** `playwright` tests are for critical paths (happy path) only, due to execution time.
-
-### 7.3 Automated Checks
-
-The repository enforces these checks via GitHub Actions. **Do not ignore local failures** expecting CI to fix them. If `make ci` fails locally, it _will_ fail in production.
+- `make ci` passes.
+- New user-facing strings use `t('key', 'Fallback')` and exist in `en`, `fr`, `fi`. `npm run i18n-check` passes.
+- Backend route or schema changes are followed by `make generate-api`; the regenerated client is committed.
+- New database columns ship with a reviewed Alembic migration (`make migration-new`).
+- New tests cover the behaviour. Non-trivial code without a test is a blocker.

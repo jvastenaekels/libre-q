@@ -80,17 +80,11 @@ To share:
 
 ---
 
-## Step 6: Understand the Participant Experience
+## Step 6: Walk One Link Yourself
 
-When a participant opens your link, they experience:
+Open the public link from Step 2 in a private window (so it does not pick up your admin session) and complete the study end-to-end as a participant would. You will go through Welcome → Consent → Presort → Rough Sort → Fine Sort → Post-Sort → Submission, and land on a confirmation code.
 
-1. **Welcome Page** -- Study title, description, and instructions
-2. **Consent Page** -- Read and accept the consent form
-3. **Presort Questionnaire** -- Answer demographic questions
-4. **Rough Sort** -- Swipe/click to categorize statements into Agree / Neutral / Disagree
-5. **Fine Sort** -- Drag statements into the forced-distribution grid
-6. **Post-Sort** -- Explain extreme placements and answer follow-up questions
-7. **Submission** -- Confirmation code is displayed
+This is the single best way to spot rough edges in instructions, statement wording, or grid sizing before recruiting real people. It also creates a row in the participant table that you will use in the next steps.
 
 ---
 
@@ -128,19 +122,14 @@ The Data page provides:
 ## Step 10: Flag or Discard Problematic Responses
 
 If you identify a response that should be excluded:
-1. Use the discard option on the participant row.
-2. Enter a reason (e.g., "Completed in under 30 seconds -- likely random").
 
-Discarded participants are excluded from exports and analysis by default, but the data is preserved.
+1. In the Data page, open the row's action menu (kebab icon at the end of the row).
+2. Click **Discard**.
+3. Enter a reason (e.g., "Completed in under 30 seconds — likely random").
 
----
+Discarded participants are excluded from exports and analysis by default, but the data is preserved for audit. To restore, open the same menu and click **Restore**.
 
-## Step 11: Manage Your Study State
-
-From the Study Overview, control the lifecycle:
-- **Pause**: Temporarily stop accepting new participants.
-- **Close**: End data collection permanently.
-- **Draft**: Return to draft mode for configuration changes (structural changes locked once real data exists).
+For the full set of state transitions a study goes through (Active → Paused → Closed → Archived), see [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). For now, leave your tutorial study Active.
 
 ---
 

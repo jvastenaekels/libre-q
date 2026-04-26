@@ -1,10 +1,19 @@
 # Configuration Reference
 
-Qualis studies are highly configurable via JSON objects stored in the `studies` table. This document details the schema for these configurations.
+Two layers of configuration apply to a Qualis deployment:
 
-## `grid_config` (The Distribution)
+1. **Per-study configuration** — JSON stored in the `studies` table; controls the participant experience and the analytical pipeline. Documented in [Study fields](#study-fields).
+2. **Application settings** — Environment variables read by the FastAPI backend at startup. Documented in [Environment / app settings](#environment--app-settings).
 
-The grid config defines the shape of the Q-sort table. It is an array of objects representing columns.
+For the import/export wrapper around per-study configuration, see [`study-configuration-format.md`](study-configuration-format.md).
+
+---
+
+## Study fields
+
+### `grid_config`
+
+The shape of the Q-sort table. An array of column objects.
 
 ```json
 [
@@ -12,25 +21,24 @@ The grid config defines the shape of the Q-sort table. It is an array of objects
   { "score": -3, "capacity": 3 },
   { "score": -2, "capacity": 4 },
   { "score": -1, "capacity": 5 },
-  { "score": 0, "capacity": 6 },
-  { "score": 1, "capacity": 5 },
-  { "score": 2, "capacity": 4 },
-  { "score": 3, "capacity": 3 },
-  { "score": 4, "capacity": 2 }
+  { "score":  0, "capacity": 6 },
+  { "score":  1, "capacity": 5 },
+  { "score":  2, "capacity": 4 },
+  { "score":  3, "capacity": 3 },
+  { "score":  4, "capacity": 2 }
 ]
 ```
 
-- **score**: The numerical value assigned to cards in this column (e.g., -4 for Most Disagree, +4 for Most Agree).
-- **capacity**: How many cards can fit into this column.
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `score` | integer | Column value. |
+| `capacity` | integer | Number of cards that fit in the column. |
 
-> [!IMPORTANT]
-> The sum of all `capacity` values **MUST** equal the total number of statements in the study.
+The sum of all `capacity` values must equal the number of statements.
 
----
+### `presort_config`
 
-## `presort_config` (Demographics)
-
-Defines the fields presented to participants before the sorting begins. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, and `email` types.
+Demographic / pre-sort fields. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, and `email` field types. Definitions are open-ended JSON; the wire shape is not enforced at the schema level beyond validity.
 
 ```json
 {
@@ -43,7 +51,7 @@ Defines the fields presented to participants before the sorting begins. Supports
   "gender": {
     "type": "select",
     "options": [
-      { "value": "Male", "label": { "en": "Male", "fr": "Homme" } },
+      { "value": "Male",   "label": { "en": "Male",   "fr": "Homme" } },
       { "value": "Female", "label": { "en": "Female", "fr": "Femme" } }
     ],
     "label": { "en": "Gender", "fr": "Genre" },
@@ -52,125 +60,162 @@ Defines the fields presented to participants before the sorting begins. Supports
 }
 ```
 
----
+### `postsort_config`
 
-## `postsort_config` (Qualitative)
-
-Controls the behavior of the final phase of the study.
+Final phase of the participant experience.
 
 ```json
 {
   "extreme_columns": [-4, 4],
   "ask_missing": true,
-  "ask_general_comment": true
+  "ask_general_comment": true,
+  "audio": { "max_storage_mb": 100 }
 }
 ```
 
-- **extreme_columns**: An array of column scores for which the participant will be asked to provide comments.
-- **ask_missing**: If true, participants are nudged to fill any empty slots (though the UI usually forces this before proceeding).
-- **ask_general_comment**: If true, shows a final text area for any additional thoughts.
-- **audio**: Optional audio configuration object.
-  - `max_storage_mb`: Per-study storage quota for audio recordings (default: 100 MB). Uploads exceeding this quota return HTTP 507.
-
----
-
-## Study Options
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `extreme_columns` | int[] | Column scores for which participants are asked for comments. |
+| `ask_missing` | boolean | If true, participants are nudged to fill any empty slots. |
+| `ask_general_comment` | boolean | If true, shows a final free-text comment field. |
+| `audio.max_storage_mb` | integer | Per-study quota for audio recordings (default 100 MB). Uploads exceeding the quota return HTTP 507. |
 
 ### `show_statement_codes`
 
-A boolean flag to control the display of statement identifiers (e.g., "S1", "S2") on the cards.
-
-```json
-{
-  "slug": "my-study",
-  "show_statement_codes": true,
-  ...
-}
-```
-
-- **true**: Displays a subtle light-gray identifier in the top-left corner of each card and in the zoom overlays. Useful for research analysis and cross-referencing.
-- **false (Default)**: Statement codes are hidden for a cleaner participant experience.
+Boolean. If true, statement identifiers (`S1`, `S2`, …) appear in the corner of each card and in zoom overlays. Default `false`.
 
 ### `randomize_statement_order`
 
-A boolean flag to control whether statements are shuffled for each participant.
-
-```json
-{
-  "slug": "my-study",
-  "randomize_statement_order": true,
-  ...
-}
-```
-
-- **true**: Statements are shuffled in a deterministic way based on the participant's session token. This prevents **order effects** (a best practice in Q-methodology).
-- **false (Default)**: Statements appear in the order defined in the database.
-
-> [!NOTE]
-> Randomization is deterministic per session - if a participant refreshes the page, they will see the same order.
+Boolean. If true, statement order is shuffled deterministically per participant session token (stable across page refreshes). Default `false`.
 
 ### `symmetry_lock`
 
-A boolean flag to enforce grid symmetry in the study designer.
-
-- **true (Default)**: The designer enforces symmetrical column capacities (e.g., if -3 has capacity 2, then +3 must also have capacity 2).
-- **false**: Allows asymmetrical grid designs.
+Boolean. If true, the designer enforces symmetric column capacities (`-3` capacity equals `+3` capacity, etc.). Default `true`.
 
 ### `default_language`
 
-The fallback language code (ISO 639-1) used when a participant's preferred language is not available.
+ISO 639-1 fallback language code. Resolution order:
 
-```json
-{
-  "slug": "my-study",
-  "default_language": "en",
-  ...
-}
-```
-
-The language resolution hierarchy is:
-
-1. Use the participant's requested language if a translation exists.
-2. Fall back to the study's `default_language`.
-3. Fall back to the first available translation.
+1. The participant's requested language, if a translation exists.
+2. The study's `default_language`.
+3. The first available translation.
 
 ### `access_password`
 
-A hashed password to restrict access to the study configuration.
+Bcrypt hash. When set, participants must enter the correct password (verified via `POST /api/study/{slug}/unlock`) before the study renders. `null` = publicly accessible.
 
-```json
-{
-  "slug": "my-study",
-  "access_password": "hashed_password_here",
-  ...
-}
-```
+### `StudyTranslation`
 
-- **Set**: Participants must enter the correct password before they can view the study content (Consent, Statements, Grid).
-- **Null (Default)**: Study is publicly accessible via its link.
+Per-language content stored in `study_translations`.
 
-> [!TIP]
-> Use this feature for sensitive or pre-publication research where you want to control who can access the study.
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `language_code` | string | ISO 639-1 code (`"en"`, `"fr"`, …). |
+| `title` | string | Study title. |
+| `subtitle` | string \| null | Tagline shown on the welcome page. |
+| `description` | string | Welcome page description. |
+| `objective` | string \| null | Research objective. |
+| `condition_of_instruction` | string \| null | Core sorting prompt. |
+| `pre_instruction` | string \| null | Instructions for the rough-sort triage phase. |
+| `instructions` | string \| null | Markdown content for the welcome page. |
+| `consent_title` | string \| null | Title for the consent step. |
+| `consent_description` | string \| null | Full text of the consent form. |
+| `ui_labels` | object | Override default button text (e.g. `{"start_button": "Go!"}`). |
+| `process_steps` | array | Custom step definitions for the progress indicator. |
+| `methodology_tips` | array | Methodology tips shown during sorting. |
+| `step_help` | object | Per-step help content for the help overlay. |
 
 ---
 
-## `StudyTranslation`
+## Environment / app settings
 
-Content that varies by language is stored in the `study_translations` table:
+All settings are read from the `Settings` Pydantic class in `backend/app/core/config.py`. Values come from `.env` at the repository root (and `../.env` as fallback). See `.env.example` for a template.
 
-| Field                      | Type            | Description                                              |
-| :------------------------- | :-------------- | :------------------------------------------------------- |
-| `language_code`            | `string`        | ISO 639-1 code (e.g., `"en"`, `"fr"`)                   |
-| `title`                    | `string`        | Study title                                              |
-| `subtitle`                 | `string | null` | Brief tagline on welcome page                            |
-| `description`              | `string`        | Short summary                                            |
-| `objective`                | `string | null` | Research objective shown to participants                  |
-| `condition_of_instruction` | `string | null` | The core sorting prompt/frame                            |
-| `pre_instruction`          | `string | null` | Instruction for the initial rough sort phase             |
-| `instructions`             | `string | null` | Detailed Markdown content for the welcome page           |
-| `consent_title`            | `string | null` | Title for the consent step                               |
-| `consent_description`      | `string | null` | Full text of the consent form                            |
-| `ui_labels`                | `json`          | Override default button text (e.g., `{"start_button": "Go!"}`) |
-| `process_steps`            | `json`          | Custom step definitions for the progress indicator       |
-| `methodology_tips`         | `json`          | Methodology tips shown during sorting                    |
-| `step_help`                | `json`          | Per-step help content for the help overlay               |
+### Core
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `API_V1_STR` | string | `/api` | Prefix for versioned routes. |
+| `PROJECT_NAME` | string | `Qualis API` | Application display name. |
+| `ENVIRONMENT` | string | `production` | One of `production`, `development`, `test`. Controls test-router registration and a few defaults. |
+| `FRONTEND_URL` | string | `http://localhost:5173` | Public frontend URL; used in outgoing emails. |
+
+### Authentication
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `SECRET_KEY` | string | dev-only | JWT signing key. **Required in production.** Generate with `python -c 'import secrets; print(secrets.token_urlsafe(48))'`. |
+| `ALGORITHM` | string | `HS256` | JWT signing algorithm. |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | int | `480` | Access token lifetime (minutes). |
+| `IP_HASH_SALT` | string | dev-only | Salt for SHA-256 hashing of participant IPs. **Required in production.** |
+
+### Database
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `DATABASE_URL` | string \| optional | dummy URL for CI | Async Postgres URL (`postgresql+asyncpg://…`). Required in real deployments. |
+| `TEST_DATABASE_URL` | string \| optional | `postgresql+asyncpg://postgres:postgres@localhost:5432/qualis_test` | Separate URL used by the test suite. |
+
+### CORS / proxies
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `ALLOWED_ORIGINS` | string (CSV) | localhost dev ports | Comma-separated list of allowed origins. Production must override. |
+| `TRUSTED_PROXIES` | string (CSV) | empty | Reverse-proxy IPs trusted for `X-Forwarded-For`. Empty = use direct peer IP only. |
+
+### Observability
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `SENTRY_DSN` | string \| optional | `None` | Server-side Sentry DSN. PII sending is hardcoded off. |
+| `SENTRY_TRACES_SAMPLE_RATE` | float | `0.0` | Performance trace sampling rate (0–1). |
+
+### Email (SMTP)
+
+If `SMTP_HOST` is unset, the backend falls back to logging invitation URLs instead of sending email.
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `SMTP_HOST` | string \| optional | `None` | SMTP server hostname. |
+| `SMTP_PORT` | int \| optional | `587` | SMTP server port. |
+| `SMTP_TLS` | bool | `True` | Use TLS for SMTP. |
+| `SMTP_USER` | string \| optional | `None` | SMTP authentication username. |
+| `SMTP_PASSWORD` | string \| optional | `None` | SMTP authentication password. |
+| `EMAILS_FROM_EMAIL` | string \| optional | `None` | Sender address. |
+| `EMAILS_FROM_NAME` | string \| optional | falls back to `PROJECT_NAME` | Sender display name. |
+
+### Audio
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `AUDIO_MAX_FILE_SIZE_MB` | int | `10` | Max audio file size (MB). |
+| `AUDIO_MAX_DURATION_SECONDS` | int | `300` | Max audio recording duration (seconds). |
+| `AUDIO_ALLOWED_MIME_TYPES` | list[string] | `["audio/webm", "video/webm", "audio/mp4", "audio/mpeg"]` | Accepted MIME types. |
+
+### Object storage (S3 / S3-compatible)
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `S3_ENDPOINT_URL` | string \| optional | `None` | Custom endpoint (e.g. Cellar, MinIO, R2). Empty = use AWS default. |
+| `S3_REGION` | string | `us-east-1` | AWS / compatible region code. |
+| `S3_BUCKET_NAME` | string \| optional | `None` | Bucket for audio. Empty disables audio recording. |
+| `S3_ACCESS_KEY_ID` | string \| optional | `None` | Access key. |
+| `S3_SECRET_ACCESS_KEY` | string \| optional | `None` | Secret key. |
+
+### Bootstrap script variables
+
+These are read by the `init_db.py` and `script_utils.py` helpers, not by the Pydantic settings class.
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `ADMIN_EMAIL` | string | `admin@example.com` | Initial admin account email. |
+| `ADMIN_PASSWORD` | string | `admin123` | Initial admin password. Override before any production bootstrap. |
+
+### Frontend build-time (Vite)
+
+Read at build time by Vite, not by the backend.
+
+| ENV_VAR | Type | Default | Description |
+| ------- | ---- | ------- | ----------- |
+| `VITE_SENTRY_DSN` | string \| optional | empty | Browser-side Sentry DSN, baked into the bundle. |
+| `VITE_ENVIRONMENT` | string \| optional | falls back to Vite `MODE` | Environment tag used by the browser Sentry init. |

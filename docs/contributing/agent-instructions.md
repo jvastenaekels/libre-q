@@ -138,9 +138,8 @@ make e2e         # playwright (study + admin flows)
 
 ## Quick Verification
 
-Before marking a task done:
+Before marking a task done, from the repository root:
 ```bash
-cd /home/julien/qualis
 make ci              # Fast verification (~2-3 min)
 # OR for full validation:
 make ci-full         # Includes E2E (~10-15 min)

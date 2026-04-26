@@ -1,14 +1,16 @@
 # Study Configuration Format (JSON)
 
-This document describes the JSON format used for exporting and importing Qualis study configurations.
+The JSON format used for exporting and importing Qualis study configurations.
 
 ## Overview
 
-The configuration file is a JSON object containing the complete design definition of a study, including settings, grid configuration, statements, and translations. It does **not** contain participant data or results.
+A configuration file is a JSON object containing the complete design definition of a study (settings, grid, statements, translations, branding, presort/postsort). It does **not** contain participant data or results.
 
-**Filename Convention:** `{slug}_config_{YYYYMMDD}.json`
+**Filename convention:** `{slug}_config_{YYYYMMDD}.json`
 
-## Schema Structure
+For runtime configuration of a study (the same fields as they appear in the database), see [`configuration.md`](configuration.md). The two reference docs share their underlying schemas; this one documents the export/import wrapper.
+
+## Schema structure
 
 ```json
 {
@@ -21,16 +23,18 @@ The configuration file is a JSON object containing the complete design definitio
     "show_statement_codes": true,
     "randomize_statement_order": true,
     "symmetry_lock": true,
+    "access_password": null,
     "grid_config": [
       { "score": -2, "capacity": 2 },
       { "score": -1, "capacity": 3 },
-      { "score": 0, "capacity": 4 },
-      { "score": 1, "capacity": 3 },
-      { "score": 2, "capacity": 2 }
+      { "score":  0, "capacity": 4 },
+      { "score":  1, "capacity": 3 },
+      { "score":  2, "capacity": 2 }
     ],
     "statements": [
       {
         "code": "S1",
+        "display_order": 1,
         "translations": [
           { "language_code": "en", "text": "Statement text in English" },
           { "language_code": "fr", "text": "Texte de l'énoncé en Français" }
@@ -41,9 +45,12 @@ The configuration file is a JSON object containing the complete design definitio
       {
         "language_code": "en",
         "title": "Study Title",
-        "description": "Study description displayed on welcome page.",
+        "subtitle": "Tagline shown on the welcome page",
+        "description": "Welcome page description",
+        "objective": "Research objective",
         "instructions": "Detailed instructions...",
         "condition_of_instruction": "Sort these cards...",
+        "pre_instruction": "Quick triage instructions",
         "consent_title": "Informed Consent",
         "consent_description": "Legal text...",
         "ui_labels": {},
@@ -53,8 +60,10 @@ The configuration file is a JSON object containing the complete design definitio
       }
     ],
     "branding": {
-      "primary_color": "#4F46E5",
-      "logo_url": "https://example.com/logo.png"
+      "accent_color": "#4F46E5",
+      "primary_color": "#0EA5E9",
+      "logo_url": "https://example.com/logo.png",
+      "partner_logos": []
     },
     "presort_config": {
       "enabled": true,
@@ -62,77 +71,99 @@ The configuration file is a JSON object containing the complete design definitio
     },
     "postsort_config": {
       "enabled": true,
-      "questions": []
+      "questions": [],
+      "extreme_columns": [-2, 2],
+      "ask_missing": true,
+      "ask_general_comment": true,
+      "audio": { "max_storage_mb": 100 }
     }
   }
 }
 ```
 
-## Field Reference
+## Field reference
 
-### Root Object
+### Root object
 
-| Field         | Type   | Description                                 |
-| :------------ | :----- | :------------------------------------------ |
-| `version`     | string | Schema version (currently "1.0").           |
-| `exported_at` | string | ISO 8601 timestamp of export.               |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `version` | string | Schema version (currently `"1.0"`). |
+| `exported_at` | string | ISO 8601 timestamp of export. |
 | `exported_by` | string | Email of the user who performed the export. |
-| `study`       | object | The main study configuration object.        |
+| `study` | object | Study configuration. |
 
-### Study Object
+### Study object
 
-| Field                       | Type    | Description                                                                  |
-| :-------------------------- | :------ | :--------------------------------------------------------------------------- |
-| `slug`                      | string  | **Required**. Unique identifier (used as default, can be changed on import). |
-| `default_language`          | string  | **Required**. ISO 639-1 code (e.g., "en").                                   |
-| `show_statement_codes`      | boolean | If true, identifiers (S1, S2) are shown to participants.                     |
-| `randomize_statement_order` | boolean | If true, statement order is randomized for each participant.                 |
-| `symmetry_lock`             | boolean | If true, prevents modifying the grid to be asymmetrical.                     |
-| `grid_config`               | array   | List of column definitions.                                                  |
-| `statements`                | array   | List of statement objects.                                                   |
-| `translations`              | array   | List of study-level translation objects.                                     |
-| `branding`                  | object  | Branding settings (colors, logo).                                            |
-| `presort_config`            | object  | Configuration for demographic questions.                                     |
-| `postsort_config`           | object  | Configuration for follow-up questions.                                       |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `slug` | string | Unique identifier within a project. May be re-mapped on import if the slug already exists. |
+| `default_language` | string | ISO 639-1 fallback language code. |
+| `show_statement_codes` | boolean | If true, statement codes (`S1`, `S2`) are visible to participants. Default `false`. |
+| `randomize_statement_order` | boolean | If true, statement display order is shuffled deterministically per session. Default `false`. |
+| `symmetry_lock` | boolean | If true, the designer enforces symmetric column capacities. Default `true`. |
+| `access_password` | string \| null | Bcrypt-hashed password gating access. `null` = publicly accessible. |
+| `grid_config` | array | Pyramid columns. See below. |
+| `statements` | array | Statement objects. |
+| `translations` | array | Per-language study content. |
+| `branding` | object \| null | Branding (colors, logos). |
+| `presort_config` | object | Demographic / pre-sort survey definition. See [`configuration.md`](configuration.md). |
+| `postsort_config` | object | Post-sort survey + audio quota. See [`configuration.md`](configuration.md). |
 
-### Grid Configuration Object
+### Grid configuration object
 
-Each item in `grid_config` represents a column in the Q-sort grid.
+Each item in `grid_config` represents a column.
 
-| Field      | Type    | Description                                                    |
-| :--------- | :------ | :------------------------------------------------------------- |
-| `score`    | integer | The numeric value associated with the column (e.g., -2, 0, 2). |
-| `capacity` | integer | The maximum number of cards that fit in this column.           |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `score` | integer | Column value (e.g. `-3`, `0`, `+3`). |
+| `capacity` | integer | Number of cards that fit in the column. |
 
-### Statement Object
+The sum of `capacity` across all columns must equal the number of statements.
 
-| Field          | Type   | Description                                       |
-| :------------- | :----- | :------------------------------------------------ |
-| `code`         | string | Unique identifier for the statement (e.g., "S1"). |
-| `translations` | array  | List of objects with `language_code` and `text`.  |
+### Statement object
 
-### Translation Object
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `code` | string | Stable statement identifier (e.g. `"S1"`). |
+| `display_order` | integer | Order used when `randomize_statement_order` is `false`. |
+| `translations` | array | One entry per language: `{ "language_code", "text" }`. |
 
-Defines the localizable content for the study interface (per language).
+### Translation object
 
-| Field                      | Type   | Description                                              |
-| :------------------------- | :----- | :------------------------------------------------------- |
-| `language_code`            | string | ISO 639-1 code (e.g., "en", "fr").                       |
-| `title`                    | string | Study title.                                             |
-| `description`              | string | Welcome page description.                                |
-| `instructions`             | string | General instructions.                                    |
-| `condition_of_instruction` | string | The core sorting prompt.                                 |
-| `pre_instruction`          | string | Instruction for the initial rough sort (pre-sort) phase. |
-| `consent_title`            | string | Title for consent step.                                  |
-| `consent_description`      | string | Full text of consent form.                               |
-| `process_steps`            | array  | Custom step definitions (optional).                      |
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `language_code` | string | ISO 639-1 (`"en"`, `"fr"`, …). |
+| `title` | string | Study title. |
+| `subtitle` | string \| null | Tagline shown on the welcome page. |
+| `description` | string | Welcome page description. |
+| `objective` | string \| null | Research objective shown to participants. |
+| `condition_of_instruction` | string | Core sorting prompt. |
+| `pre_instruction` | string \| null | Instructions for the rough-sort triage phase. |
+| `instructions` | string \| null | Markdown content shown on the welcome page. |
+| `consent_title` | string \| null | Title for the consent step. |
+| `consent_description` | string \| null | Full text of the consent form. |
+| `ui_labels` | object | Overrides for default button text (e.g. `{"start_button": "Go!"}`). |
+| `process_steps` | array | Custom step definitions for the progress indicator. |
+| `methodology_tips` | array | Tip strings shown contextually during sorting. |
+| `step_help` | object | Per-step help content for the help overlay. |
 
-## Validation Rules
+### Branding object
 
-When importing a configuration file, the system enforces the following rules:
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accent_color` | string \| null | CSS colour for accents (buttons, links). Max 50 chars. |
+| `primary_color` | string \| null | CSS colour for primary surfaces. Max 50 chars. |
+| `logo_url` | string \| null | URL for the study logo shown on the welcome page. |
+| `partner_logos` | array | List of partner logo URLs displayed in the footer. |
 
-1.  **Format**: File must be valid JSON.
-2.  **Required Fields**: `slug`, `default_language`, `statements`, and `grid_config` must be present.
-3.  **Statement Balance**: The total number of `statements` must exactly match the total capacity of the `grid_config`.
-4.  **Languages**: All `language_code` values must be valid 2-letter ISO codes.
-5.  **Translations**: Each enabled language must have a corresponding translation object.
+The branding object is stored as a JSON blob on the study record; unknown keys are preserved on round-trip but ignored by the UI.
+
+## Validation rules
+
+When importing, the following rules are enforced:
+
+1. **Format** — file must be valid JSON.
+2. **Required fields** — `slug`, `default_language`, `statements`, `grid_config`.
+3. **Statement balance** — `sum(grid_config[i].capacity) == len(statements)`.
+4. **Language codes** — every `language_code` must be a 2-letter ISO 639-1 code.
+5. **Translation completeness** — every language declared on a statement or in `translations` must appear in the study's translations array (i.e. the import service treats the union of all `language_code` values as the study's enabled languages).

@@ -117,31 +117,17 @@ Participants explain why they placed their most extreme statements (e.g., +5 and
 
 ---
 
-## Configuring your study
-
-Qualis uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
-
-### Example grid configuration
-
-```json
-{
-  "grid_config": [
-    { "score": -3, "capacity": 2 },
-    { "score": -2, "capacity": 3 },
-    { "score": -1, "capacity": 4 },
-    { "score": 0, "capacity": 5 },
-    { "score": 1, "capacity": 4 },
-    { "score": 2, "capacity": 3 },
-    { "score": 3, "capacity": 2 }
-  ]
-}
-```
+For the JSON shape used to declare a Q-grid in Qualis, see the [Configuration reference](../reference/configuration.md).
 
 ---
 
-## Critical Q-methodology in Qualis
+## Two strands of Q
 
-Q-methodology has historically split into two strands. **Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. **Critical Q** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
+Q-methodology has historically split into two strands, and the choice between them shapes how a study is designed, analysed, and written up. The next section explains where Qualis sits in that split. If you are encountering Q-methodology for the first time, the short version is: Qualis follows the **critical Q** tradition, which treats the researcher's analytical choices as themselves part of the result, rather than as neutral knobs.
+
+### Critical Q-methodology in Qualis
+
+**Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. **Critical Q** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
 
 Qualis is designed for the critical strand. The platform supports classical workflows too (the underlying factor analysis is the same), but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
 
@@ -149,29 +135,14 @@ Qualis is designed for the critical strand. The platform supports classical work
 
 | Critical Q principle | How Qualis supports it |
 |----------------------|--------------------------|
-| Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. (See [Implemented and planned features](#implemented-and-planned-features) below for current state.) |
+| Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. |
 | Researcher control over flagging | Auto-flagging is a starting point. Flagging is exposed and editable per study, and researcher decisions are part of the audit trail. |
 | Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the critical Q practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
 | Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel. The constructed nature of the P-set is visible rather than implicit. |
 | Multilingual studies | Statements, instructions, consent text, and the participant UI can be translated. Critical Q research often crosses language and cultural boundaries; this should not require reverse-engineering the platform. |
 | Self-hosted data residency | Qualis runs on the researcher's infrastructure; participant data does not transit through a third-party SaaS. Important for GDPR compliance, ethics committees, and the trust relationship with participants. |
 
-### Implemented and planned features (v0.1)
-
-| Feature | Status | Notes |
-|---------|:------:|-------|
-| PCA factor extraction | ✅ implemented | Default. Centroid extraction also exposed. |
-| Varimax rotation | ✅ implemented | Default analytical rotation. |
-| Auto-flagging with significance threshold | ✅ implemented | Default `av_rel_coef = 0.8` per Brown 1980. |
-| Factor scores + distinguishing/consensus statements | ✅ implemented | Computed via Standard Error of Differences at p < 0.05, 0.01, 0.001. |
-| Factor correlation matrix | ✅ implemented | |
-| Composite reliability (Spearman-Brown) | ✅ implemented | |
-| Multilingual studies (statements + UI) | ✅ implemented | Three default locales (en, fr, fi); easily extended. |
-| Audio post-sort responses | ✅ implemented | Stored linked to the participant's submission. |
-| Recruitment funnel + monitoring | ✅ implemented | |
-| **AnalysisRun audit trail** (persistence of analytical choices) | 🟡 v0.1 roadmap | Currently analyses are computed on-demand and exported; persistence with versioned analytical choices is the highest-priority next feature. |
-| **Audio ↔ factor membership linkage** in admin UI | 🟡 v0.1 roadmap | Data is already stored; the navigational link in the admin AnalysisPage is being wired. |
-| **Manual / judgmental rotation** | ⏳ deferred to v0.2 | See [Deliberate limitations](#deliberate-limitations) below. |
+For the running list of implemented analytical features and their parameters, see the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis). For the comparison with PQMethod, qmethod-R, KADE, FlashQ/HTMLQ, and Ken-Q, see the capability table in the project [README](../../README.md#comparison-with-existing-tools).
 
 ### Deliberate limitations
 
@@ -180,7 +151,7 @@ These are scoped out of the v0.1 release with explicit rationale.
 **Manual (judgmental) rotation is not currently supported.** Stainton Rogers (1997) and Watts & Stenner (2012) cite manual rotation as a moment where the researcher exercises explicit interpretive judgment, so the omission is a real gap from a strict critical Q standpoint. The reasoning for deferring it to v0.2:
 
 1. The mathematics is well-established, but exposing it in a usable interface (interactive loadings table, paired-factor angle controls, real-time recomputation) is a substantial UX undertaking we did not want to ship half-finished.
-2. Once the **AnalysisRun audit trail** is in place (v0.1 roadmap above), researchers using varimax can fully document and justify their choice of rotation. This partially compensates for the lack of judgmental rotation.
+2. With the AnalysisRun audit trail, researchers using varimax can fully document and justify their choice of rotation. This partially compensates for the lack of judgmental rotation.
 3. As a workaround for v0.1, researchers needing judgmental rotation can export their Q-sort matrix in PQMethod or R `qmethod` format, perform the rotation in those tools, and document the choice in their methods section.
 
 The gap is on the v0.2 plan.

@@ -1,99 +1,68 @@
 # Admin and Team Management
 
-This guide explains how to manage accounts, research teams, and study permissions in Qualis.
+How to manage accounts, research teams, and study permissions in a Qualis instance.
+
+For initial bootstrap of the first admin account on a fresh deployment, see [`deployment.md`](deployment.md). For the page-by-page UI catalog, see [`../reference/admin-dashboard.md`](../reference/admin-dashboard.md).
 
 ---
 
-## User Management
+## Account security (2FA)
 
-User accounts are managed by **Superusers**. A superuser can list all system users and create new accounts.
+Researchers are strongly encouraged to enable Two-Factor Authentication (TOTP).
 
-### Bootstrapping the First Superuser
-
-If your system is fresh, use the CLI to create your first superuser:
-
-```bash
-cd backend
-uv run python scripts/create_user.py
-```
-
-Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`. This user will be added as the **Owner** of the default project.
-
-### API Access
-
-Once you have an account, you can manage users via the API at `GET /api/admin/users/`.
-
-> [!CAUTION]
-> Superusers have global visibility. Only grant this status to trusted platform administrators.
-
----
-
-## Account Security (2FA)
-
-Researchers are strongly encouraged to enable **Two-Factor Authentication (TOTP)** to protect sensitive research data.
-
-### Enabling 2FA
-
-1. Navigate to your **Profile** page.
+1. Open **Profile → Two-Factor Authentication**.
 2. Click **Setup 2FA**.
-3. Scan the QR code with an authenticator app (e.g., Google Authenticator, Authy, or Bitwarden).
-4. Enter the 6-digit confirmation code to activate.
+3. Scan the QR code with an authenticator app (Google Authenticator, Authy, Bitwarden, …).
+4. Enter the 6-digit code to activate.
 
-### Dual-Step Login
-
-Once enabled, the login flow will require your password first, followed by a valid TOTP token.
-
-> [!IMPORTANT]
-> To disable 2FA, you must provide your current account password as a verification step.
+Once enabled, login takes the password first, then the TOTP code. To disable, you must re-enter the current password.
 
 ---
 
-## Managing Study Teams
+## Manage study teams
 
-Study owners can invite other researchers to collaborate on their work.
+Project Owners can invite collaborators and set their role from **Project settings → Members**.
 
-### Inviting a Collaborator
-
-Invite a user by their email through the **project settings** page.
+### Invite
 
 1. Enter the collaborator's email.
-2. Select a role (**Researcher** or **Viewer**).
+2. Choose a role (**Researcher** or **Viewer**).
 3. Click **Send Invitation**.
 
-Qualis will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
+Qualis generates a unique registration link. If SMTP is configured, the user receives an email; otherwise, the link is logged to stdout (visible in the deployment logs) and shown in the dashboard for manual sharing.
 
-### Invitation Process
+For an invited person already registered, the link grants project access immediately. For a new user, the link pre-fills the registration form; access is granted once the account is created.
 
-- **Registered Users**: Clicking the invitation link while logged in will immediately grant them access to the study.
-- **New Users**: The link will pre-fill the registration form. Access is granted once the account is created.
+### Roles
 
-### Roles and Permissions
+Project membership maps to study-level capability as follows:
 
-Qualis supports three project-level roles with varying levels of access:
+| Capability | Owner | Researcher | Viewer |
+| ---------- | :---: | :--------: | :----: |
+| View configuration | ✓ | ✓ | ✓ |
+| Update text / translations (Active or Paused) | ✓ | ✓ | — |
+| Update structure (Draft only) | ✓ | ✓ | — |
+| Change study state | ✓ | ✓ | — |
+| Export study data | ✓ | ✓ | — |
+| Manage project members | ✓ | — | — |
+| Delete study | ✓ | — | — |
 
-| Feature                            | Owner | Researcher | Viewer |
-| :--------------------------------- | :---: | :--------: | :----: |
-| View Configuration                 |  Yes  |    Yes     |  Yes   |
-| Update Meta/Text (Active/Paused)   |  Yes  |    Yes     |  No    |
-| Update Grid/Structure (Draft Only) |  Yes  |    Yes     |  No    |
-| Export Study Data                  |  Yes  |    Yes     |  No    |
-| Change Study State                 |  Yes  |    Yes     |  No    |
-| Manage Project Members             |  Yes  |    No      |  No    |
-| Delete Study                       |  Yes  |    No      |  No    |
+Project Owners automatically have Owner-level access on every study in their project. Project deletion (separate from study deletion) is also Owner-only and requires the project to contain no studies.
 
-**Note**: Project Owners automatically have Owner-level access to all studies in their project.
+For the role checks at the API level (and the equivalent endpoints), see [`../reference/api.md`](../reference/api.md).
 
 ---
 
-## Study Lifecycle
+## Study lifecycle
 
-Studies progress through several states:
+Studies progress through five states. The full transition rules are in [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general); a quick summary:
 
-1. **Draft**: All configuration is unlocked. Full structural changes allowed.
-2. **Active**: The study is public. **Structural configuration is locked**. Only metadata and translations (text fixes) can be updated.
-3. **Paused**: Public access is suspended. Participants cannot submit. Use this state for temporary maintenance or fixing urgent typos.
-4. **Closed**: Public access is revoked. Exporting results is still possible.
-5. **Archived**: Long-term storage for completed studies. Data is preserved but the study is hidden from the active list.
+| State | Public access | Editing |
+| ----- | ------------- | ------- |
+| Draft | None | Full structural editing. |
+| Active | Open via recruitment links | Translations and metadata only. Grid + statements are locked. |
+| Paused | Suspended | Same as Active. Use to fix a typo in a statement without taking the study down. |
+| Closed | Revoked | Same as Active. Exports remain available. |
+| Archived | Revoked | None. Long-term storage; hidden from the active list. |
 
-> [!TIP]
-> Use the **Paused** state if you need to fix a typo in a statement or instruction while the study is live, without deleting and recreating it.
+Use **Paused** rather than **Closed** if you need to fix a typo while the study is live. Use **Closed** when data collection is definitively over.

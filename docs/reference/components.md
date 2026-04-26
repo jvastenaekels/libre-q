@@ -1,10 +1,15 @@
 # Frontend Components
 
-This guide documents the key reusable React components in Qualis.
+Reference for the React component tree under `frontend/src/components/`. Two parts:
+
+1. [Sorting primitives](#sorting-primitives) — full prop tables for the components that drive the participant Q-sort experience (and are reused in admin read-only views).
+2. [Component index](#component-index) — every other component, by category, with file path and one-line purpose. Use it to locate the right file before reading source.
+
+For pages (one per route), see `frontend/src/pages/`. For the convention that splits page state/effects into a colocated `useFooPage` hook, see [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md).
 
 ---
 
-## Component Architecture
+## Component architecture
 
 ```mermaid
 graph TD
@@ -16,29 +21,22 @@ graph TD
 
     subgraph "Admin Components"
         PDC[ParticipantDetailContent]
-        PDC_V[VisualSortTab]
-        PDC_R[ResponsesTab]
-        PDC_E[EnvironmentTab]
         SRT[SurveyResponseTable]
         PMC[ParticipantMetadataCard]
     end
 
-    subgraph "Core Components"
+    subgraph "Sorting Primitives"
         CS[CardStack]
         GS[GridSort]
-    end
-
-    subgraph "Primitive Components"
         SC[SortableCard]
         DS[DroppableSlot]
         RZ[ReadingZone]
     end
 
     PDP --> PDC
-    PDC --> PDC_V & PDC_R & PDC_E
-    PDC_V --> GS
-    PDC_R --> SRT
-    PDC_E --> PMC
+    PDC --> SRT
+    PDC --> PMC
+    PDC --> GS
 
     RSP --> CS
     CS --> SC
@@ -54,188 +52,244 @@ graph TD
 
 ---
 
-## CardStack
+## Sorting primitives
 
-**Location:** `src/components/CardStack.tsx`
+### `CardStack`
 
-A swipeable card deck for the Rough Sort phase. Uses Framer Motion for gestures.
+`src/components/CardStack.tsx`
 
-### Props
+Swipeable card deck for the rough-sort phase.
 
-| Prop        | Type                                                    | Description                          |
-| ----------- | ------------------------------------------------------- | ------------------------------------ |
-| `statement` | `{ id: number; text: string; code?: string }`           | The current statement to display     |
-| `onVote`    | `(direction: 'agree' \| 'disagree' \| 'neutral') => void` | Callback when card is swiped      |
-| `x`         | `MotionValue<number>`                                   | External motion value for X position |
-| `y`         | `MotionValue<number>`                                   | External motion value for Y position |
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `statement` | `{ id: number; text: string; code?: string }` | Current statement. |
+| `onVote` | `(direction: 'agree' \| 'disagree' \| 'neutral') => void` | Swipe / tap callback. |
+| `x` | `MotionValue<number>` | External motion value for X position. |
+| `y` | `MotionValue<number>` | External motion value for Y position. |
 
-### Usage
+Uses container queries (`@container`) for type sizing.
 
-```tsx
-<CardStack
-  statement={currentStatement}
-  onVote={handleVote}
-  x={motionX}
-  y={motionY}
-/>
-```
+### `GridSort`
 
-> **Responsiveness:** This component uses container queries (`@container`) to adjust font size dynamically based on its container's width.
+`src/components/GridSort.tsx`
 
----
+Pyramid Q-sort grid for the fine-sort phase. Used in admin read-only mode for participant inspection.
 
-## GridSort
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `agreeCards` | `Card[]` | Cards in the agree pile. |
+| `disagreeCards` | `Card[]` | Cards in the disagree pile. |
+| `neutralCards` | `Card[]` | Cards in the neutral pile. |
+| `gridColumns` | `{ score: number; capacity: number }[]` | Pyramid column definition. |
+| `renderSlotContent` | `(col, row, dimensions) => ReactNode` | Required slot renderer. |
+| `isAllPlaced` | `boolean` | Whether every card is placed. |
+| `disableHoverZoom` | `boolean` | Disables hover magnification (mobile). |
+| `selectedCardId` | `number \| null` | Currently selected card. |
+| `onCardClick` | `(id: number) => void` | Card selection handler. |
+| `onSlotClick` | `(col: number, row: number) => void` | Slot click handler. |
+| `onReset` | `() => void` | Reset handler. |
+| `onValidate` | `() => void` | Submit handler. |
+| `onDimensionsChange` | `(d: { width: number; height: number }) => void` | Dimension change callback. |
+| `onZoomChange` | `(zoom: number) => void` | Zoom level callback. |
+| `onInteractionUtils` | `(utils: InteractionUtils) => void` | Exposes internal interaction utilities. |
+| `showCodes` | `boolean` | Show statement codes on cards. |
+| `highlightKey` | `string \| null` | Highlight key for distinguishing statements. |
+| `conditionOfInstruction` | `string \| null` | Condition shown above the grid. |
+| `uiLabels` | `Record<string, string>` | UI label overrides. |
+| `readOnly` | `boolean` | Disable interaction (admin read-only). |
+| `sidebarContent` | `ReactNode` | Custom sidebar content. |
 
-**Location:** `src/components/GridSort.tsx`
+`Card = { id: number; text: string; code?: string }`. Zoom/pan via `react-zoom-pan-pinch`; tap-to-place mode for touch.
 
-The main Q-grid component with zoom/pan support for Fine Sort.
+### `SortableCard`
 
-### Props
+`src/components/SortableCard.tsx`
 
-| Prop                     | Type                                                             | Description                                                     |
-| :----------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `agreeCards`             | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Agree" pile                                      |
-| `disagreeCards`          | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Disagree" pile                                   |
-| `neutralCards`           | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Neutral" pile                                    |
-| `gridColumns`            | `{ score: number; capacity: number }[]`                          | Configuration for the pyramid layout                            |
-| `renderSlotContent`      | `(col, row, dimensions) => ReactNode`                            | Render callback for slot content (required)                     |
-| `isAllPlaced`            | `boolean`                                                        | Whether all cards have been placed                              |
-| `disableHoverZoom`       | `boolean`                                                        | Disables hover magnification (useful for mobile)                |
-| `selectedCardId`         | `number \| null`                                                 | Currently selected card                                         |
-| `onCardClick`            | `(id: number) => void`                                           | Card selection handler                                          |
-| `onSlotClick`            | `(col: number, row: number) => void`                             | Slot click handler                                              |
-| `onReset`                | `() => void`                                                     | Reset handler                                                   |
-| `onValidate`             | `() => void`                                                     | Validation/submit handler                                       |
-| `onDimensionsChange`     | `(d: { width: number; height: number }) => void`                 | Callback when grid dimensions change                            |
-| `onZoomChange`           | `(zoom: number) => void`                                         | Callback when zoom level changes                                |
-| `onInteractionUtils`     | `(utils: InteractionUtils) => void`                              | Exposes internal interaction utilities                           |
-| `showCodes`              | `boolean`                                                        | Show statement codes on cards                                   |
-| `highlightKey`           | `string \| null`                                                 | Highlight key for distinguishing statements                     |
-| `conditionOfInstruction` | `string \| null`                                                 | Condition of instruction text displayed above grid              |
-| `uiLabels`               | `Record<string, string>`                                         | Custom UI label overrides                                       |
-| `readOnly`               | `boolean`                                                        | Disable all interaction (used in admin view)                    |
-| `sidebarContent`         | `ReactNode`                                                      | Custom content for sidebar area                                 |
+Draggable statement card (dnd-kit).
 
-### Features
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `id` | `number` | Card ID. |
+| `text` | `string` | Card content (Markdown). |
+| `code` | `string` | Statement code. |
+| `variant` | `'hand' \| 'grid' \| 'compact'` | Visual style. |
+| `isSelected` | `boolean` | Selection state. |
+| `isOverlay` | `boolean` | Render as drag overlay. |
+| `onClick` | `() => void` | Click handler. |
+| `onAction` | `(id: number) => void` | Action callback (e.g. zoom). |
+| `dimensions` | `{ width: number; height: number }` | Explicit card size. |
+| `aspectRatio` | `number \| 'auto'` | Card aspect ratio. |
+| `disableHoverZoom` | `boolean` | Disable hover magnification. |
+| `allowScroll` | `boolean` | Allow scroll on long card text. |
+| `hasComment` | `boolean` | Show comment indicator. |
+| `hasAudio` | `boolean` | Show audio indicator. |
+| `readOnly` | `boolean` | Disable interaction (admin read-only). |
 
-- **Zoom/Pan:** Built-in zoom controls with `react-zoom-pan-pinch`
-- **Tips:** Instructional tips that dismiss automatically
-- **Piles:** Tabbed deck showing cards by category
-- **Mobile:** Tap-to-place interaction mode
+| Variant | Use case |
+| ------- | -------- |
+| `hand` | Cards in a deck/pile. |
+| `grid` | Cards placed in the Q-grid. |
+| `compact` | Small preview cards. |
 
----
+### `DroppableSlot`
 
-## SortableCard
+`src/components/DroppableSlot.tsx`
 
-**Location:** `src/components/SortableCard.tsx`
+Drop zone for placing cards in the Q-grid.
 
-A draggable card component using dnd-kit.
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `id` | `string` | Slot identifier (`{col}-{row}`). |
+| `children` | `ReactNode` | Slot contents. |
+| `isOver` | `boolean` | Whether a card is being dragged over. |
+| `role` | `string` | ARIA role: `'button'` (default) or `'gridcell'`. |
+| `onClick` | `() => void` | Tap-to-place click handler. |
 
-### Props
+Extends `React.HTMLAttributes<HTMLDivElement>`.
 
-| Prop               | Type                             | Description                              |
-| ------------------ | -------------------------------- | ---------------------------------------- |
-| `id`               | `number`                         | Unique card ID                           |
-| `text`             | `string`                         | Card content (supports Markdown)         |
-| `code`             | `string`                         | Statement code (e.g., "S1")              |
-| `variant`          | `'hand' \| 'grid' \| 'compact'`  | Visual style                             |
-| `isSelected`       | `boolean`                        | Selection state                          |
-| `isOverlay`        | `boolean`                        | Render as drag overlay                   |
-| `onClick`          | `() => void`                     | Click handler                            |
-| `onAction`         | `(id: number) => void`           | Action callback (e.g., zoom)             |
-| `dimensions`       | `{ width: number; height: number }` | Explicit card dimensions             |
-| `aspectRatio`      | `number \| 'auto'`               | Card aspect ratio                        |
-| `disableHoverZoom` | `boolean`                        | Disable hover magnification              |
-| `allowScroll`      | `boolean`                        | Allow scroll on long card text           |
-| `hasComment`       | `boolean`                        | Show comment indicator icon              |
-| `hasAudio`         | `boolean`                        | Show audio indicator icon                |
-| `readOnly`         | `boolean`                        | Disable interaction (admin view)         |
+### `ReadingZone`
 
-### Variants
+`src/components/ReadingZone.tsx`
 
-| Variant   | Use Case               |
-| --------- | ---------------------- |
-| `hand`    | Cards in deck/pile     |
-| `grid`    | Cards placed in Q-grid |
-| `compact` | Small preview cards    |
+Fixed zone displaying a magnified view of the currently hovered or active card within `GridSort`. Includes a methodology-tip carousel.
 
 ---
 
-## DroppableSlot
+## Component index
 
-**Location:** `src/components/DroppableSlot.tsx`
+Sorted alphabetically within each category. Paths are relative to `frontend/src/components/`.
 
-A drop zone for placing cards in the Q-grid.
+### Layout & error boundaries
 
-### Props
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `ErrorBoundary` | `ErrorBoundary.tsx` | App-level React error boundary. |
+| `ComponentErrorBoundary` | `ComponentErrorBoundary.tsx` | Granular boundary with inline error display. |
+| `RouteErrorBoundary` | `RouteErrorBoundary.tsx` | Catches React Router data-loading errors. |
 
-| Prop       | Type         | Description                              |
-| ---------- | ------------ | ---------------------------------------- |
-| `id`       | `string`     | Slot identifier (format: `col-row`)      |
-| `children` | `ReactNode`  | Slot contents                            |
-| `isOver`   | `boolean`    | Whether a card is being dragged over     |
-| `role`     | `string`     | ARIA role: `'button'` (default) or `'gridcell'` |
-| `onClick`  | `() => void` | Click handler for tap-to-place           |
+### Markdown / icons (shared utilities)
 
-Extends `React.HTMLAttributes<HTMLDivElement>` for full customization.
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `DynamicIcon` | `DynamicIcon.tsx` | Loads lucide icons by string name. |
+| `SafeMarkdown` | `SafeMarkdown.tsx` | XSS-safe Markdown renderer (DOMPurify). |
+| `markdown-config` | `markdown-config.tsx` | Markdown rendering configuration object. |
 
----
+### Participant-facing
 
-## ReadingZone
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `EraseMyDataDialog` | `EraseMyDataDialog.tsx` | Participant GDPR Art. 17 erasure dialog. |
+| `MethodologyTips` | `MethodologyTips.tsx` | Carousel of Q-sort methodology guidance. |
+| `SortingAnimation` | `SortingAnimation.tsx` | Demo animation: rough sort then fine sort. |
+| `study/HelpOverlay` | `study/HelpOverlay.tsx` | Help dialog contextual to the current step. |
+| `study/StudyAccessGate` | `study/StudyAccessGate.tsx` | Password gate for restricted studies. |
+| `survey/SurveyField` | `survey/SurveyField.tsx` | Renders a pre-sort survey field. |
+| `postsort/Step1_Feedback` | `postsort/Step1_Feedback.tsx` | Post-sort feedback textarea + audio. |
+| `postsort/Step2_Questionnaire` | `postsort/Step2_Questionnaire.tsx` | Post-sort survey form. |
+| `postsort/ShareStudyLinks` | `postsort/ShareStudyLinks.tsx` | Social sharing buttons after submission. |
 
-**Location:** `src/components/ReadingZone.tsx`
+### Audio
 
-Displays a zoomed/magnified view of the currently hovered or active card within the GridSort component.
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `AudioRecorder` | `audio/AudioRecorder.tsx` | Mic recording with playback, upload, deletion. |
 
----
+### Auth
 
-## Admin Components
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `RequireAdmin` | `auth/RequireAdmin.tsx` | Route guard requiring an authenticated admin user. |
 
-### ParticipantDetailContent
+### Admin shell
 
-**Location:** `src/components/admin/dashboard/ParticipantDetailContent.tsx`
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `AdminDashboard` | `admin/AdminDashboard.tsx` | Top-level admin dashboard layout. |
+| `AppSidebar` | `admin/AppSidebar.tsx` | Admin navigation sidebar. |
+| `CommandMenu` | `admin/CommandMenu.tsx` | Cmd-K command palette. |
+| `DashboardSkeleton` | `admin/DashboardSkeleton.tsx` | Loading skeleton for dashboard content. |
+| `GuidanceCard` | `admin/GuidanceCard.tsx` | Collapsible info / tip / warning card. |
+| `LegacyRedirect` | `admin/LegacyRedirect.tsx` | Redirects legacy `/admin/*` paths. |
+| `ProjectSwitcher` | `admin/ProjectSwitcher.tsx` | Active-project selector. |
+| `StudySwitcher` | `admin/StudySwitcher.tsx` | Active-study selector. |
+| `CreateStudyDialog` | `admin/CreateStudyDialog.tsx` | Dialog to create a study. |
+| `ImportStudyDialog` | `admin/ImportStudyDialog.tsx` | Dialog to import a study from JSON. |
+| `AudioPlayer` | `admin/AudioPlayer.tsx` | Audio playback for participant responses. |
+| `layout/StudyPageHeader` | `admin/layout/StudyPageHeader.tsx` | Study-page header with title, icon, status badge. |
 
-The primary container for inspecting a participant session. Organizes content into three tabs: **Visual Sort**, **Responses**, and **Environment**.
+### Admin — dashboard
 
-### SurveyResponseTable
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `InteractiveDataView` | `admin/dashboard/InteractiveDataView.tsx` | Searchable, paginated participant table. |
+| `ParticipantDetailContent` | `admin/dashboard/ParticipantDetailContent.tsx` | Tabbed inspector (Visual Sort / Responses / Environment). |
+| `ParticipantMetadataCard` | `admin/dashboard/ParticipantMetadataCard.tsx` | Device, browser, IP-hash, durations. |
+| `RecentActivityCard` | `admin/dashboard/RecentActivityCard.tsx` | Recent submissions + engagement metrics. |
+| `RecruitmentModule` | `admin/dashboard/RecruitmentModule.tsx` | Study link sharing with QR. |
+| `StudyStatusControl` | `admin/dashboard/StudyStatusControl.tsx` | Study state transitions (launch / pause / archive). |
+| `SurveyResponseTable` | `admin/dashboard/SurveyResponseTable.tsx` | Pre/post-sort answers with i18n label mapping. |
+| `charts/DeviceBreakdownChart` | `admin/dashboard/charts/DeviceBreakdownChart.tsx` | Pie chart of desktop/mobile/tablet. |
+| `charts/QuestionDistributionCharts` | `admin/dashboard/charts/QuestionDistributionCharts.tsx` | Bar charts for survey distributions. |
+| `charts/SubmissionsTimelineChart` | `admin/dashboard/charts/SubmissionsTimelineChart.tsx` | Submissions over time. |
 
-**Location:** `src/components/admin/dashboard/SurveyResponseTable.tsx`
+### Admin — analysis
 
-A dynamic table that displays Pre-sort and Post-sort data. It handles heterogeneous key-value pairs and applies automatic label mapping via i18n keys if available.
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `AnalysisHistoryPanel` | `admin/analysis/AnalysisHistoryPanel.tsx` | Lists previously persisted analysis runs. |
+| `FactorArraysView` | `admin/analysis/FactorArraysView.tsx` | Composite Q-sort visualisation per factor. |
+| `FactorCharacteristicsTable` | `admin/analysis/FactorCharacteristicsTable.tsx` | Eigenvalues, variance, reliability, correlations. |
+| `FactorLoadingsTable` | `admin/analysis/FactorLoadingsTable.tsx` | Participant-by-factor loadings with flagging controls. |
+| `FactorVoicesPanel` | `admin/analysis/FactorVoicesPanel.tsx` | Audio + comments for flagged participants on a factor. |
+| `ScreePlot` | `admin/analysis/ScreePlot.tsx` | Eigenvalues + Kaiser reference line. |
+| `StatementsTable` | `admin/analysis/StatementsTable.tsx` | Z-scores, factor positions, distinguishing/consensus flags. |
 
-### ParticipantMetadataCard
+### Admin — designer
 
-**Location:** `src/components/admin/dashboard/ParticipantMetadataCard.tsx`
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `BrandingEditor` | `admin/designer/BrandingEditor.tsx` | Logo, accent colour, partner logos. |
+| `ConditionOfInstructionEditor` | `admin/designer/ConditionOfInstructionEditor.tsx` | Multi-language sorting prompt editor. |
+| `ExportConfigButton` | `admin/designer/ExportConfigButton.tsx` | Download study config as JSON. |
+| `IconPicker` | `admin/designer/IconPicker.tsx` | Lucide icon dropdown. |
+| `ImageUploadInput` | `admin/designer/ImageUploadInput.tsx` | Image upload with size/format validation. |
+| `ImportConfigButton` | `admin/designer/ImportConfigButton.tsx` | Import a study config from JSON. |
+| `ImportFromConcourseDialog` | `admin/designer/ImportFromConcourseDialog.tsx` | Pick concourse items to import as statements. |
+| `InterfaceEditor` | `admin/designer/InterfaceEditor.tsx` | Interaction mode + interface style. |
+| `IntroductionEditor` | `admin/designer/IntroductionEditor.tsx` | Multi-language intro + process steps. |
+| `LanguageManagerModal` | `admin/designer/LanguageManagerModal.tsx` | Add/remove study languages. |
+| `MarkdownEditor` | `admin/designer/MarkdownEditor.tsx` | Markdown edit + preview with toolbar. |
+| `MultiLangFieldIcon` | `admin/designer/MultiLangFieldIcon.tsx` | Translation-status indicator. |
+| `PostSortConfigEditor` | `admin/designer/PostSortConfigEditor.tsx` | Post-sort survey + audio configuration. |
+| `ProcessStepEditor` | `admin/designer/ProcessStepEditor.tsx` | Reorderable process-step list. |
+| `QSortEditor` | `admin/designer/QSortEditor.tsx` | Statements, distribution, defaults. |
+| `QuestionBuilder` | `admin/designer/QuestionBuilder.tsx` | Survey question builder with drag-reorderable options. |
+| `UnsavedChangesDialog` | `admin/designer/UnsavedChangesDialog.tsx` | Navigation guard for unsaved changes. |
 
-Displays technical session details including OS, Browser (v), IP, and duration. It uses `ua-parser-js` (via backend) to provide human-readable device information.
+### Admin — concourse
 
-### InteractiveDataView
+| Component | Path | Purpose |
+| --- | --- | --- |
+| `ItemDetailSheet` | `admin/concourse/ItemDetailSheet.tsx` | Slide-out sheet: item details, versions, comments. |
 
-**Location:** `src/components/admin/dashboard/InteractiveDataView.tsx`
+### UI primitives (`ui/`)
 
-The main data visualization interface for study results. Contains a participant table, timeline chart, and device breakdown chart. Includes a `charts/` subdirectory with individual visualization components.
+Shadcn UI wrappers around Radix primitives. Used throughout the app for consistent styling. Source: `frontend/src/components/ui/`.
 
-### Analysis Components
-
-**Location:** `src/components/admin/analysis/`
-
-Components for the built-in factor analysis workflow:
-
-| Component                      | Description                                                           |
-| :----------------------------- | :-------------------------------------------------------------------- |
-| `ScreePlot.tsx`                | Displays eigenvalues with a Kaiser criterion reference line            |
-| `FactorLoadingsTable.tsx`      | Participant-by-factor loading matrix with significance highlighting   |
-| `FactorArraysView.tsx`        | Composite Q-sort visualization for each factor                       |
-| `StatementsTable.tsx`          | Z-scores, factor array positions, and distinguishing/consensus flags |
-| `FactorCharacteristicsTable.tsx` | Eigenvalues, variance explained, reliability, and correlations      |
+`accordion`, `alert`, `alert-dialog`, `badge`, `breadcrumb`, `button`, `card`, `checkbox`, `dialog`, `dropdown-menu`, `form`, `input`, `label`, `progress`, `radio-group`, `select`, `separator`, `sheet`, `sidebar`, `skeleton`, `switch`, `table`, `tabs`, `textarea`, `tooltip`.
 
 ---
 
 ## Hooks
 
-### useGridZoom
+The page-level state-and-effect logic for complex pages is extracted into colocated hooks in `frontend/src/hooks/<area>/use<Name>.ts`. See [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md) for the boundary rules.
 
-Manages zoom/pan state and zonal focus for GridSort.
+A few component-level hooks are reused:
+
+### `useGridZoom`
+
+Manages zoom/pan state and zonal focus for `GridSort`.
 
 ```typescript
 const { transformRef, performAutoFit, zoomIn, zoomOut } = useGridZoom({
@@ -247,9 +301,9 @@ const { transformRef, performAutoFit, zoomIn, zoomOut } = useGridZoom({
 });
 ```
 
-### useFineSortDrag
+### `useFineSortDrag`
 
-Handles drag-and-drop logic for Fine Sort including edge panning.
+Drag-and-drop logic for fine sort (including edge panning).
 
 ```typescript
 const {
@@ -268,9 +322,9 @@ const {
 });
 ```
 
-### useViewport
+### `useViewport`
 
-Provides centralized viewport dimensions and semantic breakpoints.
+Centralised viewport dimensions and breakpoints.
 
 ```typescript
 const { width, height, isMobile, isDesktop } = useViewport();

@@ -1,23 +1,27 @@
-# Deployment Guide
+# Deployment
 
-This guide covers deploying Qualis to production environments.
+How to deploy Qualis to production. The application ships as a single FastAPI service that also serves the built React frontend, plus a Postgres database. Audio, when used, lives in S3-compatible object storage.
 
----
-
-## Deployment Options
-
-| Platform         | Difficulty | Cost                |
-| ---------------- | ---------- | ------------------- |
-| **Scalingo**     | Easy       | ~7 EUR/mo           |
-| **Render**       | Easy       | Free tier available |
-| **Heroku**       | Medium     | ~$7/mo              |
-| **Docker + VPS** | Advanced   | Variable            |
+For the canonical list of environment variables (with types and defaults), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings). This guide covers how to wire them on each supported platform.
 
 ---
 
-## Scalingo Deployment (Unified)
+## Supported platforms
 
-Qualis is deployed as a single application where the FastAPI backend serves the pre-built React frontend.
+| Platform | Difficulty | Cost | Status |
+| -------- | ---------- | ---- | ------ |
+| **Scalingo** | Easy | ~7 EUR/mo | Documented below; primary supported target. |
+| **Docker (self-host)** | Medium | Variable | `docker-compose.yml` in repo root; see [Docker](#docker). |
+| **Render** | Easy | Free tier | Generic Python + Postgres app; same env vars as Scalingo. |
+| **Heroku** | Medium | $7+/mo | Generic Python buildpack; same env vars and `Procfile` apply. |
+
+The Scalingo path is the one used in production by the maintainer; the others are known to work with the standard Python buildpack but are not documented step-by-step.
+
+---
+
+## Scalingo
+
+Qualis is deployed as a single application; the FastAPI backend serves the pre-built React frontend.
 
 ```mermaid
 graph LR
@@ -32,180 +36,160 @@ graph LR
 
 ### Prerequisites
 
-- Scalingo account and [Scalingo CLI](https://doc.scalingo.com/cli)
-- Application repository pushed to GitHub/GitLab
+- A Scalingo account and the [Scalingo CLI](https://doc.scalingo.com/cli).
+- The repository pushed to GitHub or GitLab.
 
 ### Steps
 
-1. **Create the App**
+1. **Create the app**
 
    ```bash
    scalingo create qualis
    ```
 
-2. **Add PostgreSQL Resource**
+2. **Add PostgreSQL**
 
    ```bash
    scalingo --app qualis addons-add postgresql postgresql-starter-512
    ```
 
-3. **Set Environment Variables**
+3. **Set environment variables**
 
    ```bash
    scalingo --app qualis env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
    scalingo --app qualis env-set SECRET_KEY=$(openssl rand -hex 32)
+   scalingo --app qualis env-set IP_HASH_SALT=$(openssl rand -hex 32)
    scalingo --app qualis env-set ALLOWED_ORIGINS=https://qualis.osc-fr1.scalingo.io
+   scalingo --app qualis env-set ENVIRONMENT=production
    ```
 
 4. **Deploy**
-   Push your code to the Scalingo remote. The buildpack will automatically detect the Python environment.
+
    ```bash
    git push scalingo main
    ```
 
-### Post-Deployment Automation
+The Python buildpack picks up `pyproject.toml` and `package.json` automatically.
 
-Qualis uses the `postdeploy` phase in `Procfile` to automate critical tasks after every successful build:
+### Post-deploy automation
 
-- **Schema Migration**: Executes `alembic upgrade head` to ensure all database tables are up to date.
-- **Admin Setup**: Creates the initial admin account if the database is empty.
+`Procfile` runs the following on every successful build:
 
-You can monitor these tasks in the deployment logs:
+- `alembic upgrade head` — applies pending migrations.
+- An admin bootstrap step that creates the initial admin account (using `ADMIN_EMAIL` / `ADMIN_PASSWORD`) if the database is empty.
+
+Watch the logs:
 
 ```bash
-scalingo --app qualis logs --n 100
+scalingo --app qualis logs -n 100
 ```
 
 ---
 
-## Environment Variables
+## Docker
 
-| Variable            | Description                                           | Required |
-| ------------------- | ----------------------------------------------------- | -------- |
-| `DATABASE_URL`      | Connection string (PostgreSQL with asyncpg)           | Yes      |
-| `SECRET_KEY`        | Application secret for JWT token security             | Yes      |
-| `ALLOWED_ORIGINS`   | Comma-separated list of allowed CORS origins          | Yes      |
-| `SMTP_HOST`         | SMTP server hostname for invitations                  | No       |
-| `SMTP_PORT`         | SMTP server port (usually 587)                        | No       |
-| `SMTP_USER`         | SMTP username                                         | No       |
-| `SMTP_PASSWORD`     | SMTP password or API Key                              | No       |
-| `EMAILS_FROM_EMAIL` | Sender email address                                  | No       |
-| `ENVIRONMENT`           | Runtime environment (`development` or `production`)   | No       |
-| `IP_HASH_SALT`          | Salt for hashing participant IP addresses             | Yes      |
-| `FRONTEND_URL`          | Frontend URL for CORS and email links                 | No       |
-| `S3_BUCKET_NAME`        | S3 bucket for audio recordings                        | No       |
-| `S3_REGION`             | S3 region (default: `us-east-1`)                      | No       |
-| `S3_ACCESS_KEY_ID`      | S3 access key                                         | No       |
-| `S3_SECRET_ACCESS_KEY`  | S3 secret key                                         | No       |
-| `S3_ENDPOINT_URL`       | Custom S3 endpoint (for non-AWS providers)            | No       |
-| `AUDIO_MAX_FILE_SIZE_MB`     | Max audio file size in MB (default: 10)          | No       |
-| `AUDIO_MAX_DURATION_SECONDS` | Max audio duration in seconds (default: 300)     | No       |
+A `docker-compose.yml` is provided at the repository root; it brings up the app and a Postgres service together. The same environment variables apply (see the [Configuration reference](../reference/configuration.md#environment--app-settings)). At minimum, set `SECRET_KEY`, `IP_HASH_SALT`, `DATABASE_URL`, and `ALLOWED_ORIGINS` in a `.env` file before `docker compose up`.
 
 ---
 
-## Manual Database Maintenance
+## Required environment variables
+
+The minimum set for any production deployment:
+
+| Variable | Required | Notes |
+| -------- | :------: | ----- |
+| `DATABASE_URL` | yes | `postgresql+asyncpg://user:pass@host:5432/db`. |
+| `SECRET_KEY` | yes | JWT signing key. Generate with `openssl rand -hex 32`. |
+| `IP_HASH_SALT` | yes | Salt for participant IP hashing. Generate the same way. |
+| `ALLOWED_ORIGINS` | yes | Comma-separated origin allow-list for CORS. No wildcards. |
+| `ENVIRONMENT` | yes | Set to `production`; the test routes (`/api/test/*`) are wired only for `development` / `test`. |
+
+For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
+
+---
+
+## Manual database operations
 
 Use `--` to separate Scalingo CLI flags from the command arguments.
 
-### Run Database Migrations
+### Apply migrations
 
 ```bash
 scalingo --app qualis run -- python backend/scripts/migrate.py
 ```
 
-### Sync Study Configuration
+### Seed a study
 
 ```bash
 scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
 ```
 
----
-
-## Database Reinitialization
+### Database reinitialisation
 
 > [!CAUTION]
-> This will **permanently delete all data** in your production database.
+> Permanently deletes all data. Use only during initial setup or in a throwaway prototyping environment, before any real data exists.
 
-If you need to perform a full "factory reset" of the database (e.g., during initial setup or prototyping):
+```bash
+scalingo --app qualis run -- python backend/init_db.py --reset
+```
 
-1. **Reset Infrastructure**
-   Wipe all tables and recreate the schema with default admin account:
+To wipe and reseed in one step:
 
-   ```bash
-   scalingo --app qualis run -- python backend/init_db.py --reset
-   ```
-
-2. **Repopulate Content**
-   Seed the default study data using the internal API bypass:
-   ```bash
-   scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
-   ```
-
-> [!TIP]
-> You can combine both steps:
->
-> ```bash
-> scalingo --app qualis run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
-> ```
+```bash
+scalingo --app qualis run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
+```
 
 ---
 
-## Health Checks
+## Health checks
 
-| Endpoint      | Purpose                                |
-| ------------- | -------------------------------------- |
-| `GET /`       | Verifies Frontend is correctly served  |
-| `GET /health` | Backend API health check (returns `{"status": "ok"}`) |
-
----
-
-## SSL/HTTPS
-
-Scalingo provides automatic SSL certificates for all applications. No manual configuration is required.
+| Endpoint | Purpose |
+| -------- | ------- |
+| `GET /` | Verifies the frontend is being served. |
+| `GET /health` | Backend liveness probe; returns `{"status": "ok"}`. |
 
 ---
 
-## Rate Limiting
+## SSL
 
-Qualis uses SlowAPI for request rate limiting with three operational modes:
-
-| Mode         | When Active              | Storage                    |
-| :----------- | :----------------------- | :------------------------- |
-| **Disabled** | `TESTING=true`           | None (all requests pass)   |
-| **Redis**    | `REDIS_URL` is set       | Redis (for production)     |
-| **In-memory**| Default                  | Local process memory       |
-
-In-memory mode is suitable for single-process deployments. For multi-process setups, configure `REDIS_URL` to share rate limit state across workers.
+Scalingo provisions SSL certificates automatically. For Docker / VPS deployments, terminate TLS at a reverse proxy (Caddy, Traefik, nginx) and forward to the app on its internal port; if the proxy adds `X-Forwarded-For`, set `TRUSTED_PROXIES` to the proxy's IP so that rate limiting keys on the real client.
 
 ---
 
-## Database Connection Pool
+## Runtime behaviour reference
 
-Connection pool sizing is tuned per environment:
+The following sections document runtime defaults for operators who need to size or tune a deployment. They are reference material, not setup steps.
 
-| Setting            | Production | Development |
-| :----------------- | :--------- | :---------- |
-| `pool_size`        | 3          | 1           |
-| `max_overflow`     | 2          | 1           |
-| Pool pre-ping      | Enabled    | Enabled     |
-| Statement timeout  | 30s        | 30s         |
-| Idle TX timeout    | 60s        | 60s         |
+### Rate limiting
 
-Production pool sizing (3 + 2 = 5 max connections) is designed to fit within Scalingo's starter PostgreSQL plans (~5-10 connection slots). Statement timeout prevents runaway queries from blocking the pool.
+Qualis uses SlowAPI in three modes:
 
----
+| Mode | When active | Storage |
+| ---- | ----------- | ------- |
+| Disabled | Test environment | None. |
+| Redis | `REDIS_URL` is set | Redis (production with multiple workers). |
+| In-memory | Default | Local process memory. |
 
-## Startup Validation
+For multi-process deployments, configure `REDIS_URL` to share rate-limit counters across workers.
 
-On startup, the backend validates the database schema by checking for:
+### Database connection pool
 
-- Required tables (`projects`, `users`, `studies`, `participants`, etc.)
-- Critical columns (e.g., `randomize_statement_order`, `random_seed`, `ui_labels`)
+Pool sizes are tuned per environment:
 
-If validation fails, the application logs warnings with remediation steps (e.g., "Run `alembic upgrade head`"). This helps diagnose deployment issues when migrations haven't been applied.
+| Setting | Production | Development |
+| ------- | ---------- | ----------- |
+| `pool_size` | 3 | 1 |
+| `max_overflow` | 2 | 1 |
+| Pool pre-ping | enabled | enabled |
+| Statement timeout | 30 s | 30 s |
+| Idle TX timeout | 60 s | 60 s |
 
----
+The production sizing (3 + 2 = 5 connections) is designed to fit Scalingo's starter PostgreSQL plans (5–10 slots).
 
-## SMTP Fallback
+### Startup validation
 
-When SMTP environment variables are not configured, invitation emails are logged to stdout instead of being sent. This is useful for development and testing — look for the invitation URL in the application logs.
+On startup the backend checks for required tables (`projects`, `users`, `studies`, `participants`, …) and critical columns. If something is missing, it logs a warning with the remediation step (typically `alembic upgrade head`) and continues — it does not fail closed.
+
+### SMTP fallback
+
+When `SMTP_HOST` is unset, invitation emails are logged to stdout instead of being sent. The invitation URL appears in the application logs and in the dashboard.

@@ -14,6 +14,12 @@ In this tutorial, you will set up a local development environment for Qualis, ru
 
 **Prerequisites:** Git, Python 3.13+, Node.js 24+, PostgreSQL 15+, and a Unix-like environment (Linux, macOS, or WSL).
 
+If PostgreSQL is not yet installed:
+
+- **macOS:** `brew install postgresql@15 && brew services start postgresql@15`
+- **Debian/Ubuntu:** `sudo apt install postgresql-15 && sudo service postgresql start`
+- **Windows:** Use [Postgres.app](https://postgresapp.com/) under WSL, or the [official installer](https://www.postgresql.org/download/windows/).
+
 ---
 
 ## Step 1: Clone the Repository
@@ -63,9 +69,9 @@ Create a database for local development:
 psql -U postgres
 
 # In the psql shell:
-CREATE DATABASE libreq_dev;
-CREATE USER libreq_user WITH PASSWORD 'libreq_pass';
-GRANT ALL PRIVILEGES ON DATABASE libreq_dev TO libreq_user;
+CREATE DATABASE qualis_dev;
+CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
+GRANT ALL PRIVILEGES ON DATABASE qualis_dev TO qualis_user;
 \q
 ```
 
@@ -73,10 +79,16 @@ GRANT ALL PRIVILEGES ON DATABASE libreq_dev TO libreq_user;
 
 ## Step 4: Configure Environment Variables
 
-Create a `.env` file in the project root:
+Copy the example file and edit it:
 
 ```bash
-DATABASE_URL=postgresql+asyncpg://libreq_user:libreq_pass@localhost:5432/libreq_dev
+cp .env.example .env
+```
+
+The relevant variables to set for local development are:
+
+```bash
+DATABASE_URL=postgresql+asyncpg://qualis_user:qualis_pass@localhost:5432/qualis_dev
 SECRET_KEY=your-secret-key-for-development-only
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 FRONTEND_URL=http://localhost:5173
@@ -122,17 +134,32 @@ This starts Vite at **http://localhost:5173** with HMR. Open it in your browser.
 
 ---
 
-## Step 8: Create Your First User Account
+## Step 8: Create the First Admin Account
 
-1. Navigate to **http://localhost:5173/register**.
-2. Fill in your name, email, and password.
-3. Log in at **http://localhost:5173/login**.
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`, then bootstrap the user from the repository root:
 
-You are now in the admin dashboard.
+```bash
+cd backend && uv run python init_db.py && cd ..
+```
+
+Log in at **http://localhost:5173/login**. You should land in the admin dashboard.
 
 ---
 
-## Step 9: Run the Quality Checks
+## Step 9: Make a First Code Change
+
+To verify the dev loop end to end, edit a visible string and watch HMR update the browser:
+
+1. Open `frontend/src/pages/admin/DashboardPage.tsx` (or any page you can see in the browser).
+2. Change a heading or label.
+3. Save. The browser updates without a reload.
+4. Revert the change.
+
+If you do not see the update, check the Vite terminal for HMR errors.
+
+---
+
+## Step 10: Run the Quality Checks
 
 ### Run Everything (Recommended Before Pushing)
 
@@ -168,15 +195,15 @@ cd frontend && npm run lint:fix
 
 ---
 
-## Step 10: Understand the Key Files
+## Step 11: Understand the Key Files
 
 ### Backend
 
 | Path | Description |
 |------|-------------|
 | `app/main.py` | FastAPI application entry point |
-| `app/models.py` | SQLAlchemy database models |
-| `app/schemas.py` | Pydantic request/response validation |
+| `app/models/` | SQLAlchemy models, one module per subdomain (user, project, study, participant, recruitment, concourse, analysis) |
+| `app/schemas/` | Pydantic request/response models, one module per subdomain |
 | `app/routers/` | API route handlers |
 | `app/routers/admin/` | Admin API routes (studies, projects, exports, analysis) |
 | `app/services/` | Business logic services |
@@ -198,7 +225,7 @@ cd frontend && npm run lint:fix
 
 ---
 
-## Step 11: Regenerate the API Client
+## Step 12: Regenerate the API Client
 
 If you modify backend schemas or routes:
 

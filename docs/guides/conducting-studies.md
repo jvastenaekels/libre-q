@@ -1,61 +1,52 @@
-# Researcher Handbook
+# Conducting Studies
 
-This guide is intended for researchers who want to use Qualis to conduct Q-methodology studies.
+How-to guide for the researcher running studies in Qualis. Assumes you already know Q-methodology and have a Qualis account with researcher access.
 
-## The Q-Methodology Workflow
+For the page-by-page UI catalog, see [`../reference/admin-dashboard.md`](../reference/admin-dashboard.md). For the full design walk-through on a fresh study, see [`../tutorials/your-first-study.md`](../tutorials/your-first-study.md).
 
-Qualis streamlines the traditional Q-sort process into a modern, digital experience:
+---
 
-1. **Preparation**: Define your set of statements (the Q-set) and the shape of your grid (the distribution).
-2. **Onboarding**: Participants read your instructions and provide informed consent.
-3. **Phase 1: Pre-sort (Context)**: Collect demographic or contextual data.
-4. **Phase 2: Rough Sort**: Participants categorize statements into "Agree", "Neutral", and "Disagree" piles.
-5. **Phase 3: Fine Sort (The Grid)**: Participants place statements into a forced distribution grid.
-6. **Phase 4: Post-sort (Reflections)**: Participants provide qualitative feedback on their placements.
+## Recruit and monitor
 
-### Recruitment Analytics
+Use the **Recruitment** page to generate access links and watch participation in real time.
 
-Track your participant conversion funnel in real-time on the **Recruitment** page:
+| Link type | Use case |
+| --------- | -------- |
+| Public | Open recruitment (social, mailing list, conference). Unlimited usage. |
+| Individual | Single-use tokens for panel recruitment or longitudinal designs. |
+| Limited | Capped usage (e.g. 50 per cohort). |
 
-- **Started**: Participants who accessed your study via a recruitment link.
-- **Submitted**: Participants who fully completed the sorting session.
-- **Success Rate**: The percentage of starts that resulted in a submission.
+Each link exposes a QR code for printed materials. The funnel chart on the same page (Started / Submitted / Success Rate) is the fastest way to spot a drop-off — large gaps between Started and Submitted usually point at the welcome page, the consent text, or grid sizing.
 
-> [!TIP]
-> Use the **Recruitment Funnel** chart to identify exactly where participants are dropping off (e.g., after the welcome page vs. during the fine sort).
+## Quality-control responses
 
-### Data Analysis and Quality Control
+From the **Data** page, open any participant row to see the reconstructed Q-sort, the presort and postsort answers, and the audio responses (when present). Three quick filters are useful before exporting:
 
-Access the **Data** and **Analysis** pages for deeper insights:
+- **Duration** — sort by duration to spot suspiciously fast completions.
+- **Device** — exceptionally short mobile sessions sometimes indicate an aborted attempt.
+- **Test runs** — the `is_test_run` flag is set for sessions opened via Preview; clear them in bulk before exporting.
 
-1. **Data page**: View participant timelines, device breakdowns, and individual session details. Flag or discard suspicious responses (e.g., participants who completed in under 2 minutes).
-2. **Analysis page**: Run built-in factor analysis (PCA or centroid extraction with varimax rotation). Examine factor loadings, factor arrays, distinguishing/consensus statements, and scree plots.
-3. **Exports**: Download data in CSV, PQMethod, R-Kit, KenQ JSON, or full research package formats.
-4. **Visual Audit**: Reconstruct individual Q-sorts visually to look for patterns or anomalies before exporting for factor analysis.
+To exclude a response, use **Discard** from the row's action menu and provide a reason. Discarded rows stay in the database for audit but are excluded from analysis and exports.
 
-### Study Access Security
+## Run analysis
 
-You can control access to your study through recruitment links:
+The **Analysis** page runs PCA or centroid extraction with optional varimax rotation. Each run is persisted to an audit trail (the history panel at the top of the page); past runs can be reloaded, annotated, or deleted. Results are immutable. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis) for the full set of controls and outputs.
 
-1. **Public Links**: Anyone with the link can participate (unlimited usage).
-2. **Individual Links**: Single-use tokens for controlled panel recruitment.
-3. **Limited Links**: Capped usage (e.g., 50 participants per link).
+## Export
 
-### Test Runs
+Five formats are available from **Data → Export**: CSV (wide), PQMethod ZIP, R-Kit ZIP, Research Package ZIP, and a JSON dump. Pick the format that matches the downstream tool — see the [Data Export guide](data-export.md) for which is which.
 
-Before going live, use the **Test Run** feature to walk through the participant experience yourself. Test runs are automatically flagged with `is_test_run` and excluded from exports and analysis by default. You can clear test data from the Data page.
+## Test runs and pilot mode
 
-### Tips for a Great Q-Sort
+Use the **Test Run** action in the designer toolbar to walk through the participant experience yourself. Sessions opened this way are flagged `is_test_run` and excluded from exports and analysis. Pilot mode (the **Preview** action in the designer) goes one step further: it loads the current draft from local storage instead of the database, so nothing persists at all. Use it to walk a study through the full flow before activation.
 
-- **Statement Clarity**: Keep statements concise and balanced.
-- **Instructional Design**: Use the Condition of Instruction field to explain the specific context of your study. Markdown formatting is supported.
-- **Grid Balance**: Ensure the number of slots in your grid matches the total number of statements in your Q-set. The designer validates this automatically.
+## Study lifecycle
 
-## Collecting Data
+Studies move through Draft → Active → Paused → Closed → Archived. The constraints on each transition are documented in [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). The two transitions you will use most often are:
 
-Once your study is "active", every completed sort by a participant is stored as a unique session.
+- **Draft → Active.** Triggers server-side validation. Once Active, the grid and statements are read-only; translations and metadata stay editable.
+- **Active → Paused.** Suspends new submissions while you fix a typo in a statement or instruction, without taking the study down permanently.
 
-- Participants receive a **Confirmation Code** at the end of the study.
-- All data is anonymized by default.
+## Where data lives
 
-For details on how to retrieve this data, see the [Data Export Guide](data-export.md).
+Submissions persist as soon as a participant clicks Submit. Each submission gets a confirmation code shown to the participant. To retrieve the data, see the [Data Export guide](data-export.md). For the database schema (only relevant when running custom SQL on a self-hosted instance), see [`../explanation/architecture.md#data-model`](../explanation/architecture.md#data-model).

@@ -20,7 +20,7 @@ Q-methodology tools typically separate data collection from analysis, and rarely
 
 Qualis covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. The platform is targeted at groups practising critical Q-methodology and is also usable for classical workflows.
 
-Self-hosting is intentional. Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
+Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
 
 ---
 
@@ -177,8 +177,8 @@ Organized using the [Diataxis framework](https://diataxis.fr/). See the [full in
 | | |
 | :--- | :--- |
 | **[Tutorials](docs/tutorials/)** | [Your First Study](docs/tutorials/your-first-study.md) &middot; [Collecting Responses](docs/tutorials/collecting-responses.md) &middot; [Analyzing Results](docs/tutorials/analyzing-results.md) &middot; [Local Development](docs/tutorials/local-development.md) |
-| **[Guides](docs/guides/)** | [Conducting Studies](docs/guides/conducting-studies.md) &middot; [Admin Features](docs/guides/admin-features.md) &middot; [Data Export](docs/guides/data-export.md) &middot; [Deployment](docs/guides/deployment.md) &middot; [S3 Audio Setup](docs/guides/s3-setup.md) |
-| **[Reference](docs/reference/)** | [API](docs/reference/api.md) &middot; [Configuration](docs/reference/configuration.md) &middot; [Components](docs/reference/components.md) |
+| **[Guides](docs/guides/)** | [Conducting Studies](docs/guides/conducting-studies.md) &middot; [Data Export](docs/guides/data-export.md) &middot; [Deployment](docs/guides/deployment.md) &middot; [S3 Audio Setup](docs/guides/s3-setup.md) |
+| **[Reference](docs/reference/)** | [API](docs/reference/api.md) &middot; [Configuration](docs/reference/configuration.md) &middot; [Admin Dashboard](docs/reference/admin-dashboard.md) &middot; [Components](docs/reference/components.md) |
 | **[Explanation](docs/explanation/)** | [Architecture](docs/explanation/architecture.md) &middot; [Q-Methodology](docs/explanation/q-methodology.md) &middot; [Mobile UX Decisions](docs/explanation/design-decisions/mobile-ux.md) |
 
 ---
@@ -216,7 +216,7 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 **Author contributions:**
 
-- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology.
+- **Julien Vastenaekels** (Université de Reims Champagne-Ardenne): software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology.
 - **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology. No direct code contribution.
 
 **Methodological grounding:** Qualis's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).

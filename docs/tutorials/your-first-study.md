@@ -4,6 +4,8 @@ In this tutorial, you will create a complete Q-methodology study from scratch us
 
 We will build a study called **"Attitudes Toward Remote Work"** with 12 example statements. This is a small study designed for learning; a real Q study typically has 30-60 statements.
 
+> **A few terms used throughout this tutorial.** A *Q-sort* is the act of rank-ordering a set of *statements* (a few dozen short claims about the topic) into a *forced-distribution grid* — a pyramid-shaped table that requires a near-normal distribution of placements. The forced shape compels participants to trade statements off against each other rather than agreeing with everything. The *Condition of Instruction* is the prompt that fixes the mental frame of the sort (e.g., "sort these statements according to your *personal experience* of remote work"). For a fuller introduction, see [`../explanation/q-methodology.md`](../explanation/q-methodology.md).
+
 **What you will learn:**
 
 - How to create a project and a study
@@ -156,9 +158,9 @@ For 12 statements, use a 7-column grid ranging from -3 to +3:
 |-------|----|----|----|----|----|----|----|
 | Slots |  1 |  1 |  2 |  4 |  2 |  1 |  1 |
 
-Total: 12 slots, matching our 12 statements. The designer shows a warning banner if these do not match.
+The pyramid shape is intentional: it has more slots in the middle and fewer at the extremes. Participants are forced to commit to which statements are *most* and *least* representative of their view, rather than rating everything as a mild agreement. The total slot count must equal the statement count — 12 slots, 12 statements. The designer shows a warning banner if these do not match.
 
-4. Click **Save**.
+Click **Save**.
 
 ---
 
@@ -191,7 +193,7 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 ## Step 9: Test Your Study
 
 1. In the designer toolbar, click the **Test Run** button. This opens the study in a new tab in test mode.
-2. Walk through the entire participant flow: Welcome, Consent, Presort, Rough Sort, Fine Sort, Post-Sort.
+2. Walk through the entire participant flow: **Welcome, Consent, Presort, Rough Sort, Fine Sort, Post-Sort.** Qualis splits the sort into two stages: a quick triage (the *rough sort*: agree / neutral / disagree) followed by drag-into-grid placement (the *fine sort*). The rough sort lowers cognitive load before the participant has to commit to specific positions.
 3. Test runs are automatically flagged and do not count toward real data.
 
 ---
@@ -203,7 +205,7 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 3. Qualis runs server-side validation. If there are issues, a dialog will list them.
 4. Once validated, the study state changes from **Draft** to **Active**.
 
-Your study is now live. The designer becomes read-only while the study is active.
+Your study is now live: the status badge in the header turns green and reads **Active**, and the structural fields in the designer (grid, statements) become read-only. Translations and metadata remain editable.
 
 ---
 

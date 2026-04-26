@@ -9,8 +9,8 @@ Qualis follows a strict **Three-Tier Architecture** (also known as Controller-Se
 ```mermaid
 graph TD
     Router["Router Layer (api/)"] --> Service["Service Layer (services/)"]
-    Service --> Model["Data Layer (models.py)"]
-    Service --> Schema["Validation Layer (schemas.py)"]
+    Service --> Model["Data Layer (models/)"]
+    Service --> Schema["Validation Layer (schemas/)"]
 ```
 
 ### 1.1 The Layers
@@ -25,52 +25,55 @@ graph TD
     *   **Rule**: Services accept Pydantic Schemas or primitives, and interact with SQLAlchemy Models. They should catch DB errors and raise application-specific exceptions if needed (or let global handlers catch them).
     *   **Dependency Injection**: Services are typically injected into Routers via `Depends()`.
 
-3.  **Data Layer (`app/models.py`)**:
-    *   **Responsibility**: Database schema definitions (SQLAlchemy).
+3.  **Data Layer (`app/models/`)**:
+    *   **Responsibility**: Database schema definitions (SQLAlchemy), grouped by subdomain (`user`, `project`, `study`, `participant`, `recruitment`, `concourse`, `analysis`).
     *   **Rule**: Rich models are encouraged (helper methods), but complex business rules belong in Services.
 
-4.  **Validation Layer (`app/schemas.py`)**:
-    *   **Responsibility**: Data validation and strict typing (Pydantic).
+4.  **Validation Layer (`app/schemas/`)**:
+    *   **Responsibility**: Data validation and strict typing (Pydantic), grouped by subdomain alongside the models.
     *   **Rule**: All I/O must be typed. No `dict` or `Any` passing between layers unless strictly necessary.
 
 ## 2. Directory Structure
-
-We group files by **Technical Type**, not by Domain (though domains are respected within filenames/folders where appropriate).
 
 ```text
 backend/app/
 ├── core/           # Config, security, exceptions
 ├── middleware/     # Global middleware (CORS, error handling)
-├── routers/        # HTTP Endpoints (admin/, auth.py, etc.)
-├── schemas.py      # Pydantic models (Centralized for easy AI reading)
-├── models.py       # SQLAlchemy models (Centralized for easy AI reading)
-├── services/       # Business Logic (study_service.py, etc.)
+├── routers/        # HTTP endpoints (admin/, auth.py, etc.)
+├── schemas/        # Pydantic models, one module per subdomain
+├── models/         # SQLAlchemy models, one module per subdomain
+├── services/       # Business logic (study_service.py, etc.)
+├── types/          # Shared TypedDict wire shapes
+├── utils/          # Pure helpers (security, audit, crypto, email…)
 └── main.py         # App entrypoint
 ```
 
-> **Why Centralized Models/Schemas?**
-> We found that for AI Agents, having a single source of truth for Types (`schemas.py`) and Database Structure (`models.py`) significantly reduces hallucination compared to scattered domain-based files.
+The `models/__init__.py` and `schemas/__init__.py` re-export every public name, so `from app.models import Study` continues to work alongside `from app.models.study import Study`.
 
-## 3. Best Practices
+## 3. Strict typing
 
-### 3.1 Async/Sync
+Most modules in `app/` are under `mypy --strict` via `[[tool.mypy.overrides]]` in `backend/pyproject.toml`. New utility/leaf modules should opt into the same bar by adding themselves to the overrides list. See the "Strict-typed Python modules" section in [`CLAUDE.md`](../../CLAUDE.md) for the canonical list and the conventions for using `# type: ignore[explicit-any]` at JSON boundaries.
+
+## 4. Best Practices
+
+### 4.1 Async/Sync
 
 *   **FastAPI & IO**: We use `async def` for routers.
-*   **SQLAlchemy**: We use **Async** SQLAlchemy (`AsyncSession`) for all database interactions. Ensure you use `await` for all DB calls.
+*   **SQLAlchemy**: We use **async** SQLAlchemy (`AsyncSession`) for all database interactions. Use `await` for all DB calls.
 
-### 3.2 Error Handling
+### 4.2 Error Handling
 
-Do not generic `try/except` blocks in routers. Let exceptions propagate.
+Do not use generic `try/except` blocks in routers. Let exceptions propagate.
 *   **Use `HTTPException`** for expected user errors (400, 404).
-*   **Global Handler**: `middleware/errors.py` automatically catches generic exclusions and formats 500 errors.
+*   **Global Handler**: `middleware/errors.py` automatically catches generic exceptions and formats 500 errors.
 
-### 3.3 Dependency Injection
+### 4.3 Dependency Injection
 
 Use `Depends()` for:
 *   Authentication (`get_current_user`)
-*   Database Sessions (`get_db`)
+*   Database sessions (`get_db`)
 
-## 4. Testing
+## 5. Testing
 
-*   **Integration Tests**: We prioritize integration tests in `tests/integration/` that hit valid endpoints.
-*   **Fixture-Driven**: Use `conftest.py` extensively for setup/teardown of the DB state.
+*   **Integration tests**: We prioritise integration tests in `tests/integration/` that hit real endpoints with a real database.
+*   **Fixture-driven**: Use `conftest.py` extensively for setup/teardown of DB state.
