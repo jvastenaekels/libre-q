@@ -33,7 +33,7 @@ from app.schemas import (
     TOTPSetup,
     TOTPVerify,
 )
-from app.schemas.responses import AckResponse
+from app.schemas.responses import AckResponse, TOTPEnableResponse
 from app.limiter import limiter
 from fastapi import Request
 
@@ -292,12 +292,12 @@ async def setup_totp(
     )
 
 
-@router.post("/me/2fa/enable")
+@router.post("/me/2fa/enable", response_model=TOTPEnableResponse)
 async def enable_totp(
     verify_data: TOTPVerify,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> TOTPEnableResponse:
     """Enable 2FA after verifying a token."""
     if not current_user.totp_secret:
         raise HTTPException(status_code=400, detail="TOTP not set up")
@@ -306,7 +306,7 @@ async def enable_totp(
         try:
             current_user.is_totp_enabled = True
             await db.commit()
-            return {"status": "enabled"}
+            return TOTPEnableResponse(status="enabled")
         except Exception as e:
             await db.rollback()
             logger.error(f"Unexpected error during TOTP enable: {e}", exc_info=True)
