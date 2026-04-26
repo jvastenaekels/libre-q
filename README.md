@@ -216,7 +216,7 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 **Author contributions:**
 
-- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance.
+- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology.
 - **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology. No direct code contribution.
 
 **Methodological grounding:** Qualis's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).

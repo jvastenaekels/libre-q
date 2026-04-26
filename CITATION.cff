@@ -27,8 +27,10 @@ authors:
     affiliation: "Université de Reims Champagne-Ardenne"
     # orcid: "https://orcid.org/0000-0000-0000-0000"
 # CFF 1.2.0 has no per-author "roles" field. The contribution distribution is:
-#   J. Vastenaekels — software design, implementation, documentation, maintenance
-#   C. Dedinger — methodological design, testing, conceptual feedback (no direct code contribution)
+#   J. Vastenaekels — software design, implementation, documentation, maintenance,
+#                     methodological design, testing, conceptual feedback
+#   C. Dedinger     — methodological design, testing, conceptual feedback
+#                     (no direct code contribution)
 # This distinction is documented in the README ## Acknowledgments section.
 keywords:
   - "Q methodology"
