@@ -20,7 +20,10 @@ test.describe('Project Management E2E Tests (Real Backend)', () => {
         await titleInput.fill('Updated Project Title');
 
         const newSlug = `updated-${Date.now()}`;
-        const slugInput = page.getByLabel(/url slug/i);
+        // Slug field is wrapped in a relative div with an absolute-positioned
+        // "/admin/w/" prefix; getByLabel sometimes fails to resolve through
+        // the wrapper. Target the input by name directly.
+        const slugInput = page.locator('input[name="slug"]');
         await slugInput.fill(newSlug);
 
         await page.getByRole('button', { name: /save changes/i }).click();

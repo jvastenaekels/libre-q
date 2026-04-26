@@ -63,9 +63,11 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         const projectSlug = testDb.getWorkspaceSlug();
         await page.goto(`/app/${projectSlug}/studies/${studySlug}/data`);
 
-        // Verify table loads with 2 records
+        // Verify table loads with 2 records.
+        // (Removed legacy "records found" text assertion: the new
+        // InteractiveDataView renders no such label; the row count below
+        // already validates the data loaded.)
         await expect(page.locator('table')).toBeVisible({ timeout: 15000 });
-        await expect(page.getByText('records found')).toBeVisible();
         await expect(page.locator('tbody tr')).toHaveCount(2);
 
         // Click on first participant row to open detail

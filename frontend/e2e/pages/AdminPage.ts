@@ -185,7 +185,9 @@ export class AdminPage extends BasePage {
     }
 
     async verifyStatus(status: 'Draft' | 'Active' | 'Closed') {
-        await expect(this.page.getByRole('status')).toHaveText(status);
+        // dnd-kit mounts a global #DndLiveRegion-0 with role="status";
+        // disambiguate with the testid on the study-status badge.
+        await expect(this.page.getByTestId('study-status')).toHaveText(status);
     }
 
     async logout() {

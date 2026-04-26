@@ -102,16 +102,16 @@ test.describe('State Management Flow Tests', () => {
 
         // Participant: Access study
         await participantPage.goto(`/study/${study.slug}`);
-        await expect(
-            participantPage.getByRole('button', { name: 'Get Started' })
-        ).toBeVisible();
+        await expect(participantPage.getByRole('button', { name: 'Get Started' })).toBeVisible();
 
         // Admin: Pause study
         await adminPage.getByRole('button', { name: 'Paused' }).click();
         await adminPage.getByRole('button', { name: 'Pause Study' }).click();
 
         // Wait for state to update in UI
-        await expect(adminPage.getByRole('status').filter({ hasText: 'Paused' })).toBeVisible();
+        // dnd-kit mounts a global #DndLiveRegion-0 with role="status";
+        // disambiguate with the testid on the study-status badge.
+        await expect(adminPage.getByTestId('study-status')).toHaveText(/Paused/i);
 
         // Participant: Refresh and verify study is now paused
         await participantPage.reload();
@@ -193,17 +193,22 @@ test.describe('State Management Flow Tests', () => {
         // Post-Sort
         await expect(page).toHaveURL(/post-sort/);
 
-        const submitButton = page.getByRole('button', {
-            name: /Submit|Finish|Share my perspective/i,
-        });
+        // Post-sort has multiple steps (feedback then questionnaire). The
+        // final submit lives in Step2_Questionnaire under a stable testid.
+        // Walk the wizard via the generic Continue/Next chain until the
+        // submit testid appears, then click it.
+        const submitButton = page.getByTestId('postsort-submit-btn');
         const continueButton = page.getByRole('button', { name: /Continue|Next/i });
 
-        if (await submitButton.isVisible()) {
-            await submitButton.click();
-        } else if (await continueButton.isVisible()) {
-            await continueButton.click();
-            await submitButton.click();
+        for (let i = 0; i < 5 && !(await submitButton.isVisible().catch(() => false)); i++) {
+            if (await continueButton.isVisible().catch(() => false)) {
+                await continueButton.click();
+                await page.waitForTimeout(250);
+            } else {
+                break;
+            }
         }
+        await submitButton.click();
 
         // Verify completion
         await expect(page.getByTestId('thank-you-message')).toBeVisible();
