@@ -19,6 +19,7 @@ from app.schemas import (
     ProgressUpdate,
     ResumeResponse,
 )
+from app.schemas.responses import AckResponse
 from app.services.study_service import StudyService
 
 _UUID_RE = re.compile(
@@ -58,7 +59,7 @@ async def record_consent(
     )
 
 
-@router.patch("/progress")
+@router.patch("/progress", response_model=AckResponse)
 @limiter.limit("120/minute")
 async def update_progress(
     data: ProgressUpdate,
@@ -67,7 +68,7 @@ async def update_progress(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> AckResponse:
     """Records the participant's current step (fire-and-forget from frontend)."""
     result = await db.execute(
         select(Participant)
@@ -89,10 +90,10 @@ async def update_progress(
         participant.last_step_reached_at = datetime.now(timezone.utc)
         await db.commit()
 
-    return {"status": "ok"}
+    return AckResponse(status="ok")
 
 
-@router.put("/save-draft")
+@router.put("/save-draft", response_model=AckResponse)
 @limiter.limit("120/minute")
 async def save_draft(
     data: DraftSaveInput,
@@ -101,7 +102,7 @@ async def save_draft(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> AckResponse:
     """Saves participant draft responses (fire-and-forget from frontend)."""
     result = await db.execute(
         select(Participant, Study)
@@ -127,7 +128,7 @@ async def save_draft(
     participant.draft_responses = data.draft_responses
     await db.commit()
 
-    return {"status": "ok"}
+    return AckResponse(status="ok")
 
 
 @router.get("/resume/{code}", response_model=ResumeResponse)

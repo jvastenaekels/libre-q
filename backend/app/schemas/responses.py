@@ -18,7 +18,7 @@ class AckResponse(BaseModel):
 
     status: str = Field(description="Short status token, e.g. 'ok' or 'unlocked'.")
     details: str | None = Field(
-        None, description="Optional human-readable explanation."
+        default=None, description="Optional human-readable explanation."
     )
 
 

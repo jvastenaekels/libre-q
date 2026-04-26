@@ -11,6 +11,7 @@ from app.database import get_db
 from app.exceptions import ServiceError
 from app.limiter import limiter
 from app.schemas import SubmissionInput
+from app.schemas.responses import AckResponse
 from app.services.study_service import StudyService
 from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password
@@ -114,23 +115,23 @@ async def get_study(
     )
 
 
-@router.post("/study/{slug}/unlock")
+@router.post("/study/{slug}/unlock", response_model=AckResponse)
 @limiter.limit("10/minute")
 async def unlock_study(
     request: Request,
     password: str = Query(...),
     slug: str = Path(..., pattern="^[a-z0-9-]+$"),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> AckResponse:
     """Validate study access password."""
     study = await StudyService.get_study_by_slug(db, slug)
     if not study:
         raise HTTPException(status_code=404, detail="Study not found")
 
     if not study.access_password:
-        return {"status": "unlocked", "details": "No password required"}
+        return AckResponse(status="unlocked", details="No password required")
 
     if verify_password(password, study.access_password):
-        return {"status": "unlocked"}
+        return AckResponse(status="unlocked")
 
     raise HTTPException(status_code=403, detail="Incorrect password")

@@ -33,6 +33,7 @@ from app.schemas import (
     TOTPSetup,
     TOTPVerify,
 )
+from app.schemas.responses import AckResponse
 from app.limiter import limiter
 from fastapi import Request
 
@@ -232,12 +233,16 @@ async def update_user_me(
     return current_user
 
 
-@router.post("/me/password", status_code=status.HTTP_200_OK)
+@router.post(
+    "/me/password",
+    status_code=status.HTTP_200_OK,
+    response_model=AckResponse,
+)
 async def change_password(
     password_data: PasswordChange,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> AckResponse:
     """Change current user password."""
     if not verify_password(
         password_data.current_password, current_user.hashed_password
@@ -257,7 +262,7 @@ async def change_password(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while changing password",
         )
-    return {"message": "Password updated successfully"}
+    return AckResponse(status="updated", details="Password updated successfully")
 
 
 @router.get("/me/2fa/setup", response_model=TOTPSetup)
@@ -313,12 +318,12 @@ async def enable_totp(
     raise HTTPException(status_code=400, detail="Invalid token")
 
 
-@router.post("/me/2fa/disable")
+@router.post("/me/2fa/disable", response_model=AckResponse)
 async def disable_totp(
     password_data: PasswordConfirm,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
+) -> AckResponse:
     """Disable 2FA after verifying current password."""
     if not verify_password(
         password_data.current_password, current_user.hashed_password
@@ -336,4 +341,4 @@ async def disable_totp(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while disabling 2FA",
         )
-    return {"status": "disabled"}
+    return AckResponse(status="disabled")
