@@ -152,4 +152,42 @@ describe('useStudyConfig', () => {
             expect(useConfigStore.getState().config?.title).toBe('Server Fallback Title');
         });
     });
+
+    // ── Defensive guard against the OOM loop fixed in 0a31428 ────────────────
+    // The data-sync effect refuses to write a response whose `slug` differs
+    // from the URL slug. Without this guard, an in-flight stale response
+    // (e.g. switching studies before the previous fetch resolves) would
+    // populate the store with the wrong slug, the slug-guard would fire a
+    // reset, the refetch would replay, and the loop would exhaust the heap.
+    // See `useStudyConfig.ts:246-253` for the rationale comment.
+    it('does NOT write a config response whose slug mismatches the URL slug', async () => {
+        // The router mock pins the URL slug to 'test-study'. Mock the API
+        // hook to return a response with a different slug — this is exactly
+        // the stale-in-flight scenario the guard exists for.
+        const mismatchedData = {
+            slug: 'wrong-slug',
+            title: 'Should Not Be Written',
+            language: 'en',
+            presort_config: {},
+            statements: [],
+        };
+
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: mismatchedData,
+            isLoading: false,
+            error: null,
+            refetch: vi.fn(),
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        } as any);
+
+        renderHook(() => useStudyConfig());
+
+        // Give effects a tick to run; the guard returns synchronously so
+        // setConfig should not have fired.
+        await waitFor(() => {
+            // Store stays at reset (config = null) — the mismatched payload
+            // was rejected by the guard, never reaching setConfig.
+            expect(useConfigStore.getState().config).toBeNull();
+        });
+    });
 });
