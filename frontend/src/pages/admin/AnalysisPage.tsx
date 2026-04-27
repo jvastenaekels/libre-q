@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     ChartColumnStacked,
@@ -54,8 +54,26 @@ export default function AnalysisPage() {
     const slug = studySlug ?? '';
     const { t } = useTranslation();
 
-    // Visual-only state: active results tab (Radix UI, not testable logic)
-    const [activeTab, setActiveTab] = useState('loadings');
+    // Active results tab persisted to ?tab= so reload + share-links are stable.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') ?? 'loadings';
+    const setActiveTab = useCallback(
+        (next: string) => {
+            setSearchParams(
+                (prev) => {
+                    const params = new URLSearchParams(prev);
+                    if (next === 'loadings') {
+                        params.delete('tab');
+                    } else {
+                        params.set('tab', next);
+                    }
+                    return params;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
 
     const api = useAnalysisPage(slug);
     // Capture result in local const so TypeScript narrows it through JSX callback boundaries
