@@ -99,6 +99,7 @@ class StudyService:
                     else "en"
                 ),
                 show_statement_codes=study_in.show_statement_codes,
+                distribution_mode=study_in.distribution_mode,
                 branding=study_in.branding.model_dump() if study_in.branding else None,
                 start_date=study_in.start_date,
                 end_date=study_in.end_date,
@@ -514,6 +515,9 @@ class StudyService:
             "default_language": study.default_language,
             "show_statement_codes": study.show_statement_codes,
             "randomize_statement_order": study.randomize_statement_order,
+            "distribution_mode": study.distribution_mode.value
+            if hasattr(study.distribution_mode, "value")
+            else study.distribution_mode,
             "ui_labels": get_t_attr("ui_labels", {}) or {},
             "methodology_tips": (getattr(translation, "methodology_tips", []) or [])
             or lang_defaults.get("methodology_tips", []),

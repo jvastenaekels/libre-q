@@ -434,6 +434,24 @@
         }
     },
     "admin": {
+        "study_design": {
+            "distribution_mode": {
+                "title": "Jakauman tila",
+                "helper": "Valitse, kuinka tiukasti Q-lajitteluruudukkoa noudatetaan. Pakotettu: jokainen sarake on täytettävä ilmoitettuun kapasiteettiinsa (yleisin valinta; Brown 1980; Watts & Stenner 2012). Vapaa: mikä tahansa määrä kortteja sarakkeessa, kokonaismäärä = Q-joukon koko (Brown ym. 2015 mukaan jakauman muoto vaikuttaa tuloksiin vain vähän). Joustava: kokonaismäärä pakotettu, sarakkeiden kapasiteetit ovat ohjeellisia.",
+                "forced": {
+                    "label": "Pakotettu",
+                    "tooltip": "Jokaisen sarakkeen on sisällettävä täsmälleen ilmoitettu kapasiteettinsa. Brown 1980; Watts & Stenner 2012."
+                },
+                "free": {
+                    "label": "Vapaa",
+                    "tooltip": "Korttien kokonaismäärä = Q-joukon koko; sarakekohtainen määrä on rajoittamaton. Brown ym. 2015."
+                },
+                "flexible": {
+                    "label": "Joustava",
+                    "tooltip": "Korttien kokonaismäärä = Q-joukon koko; sarakkeiden kapasiteetit ovat ohjeellisia (vain varoituksia)."
+                }
+            }
+        },
         "study": {
             "save": {
                 "success": "Muutokset tallennettu onnistuneesti",

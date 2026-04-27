@@ -49,6 +49,7 @@ from .base import uuid4 as uuid4
 from .user import User as User
 from .project import Project as Project
 from .project import ProjectMember as ProjectMember
+from .study import DistributionMode as DistributionMode
 from .study import Statement as Statement
 from .study import StatementTranslation as StatementTranslation
 from .study import Study as Study

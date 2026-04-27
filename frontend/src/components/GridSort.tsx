@@ -535,6 +535,13 @@ interface GridSortProps {
     uiLabels?: Record<string, string>;
     readOnly?: boolean;
     sidebarContent?: React.ReactNode;
+    /**
+     * Distribution mode that drives how strictly per-column capacity is
+     * enforced during interaction. `forced` keeps the existing grid-clamp
+     * behaviour; `free` and `flexible` allow placement beyond capacity (the
+     * total card count is still validated server-side).
+     */
+    distributionMode?: 'forced' | 'free' | 'flexible';
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -578,8 +585,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         uiLabels,
         readOnly = false,
         sidebarContent,
+        distributionMode = 'forced',
     }) => {
         const { t } = useTranslation();
+        const isForcedDistribution = distributionMode === 'forced';
 
         const { isMobile, isDesktop, isLandscape, height } = useViewport();
         // Include landscape phones >= 768px (e.g., iPhone 14 Pro at 844x390)
@@ -656,7 +665,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         nextRow = Math.max(0, row - 1);
                         break;
                     case 'ArrowDown': {
-                        const maxRowsInCol = currentColumn.capacity;
+                        // In free/flexible mode the per-column capacity is a
+                        // soft visual hint, not a hard cap, so allow keyboard
+                        // navigation past the declared row count.
+                        const maxRowsInCol = isForcedDistribution
+                            ? currentColumn.capacity
+                            : Number.MAX_SAFE_INTEGER;
                         nextRow = Math.min(maxRowsInCol - 1, row + 1);
                         break;
                     }
@@ -673,7 +687,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 // If moving columns, clamp the row to the new column's capacity
                 // We try to stay at the same relative height (center) or just clamp
                 if (nextCol !== col) {
-                    const newColCapacity = gridColumns[nextCol]?.capacity ?? 0;
+                    const declaredCap = gridColumns[nextCol]?.capacity ?? 0;
+                    const newColCapacity = isForcedDistribution
+                        ? declaredCap
+                        : Number.MAX_SAFE_INTEGER;
                     // Sophisticated logic: try to stay visually close?
                     // Simple logic: clamp to bottom
                     nextRow = Math.min(nextRow, newColCapacity - 1);
@@ -688,7 +705,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     }
                 }
             },
-            [gridColumns]
+            [gridColumns, isForcedDistribution]
         );
 
         useEffect(() => {

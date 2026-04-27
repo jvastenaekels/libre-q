@@ -65,6 +65,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
         show_statement_codes: study.show_statement_codes,
         randomize_statement_order: study.randomize_statement_order,
         symmetry_lock: study.symmetry_lock,
+        distribution_mode: study.distribution_mode,
         branding: study.branding,
 
         translations: (study.translations || []).map((t) => ({
@@ -359,6 +360,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     state.draft.randomize_statement_order = studyData.randomize_statement_order;
                 if (studyData.symmetry_lock !== undefined)
                     state.draft.symmetry_lock = studyData.symmetry_lock;
+                if (studyData.distribution_mode !== undefined)
+                    state.draft.distribution_mode = studyData.distribution_mode;
 
                 // --- Structural fields (Replace entirely) ---
                 if (studyData.grid_config) state.draft.grid_config = studyData.grid_config;

@@ -434,6 +434,24 @@
     }
   },
   "admin": {
+    "study_design": {
+      "distribution_mode": {
+        "title": "Mode de distribution",
+        "helper": "Choisissez le degré de contrainte appliqué à la grille de tri Q. Forcée : chaque colonne doit être remplie à sa capacité déclarée (le choix le plus courant ; Brown 1980 ; Watts & Stenner 2012). Libre : nombre quelconque de cartes par colonne, total = taille du jeu Q (Brown et al. 2015 considèrent que la forme de la distribution influe peu sur les résultats). Flexible : total imposé, capacités par colonne données à titre indicatif.",
+        "forced": {
+          "label": "Forcée",
+          "tooltip": "Chaque colonne doit contenir exactement sa capacité déclarée. Brown 1980 ; Watts & Stenner 2012."
+        },
+        "free": {
+          "label": "Libre",
+          "tooltip": "Total de cartes = taille du jeu Q ; nombre par colonne libre. Brown et al. 2015."
+        },
+        "flexible": {
+          "label": "Flexible",
+          "tooltip": "Total de cartes = taille du jeu Q ; les capacités par colonne sont indicatives (avertissements seulement)."
+        }
+      }
+    },
     "study": {
       "save": {
         "success": "Modifications enregistrées avec succès",

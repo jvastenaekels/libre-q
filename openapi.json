@@ -7031,6 +7031,16 @@
         "title": "DataInventory",
         "description": "Per-study data inventory snapshot."
       },
+      "DistributionMode": {
+        "type": "string",
+        "enum": [
+          "forced",
+          "free",
+          "flexible"
+        ],
+        "title": "DistributionMode",
+        "description": "Enum for Q-sort grid distribution enforcement.\n\nforced \u2014 each column must hold exactly its declared capacity\n    (Brown 1980; Watts & Stenner 2012).\nfree \u2014 total count must equal Q-set size; per-column capacities\n    ignored at validation (Brown et al. 2015).\nflexible \u2014 total enforced, per-column capacities are soft hints\n    (warnings only). Qualis-specific compromise."
+      },
       "DraftSaveInput": {
         "properties": {
           "session_token": {
@@ -9031,6 +9041,10 @@
             "title": "Symmetry Lock",
             "default": true
           },
+          "distribution_mode": {
+            "$ref": "#/components/schemas/DistributionMode",
+            "default": "forced"
+          },
           "start_date": {
             "anyOf": [
               {
@@ -9218,6 +9232,10 @@
             "type": "boolean",
             "title": "Symmetry Lock",
             "default": true
+          },
+          "distribution_mode": {
+            "$ref": "#/components/schemas/DistributionMode",
+            "default": "forced"
           },
           "start_date": {
             "anyOf": [
@@ -9794,6 +9812,16 @@
               }
             ],
             "title": "Symmetry Lock"
+          },
+          "distribution_mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DistributionMode"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "translations": {
             "anyOf": [

@@ -50,6 +50,8 @@ import type { Statement, StudyConfig } from '../../schemas/study';
 // Public API surface
 // ────────────────────────────────────────────────────────────────
 
+export type DistributionMode = 'forced' | 'free' | 'flexible';
+
 export interface FineSortApi {
     // Config / derived data
     config: StudyConfig | null;
@@ -60,6 +62,7 @@ export interface FineSortApi {
     unplacedNeutral: Statement[];
     isAllPlaced: boolean;
     showCodes: boolean;
+    distributionMode: DistributionMode;
 
     // Selection state
     selectedCardId: number | null;
@@ -178,6 +181,9 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         [config?.grid_config]
     );
 
+    const distributionMode: DistributionMode = (config?.distribution_mode ??
+        'forced') as DistributionMode;
+
     const { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced } = useMemo(() => {
         const placedIds = new Set(qsort.map((c) => c.statementId));
         const statements = config?.statements || [];
@@ -197,6 +203,10 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
             .map((id) => statements.find((s) => s.id === id))
             .filter((s): s is NonNullable<typeof s> => !!s);
 
+        // In forced mode the rough piles must all be empty (each card has a
+        // grid slot equal to its column capacity). In free/flexible mode any
+        // total count = stmt_count is accepted; the per-column structural
+        // constraint is relaxed.
         const isAllPlaced =
             unplacedAgree.length === 0 &&
             unplacedDisagree.length === 0 &&
@@ -381,6 +391,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         unplacedNeutral,
         isAllPlaced,
         showCodes,
+        distributionMode,
         selectedCardId,
         setSelectedCardId,
         sensors,
