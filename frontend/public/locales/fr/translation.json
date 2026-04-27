@@ -733,6 +733,7 @@
       "rotation_method": "Rotation",
       "none": "Aucune",
       "run": "Lancer l'analyse",
+      "run_will_replace": "Relancer l'analyse remplacera la vue actuelle des résultats. Utilisez le panneau d'historique pour comparer les exécutions.",
       "running": "Analyse en cours...",
       "reanalyzing": "Nouvelle analyse en cours...",
       "success": "Analyse terminée — {{n}} facteurs extraits",

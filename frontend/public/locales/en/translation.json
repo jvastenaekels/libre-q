@@ -748,6 +748,7 @@
       "rotation_method": "Rotation",
       "none": "None",
       "run": "Run Analysis",
+      "run_will_replace": "Running again will replace the current results view. Use the history panel to compare runs.",
       "running": "Analyzing...",
       "reanalyzing": "Re-analyzing...",
       "success": "Analysis complete — {{n}} factors extracted",

@@ -493,6 +493,22 @@ export default function AnalysisPage() {
                         )}
                     </div>
 
+                    {/* Warn before re-running when a result is already on screen */}
+                    {analysisResult && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex items-start gap-2">
+                            <AlertTriangle
+                                className="size-3.5 mt-0.5 shrink-0"
+                                aria-hidden="true"
+                            />
+                            <span>
+                                {t(
+                                    'admin.analysis.run_will_replace',
+                                    'Running again will replace the current results view. Use the history panel to compare runs.'
+                                )}
+                            </span>
+                        </p>
+                    )}
+
                     {/* Action buttons — visually separated */}
                     <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
                         <Button

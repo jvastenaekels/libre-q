@@ -733,6 +733,7 @@
             "rotation_method": "Rotaatio",
             "none": "Ei mitään",
             "run": "Suorita analyysi",
+            "run_will_replace": "Analyysin suorittaminen uudelleen korvaa nykyisen tulosnäkymän. Vertaile suorituksia historiapaneelin avulla.",
             "running": "Analysoidaan...",
             "reanalyzing": "Analysoidaan uudelleen...",
             "success": "Analyysi valmis — {{n}} faktoria poimittu",
