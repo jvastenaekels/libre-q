@@ -332,7 +332,7 @@ export default function AnalysisPage() {
 
                             <ul className="space-y-2">
                                 {api.manualRotations.map((mr, idx) => (
-                                    <li key={idx} className="flex flex-wrap items-center gap-2">
+                                    <li key={mr.id} className="flex flex-wrap items-center gap-2">
                                         <span className="text-xs text-slate-600">
                                             {t(
                                                 'admin.analysis.manual_rotations.factor_a_label',
