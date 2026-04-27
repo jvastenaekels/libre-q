@@ -30,6 +30,8 @@ config
 joined_at
 memberships
 symmetry_lock
+free  # DistributionMode.free enum member, referenced at the wire boundary
+flexible  # DistributionMode.flexible enum member, referenced at the wire boundary
 recruitment_links
 requires_password
 ui_labels
