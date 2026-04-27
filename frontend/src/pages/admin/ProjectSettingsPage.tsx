@@ -51,6 +51,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -105,6 +115,11 @@ export default function ProjectSettingsPage() {
     const updateProjectMutation = useUpdateProjectApiAdminProjectsSlugPatch();
     const updateMemberMutation = useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch();
     const removeMemberMutation = useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete();
+
+    const [memberToRemove, setMemberToRemove] = useState<{
+        userId: number;
+        name: string;
+    } | null>(null);
 
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
@@ -164,20 +179,26 @@ export default function ProjectSettingsPage() {
         }
     };
 
-    const handleRemoveMember = async (userId: number) => {
+    const requestRemoveMember = (userId: number, name: string) => {
         if (userId === currentUser?.id) {
             toast.error(
                 t('admin.profile.personal.cannot_remove_self', 'You cannot remove yourself')
             );
             return;
         }
-        if (!confirm(t('admin.projects.settings.team.remove_confirm'))) return;
+        setMemberToRemove({ userId, name });
+    };
+
+    const confirmRemoveMember = async () => {
+        if (!memberToRemove) return;
         try {
-            await removeMemberMutation.mutateAsync({ slug, userId });
+            await removeMemberMutation.mutateAsync({ slug, userId: memberToRemove.userId });
             toast.success(t('admin.projects.settings.team.remove_success'));
             refetchMembers();
         } catch (err) {
             toast.error(parseApiErrorSync(err, t('admin.projects.settings.team.remove_error')));
+        } finally {
+            setMemberToRemove(null);
         }
     };
 
@@ -433,15 +454,24 @@ export default function ProjectSettingsPage() {
                                                     size="sm"
                                                     className="size-9 min-h-[44px] min-w-[44px] p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                     onClick={() =>
-                                                        handleRemoveMember(member.user_id)
+                                                        requestRemoveMember(
+                                                            member.user_id,
+                                                            member.user.full_name ||
+                                                                member.user.email
+                                                        )
                                                     }
                                                     disabled={
                                                         !isAdmin ||
                                                         member.user_id === currentUser?.id
                                                     }
                                                     aria-label={t(
-                                                        'admin.project.remove_member',
-                                                        'Remove member'
+                                                        'admin.projects.settings.team.remove_member_aria',
+                                                        'Remove {{name}}',
+                                                        {
+                                                            name:
+                                                                member.user.full_name ||
+                                                                member.user.email,
+                                                        }
                                                     )}
                                                 >
                                                     <Trash2 className="size-4" />
@@ -538,6 +568,38 @@ export default function ProjectSettingsPage() {
                     </Card>
                 </div>
             </div>
+
+            <AlertDialog
+                open={memberToRemove !== null}
+                onOpenChange={(open) => !open && setMemberToRemove(null)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {t(
+                                'admin.projects.settings.team.remove_dialog_title',
+                                'Remove team member?'
+                            )}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t(
+                                'admin.projects.settings.team.remove_dialog_body',
+                                '{{name}} will lose access to this project. They can be re-invited later.',
+                                { name: memberToRemove?.name ?? '' }
+                            )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmRemoveMember}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {t('admin.projects.settings.team.remove_dialog_action', 'Remove')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
