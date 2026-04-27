@@ -21,6 +21,7 @@ import {
 import { StudySwitcher } from './StudySwitcher';
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { FocusModeHeader } from './FocusModeHeader';
+import { UserAvatar } from './UserAvatar';
 import {
     Sidebar,
     SidebarContent,
@@ -122,16 +123,7 @@ function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
-                                {user?.full_name
-                                    ? user.full_name
-                                          .split(/\s+/)
-                                          .map((w: string) => w[0])
-                                          .join('')
-                                          .substring(0, 2)
-                                          .toUpperCase()
-                                    : user?.email?.substring(0, 2).toUpperCase()}
-                            </div>
+                            <UserAvatar name={user?.full_name} email={user?.email} />
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
                                     {user?.full_name || t('admin.layout.admin_user')}
@@ -149,16 +141,7 @@ function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
-                                    {user?.full_name
-                                        ? user.full_name
-                                              .split(/\s+/)
-                                              .map((w: string) => w[0])
-                                              .join('')
-                                              .substring(0, 2)
-                                              .toUpperCase()
-                                        : user?.email?.substring(0, 2).toUpperCase()}
-                                </div>
+                                <UserAvatar name={user?.full_name} email={user?.email} />
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
                                         {user?.full_name || t('admin.layout.admin_user')}
@@ -242,7 +225,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   show: true,
               },
               {
-                  title: t('admin.sidebar.project_settings', 'Settings'),
+                  title: t('admin.sidebar.project_settings', 'Project settings'),
                   url: `/app/${projectSlug}/settings`,
                   icon: Settings2,
                   show: can('project:settings'),
@@ -291,7 +274,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: can('study:edit_design'),
                   },
                   {
-                      title: t('admin.sidebar.settings'),
+                      title: t('admin.sidebar.settings', 'Study settings'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/settings`,
                       icon: Settings,
                       show: can('study:edit_settings'),
@@ -372,7 +355,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           icon: ChartColumnStacked,
                       },
                       {
-                          title: t('admin.sidebar.settings', 'Settings'),
+                          title: t('admin.sidebar.settings', 'Study settings'),
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/settings`
