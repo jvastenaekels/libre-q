@@ -104,7 +104,7 @@ function NavLanguage() {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: mock user
-function NavUser({ user }: { user: any }) {
+function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -170,7 +170,11 @@ function NavUser({ user }: { user: any }) {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem onSelect={() => navigate('/admin/profile')}>
+                            <DropdownMenuItem
+                                onSelect={() =>
+                                    navigate(projectSlug ? `/app/${projectSlug}/profile` : '/hub')
+                                }
+                            >
                                 <BadgeCheck className="mr-2 h-4 w-4" />
                                 {t('admin.layout.profile', 'Profile')}
                             </DropdownMenuItem>
@@ -500,7 +504,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarContent>
                 <SidebarFooter className="gap-2">
                     <NavLanguage />
-                    <NavUser user={user} />
+                    <NavUser user={user} projectSlug={projectSlug} />
                 </SidebarFooter>
             </Sidebar>
         );
@@ -563,7 +567,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter className="gap-2">
                 <NavLanguage />
-                <NavUser user={user} />
+                <NavUser user={user} projectSlug={projectSlug} />
             </SidebarFooter>
         </Sidebar>
     );
