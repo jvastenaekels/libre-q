@@ -13,7 +13,6 @@ import {
     Settings,
     Download,
     Users,
-    ArrowLeft,
     Settings2,
     Wand2,
     Table,
@@ -21,6 +20,7 @@ import {
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { ProjectSwitcher } from './ProjectSwitcher';
+import { FocusModeHeader } from './FocusModeHeader';
 import {
     Sidebar,
     SidebarContent,
@@ -47,7 +47,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { usePermission } from '@/hooks/usePermission';
 import { useSidebar } from '@/components/ui/sidebar';
 
@@ -104,7 +103,7 @@ function NavLanguage() {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: mock user
-function NavUser({ user }: { user: any }) {
+function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -170,7 +169,11 @@ function NavUser({ user }: { user: any }) {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem onSelect={() => navigate('/admin/profile')}>
+                            <DropdownMenuItem
+                                onSelect={() =>
+                                    navigate(projectSlug ? `/app/${projectSlug}/profile` : '/hub')
+                                }
+                            >
                                 <BadgeCheck className="mr-2 h-4 w-4" />
                                 {t('admin.layout.profile', 'Profile')}
                             </DropdownMenuItem>
@@ -194,7 +197,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { currentProject } = useAuthStore();
     const { user } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
     const { t } = useTranslation();
     const params = useParams<{ projectSlug?: string; studySlug?: string }>();
     const { setOpenMobile } = useSidebar();
@@ -384,30 +386,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ]
         : [];
 
+    const focusStudy =
+        isFocusMode && params.studySlug
+            ? studies?.find(
+                  (s) => s.slug === params.studySlug && s.project_id === currentProject?.id
+              )
+            : undefined;
+
     // Render new architecture sidebar
     if (isNewArchitecture) {
         return (
             <Sidebar variant="inset" {...props}>
                 <SidebarHeader>
-                    {isFocusMode ? (
-                        // Focus Mode: Show back button and study context
-                        <div className="flex flex-col gap-2">
-                            <button
-                                type="button"
-                                onClick={() => navigate(`/app/${projectSlug}/dashboard`)}
-                                className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                <span>{currentProject?.title || t('admin.sidebar.project')}</span>
-                            </button>
-                            <div className="px-2">
-                                <Badge variant="outline" className="font-semibold">
-                                    {params.studySlug}
-                                </Badge>
-                            </div>
-                        </div>
+                    {isFocusMode && params.studySlug ? (
+                        <FocusModeHeader
+                            projectSlug={projectSlug}
+                            projectTitle={currentProject?.title}
+                            study={focusStudy}
+                            studySlug={params.studySlug}
+                        />
                     ) : (
-                        // Project View: Show project switcher
                         <ProjectSwitcher />
                     )}
                 </SidebarHeader>
@@ -500,7 +498,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarContent>
                 <SidebarFooter className="gap-2">
                     <NavLanguage />
-                    <NavUser user={user} />
+                    <NavUser user={user} projectSlug={projectSlug} />
                 </SidebarFooter>
             </Sidebar>
         );
@@ -563,7 +561,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter className="gap-2">
                 <NavLanguage />
-                <NavUser user={user} />
+                <NavUser user={user} projectSlug={projectSlug} />
             </SidebarFooter>
         </Sidebar>
     );
