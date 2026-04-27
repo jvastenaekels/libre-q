@@ -449,6 +449,24 @@
       "no_studies": "No studies yet",
       "no_projects": "No projects yet. Create your first project to get started."
     },
+    "study_design": {
+      "distribution_mode": {
+        "title": "Distribution mode",
+        "helper": "Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice; Brown 1980; Watts & Stenner 2012). Free: any number of cards per column, total = Q-set size (Brown et al. 2015 argue distribution shape barely affects results). Flexible: total enforced, columns are soft hints.",
+        "forced": {
+          "label": "Forced",
+          "tooltip": "Each column must hold exactly its declared capacity. Brown 1980; Watts & Stenner 2012."
+        },
+        "free": {
+          "label": "Free",
+          "tooltip": "Total cards = Q-set size; per-column count is unconstrained. Brown et al. 2015."
+        },
+        "flexible": {
+          "label": "Flexible",
+          "tooltip": "Total cards = Q-set size; per-column capacities are soft hints (warnings only)."
+        }
+      }
+    },
     "study": {
       "save": {
         "success": "Changes saved successfully",
@@ -673,7 +691,19 @@
       "diff_status": "status",
       "diff_text": "text",
       "diff_tags": "tags",
-      "diff_changed": "Changed:"
+      "diff_changed": "Changed:",
+      "methodological_context": {
+        "title": "Methodological context",
+        "subtitle": "Optional documentation fields. Fill in what's relevant to your design; leave others blank."
+      },
+      "construction_memo": {
+        "title": "Construction memo",
+        "helper": "Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.",
+        "placeholder": "Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...",
+        "save": "Save memo",
+        "saved": "Construction memo saved",
+        "save_error": "Failed to save construction memo"
+      }
     },
     "concourse_import": {
       "title": "Import from Concourse",

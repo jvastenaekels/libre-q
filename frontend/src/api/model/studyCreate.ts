@@ -10,6 +10,7 @@ import type { StudyCreatePresortConfig } from './studyCreatePresortConfig';
 import type { StudyCreatePostsortConfig } from './studyCreatePostsortConfig';
 import type { StudyCreateBranding } from './studyCreateBranding';
 import type { StudyCreateDefaultLanguage } from './studyCreateDefaultLanguage';
+import type { DistributionMode } from './distributionMode';
 import type { StudyCreateStartDate } from './studyCreateStartDate';
 import type { StudyCreateEndDate } from './studyCreateEndDate';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
@@ -34,6 +35,7 @@ export interface StudyCreate {
     show_statement_codes?: boolean;
     randomize_statement_order?: boolean;
     symmetry_lock?: boolean;
+    distribution_mode?: DistributionMode;
     start_date?: StudyCreateStartDate;
     end_date?: StudyCreateEndDate;
     translations: StudyTranslationCreate[];

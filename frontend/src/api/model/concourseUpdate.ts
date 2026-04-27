@@ -6,6 +6,7 @@
  */
 import type { ConcourseUpdateTitle } from './concourseUpdateTitle';
 import type { ConcourseUpdateDescription } from './concourseUpdateDescription';
+import type { ConcourseUpdateConstructionMemo } from './concourseUpdateConstructionMemo';
 
 /**
  * Schema for updating a concourse.
@@ -13,4 +14,5 @@ import type { ConcourseUpdateDescription } from './concourseUpdateDescription';
 export interface ConcourseUpdate {
     title?: ConcourseUpdateTitle;
     description?: ConcourseUpdateDescription;
+    construction_memo?: ConcourseUpdateConstructionMemo;
 }

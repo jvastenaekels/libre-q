@@ -1,5 +1,6 @@
 """Unit tests for StudyService."""
 
+import logging
 import uuid
 
 import pytest
@@ -7,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.exceptions import ValidationError
-from app.models import Participant, ParticipantStatus
+from app.models import DistributionMode, Participant, ParticipantStatus
 from app.schemas import QSortEntryInput, SubmissionInput
 from app.services.study_service import StudyService
 
@@ -161,6 +162,86 @@ async def test_process_submission_completed_early_return(db, active_study):
     )
     p_after = res.scalar_one()
     assert p_after.status == ParticipantStatus.completed  # Stayed completed
+
+
+@pytest.mark.asyncio
+async def test_validate_distribution_forced_default_rejects_mismatched_columns(
+    active_study,
+):
+    """Default mode is `forced`: column-count mismatch must raise."""
+    # active_study has capacity: -1:1, 0:2, 1:1 (Total 4)
+    # Mode default is `forced`, so per-column mismatch is rejected.
+    assert active_study.distribution_mode == DistributionMode.forced
+    qsort = [
+        QSortEntryInput(statement_id=1, grid_score=-1),
+        QSortEntryInput(statement_id=2, grid_score=-1),  # over capacity
+        QSortEntryInput(statement_id=3, grid_score=0),
+        QSortEntryInput(statement_id=4, grid_score=1),
+    ]
+    with pytest.raises(ValidationError, match="incorrect number of cards"):
+        StudyService.validate_distribution(active_study, qsort)
+
+
+@pytest.mark.asyncio
+async def test_validate_distribution_free_accepts_lopsided(active_study):
+    """In `free` mode, all cards in one column passes (total = N)."""
+    active_study.distribution_mode = DistributionMode.free
+    qsort = [
+        QSortEntryInput(statement_id=1, grid_score=0),
+        QSortEntryInput(statement_id=2, grid_score=0),
+        QSortEntryInput(statement_id=3, grid_score=0),
+        QSortEntryInput(statement_id=4, grid_score=0),
+    ]
+    # Should not raise: total cards == stmt_count, all scores valid.
+    StudyService.validate_distribution(active_study, qsort)
+
+
+@pytest.mark.asyncio
+async def test_validate_distribution_flexible_accepts_and_warns(
+    active_study, caplog
+):
+    """In `flexible` mode, lopsided distribution passes but logs a warning."""
+    active_study.distribution_mode = DistributionMode.flexible
+    qsort = [
+        QSortEntryInput(statement_id=1, grid_score=0),
+        QSortEntryInput(statement_id=2, grid_score=0),
+        QSortEntryInput(statement_id=3, grid_score=0),
+        QSortEntryInput(statement_id=4, grid_score=0),
+    ]
+    with caplog.at_level(logging.WARNING, logger="app.services.submission_service"):
+        # Should not raise.
+        StudyService.validate_distribution(active_study, qsort)
+    assert any(
+        "Flexible mode" in r.message and "soft hint" in r.message
+        for r in caplog.records
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "mode",
+    [DistributionMode.forced, DistributionMode.free, DistributionMode.flexible],
+)
+async def test_validate_distribution_invalid_score_rejected_all_modes(
+    active_study, mode
+):
+    """An out-of-range score is always rejected, regardless of mode."""
+    active_study.distribution_mode = mode
+    qsort = [
+        QSortEntryInput(statement_id=1, grid_score=-1),
+        QSortEntryInput(statement_id=2, grid_score=0),
+        QSortEntryInput(statement_id=3, grid_score=0),
+        QSortEntryInput(statement_id=4, grid_score=5),  # not in grid (-1, 0, 1)
+    ]
+    if mode == DistributionMode.forced:
+        # forced fires the per-column check first (column 1 expects 1, has 0).
+        with pytest.raises(
+            ValidationError, match=r"(incorrect number of cards|invalid grid scores)"
+        ):
+            StudyService.validate_distribution(active_study, qsort)
+    else:
+        with pytest.raises(ValidationError, match="invalid grid scores"):
+            StudyService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio

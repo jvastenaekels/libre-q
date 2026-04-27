@@ -53,6 +53,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         unplacedNeutral,
         isAllPlaced,
         showCodes,
+        distributionMode,
         selectedCardId,
         sensors,
         activeId,
@@ -139,6 +140,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         isAllPlaced={isAllPlaced}
                         onValidate={handleValidate}
                         showCodes={showCodes}
+                        distributionMode={distributionMode}
                         highlightKey={highlightKey}
                         uiLabels={config.ui_labels}
                     />

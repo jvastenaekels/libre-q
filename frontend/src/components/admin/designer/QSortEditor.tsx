@@ -1479,6 +1479,85 @@ const QSortEditor = ({
                                 </div>
                             </div>
 
+                            {/* Distribution mode toggle group */}
+                            <div className="mb-8 px-4 py-4 sm:px-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <div className="flex-1">
+                                        <Label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                                            {t(
+                                                'admin.study_design.distribution_mode.title',
+                                                'Distribution mode'
+                                            )}
+                                        </Label>
+                                        <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                                            {t(
+                                                'admin.study_design.distribution_mode.helper',
+                                                'Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice; Brown 1980; Watts & Stenner 2012). Free: any number of cards per column, total = Q-set size (Brown et al. 2015 argue distribution shape barely affects results). Flexible: total enforced, columns are soft hints.'
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <RadioGroup
+                                    value={draft.distribution_mode ?? 'forced'}
+                                    onValueChange={(value) => {
+                                        if (
+                                            value === 'forced' ||
+                                            value === 'free' ||
+                                            value === 'flexible'
+                                        ) {
+                                            updateDraft((d) => {
+                                                d.distribution_mode = value;
+                                            });
+                                        }
+                                    }}
+                                    disabled={readOnly}
+                                    className="flex flex-col sm:flex-row gap-3"
+                                >
+                                    {(['forced', 'free', 'flexible'] as const).map((mode) => (
+                                        <Tooltip key={mode}>
+                                            <TooltipTrigger asChild>
+                                                <Label
+                                                    htmlFor={`distribution-mode-${mode}`}
+                                                    className={cn(
+                                                        'flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all',
+                                                        (draft.distribution_mode ?? 'forced') ===
+                                                            mode
+                                                            ? 'border-indigo-500 bg-indigo-50/60 ring-2 ring-indigo-200'
+                                                            : 'border-slate-200 bg-white hover:border-slate-300',
+                                                        readOnly && 'opacity-60 cursor-not-allowed'
+                                                    )}
+                                                >
+                                                    <RadioGroupItem
+                                                        id={`distribution-mode-${mode}`}
+                                                        value={mode}
+                                                    />
+                                                    <span className="text-sm font-bold text-slate-700">
+                                                        {t(
+                                                            `admin.study_design.distribution_mode.${mode}.label`,
+                                                            mode === 'forced'
+                                                                ? 'Forced'
+                                                                : mode === 'free'
+                                                                  ? 'Free'
+                                                                  : 'Flexible'
+                                                        )}
+                                                    </span>
+                                                </Label>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-xs">
+                                                {t(
+                                                    `admin.study_design.distribution_mode.${mode}.tooltip`,
+                                                    mode === 'forced'
+                                                        ? 'Each column must hold exactly its declared capacity. Brown 1980; Watts & Stenner 2012.'
+                                                        : mode === 'free'
+                                                          ? 'Total cards = Q-set size; per-column count is unconstrained. Brown et al. 2015.'
+                                                          : 'Total cards = Q-set size; per-column capacities are soft hints (warnings only).'
+                                                )}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    ))}
+                                </RadioGroup>
+                            </div>
+
                             {/* Validation Bottom Bar */}
                             <div
                                 className={cn(

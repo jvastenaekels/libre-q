@@ -4,6 +4,8 @@
 
 """Study, StudyTranslation, Statement, and StatementTranslation models."""
 
+import enum
+
 from .base import (
     Any,
     Base,
@@ -22,6 +24,22 @@ from .base import (
     mapped_column,
     relationship,
 )
+
+
+class DistributionMode(str, enum.Enum):
+    """Enum for Q-sort grid distribution enforcement.
+
+    forced — each column must hold exactly its declared capacity
+        (Brown 1980; Watts & Stenner 2012).
+    free — total count must equal Q-set size; per-column capacities
+        ignored at validation (Brown et al. 2015).
+    flexible — total enforced, per-column capacities are soft hints
+        (warnings only). Qualis-specific compromise.
+    """
+
+    forced = "forced"
+    free = "free"
+    flexible = "flexible"
 
 
 class Study(Base):
@@ -47,6 +65,11 @@ class Study(Base):
     symmetry_lock: Mapped[bool] = mapped_column(
         Boolean, default=True
     )  # Enforce grid symmetry in designer
+    distribution_mode: Mapped[DistributionMode] = mapped_column(
+        SAEnum(DistributionMode, name="distributionmode"),
+        default=DistributionMode.forced,
+        server_default="forced",
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -188,4 +211,10 @@ class StatementTranslation(Base):
     )
 
 
-__all__ = ["Study", "StudyTranslation", "Statement", "StatementTranslation"]
+__all__ = [
+    "DistributionMode",
+    "Statement",
+    "StatementTranslation",
+    "Study",
+    "StudyTranslation",
+]

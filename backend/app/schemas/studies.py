@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models import StudyState
+from app.models import DistributionMode, StudyState
 
 from .recruitment import RecruitmentLinkRead
 from .projects import ProjectBrief
@@ -192,6 +192,7 @@ class StudyBase(BaseModel):
     show_statement_codes: bool = False
     randomize_statement_order: bool = False
     symmetry_lock: bool = True
+    distribution_mode: DistributionMode = DistributionMode.forced
     start_date: datetime | None = None
     end_date: datetime | None = None
 
@@ -216,6 +217,7 @@ class StudyUpdate(BaseModel):
     show_statement_codes: bool | None = None
     randomize_statement_order: bool | None = None
     symmetry_lock: bool | None = None
+    distribution_mode: DistributionMode | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
     access_password: str | None = None

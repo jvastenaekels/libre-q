@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ConcourseCreateDescription } from './concourseCreateDescription';
+import type { ConcourseCreateConstructionMemo } from './concourseCreateConstructionMemo';
 
 /**
  * Schema for creating a concourse.
@@ -16,4 +17,5 @@ export interface ConcourseCreate {
      */
     title: string;
     description?: ConcourseCreateDescription;
+    construction_memo?: ConcourseCreateConstructionMemo;
 }

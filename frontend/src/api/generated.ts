@@ -84,6 +84,7 @@ import type { RequestHandlerOptions } from 'msw';
 
 import {
     ConcourseItemStatus,
+    DistributionMode,
     ParticipantStatus,
     ProjectRole,
     RecruitmentLinkType,
@@ -11748,6 +11749,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -12029,6 +12034,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 undefined,
             ]),
             symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            distribution_mode: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(DistributionMode)),
+                undefined,
+            ]),
             start_date: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -12324,6 +12333,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -12596,6 +12609,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -12871,6 +12888,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -13143,6 +13164,10 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -13441,6 +13466,10 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             undefined,
         ]),
         symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        distribution_mode: faker.helpers.arrayElement([
+            faker.helpers.arrayElement(Object.values(DistributionMode)),
+            undefined,
+        ]),
         start_date: faker.helpers.arrayElement([
             faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
             undefined,
@@ -13722,6 +13751,10 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    distribution_mode: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(DistributionMode)),
+        undefined,
+    ]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -14911,6 +14944,10 @@ export const getCreateConcourseApiAdminConcoursesPostResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
+    construction_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     item_count: faker.helpers.arrayElement([
         faker.number.int({ min: undefined, max: undefined }),
         undefined,
@@ -14933,6 +14970,13 @@ export const getListConcoursesApiAdminConcoursesGetResponseMock = (
             project_id: faker.number.int({ min: undefined, max: undefined }),
             title: faker.string.alpha({ length: { min: 10, max: 20 } }),
             description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            construction_memo: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
@@ -14967,6 +15011,10 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
@@ -15048,6 +15096,10 @@ export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock = 
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),

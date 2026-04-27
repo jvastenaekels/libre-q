@@ -159,6 +159,11 @@ export default function ConcourseDetailPage() {
         sheetTab,
         openSheet,
         closeSheet,
+        constructionMemo,
+        setConstructionMemo,
+        isConstructionMemoDirty,
+        saveConstructionMemo,
+        isSavingConstructionMemo,
         exportCsv,
     } = api;
 
@@ -227,6 +232,73 @@ export default function ConcourseDetailPage() {
                     </div>
                 }
             />
+
+            {/* Methodological context — neutral umbrella for optional documentation fields. */}
+            <div className="space-y-1">
+                <h2 className="text-sm font-semibold text-slate-700">
+                    {t('admin.concourse.methodological_context.title', 'Methodological context')}
+                </h2>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                    {t(
+                        'admin.concourse.methodological_context.subtitle',
+                        "Optional documentation fields. Fill in what's relevant to your design; leave others blank."
+                    )}
+                </p>
+            </div>
+
+            <Card className="rounded-xl border-slate-200">
+                <CardContent className="p-4 sm:p-6 space-y-3">
+                    <div>
+                        <Label
+                            htmlFor="construction-memo"
+                            className="text-sm font-bold text-slate-900"
+                        >
+                            {t('admin.concourse.construction_memo.title', 'Construction memo')}
+                        </Label>
+                        <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                            {t(
+                                'admin.concourse.construction_memo.helper',
+                                'Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.'
+                            )}
+                        </p>
+                    </div>
+                    <Textarea
+                        id="construction-memo"
+                        rows={8}
+                        maxLength={10000}
+                        value={constructionMemo}
+                        onChange={(e) => setConstructionMemo(e.target.value)}
+                        placeholder={t(
+                            'admin.concourse.construction_memo.placeholder',
+                            'Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...'
+                        )}
+                        disabled={!canEdit || isSavingConstructionMemo}
+                        className="rounded-xl bg-white text-sm leading-relaxed"
+                    />
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">
+                            {constructionMemo.length > 9000
+                                ? `${constructionMemo.length} / 10000`
+                                : ''}
+                        </span>
+                        {canEdit && (
+                            <Button
+                                size="sm"
+                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                onClick={saveConstructionMemo}
+                                disabled={!isConstructionMemoDirty || isSavingConstructionMemo}
+                            >
+                                {isSavingConstructionMemo ? (
+                                    <Loader2 className="size-4 mr-1 animate-spin" />
+                                ) : (
+                                    <Check className="size-4 mr-1" />
+                                )}
+                                {t('admin.concourse.construction_memo.save', 'Save memo')}
+                            </Button>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Filters */}
             <div className="flex flex-col gap-2">

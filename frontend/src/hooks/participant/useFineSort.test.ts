@@ -194,4 +194,21 @@ describe('useFineSort', () => {
         expect(result.current.gridColumns[0].score).toBe(-1);
         expect(result.current.gridColumns[2].score).toBe(1);
     });
+
+    it("defaults distributionMode to 'forced' when not set on config", () => {
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        expect(result.current.distributionMode).toBe('forced');
+    });
+
+    it("surfaces distributionMode='free' from config", () => {
+        useConfigStore.getState().setConfig({ ...mockConfig, distribution_mode: 'free' });
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        expect(result.current.distributionMode).toBe('free');
+    });
+
+    it("surfaces distributionMode='flexible' from config", () => {
+        useConfigStore.getState().setConfig({ ...mockConfig, distribution_mode: 'flexible' });
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        expect(result.current.distributionMode).toBe('flexible');
+    });
 });

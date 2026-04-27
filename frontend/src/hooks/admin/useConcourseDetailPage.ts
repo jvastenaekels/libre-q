@@ -41,6 +41,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import {
     useGetConcourseApiAdminConcoursesConcourseIdGet,
+    useUpdateConcourseApiAdminConcoursesConcourseIdPatch,
     useCreateItemApiAdminConcoursesConcourseIdItemsPost,
     useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch,
     useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete,
@@ -252,6 +253,13 @@ export interface ConcourseDetailPageApi {
     openSheet: (item: ConcourseItemRead, tab: 'history' | 'comments') => void;
     closeSheet: () => void;
 
+    // Construction memo (critical-Q reflexivity: Sneegas 2020)
+    constructionMemo: string;
+    setConstructionMemo: (value: string) => void;
+    isConstructionMemoDirty: boolean;
+    saveConstructionMemo: () => Promise<void>;
+    isSavingConstructionMemo: boolean;
+
     // Export
     exportCsv: () => void;
 }
@@ -288,6 +296,7 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
     const { data: tags } = useListTagsApiAdminConcoursesTagsGet();
 
     // ── Mutations ────────────────────────────────────────────────
+    const updateConcourseMutation = useUpdateConcourseApiAdminConcoursesConcourseIdPatch();
     const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
     const updateItemMutation = useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch();
     const deleteItemMutation = useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete();
@@ -377,6 +386,43 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
     const [newTagName, setNewTagName] = useState('');
     const [newTagColor, setNewTagColor] = useState('#6366f1');
     const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
+
+    // ── Construction memo (critical-Q reflexivity) ──────────────
+    // Free-text record of how the concourse was constructed: sources
+    // canvassed, voices retained or excluded, sampling rationale.
+    // (Sneegas 2020; Robbins & Krueger 2000.)
+    const [constructionMemo, setConstructionMemo] = useState('');
+    const [savedConstructionMemo, setSavedConstructionMemo] = useState('');
+    useEffect(() => {
+        const value = concourse?.construction_memo ?? '';
+        setConstructionMemo(value);
+        setSavedConstructionMemo(value);
+    }, [concourse?.construction_memo]);
+    const isConstructionMemoDirty = constructionMemo !== savedConstructionMemo;
+    const saveConstructionMemo = useCallback(async () => {
+        if (!id) return;
+        try {
+            await updateConcourseMutation.mutateAsync({
+                concourseId: id,
+                data: {
+                    construction_memo: constructionMemo.length > 0 ? constructionMemo : null,
+                },
+            });
+            setSavedConstructionMemo(constructionMemo);
+            await invalidate();
+            toast.success(t('admin.concourse.construction_memo.saved', 'Construction memo saved'));
+        } catch (err) {
+            toast.error(
+                parseApiErrorSync(
+                    err,
+                    t(
+                        'admin.concourse.construction_memo.save_error',
+                        'Failed to save construction memo'
+                    )
+                )
+            );
+        }
+    }, [id, constructionMemo, updateConcourseMutation, invalidate, t]);
 
     // ── Multi-select + bulk actions ─────────────────────────────
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
@@ -912,6 +958,13 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
         sheetTab,
         openSheet,
         closeSheet,
+
+        // Construction memo
+        constructionMemo,
+        setConstructionMemo,
+        isConstructionMemoDirty,
+        saveConstructionMemo,
+        isSavingConstructionMemo: updateConcourseMutation.isPending,
 
         // Export
         exportCsv,

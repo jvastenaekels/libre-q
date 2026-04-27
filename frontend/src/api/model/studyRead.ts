@@ -10,6 +10,7 @@ import type { StudyReadPresortConfig } from './studyReadPresortConfig';
 import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
 import type { StudyReadBranding } from './studyReadBranding';
 import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
+import type { DistributionMode } from './distributionMode';
 import type { StudyReadStartDate } from './studyReadStartDate';
 import type { StudyReadEndDate } from './studyReadEndDate';
 import type { StudyReadProject } from './studyReadProject';
@@ -36,6 +37,7 @@ export interface StudyRead {
     show_statement_codes?: boolean;
     randomize_statement_order?: boolean;
     symmetry_lock?: boolean;
+    distribution_mode?: DistributionMode;
     start_date?: StudyReadStartDate;
     end_date?: StudyReadEndDate;
     id: number;

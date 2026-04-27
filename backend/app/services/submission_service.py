@@ -15,6 +15,7 @@ from ..exceptions import (
     ValidationError,
 )
 from ..models import (
+    DistributionMode,
     Participant,
     ParticipantStatus,
     QSortEntry,
@@ -204,14 +205,46 @@ class SubmissionService:
                 "Study configuration error: Could not parse grid_config."
             )
 
-        for score_val, capacity in target_dist.items():
-            count = submission_counts.get(score_val, 0)
-            if count != capacity:
-                raise ValidationError(
-                    f"Column {score_val} has incorrect number of cards. Expected {capacity}, got {count}."
-                )
-            if score_val in submission_counts:
-                del submission_counts[score_val]
+        # Determine the distribution mode. Default to 'forced' for backwards
+        # compatibility (existing studies without the column will be migrated
+        # with server_default='forced'; in tests using a mock, the attribute may
+        # be missing entirely).
+        mode = getattr(study, "distribution_mode", DistributionMode.forced)
+        if mode is None:
+            mode = DistributionMode.forced
+
+        if mode == DistributionMode.forced:
+            # Strict: each declared column must hold exactly its capacity.
+            for score_val, capacity in target_dist.items():
+                count = submission_counts.get(score_val, 0)
+                if count != capacity:
+                    raise ValidationError(
+                        f"Column {score_val} has incorrect number of cards. "
+                        f"Expected {capacity}, got {count}."
+                    )
+                if score_val in submission_counts:
+                    del submission_counts[score_val]
+        else:
+            # free / flexible: skip per-column equality. The total card count
+            # has already been validated above (len(qsort) == stmt_count).
+            # We still drop valid scores from submission_counts so the
+            # invalid-score check below works identically across modes.
+            if mode == DistributionMode.flexible:
+                # Soft hint: log a warning when per-column counts diverge from
+                # declared capacities, but do not reject.
+                for score_val, capacity in target_dist.items():
+                    count = submission_counts.get(score_val, 0)
+                    if count != capacity:
+                        logger.warning(
+                            "Flexible mode: column %s has %d cards, declared "
+                            "capacity %d (soft hint, not rejected).",
+                            score_val,
+                            count,
+                            capacity,
+                        )
+            for score_val in target_dist:
+                if score_val in submission_counts:
+                    del submission_counts[score_val]
 
         if submission_counts:
             invalid_scores = list(submission_counts.keys())
