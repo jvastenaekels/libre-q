@@ -242,7 +242,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   show: true,
               },
               {
-                  title: t('admin.sidebar.project_settings', 'Settings'),
+                  title: t('admin.sidebar.project_settings', 'Project settings'),
                   url: `/app/${projectSlug}/settings`,
                   icon: Settings2,
                   show: can('project:settings'),
@@ -291,7 +291,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: can('study:edit_design'),
                   },
                   {
-                      title: t('admin.sidebar.settings'),
+                      title: t('admin.sidebar.settings', 'Study settings'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/settings`,
                       icon: Settings,
                       show: can('study:edit_settings'),
@@ -372,7 +372,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           icon: ChartColumnStacked,
                       },
                       {
-                          title: t('admin.sidebar.settings', 'Settings'),
+                          title: t('admin.sidebar.settings', 'Study settings'),
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/settings`
