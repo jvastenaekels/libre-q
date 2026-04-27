@@ -81,5 +81,7 @@ describe('GeneralSettingsPage delete dialog', () => {
         await userEvent.type(typedField, 'wrong-slug');
         const confirmBtn = await screen.findByRole('button', { name: /^delete permanently$/i });
         expect(confirmBtn).toBeDisabled();
+        expect(deleteStudy).not.toHaveBeenCalled();
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     });
 });

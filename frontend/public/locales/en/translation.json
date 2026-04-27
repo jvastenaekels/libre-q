@@ -2113,7 +2113,6 @@
         "delete_dialog_title": "Delete this study?",
         "delete_dialog_intro": "All sorts, audio recordings, and analysis runs for this study will be permanently deleted. This cannot be undone.",
         "delete_dialog_typed_label": "Type the study slug to confirm",
-        "delete_dialog_typed_placeholder": "{{slug}}",
         "delete_dialog_action": "Delete permanently"
       },
       "save_button": "Save changes",

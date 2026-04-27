@@ -2098,7 +2098,6 @@
                 "delete_dialog_title": "Poistetaanko tämä tutkimus?",
                 "delete_dialog_intro": "Kaikki lajittelut, äänitallenteet ja analyysit poistetaan pysyvästi. Tätä ei voi kumota.",
                 "delete_dialog_typed_label": "Vahvista kirjoittamalla tutkimuksen slug",
-                "delete_dialog_typed_placeholder": "{{slug}}",
                 "delete_dialog_action": "Poista pysyvästi"
             },
             "save_button": "Tallenna muutokset",
