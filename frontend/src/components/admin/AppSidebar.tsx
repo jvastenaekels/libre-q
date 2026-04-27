@@ -13,7 +13,6 @@ import {
     Settings,
     Download,
     Users,
-    ArrowLeft,
     Settings2,
     Wand2,
     Table,
@@ -21,6 +20,7 @@ import {
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { ProjectSwitcher } from './ProjectSwitcher';
+import { FocusModeHeader } from './FocusModeHeader';
 import {
     Sidebar,
     SidebarContent,
@@ -47,7 +47,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { usePermission } from '@/hooks/usePermission';
 import { useSidebar } from '@/components/ui/sidebar';
 
@@ -198,7 +197,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { currentProject } = useAuthStore();
     const { user } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
     const { t } = useTranslation();
     const params = useParams<{ projectSlug?: string; studySlug?: string }>();
     const { setOpenMobile } = useSidebar();
@@ -388,30 +386,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ]
         : [];
 
+    const focusStudy =
+        isFocusMode && params.studySlug
+            ? studies?.find(
+                  (s) => s.slug === params.studySlug && s.project_id === currentProject?.id
+              )
+            : undefined;
+
     // Render new architecture sidebar
     if (isNewArchitecture) {
         return (
             <Sidebar variant="inset" {...props}>
                 <SidebarHeader>
-                    {isFocusMode ? (
-                        // Focus Mode: Show back button and study context
-                        <div className="flex flex-col gap-2">
-                            <button
-                                type="button"
-                                onClick={() => navigate(`/app/${projectSlug}/dashboard`)}
-                                className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                <span>{currentProject?.title || t('admin.sidebar.project')}</span>
-                            </button>
-                            <div className="px-2">
-                                <Badge variant="outline" className="font-semibold">
-                                    {params.studySlug}
-                                </Badge>
-                            </div>
-                        </div>
+                    {isFocusMode && params.studySlug ? (
+                        <FocusModeHeader
+                            projectSlug={projectSlug}
+                            projectTitle={currentProject?.title}
+                            study={focusStudy}
+                            studySlug={params.studySlug}
+                        />
                     ) : (
-                        // Project View: Show project switcher
                         <ProjectSwitcher />
                     )}
                 </SidebarHeader>
