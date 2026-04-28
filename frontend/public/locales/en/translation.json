@@ -597,6 +597,7 @@
       "title": "Concourse",
       "description": "Manage candidate statements for your Q-methodology study",
       "default_title": "Concourse",
+      "default_title_for_project": "{{project}} — Concourse",
       "create": "New Concourse",
       "create_success": "Concourse created",
       "create_error": "Failed to create concourse",

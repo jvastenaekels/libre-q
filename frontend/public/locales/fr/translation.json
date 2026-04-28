@@ -582,6 +582,7 @@
       "title": "Concours",
       "description": "Gérer les énoncés candidats pour votre étude Q-méthodologie",
       "default_title": "Concours",
+      "default_title_for_project": "{{project}} — Concours",
       "create": "Nouveau concours",
       "create_success": "Concours créé",
       "create_error": "Échec de la création du concours",

@@ -582,6 +582,7 @@
             "title": "Lausekokoelma",
             "description": "Hallitse ehdokaslauseita Q-metodologiatutkimustasi varten",
             "default_title": "Lausekokoelma",
+            "default_title_for_project": "{{project}} — Lausekokoelma",
             "create": "Uusi lausekokoelma",
             "create_success": "Lausekokoelma luotu",
             "create_error": "Lausekokoelman luonti epäonnistui",
