@@ -1415,6 +1415,7 @@
       "translation_needed": "Review required (copy)",
       "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
       "reset_defaults": "Reset to defaults",
+      "editing_language_banner": "Editing the {{language}} version. Use the language selector in the toolbar to switch.",
       "multilang": {
         "view_others": "View in other languages",
         "other_formulations": "Other Formulations"

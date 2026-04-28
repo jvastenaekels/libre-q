@@ -1399,6 +1399,7 @@
             "translation_needed": "Tarkistus vaaditaan (Kopio)",
             "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
             "reset_defaults": "Palauta oletukset",
+            "editing_language_banner": "Muokkaat versiota {{language}}. Vaihda työkalupalkin kielivalitsimella.",
             "multilang": {
                 "view_others": "Näytä muilla kielillä",
                 "other_formulations": "Muut muotoilut"

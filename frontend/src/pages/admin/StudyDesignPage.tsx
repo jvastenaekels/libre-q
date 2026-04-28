@@ -17,6 +17,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Save,
+    Languages,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,7 +55,7 @@ import { useStudyDesignPage, type DesignStepId } from '@/hooks/admin/useStudyDes
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 7 step-editor panels + toolbar + checklist + read-only overlay; all logic lives in useStudyDesignPage
 const StudyDesignPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const api = useStudyDesignPage();
 
     // Visual-only state: tab-list scroll chevrons (tightly coupled to the DOM ref)
@@ -361,6 +362,36 @@ const StudyDesignPage = () => {
                 )}
                 {/* Left Pane: Editor */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
+                    {(() => {
+                        // Banner: chrome locale ≠ language being edited.
+                        // Researchers are editing one language while reading the
+                        // form chrome in another — easy to overwrite the wrong
+                        // version unless we say so explicitly.
+                        const chromeLocale = (i18n.resolvedLanguage ?? '').toLowerCase();
+                        const editing = (api.activeLocale ?? '').toLowerCase();
+                        if (!editing || !chromeLocale || chromeLocale === editing) return null;
+                        return (
+                            <div className="max-w-full lg:max-w-5xl mx-auto mb-4">
+                                <div
+                                    role="status"
+                                    aria-live="polite"
+                                    className="flex items-start gap-2 px-3 py-2 rounded-md text-sm bg-amber-50 border border-amber-200 text-amber-900"
+                                >
+                                    <Languages
+                                        className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-700"
+                                        aria-hidden="true"
+                                    />
+                                    <span>
+                                        {t(
+                                            'admin.design.editing_language_banner',
+                                            'Editing the {{language}} version. Use the language selector in the toolbar to switch.',
+                                            { language: api.activeLocale.toUpperCase() }
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })()}
                     <Tabs
                         value={api.activeStep}
                         onValueChange={(v: string) => api.setActiveStep(v as DesignStepId)}

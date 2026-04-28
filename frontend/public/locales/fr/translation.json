@@ -1437,6 +1437,7 @@
       "translation_needed": "Révision requise (Copie)",
       "translation_needed_desc": "Ce contenu a été automatiquement copié d'une autre langue. Veuillez le réviser et le localiser.",
       "reset_defaults": "Réinitialiser par défaut",
+      "editing_language_banner": "Vous éditez la version {{language}}. Utilisez le sélecteur de langue dans la barre d'outils pour changer.",
       "multilang": {
         "view_others": "Voir dans d'autres langues",
         "other_formulations": "Autres formulations"
