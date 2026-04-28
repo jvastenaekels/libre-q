@@ -18,6 +18,9 @@ import {
     ChevronRight,
     Save,
     Languages,
+    MoreHorizontal,
+    Upload,
+    Download,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,8 +39,7 @@ import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/GuidanceCard';
-import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
-import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';
+import { useImportConfig, useExportConfig } from '@/hooks/admin/useImportExportConfig';
 import { UnsavedChangesDialog } from '@/components/admin/designer/UnsavedChangesDialog';
 import { ActivateStudyDialog } from '@/components/admin/designer/ActivateStudyDialog';
 import { formatBackendError } from '@/utils/i18nHelpers';
@@ -59,6 +61,11 @@ const StudyDesignPage = () => {
     const { t, i18n } = useTranslation();
     const [activateDialogOpen, setActivateDialogOpen] = useState(false);
     const api = useStudyDesignPage();
+    // Wave B — Import/Export config moved to a `⋯` overflow menu next to Save.
+    // The icon-only buttons in the toolbar were ambiguous; a labelled dropdown
+    // restores discoverability without re-promoting them to primary actions.
+    const importer = useImportConfig();
+    const exporter = useExportConfig(api.effectiveSlug);
 
     // Visual-only state: tab-list scroll chevrons (tightly coupled to the DOM ref)
     const tabsListRef = useRef<HTMLDivElement>(null);
@@ -265,18 +272,52 @@ const StudyDesignPage = () => {
                                 </span>
                             </Button>
 
-                            <ImportConfigButton
-                                showText={false}
-                                disabled={api.isFullyReadOnly}
-                                className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
-                            />
-
-                            <ExportConfigButton
-                                studySlug={api.effectiveSlug}
-                                variant="outline"
-                                showText={false}
-                                className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
-                            />
+                            {importer.fileInput}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={api.isFullyReadOnly}
+                                        title={t(
+                                            'admin.design.toolbar.more_actions',
+                                            'More actions'
+                                        )}
+                                        className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
+                                    >
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 rounded-xl shadow-xl border-slate-100 p-1.5"
+                                >
+                                    <DropdownMenuItem
+                                        onSelect={importer.triggerImport}
+                                        disabled={importer.isImporting || api.isFullyReadOnly}
+                                        className="gap-2.5 cursor-pointer py-2 px-3 rounded-lg font-medium text-sm"
+                                    >
+                                        {importer.isImporting ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Upload className="h-4 w-4 text-indigo-500" />
+                                        )}
+                                        {t('admin.import.config', 'Import configuration')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onSelect={() => void exporter.triggerExport()}
+                                        disabled={exporter.isExporting}
+                                        className="gap-2.5 cursor-pointer py-2 px-3 rounded-lg font-medium text-sm"
+                                    >
+                                        {exporter.isExporting ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Download className="h-4 w-4 text-indigo-500" />
+                                        )}
+                                        {t('admin.export.config', 'Export configuration')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
                         <div className="h-6 w-px bg-slate-200 hidden md:block" />

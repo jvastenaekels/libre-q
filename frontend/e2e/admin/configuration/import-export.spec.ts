@@ -54,10 +54,13 @@ test.describe('Import/Export Study Configuration', () => {
         const projectSlug = testDb.getWorkspaceSlug();
         await page.goto(`/app/${projectSlug}/studies/${sourceSlug}/design`);
 
-        // ExportConfigButton triggers a client-side blob download via
-        // window.URL.createObjectURL — Playwright's waitForEvent('download') catches it.
+        // Wave B — Import/Export are now under a "More actions" overflow menu
+        // next to the Save button. Open the menu, then click the Export item.
+        // The download is a client-side blob via window.URL.createObjectURL,
+        // which Playwright's waitForEvent('download') catches.
         const downloadPromise = page.waitForEvent('download');
-        await page.getByRole('button', { name: /export configuration/i }).click();
+        await page.getByRole('button', { name: /more actions/i }).click();
+        await page.getByRole('menuitem', { name: /export configuration/i }).click();
         const download = await downloadPromise;
         const exportedJson = JSON.parse(
             await download.createReadStream().then(async (s) => {
