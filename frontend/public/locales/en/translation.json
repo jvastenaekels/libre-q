@@ -710,7 +710,12 @@
         "saved": "Construction memo saved",
         "save_error": "Failed to save construction memo"
       },
-      "status_pills_aria": "Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}"
+      "status_pills_aria": "Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}",
+      "import_from_csv": "Import CSV/TSV…",
+      "import_csv_hint": "CSV/TSV must have headers code, language, text. Rows in the selected language are loaded into the textarea above.",
+      "import_csv_no_match": "No rows match the selected language ({{lang}}).",
+      "import_csv_skipped": "Skipped {{count}} row(s) in other languages: {{langs}}.",
+      "import_csv_more_errors": "{{count}} more issues"
     },
     "concourse_import": {
       "title": "Import from Concourse",

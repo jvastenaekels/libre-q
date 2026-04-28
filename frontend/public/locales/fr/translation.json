@@ -695,7 +695,12 @@
         "saved": "Mémo de construction enregistré",
         "save_error": "Échec de l'enregistrement du mémo de construction"
       },
-      "status_pills_aria": "Accepté : {{a}} ; Proposé : {{p}} ; Rejeté : {{r}}"
+      "status_pills_aria": "Accepté : {{a}} ; Proposé : {{p}} ; Rejeté : {{r}}",
+      "import_from_csv": "Importer CSV/TSV…",
+      "import_csv_hint": "Le fichier CSV/TSV doit avoir les en-têtes code, language, text. Les lignes dans la langue sélectionnée sont chargées dans la zone de texte ci-dessus.",
+      "import_csv_no_match": "Aucune ligne ne correspond à la langue sélectionnée ({{lang}}).",
+      "import_csv_skipped": "{{count}} ligne(s) ignorée(s) dans d’autres langues : {{langs}}.",
+      "import_csv_more_errors": "{{count}} autres problèmes"
     },
     "concourse_import": {
       "title": "Importer depuis un concours",

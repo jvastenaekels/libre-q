@@ -695,7 +695,12 @@
                 "saved": "Rakentamisen muistio tallennettu",
                 "save_error": "Rakentamisen muistion tallennus epäonnistui"
             },
-            "status_pills_aria": "Hyväksytty: {{a}}; Ehdotettu: {{p}}; Hylätty: {{r}}"
+            "status_pills_aria": "Hyväksytty: {{a}}; Ehdotettu: {{p}}; Hylätty: {{r}}",
+            "import_from_csv": "Tuo CSV/TSV…",
+            "import_csv_hint": "CSV/TSV-tiedostossa on oltava otsikot code, language, text. Valitun kielen rivit ladataan yllä olevaan tekstilaatikkoon.",
+            "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
+            "import_csv_skipped": "Ohitettu {{count}} rivi(ä) muilla kielillä: {{langs}}.",
+            "import_csv_more_errors": "{{count}} lisää ongelmaa"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
