@@ -1187,6 +1187,17 @@ export default function ConcourseDetailPage() {
                                         />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl max-h-60">
+                                        {/* Study languages first — these are the languages the
+                                            researcher actually configured for this study. */}
+                                        {languages.map((lang) => (
+                                            <SelectItem key={lang} value={lang}>
+                                                {langDisplayName(lang)} ({lang})
+                                            </SelectItem>
+                                        ))}
+                                        {/* Other ISO languages after, for the rare case where
+                                            the researcher wants to add an item in a language
+                                            not yet declared on the study. Mirrors the bulk-
+                                            import dialog so behavior is consistent. */}
                                         {commonLanguages.map((lang) => (
                                             <SelectItem key={lang.code} value={lang.code}>
                                                 {lang.name} ({lang.code})
