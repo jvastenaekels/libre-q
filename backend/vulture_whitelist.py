@@ -271,6 +271,7 @@ ran_by_email
 # Data-lifecycle endpoints + Pydantic field hooks (app/routers/admin/lifecycle.py)
 get_data_inventory
 bulk_anonymise_old_participants
+preview_anonymise_candidates
 total_mb
 completed_older_than_1y
 completed_older_than_2y

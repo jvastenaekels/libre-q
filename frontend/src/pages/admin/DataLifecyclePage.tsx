@@ -24,6 +24,7 @@ import {
 import {
     useGetDataInventoryApiAdminStudiesSlugDataInventoryGet,
     useBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost,
+    usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet,
     getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryKey,
 } from '@/api/generated';
 import type { BulkAnonymiseResult } from '@/api/model';
@@ -126,26 +127,15 @@ export default function DataLifecyclePage() {
     const cutoffDt = new Date(cutoffDate);
     cutoffDt.setHours(23, 59, 59, 999);
 
-    // For candidate count estimation, compare the *start-of-day* cutoff against
-    // the thresholds so there is no sub-day floating-point drift.
-    const cutoffStartOfDay = new Date(cutoffDate).getTime();
-    const now = Date.now();
-    const oneYearMs = 365.25 * 24 * 60 * 60 * 1000;
-    const twoYearMs = 2 * oneYearMs;
-    // Age of the cutoff: how far in the past is the chosen date?
-    const cutoffAge = now - cutoffStartOfDay;
-
-    let candidateCount = 0;
-    if (inventory) {
-        if (cutoffAge >= twoYearMs) {
-            candidateCount = inventory.timeline.completed_older_than_2y;
-        } else if (cutoffAge >= oneYearMs - 24 * 60 * 60 * 1000) {
-            // Within 1 day of the 1-year threshold — count as "older than 1 year".
-            candidateCount = inventory.timeline.completed_older_than_1y;
-        } else {
-            candidateCount = 0;
-        }
-    }
+    // Server-side preview: exact count of candidates that bulk anonymise
+    // would touch for this cutoff. Replaces the year-bucketed estimate.
+    const { data: previewData, isFetching: isPreviewFetching } =
+        usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet(
+            effectiveSlug,
+            { cutoff: cutoffDt.toISOString() },
+            { query: { enabled: !!effectiveSlug } }
+        );
+    const candidateCount = previewData?.candidates ?? 0;
 
     // ── render: loading / error ─────────────────────────────────────────────
     if (isLoading) {
@@ -412,20 +402,16 @@ export default function DataLifecyclePage() {
                         {/* Preview / candidate count */}
                         <div className="bg-slate-50 rounded-xl p-4 text-sm">
                             <span className="font-semibold text-slate-700">
-                                {t('admin.lifecycle.preview_label', 'Lower-bound estimate:')}
+                                {t('admin.lifecycle.preview_label', 'Candidates:')}
                             </span>{' '}
-                            <span className="font-bold text-slate-900">≥ {candidateCount}</span>
-                            <p className="text-xs text-slate-500 mt-1 italic">
-                                {t(
-                                    'admin.lifecycle.preview_bucket_note',
-                                    'Counts are computed against year-bucket thresholds (≥1y, ≥2y) — for cutoffs between buckets the displayed number is conservative. The actual count anonymised may be higher; see the bucket counts above.'
-                                )}
-                            </p>
-                            {candidateCount === 0 && (
+                            <span className="font-bold text-slate-900">
+                                {isPreviewFetching ? '…' : candidateCount}
+                            </span>
+                            {!isPreviewFetching && candidateCount === 0 && (
                                 <p className="text-xs text-slate-400 mt-1">
                                     {t(
                                         'admin.lifecycle.preview_zero',
-                                        'No participants qualify for this cutoff under the year buckets. Pick a date ≥ 1 year ago to see a non-zero estimate, or wait for the precise server-side preview.'
+                                        'No participants qualify for this cutoff. Try an earlier date.'
                                     )}
                                 </p>
                             )}

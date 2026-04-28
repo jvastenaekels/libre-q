@@ -93,6 +93,24 @@ class BulkAnonymiseResult(BaseModel):
     skipped_already_anonymous: int
 
 
+class AnonymisePreviewResponse(BaseModel):
+    """Exact count preview for a prospective bulk anonymisation.
+
+    Cheap (one COUNT query). No mutation, no audit. Filters out
+    already-anonymised participants so the count reflects what
+    bulk_anonymise_old_participants would actually anonymise — not the
+    larger raw `candidates` figure.
+    """
+
+    cutoff: datetime
+    candidates: int = Field(
+        description=(
+            "Completed, not-yet-anonymised participants whose "
+            "submitted_at is strictly before cutoff."
+        )
+    )
+
+
 @router.get("/{slug}/data-inventory", response_model=DataInventory)
 async def get_data_inventory(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
@@ -194,6 +212,34 @@ async def get_data_inventory(
         ),
         locales={lang: int(c) for lang, c in locales_rows if lang},
     )
+
+
+@router.get(
+    "/{slug}/anonymise-preview",
+    response_model=AnonymisePreviewResponse,
+)
+async def preview_anonymise_candidates(
+    cutoff: datetime,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> AnonymisePreviewResponse:
+    """Return the exact number of participants that bulk anonymisation
+    would touch for the given cutoff.
+
+    Use case: replace the year-bucketed UI estimate with a precise
+    figure as the user adjusts the cutoff date. Filters out
+    already-anonymised rows so the preview matches what the bulk
+    endpoint would actually anonymise (not the larger
+    BulkAnonymiseResult.candidates which counts skipped ones too).
+    """
+    count_q = select(func.count(Participant.id)).where(
+        Participant.study_id == study.id,
+        Participant.status == ParticipantStatus.completed,
+        Participant.submitted_at < cutoff,
+        Participant.anonymised_at.is_(None),
+    )
+    count = (await db.execute(count_q)).scalar() or 0
+    return AnonymisePreviewResponse(cutoff=cutoff, candidates=int(count))
 
 
 @router.post(

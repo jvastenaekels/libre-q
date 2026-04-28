@@ -16,14 +16,16 @@ vi.mock('sonner', () => ({
 }));
 
 // Hoisted mocks
-const { mockInventoryHook, mockAnonymiseMutation } = vi.hoisted(() => ({
+const { mockInventoryHook, mockAnonymiseMutation, mockPreviewHook } = vi.hoisted(() => ({
     mockInventoryHook: vi.fn(),
     mockAnonymiseMutation: vi.fn(),
+    mockPreviewHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
     useGetDataInventoryApiAdminStudiesSlugDataInventoryGet: mockInventoryHook,
     useBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost: mockAnonymiseMutation,
+    usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet: mockPreviewHook,
     getGetDataInventoryApiAdminStudiesSlugDataInventoryGetQueryKey: vi.fn(() => [
         '/api/admin/studies/test-study/data-inventory',
     ]),
@@ -79,6 +81,13 @@ describe('DataLifecyclePage', () => {
     beforeEach(() => {
         mockInventoryHook.mockReset();
         mockAnonymiseMutation.mockReset();
+        mockPreviewHook.mockReset();
+        // Default: preview returns 0 candidates and is not fetching.
+        // Individual tests override when they need a specific count.
+        mockPreviewHook.mockReturnValue({
+            data: { candidates: 0, cutoff: new Date().toISOString() },
+            isFetching: false,
+        });
     });
 
     it('renders inventory data when API resolves', () => {
@@ -161,6 +170,12 @@ describe('DataLifecyclePage', () => {
             data: mockInventory,
             isLoading: false,
             error: null,
+        });
+        // Server-side preview returns 18 — exact count, not the year-bucketed
+        // estimate the old UI computed locally from inventory.timeline.
+        mockPreviewHook.mockReturnValue({
+            data: { candidates: 18, cutoff: new Date().toISOString() },
+            isFetching: false,
         });
         mockAnonymiseMutation.mockReturnValue({
             mutate: mutateMock,
