@@ -683,7 +683,7 @@
       "bulk_clear": "Clear",
       "bulk_status_success": "{{count}} items updated",
       "bulk_status_error": "Failed to update some items",
-      "qset_title": "Q-set",
+      "qset_title": "Curation",
       "qset_pending": "{{count}} items still to review",
       "qset_complete": "All items reviewed",
       "show_pending": "To review",

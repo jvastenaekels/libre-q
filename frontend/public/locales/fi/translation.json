@@ -668,7 +668,7 @@
             "bulk_clear": "Tyhjennä",
             "bulk_status_success": "{{count}} kohdetta päivitetty",
             "bulk_status_error": "Joidenkin kohteiden päivitys epäonnistui",
-            "qset_title": "Q-set",
+            "qset_title": "Kuratointi",
             "qset_pending": "{{count}} kohdetta vielä tarkistettavana",
             "qset_complete": "Kaikki kohteet tarkistettu",
             "show_pending": "Tarkistettavat",
