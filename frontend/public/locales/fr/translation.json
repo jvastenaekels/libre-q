@@ -1512,7 +1512,8 @@
         "editing_language": "Édition",
         "manage_langs": "Gérer les langues",
         "select_lang": "Choisir la langue",
-        "test_run_help": "Ouvre un aperçu participant. Les runs de test sont marqués is_test_run=true et n’entrent jamais dans les données publiées."
+        "test_run_help": "Ouvre un aperçu participant. Les runs de test sont marqués is_test_run=true et n’entrent jamais dans les données publiées.",
+        "more_actions": "Autres actions"
       },
       "sync": {
         "saving": "Enregistrement...",
@@ -1910,6 +1911,7 @@
       "title": "Conception de l'étude",
       "methodology_memo": {
         "title": "Mémo méthodologique",
+        "summary": "Optionnel · pour la réplication & la préinscription",
         "help": "Optionnel. Documentez pourquoi cette distribution, ces consignes, cette taille de Q-set. Utile pour la réplication et la préinscription (Watts & Stenner 2012 ; Sneegas 2020). Laissez vide si non pertinent.",
         "label": "Mémo (toutes langues)",
         "placeholder": "Documentez le rationnel de vos choix de design…"

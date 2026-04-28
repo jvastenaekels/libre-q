@@ -83,19 +83,29 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
                             <div className="flex items-center justify-between w-full pr-2">
-                                <div className="flex items-center gap-4 overflow-hidden">
-                                    <div className="p-2 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm transition-colors group-hover:bg-white group-hover:border-indigo-200">
+                                <div className="flex items-center gap-4 overflow-hidden flex-1">
+                                    <div className="p-2 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm transition-colors group-hover:bg-white group-hover:border-indigo-200 shrink-0">
                                         <IconComponent className="h-4 w-4 text-indigo-600" />
                                     </div>
-                                    <span className="text-sm font-bold text-slate-700 truncate tracking-tight">
-                                        {step.title || (
-                                            <span className="text-slate-400 font-medium italic">
-                                                {t(
-                                                    'admin.design.intro.process_steps.defaults.new_step'
-                                                )}
+                                    {/* Wave B — show step title + 1-line description preview when
+                                        collapsed so the user can identify content without expanding
+                                        each row. Description is truncated; full edit happens inside. */}
+                                    <div className="flex flex-col min-w-0 text-left">
+                                        <span className="text-sm font-bold text-slate-700 truncate tracking-tight">
+                                            {step.title || (
+                                                <span className="text-slate-400 font-medium italic">
+                                                    {t(
+                                                        'admin.design.intro.process_steps.defaults.new_step'
+                                                    )}
+                                                </span>
+                                            )}
+                                        </span>
+                                        {step.description && (
+                                            <span className="text-xs text-slate-400 font-medium truncate mt-0.5">
+                                                {step.description}
                                             </span>
                                         )}
-                                    </span>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                     <AccordionTrigger className="py-2 hover:no-underline text-slate-400 hover:text-indigo-600">

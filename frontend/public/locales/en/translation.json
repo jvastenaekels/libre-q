@@ -1490,7 +1490,8 @@
         "editing_language": "Editing language",
         "manage_langs": "Manage languages",
         "select_lang": "Select language",
-        "test_run_help": "Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data."
+        "test_run_help": "Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data.",
+        "more_actions": "More actions"
       },
       "sync": {
         "saving": "Saving...",
@@ -1887,6 +1888,7 @@
       },
       "methodology_memo": {
         "title": "Methodology memo",
+        "summary": "Optional · for replication & pre-registration",
         "help": "Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.",
         "label": "Memo (any language)",
         "placeholder": "Document the rationale behind your design choices…"
