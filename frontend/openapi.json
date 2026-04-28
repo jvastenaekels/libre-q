@@ -2092,6 +2092,67 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/anonymise-preview": {
+      "get": {
+        "tags": [
+          "admin-lifecycle",
+          "Admin Lifecycle"
+        ],
+        "summary": "Preview Anonymise Candidates",
+        "description": "Return the exact number of participants that bulk anonymisation\nwould touch for the given cutoff.\n\nUse case: replace the year-bucketed UI estimate with a precise\nfigure as the user adjusts the cutoff date. Filters out\nalready-anonymised rows so the preview matches what the bulk\nendpoint would actually anonymise (not the larger\nBulkAnonymiseResult.candidates which counts skipped ones too).",
+        "operationId": "preview_anonymise_candidates_api_admin_studies__slug__anonymise_preview_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "cutoff",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Cutoff"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnonymisePreviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/anonymise-bulk": {
       "post": {
         "tags": [
@@ -5871,6 +5932,27 @@
         ],
         "title": "AnalysisRunSummary",
         "description": "Lightweight summary of a persisted analysis run, used in list views."
+      },
+      "AnonymisePreviewResponse": {
+        "properties": {
+          "cutoff": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cutoff"
+          },
+          "candidates": {
+            "type": "integer",
+            "title": "Candidates",
+            "description": "Completed, not-yet-anonymised participants whose submitted_at is strictly before cutoff."
+          }
+        },
+        "type": "object",
+        "required": [
+          "cutoff",
+          "candidates"
+        ],
+        "title": "AnonymisePreviewResponse",
+        "description": "Exact count preview for a prospective bulk anonymisation.\n\nCheap (one COUNT query). No mutation, no audit. Filters out\nalready-anonymised participants so the count reflects what\nbulk_anonymise_old_participants would actually anonymise \u2014 not the\nlarger raw `candidates` figure."
       },
       "AudioInventory": {
         "properties": {

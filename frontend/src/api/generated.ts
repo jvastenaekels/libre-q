@@ -59,6 +59,7 @@ import type {
     ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams,
     PasswordChange,
     PasswordConfirm,
+    PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
     ProgressUpdate,
     ProjectCreate,
     ProjectInvitationCreate,
@@ -96,6 +97,7 @@ import type {
     AnalysisResult,
     AnalysisRunRead,
     AnalysisRunSummary,
+    AnonymisePreviewResponse,
     AudioRecordingRead,
     AudioUploadResponse,
     BulkAnonymiseResult,
@@ -4821,6 +4823,230 @@ export function useGetDataInventoryApiAdminStudiesSlugDataInventoryGet<
         slug,
         options
     );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Return the exact number of participants that bulk anonymisation
+would touch for the given cutoff.
+
+Use case: replace the year-bucketed UI estimate with a precise
+figure as the user adjusts the cutoff date. Filters out
+already-anonymised rows so the preview matches what the bulk
+endpoint would actually anonymise (not the larger
+BulkAnonymiseResult.candidates which counts skipped ones too).
+ * @summary Preview Anonymise Candidates
+ */
+export const previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet = (
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<AnonymisePreviewResponse>({
+        url: `/api/admin/studies/${slug}/anonymise-preview`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryKey = (
+    slug?: string,
+    params?: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams
+) => {
+    return [`/api/admin/studies/${slug}/anonymise-preview`, ...(params ? [params] : [])] as const;
+};
+
+export const getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryKey(slug, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>>
+    > = ({ signal }) =>
+        previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet(slug, params, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<
+            ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+        >,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryResult =
+    NonNullable<
+        Awaited<ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>>
+    >;
+export type PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryError =
+    HTTPValidationError;
+
+export function usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet<
+    TData = Awaited<
+        ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet<
+    TData = Awaited<
+        ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet<
+    TData = Awaited<
+        ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Preview Anonymise Candidates
+ */
+
+export function usePreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet<
+    TData = Awaited<
+        ReturnType<typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetQueryOptions(
+            slug,
+            params,
+            options
+        );
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -14640,6 +14866,14 @@ export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetResponseMock 
     ...overrideResponse,
 });
 
+export const getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetResponseMock = (
+    overrideResponse: Partial<AnonymisePreviewResponse> = {}
+): AnonymisePreviewResponse => ({
+    cutoff: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    candidates: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
+
 export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostResponseMock = (
     overrideResponse: Partial<BulkAnonymiseResult> = {}
 ): BulkAnonymiseResult => ({
@@ -16585,6 +16819,32 @@ export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler =
     );
 };
 
+export const getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetMockHandler = (
+    overrideResponse?:
+        | AnonymisePreviewResponse
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<AnonymisePreviewResponse> | AnonymisePreviewResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/anonymise-preview',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMockHandler = (
     overrideResponse?:
         | BulkAnonymiseResult
@@ -17951,6 +18211,7 @@ export const getQualisAPIMock = () => [
     getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMockHandler(),
     getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetMockHandler(),
     getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler(),
+    getPreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetMockHandler(),
     getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),

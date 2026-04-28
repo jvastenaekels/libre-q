@@ -192,3 +192,90 @@ async def test_data_inventory_unauthenticated(
         f"/api/admin/studies/{active_study.slug}/data-inventory"
     )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_anonymise_preview_counts_only_completed_not_yet_anonymised(
+    client: AsyncClient,
+    test_user,
+    auth_token_factory,
+    study_with_mixed_participants: Study,
+):
+    """Preview must match what bulk_anonymise would actually anonymise:
+    completed + before cutoff + not yet anonymised. The fixture has
+    one 400-day completed and one 200-day already-anonymised completed —
+    only the former should appear in a 1-year preview."""
+    headers = auth_token_factory(test_user)
+    slug = study_with_mixed_participants.slug
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=365)).isoformat()
+
+    response = await client.get(
+        f"/api/admin/studies/{slug}/anonymise-preview",
+        params={"cutoff": cutoff},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["candidates"] == 1
+
+
+@pytest.mark.asyncio
+async def test_anonymise_preview_excludes_already_anonymised(
+    client: AsyncClient,
+    test_user,
+    auth_token_factory,
+    study_with_mixed_participants: Study,
+):
+    """A cutoff far enough in the past to include the 200-day
+    already-anonymised participant must still NOT count it — the
+    preview filters anonymised_at IS NULL."""
+    headers = auth_token_factory(test_user)
+    slug = study_with_mixed_participants.slug
+    # 100 days ago — would catch both the 400-day and the 200-day
+    # rows, but the 200-day is already anonymised.
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=100)).isoformat()
+
+    response = await client.get(
+        f"/api/admin/studies/{slug}/anonymise-preview",
+        params={"cutoff": cutoff},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["candidates"] == 1
+
+
+@pytest.mark.asyncio
+async def test_anonymise_preview_returns_zero_when_cutoff_too_recent(
+    client: AsyncClient,
+    test_user,
+    auth_token_factory,
+    study_with_mixed_participants: Study,
+):
+    """Cutoff in the very recent past — nothing matches yet."""
+    headers = auth_token_factory(test_user)
+    slug = study_with_mixed_participants.slug
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+
+    response = await client.get(
+        f"/api/admin/studies/{slug}/anonymise-preview",
+        params={"cutoff": cutoff},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    # All completed submissions in the fixture (10d, 5d-discarded, 3d, 200d-anon, 400d)
+    # are >1 day old. Discarded are still "completed" status, not yet anonymised.
+    # 400d → 1, 200d → already-anon (excluded), 10d → 1, 5d-discarded → 1, 3d → 1.
+    assert response.json()["candidates"] == 4
+
+
+@pytest.mark.asyncio
+async def test_anonymise_preview_unauthenticated(
+    client: AsyncClient,
+    active_study: Study,
+):
+    cutoff = datetime.now(timezone.utc).isoformat()
+    response = await client.get(
+        f"/api/admin/studies/{active_study.slug}/anonymise-preview",
+        params={"cutoff": cutoff},
+    )
+    assert response.status_code == 401
