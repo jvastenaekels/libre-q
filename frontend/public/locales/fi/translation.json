@@ -757,6 +757,11 @@
             "scree_plot_label": "Ominaisarvokaavio {{n}} faktorille",
             "loading_eigenvalues": "Ladataan ominaisarvoja...",
             "empty_state": "Määritä parametrit yllä ja napsauta \"Suorita analyysi\" poimimaan faktorit Q-lajittelutiedoistasi.",
+            "empty": {
+                "contract_title": "Q-lajitteludataa ei ole vielä riittävästi",
+                "contract_body": "Q-metodologian faktorianalyysi vaatii vähintään 2 osallistujaa, jotka ovat suorittaneet lajittelun. Konfiguraatiovalinnat (poimintatapa, faktorit, rotaatio, merkintä) saavat merkityksensä, kun dataa on saatavilla. Jaa tutkimuslinkki yleisnäkymästä aloittaaksesi vastausten keräämisen.",
+                "contract_cta": "Avaa tutkimuksen yleisnäkymä"
+            },
             "tab_loadings": "Lataukset",
             "tab_factor_arrays": "Faktoritaulukot",
             "tab_statements": "Väittämät",
@@ -2052,7 +2057,10 @@
             "export_emails_success": "Sähköpostit viety onnistuneesti",
             "empty": {
                 "no_participants_title": "Ei vielä osallistujia",
-                "no_participants_desc": "Jaa tutkimuksesi linkki aloittaaksesi vastausten keräämisen."
+                "no_participants_desc": "Jaa tutkimuksesi linkki aloittaaksesi vastausten keräämisen.",
+                "contract_title": "Ei vielä lähetyksiä",
+                "contract_body": "Tämä sivu listaa osallistujien lähetykset ja tarjoaa CSV/JSON-vientejä heti kun ensimmäinen vastaus saapuu. Jaa tutkimuslinkki yleisnäkymästä aloittaaksesi tietojen keräämisen.",
+                "contract_cta": "Avaa tutkimuksen yleisnäkymä"
             },
             "pagination": {
                 "showing": "Näytetään {{from}}–{{to}} / {{total}}"
@@ -2366,7 +2374,12 @@
             "confirm_irreversible": "This action is immediate and cannot be undone.",
             "confirm_in_progress": "Anonymising…",
             "confirm_action": "Yes, anonymise",
-            "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta)."
+            "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta).",
+            "empty": {
+                "title": "Ei vielä osallistujadataa",
+                "body": "Tämä sivu aktivoi inventaarion ja joukkonimellistämisen ohjaimet (GDPR Art. 5) heti kun ensimmäinen osallistuja lähettää Q-lajittelun. Sitä ennen jaa tutkimuslinkki yleisnäkymästä aloittaaksesi vastausten keräämisen.",
+                "cta": "Avaa tutkimuksen yleisnäkymä"
+            }
         }
     },
     "resume": {

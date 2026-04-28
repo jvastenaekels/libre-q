@@ -14,6 +14,7 @@ import {
     RefreshCw,
     History,
     Plus,
+    Users,
     X,
 } from 'lucide-react';
 
@@ -39,6 +40,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { GuidanceCard } from '@/components/admin/GuidanceCard';
+import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
 import { ScreePlot } from '@/components/admin/analysis/ScreePlot';
 import { FactorLoadingsTable } from '@/components/admin/analysis/FactorLoadingsTable';
 import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
@@ -50,7 +52,7 @@ import { useAnalysisPage } from '@/hooks/admin/useAnalysisPage';
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 4 tab panels + conditional error/loading states; all logic lives in useAnalysisPage
 export default function AnalysisPage() {
-    const { studySlug } = useParams();
+    const { studySlug, projectSlug } = useParams();
     const slug = studySlug ?? '';
     const { t } = useTranslation();
 
@@ -78,6 +80,43 @@ export default function AnalysisPage() {
     const api = useAnalysisPage(slug);
     // Capture result in local const so TypeScript narrows it through JSX callback boundaries
     const analysisResult = api.result;
+
+    // ── Empty-state contract: not enough participants for factor analysis ──
+    // Wave A — UX progressive-disclosure audit. The configuration card walls
+    // (4 dropdowns + rationale paragraphs) above a disabled "Run Analysis"
+    // button are noise on a study with 0–1 completed sorts. Render an honest
+    // contract instead. The history panel below preserves access to past runs
+    // and its own pedagogical empty state with Watts & Stenner / Sneegas
+    // citations.
+    if (api.isTooFewParticipants && !analysisResult && !api.isRunning) {
+        return (
+            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+                <StudyPageHeader
+                    title={t('admin.analysis.title', 'Analysis')}
+                    description={t(
+                        'admin.analysis.description',
+                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                    )}
+                    icon={ChartColumnStacked}
+                />
+                <EmptyStateContract
+                    icon={Users}
+                    title={t('admin.analysis.empty.contract_title', 'Not enough Q-sort data yet')}
+                    body={t(
+                        'admin.analysis.empty.contract_body',
+                        'Q-methodology factor analysis requires at least 2 participants who have completed the sort. Configuration choices (extraction, factors, rotation, flagging) carry meaning once data exists. Share the study link from the overview to start collecting responses.'
+                    )}
+                    ctaLabel={t('admin.analysis.empty.contract_cta', 'Open study overview')}
+                    ctaTo={`/app/${projectSlug ?? ''}/studies/${slug}`}
+                />
+                <AnalysisHistoryPanel
+                    slug={slug}
+                    currentRunId={null}
+                    onLoadRun={api.handleLoadHistoricalRun}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">

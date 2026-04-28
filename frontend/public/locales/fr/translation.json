@@ -757,6 +757,11 @@
       "scree_plot_label": "Diagramme d'éboulis montrant les valeurs propres pour {{n}} facteurs",
       "loading_eigenvalues": "Chargement des valeurs propres...",
       "empty_state": "Configurez les paramètres ci-dessus et cliquez sur « Lancer l'analyse » pour extraire les facteurs de vos données Q-sort.",
+      "empty": {
+        "contract_title": "Pas encore assez de données Q-sort",
+        "contract_body": "L'analyse factorielle Q nécessite au moins 2 participants ayant complété le tri. Les choix de configuration (extraction, facteurs, rotation, marquage) prennent leur sens une fois les données disponibles. Partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des réponses.",
+        "contract_cta": "Ouvrir la vue d'ensemble"
+      },
       "tab_loadings": "Saturations",
       "tab_factor_arrays": "Tableaux factoriels",
       "tab_statements": "Énoncés",
@@ -2090,7 +2095,10 @@
       "export_emails_success": "Emails exportés avec succès",
       "empty": {
         "no_participants_title": "Aucun participant pour l'instant",
-        "no_participants_desc": "Partagez le lien de votre étude pour commencer à collecter des réponses."
+        "no_participants_desc": "Partagez le lien de votre étude pour commencer à collecter des réponses.",
+        "contract_title": "Aucune soumission pour le moment",
+        "contract_body": "Cette page listera les soumissions des participants et proposera les exports CSV/JSON dès la première réponse. Partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des données.",
+        "contract_cta": "Ouvrir la vue d'ensemble"
       },
       "pagination": {
         "showing": "{{from}}–{{to}} sur {{total}}"
@@ -2221,7 +2229,12 @@
       "confirm_irreversible": "Cette action est immédiate et irréversible.",
       "confirm_in_progress": "Anonymisation en cours…",
       "confirm_action": "Oui, anonymiser",
-      "cutoff_from_policy": "Valeur par défaut dérivée de la politique de conservation de l’étude ({{months}} mois)."
+      "cutoff_from_policy": "Valeur par défaut dérivée de la politique de conservation de l’étude ({{months}} mois).",
+      "empty": {
+        "title": "Aucune donnée participante pour le moment",
+        "body": "Cette page activera les tableaux d'inventaire et les contrôles d'anonymisation en masse (RGPD art. 5) dès la première soumission d'un participant. En attendant, partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des réponses.",
+        "cta": "Ouvrir la vue d'ensemble"
+      }
     },
     "projects": {
       "title": "Projets",

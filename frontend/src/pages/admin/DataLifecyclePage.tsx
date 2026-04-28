@@ -43,6 +43,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -200,6 +201,35 @@ export default function DataLifecyclePage() {
     }
 
     const { participants, audio, timeline, locales } = inventory;
+
+    // ── Empty-state contract: no participant data yet ─────────────────────
+    // Wave A — UX progressive-disclosure audit. The Lifecycle page surfaces
+    // GDPR Art. 5 controls that only have meaning once data exists. Until then,
+    // render an honest contract pointing the user to the share-link surface.
+    if (participants.total === 0) {
+        return (
+            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+                <StudyPageHeader
+                    title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
+                    description={t(
+                        'admin.lifecycle.header_desc',
+                        'GDPR Art. 5 data minimisation controls'
+                    )}
+                    icon={ShieldCheck}
+                />
+                <EmptyStateContract
+                    icon={Users}
+                    title={t('admin.lifecycle.empty.title', 'No participant data yet')}
+                    body={t(
+                        'admin.lifecycle.empty.body',
+                        'This page will activate the inventory dashboards and bulk-anonymisation controls (GDPR Art. 5) as soon as the first participant submits a Q-sort. Until then, share the study link from the overview to start collecting responses.'
+                    )}
+                    ctaLabel={t('admin.lifecycle.empty.cta', 'Open study overview')}
+                    ctaTo={`/app/${projectSlug ?? ''}/studies/${studySlug ?? ''}`}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
