@@ -43,8 +43,8 @@ test.describe('Admin Profile Management', () => {
         await page.getByLabel('Current Password').fill('wrongpass');
         await page.getByLabel('New Password').fill('newsecurepass123');
         await page.getByRole('button', { name: /change password/i }).click();
-        await expect(
-            page.getByText(/Failed to change password\. [Cc]heck current password\./)
-        ).toBeVisible();
+        // Toast title and description live in separate text nodes; match
+        // just the title to avoid cross-node text concatenation issues.
+        await expect(page.getByText(/Failed to change password/i)).toBeVisible();
     });
 });
