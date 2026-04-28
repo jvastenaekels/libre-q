@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import AnalysisPage from './AnalysisPage';
 import type { AnalysisResult } from '@/api/model';
 import type { EigenvalueResult } from '@/api/model';
+import { ApiError } from '@/api/client';
 
 // Mock sonner
 vi.mock('sonner', () => ({
@@ -59,7 +60,7 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
     return {
         ...actual,
-        useParams: () => ({ studySlug: 'test-study' }),
+        useParams: () => ({ studySlug: 'test-study', projectSlug: 'test-project' }),
         useSearchParams: () => [new URLSearchParams(), vi.fn()],
     };
 });
@@ -248,6 +249,36 @@ describe('AnalysisPage', () => {
         // The isTooFewParticipants check requires ApiError instanceof, which won't match
         // with plain Error. The generic error path shows instead.
         expect(screen.getByText(/Failed to load analysis data|at least 2/i)).toBeInTheDocument();
+    });
+
+    it('renders empty-state contract instead of configuration card when too few participants', () => {
+        // Wave A — the empty-state branch fires when eigenvalues 400s with a real
+        // ApiError instance (server says "need at least 2 valid participants").
+        const apiError = new ApiError(
+            400,
+            'Need at least 2 valid participants for analysis, got 0',
+            'too_few_participants'
+        );
+        mockEigenvaluesHook.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isSuccess: false,
+            isError: true,
+            error: apiError,
+            refetch: vi.fn(),
+        });
+
+        renderWithProviders(<AnalysisPage />);
+
+        // Empty-state contract is rendered
+        expect(screen.getByText(/Not enough Q-sort data yet/i)).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /open study overview/i })).toBeInTheDocument();
+
+        // Configuration chrome is NOT rendered: the "Configuration" heading
+        // and the "Run Analysis" button (the only unambiguous markers — the
+        // word "extraction" also appears in the empty-state body copy).
+        expect(screen.queryByRole('heading', { name: /^Configuration$/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /run analysis/i })).not.toBeInTheDocument();
     });
 
     it('renders scree plot and controls after eigenvalues load', () => {

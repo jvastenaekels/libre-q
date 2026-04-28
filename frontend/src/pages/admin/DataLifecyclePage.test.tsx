@@ -36,7 +36,7 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
     return {
         ...actual,
-        useParams: () => ({ studySlug: 'test-study' }),
+        useParams: () => ({ studySlug: 'test-study', projectSlug: 'test-project' }),
     };
 });
 
@@ -217,5 +217,49 @@ describe('DataLifecyclePage', () => {
                 })
             );
         });
+    });
+
+    it('renders empty-state contract instead of inventory cards when no participants', () => {
+        const emptyInventory: DataInventory = {
+            ...mockInventory,
+            participants: {
+                total: 0,
+                started: 0,
+                completed: 0,
+                discarded: 0,
+                anonymised: 0,
+            },
+            audio: { count: 0, total_bytes: 0, total_mb: 0 },
+            timeline: {
+                first_submission_at: null,
+                last_submission_at: null,
+                last_anonymisation_at: null,
+                completed_older_than_1y: 0,
+                completed_older_than_2y: 0,
+            },
+            locales: {},
+        };
+        mockInventoryHook.mockReturnValue({
+            data: emptyInventory,
+            isLoading: false,
+            error: null,
+        });
+        mockAnonymiseMutation.mockReturnValue({
+            mutate: vi.fn(),
+            isPending: false,
+        });
+
+        renderWithProviders(<DataLifecyclePage />);
+
+        // Empty-state contract is shown
+        expect(screen.getByText(/No participant data yet/i)).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /open study overview/i })).toBeInTheDocument();
+
+        // Inventory chrome is NOT shown
+        expect(screen.queryByText('Participants snapshot')).not.toBeInTheDocument();
+        expect(screen.queryByText('Bulk anonymisation')).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('button', { name: /anonymise older than/i })
+        ).not.toBeInTheDocument();
     });
 });

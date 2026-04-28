@@ -772,6 +772,11 @@
       "scree_plot_label": "Scree plot showing eigenvalues for {{n}} factors",
       "loading_eigenvalues": "Loading eigenvalues...",
       "empty_state": "Configure parameters above and click \"Run Analysis\" to extract factors from your Q-sort data.",
+      "empty": {
+        "contract_title": "Not enough Q-sort data yet",
+        "contract_body": "Q-methodology factor analysis requires at least 2 participants who have completed the sort. Configuration choices (extraction, factors, rotation, flagging) carry meaning once data exists. Share the study link from the overview to start collecting responses.",
+        "contract_cta": "Open study overview"
+      },
       "tab_loadings": "Loadings",
       "tab_factor_arrays": "Factor Arrays",
       "tab_statements": "Statements",
@@ -2067,7 +2072,10 @@
       "export_emails_success": "Emails exported successfully",
       "empty": {
         "no_participants_title": "No participants yet",
-        "no_participants_desc": "Share your study link to start collecting responses."
+        "no_participants_desc": "Share your study link to start collecting responses.",
+        "contract_title": "No submissions yet",
+        "contract_body": "This page will list participant submissions and offer CSV/JSON exports as soon as the first response arrives. Share the study link from the overview to start collecting data.",
+        "contract_cta": "Open study overview"
       },
       "pagination": {
         "showing": "Showing {{from}}–{{to}} of {{total}}"
@@ -2236,7 +2244,12 @@
       "confirm_irreversible": "This action is immediate and cannot be undone.",
       "confirm_in_progress": "Anonymising…",
       "confirm_action": "Yes, anonymise",
-      "cutoff_from_policy": "Default derived from study retention policy ({{months}} months)."
+      "cutoff_from_policy": "Default derived from study retention policy ({{months}} months).",
+      "empty": {
+        "title": "No participant data yet",
+        "body": "This page will activate the inventory dashboards and bulk-anonymisation controls (GDPR Art. 5) as soon as the first participant submits a Q-sort. Until then, share the study link from the overview to start collecting responses.",
+        "cta": "Open study overview"
+      }
     },
     "projects": {
       "title": "Projects",
