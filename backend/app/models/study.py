@@ -102,6 +102,11 @@ class Study(Base):
     # conditions of instruction, Q-set size — useful for replication and
     # pre-registration (Watts & Stenner 2012; Sneegas 2020).
     methodology_memo: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Retention policy (in months) driving the default cutoff offered by the
+    # data-lifecycle anonymisation flow. NULL = use the system default
+    # (currently 12 months). Editable in study settings; lifecycle page
+    # honours it as the default cutoff but does not enforce it automatically.
+    data_retention_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Relationships
     project: Mapped["Project"] = relationship(back_populates="studies", lazy="selectin")  # type: ignore[name-defined]  # noqa: F821

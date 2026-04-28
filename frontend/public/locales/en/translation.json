@@ -2168,6 +2168,15 @@
         "warning_high_usage": "Storage usage is high. Consider increasing the quota or removing old recordings.",
         "save_success": "Storage quota updated",
         "save_error": "Failed to update storage quota"
+      },
+      "retention": {
+        "title": "Data retention",
+        "description": "Number of months to keep identifiable participant data before recommending anonymisation. Drives the default cutoff in Data Lifecycle. Leave empty to use the system default (12 months).",
+        "months_label": "Retention (months)",
+        "help": "Researchers in the EU should align this with their RGPD retention policy. Common values: 6, 12, 24, 60.",
+        "save_success": "Data retention policy updated",
+        "save_error": "Failed to update data retention policy",
+        "range_error": "Retention must be an integer between 1 and 240 months."
       }
     },
     "lifecycle": {
@@ -2210,7 +2219,8 @@
       "confirm_preserved": "Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.",
       "confirm_irreversible": "This action is immediate and cannot be undone.",
       "confirm_in_progress": "Anonymising…",
-      "confirm_action": "Yes, anonymise"
+      "confirm_action": "Yes, anonymise",
+      "cutoff_from_policy": "Default derived from study retention policy ({{months}} months)."
     },
     "projects": {
       "title": "Projects",

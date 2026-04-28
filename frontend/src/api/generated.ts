@@ -11991,6 +11991,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -12287,6 +12291,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                     faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
                 ]),
+                undefined,
+            ]),
+            data_retention_months: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
                 undefined,
             ]),
             id: faker.number.int({ min: undefined, max: undefined }),
@@ -12586,6 +12594,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -12864,6 +12876,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     ]),
     methodology_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
@@ -13149,6 +13165,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -13427,6 +13447,10 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     ]),
     methodology_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
@@ -13738,6 +13762,10 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             ]),
             undefined,
         ]),
+        data_retention_months: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
+            undefined,
+        ]),
         id: faker.number.int({ min: undefined, max: undefined }),
         project_id: faker.number.int({ min: undefined, max: undefined }),
         project: faker.helpers.arrayElement([
@@ -14025,6 +14053,10 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     ]),
     methodology_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
@@ -14899,6 +14931,10 @@ export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetResponseMock 
         {
             [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
         },
+        undefined,
+    ]),
+    data_retention_months: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
         undefined,
     ]),
     ...overrideResponse,

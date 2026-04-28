@@ -197,6 +197,28 @@ async def test_update_study_methodology_memo_round_trip(
 
 
 @pytest.mark.asyncio
+async def test_update_study_data_retention_months_round_trip(
+    db: AsyncSession, seed_study: Study
+):
+    """data_retention_months: optional integer drives the default cutoff
+    offered by the data-lifecycle anonymisation flow.
+
+    Bounds (1..240) are enforced by Pydantic; the service layer only stores.
+    """
+    assert seed_study.data_retention_months is None
+
+    updated = await StudyService.update_study(
+        db, seed_study, StudyUpdate(data_retention_months=18)
+    )
+    assert updated.data_retention_months == 18
+
+    cleared = await StudyService.update_study(
+        db, seed_study, StudyUpdate(data_retention_months=None)
+    )
+    assert cleared.data_retention_months is None
+
+
+@pytest.mark.asyncio
 async def test_update_study_translation_sync(
     db: AsyncSession, seed_study: Study
 ):

@@ -196,6 +196,7 @@ class StudyBase(BaseModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     methodology_memo: str | None = None
+    data_retention_months: int | None = Field(None, ge=1, le=240)
 
 
 class StudyCreate(StudyBase):
@@ -225,6 +226,7 @@ class StudyUpdate(BaseModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     methodology_memo: str | None = None
+    data_retention_months: int | None = Field(None, ge=1, le=240)
     last_updated_at: datetime | None = None
 
     # Note: Symmetry validation is skipped for drafts/updates to allow partial saves.

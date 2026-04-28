@@ -2153,6 +2153,15 @@
                 "warning_high_usage": "Tallennustilan käyttö on korkea. Harkitse kiintiön kasvattamista tai vanhojen tallenteiden poistamista.",
                 "save_success": "Tallennustilakiintiö päivitetty",
                 "save_error": "Tallennustilakiintiön päivitys epäonnistui"
+            },
+            "retention": {
+                "title": "Tietojen säilytys",
+                "description": "Kuukausien määrä, jonka ajan tunnistettavia osallistujatietoja säilytetään ennen anonymisoinnin suosittelua. Määrittää oletusrajan tietojen elinkaarella. Jätä tyhjäksi käyttääksesi järjestelmän oletusta (12 kuukautta).",
+                "months_label": "Säilytys (kuukautta)",
+                "help": "EU-tutkijoiden tulisi sovittaa tämä RGPD-säilytyspolitiikkaansa. Yleisiä arvoja: 6, 12, 24, 60.",
+                "save_success": "Säilytyspolitiikka päivitetty",
+                "save_error": "Säilytyspolitiikan päivitys epäonnistui",
+                "range_error": "Säilytyksen on oltava kokonaisluku väliltä 1–240 kuukautta."
             }
         },
         "projects": {
@@ -2340,7 +2349,8 @@
             "confirm_preserved": "Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.",
             "confirm_irreversible": "This action is immediate and cannot be undone.",
             "confirm_in_progress": "Anonymising…",
-            "confirm_action": "Yes, anonymise"
+            "confirm_action": "Yes, anonymise",
+            "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta)."
         }
     },
     "resume": {
