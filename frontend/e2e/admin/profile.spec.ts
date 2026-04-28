@@ -39,12 +39,14 @@ test.describe('Admin Profile Management', () => {
         // Locale renders "Min 8 characters" (admin.profile.password.validation.min_length).
         await expect(page.getByText('Min 8 characters')).toBeVisible();
 
-        // Validate password change — wrong current password
+        // Validate password change — wrong current password.
+        // The toast title shows the API's `detail` field
+        // ('Incorrect current password' from auth.py:252) when the API
+        // call returns 400. parseApiErrorSync prefers the server message
+        // over the i18n fallback when available.
         await page.getByLabel('Current Password').fill('wrongpass');
         await page.getByLabel('New Password').fill('newsecurepass123');
         await page.getByRole('button', { name: /change password/i }).click();
-        // Toast title and description live in separate text nodes; match
-        // just the title to avoid cross-node text concatenation issues.
-        await expect(page.getByText(/Failed to change password/i)).toBeVisible();
+        await expect(page.getByText(/incorrect current password/i)).toBeVisible();
     });
 });
