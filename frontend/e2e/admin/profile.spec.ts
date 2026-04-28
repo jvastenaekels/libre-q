@@ -28,18 +28,25 @@ test.describe('Admin Profile Management', () => {
         await page.waitForLoadState('domcontentloaded');
         await expect(page.getByLabel('Full Name')).toHaveValue(newName);
 
-        // Validate password change — short password
+        // Validate password change — short password.
+        // Fill BOTH fields so only the min-length error surfaces (zod stops
+        // at the first invalid field's message in shadcn FormMessage when
+        // multiple fields fail; the schema-level coverage of the empty-
+        // currentPassword case lives in ProfilePage.schema.test.ts).
+        await page.getByLabel('Current Password').fill('placeholder-current');
         await page.getByLabel('New Password').fill('123');
-        await page.getByRole('button', { name: 'Change Password' }).click();
+        await page.getByRole('button', { name: /change password/i }).click();
         // Locale renders "Min 8 characters" (admin.profile.password.validation.min_length).
         await expect(page.getByText('Min 8 characters')).toBeVisible();
 
-        // Validate password change — wrong current password
+        // Validate password change — wrong current password.
+        // The toast title shows the API's `detail` field
+        // ('Incorrect current password' from auth.py:252) when the API
+        // call returns 400. parseApiErrorSync prefers the server message
+        // over the i18n fallback when available.
         await page.getByLabel('Current Password').fill('wrongpass');
         await page.getByLabel('New Password').fill('newsecurepass123');
-        await page.getByRole('button', { name: 'Change Password' }).click();
-        await expect(
-            page.getByText('Failed to change password. check current password.')
-        ).toBeVisible();
+        await page.getByRole('button', { name: /change password/i }).click();
+        await expect(page.getByText(/incorrect current password/i)).toBeVisible();
     });
 });
