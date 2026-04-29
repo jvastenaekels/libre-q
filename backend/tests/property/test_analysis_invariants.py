@@ -30,6 +30,7 @@ from app.services.analysis_service import (
     classify_statements,
     compute_factor_characteristics,
     compute_factor_scores,
+    compute_preview_range,
     correlation_matrix,
     extract_pca,
     flag_sorts,
@@ -378,3 +379,70 @@ def test_distinguishing_zscores_actually_differ(matrix: np.ndarray) -> None:
             f"Statement {s} classified as distinguishing but no factor pair has "
             f"|z_i - z_j| > SED * {z_05:.3f}. z_scores={z_scores[s]}, sed={sed}"
         )
+
+
+# ---------------------------------------------------------------------------
+# 7. compute_preview_range row matches a real run_analysis run
+# ---------------------------------------------------------------------------
+
+
+@given(matrix=q_sort_matrix_small())
+@settings(max_examples=10, deadline=15_000, suppress_health_check=[HealthCheck.too_slow])
+def test_preview_range_matches_run_analysis(matrix: np.ndarray) -> None:
+    """For a given k, preview-range row equals a real run_analysis(k) on counts.
+
+    This pins the contract that preview-range is N real runs, not a single-pass
+    approximation. n_distinguishing and n_consensus must agree.
+    """
+    n_statements, n_participants = matrix.shape
+    k = _safe_n_factors(matrix)
+    grid_config = _make_grid_config(n_statements)
+
+    # Build a minimal SortDataDump that round-trips through build_sort_matrix.
+    # The keys required by build_sort_matrix are:
+    #   dump["study"]["statements"] (list of n_statements StatementDumpRecord-shaped dicts)
+    #   dump["participants"] (list of dicts with "scores", "status", "is_discarded")
+    # We give each participant status="completed" and is_discarded=False so the
+    # variance filter keeps them all (the strategy already filters zero-variance).
+    dump = {
+        "study": {
+            "id": 1,
+            "grid_config": grid_config,
+            "statements": [
+                {
+                    "id": j,
+                    "code": f"S{j}",
+                    "translations": [{"language_code": "en", "text": f"s{j}"}],
+                }
+                for j in range(n_statements)
+            ],
+        },
+        "participants": [
+            {
+                "id": i,
+                "label": f"P{i}",
+                "scores": matrix[:, i].tolist(),
+                "status": "completed",
+                "is_discarded": False,
+            }
+            for i in range(n_participants)
+        ],
+    }
+
+    rows = compute_preview_range(
+        dump,  # type: ignore[arg-type]  # minimal dict, structurally matches SortDataDump
+        [k],
+        "pca",
+        "varimax",
+        "auto",
+    )
+    real = run_analysis(
+        matrix,
+        n_factors=k,
+        extraction="pca",
+        rotation="varimax",
+        flagging="auto",
+        grid_config=grid_config,
+    )
+    assert rows[0]["n_distinguishing"] == len(real["distinguishing"])
+    assert rows[0]["n_consensus"] == len(real["consensus"])
