@@ -1,7 +1,7 @@
 """Analysis schemas for Q-method factor analysis."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import (
     BaseModel,
@@ -255,12 +255,56 @@ class AnalysisResult(BaseModel):
 
 
 class EigenvalueResult(BaseModel):
-    """Eigenvalues for scree plot (pre-analysis)."""
+    """Eigenvalues for the scree plot plus three retention indicators.
+
+    All three indicators are advisory — Watts & Stenner (2012) emphasise
+    that factor retention in Q-methodology also depends on interpretability
+    and stability, not just statistical thresholds.
+    """
 
     eigenvalues: list[float]
-    suggested_n_factors: int = Field(
-        description="Suggested number of factors (Kaiser criterion: eigenvalue > 1)"
+    kaiser_n: int = Field(description="Kaiser criterion: number of eigenvalues > 1.")
+    parallel_analysis_n: int = Field(
+        description="Horn (1965) parallel analysis: count of observed eigenvalues "
+        "exceeding the 95th percentile of random-data eigenvalues.",
     )
+    velicer_map_n: int = Field(
+        description="Velicer (1976) Minimum Average Partial.",
+    )
+    suggested_n_factors: int = Field(
+        description="Backward-compatible alias for kaiser_n. Frontends should "
+        "prefer the three explicit fields."
+    )
+
+
+class PreviewRangeRequest(BaseModel):
+    """Request body for POST /analysis/preview-range."""
+
+    n_factors_range: list[int] = Field(
+        min_length=1,
+        max_length=8,
+        description="Candidate k values, e.g. [2, 3, 4, 5, 6].",
+    )
+    extraction: Literal["pca", "centroid"] = Field(default="pca")
+    rotation: Literal["varimax", "none", "judgmental"] = Field(default="varimax")
+    flagging: Literal["auto", "manual"] = Field(default="auto")
+
+
+class PreviewRangeRow(BaseModel):
+    """One PreviewSummary row, mirrors the service TypedDict."""
+
+    n_factors: int
+    cumulative_variance: float
+    pct_flagged: float
+    n_distinguishing: int
+    n_cross_loaders: int
+    n_consensus: int
+    min_defining_sorts: int
+    has_empty_factor: bool
+
+
+class PreviewRangeResponse(BaseModel):
+    rows: list[PreviewRangeRow]
 
 
 # ---- AnalysisRun (persisted analysis history) ----

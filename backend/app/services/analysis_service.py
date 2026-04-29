@@ -93,6 +93,25 @@ class BootstrapStabilityResult(TypedDict):
     factor_mean_se: list[float]
 
 
+class PreviewSummary(TypedDict):
+    """Per-k summary returned by compute_preview_range.
+
+    All fields are descriptive — see the Phase Explorer spec for usage.
+    `min_defining_sorts` is the minimum across factors of the count of
+    flagged participants on each factor; `has_empty_factor` is True when
+    at least one factor has zero defining sorts (over-factorisation).
+    """
+
+    n_factors: int
+    cumulative_variance: float
+    pct_flagged: float
+    n_distinguishing: int
+    n_cross_loaders: int
+    n_consensus: int
+    min_defining_sorts: int
+    has_empty_factor: bool
+
+
 class AnalysisRunResult(TypedDict):
     """Return type of run_analysis().
 
@@ -812,6 +831,79 @@ def compute_eigenvalues(
     return eigenvalues_list, max(suggested, 1)
 
 
+def compute_parallel_analysis_n(
+    dataset: NDArray[np.float64],
+    n_simulations: int = 1000,
+    seed: int = 42,
+) -> int:
+    """Horn (1965) parallel analysis on the participant-correlation matrix.
+
+    Compares observed eigenvalues against the 95th percentile of eigenvalues
+    from random Gaussian datasets of matching shape. Returns the count of
+    factors whose observed eigenvalue exceeds the simulated threshold,
+    floored at 1 (the analysis always needs at least one factor).
+
+    Args:
+        dataset: (n_statements x n_participants) Q-sort matrix.
+        n_simulations: Monte-Carlo iterations. Default 1000.
+        seed: RNG seed for reproducibility.
+
+    Returns:
+        Number of factors retained (>= 1).
+    """
+    n_statements, n_participants = dataset.shape
+    rng = np.random.default_rng(seed)
+    sim_eigs = np.zeros((n_simulations, n_participants))
+    # Q-method convention: dataset is (n_statements, n_participants). Random
+    # matrices preserve that shape so the simulated participant-correlation
+    # eigenvalue distribution is shape-matched to the observed one.
+    for i in range(n_simulations):
+        sim = rng.standard_normal(size=(n_statements, n_participants))
+        sim_cor = correlation_matrix(sim)
+        evs = np.linalg.eigvalsh(sim_cor)
+        sim_eigs[i] = np.sort(evs)[::-1]
+    threshold = np.percentile(sim_eigs, 95, axis=0)
+    obs_cor = correlation_matrix(dataset)
+    obs_eigs = np.sort(np.linalg.eigvalsh(obs_cor))[::-1]
+    return max(int(np.sum(obs_eigs > threshold)), 1)
+
+
+def compute_velicer_map_n(cor_mat: NDArray[np.float64]) -> int:
+    """Velicer (1976) Minimum Average Partial.
+
+    For each candidate k from 1 to min(n-1, 8), extract k principal
+    components, deflate the correlation matrix, then compute the average
+    squared off-diagonal of the resulting partial correlation matrix.
+    The k that minimises this average is the optimal number of factors.
+
+    Args:
+        cor_mat: Participant-correlation matrix (n x n).
+
+    Returns:
+        Optimal number of factors (>= 1).
+    """
+    n = cor_mat.shape[0]
+    if n < 2:
+        return 1
+    eigenvalues, eigenvectors = np.linalg.eigh(cor_mat)
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+
+    map_values: list[float] = []
+    for k in range(1, min(n, 9)):
+        evs_k = np.maximum(eigenvalues[:k], 0.0)
+        loadings = eigenvectors[:, :k] * np.sqrt(evs_k)
+        residual = cor_mat - loadings @ loadings.T
+        diag = np.sqrt(np.maximum(np.diag(residual), 1e-10))
+        partial = residual / np.outer(diag, diag)
+        np.fill_diagonal(partial, 0.0)
+        avg_sq = float(np.sum(partial**2) / (n * (n - 1)))
+        map_values.append(avg_sq)
+
+    return int(np.argmin(map_values)) + 1
+
+
 def _distribution_from_grid_config(
     grid_config: list[dict[str, object]],
 ) -> NDArray[np.int64]:
@@ -1086,3 +1178,68 @@ def compute_bootstrap_stability(
         statements=statement_stab,
         factor_mean_se=factor_mean_se,
     )
+
+
+def compute_preview_range(
+    dump: SortDataDump,
+    n_factors_range: list[int],
+    extraction: str,
+    rotation: str,
+    flagging: str,
+) -> list[PreviewSummary]:
+    """Run analysis once per k and summarise each result.
+
+    Used by POST /analysis/preview-range to populate the Phase Explorer
+    preview table. The function deliberately calls run_analysis N times
+    rather than truncating a single high-k extraction — centroid is
+    iterative on residuals (Brown 1980) and judgmental rotation is
+    path-dependent, so a single-pass shortcut would silently misrepresent
+    those configurations. Caller is responsible for gating the extraction
+    and rotation values upstream (see router validation).
+
+    Args:
+        dump: SortDataDump as returned by _get_analysis_dump.
+        n_factors_range: Sorted list of candidate k values.
+        extraction: 'pca' or 'centroid'.
+        rotation: 'varimax', 'none', or 'judgmental'.
+        flagging: 'auto' or 'manual' (manual treated as auto here — preview
+            is exploratory only; manual flagging is committed-run territory).
+
+    Returns:
+        One PreviewSummary per k, in the input order.
+    """
+    dataset, _participants, _statements = build_sort_matrix(dump)
+    grid_config = dump["study"]["grid_config"]
+    rows: list[PreviewSummary] = []
+    for k in n_factors_range:
+        result = run_analysis(
+            dataset,
+            n_factors=k,
+            extraction=extraction,
+            rotation=rotation,
+            flagging="auto",
+            grid_config=grid_config,
+        )
+        flags = result["flags"]
+        n_participants = flags.shape[0]
+        any_flag = flags.any(axis=1)
+        cross = flags.sum(axis=1) >= 2
+        per_factor_flagged = flags.sum(axis=0)
+        cumulative_variance = (
+            float(result["factor_characteristics"][-1]["cumulative_variance"])
+            if result["factor_characteristics"]
+            else 0.0
+        )
+        rows.append(
+            PreviewSummary(
+                n_factors=k,
+                cumulative_variance=cumulative_variance,
+                pct_flagged=float(any_flag.sum()) / max(n_participants, 1),
+                n_distinguishing=len(result["distinguishing"]),
+                n_cross_loaders=int(cross.sum()),
+                n_consensus=len(result["consensus"]),
+                min_defining_sorts=int(per_factor_flagged.min()),
+                has_empty_factor=bool((per_factor_flagged == 0).any()),
+            )
+        )
+    return rows

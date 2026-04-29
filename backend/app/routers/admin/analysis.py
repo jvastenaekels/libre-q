@@ -37,6 +37,9 @@ from ...schemas import (
     ParticipantAudioRecording,
     ParticipantCardComment,
     ParticipantLoading,
+    PreviewRangeRequest,
+    PreviewRangeResponse,
+    PreviewRangeRow,
     StatementClassification,
     StatementScore,
 )
@@ -45,6 +48,9 @@ from ...services.analysis_service import (
     build_sort_matrix,
     compute_bootstrap_stability,
     compute_eigenvalues,
+    compute_parallel_analysis_n,
+    compute_preview_range,
+    compute_velicer_map_n,
     correlation_matrix,
     run_analysis,
 )
@@ -105,16 +111,27 @@ async def get_eigenvalues(
         raise HTTPException(status_code=400, detail=str(e))
 
     try:
-        eigenvalues, suggested = await asyncio.to_thread(
-            lambda: compute_eigenvalues(correlation_matrix(dataset))
+        cor = correlation_matrix(dataset)
+        eigenvalues, kaiser_n = await asyncio.to_thread(
+            lambda: compute_eigenvalues(cor)
         )
+        parallel_n = await asyncio.to_thread(
+            lambda: compute_parallel_analysis_n(dataset)
+        )
+        map_n = await asyncio.to_thread(lambda: compute_velicer_map_n(cor))
     except (np.linalg.LinAlgError, ValueError) as e:
         raise HTTPException(
             status_code=400,
             detail=f"Failed to compute eigenvalues: {e}",
         )
 
-    return EigenvalueResult(eigenvalues=eigenvalues, suggested_n_factors=suggested)
+    return EigenvalueResult(
+        eigenvalues=eigenvalues,
+        kaiser_n=kaiser_n,
+        parallel_analysis_n=parallel_n,
+        velicer_map_n=map_n,
+        suggested_n_factors=kaiser_n,
+    )
 
 
 @router.post("/{slug}/analysis/run")
@@ -381,6 +398,73 @@ async def run_factor_analysis(
     )
 
     return analysis_result
+
+
+@router.post("/{slug}/analysis/preview-range")
+@limiter.limit("10/minute")
+async def preview_range(
+    request: Request,
+    body: PreviewRangeRequest,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> PreviewRangeResponse:
+    """Compute summaries for a range of n_factors values without persisting.
+
+    Gated to PCA + varimax (or no rotation): centroid extraction (Brown 1980)
+    and judgmental rotation are path-dependent, so previewing them would
+    silently mislead. Bootstrap is excluded — it is not a retention criterion
+    and would dominate the cost budget.
+    """
+    if body.extraction != "pca":
+        raise HTTPException(
+            status_code=400,
+            detail="Preview range supports PCA extraction only "
+            "(centroid is path-dependent; commit a real run to inspect).",
+        )
+    if body.rotation not in {"varimax", "none"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Preview range supports varimax rotation only "
+            "(judgmental rotation is path-dependent; commit a real run to inspect).",
+        )
+
+    dump = await _get_analysis_dump(db, study.id)
+    try:
+        # Re-run inside compute_preview_range; we call it here to get the
+        # post-filter column count for honest k-range validation. Cheap
+        # (pure NumPy, sub-millisecond on typical data).
+        matrix, _participants, _statements = build_sort_matrix(dump)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    n_valid_participants = matrix.shape[1]
+    max_k = min(8, max(n_valid_participants - 1, 1))
+    bad = [k for k in body.n_factors_range if k < 2 or k > max_k]
+    if bad:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"n_factors values {bad} out of range. Allowed: "
+                f"[2, {max_k}] given {n_valid_participants} valid participants."
+            ),
+        )
+
+    try:
+        rows = await asyncio.to_thread(
+            lambda: compute_preview_range(
+                dump=dump,
+                n_factors_range=sorted(body.n_factors_range),
+                extraction=body.extraction,
+                rotation=body.rotation,
+                flagging=body.flagging,
+            )
+        )
+    except (np.linalg.LinAlgError, ValueError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Preview range computation failed: {e}",
+        )
+
+    return PreviewRangeResponse(rows=[PreviewRangeRow(**r) for r in rows])
 
 
 # ---- AnalysisRun history endpoints (audit trail) ----
