@@ -134,8 +134,7 @@ export function useInterpretPhase(
     // ── showFactorNarratives (localStorage-persisted UI preference) ─
     // Per-user-per-browser is the right granularity for a private view
     // preference: co-authors don't override each other. Wrapped in try/catch
-    // for private mode + quota safety. Copied verbatim from the legacy
-    // useAnalysisPage block (lines 264-285) — well-tested logic, preserve.
+    // for private mode + quota safety.
     const narrativesPrefKey = `qualis-analysis-show-narratives-${slug || ''}`;
     const [showFactorNarratives, setShowFactorNarrativesState] = useState<boolean>(() => {
         if (!slug) return true;

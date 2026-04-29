@@ -7,9 +7,8 @@
 /**
  * Pure CSV/blob export helpers for AnalysisResult payloads.
  *
- * Extracted from the legacy useAnalysisPage hook so that the Interpret-phase
- * shell (which no longer owns those helpers) can reuse them. No state, no
- * React, just data → string / data → side-effect.
+ * Extracted so that the Interpret-phase shell can reuse them without dragging
+ * React state. No state, no React, just data → string / data → side-effect.
  */
 
 import type { AnalysisResult } from '@/api/model';

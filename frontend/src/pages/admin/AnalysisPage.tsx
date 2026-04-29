@@ -812,11 +812,10 @@ function InterpretShell({
     const analysisResult = run ? (run.result as unknown as AnalysisResult) : null;
 
     // ── Manual flag overrides (Phase 2: local state) ─────────────────
-    // The legacy useAnalysisPage tracked manual flag overrides while the
-    // analyst was looking at a fresh result. Phase 2's interpret hook is
-    // pure read; manual flagging is being re-thought in PR 4 with the
-    // canvas. For now, we keep a light local-state copy seeded from the
-    // run's auto-flagged participants whenever the run loads, so the
+    // The interpret hook is pure read; manual flagging is being re-thought
+    // in PR 4 with the canvas. For now, we keep a light local-state copy
+    // seeded from the run's auto-flagged participants whenever the run
+    // loads, so the
     // FactorLoadingsTable still has somewhere to write toggles. The
     // flagging mode is read off the persisted run.
     const flaggingMode: 'auto' | 'manual' = run?.flagging_mode === 'manual' ? 'manual' : 'auto';
