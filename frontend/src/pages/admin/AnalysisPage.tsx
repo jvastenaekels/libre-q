@@ -890,28 +890,9 @@ function InterpretShell({
     }, [run]);
 
     // ── Per-analyst, per-study UI preference for showing per-factor narratives.
-    const narrativesPrefKey = `qualis-analysis-show-narratives-${slug || ''}`;
-    const [showFactorNarratives, setShowFactorNarrativesState] = useState<boolean>(() => {
-        if (!slug) return true;
-        try {
-            const raw = window.localStorage.getItem(narrativesPrefKey);
-            if (raw === null) return true;
-            return raw === 'true';
-        } catch {
-            return true;
-        }
-    });
-    const setShowFactorNarratives = useCallback(
-        (v: boolean) => {
-            setShowFactorNarrativesState(v);
-            try {
-                window.localStorage.setItem(narrativesPrefKey, String(v));
-            } catch {
-                // Ignore localStorage errors (quota / private mode).
-            }
-        },
-        [narrativesPrefKey]
-    );
+    // Owned by useInterpretPhase so the localStorage contract (default-true,
+    // per-slug key, quota/private-mode safe) is covered by hook tests.
+    const { showFactorNarratives, setShowFactorNarratives } = interpret;
 
     // ── Loading / error gates ────────────────────────────────────────
     if (interpret.isLoading) {

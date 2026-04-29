@@ -38,6 +38,13 @@ export interface InterpretPhaseApi {
     appendToNarrative: (snippet: string) => void;
     compareRun: AnalysisRunRead | null;
     deltaByStatement: Map<number, number> | null;
+    /**
+     * Per-analyst, per-study UI preference for showing the per-factor narrative
+     * editor in the interpret view. Persisted in localStorage so the choice
+     * survives reloads; private to the browser (co-authors don't override).
+     */
+    showFactorNarratives: boolean;
+    setShowFactorNarratives: (v: boolean) => void;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -124,6 +131,34 @@ export function useInterpretPhase(
         setNarrativeDraftState((prev) => (prev ? `${prev}\n\n${snippet}` : snippet));
     }, []);
 
+    // ── showFactorNarratives (localStorage-persisted UI preference) ─
+    // Per-user-per-browser is the right granularity for a private view
+    // preference: co-authors don't override each other. Wrapped in try/catch
+    // for private mode + quota safety. Copied verbatim from the legacy
+    // useAnalysisPage block (lines 264-285) — well-tested logic, preserve.
+    const narrativesPrefKey = `qualis-analysis-show-narratives-${slug || ''}`;
+    const [showFactorNarratives, setShowFactorNarrativesState] = useState<boolean>(() => {
+        if (!slug) return true;
+        try {
+            const raw = window.localStorage.getItem(narrativesPrefKey);
+            if (raw === null) return true;
+            return raw === 'true';
+        } catch {
+            return true;
+        }
+    });
+    const setShowFactorNarratives = useCallback(
+        (v: boolean) => {
+            setShowFactorNarrativesState(v);
+            try {
+                window.localStorage.setItem(narrativesPrefKey, String(v));
+            } catch {
+                // Ignore localStorage errors (e.g., quota exceeded, private mode).
+            }
+        },
+        [narrativesPrefKey]
+    );
+
     // ── deltaByStatement (by-index match — Phase 2) ───────────────
     // Phase 5 (Task 27) refines this to Tucker's φ alignment with sign-flip
     // detection and ambiguous-match warnings. Map shape stays stable so the
@@ -154,5 +189,7 @@ export function useInterpretPhase(
         appendToNarrative,
         compareRun,
         deltaByStatement,
+        showFactorNarratives,
+        setShowFactorNarratives,
     };
 }

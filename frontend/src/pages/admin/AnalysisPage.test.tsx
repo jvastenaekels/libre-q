@@ -553,6 +553,79 @@ describe('AnalysisPage', () => {
         expect(screen.queryByRole('button', { name: /^run analysis$/i })).not.toBeInTheDocument();
     });
 
+    it('bounces back to Explore when AnalysisHistoryPanel signals current-run deletion', async () => {
+        // Setup: in interpret phase viewing run 42; the history panel lists
+        // run 42 as the only entry. Clicking trash → confirm → the delete
+        // mutation onSuccess fires onLoadRun(null, null), which the page
+        // turns into navigateToExplore() — URL drops ?phase=interpret.
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+        mockListRunsHook.mockReturnValue({
+            data: [
+                {
+                    id: 42,
+                    ran_at: '2026-04-29T12:00:00Z',
+                    extraction_method: 'pca',
+                    n_factors: 2,
+                    rotation_method: 'varimax',
+                    flagging_mode: 'auto',
+                },
+            ],
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+        });
+        // The delete mutation fires its onSuccess synchronously so the
+        // panel's onLoadRun(null, null) callback runs in-place.
+        const mockDeleteMutate = vi.fn(
+            (
+                _vars: unknown,
+                opts?: {
+                    onSuccess?: () => void;
+                }
+            ) => {
+                opts?.onSuccess?.();
+            }
+        );
+        mockDeleteRunMutation.mockReturnValue({ mutate: mockDeleteMutate, isPending: false });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        // We're in interpret phase first.
+        await waitFor(() => {
+            expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+        });
+
+        // Open the delete confirmation, then confirm. The history panel
+        // exposes a Trash2 button per row; AlertDialog renders "Delete" as
+        // its confirm action.
+        const deleteButtons = screen.getAllByLabelText(/Delete this analysis run/i);
+        await userEvent.click(deleteButtons[0] as HTMLElement);
+        const confirmButton = await screen.findByRole('button', { name: /^Delete$/ });
+        await userEvent.click(confirmButton);
+
+        // After bounce: interpret marker is gone, Explore configuration is back.
+        await waitFor(() => {
+            expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
+        });
+        expect(screen.getByRole('button', { name: /run analysis/i })).toBeInTheDocument();
+    });
+
     it('navigates to interpret phase after a successful run', async () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,

@@ -406,4 +406,47 @@ describe('useInterpretPhase', () => {
         expect(result.current.compareRun).toBeNull();
         expect(result.current.deltaByStatement).toBeNull();
     });
+
+    describe('showFactorNarratives localStorage', () => {
+        beforeEach(() => {
+            window.localStorage.clear();
+        });
+
+        it('defaults to true when localStorage is empty', () => {
+            const { result } = renderHook(() => useInterpretPhase('test-slug', null, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.showFactorNarratives).toBe(true);
+        });
+
+        it('reads false from localStorage', () => {
+            window.localStorage.setItem('qualis-analysis-show-narratives-test-slug', 'false');
+            const { result } = renderHook(() => useInterpretPhase('test-slug', null, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.showFactorNarratives).toBe(false);
+        });
+
+        it('writes the new value on toggle', () => {
+            const { result } = renderHook(() => useInterpretPhase('test-slug', null, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setShowFactorNarratives(false);
+            });
+            expect(window.localStorage.getItem('qualis-analysis-show-narratives-test-slug')).toBe(
+                'false'
+            );
+            expect(result.current.showFactorNarratives).toBe(false);
+        });
+
+        it('uses per-study localStorage keys', () => {
+            window.localStorage.setItem('qualis-analysis-show-narratives-study-a', 'false');
+            const { result } = renderHook(() => useInterpretPhase('study-b', null, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+            // Different slug → default true (no leakage from study-a).
+            expect(result.current.showFactorNarratives).toBe(true);
+        });
+    });
 });

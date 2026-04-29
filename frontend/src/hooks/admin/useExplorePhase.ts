@@ -112,7 +112,6 @@ export interface ExplorePhaseApi {
 export function useExplorePhase(slug: string, onCommit: (runId: number) => void): ExplorePhaseApi {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const [, setSearchParams] = useSearchParams();
     const [searchParamsSnapshot] = useSearchParams();
 
     // ── Form state (persisted in URL) ─────────────────────────────
@@ -159,17 +158,6 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
     const removeManualRotation = useCallback((index: number) => {
         setManualRotations((prev) => prev.filter((_, i) => i !== index));
     }, []);
-
-    // ── URL sync ──────────────────────────────────────────────────
-    const syncParams = useCallback(
-        (ext: string, nf: number, rot: string, flag: string) => {
-            setSearchParams(
-                { extraction: ext, nFactors: String(nf), rotation: rot, flagging: flag },
-                { replace: true }
-            );
-        },
-        [setSearchParams]
-    );
 
     // ── Eigenvalues query ─────────────────────────────────────────
     // 4xx responses (e.g. 400 "Need at least 2 valid participants") are
@@ -250,7 +238,6 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
             },
             {
                 onSuccess: async (data) => {
-                    syncParams(extraction, nFactors, rotation, flagging);
                     toast.success(
                         t('admin.analysis.success', 'Analysis complete — {{n}} factors extracted', {
                             n: data.n_factors,
@@ -288,7 +275,6 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
         bootstrapEnabled,
         bootstrapIterations,
         analysisMutation,
-        syncParams,
         t,
         queryClient,
         onCommit,
