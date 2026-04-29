@@ -113,6 +113,7 @@ import type { DumpParticipant, DumpResponse } from './types';
 import { QuestionDistributionCharts } from './charts/QuestionDistributionCharts';
 import { SubmissionsTimelineChart } from './charts/SubmissionsTimelineChart';
 import { DeviceBreakdownChart } from './charts/DeviceBreakdownChart';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface InteractiveDataViewProps {
     slug: string;
@@ -1763,25 +1764,19 @@ export default function InteractiveDataView({
                                         className="h-64 text-center"
                                     >
                                         {liveCount === 0 ? (
-                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                <div className="p-4 bg-slate-50 rounded-full">
-                                                    <Inbox className="w-8 h-8 opacity-30" />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <p className="font-bold text-slate-600">
-                                                        {t(
-                                                            'admin.data.empty.no_participants_title',
-                                                            'No participants yet'
-                                                        )}
-                                                    </p>
-                                                    <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                                                        {t(
-                                                            'admin.data.empty.no_participants_desc',
-                                                            'Share your study link to start collecting responses.'
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            // Wave E (E2): migrated to <EmptyState>.
+                                            <EmptyState
+                                                icon={Inbox}
+                                                title={t(
+                                                    'admin.data.empty.no_participants_title',
+                                                    'No participants yet'
+                                                )}
+                                                body={t(
+                                                    'admin.data.empty.no_participants_desc',
+                                                    'Share your study link to start collecting responses.'
+                                                )}
+                                                variant="inline"
+                                            />
                                         ) : (
                                             <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
                                                 <div className="p-4 bg-slate-50 rounded-full">

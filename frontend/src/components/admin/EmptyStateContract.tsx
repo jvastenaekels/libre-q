@@ -1,6 +1,11 @@
+/*
+ * Qualis - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import type { LucideIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface EmptyStateContractProps {
     icon: LucideIcon;
@@ -10,25 +15,28 @@ interface EmptyStateContractProps {
     ctaTo: string;
 }
 
+/**
+ * Wave A — page-level empty-state contract used on Lifecycle / Data /
+ * Analysis when those pages have no participant data yet.
+ *
+ * Wave E (E2) — now a thin wrapper over the `<EmptyState>` primitive
+ * (`components/ui/empty-state.tsx`). API kept stable so existing
+ * call sites don't change.
+ */
 export function EmptyStateContract({
-    icon: Icon,
+    icon,
     title,
     body,
     ctaLabel,
     ctaTo,
 }: EmptyStateContractProps) {
     return (
-        <div className="max-w-2xl rounded-2xl border border-slate-100 bg-white px-8 py-10 shadow-sm flex flex-col items-start gap-5">
-            <div className="rounded-xl bg-indigo-50 p-3">
-                <Icon className="size-6 text-indigo-500" aria-hidden="true" />
-            </div>
-            <div className="space-y-2">
-                <h2 className="text-lg font-black text-slate-900 tracking-tight">{title}</h2>
-                <p className="text-sm text-slate-600 leading-relaxed">{body}</p>
-            </div>
-            <Button asChild className="rounded-xl">
-                <Link to={ctaTo}>{ctaLabel}</Link>
-            </Button>
-        </div>
+        <EmptyState
+            icon={icon}
+            title={title}
+            body={body}
+            cta={{ label: ctaLabel, to: ctaTo }}
+            variant="card"
+        />
     );
 }
