@@ -15,20 +15,12 @@ interface Props {
 
 function parseMentions(text: string, members: ProjectMemberLite[]): number[] {
     const ids = Array.from(text.matchAll(/@([\w-]+)/g))
-        .map(
-            (m) =>
-                members.find((u) => u.display_name === m[1])?.user_id ?? null,
-        )
+        .map((m) => members.find((u) => u.display_name === m[1])?.user_id ?? null)
         .filter((x): x is number => x !== null);
     return [...new Set(ids)];
 }
 
-export function MentionAutocomplete({
-    value,
-    onChange,
-    members,
-    placeholder,
-}: Props) {
+export function MentionAutocomplete({ value, onChange, members, placeholder }: Props) {
     const [query, setQuery] = useState<string | null>(null);
     const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -37,24 +29,20 @@ export function MentionAutocomplete({
         const cursor = e.target.selectionStart;
         const head = text.slice(0, cursor);
         const m = /@([\w-]*)$/.exec(head);
-        setQuery(m ? m[1] : null);
+        setQuery(m ? (m[1] ?? '') : null);
         onChange(text, parseMentions(text, members));
     };
 
     const filtered =
         query !== null
-            ? members.filter((m) =>
-                  m.display_name.toLowerCase().includes(query.toLowerCase()),
-              )
+            ? members.filter((m) => m.display_name.toLowerCase().includes(query.toLowerCase()))
             : [];
 
     const insert = (m: ProjectMemberLite) => {
         const node = ref.current;
         if (!node) return;
         const cursor = node.selectionStart;
-        const head = value
-            .slice(0, cursor)
-            .replace(/@[\w-]*$/, `@${m.display_name} `);
+        const head = value.slice(0, cursor).replace(/@[\w-]*$/, `@${m.display_name} `);
         const tail = value.slice(cursor);
         const next = head + tail;
         onChange(next, parseMentions(next, members));

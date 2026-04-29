@@ -21,10 +21,7 @@ interface Props {
     onToggleResolve: (comment: MemoCommentRead) => Promise<void>;
 }
 
-function displayNameFor(
-    userId: number | null,
-    members: ProjectMemberLite[],
-): string {
+function displayNameFor(userId: number | null, members: ProjectMemberLite[]): string {
     if (userId === null) return '(removed)';
     const m = members.find((x) => x.user_id === userId);
     return m ? `@${m.display_name}` : `user #${userId}`;
@@ -47,9 +44,7 @@ export function CommentThread({
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editDraft, setEditDraft] = useState('');
 
-    const visible = showResolved
-        ? comments
-        : comments.filter((c) => !c.resolved);
+    const visible = showResolved ? comments : comments.filter((c) => !c.resolved);
 
     const submit = async () => {
         if (!draft.trim()) return;
@@ -65,10 +60,7 @@ export function CommentThread({
                 const canModerate = isAuthor || isOwner;
                 if (editingId === c.id) {
                     return (
-                        <div
-                            key={c.id}
-                            className="border rounded-xl p-3 bg-white space-y-2"
-                        >
+                        <div key={c.id} className="border rounded-xl p-3 bg-white space-y-2">
                             <textarea
                                 value={editDraft}
                                 onChange={(e) => setEditDraft(e.target.value)}
@@ -97,10 +89,7 @@ export function CommentThread({
                     );
                 }
                 return (
-                    <div
-                        key={c.id}
-                        className="border rounded-xl p-3 bg-white text-sm"
-                    >
+                    <div key={c.id} className="border rounded-xl p-3 bg-white text-sm">
                         <div className="text-xs text-slate-500 mb-1">
                             {displayNameFor(c.user_id, members)} ·{' '}
                             {new Date(c.created_at).toLocaleDateString()}
@@ -167,7 +156,7 @@ export function CommentThread({
                     members={members}
                     placeholder={t(
                         'admin.memo.comment_placeholder',
-                        'Write a comment. Use @ to mention.',
+                        'Write a comment. Use @ to mention.'
                     )}
                 />
                 <div className="flex justify-end">

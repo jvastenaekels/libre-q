@@ -16,16 +16,9 @@ interface Props {
     currentUserId: number;
     members: ProjectMemberLite[];
     showResolved: boolean;
-    onEditEntry: (
-        id: number,
-        patch: { title?: string; body?: string },
-    ) => Promise<unknown>;
+    onEditEntry: (id: number, patch: { title?: string; body?: string }) => Promise<unknown>;
     onDeleteEntry: (id: number) => Promise<void>;
-    onPostComment: (
-        entryId: number,
-        body: string,
-        mentions: number[],
-    ) => Promise<unknown>;
+    onPostComment: (entryId: number, body: string, mentions: number[]) => Promise<unknown>;
     onEditComment: (commentId: number, body: string) => Promise<unknown>;
     onDeleteComment: (commentId: number) => Promise<void>;
     onToggleResolve: (comment: MemoCommentRead) => Promise<void>;
@@ -52,7 +45,7 @@ export function MemoEntry({
     const [showThread, setShowThread] = useState(false);
 
     const visibleCommentCount = entry.comments.filter(
-        (c) => !c.deleted && (showResolved || !c.resolved),
+        (c) => !c.deleted && (showResolved || !c.resolved)
     ).length;
 
     return (
@@ -72,11 +65,7 @@ export function MemoEntry({
                             className="w-full text-sm rounded-md border px-2 py-1"
                         />
                         <div className="flex justify-end gap-2">
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setEditing(false)}
-                            >
+                            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
                                 {t('admin.memo.cancel', 'Cancel')}
                             </Button>
                             <Button
@@ -93,9 +82,7 @@ export function MemoEntry({
                 ) : (
                     <div>
                         <div className="flex items-baseline justify-between">
-                            <h4 className="text-sm font-bold text-slate-900">
-                                {entry.title}
-                            </h4>
+                            <h4 className="text-sm font-bold text-slate-900">{entry.title}</h4>
                             {canEdit && (
                                 <div className="flex gap-2 text-xs">
                                     <button
@@ -113,8 +100,8 @@ export function MemoEntry({
                                                 window.confirm(
                                                     t(
                                                         'admin.memo.delete_entry_confirm',
-                                                        'Delete this entry?',
-                                                    ),
+                                                        'Delete this entry?'
+                                                    )
                                                 )
                                             ) {
                                                 onDeleteEntry(entry.id);
@@ -155,12 +142,8 @@ export function MemoEntry({
                         currentUserId={currentUserId}
                         isOwner={isOwner}
                         members={members}
-                        onPost={(b, m) =>
-                            onPostComment(entry.id, b, m).then(() => undefined)
-                        }
-                        onEdit={(id, b) =>
-                            onEditComment(id, b).then(() => undefined)
-                        }
+                        onPost={(b, m) => onPostComment(entry.id, b, m).then(() => undefined)}
+                        onEdit={(id, b) => onEditComment(id, b).then(() => undefined)}
                         onDelete={onDeleteComment}
                         onToggleResolve={onToggleResolve}
                     />
