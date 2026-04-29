@@ -319,3 +319,27 @@ async def test_upgrade_aborts_on_oversized_memo() -> None:
     # upgrade succeeds on clean data.
     await _wipe_application_data()
     _restore_to_prev_revision()
+
+
+@pytest.mark.asyncio
+async def test_migration_aborts_when_study_methodology_memo_exceeds_cap() -> None:
+    """A studies.methodology_memo > 10000 chars aborts the migration."""
+    _reset_schema_to_prev_revision()
+    await _wipe_application_data()
+
+    oversized = "y" * 10001
+    conn = await _get_conn()
+    try:
+        _, project_id = await _seed_minimal_project_user(conn)
+        # Leave concourses empty; only seed an oversized study memo.
+        await _seed_study(conn, project_id, oversized)
+    finally:
+        await conn.close()
+
+    with pytest.raises(RuntimeError, match="10000-char cap"):
+        _upgrade_to_memo_revision()
+
+    # The migration rolled back (PostgreSQL DDL is transactional).
+    # Remove the oversized study before restoring so the next upgrade succeeds.
+    await _wipe_application_data()
+    _restore_to_prev_revision()

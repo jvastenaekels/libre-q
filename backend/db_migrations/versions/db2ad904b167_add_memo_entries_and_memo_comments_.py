@@ -93,11 +93,12 @@ def upgrade() -> None:
 
     # ---- Data step: migrate existing free-text memos -----------------
     too_long = bind.execute(sa.text("""
-        SELECT COUNT(*) FROM concourses
-        WHERE char_length(COALESCE(construction_memo, '')) > 10000
-        UNION ALL
-        SELECT COUNT(*) FROM studies
-        WHERE char_length(COALESCE(methodology_memo, '')) > 10000
+        SELECT
+            (SELECT COUNT(*) FROM concourses
+             WHERE char_length(COALESCE(construction_memo, '')) > 10000)
+            +
+            (SELECT COUNT(*) FROM studies
+             WHERE char_length(COALESCE(methodology_memo, '')) > 10000)
     """)).scalar()
     if too_long and too_long > 0:
         raise RuntimeError(
