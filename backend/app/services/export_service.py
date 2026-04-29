@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..models import Participant, Study, Statement
+from ..schemas.memos import MemoRead
 from .storage_service import storage_service
 
 if TYPE_CHECKING:
@@ -292,10 +293,89 @@ class ExportService:
         return zip_buffer.getvalue()
 
     @staticmethod
+    def render_memo_md(memo: MemoRead, user_emails: dict[int, str]) -> str:
+        """Render a memo to Markdown for inclusion in the research package.
+
+        `user_emails` maps user_id → email; entries missing from the map
+        (or with last_edited_by == None) produce a 'system' attribution.
+        Returns an empty string when there are no entries.
+        """
+        if not memo.entries:
+            return ""
+
+        lines: list[str] = []
+        lines.append(f"# Memo for {memo.parent_type} #{memo.parent_id}\n")
+
+        for e in memo.entries:
+            lines.append(f"## {e.title}\n")
+            if e.body:
+                lines.append(e.body + "\n")
+            lines.append("")
+
+        last = max(memo.entries, key=lambda e: e.updated_at)
+        editor_email = user_emails.get(last.last_edited_by or -1, "system")
+        lines.append(
+            f"\n---\nLast updated {last.updated_at:%Y-%m-%d} by {editor_email}.\n"
+        )
+        return "\n".join(lines)
+
+    @staticmethod
+    def render_memo_discussion_md(
+        memo: MemoRead,
+        user_emails: dict[int, str],
+    ) -> str:
+        """Render the memo's discussion threads to Markdown.
+
+        Output structure:
+            # Memo discussion — {parent_type} #{parent_id}
+
+            ## {entry title}
+
+            - {author} · {YYYY-MM-DD HH:MM}: {body}
+            - {author} · {YYYY-MM-DD HH:MM} [resolved]: {body}
+            - {author} · {YYYY-MM-DD HH:MM}: [deleted comment]
+
+        Entries with no comments are skipped. Returns "" if no entries have
+        any comments.
+
+        `user_emails` maps user_id → email; missing user_id becomes "(removed)".
+        """
+        if not memo.entries:
+            return ""
+
+        sections: list[str] = []
+        has_any_comment = False
+        sections.append(f"# Memo discussion — {memo.parent_type} #{memo.parent_id}\n")
+
+        for e in memo.entries:
+            if not e.comments:
+                continue
+            has_any_comment = True
+            sections.append(f"## {e.title}\n")
+            for c in e.comments:
+                ts = c.created_at.strftime("%Y-%m-%d %H:%M")
+                author = (
+                    user_emails.get(c.user_id, f"user #{c.user_id}")
+                    if c.user_id is not None
+                    else "(removed)"
+                )
+                tag = " [resolved]" if c.resolved else ""
+                body = "[deleted comment]" if c.deleted else c.body
+                sections.append(f"- {author} · {ts}{tag}: {body}")
+            sections.append("")
+
+        if not has_any_comment:
+            return ""
+
+        return "\n".join(sections)
+
+    @staticmethod
     def generate_research_package(
         study: Study,
         participants: list[Participant],
         full_dump: "StudyDump | None" = None,
+        memo_md: str | None = None,
+        memo_discussion_md: str | None = None,
     ) -> bytes:
         """Generates a ZIP containing the complete research data package."""
         zip_buffer = io.BytesIO()
@@ -341,6 +421,14 @@ class ExportService:
             zip_file.writestr(
                 "r_kit/analysis.R", ExportService._generate_r_script(study)
             )
+
+            # 7. Memo (only when the study has at least one memo entry)
+            if memo_md:
+                zip_file.writestr("memo/memo.md", memo_md)
+
+            # 8. Memo discussion (opt-in)
+            if memo_discussion_md:
+                zip_file.writestr("memo/memo-discussion.md", memo_discussion_md)
 
         return zip_buffer.getvalue()
 
