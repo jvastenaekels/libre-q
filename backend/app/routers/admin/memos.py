@@ -19,8 +19,10 @@ from app.dependencies import (
 from app.limiter import limiter
 from app.models import (
     Concourse,
+    MemoComment,
     MemoEntry,
     MemoParentType,
+    Project,
     ProjectMember,
     ProjectRole,
     Study,
@@ -264,7 +266,7 @@ async def post_comment(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
-    _, project_id = await _resolve_entry_parent(db, eid)
+    entry, project_id = await _resolve_entry_parent(db, eid)
     await _check_member(db, project_id, user, ProjectRole.viewer)
     await MemoService.validate_mentions(
         db, project_id=project_id, user_ids=payload.mentions
@@ -275,6 +277,15 @@ async def post_comment(
         user_id=user.id,
         body=payload.body,
         mentions=payload.mentions,
+    )
+    # Dispatch mention emails (non-blocking: failures are logged and swallowed).
+    await _dispatch_mention_emails(
+        db,
+        comment=c,
+        mentions=payload.mentions,
+        mentioner=user,
+        parent_type=entry.parent_type,
+        parent_id=entry.parent_id,
     )
     return MemoCommentRead.model_validate(c, from_attributes=True)
 
@@ -355,3 +366,66 @@ async def unresolve_comment(
         await _check_member(db, project_id, user, ProjectRole.researcher)
     unresolved = await MemoService.unresolve_comment(db, comment_id=cid)
     return MemoCommentRead.model_validate(unresolved, from_attributes=True)
+
+
+# ---------- email dispatch --------------------------------------------------
+
+
+async def _dispatch_mention_emails(
+    db: AsyncSession,
+    *,
+    comment: MemoComment,
+    mentions: list[int],
+    mentioner: User,
+    parent_type: MemoParentType,
+    parent_id: int,
+) -> None:
+    """For each mentioned non-self user, dispatch one email.
+
+    Resolves project + parent metadata for the email subject/body. Logs
+    and swallows individual failures so one bad address doesn't kill
+    the whole batch.
+    """
+    if not mentions:
+        return
+
+    from app.core.config import settings
+    from app.utils.email import send_memo_mention_email
+
+    rows = (await db.execute(select(User).where(User.id.in_(mentions)))).scalars().all()
+
+    if parent_type == MemoParentType.concourse:
+        c_obj = await db.get(Concourse, parent_id)
+        title = c_obj.title if c_obj is not None else "(concourse)"
+        project_id = c_obj.project_id if c_obj is not None else 0
+        link_path = f"/admin/concourses/{parent_id}"
+    else:
+        s_obj = await db.get(Study, parent_id)
+        title = s_obj.slug if s_obj is not None else "(study)"
+        project_id = s_obj.project_id if s_obj is not None else 0
+        link_path = (
+            f"/admin/studies/{s_obj.slug}/design"
+            if s_obj is not None
+            else "/admin/studies"
+        )
+
+    project = await db.get(Project, project_id)
+    excerpt = comment.body[:240] + ("…" if len(comment.body) > 240 else "")
+    frontend_url = getattr(settings, "FRONTEND_URL", "")
+
+    for u in rows:
+        if u.id == mentioner.id:
+            continue  # don't email the user who made the mention
+        try:
+            send_memo_mention_email(
+                email_to=u.email,
+                project_name=project.title if project is not None else "",
+                parent_type=parent_type.value,
+                parent_title=title,
+                mention_excerpt=excerpt,
+                link_url=f"{frontend_url}{link_path}",
+                mentioner_name=mentioner.email,
+            )
+        except Exception:
+            # Logged inside the helper; don't let one bad address kill the batch.
+            pass

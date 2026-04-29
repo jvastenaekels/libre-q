@@ -5,6 +5,7 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models import ProjectMember, ProjectRole
 from app.services.memo_service import MemoService
 
 pytestmark = pytest.mark.asyncio
@@ -89,3 +90,75 @@ async def test_resolve_then_unresolve(
     )
     assert unresolved.resolved is False
     assert unresolved.resolved_at is None
+
+
+async def test_post_comment_with_mention_dispatches_email(
+    client,
+    db: AsyncSession,
+    seed_entry_id: int,
+    seed_user_id: int,
+    seed_other_user_id: int,
+    seed_project_id: int,
+    auth_headers_for_seed_user,
+    monkeypatch,
+) -> None:
+    """Each non-self mention triggers send_memo_mention_email exactly once."""
+    # seed_other_user_id is not yet a project member; validate_mentions requires it.
+    member = ProjectMember(
+        project_id=seed_project_id,
+        user_id=seed_other_user_id,
+        role=ProjectRole.viewer,
+    )
+    db.add(member)
+    await db.commit()
+
+    sent: list[dict] = []
+
+    def fake_send(**kwargs: object) -> None:
+        sent.append(dict(kwargs))
+
+    monkeypatch.setattr(
+        "app.utils.email.send_memo_mention_email",
+        fake_send,
+    )
+
+    response = await client.post(
+        f"/api/admin/memo-entries/{seed_entry_id}/comments",
+        json={
+            "body": "ping @other",
+            "mentions": [seed_other_user_id],
+        },
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 201
+    assert len(sent) == 1
+    assert sent[0]["mentioner_name"]  # not empty
+
+
+async def test_post_comment_skips_self_mention(
+    client,
+    db: AsyncSession,
+    seed_entry_id: int,
+    seed_user_id: int,
+    seed_project_id: int,
+    auth_headers_for_seed_user,
+    monkeypatch,
+) -> None:
+    """Mentioning yourself does not trigger an email."""
+    sent: list[dict] = []
+
+    monkeypatch.setattr(
+        "app.utils.email.send_memo_mention_email",
+        lambda **kw: sent.append(dict(kw)),
+    )
+
+    response = await client.post(
+        f"/api/admin/memo-entries/{seed_entry_id}/comments",
+        json={
+            "body": "ping @me",
+            "mentions": [seed_user_id],  # self-mention
+        },
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 201
+    assert sent == []
