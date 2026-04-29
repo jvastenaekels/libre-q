@@ -41,8 +41,10 @@ import type {
     DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
     DraftSaveInput,
     GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
     GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     GetStudyApiStudySlugGetParams,
+    GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
     GetTemplatesApiAdminMemoTemplatesGetParams,
     HTTPValidationError,
     InvitationAccept,
@@ -10702,6 +10704,354 @@ export function useGetStudyMemoApiAdminStudiesSidMemoGet<
 }
 
 /**
+ * @summary Get Concourse Memo Unread
+ */
+export const getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet = (
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<number>({
+        url: `/api/admin/concourses/${cid}/memo/unread`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryKey = (
+    cid?: number,
+    params?: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams
+) => {
+    return [`/api/admin/concourses/${cid}/memo/unread`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryKey(cid, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>
+    > = ({ signal }) =>
+        getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet(cid, params, signal);
+
+    return { queryKey, queryFn, enabled: !!cid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>
+>;
+export type GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryError =
+    HTTPValidationError;
+
+export function useGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Concourse Memo Unread
+ */
+
+export function useGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    params: GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetQueryOptions(
+        cid,
+        params,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Get Study Memo Unread
+ */
+export const getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet = (
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<number>({
+        url: `/api/admin/studies/${sid}/memo/unread`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryKey = (
+    sid?: number,
+    params?: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams
+) => {
+    return [`/api/admin/studies/${sid}/memo/unread`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryKey(sid, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>
+    > = ({ signal }) => getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet(sid, params, signal);
+
+    return { queryKey, queryFn, enabled: !!sid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>
+>;
+export type GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryError = HTTPValidationError;
+
+export function useGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Study Memo Unread
+ */
+
+export function useGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    params: GetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoUnreadApiAdminStudiesSidMemoUnreadGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetQueryOptions(
+        sid,
+        params,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * @summary Get Templates
  */
 export const getTemplatesApiAdminMemoTemplatesGet = (
@@ -17066,6 +17416,12 @@ export const getGetStudyMemoApiAdminStudiesSidMemoGetResponseMock = (
     ...overrideResponse,
 });
 
+export const getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetResponseMock = (): number =>
+    faker.number.int();
+
+export const getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetResponseMock = (): number =>
+    faker.number.int();
+
 export const getGetTemplatesApiAdminMemoTemplatesGetResponseMock = (): MemoTemplate[] =>
     Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
         title: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -19527,6 +19883,54 @@ export const getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler = (
     );
 };
 
+export const getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetMockHandler = (
+    overrideResponse?:
+        | number
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<number> | number),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:cid/memo/unread',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetMockHandler = (
+    overrideResponse?:
+        | number
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<number> | number),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:sid/memo/unread',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getGetTemplatesApiAdminMemoTemplatesGetMockHandler = (
     overrideResponse?:
         | MemoTemplate[]
@@ -20187,6 +20591,8 @@ export const getQualisAPIMock = () => [
     getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMockHandler(),
     getGetConcourseMemoApiAdminConcoursesCidMemoGetMockHandler(),
     getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler(),
+    getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetMockHandler(),
+    getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetMockHandler(),
     getGetTemplatesApiAdminMemoTemplatesGetMockHandler(),
     getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMockHandler(),
     getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostMockHandler(),

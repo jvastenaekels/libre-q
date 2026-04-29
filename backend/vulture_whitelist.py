@@ -332,6 +332,8 @@ resolved_by
 deleted
 get_concourse_memo
 get_study_memo
+get_concourse_memo_unread
+get_study_memo_unread
 create_concourse_entry
 create_study_entry
 post_comment

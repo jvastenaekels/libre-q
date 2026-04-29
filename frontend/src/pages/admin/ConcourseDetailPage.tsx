@@ -62,6 +62,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ItemDetailSheet } from '@/components/admin/concourse/ItemDetailSheet';
 import { useConcourseDetailPage } from '@/hooks/admin/useConcourseDetailPage';
 import { MemoSection } from '@/components/admin/memo/MemoSection';
+import { useMemoUnreadBadge } from '@/hooks/admin/useMemoUnreadBadge';
 import { useAuthStore } from '@/store/useAuthStore';
 import { usePermission } from '@/hooks/usePermission';
 import { useAdminContext } from '@/hooks/useAdminContext';
@@ -183,6 +184,12 @@ export default function ConcourseDetailPage() {
         exportCsv,
     } = api;
 
+    const memoUnreadCount = useMemoUnreadBadge(
+        'concourse',
+        concourse?.id ?? 0,
+        currentUser?.id ?? 0
+    );
+
     // ── Bulk-import file picker ─────────────────────────────────────
     // Researchers can also drop a CSV/TSV file into the bulk-import
     // dialog. We parse client-side, surface per-row errors, and feed the
@@ -298,8 +305,13 @@ export default function ConcourseDetailPage() {
                 >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-100">
                         <div className="flex flex-col items-start text-left">
-                            <span className="text-sm font-bold text-slate-900">
+                            <span className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                 {t('admin.memo.title_concourse', 'Construction memo')}
+                                {memoUnreadCount > 0 && (
+                                    <span className="rounded-full bg-amber-100 text-amber-800 text-xs px-2 py-0.5 font-medium">
+                                        {memoUnreadCount}
+                                    </span>
+                                )}
                             </span>
                             <span className="text-xs font-medium text-slate-500 mt-0.5">
                                 {t(

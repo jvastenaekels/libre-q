@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -143,6 +145,60 @@ async def get_study_memo(
     await _check_member(db, s.project_id, user, ProjectRole.viewer)
     return await MemoService.get_memo(
         db, parent_type=MemoParentType.study, parent_id=sid
+    )
+
+
+@router.get("/concourses/{cid}/memo/unread")
+async def get_concourse_memo_unread(
+    cid: int,
+    since: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> int:
+    c = await db.get(Concourse, cid)
+    if c is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
+    await _check_member(db, c.project_id, user, ProjectRole.viewer)
+    try:
+        since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="`since` must be ISO-8601",
+        )
+    return await MemoService.count_unread_for_parent(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=cid,
+        current_user_id=user.id,
+        since=since_dt,
+    )
+
+
+@router.get("/studies/{sid}/memo/unread")
+async def get_study_memo_unread(
+    sid: int,
+    since: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> int:
+    s = await db.get(Study, sid)
+    if s is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
+    await _check_member(db, s.project_id, user, ProjectRole.viewer)
+    try:
+        since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="`since` must be ISO-8601",
+        )
+    return await MemoService.count_unread_for_parent(
+        db,
+        parent_type=MemoParentType.study,
+        parent_id=sid,
+        current_user_id=user.id,
+        since=since_dt,
     )
 
 
