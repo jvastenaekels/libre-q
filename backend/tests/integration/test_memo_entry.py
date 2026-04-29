@@ -180,3 +180,57 @@ async def test_post_comment_rejects_non_member_mention(
     )
     assert response.status_code == 400
     assert "not project members" in response.json()["message"]
+
+
+async def test_concourse_unread_count(
+    client: AsyncClient,
+    seed_concourse_id: int,
+    seed_other_user_id: int,
+    seed_entry_id: int,
+    auth_headers_for_seed_user: dict[str, str],
+    db: AsyncSession,
+) -> None:
+    """Comments by other users newer than `since` count; own comments don't."""
+    # Post a comment from seed_other_user_id (the "remote" author)
+    await MemoService.add_comment(
+        db,
+        entry_id=seed_entry_id,
+        user_id=seed_other_user_id,
+        body="hello from other user",
+        mentions=[],
+    )
+
+    # Query unread since epoch from the seed_user's perspective
+    response = await client.get(
+        f"/api/admin/concourses/{seed_concourse_id}/memo/unread?since=1970-01-01T00:00:00Z",
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 200
+    assert response.json() >= 1
+
+
+async def test_unread_excludes_own_comments(
+    client: AsyncClient,
+    seed_concourse_id: int,
+    seed_user_id: int,
+    seed_entry_id: int,
+    auth_headers_for_seed_user: dict[str, str],
+    db: AsyncSession,
+) -> None:
+    """Comments authored by the requesting user do not count as unread."""
+    # Post a comment as the SAME user who is making the request
+    await MemoService.add_comment(
+        db,
+        entry_id=seed_entry_id,
+        user_id=seed_user_id,
+        body="my own thought",
+        mentions=[],
+    )
+
+    response = await client.get(
+        f"/api/admin/concourses/{seed_concourse_id}/memo/unread?since=1970-01-01T00:00:00Z",
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 200
+    # Own comments must not be counted
+    assert response.json() == 0

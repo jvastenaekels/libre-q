@@ -4832,6 +4832,122 @@
         }
       }
     },
+    "/api/admin/concourses/{cid}/memo/unread": {
+      "get": {
+        "tags": [
+          "admin-memos",
+          "memos"
+        ],
+        "summary": "Get Concourse Memo Unread",
+        "operationId": "get_concourse_memo_unread_api_admin_concourses__cid__memo_unread_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cid"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Get Concourse Memo Unread Api Admin Concourses  Cid  Memo Unread Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{sid}/memo/unread": {
+      "get": {
+        "tags": [
+          "admin-memos",
+          "memos"
+        ],
+        "summary": "Get Study Memo Unread",
+        "operationId": "get_study_memo_unread_api_admin_studies__sid__memo_unread_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Get Study Memo Unread Api Admin Studies  Sid  Memo Unread Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/memo/templates": {
       "get": {
         "tags": [

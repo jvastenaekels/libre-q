@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { usePermission } from '@/hooks/usePermission';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import { MemoSection } from '@/components/admin/memo/MemoSection';
+import { useMemoUnreadBadge } from '@/hooks/admin/useMemoUnreadBadge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -37,6 +38,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { user: currentUser } = useAuthStore();
     const { role: projectRole } = usePermission();
     const { project } = useAdminContext();
+    const memoUnreadCount = useMemoUnreadBadge('study', original?.id ?? 0, currentUser?.id ?? 0);
     const projectMembers = (project?.members ?? []).map((m) => ({
         user_id: m.user_id,
         display_name: m.user.full_name ?? m.user.email,
@@ -414,7 +416,14 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 <BookOpen className="h-5 w-5 text-indigo-600" />
                             </div>
                             <div className="flex flex-col items-start">
-                                <span>{t('admin.memo.title_study', 'Methodology memo')}</span>
+                                <span className="flex items-center gap-2">
+                                    {t('admin.memo.title_study', 'Methodology memo')}
+                                    {memoUnreadCount > 0 && (
+                                        <span className="rounded-full bg-amber-100 text-amber-800 text-xs px-2 py-0.5 font-medium">
+                                            {memoUnreadCount}
+                                        </span>
+                                    )}
+                                </span>
                                 <span className="text-xs font-medium text-slate-500 mt-0.5">
                                     {t(
                                         'admin.memo.summary_empty_study',

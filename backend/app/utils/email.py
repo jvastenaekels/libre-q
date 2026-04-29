@@ -63,3 +63,63 @@ def send_invitation_email(
     except Exception as e:
         logger.error(f"Failed to send invitation email to {email_to}: {str(e)}")
         raise
+
+
+def send_memo_mention_email(
+    email_to: str,
+    *,
+    project_name: str,
+    parent_type: str,
+    parent_title: str,
+    mention_excerpt: str,
+    link_url: str,
+    mentioner_name: str,
+) -> None:
+    """Notify a project member that they were @-mentioned in a memo comment.
+
+    Mirrors `send_invitation_email`: silently logs the message instead of
+    sending when SMTP settings are missing (development environments).
+    """
+    subject = f"You were mentioned in {parent_title} ({parent_type})"
+
+    html_content = f"""
+    <html>
+        <body>
+            <p>{mentioner_name} mentioned you in <strong>{parent_title}</strong>
+               ({parent_type}, project {project_name}).</p>
+            <blockquote>{mention_excerpt}</blockquote>
+            <p><a href="{link_url}">Open in Qualis</a></p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+
+    if not settings.SMTP_HOST or not settings.SMTP_USER or not settings.SMTP_PASSWORD:
+        logger.warning("SMTP settings missing. Logging memo-mention email instead:")
+        logger.warning(f"To: {email_to}")
+        logger.warning(f"Subject: {subject}")
+        logger.warning(f"Link: {link_url}")
+        logger.info(
+            f"\n--- MOCK MEMO MENTION EMAIL ---\n"
+            f"To: {email_to}\nSubject: {subject}\nLink: {link_url}\n"
+            f"-------------------------------\n"
+        )
+        return
+
+    message = MIMEMultipart()
+    message["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
+    message["To"] = email_to
+    message["Subject"] = subject
+    message.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(settings.SMTP_HOST, int(settings.SMTP_PORT or 0)) as server:
+            if settings.SMTP_TLS:
+                server.starttls()
+            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+            server.send_message(message)
+        logger.info(f"Memo-mention email sent to {email_to}")
+    except Exception as e:
+        logger.error(f"Failed to send memo-mention email to {email_to}: {str(e)}")
+        raise

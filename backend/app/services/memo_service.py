@@ -12,6 +12,7 @@ inputs.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Sequence
 
 from fastapi import HTTPException, status
@@ -304,3 +305,29 @@ class MemoService:
         await db.commit()
         await db.refresh(c)
         return c
+
+    @staticmethod
+    async def count_unread_for_parent(
+        db: AsyncSession,
+        *,
+        parent_type: MemoParentType,
+        parent_id: int,
+        current_user_id: int,
+        since: datetime,
+    ) -> int:
+        """Count comments newer than `since`, not authored by the user, not deleted."""
+        from sqlalchemy import func as sa_func
+
+        stmt = (
+            select(sa_func.count(MemoComment.id))
+            .join(MemoEntry, MemoComment.entry_id == MemoEntry.id)
+            .where(
+                MemoEntry.parent_type == parent_type,
+                MemoEntry.parent_id == parent_id,
+                MemoComment.created_at > since,
+                MemoComment.user_id != current_user_id,
+                MemoComment.deleted == False,  # noqa: E712 — SQLAlchemy needs == not `is`
+            )
+        )
+        result = (await db.execute(stmt)).scalar()
+        return result or 0
