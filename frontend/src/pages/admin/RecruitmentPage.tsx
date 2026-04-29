@@ -65,6 +65,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import type { RecruitmentLinkType } from '@/api/model';
 import { useRecruitmentPage } from '@/hooks/admin/useRecruitmentPage';
+import { EmptyState } from '@/components/ui/empty-state';
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from state-aware banners + multi-row table cells with per-link-type rendering; all logic lives in useRecruitmentPage
 const RecruitmentPage = () => {
@@ -892,33 +893,27 @@ const RecruitmentPage = () => {
                             {links?.length === 0 ? (
                                 <TableRow className="hover:bg-transparent">
                                     <TableCell colSpan={6} className="p-6">
-                                        <div className="text-center py-12 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
-                                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 mb-4">
-                                                <Link2 className="h-6 w-6 text-slate-400" />
-                                            </div>
-                                            <p className="text-sm font-bold text-slate-700 mb-1">
-                                                {t(
+                                        {/* Wave E (E2): migrated to <EmptyState> primitive. */}
+                                        <div className="bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                                            <EmptyState
+                                                icon={Link2}
+                                                title={t(
                                                     'admin.recruitment.empty_title',
                                                     'No recruitment links yet'
                                                 )}
-                                            </p>
-                                            <p className="text-xs text-slate-400 font-medium mb-4 max-w-xs mx-auto">
-                                                {t(
+                                                body={t(
                                                     'admin.recruitment.empty_description',
                                                     'Create your first link to start inviting participants.'
                                                 )}
-                                            </p>
-                                            <Button
-                                                size="sm"
-                                                onClick={() => setIsCreateModalOpen(true)}
-                                                className="bg-indigo-600 hover:bg-indigo-700 font-bold rounded-xl shadow-sm"
-                                            >
-                                                <Plus className="h-4 w-4 mr-1.5" />
-                                                {t(
-                                                    'admin.recruitment.empty_cta',
-                                                    'Create access link'
-                                                )}
-                                            </Button>
+                                                cta={{
+                                                    label: t(
+                                                        'admin.recruitment.empty_cta',
+                                                        'Create access link'
+                                                    ),
+                                                    onClick: () => setIsCreateModalOpen(true),
+                                                }}
+                                                variant="inline"
+                                            />
                                         </div>
                                     </TableCell>
                                 </TableRow>
