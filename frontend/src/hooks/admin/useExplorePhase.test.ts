@@ -15,6 +15,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
+import type { PreviewRangeRow } from '@/api/model/previewRangeRow';
 import { useExplorePhase } from './useExplorePhase';
 
 // ── Mocks ──────────────────────────────────────────────────────────
@@ -628,6 +629,63 @@ describe('useExplorePhase', () => {
                 await result.current.handlePreviewRange([2, 3]);
             });
             expect(mutateAsync).not.toHaveBeenCalled();
+        });
+
+        it('discards in-flight preview-range result when extraction changes mid-flight', async () => {
+            // Race: while mutateAsync is in flight, the user flips extraction.
+            // The reset effect clears previewRows AND bumps the snapshot token;
+            // when the stale promise resolves, the commit must be skipped.
+            let resolveMutation: ((v: { rows: PreviewRangeRow[] }) => void) | null = null;
+            const mutateAsync = vi.fn(
+                () =>
+                    new Promise<{ rows: PreviewRangeRow[] }>((resolve) => {
+                        resolveMutation = resolve;
+                    })
+            );
+            mockPreviewRangeMutation.mockReturnValue({
+                mutateAsync,
+                isPending: true,
+                isError: false,
+                error: null,
+            });
+
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+
+            // Start the preview-range request (don't await — keep the promise in flight).
+            let pendingPreview: Promise<void> | undefined;
+            await act(async () => {
+                pendingPreview = result.current.handlePreviewRange([2, 3]);
+            });
+
+            // Flip extraction mid-flight: this resets previewRows and bumps the token.
+            await act(async () => {
+                result.current.setExtraction('centroid');
+            });
+
+            // Now resolve the stale mutation with rows that should NOT be committed.
+            expect(resolveMutation).not.toBeNull();
+            await act(async () => {
+                resolveMutation?.({
+                    rows: [
+                        {
+                            n_factors: 2,
+                            cumulative_variance: 47,
+                            pct_flagged: 0.8,
+                            n_distinguishing: 8,
+                            n_cross_loaders: 0,
+                            n_consensus: 3,
+                            min_defining_sorts: 4,
+                            has_empty_factor: false,
+                        },
+                    ],
+                });
+                await pendingPreview;
+            });
+
+            // The stale rows must NOT have landed: previewRows is still undefined.
+            expect(result.current.previewRows).toBeUndefined();
         });
     });
 

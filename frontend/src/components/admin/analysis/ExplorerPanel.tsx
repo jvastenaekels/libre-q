@@ -34,18 +34,23 @@ export function ExplorerPanel({ explore, advancedContent }: Props) {
 
     // Auto-fetch a sensible preview range on mount (or when the gate flips
     // from disabled to enabled). Range covers k = 2 .. min(6, maxFactors).
+    // Wait until eigenvalues actually loaded — otherwise maxFactors is the
+    // stale fallback (10), and small studies (n=3..6) would see the request
+    // rejected with a 400 "k > max_k" toast.
     useEffect(() => {
         if (
+            explore.hasEigenvalues &&
             explore.canPreviewRange &&
             explore.previewRows === undefined &&
             !explore.isPreviewing &&
             explore.maxFactors >= 2
         ) {
-            const length = Math.min(5, explore.maxFactors - 1);
-            const range = Array.from({ length }, (_, i) => i + 2);
+            const upper = Math.min(6, explore.maxFactors);
+            const range = Array.from({ length: upper - 1 }, (_, i) => i + 2);
             void explore.handlePreviewRange(range);
         }
     }, [
+        explore.hasEigenvalues,
         explore.canPreviewRange,
         explore.previewRows,
         explore.isPreviewing,

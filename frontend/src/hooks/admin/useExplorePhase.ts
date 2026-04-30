@@ -11,7 +11,7 @@
  * manage the post-run interpretation surfaces (those live in useInterpretPhase).
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -28,7 +28,6 @@ import type { ManualRotation } from '@/api/model';
 import type { PreviewRangeRow } from '@/api/model/previewRangeRow';
 import type { PreviewRangeRequestExtraction } from '@/api/model/previewRangeRequestExtraction';
 import type { PreviewRangeRequestRotation } from '@/api/model/previewRangeRequestRotation';
-import type { PreviewRangeRequestFlagging } from '@/api/model/previewRangeRequestFlagging';
 
 /**
  * Client-side draft of a manual rotation row. Carries a stable `id` used as the
@@ -233,25 +232,39 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
 
     const canPreviewRange = extraction === 'pca' && (rotation === 'varimax' || rotation === 'none');
 
+    // Monotonic token: every preview-range call captures the current value
+    // and only commits its result if the token still matches. The reset effect
+    // bumps the token so any in-flight resolution is silenced when the user
+    // flips extraction / rotation / flagging mid-flight (otherwise the stale
+    // rows would land under the new config).
+    const previewTokenRef = useRef(0);
+
     const handlePreviewRange = useCallback(
         async (range: number[]) => {
             if (!canPreviewRange) return;
+            const token = ++previewTokenRef.current;
             const data = await previewMutation.mutateAsync({
                 slug,
                 data: {
                     n_factors_range: range,
                     extraction: extraction as PreviewRangeRequestExtraction,
                     rotation: rotation as PreviewRangeRequestRotation,
-                    flagging: flagging as PreviewRangeRequestFlagging,
+                    flagging,
                 },
             });
-            setPreviewRows(data.rows);
+            if (token === previewTokenRef.current) {
+                setPreviewRows(data.rows);
+            }
+            // else: a newer call (or a config flip) has invalidated this resolution.
         },
         [slug, extraction, rotation, flagging, canPreviewRange, previewMutation]
     );
 
     // Reset stale rows whenever a setting that would change the preview flips.
+    // Bumping the token cancels any pending commit even if the user doesn't
+    // trigger a new mutate.
     useEffect(() => {
+        previewTokenRef.current += 1;
         setPreviewRows(undefined);
     }, [extraction, rotation, flagging]);
 

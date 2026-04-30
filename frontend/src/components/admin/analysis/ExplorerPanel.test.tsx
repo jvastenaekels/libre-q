@@ -168,4 +168,22 @@ describe('ExplorerPanel', () => {
         renderWithProviders(<ExplorerPanel explore={explore} />);
         expect(handlePreviewRange).not.toHaveBeenCalled();
     });
+
+    it('does NOT auto-fire when eigenvalues are still loading', () => {
+        // Regression: useExplorePhase falls back to maxFactors=10 while
+        // eigenvaluesQuery.data is undefined. Without the hasEigenvalues gate,
+        // the effect would fire with [2,3,4,5,6] — and for a study of n=3..6
+        // participants the backend rejects k > min(8, n-1) with a 400.
+        const handlePreviewRange = vi.fn();
+        const explore = buildExplore({
+            hasEigenvalues: false, // eigenvalues query in flight
+            canPreviewRange: true,
+            previewRows: undefined,
+            isPreviewing: false,
+            maxFactors: 10, // stale fallback
+            handlePreviewRange,
+        });
+        renderWithProviders(<ExplorerPanel explore={explore} />);
+        expect(handlePreviewRange).not.toHaveBeenCalled();
+    });
 });
