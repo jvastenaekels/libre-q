@@ -33,7 +33,12 @@ from ..models import (
     StudyTranslation,
 )
 from ..schemas import StudyCreate, StudyUpdate
-from .study_defaults import DEFAULT_PROCESS_STEPS, DEFAULT_TRANSLATION_CONTENT
+from .study_defaults import (
+    DEFAULT_PROCESS_STEPS,
+    DEFAULT_TRANSLATION_CONTENT,
+    build_process_steps,
+    build_step_help,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +105,7 @@ class StudyService:
                 ),
                 show_statement_codes=study_in.show_statement_codes,
                 distribution_mode=study_in.distribution_mode,
+                rough_sort_enabled=study_in.rough_sort_enabled,
                 branding=study_in.branding.model_dump() if study_in.branding else None,
                 start_date=study_in.start_date,
                 end_date=study_in.end_date,
@@ -117,12 +123,19 @@ class StudyService:
                     lang, DEFAULT_TRANSLATION_CONTENT["en"]
                 )
                 if not t_data.get("process_steps"):
-                    t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
-                        lang, DEFAULT_PROCESS_STEPS["en"]
+                    t_data["process_steps"] = build_process_steps(
+                        rough_sort_enabled=study_in.rough_sort_enabled,
+                        locale=lang,
                     )
                 for field, value in defaults.items():
                     if not t_data.get(field):
-                        t_data[field] = value
+                        if field == "step_help":
+                            t_data[field] = build_step_help(
+                                rough_sort_enabled=study_in.rough_sort_enabled,
+                                locale=lang,
+                            )
+                        else:
+                            t_data[field] = value
                 db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
             for idx, s_in in enumerate(study_in.statements):
