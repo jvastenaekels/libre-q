@@ -972,7 +972,7 @@
                 "narrative_title": "Narrative — F{{n}}",
                 "insert_comment_quote": "Insert comment as quote"
             },
-            "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}…\""
+            "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}\""
         },
         "project": {
             "remove_member": "Remove member",

@@ -20,6 +20,14 @@ interface Props {
     onFocusChange: (factor: number) => void;
 }
 
+/**
+ * Cap on the number of top |z| statements rendered in the canvas.
+ * 12 covers the typical 6-up + 6-down extremes of a 30-statement Q-set;
+ * larger Q-sets (60+ statements) may bury some distinguishing items
+ * outside the cap. The current sort by |z| descending typically surfaces
+ * distinguishing items but doesn't guarantee it; "distinguishing first"
+ * is a future refinement (Phase 5+).
+ */
 const TOP_STATEMENTS_LIMIT = 12;
 const QUOTE_TRUNCATE = 60;
 
@@ -65,9 +73,13 @@ export function FactorCanvas({ slug, interpret, onFocusChange }: Props) {
         (comment: ParticipantCardComment, participantLabel: string) => {
             const snippet = formatQuote(t, comment, participantLabel);
             editorRef.current?.appendQuote(snippet);
-            interpret.appendToNarrative(snippet);
+            // Note: previously also called interpret.appendToNarrative(snippet),
+            // but no current consumer reads the hook's narrativeDraft externally.
+            // The editor's internal draft is the source of truth until save flushes
+            // to factor_notes. Reintroduce the dual-write only if a consumer
+            // materializes (e.g. compare-pin reading drafts).
         },
-        [t, interpret]
+        [t]
     );
 
     if (!run || !result) {
@@ -167,10 +179,11 @@ type TFn = (key: string, fallback: string, opts?: Record<string, unknown>) => st
 
 function formatQuote(t: TFn, comment: ParticipantCardComment, participantLabel: string): string {
     const stmtFull = comment.statement_text ?? '';
-    const stmt = stmtFull.length > QUOTE_TRUNCATE ? stmtFull.slice(0, QUOTE_TRUNCATE) : stmtFull;
+    const stmt =
+        stmtFull.length > QUOTE_TRUNCATE ? `${stmtFull.slice(0, QUOTE_TRUNCATE)}…` : stmtFull;
     return t(
         'admin.analysis.quote_insert_format',
-        '> {{text}}\n> — {{p}}, on statement {{code}}: "{{stmt}}…"',
+        '> {{text}}\n> — {{p}}, on statement {{code}}: "{{stmt}}"',
         {
             text: comment.comment,
             p: participantLabel,

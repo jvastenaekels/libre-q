@@ -51,7 +51,7 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                     setDraft((prev) => (prev ? `${prev}\n\n${snippet}` : snippet));
                 },
             }),
-            []
+            [] // setters (setIsEditing, setDraft) are stable; the closure stays correct.
         );
 
         const mutation = useUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch();

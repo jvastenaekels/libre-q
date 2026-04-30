@@ -924,7 +924,7 @@
                 "narrative_title": "Narratiivi — F{{n}}",
                 "insert_comment_quote": "Lisää kommentti lainauksena"
             },
-            "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}…\""
+            "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}\""
         },
         "project": {
             "remove_member": "Poista jäsen",

@@ -193,7 +193,7 @@ describe('FactorCanvas', () => {
         expect(container.firstChild).toBeNull();
     });
 
-    it('clicking a comment ▸+ button calls handleInsertCommentQuote → appendToNarrative', async () => {
+    it('clicking a comment ▸+ button inserts the formatted snippet into the editor', async () => {
         mockCommentsHook.mockReturnValue(
             dataOk<ParticipantCardComment>([
                 {
@@ -207,6 +207,7 @@ describe('FactorCanvas', () => {
             ])
         );
 
+        // Spy on appendToNarrative to confirm the dual-write was removed.
         const appendToNarrative = vi.fn();
         const interpret = buildInterpret({ appendToNarrative });
         renderWithProviders(
@@ -216,12 +217,67 @@ describe('FactorCanvas', () => {
         const insertBtn = await screen.findByLabelText(/insert comment as quote/i);
         fireEvent.click(insertBtn);
 
-        expect(appendToNarrative).toHaveBeenCalledTimes(1);
-        const snippet = appendToNarrative.mock.calls[0]?.[0] as string;
-        expect(snippet).toContain('Because food sovereignty matters');
-        expect(snippet).toMatch(/^> /);
-        expect(snippet).toContain('P1');
-        expect(snippet).toContain('S07');
+        // appendQuote forces edit mode → textarea now visible with the snippet.
+        const textarea = await screen.findByRole('textbox');
+        const value = (textarea as HTMLTextAreaElement).value;
+        expect(value).toContain('Because food sovereignty matters');
+        expect(value).toMatch(/^> /);
+        expect(value).toContain('P1');
+        expect(value).toContain('S07');
+
+        // Negative test: dual-write was removed, hook-level draft is no longer
+        // touched from FactorCanvas.
+        expect(appendToNarrative).not.toHaveBeenCalled();
+    });
+
+    it('formatQuote does not append ellipsis on short statements', async () => {
+        mockCommentsHook.mockReturnValue(
+            dataOk<ParticipantCardComment>([
+                {
+                    participant_db_id: 1,
+                    statement_id: 7,
+                    statement_code: 'S07',
+                    statement_text: 'Short text', // < 60 chars
+                    grid_score: 4,
+                    comment: 'Because',
+                },
+            ])
+        );
+        renderWithProviders(
+            <FactorCanvas slug="s" interpret={buildInterpret()} onFocusChange={vi.fn()} />
+        );
+        const insertBtn = await screen.findByLabelText(/insert comment as quote/i);
+        fireEvent.click(insertBtn);
+        const textarea = await screen.findByRole('textbox');
+        const value = (textarea as HTMLTextAreaElement).value;
+        expect(value).toContain('"Short text"');
+        expect(value).not.toContain('…');
+    });
+
+    it('formatQuote appends ellipsis only when statement is truncated', async () => {
+        const longText =
+            'This is a very long statement that exceeds the truncation threshold of sixty characters by quite a bit.';
+        mockCommentsHook.mockReturnValue(
+            dataOk<ParticipantCardComment>([
+                {
+                    participant_db_id: 1,
+                    statement_id: 7,
+                    statement_code: 'S07',
+                    statement_text: longText,
+                    grid_score: 4,
+                    comment: 'Because',
+                },
+            ])
+        );
+        renderWithProviders(
+            <FactorCanvas slug="s" interpret={buildInterpret()} onFocusChange={vi.fn()} />
+        );
+        const insertBtn = await screen.findByLabelText(/insert comment as quote/i);
+        fireEvent.click(insertBtn);
+        const textarea = await screen.findByRole('textbox');
+        const value = (textarea as HTMLTextAreaElement).value;
+        expect(value).toContain('…');
+        expect(value).toContain(longText.slice(0, 60));
     });
 
     it('does NOT render an insert button on audio rows', async () => {
