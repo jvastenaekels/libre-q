@@ -914,7 +914,9 @@
                 "pct_flagged": "% flagattu",
                 "n_distinguishing": "# erottavia",
                 "n_cross_loaders": "# ristikuormitt.",
-                "min_def_sorts": "min määr. sortit"
+                "min_def_sorts": "min määr. sortit",
+                "advanced_title": "Lisäasetukset",
+                "commit_cta": "Vahvista ja tulkitse"
             }
         },
         "project": {

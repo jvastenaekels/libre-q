@@ -962,7 +962,9 @@
                 "pct_flagged": "% flagged",
                 "n_distinguishing": "# distinguishing",
                 "n_cross_loaders": "# cross-loaders",
-                "min_def_sorts": "min defining sorts"
+                "min_def_sorts": "min defining sorts",
+                "advanced_title": "Advanced configuration",
+                "commit_cta": "Commit and interpret"
             }
         },
         "project": {

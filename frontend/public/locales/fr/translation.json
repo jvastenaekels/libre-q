@@ -914,7 +914,9 @@
                 "pct_flagged": "% flaggés",
                 "n_distinguishing": "# distinguish.",
                 "n_cross_loaders": "# cross-load.",
-                "min_def_sorts": "min sorts définiss."
+                "min_def_sorts": "min sorts définiss.",
+                "advanced_title": "Configuration avancée",
+                "commit_cta": "Valider et interpréter"
             }
         },
         "project": {
