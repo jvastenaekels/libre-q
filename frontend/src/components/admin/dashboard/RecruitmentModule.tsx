@@ -121,7 +121,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                                 level="H"
                                 includeMargin={false}
                                 imageSettings={{
-                                    src: '/favicon.svg',
+                                    src: '/icon-192.png',
                                     x: undefined,
                                     y: undefined,
                                     height: 30,
