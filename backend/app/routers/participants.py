@@ -21,6 +21,7 @@ from app.schemas import (
 )
 from app.schemas.responses import AckResponse
 from app.services.study_service import StudyService
+from app.utils.study_flow import InvalidStepTransition, validate_step_transition
 
 _UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
@@ -71,21 +72,32 @@ async def update_progress(
 ) -> AckResponse:
     """Records the participant's current step (fire-and-forget from frontend)."""
     result = await db.execute(
-        select(Participant)
+        select(Participant, Study)
         .join(Study, Participant.study_id == Study.id)
         .where(Participant.session_token == data.session_token, Study.slug == slug)
-        .with_for_update()
+        .with_for_update(of=Participant)
     )
-    participant = result.scalar_one_or_none()
+    row = result.one_or_none()
 
-    if not participant:
+    if not row:
         raise HTTPException(status_code=404, detail="Participant not found")
+
+    participant, study = row.tuple()
 
     # Only advance forward (never regress)
     if (
         participant.last_step_reached is None
         or data.step > participant.last_step_reached
     ):
+        try:
+            validate_step_transition(
+                current_step=participant.last_step_reached or 1,
+                target_step=data.step,
+                rough_sort_enabled=study.rough_sort_enabled,
+            )
+        except InvalidStepTransition as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
         participant.last_step_reached = data.step
         participant.last_step_reached_at = datetime.now(timezone.utc)
         await db.commit()

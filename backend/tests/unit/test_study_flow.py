@@ -40,11 +40,13 @@ def test_step_4_from_step_2_when_rough_disabled() -> None:
     )
 
 
-def test_step_4_from_step_2_rejected_when_rough_enabled() -> None:
-    with pytest.raises(InvalidStepTransition):
-        validate_step_transition(
-            current_step=2, target_step=4, rough_sort_enabled=True
-        )
+def test_step_4_from_step_2_allowed_when_rough_enabled() -> None:
+    # /progress is fire-and-forget: forward jumps to any enabled step are OK.
+    # Strict-sequence enforcement would conflict with the existing endpoint
+    # semantics (frontend may report any reached step).
+    validate_step_transition(
+        current_step=2, target_step=4, rough_sort_enabled=True
+    )
 
 
 def test_backward_transitions_always_allowed() -> None:

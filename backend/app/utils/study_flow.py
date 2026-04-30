@@ -33,9 +33,12 @@ def validate_step_transition(
 ) -> None:
     """Raise ``InvalidStepTransition`` if the target step is not reachable.
 
+    The /progress endpoint is fire-and-forget: the frontend may report any
+    forward step it has reached. We only reject targets that are not
+    structurally enabled for the study (e.g. step 3 when rough_sort_enabled
+    is False — that step does not exist in the participant flow).
+
     Backward and idempotent transitions are always allowed (resume / replay).
-    Forward transitions must land on the immediate next enabled step — no
-    skipping over an enabled intermediate step.
     """
     if target_step <= current_step:
         return
@@ -44,11 +47,4 @@ def validate_step_transition(
         raise InvalidStepTransition(
             f"Step {target_step} is not enabled for this study "
             f"(allowed: {allowed})"
-        )
-    # Forward jump check: target must be the next enabled step after current.
-    next_enabled = next((s for s in allowed if s > current_step), None)
-    if next_enabled is not None and target_step != next_enabled:
-        raise InvalidStepTransition(
-            f"Step {target_step} skips required step {next_enabled} "
-            f"(allowed sequence: {allowed})"
         )
