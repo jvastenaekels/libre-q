@@ -839,7 +839,7 @@ describe.each([
         setViewport('desktop');
     });
 
-    it('rapid double-click on a card does not place it twice', () => {
+    it('keeps validate disabled after rapid double-click before placement completes', () => {
         // The page delegates click handling to useFineSortDrag → handleCardClick,
         // which the response store ultimately translates into placeCardInGrid.
         // The store dedupes by filtering out the existing entry, so two rapid

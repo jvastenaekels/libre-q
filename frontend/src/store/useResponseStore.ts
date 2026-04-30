@@ -123,7 +123,18 @@ const _placeOrMove = (
         return;
     }
     const filtered = state.qsort.filter((p) => p.statementId !== statementId);
-    set({ qsort: [...filtered, { statementId, col, row }] });
+    // Deck-mode invariant: a placed card must not also live in the flat deck.
+    // When the card is currently in the deck, splice it out atomically with the
+    // qsort update so the two slices never disagree (rough mode: deck is always
+    // empty, so this branch is skipped and only qsort is updated).
+    if (state.deck.includes(statementId)) {
+        set({
+            qsort: [...filtered, { statementId, col, row }],
+            deck: state.deck.filter((id) => id !== statementId),
+        });
+    } else {
+        set({ qsort: [...filtered, { statementId, col, row }] });
+    }
     triggerSavingIndicator();
 };
 
@@ -296,6 +307,10 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             version: 2,
             storage: safeLocalStorage,
             migrate: (persisted: unknown, version: number) => {
+                // v1 → v2: deck slice added; structurally compatible because
+                // `deck` defaults to [] via the `...initialResponses` spread on
+                // rehydration (any persisted v1 blob simply lacks `deck` and the
+                // default fills it in). No data transform needed.
                 if (version < 2) return persisted as Responses;
                 return persisted as Responses;
             },

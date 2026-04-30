@@ -165,5 +165,27 @@ describe('useResponseStore', () => {
             store.resetResponses();
             expect(useResponseStore.getState().deck).toEqual([]);
         });
+
+        it('placeCardInGrid splices the id out of deck (deck-mode invariant)', () => {
+            const store = useResponseStore.getState();
+            // Seed the deck so we can verify placement removes the id.
+            store.addToDeck(1);
+            store.addToDeck(2);
+            expect(useResponseStore.getState().deck).toEqual([1, 2]);
+
+            store.placeCardInGrid(1, 0, 0);
+
+            const state = useResponseStore.getState();
+            expect(state.deck).toEqual([2]); // 1 is now placed, 2 still in deck
+            expect(state.qsort).toHaveLength(1);
+            expect(state.qsort[0]).toEqual({ statementId: 1, col: 0, row: 0 });
+        });
+
+        it('placeCardInGrid leaves deck untouched when the id is not in it (rough mode)', () => {
+            const store = useResponseStore.getState();
+            // Deck stays empty; placing should not corrupt the empty list.
+            store.placeCardInGrid(1, 0, 0);
+            expect(useResponseStore.getState().deck).toEqual([]);
+        });
     });
 });
