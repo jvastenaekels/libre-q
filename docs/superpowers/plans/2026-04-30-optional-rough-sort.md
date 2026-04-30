@@ -78,6 +78,14 @@ Task 18.5 adds **viewport rotation tests** via `Object.defineProperty(window, 'i
 - `frontend/public/locales/{en,fr,fi}/translation.json` — new keys for toggle + deck + lock banner
 - `frontend/src/store/useResponseStore.ts` — guard `categorizeCard` no-op when deck mode (keep slice for backwards-compat)
 
+#### Frontend — modified (Phase 2 additions, found post-Phase-1 audit)
+- `frontend/src/layouts/StudyLayout.tsx:58-63,236-237,516` — **participant breadcrumb** + routing skip; mirror the existing `isPresortEnabled` pattern (lines 237, 516) for rough so step 3 is filtered out of `visibleSteps` and routing skips `/rough-sort` when disabled
+- `frontend/src/pages/WelcomePage.tsx:104-108` — **welcome page process_steps display**: filter `process_steps` at render time using `getEnabledSteps(study)` so the participant doesn't see a "rough sort" preview entry when the flag is off
+- `frontend/src/constants/stepRoutes.ts` — keep the literal map but document that step 3 is conditionally inhabited (consumers must check the flag); no edit needed if all callers go through `StudyLayout` skip logic
+- `frontend/src/utils/studyConfig.ts` — add `isRoughSortEnabled(config)` mirror of the existing `isPresortEnabled` for symmetry; both return true when the feature is structurally on, false when off
+- `frontend/src/constants/studyDefaults.ts` — frontend-side defaults still include the rough step (matches the backend constant pattern); filtering happens at render via `getEnabledSteps`
+- `frontend/src/components/admin/designer/ProcessStepEditor.tsx` — admin awareness when editing process_steps; out of Phase 2 (touched in Phase 3 alongside the toggle UI), but documented here so the spec is complete
+
 ---
 
 # Phase 1 — Foundation (PR 1)
