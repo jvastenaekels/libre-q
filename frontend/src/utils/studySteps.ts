@@ -100,6 +100,26 @@ export function getStepLabels(
 }
 
 /**
+ * Look up the label + progress percentage for a single persisted step.
+ *
+ * Returns null if the step is not enabled for the study (e.g. step 3 with
+ * rough disabled). Callers (like RecentActivityCard) typically render
+ * nothing in that case.
+ */
+export function getStepInfo(
+    study: StudyShape,
+    persistedNumber: number
+): { labelKey: string; labelDefault: string; progress: number } | null {
+    const desc = getEnabledSteps(study).find((s) => s.persistedNumber === persistedNumber);
+    if (!desc) return null;
+    return {
+        labelKey: desc.labelKey,
+        labelDefault: desc.labelDefault,
+        progress: desc.progressPct,
+    };
+}
+
+/**
  * Map a persisted step number to its key, given a study config.
  *
  * If the step number is not enabled for this study (e.g. step 3 with

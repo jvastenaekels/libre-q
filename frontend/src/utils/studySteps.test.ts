@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { getEnabledSteps, getStepLabels, mapPersistedStepToKey } from './studySteps';
+import {
+    getEnabledSteps,
+    getStepInfo,
+    getStepLabels,
+    mapPersistedStepToKey,
+} from './studySteps';
 
 const baseStudy = (overrides: Partial<{ rough_sort_enabled: boolean }> = {}) =>
     ({
@@ -96,5 +101,29 @@ describe('getStepLabels', () => {
     it('respects the keys filter', () => {
         const labels = getStepLabels(baseStudy(), new Set(['fine'] as const));
         expect(Object.keys(labels)).toEqual(['4']);
+    });
+});
+
+describe('getStepInfo', () => {
+    it('returns label + progress for an enabled step (rough mode)', () => {
+        const info = getStepInfo(baseStudy({ rough_sort_enabled: true }), 4);
+        expect(info).toEqual({
+            labelKey: 'admin.data.step.fine',
+            labelDefault: 'Q-sort',
+            progress: 80,
+        });
+    });
+
+    it('progress reflects 4-step distribution when rough disabled', () => {
+        const info = getStepInfo(baseStudy({ rough_sort_enabled: false }), 4);
+        expect(info?.progress).toBe(75);
+    });
+
+    it('returns null for a structurally-disabled step', () => {
+        expect(getStepInfo(baseStudy({ rough_sort_enabled: false }), 3)).toBeNull();
+    });
+
+    it('returns null for an out-of-range step', () => {
+        expect(getStepInfo(baseStudy(), 99)).toBeNull();
     });
 });
