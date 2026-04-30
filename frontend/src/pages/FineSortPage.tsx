@@ -122,28 +122,30 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                     items={config.statements.map((s) => s.id)}
                     strategy={rectSortingStrategy}
                 >
-                    <GridSort
-                        agreeCards={unplacedAgree}
-                        disagreeCards={unplacedDisagree}
-                        neutralCards={unplacedNeutral}
-                        gridColumns={gridColumns}
-                        renderSlotContent={renderSlotContent}
-                        conditionOfInstruction={config.condition_of_instruction}
-                        disableHoverZoom={activeId !== null}
-                        selectedCardId={selectedCardId}
-                        onCardClick={handleCardClick}
-                        onSlotClick={handleSlotClick}
-                        onDimensionsChange={setCardDimensions}
-                        onReset={handleReset}
-                        onZoomChange={setZoomLevel}
-                        onInteractionUtils={setInteractionUtils}
-                        isAllPlaced={isAllPlaced}
-                        onValidate={handleValidate}
-                        showCodes={showCodes}
-                        distributionMode={distributionMode}
-                        highlightKey={highlightKey}
-                        uiLabels={config.ui_labels}
-                    />
+                    {config?.rough_sort_enabled !== false ? (
+                        <GridSort
+                            agreeCards={unplacedAgree}
+                            disagreeCards={unplacedDisagree}
+                            neutralCards={unplacedNeutral}
+                            gridColumns={gridColumns}
+                            renderSlotContent={renderSlotContent}
+                            conditionOfInstruction={config.condition_of_instruction}
+                            disableHoverZoom={activeId !== null}
+                            selectedCardId={selectedCardId}
+                            onCardClick={handleCardClick}
+                            onSlotClick={handleSlotClick}
+                            onDimensionsChange={setCardDimensions}
+                            onReset={handleReset}
+                            onZoomChange={setZoomLevel}
+                            onInteractionUtils={setInteractionUtils}
+                            isAllPlaced={isAllPlaced}
+                            onValidate={handleValidate}
+                            showCodes={showCodes}
+                            distributionMode={distributionMode}
+                            highlightKey={highlightKey}
+                            uiLabels={config.ui_labels}
+                        />
+                    ) : null}
                 </SortableContext>
             </div>
             {createPortal(
