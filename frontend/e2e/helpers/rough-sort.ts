@@ -51,6 +51,26 @@ export async function captureTransition(
     }
 }
 
+/**
+ * Shoot a screenshot using a pre-formatted suffix (no separate step counter).
+ * Used by the free-mode spec where the canonical filename is
+ * `${vp}-${mode}-free-NN-label.png` without an extra step prefix.
+ */
+export async function captureWithSuffix(
+    page: Page,
+    formFactor: string,
+    mode: 'rough' | 'deck',
+    suffix: string
+): Promise<void> {
+    const filename = `e2e/participant/fine-sort-screenshots/${formFactor}-${mode}-${suffix}.png`;
+    try {
+        await page.waitForTimeout(400);
+        await page.screenshot({ path: filename, fullPage: false, animations: 'disabled' });
+    } catch {
+        // Screenshot best-effort; never fail the test on capture issues.
+    }
+}
+
 async function tryZoomOut(page: Page): Promise<void> {
     try {
         const zoomOutBtn = page.getByRole('button', { name: /zoom out/i }).first();
@@ -144,4 +164,87 @@ export async function placeNCards(page: Page, n: number): Promise<number> {
  */
 export async function countPlacedCards(page: Page): Promise<number> {
     return page.locator('[role="gridcell"] [data-testid^="card-"]').count();
+}
+
+/**
+ * Place a single card from the deck onto the first empty slot of the given
+ * column index. Returns true if a card was moved, false if the deck was empty
+ * or the target column had no free slot.
+ *
+ * Useful for free-mode tests where we want to deliberately stack a single
+ * column or unbalance the distribution. Targets `#slot_${col}_${row}` IDs
+ * emitted by GridSort (column-major DOM order).
+ */
+async function placeOnceInColumn(page: Page, columnIndex: number): Promise<boolean> {
+    const deckContainer = page.getByTestId('deck-cards-container');
+    const deckCards = deckContainer.locator('[data-testid^="card-"]');
+    const remaining = await deckCards.count();
+    if (remaining === 0) return false;
+
+    // Find the first empty slot in the target column.
+    const colSlots = page.locator(`[id^="slot_${columnIndex}_"]:not(:has([data-testid^="card-"]))`);
+    const colSlotsCount = await colSlots.count();
+    if (colSlotsCount === 0) return false;
+
+    const card = deckCards.first();
+    await card.click({ force: true }).catch(async () => {
+        await card.evaluate((node: HTMLElement) => node.click());
+    });
+
+    const target = colSlots.first();
+    await target.scrollIntoViewIfNeeded().catch(() => {});
+    await target.evaluate((node: HTMLElement) => node.click());
+
+    await expect
+        .poll(async () => deckContainer.locator('[data-testid^="card-"]').count(), {
+            timeout: 5000,
+        })
+        .toBeLessThan(remaining);
+    return true;
+}
+
+/**
+ * Place exactly N cards from the deck into a specific column. Returns the
+ * number actually placed (capped by available deck cards and free slots).
+ *
+ * In rough-sort mode, walks through pile tabs as needed so the helper works
+ * for both rough+fine and deck-only flows.
+ */
+export async function placeNCardsInColumn(
+    page: Page,
+    n: number,
+    columnIndex: number
+): Promise<number> {
+    const deckContainer = page.getByTestId('deck-cards-container');
+    await expect(deckContainer).toBeVisible({ timeout: 10000 });
+    await tryZoomOut(page);
+
+    const isRoughMode = (await page.getByRole('tab').count()) === 3;
+    let placed = 0;
+    let pileIndex = 0;
+
+    while (placed < n) {
+        if (isRoughMode) {
+            // Activate current pile.
+            const tab = page.getByRole('tab').nth(pileIndex);
+            await tab.click();
+            await expect(tab).toHaveAttribute('aria-selected', 'true');
+        }
+
+        const moved = await placeOnceInColumn(page, columnIndex);
+        if (moved) {
+            placed++;
+            continue;
+        }
+
+        // No card moved. If rough mode, try the next pile; otherwise we're
+        // done (deck empty or column full).
+        if (isRoughMode && pileIndex < 2) {
+            pileIndex++;
+            continue;
+        }
+        break;
+    }
+
+    return placed;
 }
