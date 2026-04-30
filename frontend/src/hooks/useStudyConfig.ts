@@ -12,6 +12,115 @@ import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
 import i18n from '../i18n';
 
+/** Map a fetch/parse error onto an i18n translation key for the user-facing message. */
+function mapErrorToTranslationKey(error: unknown): string {
+    if (error instanceof ApiError) {
+        if (error.status === 404 || error.status === 422) return 'common.errors.not_found';
+        if (error.status === 429) return 'common.errors.rate_limited';
+        return 'common.errors.unknown';
+    }
+    if (error instanceof ZodError) return 'common.errors.validation';
+    if (error instanceof TypeError || (error instanceof Error && error.name === 'TypeError')) {
+        return 'common.errors.network';
+    }
+    return 'common.errors.unknown';
+}
+
+/**
+ * Parse a localStorage draft (raw, with `translations` array) into the flat
+ * StudyConfig shape consumed by the player. Returns the input as-is if it's
+ * already a resolved synthetic config (no `translations` array).
+ */
+// biome-ignore lint/suspicious/noExplicitAny: localStorage draft has dynamic shape
+function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig {
+    if (!raw.translations || !Array.isArray(raw.translations)) {
+        return raw as StudyConfig;
+    }
+
+    const lang = sessionLanguage || raw.translations[0]?.language_code || 'en';
+    const tr =
+        // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+        raw.translations.find((t: any) => t.language_code === lang) || raw.translations[0];
+
+    return {
+        ...raw,
+        title: tr?.title || 'No Title',
+        subtitle: tr?.subtitle,
+        description: tr?.description,
+        objective: tr?.objective,
+        instructions: tr?.instructions,
+        consent: {
+            title: tr?.consent_title,
+            description: tr?.consent_description,
+        },
+        pre_instruction: tr?.pre_instruction,
+        condition_of_instruction: tr?.condition_of_instruction,
+        ui_labels: tr?.ui_labels || {},
+        process_steps: tr?.process_steps || [],
+        language: lang,
+        // biome-ignore lint/suspicious/noExplicitAny: draft statement type
+        statements: (raw.statements || []).map((s: any, index: number) => {
+            // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+            const st = s.translations?.find((t: any) => t.language_code === lang);
+            return {
+                id: index + 1,
+                code: s.code,
+                text: st?.text || '',
+            };
+        }),
+    } as StudyConfig;
+}
+
+/** Sync i18n + session language to the resolved config language. */
+async function syncConfigLanguage(
+    configLanguage: string | undefined,
+    sessionLanguage: string | null,
+    setLanguage: (lang: string) => void
+): Promise<void> {
+    if (!configLanguage) return;
+    if (i18n.language !== configLanguage) {
+        await i18n.changeLanguage(configLanguage);
+    }
+    if (sessionLanguage !== configLanguage) {
+        setLanguage(configLanguage);
+    }
+}
+
+/**
+ * Apply server data's resolved language to i18n and the session store, and
+ * seed the query cache for the resolved language on first detection so the
+ * next render doesn't trigger a duplicate fetch.
+ */
+function syncResolvedLanguage(
+    data: StudyConfig,
+    slug: string | undefined,
+    sessionLanguage: string | null,
+    password: string | undefined,
+    setLanguage: (lang: string) => void
+): void {
+    const langChanged = !sessionLanguage || (data.language && sessionLanguage !== data.language);
+    if (!langChanged) return;
+    const newLang = data.language || 'en';
+
+    // Seed the cache only on first detection (sessionLanguage was null) so a
+    // freshly visited page doesn't re-fetch under the resolved language.
+    if (!sessionLanguage && slug) {
+        const searchParams = new URLSearchParams(window.location.search);
+        const linkToken = searchParams.get('token') || undefined;
+        queryClient.setQueryData(
+            getGetStudyApiStudySlugGetQueryKey(slug, {
+                lang: newLang,
+                link_token: linkToken,
+                password,
+            }),
+            data
+        );
+    }
+
+    if (sessionLanguage !== newLang) setLanguage(newLang);
+    if (i18n.language !== newLang) i18n.changeLanguage(newLang);
+}
+
 export const useStudyConfig = () => {
     const { slug } = useParams();
     const [password, setPasswordState] = useState<string | undefined>();
@@ -59,126 +168,80 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (!isTestMode || !slug) return;
 
+        const loadFromLocalDraft = async (
+            draftJson: string | null,
+            legacyJson: string | null
+        ): Promise<void> => {
+            try {
+                const config = draftJson
+                    ? parseStudyDraft(JSON.parse(draftJson), sessionLanguage)
+                    : (JSON.parse(legacyJson as string) as StudyConfig);
+
+                await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
+                if (config.ui_labels) {
+                    applyStudyOverrides(config.language || 'en', config.ui_labels);
+                }
+
+                setConfig(config);
+                setConfigError(null);
+            } catch (e) {
+                console.error('Failed to parse test config from localStorage', e);
+                setConfigError('common.errors.validation');
+            } finally {
+                setConfigLoading(false);
+            }
+        };
+
+        const applyServerData = async (serverData: StudyConfig): Promise<void> => {
+            if (serverData.ui_labels) {
+                applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
+            }
+            const langChanged =
+                !sessionLanguage ||
+                (serverData.language && sessionLanguage !== serverData.language);
+            if (langChanged) {
+                const newLang = serverData.language || 'en';
+                await i18n.changeLanguage(newLang);
+                setLanguage(newLang);
+            }
+            setConfig(serverData);
+            setConfigError(null);
+        };
+
+        const loadFromServerFallback = async (): Promise<void> => {
+            console.warn(
+                `[useStudyConfig] No draft found in localStorage for ${slug}. Attempting server fallback.`
+            );
+            try {
+                const { data: serverData } = await refetch();
+                if (!serverData) throw new Error('Server returned no data');
+                await applyServerData(serverData);
+            } catch (err) {
+                console.error('[useStudyConfig] Server fallback failed', err);
+                setConfigError('common.errors.not_found');
+            } finally {
+                setConfigLoading(false);
+            }
+        };
+
         const loadFromStorage = async () => {
             resetConfig(); // Clear previous study config
             setConfigLoading(true);
 
-            // Check if we need a fresh start (set by StudyDesignPage)
+            // Honour the StudyDesignPage reset signal before reading drafts.
             const resetKey = `qualis-pilot-reset-${slug}`;
             if (localStorage.getItem(resetKey)) {
                 resetAllStores({ skipConfig: true });
                 localStorage.removeItem(resetKey);
             }
 
-            const draftKey = `qualis-test-draft-${slug}`;
-            const legacyKey = `qualis-test-config-${slug}`;
-
-            const draftJson = localStorage.getItem(draftKey);
-            const legacyJson = localStorage.getItem(legacyKey);
+            const draftJson = localStorage.getItem(`qualis-test-draft-${slug}`);
+            const legacyJson = localStorage.getItem(`qualis-test-config-${slug}`);
 
             if (draftJson || legacyJson) {
-                try {
-                    let config: StudyConfig;
-                    if (draftJson) {
-                        const raw = JSON.parse(draftJson);
-                        // Raw drafts have a translations array — resolve into flat fields
-                        if (raw.translations && Array.isArray(raw.translations)) {
-                            const lang =
-                                sessionLanguage || raw.translations[0]?.language_code || 'en';
-                            const tr =
-                                // biome-ignore lint/suspicious/noExplicitAny: draft translation type
-                                raw.translations.find((t: any) => t.language_code === lang) ||
-                                raw.translations[0];
-                            config = {
-                                ...raw,
-                                title: tr?.title || 'No Title',
-                                subtitle: tr?.subtitle,
-                                description: tr?.description,
-                                objective: tr?.objective,
-                                instructions: tr?.instructions,
-                                consent: {
-                                    title: tr?.consent_title,
-                                    description: tr?.consent_description,
-                                },
-                                pre_instruction: tr?.pre_instruction,
-                                condition_of_instruction: tr?.condition_of_instruction,
-                                ui_labels: tr?.ui_labels || {},
-                                process_steps: tr?.process_steps || [],
-                                language: lang,
-                                // biome-ignore lint/suspicious/noExplicitAny: draft statement type
-                                statements: (raw.statements || []).map((s: any, index: number) => {
-                                    const st = s.translations?.find(
-                                        // biome-ignore lint/suspicious/noExplicitAny: draft translation type
-                                        (t: any) => t.language_code === lang
-                                    );
-                                    return {
-                                        id: index + 1,
-                                        code: s.code,
-                                        text: st?.text || '',
-                                    };
-                                }),
-                            } as StudyConfig;
-                        } else {
-                            // Already a resolved synthetic config
-                            config = raw as StudyConfig;
-                        }
-                    } else {
-                        config = JSON.parse(legacyJson as string);
-                    }
-                    if (config.language) {
-                        if (i18n.language !== config.language) {
-                            await i18n.changeLanguage(config.language);
-                        }
-                        if (sessionLanguage !== config.language) {
-                            setLanguage(config.language);
-                        }
-                    }
-
-                    if (config.ui_labels) {
-                        applyStudyOverrides(config.language || 'en', config.ui_labels);
-                    }
-
-                    setConfig(config);
-                    setConfigError(null);
-                    setConfigLoading(false);
-                } catch (e) {
-                    console.error('Failed to parse test config from localStorage', e);
-                    setConfigError('common.errors.validation');
-                    setConfigLoading(false);
-                }
+                await loadFromLocalDraft(draftJson, legacyJson);
             } else {
-                console.warn(
-                    `[useStudyConfig] No draft found in localStorage for ${slug}. Attempting server fallback.`
-                );
-                try {
-                    // Fallback to server data (Collaborative Pilot Mode)
-                    // This allows colleagues to test the "last saved" version without a local draft
-                    const { data: serverData } = await refetch();
-
-                    if (serverData) {
-                        if (serverData.ui_labels) {
-                            applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
-                        }
-
-                        if (
-                            !sessionLanguage ||
-                            (serverData.language && sessionLanguage !== serverData.language)
-                        ) {
-                            await i18n.changeLanguage(serverData.language || 'en');
-                            setLanguage(serverData.language || 'en');
-                        }
-
-                        setConfig(serverData);
-                        setConfigError(null);
-                    } else {
-                        throw new Error('Server returned no data');
-                    }
-                } catch (err) {
-                    console.error('[useStudyConfig] Server fallback failed', err);
-                    setConfigError('common.errors.not_found');
-                } finally {
-                    setConfigLoading(false);
-                }
+                await loadFromServerFallback();
             }
         };
 
@@ -250,71 +313,22 @@ export const useStudyConfig = () => {
         // resets everything — including the query cache — which triggers a refetch,
         // and the cycle repeats until the heap is exhausted.
         if (data?.slug && slug && data.slug !== slug) return;
-        if (data && !isTestMode) {
-            setConfig(data);
+        if (!data || isTestMode) return;
 
-            if (data.ui_labels) {
-                applyStudyOverrides(data.language || 'en', data.ui_labels);
-            }
-
-            if (!sessionLanguage || (data.language && sessionLanguage !== data.language)) {
-                const newLang = data.language || 'en';
-
-                // Seed the cache for the resolved language to prevent double-fetch on first visit
-                // Only if the current sessionLanguage is null (first detection)
-                if (!sessionLanguage && slug) {
-                    const searchParams = new URLSearchParams(window.location.search);
-                    const linkToken = searchParams.get('token') || undefined;
-                    const queryParams = {
-                        lang: newLang,
-                        link_token: linkToken,
-                        password: password,
-                    };
-                    queryClient.setQueryData(
-                        getGetStudyApiStudySlugGetQueryKey(slug, queryParams),
-                        data
-                    );
-                }
-
-                if (sessionLanguage !== newLang) {
-                    setLanguage(newLang);
-                }
-                if (i18n.language !== newLang) {
-                    i18n.changeLanguage(newLang);
-                }
-            }
-            // Clear error on success
-            setConfigError(null);
-
-            // Handle password error
-            if (data.requires_password && password) {
-                setPasswordError(true);
-            } else {
-                setPasswordError(false);
-            }
+        setConfig(data);
+        if (data.ui_labels) {
+            applyStudyOverrides(data.language || 'en', data.ui_labels);
         }
+        syncResolvedLanguage(data, slug, sessionLanguage, password, setLanguage);
+        setConfigError(null);
+        setPasswordError(Boolean(data.requires_password && password));
     }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode, password, slug]);
 
     // --- Effect: Sync Error ---
     useEffect(() => {
         if (error) {
             console.error('Failed to fetch or validate study:', error);
-            let errorKey = 'common.errors.unknown';
-
-            if (error instanceof ApiError) {
-                if (error.status === 404 || error.status === 422)
-                    errorKey = 'common.errors.not_found';
-                if (error.status === 429) errorKey = 'common.errors.rate_limited';
-            } else if (error instanceof ZodError) {
-                errorKey = 'common.errors.validation';
-            } else if (
-                error instanceof TypeError ||
-                (error instanceof Error && error.name === 'TypeError')
-            ) {
-                errorKey = 'common.errors.network';
-            }
-
-            setConfigError(errorKey);
+            setConfigError(mapErrorToTranslationKey(error));
         }
     }, [error, setConfigError]);
 

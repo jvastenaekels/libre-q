@@ -46,9 +46,9 @@ export function MemoSection({
     });
 
     // Bump last-seen the first time we render with non-empty content.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: fires once per memo parent, not on every entries/markSeen change
     useEffect(() => {
         if (m.entries.length > 0) m.markSeen();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parentId]);
 
     const [newEntryTitle, setNewEntryTitle] = useState('');

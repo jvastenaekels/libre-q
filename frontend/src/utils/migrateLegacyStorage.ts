@@ -41,7 +41,7 @@ export function migrateLegacyStorage(): void {
         const legacyKeys: string[] = [];
         for (let i = 0; i < storage.length; i++) {
             const key = storage.key(i);
-            if (key && key.startsWith(PREFIX)) legacyKeys.push(key);
+            if (key?.startsWith(PREFIX)) legacyKeys.push(key);
         }
         for (const oldKey of legacyKeys) {
             const newKey = `qualis-${oldKey.slice(PREFIX.length)}`;

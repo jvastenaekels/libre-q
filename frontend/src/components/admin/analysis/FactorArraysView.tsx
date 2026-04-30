@@ -103,8 +103,7 @@ export function FactorArraysView({
                 const maxRows = Math.max(...sortedScores.map((s) => groups.get(s)?.length ?? 0));
 
                 const factorKey = String(f + 1);
-                const noteForFactor =
-                    (currentRun?.factor_notes && currentRun.factor_notes[factorKey]) || '';
+                const noteForFactor = currentRun?.factor_notes?.[factorKey] || '';
 
                 return (
                     <div key={f} className="space-y-3">

@@ -104,6 +104,74 @@ export default {
         request(url, { ...options, method: 'DELETE' }),
 };
 
+interface ParsedErrorBody {
+    message: string;
+    code?: string;
+    details?: unknown;
+}
+
+/**
+ * Parse the body of an error response as JSON if possible, falling back to
+ * status-specific shims for non-JSON gateway errors (502/504 HTML pages).
+ */
+function parseErrorBody(errorText: string, status: number): ParsedErrorBody {
+    try {
+        const parsed = JSON.parse(errorText);
+        let message = errorText;
+        if (parsed.message) {
+            message = parsed.message;
+        } else if (parsed.detail) {
+            message =
+                typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+        }
+        return { message, code: parsed.code, details: parsed.details };
+    } catch {
+        if (status === 502) {
+            return { message: 'Service unavailable (Bad Gateway)', code: 'bad_gateway' };
+        }
+        if (status === 504) {
+            return { message: 'Gateway Timeout', code: 'gateway_timeout' };
+        }
+        return { message: errorText };
+    }
+}
+
+/** Side effects (toasts, redirect) for error responses. */
+function handleErrorStatus(status: number, url: string, message: string): void {
+    if (status === 401 && !url.includes('/api/token')) {
+        // Distinguish 'had a token, lost it' (session_expired) from 'never
+        // authenticated' (auth_required).
+        const hadToken = useAuthStore.getState().token !== null;
+        useAuthStore.getState().logout();
+        if (!window.location.pathname.includes('/login')) {
+            const reason = hadToken ? 'session_expired' : 'auth_required';
+            window.location.href = `/login?reason=${reason}`;
+        }
+    }
+    if (status === 429) {
+        toast.error('Too Many Requests', {
+            description: 'Please wait a moment before trying again.',
+        });
+    }
+    if (status === 409) {
+        toast.error('Conflict', {
+            description: message || 'The resource has been modified or already exists.',
+        });
+    }
+}
+
+async function processResponse(response: Response, url: string, responseType: string | undefined) {
+    if (!response.ok) {
+        const errorText = await response.text();
+        const { message, code, details } = parseErrorBody(errorText, response.status);
+        handleErrorStatus(response.status, url, message);
+        throw new ApiError(response.status, message, code, details);
+    }
+    return {
+        data: await (responseType === 'blob' ? response.blob() : response.json()),
+    };
+}
+
 async function request(
     url: string,
     options: RequestInit & {
@@ -116,12 +184,10 @@ async function request(
             ? `${BASE_URL}${url}`
             : `${BASE_URL}/api${url}`;
 
-    // Get token from either admin store or participant session store
     const adminToken = useAuthStore.getState().token;
     const sessionToken = useSessionStore.getState().token;
     const token = adminToken || sessionToken;
 
-    // Get current project ID
     const currentProject = useAuthStore.getState().currentProject;
     const projectId = currentProject?.id ? String(currentProject.id) : undefined;
 
@@ -133,8 +199,7 @@ async function request(
     };
 
     const controller = new AbortController();
-    const timeout = 30000; // 30 seconds
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     let response: Response;
     try {
@@ -152,72 +217,5 @@ async function request(
         clearTimeout(timeoutId);
     }
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        let message = errorText;
-        let code: string | undefined;
-        let details: unknown | undefined;
-
-        try {
-            const parsed = JSON.parse(errorText);
-
-            // Standard Error Schema Parsing
-            if (parsed.message) {
-                message = parsed.message;
-            } else if (parsed.detail) {
-                // Fallback for legacy/fastapi default errors if any remain
-                message =
-                    typeof parsed.detail === 'string'
-                        ? parsed.detail
-                        : JSON.stringify(parsed.detail);
-            }
-
-            if (parsed.code) {
-                code = parsed.code;
-            }
-            if (parsed.details !== undefined) {
-                details = parsed.details;
-            }
-        } catch (_e) {
-            // Keep original errorText if not JSON (e.g. 502 Bad Gateway HTML)
-            if (response.status === 502) {
-                message = 'Service unavailable (Bad Gateway)';
-                code = 'bad_gateway';
-            } else if (response.status === 504) {
-                message = 'Gateway Timeout';
-                code = 'gateway_timeout';
-            }
-        }
-
-        if (response.status === 401 && !url.includes('/api/token')) {
-            // Handle session expiry for manual fetches too. Distinguish
-            // 'had a token, lost it' from 'never authenticated' so a
-            // first-time admin visitor doesn't see 'session_expired'.
-            const hadToken = useAuthStore.getState().token !== null;
-            useAuthStore.getState().logout();
-            if (!window.location.pathname.includes('/login')) {
-                const reason = hadToken ? 'session_expired' : 'auth_required';
-                window.location.href = `/login?reason=${reason}`;
-            }
-        }
-
-        // 429 Too Many Requests
-        if (response.status === 429) {
-            toast.error('Too Many Requests', {
-                description: 'Please wait a moment before trying again.',
-            });
-        }
-
-        // 409 Conflict
-        if (response.status === 409) {
-            toast.error('Conflict', {
-                description: message || 'The resource has been modified or already exists.',
-            });
-        }
-
-        throw new ApiError(response.status, message, code, details);
-    }
-    return {
-        data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
-    };
+    return processResponse(response, url, options?.responseType);
 }

@@ -214,7 +214,7 @@ describe('useStudyDesignPage', () => {
     it('detects unbalanced grid (statementsCount !== gridCapacity)', () => {
         const unbalanced: StudyRead = {
             ...mockStudy,
-            statements: [...mockStudy.statements!, { code: 's7', translations: [] }],
+            statements: [...(mockStudy.statements ?? []), { code: 's7', translations: [] }],
         } as StudyRead;
         useStudyDesigner.getState().setStudy(unbalanced);
         mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: unbalanced }));
@@ -288,7 +288,7 @@ describe('useStudyDesignPage', () => {
         const study: StudyRead = {
             ...mockStudy,
             translations: [
-                ...mockStudy.translations!,
+                ...(mockStudy.translations ?? []),
                 {
                     language_code: 'fr',
                     title: 'Étude',

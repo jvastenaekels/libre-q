@@ -131,30 +131,79 @@ function normalizeLocalizedField(
     availableLanguages: string[],
     defaultLang = 'en'
 ): Record<string, string> {
-    const result: Record<string, string> = {};
-
     if (typeof field === 'string') {
-        // Legacy format: convert string to object for all languages
-        for (const lang of availableLanguages) {
-            result[lang] = field;
-        }
-        // Ensure default language is set if not in available
+        const result: Record<string, string> = {};
+        for (const lang of availableLanguages) result[lang] = field;
         if (!result[defaultLang]) result[defaultLang] = field;
-    } else if (field && typeof field === 'object') {
-        const sourceVal = field[defaultLang] || Object.values(field)[0] || '';
-        for (const lang of availableLanguages) {
-            // Treat empty strings as missing and fallback to source
-            const val = field[lang];
-            result[lang] = val ? val : sourceVal;
-        }
-    } else {
-        // Empty case
-        for (const lang of availableLanguages) {
-            result[lang] = '';
-        }
+        return result;
     }
-
+    if (field && typeof field === 'object') {
+        const sourceVal = field[defaultLang] || Object.values(field)[0] || '';
+        const result: Record<string, string> = {};
+        for (const lang of availableLanguages) {
+            result[lang] = field[lang] || sourceVal;
+        }
+        return result;
+    }
+    // Empty / null / undefined / non-object input
+    const result: Record<string, string> = {};
+    for (const lang of availableLanguages) result[lang] = '';
     return result;
+}
+
+/** Normalize a single question option (string or object form). */
+function normalizeOption(
+    // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
+    opt: any,
+    availableLanguages: string[],
+    defaultLang: string
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic option shape
+): any {
+    if (typeof opt === 'string') {
+        return {
+            label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
+            value: opt,
+        };
+    }
+    if (opt?.label) {
+        return {
+            ...opt,
+            label: normalizeLocalizedField(opt.label, availableLanguages, defaultLang),
+        };
+    }
+    return opt;
+}
+
+/** Normalize the label / placeholder / options of a single question. */
+function normalizeQuestion(
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic question shape
+    q: any,
+    availableLanguages: string[],
+    defaultLang: string
+): void {
+    q.label = normalizeLocalizedField(q.label, availableLanguages, defaultLang);
+    if (q.placeholder) {
+        q.placeholder = normalizeLocalizedField(q.placeholder, availableLanguages, defaultLang);
+    }
+    if (Array.isArray(q.options)) {
+        q.options = q.options.map(
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic option shape
+            (opt: any) => normalizeOption(opt, availableLanguages, defaultLang)
+        );
+    }
+}
+
+/** Iterate a question-id keyed map and normalize each entry. */
+function normalizeQuestionMap(
+    // biome-ignore lint/suspicious/noExplicitAny: legacy map of questions
+    questions: Record<string, any> | undefined,
+    availableLanguages: string[],
+    defaultLang: string
+): void {
+    if (!questions) return;
+    for (const qId in questions) {
+        normalizeQuestion(questions[qId], availableLanguages, defaultLang);
+    }
 }
 
 /**
@@ -178,81 +227,16 @@ function normalizeStudyData(draft: StudyUpdate) {
                 fields: draft.presort_config as any,
             };
         }
-
         // biome-ignore lint/suspicious/noExplicitAny: legacy migration
-        const fields = (draft.presort_config as any).fields || {};
-        for (const qId in fields) {
-            const q = fields[qId];
-            q.label = normalizeLocalizedField(q.label, availableLanguages, defaultLang);
-            if (q.placeholder) {
-                q.placeholder = normalizeLocalizedField(
-                    q.placeholder,
-                    availableLanguages,
-                    defaultLang
-                );
-            }
-            if (Array.isArray(q.options)) {
-                // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
-                q.options = q.options.map((opt: any) => {
-                    if (typeof opt === 'string') {
-                        return {
-                            label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
-                            value: opt,
-                        };
-                    }
-                    if (opt?.label) {
-                        return {
-                            ...opt,
-                            label: normalizeLocalizedField(
-                                opt.label,
-                                availableLanguages,
-                                defaultLang
-                            ),
-                        };
-                    }
-                    return opt;
-                });
-            }
-        }
+        const fields = (draft.presort_config as any).fields;
+        normalizeQuestionMap(fields, availableLanguages, defaultLang);
     }
 
     // --- Normalize Post-Sort ---
     if (draft.postsort_config) {
         // biome-ignore lint/suspicious/noExplicitAny: config traversal
-        const questions = (draft.postsort_config as any).questions || {};
-        for (const qId in questions) {
-            const q = questions[qId];
-            q.label = normalizeLocalizedField(q.label, availableLanguages, defaultLang);
-            if (q.placeholder) {
-                q.placeholder = normalizeLocalizedField(
-                    q.placeholder,
-                    availableLanguages,
-                    defaultLang
-                );
-            }
-            if (Array.isArray(q.options)) {
-                // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
-                q.options = q.options.map((opt: any) => {
-                    if (typeof opt === 'string') {
-                        return {
-                            label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
-                            value: opt,
-                        };
-                    }
-                    if (opt?.label) {
-                        return {
-                            ...opt,
-                            label: normalizeLocalizedField(
-                                opt.label,
-                                availableLanguages,
-                                defaultLang
-                            ),
-                        };
-                    }
-                    return opt;
-                });
-            }
-        }
+        const questions = (draft.postsort_config as any).questions;
+        normalizeQuestionMap(questions, availableLanguages, defaultLang);
     }
 }
 
@@ -347,68 +331,73 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
         set(
             produce((state: StudyDesignerState) => {
                 if (!state.draft) return;
-
-                // Handle both wrapped and unwrapped configs
-                const studyData = config.study || config;
-
-                // --- Top-level simple fields ---
-                if (studyData.default_language)
-                    state.draft.default_language = studyData.default_language;
-                if (studyData.show_statement_codes !== undefined)
-                    state.draft.show_statement_codes = studyData.show_statement_codes;
-                if (studyData.randomize_statement_order !== undefined)
-                    state.draft.randomize_statement_order = studyData.randomize_statement_order;
-                if (studyData.symmetry_lock !== undefined)
-                    state.draft.symmetry_lock = studyData.symmetry_lock;
-                if (studyData.distribution_mode !== undefined)
-                    state.draft.distribution_mode = studyData.distribution_mode;
-
-                // --- Structural fields (Replace entirely) ---
-                if (studyData.grid_config) state.draft.grid_config = studyData.grid_config;
-                if (studyData.statements) state.draft.statements = studyData.statements;
-
-                // --- Config Objects (Merge) ---
-                if (studyData.branding) {
-                    state.draft.branding = {
-                        ...(state.draft.branding || {}),
-                        ...studyData.branding,
-                    };
-                }
-                if (studyData.presort_config) {
-                    state.draft.presort_config = {
-                        ...(state.draft.presort_config || {}),
-                        ...studyData.presort_config,
-                    };
-                }
-                if (studyData.postsort_config) {
-                    state.draft.postsort_config = {
-                        ...(state.draft.postsort_config || {}),
-                        ...studyData.postsort_config,
-                    };
-                }
-
-                if (Array.isArray(studyData.translations)) {
-                    if (!state.draft.translations) state.draft.translations = [];
-                    for (const tIn of studyData.translations) {
-                        const existingIdx = state.draft.translations.findIndex(
-                            (tr) => tr.language_code === tIn.language_code
-                        );
-
-                        if (existingIdx !== -1) {
-                            // Merge into existing translation
-                            state.draft.translations[existingIdx] = {
-                                ...state.draft.translations[existingIdx],
-                                ...tIn,
-                            };
-                        } else {
-                            // Add new translation
-                            state.draft.translations.push(tIn);
-                        }
-                    }
-                }
-
+                const studyData = config.study || config; // wrapped or unwrapped
+                applyImportedSimpleFields(state.draft, studyData);
+                applyImportedStructuralFields(state.draft, studyData);
+                applyImportedMergedConfigs(state.draft, studyData);
+                applyImportedTranslations(state.draft, studyData);
                 normalizeStudyData(state.draft);
                 state.syncStatus = 'modified';
             })
         ),
 }));
+
+// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
+function applyImportedSimpleFields(draft: StudyUpdate, studyData: any): void {
+    const keys = [
+        'default_language',
+        'show_statement_codes',
+        'randomize_statement_order',
+        'symmetry_lock',
+        'distribution_mode',
+    ] as const;
+    for (const key of keys) {
+        if (studyData[key] !== undefined) {
+            draft[key] = studyData[key];
+        }
+    }
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
+function applyImportedStructuralFields(draft: StudyUpdate, studyData: any): void {
+    if (studyData.grid_config) draft.grid_config = studyData.grid_config;
+    if (studyData.statements) draft.statements = studyData.statements;
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
+function applyImportedMergedConfigs(draft: StudyUpdate, studyData: any): void {
+    if (studyData.branding) {
+        draft.branding = { ...(draft.branding || {}), ...studyData.branding };
+    }
+    if (studyData.presort_config) {
+        draft.presort_config = {
+            ...(draft.presort_config || {}),
+            ...studyData.presort_config,
+        };
+    }
+    if (studyData.postsort_config) {
+        draft.postsort_config = {
+            ...(draft.postsort_config || {}),
+            ...studyData.postsort_config,
+        };
+    }
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
+function applyImportedTranslations(draft: StudyUpdate, studyData: any): void {
+    if (!Array.isArray(studyData.translations)) return;
+    if (!draft.translations) draft.translations = [];
+    for (const tIn of studyData.translations) {
+        const existingIdx = draft.translations.findIndex(
+            (tr) => tr.language_code === tIn.language_code
+        );
+        if (existingIdx !== -1) {
+            draft.translations[existingIdx] = {
+                ...draft.translations[existingIdx],
+                ...tIn,
+            };
+        } else {
+            draft.translations.push(tIn);
+        }
+    }
+}

@@ -9,6 +9,77 @@ interface MergeResult {
     warnings?: string[];
 }
 
+/** Track of conflicts/warnings produced while resolving each field. */
+interface MergeAccumulator {
+    conflicts: string[];
+    warnings: string[];
+}
+
+/**
+ * 3-way merge for one field. Returns the value to keep (or undefined to keep local).
+ * Mutates `acc` to record conflicts/warnings.
+ */
+function resolveField<T>(
+    fieldName: string,
+    localVal: T,
+    baseVal: T,
+    serverVal: T,
+    strategy: ResolutionStrategy,
+    acc: MergeAccumulator
+): { take: 'local' | 'server' } {
+    const localJson = JSON.stringify(localVal);
+    const baseJson = JSON.stringify(baseVal);
+    const serverJson = JSON.stringify(serverVal);
+
+    const localChanged = localJson !== baseJson;
+    const serverChanged = serverJson !== baseJson;
+
+    if (!serverChanged) return { take: 'local' };
+
+    // Server changed and local didn't — accept server.
+    if (!localChanged) return { take: 'server' };
+
+    // Both changed to the same value — no conflict.
+    if (localJson === serverJson) return { take: 'local' };
+
+    // Both changed to different values — conflict, resolved per strategy.
+    if (strategy === 'local-wins') {
+        acc.warnings.push(fieldName);
+        return { take: 'local' };
+    }
+    if (strategy === 'server-wins') {
+        acc.warnings.push(fieldName);
+        return { take: 'server' };
+    }
+    acc.conflicts.push(fieldName);
+    return { take: 'local' };
+}
+
+const IGNORED_SIMPLE_FIELDS = new Set<keyof StudyUpdate>([
+    'last_updated_at',
+    'translations',
+    'statements',
+    'grid_config',
+]);
+
+function mergeSimpleFields(
+    merged: StudyUpdate,
+    local: StudyUpdate,
+    server: StudyUpdate,
+    baseline: StudyUpdate,
+    strategy: ResolutionStrategy,
+    acc: MergeAccumulator
+): void {
+    for (const key of Object.keys(local) as (keyof StudyUpdate)[]) {
+        if (IGNORED_SIMPLE_FIELDS.has(key)) continue;
+        const decision = resolveField(key, local[key], baseline[key], server[key], strategy, acc);
+        if (decision.take === 'server') {
+            // @ts-expect-error key is a valid StudyUpdate key
+            merged[key] = server[key];
+        }
+    }
+}
+
 /**
  * Merges a local draft with a new server state, using the original state as a baseline.
  * Returns success with merged object, or failure with list of conflicting fields.
@@ -20,13 +91,10 @@ export function mergeStudyUpdates(
     strategy: ResolutionStrategy = 'manual'
 ): MergeResult {
     if (!baseline) {
-        // No baseline means we can't do a 3-way merge correctly without assume everything is a conflict or everything is overwrite.
-        // Safer to fail unless allowed to overwrite.
         if (strategy === 'local-wins') {
-            const merged = { ...local, last_updated_at: server.last_updated_at };
             return {
                 success: true,
-                merged,
+                merged: { ...local, last_updated_at: server.last_updated_at },
                 warnings: ['Baselineless merge (Local Wins)'],
             };
         }
@@ -34,121 +102,45 @@ export function mergeStudyUpdates(
     }
 
     const merged: StudyUpdate = { ...local };
-    const conflicts: string[] = [];
-    const warnings: string[] = [];
+    const acc: MergeAccumulator = { conflicts: [], warnings: [] };
 
-    // Fields to ignore or handle specially
-    const ignoredFields = ['last_updated_at', 'translations', 'statements', 'grid_config'];
+    mergeSimpleFields(merged, local, server, baseline, strategy, acc);
 
-    // 1. Simple Fields
-    const keys = Object.keys(local) as (keyof StudyUpdate)[];
+    const grid = resolveField(
+        'grid_config',
+        local.grid_config,
+        baseline.grid_config,
+        server.grid_config,
+        strategy,
+        acc
+    );
+    if (grid.take === 'server') merged.grid_config = server.grid_config;
 
-    for (const key of keys) {
-        if (ignoredFields.includes(key)) continue;
+    const statements = resolveField(
+        'statements',
+        local.statements,
+        baseline.statements,
+        server.statements,
+        strategy,
+        acc
+    );
+    if (statements.take === 'server') merged.statements = server.statements;
 
-        const localVal = JSON.stringify(local[key]);
-        const baseVal = JSON.stringify(baseline[key]);
-        const serverVal = JSON.stringify(server[key]);
+    const translations = resolveField(
+        'translations',
+        local.translations,
+        baseline.translations,
+        server.translations,
+        strategy,
+        acc
+    );
+    if (translations.take === 'server') merged.translations = server.translations;
 
-        const localChanged = localVal !== baseVal;
-        const serverChanged = serverVal !== baseVal;
-
-        if (serverChanged) {
-            if (!localChanged) {
-                // Safe update: Server changed, Local didn't. Accept Server.
-                // @ts-expect-error
-                merged[key] = server[key];
-            } else if (localVal !== serverVal) {
-                // Conflict: Both changed to different values
-                if (strategy === 'local-wins') {
-                    // Keep local value (already in merged), add warning
-                    warnings.push(key);
-                } else if (strategy === 'server-wins') {
-                    // Take server value
-                    // @ts-expect-error
-                    merged[key] = server[key];
-                    warnings.push(key);
-                } else {
-                    conflicts.push(key);
-                }
-            }
-        }
-    }
-
-    // 2. Grid Config
-    // Grid is sensitive. If server changed grid, and local changed grid, big conflict.
-    if (JSON.stringify(server.grid_config) !== JSON.stringify(baseline.grid_config)) {
-        if (JSON.stringify(local.grid_config) !== JSON.stringify(baseline.grid_config)) {
-            if (JSON.stringify(local.grid_config) !== JSON.stringify(server.grid_config)) {
-                if (strategy === 'local-wins') {
-                    warnings.push('grid_config');
-                } else if (strategy === 'server-wins') {
-                    merged.grid_config = server.grid_config;
-                    warnings.push('grid_config');
-                } else {
-                    conflicts.push('grid_config');
-                }
-            }
-        } else {
-            merged.grid_config = server.grid_config;
-        }
-    }
-
-    // 3. Statements (Array Merge by Code)
-    // We assume 'code' is the stable identifier for statements in the Designer.
-    // If server added/removed, and local added/removed...
-    // Strategy: Union of codes.
-    // If conflict on content (text) for same code -> Flag conflict.
-
-    const localStatementsJson = JSON.stringify(local.statements);
-    const baseStatementsJson = JSON.stringify(baseline.statements);
-    const serverStatementsJson = JSON.stringify(server.statements);
-
-    if (serverStatementsJson !== baseStatementsJson) {
-        if (localStatementsJson !== baseStatementsJson) {
-            if (localStatementsJson !== serverStatementsJson) {
-                if (strategy === 'local-wins') {
-                    warnings.push('statements');
-                } else if (strategy === 'server-wins') {
-                    merged.statements = server.statements;
-                    warnings.push('statements');
-                } else {
-                    conflicts.push('statements');
-                }
-            }
-        } else {
-            merged.statements = server.statements;
-        }
-    }
-
-    // 4. Translations (Array Merge by Language Code)
-    const localTransJson = JSON.stringify(local.translations);
-    const baseTransJson = JSON.stringify(baseline.translations);
-    const serverTransJson = JSON.stringify(server.translations);
-
-    if (serverTransJson !== baseTransJson) {
-        if (localTransJson !== baseTransJson) {
-            if (localTransJson !== serverTransJson) {
-                if (strategy === 'local-wins') {
-                    warnings.push('translations');
-                } else if (strategy === 'server-wins') {
-                    merged.translations = server.translations;
-                    warnings.push('translations');
-                } else {
-                    conflicts.push('translations');
-                }
-            }
-        } else {
-            merged.translations = server.translations;
-        }
-    }
-
-    // Always take the server's timestamp
     merged.last_updated_at = server.last_updated_at;
 
-    if (conflicts.length > 0) {
-        return { success: false, conflicts };
+    if (acc.conflicts.length > 0) {
+        return { success: false, conflicts: acc.conflicts };
     }
 
-    return { success: true, merged, warnings };
+    return { success: true, merged, warnings: acc.warnings };
 }

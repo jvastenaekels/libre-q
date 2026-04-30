@@ -36,7 +36,7 @@ describe('FactorSelectorChips', () => {
         renderWithProviders(
             <FactorSelectorChips nFactors={3} activeFactor={1} onSelect={onSelect} />
         );
-        fireEvent.click(screen.getAllByRole('tab')[1]!);
+        fireEvent.click(screen.getByRole('tab', { name: 'F2' }));
         expect(onSelect).toHaveBeenCalledWith(2);
     });
 

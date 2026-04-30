@@ -4,6 +4,100 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+type Operator = 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
+
+interface VisibilityCondition {
+    depends_on: string;
+    operator: Operator;
+    value?: unknown;
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: form values can be anything
+type FormValues = Record<string, any>;
+// biome-ignore lint/suspicious/noExplicitAny: config structure is dynamic
+type QuestionsConfig = Record<string, any>;
+
+/** Comparison when the actual value is empty (undefined / null / ''). */
+function evaluateEmpty(operator: Operator, actualValue: unknown, targetValue: unknown): boolean {
+    if (operator === 'not_equals') {
+        return String(actualValue) !== String(targetValue);
+    }
+    return false;
+}
+
+/**
+ * Standard scalar/array comparison.
+ * Returns true|false for terminal operators (contains/greater_than/less_than/not_equals),
+ * and 'fallback' for `equals` when the strict comparison failed (caller may try
+ * the localized-label fallback).
+ */
+function compareValues(
+    operator: Operator,
+    actualValue: unknown,
+    targetValue: unknown
+): boolean | 'fallback' {
+    const actualStr = String(actualValue);
+    const targetStr = String(targetValue);
+
+    switch (operator) {
+        case 'equals':
+            return actualStr === targetStr ? true : 'fallback';
+        case 'not_equals':
+            return actualStr !== targetStr;
+        case 'contains':
+            if (Array.isArray(actualValue)) return actualValue.includes(targetValue);
+            if (typeof actualValue === 'string') return actualValue.includes(targetStr);
+            return false;
+        case 'greater_than':
+            return Number(actualValue) > Number(targetValue);
+        case 'less_than':
+            return Number(actualValue) < Number(targetValue);
+        default:
+            return true;
+    }
+}
+
+/**
+ * Fallback for `equals` when the strict comparison failed.
+ *
+ * Handles two scenarios where condition target and submitted value disagree on
+ * value-vs-label representation of the same option:
+ *  A) Config has internal id ("yes_val") but user submitted localized label ("Oui").
+ *  B) Config has localized value ("Kyllä") but condition references the English label ("Yes").
+ *
+ * Returns true iff condition.value and the submitted value resolve to the same option.
+ */
+function matchLocalizedOption(
+    questionsConfig: QuestionsConfig | undefined,
+    dependsOn: string,
+    targetValue: unknown,
+    actualValue: unknown
+): boolean {
+    if (!questionsConfig || typeof targetValue !== 'string' || typeof actualValue !== 'string') {
+        return false;
+    }
+    const question = questionsConfig[dependsOn];
+    if (!question || !Array.isArray(question.options)) return false;
+
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic option type
+    const optionMatchesValue = (opt: any, candidate: string): boolean => {
+        const optVal = typeof opt === 'string' ? opt : opt.value;
+        if (String(optVal) === candidate) return true;
+        if (typeof opt === 'object' && opt.label) {
+            return Object.values(opt.label).some((l) => String(l) === candidate);
+        }
+        return false;
+    };
+
+    const targetOption = question.options.find(
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic option type
+        (opt: any) => optionMatchesValue(opt, String(targetValue))
+    );
+    if (!targetOption) return false;
+
+    return optionMatchesValue(targetOption, String(actualValue));
+}
+
 /**
  * Evaluates a visibility condition against current form values.
  *
@@ -13,114 +107,21 @@
  * @returns true if the condition is met, false otherwise
  */
 export function evaluateVisibilityCondition(
-    condition:
-        | {
-              depends_on: string;
-              operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
-              value?: unknown;
-          }
-        | undefined,
-    // biome-ignore lint/suspicious/noExplicitAny: form values can be anything
-    values: Record<string, any>,
-    // biome-ignore lint/suspicious/noExplicitAny: config structure
-    questionsConfig?: Record<string, any>
+    condition: VisibilityCondition | undefined,
+    values: FormValues,
+    questionsConfig?: QuestionsConfig
 ): boolean {
     if (!condition) return true;
 
     const actualValue = values[condition.depends_on];
     const targetValue = condition.value;
 
-    // Handle case where parent question hasn't been answered yet
     if (actualValue === undefined || actualValue === null || actualValue === '') {
-        // Only allow if checking for "not_equals" a value that isn't empty/null
-        if (condition.operator === 'not_equals') {
-            return String(actualValue) !== String(targetValue);
-        }
-        return false;
+        return evaluateEmpty(condition.operator, actualValue, targetValue);
     }
 
-    // Standard comparison
-    let isMatch = false;
-    const actualStr = String(actualValue);
-    const targetStr = String(targetValue);
+    const result = compareValues(condition.operator, actualValue, targetValue);
+    if (result !== 'fallback') return result;
 
-    switch (condition.operator) {
-        case 'equals':
-            if (actualStr === targetStr) {
-                isMatch = true;
-            }
-            break;
-        case 'not_equals':
-            if (actualStr !== targetStr) {
-                return true;
-            }
-            break;
-        case 'contains':
-            if (Array.isArray(actualValue)) {
-                return actualValue.includes(targetValue);
-            }
-            if (typeof actualValue === 'string') {
-                return actualValue.includes(targetStr);
-            }
-            return false;
-        case 'greater_than':
-            return Number(actualValue) > Number(targetValue);
-        case 'less_than':
-            return Number(actualValue) < Number(targetValue);
-        default:
-            return true;
-    }
-
-    if (isMatch) return true;
-
-    // Fallback: Check localized labels if standard check failed
-    // This handles two scenarios:
-    // A) Config has internal ID (e.g. "yes_val") but user submitted localized label ("Oui")
-    // B) Config has localized Label (e.g. "Yes") but user submitted internal ID ("Kyllä")
-    if (
-        questionsConfig &&
-        condition.operator === 'equals' &&
-        typeof targetValue === 'string' &&
-        typeof actualValue === 'string'
-    ) {
-        const question = questionsConfig[condition.depends_on];
-        if (question && Array.isArray(question.options)) {
-            // 1. Find the "Target Option" by checking if 'targetValue' matches EITHER the option's value OR any of its labels
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic option type
-            const targetOption = question.options.find((opt: any) => {
-                const optVal = typeof opt === 'string' ? opt : opt.value;
-
-                // Match against VALUE
-                if (String(optVal) === String(targetValue)) return true;
-
-                // Match against LABELS
-                if (typeof opt === 'object' && opt.label) {
-                    const labels = Object.values(opt.label);
-                    if (labels.some((l) => String(l) === String(targetValue))) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            if (targetOption) {
-                const optVal = typeof targetOption === 'string' ? targetOption : targetOption.value;
-
-                // 2. Check if 'actualValue' matches EITHER the Target Option's value OR any of its labels
-
-                // Check Value
-                if (String(optVal) === String(actualValue)) return true;
-
-                // Check Labels
-                if (typeof targetOption === 'object' && targetOption.label) {
-                    const labels = Object.values(targetOption.label);
-                    if (labels.some((l) => String(l) === String(actualValue))) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-
-    return false;
+    return matchLocalizedOption(questionsConfig, condition.depends_on, targetValue, actualValue);
 }

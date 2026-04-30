@@ -263,6 +263,7 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
     // Reset stale rows whenever a setting that would change the preview flips.
     // Bumping the token cancels any pending commit even if the user doesn't
     // trigger a new mutate.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: deps are intentional triggers, not body references
     useEffect(() => {
         previewTokenRef.current += 1;
         setPreviewRows(undefined);

@@ -513,7 +513,7 @@ const QSortEditor = ({
 
                 // Regex for common separators: "Code: Text" or "Code, Text" or "Code - Text"
                 const match = line.match(/^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+(.+)$/);
-                if (match && match[1] && match[2]) {
+                if (match?.[1] && match[2]) {
                     return { code: match[1], text: match[2].trim() };
                 }
 

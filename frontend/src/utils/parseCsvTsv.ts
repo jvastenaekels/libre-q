@@ -20,53 +20,88 @@
  * survived; callers decide whether to import partial results or block.
  */
 
+interface ParserState {
+    result: string[][];
+    row: string[];
+    currentField: string;
+    inQuotes: boolean;
+}
+
+/**
+ * Handle one character while inside a quoted field.
+ * Returns the number of extra characters consumed (0 or 1).
+ */
+function handleQuotedChar(s: ParserState, char: string, nextChar: string | undefined): number {
+    if (char === '"' && nextChar === '"') {
+        s.currentField += '"';
+        return 1; // skip the doubled quote
+    }
+    if (char === '"') {
+        s.inQuotes = false;
+        return 0;
+    }
+    s.currentField += char;
+    return 0;
+}
+
+function flushField(s: ParserState): void {
+    s.row.push(s.currentField.trim());
+    s.currentField = '';
+}
+
+function flushRow(s: ParserState): void {
+    flushField(s);
+    s.result.push(s.row);
+    s.row = [];
+}
+
+/**
+ * Handle one character while outside any quoted field.
+ * Returns the number of extra characters consumed (0 or 1).
+ */
+function handleUnquotedChar(
+    s: ParserState,
+    char: string,
+    nextChar: string | undefined,
+    separator: string
+): number {
+    if (char === '"') {
+        s.inQuotes = true;
+        return 0;
+    }
+    if (char === separator) {
+        flushField(s);
+        return 0;
+    }
+    if (char === '\n') {
+        flushRow(s);
+        return 0;
+    }
+    if (char === '\r') {
+        flushRow(s);
+        return nextChar === '\n' ? 1 : 0;
+    }
+    s.currentField += char;
+    return 0;
+}
+
 /** Robust CSV/TSV parser that handles quoted fields and internal newlines. */
 export function parseCsvTsv(text: string, separator: string = '\t'): string[][] {
-    const result: string[][] = [];
-    let row: string[] = [];
-    let currentField = '';
-    let inQuotes = false;
+    const s: ParserState = { result: [], row: [], currentField: '', inQuotes: false };
 
     for (let i = 0; i < text.length; i++) {
-        const char = text[i];
+        const char = text[i] ?? '';
         const nextChar = text[i + 1];
-
-        if (inQuotes) {
-            if (char === '"' && nextChar === '"') {
-                currentField += '"';
-                i++; // Skip next quote
-            } else if (char === '"') {
-                inQuotes = false;
-            } else {
-                currentField += char;
-            }
-        } else {
-            if (char === '"') {
-                inQuotes = true;
-            } else if (char === separator) {
-                row.push(currentField.trim());
-                currentField = '';
-            } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                if (char === '\r') i++;
-                row.push(currentField.trim());
-                result.push(row);
-                row = [];
-                currentField = '';
-            } else if (char === '\r') {
-                row.push(currentField.trim());
-                result.push(row);
-                row = [];
-                currentField = '';
-            } else {
-                currentField += char;
-            }
-        }
+        const skip = s.inQuotes
+            ? handleQuotedChar(s, char, nextChar)
+            : handleUnquotedChar(s, char, nextChar, separator);
+        i += skip;
     }
-    if (row.length > 0 || currentField !== '') {
-        row.push(currentField.trim());
-        result.push(row);
+    if (s.row.length > 0 || s.currentField !== '') {
+        flushField(s);
+        s.result.push(s.row);
     }
-    return result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
+    return s.result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
 }
 
 /** Auto-detect the delimiter from the first content line. */

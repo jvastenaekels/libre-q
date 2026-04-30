@@ -446,17 +446,15 @@ export default function GeneralSettingsPage() {
                                 </AlertDescription>
                             </Alert>
                         ) : (
-                            <>
-                                <Button
-                                    variant="secondary"
-                                    disabled={!isClosed}
-                                    onClick={handleArchive}
-                                    className="w-full sm:w-auto rounded-xl font-black bg-amber-100 text-amber-700 hover:bg-amber-200 border-none shadow-sm"
-                                >
-                                    <Archive className="w-4 h-4 mr-2" />
-                                    {t('admin.settings.lifecycle.archive_button')}
-                                </Button>
-                            </>
+                            <Button
+                                variant="secondary"
+                                disabled={!isClosed}
+                                onClick={handleArchive}
+                                className="w-full sm:w-auto rounded-xl font-black bg-amber-100 text-amber-700 hover:bg-amber-200 border-none shadow-sm"
+                            >
+                                <Archive className="w-4 h-4 mr-2" />
+                                {t('admin.settings.lifecycle.archive_button')}
+                            </Button>
                         )}
                     </CardFooter>
                 </Card>
