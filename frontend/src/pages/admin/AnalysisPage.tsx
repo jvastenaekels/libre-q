@@ -63,6 +63,12 @@ import type { AnalysisResult, AnalysisRunRead, AnalysisRunSummary } from '@/api/
 import { downloadBlob, generateLoadingsCsv, generateScoresCsv } from '@/utils/analysisCsvExport';
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 
+function parseRunIdParam(raw: string | null): number | null {
+    if (raw === null) return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+}
+
 export default function AnalysisPage() {
     const { studySlug, projectSlug } = useParams();
     const slug = studySlug ?? '';
@@ -70,11 +76,9 @@ export default function AnalysisPage() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const phase = searchParams.get('phase') ?? 'explore';
-    const runIdParam = searchParams.get('runId');
-    const runId = runIdParam ? Number(runIdParam) : null;
+    const runId = parseRunIdParam(searchParams.get('runId'));
     const focus = searchParams.get('focus') ?? 'f1';
-    const compareToParam = searchParams.get('compareTo');
-    const compareTo = compareToParam ? Number(compareToParam) : null;
+    const compareTo = parseRunIdParam(searchParams.get('compareTo'));
 
     const navigateToInterpret = useCallback(
         (newRunId: number) => {
