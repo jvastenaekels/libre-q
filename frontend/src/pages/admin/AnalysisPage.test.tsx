@@ -41,6 +41,14 @@ vi.mock('@/api/generated', () => ({
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: vi.fn(() => [
         '/api/admin/studies/test-study/analysis/runs',
     ]),
+    // Preview-range mutation lives in useExplorePhase; idle stub is enough
+    // for AnalysisPage integration tests (no test triggers the action).
+    usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost: () => ({
+        mutateAsync: vi.fn().mockResolvedValue({ rows: [] }),
+        isPending: false,
+        isError: false,
+        error: null,
+    }),
     // FactorVoicesPanel renders inside the results tab and calls these hooks
     // — return idle/empty queries so the panel renders the empty state
     // without a real network call.
@@ -74,6 +82,9 @@ const ANALYSIS_PATH = '/app/test-project/studies/test-study/analysis';
 
 const mockEigenvalues: EigenvalueResult = {
     eigenvalues: [2.5, 1.2, 0.8, 0.5],
+    kaiser_n: 2,
+    parallel_analysis_n: 2,
+    velicer_map_n: 2,
     suggested_n_factors: 2,
 };
 
