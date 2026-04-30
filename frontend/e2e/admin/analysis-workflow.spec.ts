@@ -72,16 +72,14 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     }
 
     // -----------------------------------------------------------------------
-    // 3. Click "Run Analysis" and wait for results
+    // 3. Click "Commit and interpret" and wait for results
     // -----------------------------------------------------------------------
-    const runButton = page.getByRole('button', { name: /run analysis/i });
+    const runButton = page.getByRole('button', { name: /commit and interpret/i });
     await expect(runButton).toBeEnabled({ timeout: 10_000 });
     await runButton.click();
 
-    // The button changes to "Analyzing…" while running
-    await expect(page.getByRole('button', { name: /analyzing/i })).toBeVisible({
-        timeout: 5_000,
-    });
+    // The button stays disabled while the analysis runs (spinner replaces icon).
+    await expect(runButton).toBeDisabled({ timeout: 5_000 });
 
     // Wait for the results card to render — the Tabs component appears once
     // analysisMutation.isSuccess fires and setResult() is called.
@@ -257,8 +255,8 @@ test('analysis page smoke: page renders with scree plot and run button', async (
     // Page title region
     await expect(page.getByText(/analysis/i).first()).toBeVisible({ timeout: 15_000 });
 
-    // "Run Analysis" button appears once eigenvalues load
-    const runBtn = page.getByRole('button', { name: /run analysis/i });
+    // "Commit and interpret" button appears once eigenvalues load
+    const runBtn = page.getByRole('button', { name: /commit and interpret/i });
     await expect(runBtn).toBeEnabled({ timeout: 30_000 });
 
     // History panel shows the empty-state message (no runs yet)
