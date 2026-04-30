@@ -899,6 +899,13 @@
                 "running": "Bootstrap en cours…",
                 "se_column": "Erreur-type moyenne (z)",
                 "tooltip": "Bootstrap non paramétrique des Q-sorts (rééchantillonnés avec remise) ; l'analyse est répétée B fois pour estimer les IC à 95 % des z-scores."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostics",
+                "kaiser": "Kaiser",
+                "parallel": "Analyse parallèle",
+                "map": "MAP de Velicer",
+                "advisory": "Indicateurs consultatifs — la rétention en Q-méthode dépend aussi de l'interprétabilité et de la stabilité (Watts & Stenner 2012)."
             }
         },
         "project": {

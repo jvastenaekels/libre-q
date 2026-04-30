@@ -899,6 +899,13 @@
                 "aria": "Edit factor {{n}} narrative",
                 "saved": "Factor narrative saved.",
                 "error": "Failed to save the factor narrative."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostiikka",
+                "kaiser": "Kaiser",
+                "parallel": "Rinnakkaisanalyysi",
+                "map": "Velicerin MAP",
+                "advisory": "Vain ohjaava — Q-menetelmän tekijöiden säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012)."
             }
         },
         "project": {

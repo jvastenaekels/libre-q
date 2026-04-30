@@ -947,6 +947,13 @@
                 "running": "Running bootstrap…",
                 "se_column": "Mean SE (z)",
                 "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); analysis is repeated B times to estimate 95% CIs on z-scores."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostics",
+                "kaiser": "Kaiser",
+                "parallel": "Parallel analysis",
+                "map": "Velicer's MAP",
+                "advisory": "Advisory only — Q-method retention also depends on interpretability and stability (Watts & Stenner 2012)."
             }
         },
         "project": {
