@@ -353,3 +353,99 @@ describe('useFineSort deck mode', () => {
         expect(state.deck.sort()).toEqual([1, 2, 3]);
     });
 });
+
+// ── Task 20.5.6 — Distribution-mode edge cases ──────────────────────
+//
+// These tests interrogate the hook directly so they can run in BOTH
+// modes via describe.each (rough_sort_enabled flag). The hook must
+// surface gridColumns and isAllPlaced correctly even when one column
+// has capacity 0 or the grid is non-symmetric.
+describe.each([
+    true,
+    false,
+] as const)('useFineSort distribution-mode edge cases (rough=%s)', (roughEnabled) => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useResponseStore.getState().resetResponses();
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+    });
+
+    it.each([
+        'forced',
+        'flexible',
+    ] as const)('surfaces a capacity-0 column in %s mode (gridColumns intact)', (mode) => {
+        const grid = [
+            { score: -1, capacity: 1 },
+            { score: 0, capacity: 0 }, // empty centre column
+            { score: 1, capacity: 1 },
+        ];
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            rough_sort_enabled: roughEnabled,
+            grid_config: grid,
+            distribution_mode: mode,
+            statements: [
+                { id: 1, text: 'A' },
+                { id: 2, text: 'B' },
+            ],
+        });
+        if (roughEnabled) {
+            // Seed rough so the navigation guard does not redirect.
+            useResponseStore.getState().categorizeCard(1, 'agree');
+            useResponseStore.getState().categorizeCard(2, 'disagree');
+        }
+
+        const { result } = renderHook(() => useFineSort(null), {
+            wrapper: AllTheProviders,
+        });
+
+        // Hook surfaces the empty middle column verbatim.
+        expect(result.current.gridColumns).toHaveLength(3);
+        expect(result.current.gridColumns[1].capacity).toBe(0);
+        expect(result.current.distributionMode).toBe(mode);
+        // No card is placed yet so isAllPlaced must be false.
+        expect(result.current.isAllPlaced).toBe(false);
+    });
+
+    it('non-symmetric grid (asymmetric distribution) → isAllPlaced=true with 16 placements', async () => {
+        const grid = [
+            { score: -3, capacity: 1 },
+            { score: -2, capacity: 2 },
+            { score: -1, capacity: 3 },
+            { score: 0, capacity: 4 },
+            { score: 1, capacity: 3 },
+            { score: 2, capacity: 2 },
+            { score: 3, capacity: 1 },
+        ];
+        const stmts = Array.from({ length: 16 }, (_, i) => ({
+            id: i + 1,
+            code: String(i + 1),
+            text: `S${i + 1}`,
+        }));
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            rough_sort_enabled: roughEnabled,
+            grid_config: grid,
+            statements: stmts,
+        });
+
+        // Place every card consistent with the grid layout.
+        let next = 1;
+        grid.forEach((col, colIdx) => {
+            for (let row = 0; row < col.capacity; row++) {
+                useResponseStore.getState().placeCardInGrid(next, colIdx, row);
+                next += 1;
+            }
+        });
+
+        const { result } = renderHook(() => useFineSort(null), {
+            wrapper: AllTheProviders,
+        });
+        await act(async () => {});
+
+        expect(result.current.gridColumns).toHaveLength(7);
+        expect(result.current.qsort).toHaveLength(16);
+        expect(result.current.isAllPlaced).toBe(true);
+    });
+});
