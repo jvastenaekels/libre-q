@@ -137,7 +137,13 @@ async def save_draft(
             status_code=403, detail="Study is not currently accepting responses"
         )
 
-    participant.draft_responses = data.draft_responses
+    # When rough sort is disabled for this study, silently drop any stale
+    # `rough` slice from the incoming draft (defensive against legacy clients).
+    incoming = dict(data.draft_responses)
+    if not study.rough_sort_enabled:
+        incoming.pop("rough", None)
+
+    participant.draft_responses = incoming
     await db.commit()
 
     return AckResponse(status="ok")
