@@ -104,6 +104,7 @@ export default function ParticipantDetailsPage() {
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
             postsort_config: study.postsort_config as any,
             state: study.state || 'draft',
+            distribution_mode: study.distribution_mode,
         };
 
         const studyDump: DumpResponse = {

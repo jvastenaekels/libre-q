@@ -139,7 +139,7 @@ export function ParticipantDetailContent({
     };
 
     // --- Data Preparation for GridSort ---
-    const { gridConfig, gridPlacements, statementsMap } = useMemo(() => {
+    const { gridConfig, gridPlacements, statementsMap, qsortForGridSort } = useMemo(() => {
         const statements = studyData.study.statements || [];
         // Map statement ID directly to statement object for easy lookup
         const sMap = new Map(statements.map((s) => [s.id, s]));
@@ -166,6 +166,11 @@ export function ParticipantDetailContent({
         // participant.placements is { statementId: score }
         const placements: Record<number, { col: number; row: number }> = {};
         const slotsFilled: Record<number, number> = {}; // track rows per col/score
+        // qsort shape consumed by GridSort.slotCounts (only col/row are read,
+        // but we keep statementId for completeness and future use). Built in
+        // lockstep with `placements` so free-mode overflow rows are surfaced
+        // for admin viewers (PR #77 follow-up).
+        const qsort: { statementId: number; col: number; row: number }[] = [];
 
         Object.entries(participant.placements).forEach(([sIdStr, score]) => {
             const sId = Number(sIdStr);
@@ -173,6 +178,7 @@ export function ParticipantDetailContent({
             if (colIdx !== undefined) {
                 const row = slotsFilled[colIdx] || 0;
                 placements[sId] = { col: colIdx, row };
+                qsort.push({ statementId: sId, col: colIdx, row });
                 slotsFilled[colIdx] = row + 1;
             }
         });
@@ -181,6 +187,7 @@ export function ParticipantDetailContent({
             gridConfig: config,
             gridPlacements: placements,
             statementsMap: sMap,
+            qsortForGridSort: qsort,
         };
     }, [studyData, participant]);
 
@@ -466,6 +473,11 @@ export function ParticipantDetailContent({
                                 neutralCards={[]}
                                 gridColumns={gridConfig}
                                 readOnly={true}
+                                // Mirror the participant-side semantics so
+                                // overflow rows in free-mode submissions stay
+                                // visible to admins (PR #77 follow-up).
+                                distributionMode={studyData.study.distribution_mode ?? 'forced'}
+                                qsort={qsortForGridSort}
                                 conditionOfInstruction={t(
                                     'admin.participant.grid.read_only_mode',
                                     'Viewer Mode'
