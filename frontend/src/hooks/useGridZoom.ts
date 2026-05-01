@@ -42,14 +42,15 @@ export const useGridZoom = ({
         let scale: number, x: number, y: number;
 
         if (isMobile) {
-            // The zoom toolbar is positioned absolute top-4 right-4, ~60px wide.
-            // Scale the grid to fit within the wrapper width MINUS the toolbar
-            // footprint so column headers (e.g. "+1" on the rightmost column)
-            // stay visible instead of being hidden under the toolbar. Portrait
-            // only — landscape-mobile uses a different sidebar layout.
-            const TOOLBAR_RESERVED_PX = isLandscapeMobile ? 0 : 64;
-            const usableW = Math.max(0, wrapperW - TOOLBAR_RESERVED_PX);
-            const widthScale = (usableW * 0.98) / contentW;
+            // Center the grid in the full wrapper width. Portrait mobile used
+            // to subtract ~64px on the right so the rightmost column wouldn't
+            // sit under the floating zoom toolbar (top-right, with
+            // backdrop-blur), but the result was visibly off-center to the
+            // left and the toolbar's blur is enough to keep the underlying
+            // content readable when it does overlap. Landscape mobile already
+            // used the full wrapper width (no toolbar in the same corner);
+            // desktop has its own branch below.
+            const widthScale = (wrapperW * 0.98) / contentW;
             const heightScale = (wrapperH * (isLandscapeMobile ? 0.95 : 0.9)) / contentH;
 
             if (isLandscapeMobile) {
@@ -60,10 +61,7 @@ export const useGridZoom = ({
                 scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
             }
 
-            // Center horizontally inside the usable area (excluding the
-            // toolbar reserved column on portrait), so the rightmost grid
-            // column never extends behind the absolute toolbar overlay.
-            x = (usableW - contentW * scale) / 2;
+            x = (wrapperW - contentW * scale) / 2;
 
             if (isLandscapeMobile) {
                 // Center vertically in landscape
