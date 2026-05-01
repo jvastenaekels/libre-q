@@ -441,6 +441,90 @@ class StudyService:
     # ------------------------------------------------------------------
 
     @staticmethod
+    def _resolve_statement_data(
+        study: Study,
+        resolved_lang: str,
+        session_token: UUID | None,
+    ) -> list[dict[str, Any]]:
+        """Resolve each statement's translation chain (resolved_lang → en →
+        first available) and optionally apply a deterministic per-session
+        shuffle when ``randomize_statement_order`` is enabled.
+        """
+        statements_data: list[dict[str, Any]] = []
+        for s in study.statements:
+            s_trans = next(
+                (t for t in s.translations if t.language_code == resolved_lang), None
+            )
+            if not s_trans:
+                s_trans = next(
+                    (t for t in s.translations if t.language_code == "en"), None
+                )
+            if not s_trans and s.translations:
+                s_trans = s.translations[0]
+            text = s_trans.text if s_trans else s.code
+            statements_data.append({"id": s.id, "text": text, "code": s.code})
+
+        if study.randomize_statement_order and session_token:
+            import random
+
+            # Deterministic per-session shuffle for Q-methodology
+            # reproducibility, not a security-sensitive RNG.
+            local_random = random.Random(  # nosec B311
+                StudyService._generate_session_seed(str(session_token))
+            )
+            local_random.shuffle(statements_data)
+        return statements_data
+
+    @staticmethod
+    def _compute_effective_state(study: Study) -> str:
+        """Compute the public-facing state of a study, accounting for
+        date-based transitions (DB state stays ``active`` past the
+        scheduled window). Returns the state's wire value."""
+        from datetime import datetime, timezone
+
+        if study.state != StudyState.active:
+            return cast(str, study.state.value)
+
+        now = datetime.now(timezone.utc)
+
+        def is_now_before(target_dt: datetime) -> bool:
+            if target_dt.tzinfo is None:
+                return now.replace(tzinfo=None) < target_dt
+            return now < target_dt
+
+        def is_now_after(target_dt: datetime) -> bool:
+            if target_dt.tzinfo is None:
+                return now.replace(tzinfo=None) > target_dt
+            return now > target_dt
+
+        if study.start_date and is_now_before(study.start_date):
+            return cast(str, StudyState.paused.value)
+        if study.end_date and is_now_after(study.end_date):
+            return cast(str, StudyState.closed.value)
+        return cast(str, study.state.value)
+
+    @staticmethod
+    def _resolve_process_steps(
+        translation: Any, resolved_lang: str, base_lang: str
+    ) -> list[Any]:
+        """Process-steps fallback chain: translation → defaults[resolved_lang]
+        → defaults[base_lang] → defaults['en']."""
+        return (
+            (getattr(translation, "process_steps", []) or [])
+            or DEFAULT_PROCESS_STEPS.get(resolved_lang)
+            or DEFAULT_PROCESS_STEPS.get(base_lang)
+            or DEFAULT_PROCESS_STEPS.get("en", [])
+        )
+
+    @staticmethod
+    def _resolve_distribution_mode(study: Study) -> Any:
+        """Return the distribution mode wire value, tolerating either a
+        DistributionMode enum or a raw string (e.g. when a test fixture
+        bypasses the ORM)."""
+        mode = study.distribution_mode
+        return mode.value if hasattr(mode, "value") else mode
+
+    @staticmethod
     async def get_resolved_study_config(
         study: Study,
         lang: str | None = None,
@@ -478,59 +562,15 @@ class StudyService:
             "objective", None
         )
 
-        statements_data = []
-        for s in study.statements:
-            # Resolve statement translation
-            s_trans = next(
-                (t for t in s.translations if t.language_code == resolved_lang), None
-            )
-            if not s_trans:
-                s_trans = next(
-                    (t for t in s.translations if t.language_code == "en"), None
-                )
-            if not s_trans and s.translations:
-                s_trans = s.translations[0]
-
-            text = s_trans.text if s_trans else s.code
-            statements_data.append({"id": s.id, "text": text, "code": s.code})
-
-        # Q Methodology: Randomize statement order if configured
-        if study.randomize_statement_order and session_token:
-            import random
-
-            # Deterministic per-session shuffle for Q-methodology
-            # reproducibility, not a security-sensitive RNG.
-            local_random = random.Random(  # nosec B311
-                StudyService._generate_session_seed(str(session_token))
-            )
-            local_random.shuffle(statements_data)
+        statements_data = StudyService._resolve_statement_data(
+            study, resolved_lang, session_token
+        )
 
         # Helper for translation attributes
         def get_t_attr(attr: str, default: Any = None) -> Any:
             return getattr(translation, attr, default) if translation else default
 
-        # Calculate effective state based on dates
-        from datetime import datetime, timezone
-
-        now = datetime.now(timezone.utc)
-        effective_state = study.state.value
-
-        if study.state == StudyState.active:
-
-            def is_now_before(target_dt: datetime) -> bool:
-                if target_dt.tzinfo is None:
-                    return now.replace(tzinfo=None) < target_dt
-                return now < target_dt
-
-            def is_now_after(target_dt: datetime) -> bool:
-                if target_dt.tzinfo is None:
-                    return now.replace(tzinfo=None) > target_dt
-                return now > target_dt
-
-            if study.start_date and is_now_before(study.start_date):
-                effective_state = StudyState.paused.value
-            elif study.end_date and is_now_after(study.end_date):
-                effective_state = StudyState.closed.value
+        effective_state = StudyService._compute_effective_state(study)
 
         # Bound to a local to keep the bandit suppression on a single line and
         # avoid AST propagation to the dict literal below. The field name
@@ -548,10 +588,9 @@ class StudyService:
             "postsort_config": study.postsort_config,
             "grid_config": study.grid_config,
             "statements": statements_data,
-            "process_steps": (getattr(translation, "process_steps", []) or [])
-            or DEFAULT_PROCESS_STEPS.get(resolved_lang)
-            or DEFAULT_PROCESS_STEPS.get(base_lang)
-            or DEFAULT_PROCESS_STEPS.get("en", []),
+            "process_steps": StudyService._resolve_process_steps(
+                translation, resolved_lang, base_lang
+            ),
             "consent": {
                 "title": get_t_attr("consent_title")
                 or lang_defaults.get("consent_title"),
@@ -567,9 +606,7 @@ class StudyService:
             "show_statement_codes": study.show_statement_codes,
             "randomize_statement_order": study.randomize_statement_order,
             "rough_sort_enabled": study.rough_sort_enabled,
-            "distribution_mode": study.distribution_mode.value
-            if hasattr(study.distribution_mode, "value")
-            else study.distribution_mode,
+            "distribution_mode": StudyService._resolve_distribution_mode(study),
             "ui_labels": get_t_attr("ui_labels", {}) or {},
             "methodology_tips": (getattr(translation, "methodology_tips", []) or [])
             or lang_defaults.get("methodology_tips", []),
