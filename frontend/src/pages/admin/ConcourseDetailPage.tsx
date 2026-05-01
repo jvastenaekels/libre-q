@@ -25,15 +25,17 @@ import {
     Filter,
     Globe,
     FileSpreadsheet,
+    NotebookPen,
 } from 'lucide-react';
 import { parseConcourseCsv } from '@/utils/parseCsvTsv';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-    Accordion,
-    AccordionItem,
-    AccordionTrigger,
-    AccordionContent,
-} from '@/components/ui/accordion';
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -198,6 +200,7 @@ export default function ConcourseDetailPage() {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [csvErrors, setCsvErrors] = useState<string[]>([]);
     const [csvSkippedLangs, setCsvSkippedLangs] = useState<string[]>([]);
+    const [memoOpen, setMemoOpen] = useState(false);
 
     const handleCsvFile = async (file: File) => {
         const text = await file.text();
@@ -250,6 +253,31 @@ export default function ConcourseDetailPage() {
                 icon={Library}
                 actions={
                     <div className="flex items-center gap-2">
+                        {canEdit && (
+                            <Button
+                                size="sm"
+                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                onClick={openAddItemDialog}
+                            >
+                                <Plus className="size-4 sm:mr-1" />
+                                <span className="hidden sm:inline">
+                                    {t('admin.concourse.add_item', 'Add Item')}
+                                </span>
+                            </Button>
+                        )}
+                        {canEdit && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl"
+                                onClick={openImportDialog}
+                            >
+                                <Upload className="size-4 sm:mr-1" />
+                                <span className="hidden sm:inline">
+                                    {t('admin.concourse.bulk_import', 'Bulk Import')}
+                                </span>
+                            </Button>
+                        )}
                         <Button
                             variant="outline"
                             size="sm"
@@ -262,83 +290,52 @@ export default function ConcourseDetailPage() {
                                 {t('admin.concourse.export_csv', 'Export CSV')}
                             </span>
                         </Button>
-                        {canEdit && (
-                            <>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="rounded-xl"
-                                    onClick={openImportDialog}
-                                >
-                                    <Upload className="size-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">
-                                        {t('admin.concourse.bulk_import', 'Bulk Import')}
-                                    </span>
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                    onClick={openAddItemDialog}
-                                >
-                                    <Plus className="size-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">
-                                        {t('admin.concourse.add_item', 'Add Item')}
-                                    </span>
-                                </Button>
-                            </>
-                        )}
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="rounded-xl relative"
+                            onClick={() => setMemoOpen(true)}
+                            aria-label={t('admin.memo.title_concourse', 'Construction memo')}
+                            title={t('admin.memo.title_concourse', 'Construction memo')}
+                        >
+                            <NotebookPen className="size-4" />
+                            {memoUnreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-[10px] leading-none px-1.5 py-0.5 font-medium border border-white">
+                                    {memoUnreadCount}
+                                </span>
+                            )}
+                        </Button>
                     </div>
                 }
             />
 
-            {/* Construction memo — Wave D (D1 + D7-bonus from REPORT.md):
-                - dropped the redundant "Methodological context" wrapper section
-                  (H7) — the Accordion trigger carries the field's intent.
-                - wrapped in Accordion: expanded-by-default when empty (invites
-                  first entry), collapsed-by-default once the researcher has
-                  saved content (40% vertical real-estate reclaimed for the
-                  actual item list). */}
-            <Accordion type="multiple" defaultValue={['memo']} className="space-y-2">
-                <AccordionItem
-                    value="memo"
-                    className="border border-slate-200 rounded-xl overflow-hidden bg-white"
-                >
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-100">
-                        <div className="flex flex-col items-start text-left">
-                            <span className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                {t('admin.memo.title_concourse', 'Construction memo')}
-                                {memoUnreadCount > 0 && (
-                                    <span className="rounded-full bg-amber-100 text-amber-800 text-xs px-2 py-0.5 font-medium">
-                                        {memoUnreadCount}
-                                    </span>
-                                )}
-                            </span>
-                            <span className="text-xs font-medium text-slate-500 mt-0.5">
-                                {t(
-                                    'admin.memo.summary_empty_concourse',
-                                    'Optional · for transparency about the curation process'
-                                )}
-                            </span>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <div className="p-4 sm:p-6">
-                            {concourse && currentUser && (
-                                <MemoSection
-                                    parentType="concourse"
-                                    parentId={concourse.id}
-                                    currentUserId={currentUser.id}
-                                    isOwner={projectRole === 'owner'}
-                                    canEdit={
-                                        projectRole === 'owner' || projectRole === 'researcher'
-                                    }
-                                    members={projectMembers}
-                                />
+            <Sheet open={memoOpen} onOpenChange={setMemoOpen}>
+                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>
+                            {t('admin.memo.title_concourse', 'Construction memo')}
+                        </SheetTitle>
+                        <SheetDescription>
+                            {t(
+                                'admin.memo.summary_empty_concourse',
+                                'Optional · for transparency about the curation process'
                             )}
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div className="mt-4">
+                        {concourse && currentUser && (
+                            <MemoSection
+                                parentType="concourse"
+                                parentId={concourse.id}
+                                currentUserId={currentUser.id}
+                                isOwner={projectRole === 'owner'}
+                                canEdit={projectRole === 'owner' || projectRole === 'researcher'}
+                                members={projectMembers}
+                            />
+                        )}
+                    </div>
+                </SheetContent>
+            </Sheet>
 
             {/* Filters */}
             <div className="flex flex-col gap-2">

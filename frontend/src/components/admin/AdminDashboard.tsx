@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
@@ -80,7 +79,6 @@ export function AdminDashboard() {
         draftStudies,
         pausedStudies,
         closedStudies,
-        totalParticipants,
         alerts,
         currentLocale,
         showCreateDialog,
@@ -199,75 +197,15 @@ export function AdminDashboard() {
                             {currentProject?.title}
                         </h1>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                        <TooltipProvider delayDuration={300}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
-                                        {t('admin.dashboard.n_studies', {
-                                            count: studies?.length ?? 0,
-                                            defaultValue: '{{count}} studies',
-                                        })}
-                                    </span>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-xs text-xs">
-                                    {t(
-                                        'admin.dashboard.n_studies_help',
-                                        'Total number of studies in this project, including drafts and closed.'
-                                    )}
-                                </TooltipContent>
-                            </Tooltip>
-                            <span className="text-border">|</span>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
-                                        {t('admin.dashboard.n_active', {
-                                            count: activeStudies.length,
-                                            defaultValue: '{{count}} active',
-                                        })}
-                                    </span>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-xs text-xs">
-                                    {t(
-                                        'admin.dashboard.n_active_help',
-                                        'Studies currently accepting participant submissions (state = active).'
-                                    )}
-                                </TooltipContent>
-                            </Tooltip>
-                            <span className="text-border">|</span>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
-                                        {t('admin.dashboard.n_participants_total', {
-                                            count: totalParticipants,
-                                            defaultValue: '{{count}} participants',
-                                        })}
-                                    </span>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-xs text-xs">
-                                    {t(
-                                        'admin.dashboard.n_participants_total_help',
-                                        'Sum of completed participants across all studies in this project.'
-                                    )}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                    {/* Wave E (E8): "Import" demoted from outline to ghost so
-                        the visual hierarchy reflects relative frequency —
-                        most projects create studies; importing from a JSON
-                        config is the rarer, power-user path. The primary
-                        "Create study" stays a filled blue CTA (audit
-                        REPORT.md finding H4). */}
-                    <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
-                        <Upload className="mr-2 h-3.5 w-3.5" />
-                        {t('admin.dashboard.import_study', 'Import')}
-                    </Button>
                     <Button onClick={() => setShowCreateDialog(true)} size="sm">
                         <Plus className="mr-2 h-3.5 w-3.5" />
                         {t('admin.dashboard.create_study', 'Create study')}
+                    </Button>
+                    <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
+                        <Upload className="mr-2 h-3.5 w-3.5" />
+                        {t('admin.dashboard.import_study', 'Import')}
                     </Button>
                 </div>
             </div>
