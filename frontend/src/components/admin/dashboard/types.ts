@@ -54,6 +54,11 @@ export interface DumpResponse {
         } & Record<string, any>;
         state: string;
         rough_sort_enabled?: boolean;
+        // Distribution semantics (forced | free | flexible). When 'free', the
+        // read-only grid viewer must surface overflow rows that exceed the
+        // declared per-column capacity — otherwise admin-side data is
+        // silently truncated for free-mode participants.
+        distribution_mode?: 'forced' | 'free' | 'flexible';
     };
     participants: DumpParticipant[];
     statement_id_to_index: Record<string, number>;

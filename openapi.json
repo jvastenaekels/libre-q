@@ -8066,7 +8066,7 @@
           "flexible"
         ],
         "title": "DistributionMode",
-        "description": "Enum for Q-sort grid distribution enforcement.\n\nforced \u2014 each column must hold exactly its declared capacity\n    (Brown 1980; Watts & Stenner 2012).\nfree \u2014 total count must equal Q-set size; per-column capacities\n    ignored at validation (Brown et al. 2015).\nflexible \u2014 total enforced, per-column capacities are soft hints\n    (warnings only). Qualis-specific compromise."
+        "description": "Enum for Q-sort grid distribution enforcement.\n\nforced \u2014 activation requires sum(capacity) == len(statements); each column\n    must hold exactly its declared capacity at submission\n    (Brown 1980; Watts & Stenner 2012).\nfree \u2014 activation requires sum(capacity) >= len(statements) (the grid must\n    fit every statement; declared capacities are an upper hint, columns\n    may absorb overflow at sort time). Total submitted count must equal\n    the Q-set size; per-column capacities are not enforced\n    (Brown et al. 2015).\nflexible \u2014 activation requires sum(capacity) == len(statements); total is\n    enforced at submission; per-column capacities are soft hints\n    (warnings only). Qualis-specific compromise."
       },
       "DraftSaveInput": {
         "properties": {

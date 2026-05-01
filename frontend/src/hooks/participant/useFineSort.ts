@@ -334,6 +334,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         interactionUtils,
         statements: config?.statements || [],
         actions,
+        distributionMode,
     });
 
     // ── Reconciliation effect ─────────────────────────────────────
@@ -355,6 +356,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         gridColumns,
         unplaceCard: actions.unplaceCard,
         categorizeCard: actions.categorizeCard,
+        distributionMode,
     });
 
     // ── Keyboard handler ──────────────────────────────────────────
