@@ -897,7 +897,7 @@ const StudyLayoutContent: React.FC = () => {
                                         <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
                                             {t(
                                                 'resume.instruction_detail',
-                                                'Keep this link private — it gives access to your session.'
+                                                'Keep this link private. It gives access to your session.'
                                             )}
                                         </p>
                                         <div className="flex items-center gap-2">

@@ -230,7 +230,7 @@ describe('FactorCanvas', () => {
                 {...compareDefaults()}
             />
         );
-        expect(screen.getByText(/Narrative.*F1/i)).toBeInTheDocument();
+        expect(screen.getByText(/F1.*narrative/i)).toBeInTheDocument();
     });
 
     it('returns null when run.result is missing', () => {

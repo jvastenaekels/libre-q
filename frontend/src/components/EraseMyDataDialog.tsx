@@ -117,7 +117,7 @@ export function EraseMyDataDialog({ slug, sessionToken }: Props) {
                             <span className="block">
                                 {t(
                                     'erasure.confirm_what_kept',
-                                    'Your statement rankings will be preserved as anonymous research data — they no longer link to you.'
+                                    'Your statement rankings will be preserved as anonymous research data. They no longer link to you.'
                                 )}
                             </span>
                             <span className="block font-medium text-slate-700">

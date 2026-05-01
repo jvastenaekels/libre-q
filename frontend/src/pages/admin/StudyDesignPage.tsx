@@ -712,8 +712,8 @@ const StudyDesignPage = () => {
                                             {t('admin.study_design.rough_sort.lock_banner', {
                                                 count: api.roughSortLockedCount,
                                                 defaultValue:
-                                                    'Toggle locked — {{count}} participant(s) have started the survey. ' +
-                                                    'Archive or delete those sessions before changing this setting.',
+                                                    'Toggle locked. {{count}} participant(s) have started the survey; ' +
+                                                    'archive or delete those sessions before changing this setting.',
                                             })}
                                         </div>
                                     )}
@@ -746,7 +746,7 @@ const StudyDesignPage = () => {
                                         <p className="text-xs italic text-slate-500">
                                             {t(
                                                 'admin.study_design.rough_sort.deck_mode_note',
-                                                'Disabled — participants will see the full Q-set as a horizontally-scrollable deck.'
+                                                'Disabled. Participants see the full Q-set as a horizontally-scrollable deck.'
                                             )}
                                         </p>
                                     )}

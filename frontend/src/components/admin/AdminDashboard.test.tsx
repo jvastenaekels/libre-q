@@ -3,12 +3,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { AdminDashboard } from './AdminDashboard';
 
 // Hoisted mocks for generated API hooks
-const { mockStudiesHook } = vi.hoisted(() => ({
+const { mockStudiesHook, mockConcoursesHook } = vi.hoisted(() => ({
     mockStudiesHook: vi.fn(),
+    mockConcoursesHook: vi.fn(() => ({ data: { items: [] }, isLoading: false })),
 }));
 
 vi.mock('@/api/generated', () => ({
     useListStudiesApiAdminStudiesGet: mockStudiesHook,
+    useListConcoursesApiAdminConcoursesGet: mockConcoursesHook,
 }));
 
 // Mock stores
@@ -150,8 +152,8 @@ describe('AdminDashboard', () => {
 
         renderWithProviders(<AdminDashboard />);
 
-        // StudyGroups renders a "Studies" heading
-        expect(screen.getByText('Studies')).toBeInTheDocument();
+        // Multi-study branch renders the StudyGroups directly (no parent
+        // "Studies" header — subgroup labels carry the semantics).
         expect(screen.getByText('My Study')).toBeInTheDocument();
         expect(screen.getByText('Second Study')).toBeInTheDocument();
     });

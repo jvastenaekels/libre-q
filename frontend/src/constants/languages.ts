@@ -5,7 +5,7 @@ export interface Language {
 }
 
 export const SUPPORTED_LANGUAGES: Language[] = [
-    { code: 'en', label: 'English', flag: 'EN' },
-    { code: 'fr', label: 'Français', flag: 'FR' },
-    { code: 'fi', label: 'Suomi', flag: 'FI' },
+    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'fr', label: 'Français', flag: '🇫🇷' },
+    { code: 'fi', label: 'Suomi', flag: '🇫🇮' },
 ];

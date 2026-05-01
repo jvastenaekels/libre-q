@@ -11,6 +11,7 @@ import {
     Clock,
     Briefcase,
     FlaskConical,
+    Library,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -26,6 +27,7 @@ import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useTranslation } from 'react-i18next';
 import { useAdminDashboard } from '@/hooks/admin/useAdminDashboard';
 import type { StudyRead } from '@/api/model/studyRead';
+import type { ConcourseRead } from '@/api/model/concourseRead';
 
 type TranslateFn = ReturnType<typeof useTranslation>['t'];
 
@@ -79,6 +81,8 @@ export function AdminDashboard() {
         draftStudies,
         pausedStudies,
         closedStudies,
+        concourse,
+        isConcourseLoading,
         alerts,
         currentLocale,
         showCreateDialog,
@@ -87,6 +91,7 @@ export function AdminDashboard() {
         setShowImportDialog,
         getStudyTitle,
         handleOpenStudy,
+        handleOpenConcourse,
     } = useAdminDashboard();
 
     if (isLoading) {
@@ -244,6 +249,16 @@ export function AdminDashboard() {
                 </Card>
             )}
 
+            {/* Concourse — discoverability anchor for the upstream artefact
+                (curation precedes studies). Skeleton while the independent
+                concourses query is in flight so the card body doesn't flash
+                from "Curate candidate statements" to "N statements". */}
+            {isConcourseLoading ? (
+                <Skeleton className="h-14 rounded-xl" />
+            ) : (
+                <ConcourseCard concourse={concourse} onOpen={handleOpenConcourse} t={t} />
+            )}
+
             {/* Studies */}
             {studies && studies.length === 1 && studies[0] ? (
                 <SingleStudyCard
@@ -255,24 +270,16 @@ export function AdminDashboard() {
                     onCreateStudy={() => setShowCreateDialog(true)}
                 />
             ) : (
-                <>
-                    <div className="flex items-center gap-2">
-                        <FlaskConical className="h-5 w-5 text-indigo-500" />
-                        <h2 className="text-lg font-black text-slate-900">
-                            {t('admin.dashboard.studies', 'Studies')}
-                        </h2>
-                    </div>
-                    <StudyGroups
-                        activeStudies={activeStudies}
-                        pausedStudies={pausedStudies}
-                        draftStudies={draftStudies}
-                        closedStudies={closedStudies}
-                        getTitle={getStudyTitle}
-                        onOpen={handleOpenStudy}
-                        locale={currentLocale}
-                        t={t}
-                    />
-                </>
+                <StudyGroups
+                    activeStudies={activeStudies}
+                    pausedStudies={pausedStudies}
+                    draftStudies={draftStudies}
+                    closedStudies={closedStudies}
+                    getTitle={getStudyTitle}
+                    onOpen={handleOpenStudy}
+                    locale={currentLocale}
+                    t={t}
+                />
             )}
 
             <CreateStudyDialog
@@ -290,6 +297,56 @@ export function AdminDashboard() {
 }
 
 // --- Sub-components ---
+
+function ConcourseCard({
+    concourse,
+    onOpen,
+    t,
+}: {
+    concourse: ConcourseRead | undefined;
+    onOpen: () => void;
+    t: TranslateFn;
+}) {
+    const itemCount = concourse?.item_count ?? 0;
+
+    return (
+        <Card
+            className="group cursor-pointer hover:border-foreground/20 transition-colors"
+            onClick={onOpen}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpen();
+                }
+            }}
+            tabIndex={0}
+            role="button"
+        >
+            <CardContent className="py-3 px-4">
+                <div className="flex items-center gap-3">
+                    <Library className="h-5 w-5 text-indigo-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold truncate group-hover:text-indigo-600 transition-colors">
+                            {t('admin.concourse.title', 'Concourse')}
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            {concourse
+                                ? t('admin.dashboard.concourse_n_items', {
+                                      count: itemCount,
+                                      defaultValue: '{{count}} statements',
+                                  })
+                                : t(
+                                      'admin.dashboard.concourse_open_hint',
+                                      'Curate candidate statements'
+                                  )}
+                        </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 function OnboardingStep({
     step,

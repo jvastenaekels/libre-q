@@ -63,7 +63,7 @@ export function ExportPackageDialog({
                         <p className="text-xs text-slate-500">
                             {t(
                                 'admin.export.package_dialog.discussion_hint',
-                                'Adds memo/memo-discussion.md with all comment threads (signed and dated). Off by default — keep your export clean unless you want the deliberation trail.'
+                                'Adds memo/memo-discussion.md with all comment threads (signed and dated). Off by default; keep your export clean unless you want the deliberation trail.'
                             )}
                         </p>
                     </div>

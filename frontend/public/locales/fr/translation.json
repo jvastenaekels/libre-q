@@ -256,7 +256,7 @@
     "rough": {
         "header": {
             "subtitle": "Glissez à **gauche** pour « Pas d'accord », à **droite** pour « D'accord », ou en **bas** pour « Neutre / Indécis ».",
-            "hint": "C'est du spontané — vous pourrez changer d'avis juste après."
+            "hint": "C'est du spontané. Vous pourrez changer d'avis juste après."
         },
         "complete": {
             "title": "Première étape validée",
@@ -452,8 +452,8 @@
                 "section_title": "Étape de pré-tri",
                 "toggle_label": "Activer le pré-tri (3 piles d'accord/neutre/pas d'accord)",
                 "toggle_help": "Recommandé pour les Q-sets longs (>40 énoncés). Environ 38 % des études Q publiées utilisent cette étape (Dieteren et al. 2023).",
-                "lock_banner": "Verrou actif — {{count}} participant(s) ont commencé l'enquête. Archivez ou supprimez ces sessions avant de modifier ce réglage.",
-                "deck_mode_note": "Désactivé — les participants verront l'ensemble du Q-set sous forme d'un deck défilant horizontalement."
+                "lock_banner": "Verrou actif. {{count}} participant(s) ont commencé l'enquête ; archivez ou supprimez ces sessions avant de modifier ce réglage.",
+                "deck_mode_note": "Désactivé. Les participants verront l'ensemble du Q-set sous forme d'un deck défilant horizontalement."
             }
         },
         "study": {
@@ -579,7 +579,7 @@
             "title": "Concours",
             "description": "Gérer les énoncés candidats pour votre étude Q-méthodologie",
             "default_title": "Concours",
-            "default_title_for_project": "{{project}} — Concours",
+            "default_title_for_project": "Concours {{project}}",
             "create": "Nouveau concours",
             "create_success": "Concours créé",
             "create_error": "Échec de la création du concours",
@@ -690,7 +690,7 @@
         },
         "concourse_import": {
             "title": "Importer depuis un concours",
-            "desc": "Sélectionnez des éléments d'un concours à importer comme énoncés d'étude. Les éléments sont copiés — les modifications du concours n'affecteront pas l'étude.",
+            "desc": "Sélectionnez des éléments d'un concours à importer comme énoncés d'étude. Les éléments sont copiés ; les modifications du concours n'affecteront pas l'étude.",
             "button_label": "Importer depuis un concours",
             "select_concourse": "Concours",
             "select_placeholder": "Choisir un concours...",
@@ -719,7 +719,7 @@
         },
         "analysis": {
             "title": "Analyse",
-            "description": "Analyse factorielle des données Q-sort — extraire les points de vue des réponses des participants",
+            "description": "Analyse factorielle des données Q-sort : extraire les points de vue à partir des réponses des participants",
             "configuration": "Configuration",
             "configuration_description": "Sélectionner la méthode d'extraction, le nombre de facteurs et la rotation",
             "extraction_method": "Extraction",
@@ -731,7 +731,7 @@
             "run_will_replace": "Relancer l'analyse remplacera la vue actuelle des résultats. Utilisez le panneau d'historique pour comparer les exécutions.",
             "running": "Analyse en cours...",
             "reanalyzing": "Nouvelle analyse en cours...",
-            "success": "Analyse terminée — {{n}} facteurs extraits",
+            "success": "Analyse terminée. {{n}} facteurs extraits.",
             "error": "Échec de l'analyse : {{message}}",
             "scree_hint": "Chaque barre montre la variance expliquée par un facteur (sa valeur propre). La ligne pointillée marque la valeur propre = 1 (critère de Kaiser). Cliquez sur une barre pour sélectionner le nombre de facteurs à extraire.",
             "kaiser_suggestion": "{{n}} facteur(s) ont une valeur propre supérieure à 1 (critère de Kaiser)",
@@ -832,7 +832,7 @@
                 "title": "Historique des analyses",
                 "loading": "Chargement de l'historique…",
                 "fetch_error": "Impossible de charger l'historique des analyses.",
-                "empty": "Aucune analyse précédente pour cette étude — lancez-en une pour démarrer la piste d'audit.",
+                "empty": "Aucune analyse précédente pour cette étude. Lancez-en une pour démarrer la piste d'audit.",
                 "empty_explainer": "Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
                 "load_error": "Impossible de charger cette analyse.",
                 "load_run_aria": "Charger l'analyse du {{date}}",
@@ -855,7 +855,7 @@
                 "delete_confirm": "Supprimer",
                 "deleted": "Analyse supprimée.",
                 "delete_error": "Impossible de supprimer l'analyse.",
-                "viewing_banner": "Consultation de l'analyse du {{date}} — {{extraction}} · {{n}}F · {{rotation}}",
+                "viewing_banner": "Consultation de l'analyse du {{date}} : {{extraction}} · {{n}}F · {{rotation}}",
                 "back_to_current": "Retour à l'actuelle"
             },
             "factor_voices": {
@@ -864,7 +864,7 @@
                 "no_material": "Aucun enregistrement audio ni commentaire écrit des participants définissant ce facteur.",
                 "loading": "Chargement des enregistrements…",
                 "error": "Impossible de charger les enregistrements audio. Veuillez réessayer.",
-                "context": "Ancrez l'interprétation des facteurs dans les mots des participants — leurs justifications audio comme leurs commentaires écrits sur les cartes.",
+                "context": "Ancrez l'interprétation des facteurs dans les mots des participants : leurs justifications audio comme leurs commentaires écrits sur les cartes.",
                 "context_aria": "À propos de ce panneau",
                 "audio_label": "Enregistrement : {{key}} par {{participant}}",
                 "url_unavailable": "URL audio non disponible.",
@@ -872,7 +872,7 @@
             },
             "factor_note": {
                 "label": "Narration du facteur",
-                "placeholder": "Rédigez la narration interprétative de ce facteur — le discours, les voix et les tensions qu'il met en avant.",
+                "placeholder": "Rédigez la narration interprétative de ce facteur : le discours, les voix et les tensions qu'il met en avant.",
                 "empty_hint": "Ajouter une narration interprétative pour ce facteur",
                 "char_count": "{{n}}/{{max}}",
                 "edit_aria": "Modifier la narration du facteur {{n}}",
@@ -912,11 +912,11 @@
                 "kaiser": "Kaiser",
                 "parallel": "Analyse parallèle",
                 "map": "MAP de Velicer",
-                "advisory": "Indicateurs consultatifs — la rétention en Q-méthode dépend aussi de l'interprétabilité et de la stabilité (Watts & Stenner 2012).",
+                "advisory": "Indicateurs consultatifs. La rétention en Q-méthode dépend aussi de l'interprétabilité et de la stabilité (Watts & Stenner 2012).",
                 "preview_range_title": "Aperçu par k",
-                "preview_range_disabled": "L'aperçu n'est pris en charge qu'avec PCA + varimax. L'extraction centroid et la rotation jugementale sont path-dépendantes — lancez un run réel pour les inspecter.",
+                "preview_range_disabled": "L'aperçu n'est pris en charge qu'avec PCA + varimax. L'extraction centroid et la rotation jugementale sont path-dépendantes ; lancez un run réel pour les inspecter.",
                 "select_k": "{{k}} facteurs",
-                "empty_factor": "Facteur vide — sur-factorisation",
+                "empty_factor": "Facteur vide (sur-factorisation)",
                 "cumvar": "% var. cum.",
                 "pct_flagged": "% flaggés",
                 "n_distinguishing": "# distinguish.",
@@ -928,7 +928,7 @@
             "interpret": {
                 "def_sorts": "Sorts définissants : {{n}}",
                 "statements_title": "Énoncés",
-                "narrative_title": "Narration — F{{n}}",
+                "narrative_title": "Narration F{{n}}",
                 "insert_comment_quote": "Insérer le commentaire comme citation",
                 "focus_mode": "Focus par facteur",
                 "overview_mode": "Vue d'ensemble",
@@ -940,12 +940,12 @@
                 "run_label": "Run #{{id}} ({{n}} facteurs)",
                 "pinned": "Comparaison avec le run #{{id}}",
                 "phi": "φ = {{phi}}",
-                "ambiguous": "appariement ambigu — interpréter les Δ avec précaution",
+                "ambiguous": "appariement ambigu (interpréter les Δ avec précaution)",
                 "unpin": "Désépingler",
                 "delta_z_aria": "Δz {{delta}} vs run de comparaison",
                 "delta_loading_aria": "Δsaturation {{delta}} vs run de comparaison"
             },
-            "quote_insert_format": "> {{text}}\n> — {{p}}, sur l'énoncé {{code}} : « {{stmt}} »"
+            "quote_insert_format": "> {{text}}\n> {{p}}, sur l'énoncé {{code}} : « {{stmt}} »"
         },
         "project": {
             "remove_member": "Retirer le membre",
@@ -995,7 +995,7 @@
                 "slug_description": "L'identifiant unique utilisé dans l'URL de l'étude. Lettres minuscules, chiffres et tirets uniquement.",
                 "slug_locked": "Le slug de l'URL ne peut être modifié que lorsque l'étude est en mode brouillon."
             },
-            "state_draft": "Mode brouillon — les liens fonctionneront après activation.",
+            "state_draft": "Mode brouillon. Les liens fonctionneront une fois l'étude activée.",
             "state_closed": "Cette étude est fermée. Les liens existants restent visibles mais les nouveaux participants ne peuvent pas commencer.",
             "state_archived": "Cette étude est archivée. Toutes les données de recrutement sont en lecture seule.",
             "empty_title": "Aucun lien de recrutement",
@@ -1090,7 +1090,7 @@
                 "usage": "Capacité",
                 "status": "État",
                 "actions": "Gérer",
-                "type_help": "Public, Usage unique, ou Capacité limitée — voir les descriptions de stratégie dans la boîte de dialogue « Nouveau lien d’accès »."
+                "type_help": "Public, Usage unique, ou Capacité limitée. Voir les descriptions de stratégie dans la boîte de dialogue « Nouveau lien d’accès »."
             },
             "status": {
                 "public": "Public",
@@ -1189,6 +1189,9 @@
             "n_active_other": "{{count}} actives",
             "n_participants_total_one": "{{count}} participant",
             "n_participants_total_other": "{{count}} participants",
+            "concourse_n_items_one": "{{count}} énoncé",
+            "concourse_n_items_other": "{{count}} énoncés",
+            "concourse_open_hint": "Constituer le concourse",
             "created": "Créée",
             "no_studies": "Aucune étude trouvée. Créez votre première étude pour commencer !",
             "import_study": "Importer une étude",
@@ -1273,7 +1276,7 @@
             "package_dialog": {
                 "title": "Télécharger le pack de recherche",
                 "description": "Regroupe toutes les données de l'étude dans un ZIP pour OSF / pré-inscription.",
-                "discussion_hint": "Ajoute memo/memo-discussion.md avec tous les fils de commentaires (signés et datés). Désactivé par défaut — gardez votre export propre sauf si vous voulez la trace de délibération."
+                "discussion_hint": "Ajoute memo/memo-discussion.md avec tous les fils de commentaires (signés et datés). Désactivé par défaut ; gardez votre export propre sauf si vous voulez la trace de délibération."
             }
         },
         "import": {
@@ -1802,9 +1805,9 @@
                     "tooltip_desc": "Dans la méthode Q, une distribution forcée est généralement quasi-normale. Cela oblige le participant à faire des choix difficiles et à discriminer clairement entre les items.",
                     "locked": "Conception verrouillée",
                     "locked_desc": "Les changements structurels (codes des énoncés, grille) sont désactivés car l'étude a recueilli des données ou n'est plus en mode brouillon. Vous pouvez toujours modifier les textes des traductions.",
-                    "locked_active": "Étude active — repassez en brouillon pour éditer",
-                    "locked_paused": "Étude en pause — repassez en brouillon pour éditer",
-                    "locked_closed": "Étude clôturée — la conception est archivée",
+                    "locked_active": "Cette étude est active. Pour la modifier, passez-la en brouillon.",
+                    "locked_paused": "Cette étude est en pause. Pour la modifier, passez-la en brouillon.",
+                    "locked_closed": "Cette étude est clôturée. La conception est archivée.",
                     "mismatch_title": "Capacité de grille incorrecte",
                     "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
                     "unlock_hint": "Aller dans l'explorateur de données pour purger les sessions et débloquer la structure"
@@ -2337,9 +2340,9 @@
             "no_projects": "Aucun projet. Créez votre premier projet pour commencer."
         },
         "memo": {
-            "title_concourse": "Mémo de construction",
+            "title_concourse": "Notes de sélection",
             "title_study": "Mémo méthodologique",
-            "summary_empty_concourse": "Optionnel · pour la transparence du processus curatorial",
+            "summary_empty_concourse": "Comment et pourquoi vous avez constitué ce concourse",
             "summary_empty_study": "Optionnel · pour réplication & préenregistrement",
             "summary_filled_one": "{{n}} entrée · cliquer pour ouvrir",
             "summary_filled_other": "{{n}} entrées · cliquer pour ouvrir",
@@ -2438,7 +2441,7 @@
         "link_copied": "Lien copié !",
         "instruction": "Pour reprendre sur un autre appareil, enregistrez ce lien :",
         "instruction_same_browser": "Si vous revenez sur ce navigateur, votre progression sera sauvegardée automatiquement.",
-        "instruction_detail": "Gardez ce lien privé — il donne accès à votre session.",
+        "instruction_detail": "Gardez ce lien privé. Il donne accès à votre session.",
         "resume_url": "Lien de reprise",
         "saving": "Enregistrement...",
         "saved": "Enregistré",
@@ -2468,7 +2471,7 @@
         "button": "Demander la suppression de mes données",
         "confirm_title": "Effacer vos données personnelles ?",
         "confirm_what_erased": "Seront supprimés définitivement : l'adresse IP enregistrée avec votre session, l'identifiant de votre navigateur, vos réponses textuelles (pré- et post-tri), et tout enregistrement audio que vous avez fourni.",
-        "confirm_what_kept": "Vos classements d'énoncés seront conservés comme données de recherche anonymes — ils ne seront plus reliés à vous.",
+        "confirm_what_kept": "Vos classements d'énoncés seront conservés comme données de recherche anonymes. Ils ne seront plus reliés à vous.",
         "confirm_irreversible": "Cette action est immédiate et irréversible.",
         "confirm_action": "Oui, effacer mes données",
         "confirm_in_progress": "Effacement…",

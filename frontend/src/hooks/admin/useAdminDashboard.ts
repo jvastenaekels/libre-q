@@ -19,8 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { enUS, fr, fi } from 'date-fns/locale';
 import type { Locale } from 'date-fns';
-import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
-import type { StudyRead } from '@/api/model';
+import {
+    useListConcoursesApiAdminConcoursesGet,
+    useListStudiesApiAdminStudiesGet,
+} from '@/api/generated';
+import type { ConcourseRead, StudyRead } from '@/api/model';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
 
@@ -43,6 +46,8 @@ export interface AdminDashboardApi {
     pausedStudies: StudyRead[];
     closedStudies: StudyRead[];
     totalParticipants: number;
+    concourse: ConcourseRead | undefined;
+    isConcourseLoading: boolean;
     alerts: DashboardAlert[];
     currentLocale: Locale;
     showCreateDialog: boolean;
@@ -51,6 +56,7 @@ export interface AdminDashboardApi {
     setShowImportDialog: (open: boolean) => void;
     getStudyTitle: (study: StudyRead) => string;
     handleOpenStudy: (studySlug: string) => void;
+    handleOpenConcourse: () => void;
 }
 
 const DAYS_TO_DEADLINE_ALERT = 7;
@@ -71,6 +77,12 @@ export function useAdminDashboard(): AdminDashboardApi {
     const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
         query: { enabled: !!currentProject?.id },
     });
+
+    const { data: concoursesData, isLoading: isConcourseLoading } =
+        useListConcoursesApiAdminConcoursesGet(undefined, {
+            query: { enabled: !!currentProject?.id },
+        });
+    const concourse = concoursesData?.items?.[0];
 
     const studies = useMemo(
         () => allStudiesData?.items?.filter((s) => s.project_id === currentProject?.id),
@@ -113,6 +125,10 @@ export function useAdminDashboard(): AdminDashboardApi {
         [setActiveStudy, navigate, projectSlug]
     );
 
+    const handleOpenConcourse = useCallback((): void => {
+        navigate(`/app/${projectSlug}/concourses`);
+    }, [navigate, projectSlug]);
+
     const alerts = useMemo<DashboardAlert[]>(() => {
         const out: DashboardAlert[] = [];
         const now = Date.now();
@@ -147,6 +163,8 @@ export function useAdminDashboard(): AdminDashboardApi {
         pausedStudies: buckets.pausedStudies,
         closedStudies: buckets.closedStudies,
         totalParticipants,
+        concourse,
+        isConcourseLoading,
         alerts,
         currentLocale,
         showCreateDialog,
@@ -155,5 +173,6 @@ export function useAdminDashboard(): AdminDashboardApi {
         setShowImportDialog,
         getStudyTitle,
         handleOpenStudy,
+        handleOpenConcourse,
     };
 }

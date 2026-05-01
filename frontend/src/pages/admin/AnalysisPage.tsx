@@ -192,7 +192,7 @@ export default function AnalysisPage() {
                     title={t('admin.analysis.title', 'Analysis')}
                     description={t(
                         'admin.analysis.description',
-                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                        'Factor analysis of Q-sort data: extract viewpoints from participant responses'
                     )}
                     icon={ChartColumnStacked}
                 />
@@ -267,7 +267,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                 title={t('admin.analysis.title', 'Analysis')}
                 description={t(
                     'admin.analysis.description',
-                    'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                    'Factor analysis of Q-sort data: extract viewpoints from participant responses'
                 )}
                 icon={ChartColumnStacked}
             />
@@ -933,7 +933,7 @@ function InterpretShell({
                     title={t('admin.analysis.title', 'Analysis')}
                     description={t(
                         'admin.analysis.description',
-                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                        'Factor analysis of Q-sort data: extract viewpoints from participant responses'
                     )}
                     icon={ChartColumnStacked}
                 />
@@ -960,7 +960,7 @@ function InterpretShell({
                     title={t('admin.analysis.title', 'Analysis')}
                     description={t(
                         'admin.analysis.description',
-                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                        'Factor analysis of Q-sort data: extract viewpoints from participant responses'
                     )}
                     icon={ChartColumnStacked}
                 />
@@ -1002,7 +1002,7 @@ function InterpretShell({
                 title={t('admin.analysis.title', 'Analysis')}
                 description={t(
                     'admin.analysis.description',
-                    'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                    'Factor analysis of Q-sort data: extract viewpoints from participant responses'
                 )}
                 icon={ChartColumnStacked}
             />
@@ -1036,14 +1036,14 @@ function InterpretShell({
                                     aria-hidden="true"
                                 />
                             )}
-                            {t('admin.analysis.export_xlsx', 'XLSX — Complete Analysis')}
+                            {t('admin.analysis.export_xlsx', 'XLSX: Complete Analysis')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => void handleExport('loadings')}>
-                            {t('admin.analysis.export_loadings', 'CSV — Factor Loadings')}
+                            {t('admin.analysis.export_loadings', 'CSV: Factor Loadings')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => void handleExport('scores')}>
-                            {t('admin.analysis.export_scores', 'CSV — Statement Scores')}
+                            {t('admin.analysis.export_scores', 'CSV: Statement Scores')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -1070,7 +1070,7 @@ function InterpretShell({
                 <span className="flex-1">
                     {t(
                         'admin.analysis.history.viewing_banner',
-                        'Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}',
+                        'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
                         {
                             date: new Date(run.ran_at).toLocaleString(undefined, {
                                 year: 'numeric',

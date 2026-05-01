@@ -138,7 +138,7 @@
             "why": "Why it matters",
             "step_welcome": {
                 "what": "Read the research objectives and the specific instructions for participation.",
-                "why": "Beyond standard ethical consent, this ensures you grasp the specific 'condition of instruction'—the precise lens or scenario you must adopt to evaluate the statements—which is essential for data validity."
+                "why": "Beyond standard ethical consent, you need to grasp the 'condition of instruction': the precise lens or scenario you adopt to evaluate the statements. This matters for data validity."
             },
             "step_presort": {
                 "what": "Provide background information to help characterize your participant profile.",
@@ -256,7 +256,7 @@
     "rough": {
         "header": {
             "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
-            "hint": "This is spontaneous — you can change your mind right after."
+            "hint": "This is spontaneous. You can change your mind right after."
         },
         "complete": {
             "title": "First step complete",
@@ -447,9 +447,9 @@
             "no_projects": "No projects yet. Create your first project to get started."
         },
         "memo": {
-            "title_concourse": "Construction memo",
+            "title_concourse": "Selection notes",
             "title_study": "Methodology memo",
-            "summary_empty_concourse": "Optional · for transparency about the curation process",
+            "summary_empty_concourse": "How and why you built this concourse",
             "summary_empty_study": "Optional · for replication & pre-registration",
             "summary_filled_one": "{{n}} entry · click to view",
             "summary_filled_other": "{{n}} entries · click to view",
@@ -500,8 +500,8 @@
                 "section_title": "Rough sort step",
                 "toggle_label": "Enable preliminary sort (3-pile triage)",
                 "toggle_help": "Recommended for large Q-sets (>40 statements). About 38% of published Q studies use this step (Dieteren et al. 2023).",
-                "lock_banner": "Toggle locked — {{count}} participant(s) have started the survey. Archive or delete those sessions before changing this setting.",
-                "deck_mode_note": "Disabled — participants will see the full Q-set as a horizontally-scrollable deck."
+                "lock_banner": "Toggle locked. {{count}} participant(s) have started the survey; archive or delete those sessions before changing this setting.",
+                "deck_mode_note": "Disabled. Participants see the full Q-set as a horizontally-scrollable deck."
             }
         },
         "study": {
@@ -627,7 +627,7 @@
             "title": "Concourse",
             "description": "Manage candidate statements for your Q-methodology study",
             "default_title": "Concourse",
-            "default_title_for_project": "{{project}} — Concourse",
+            "default_title_for_project": "{{project}} concourse",
             "create": "New Concourse",
             "create_success": "Concourse created",
             "create_error": "Failed to create concourse",
@@ -738,7 +738,7 @@
         },
         "concourse_import": {
             "title": "Import from Concourse",
-            "desc": "Select items from a concourse to import as study statements. Items are copied — changes to the concourse will not affect the study.",
+            "desc": "Select items from a concourse to import as study statements. Items are copied; changes to the concourse will not affect the study.",
             "button_label": "Import from Concourse",
             "select_concourse": "Concourse",
             "select_placeholder": "Choose a concourse...",
@@ -767,7 +767,7 @@
         },
         "analysis": {
             "title": "Analysis",
-            "description": "Factor analysis of Q-sort data — extract viewpoints from participant responses",
+            "description": "Factor analysis of Q-sort data: extract viewpoints from participant responses",
             "configuration": "Configuration",
             "configuration_description": "Select extraction method, number of factors, and rotation",
             "extraction_method": "Extraction",
@@ -779,7 +779,7 @@
             "run_will_replace": "Running again will replace the current results view. Use the history panel to compare runs.",
             "running": "Analyzing...",
             "reanalyzing": "Re-analyzing...",
-            "success": "Analysis complete — {{n}} factors extracted",
+            "success": "Analysis complete. {{n}} factors extracted.",
             "error": "Analysis failed: {{message}}",
             "scree_hint": "Each bar shows how much variance a factor explains (its eigenvalue). The dashed line marks eigenvalue = 1 (Kaiser criterion). Click a bar to select the number of factors to extract.",
             "kaiser_suggestion": "{{n}} factor(s) have eigenvalues above 1 (Kaiser criterion)",
@@ -880,7 +880,7 @@
                 "title": "Analysis history",
                 "loading": "Loading history…",
                 "fetch_error": "Could not load analysis history.",
-                "empty": "No previous analyses for this study yet — run one to start the audit trail.",
+                "empty": "No previous analyses for this study yet. Run one to start the audit trail.",
                 "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
                 "load_error": "Failed to load the analysis run.",
                 "load_run_aria": "Load analysis run from {{date}}",
@@ -903,7 +903,7 @@
                 "delete_confirm": "Delete",
                 "deleted": "Analysis run deleted.",
                 "delete_error": "Failed to delete the run.",
-                "viewing_banner": "Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}",
+                "viewing_banner": "Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
                 "back_to_current": "Back to current"
             },
             "factor_voices": {
@@ -912,7 +912,7 @@
                 "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
                 "loading": "Loading recordings…",
                 "error": "Could not load audio recordings. Please try again.",
-                "context": "Ground factor interpretation in participants' own words — their audio rationales and their written card comments.",
+                "context": "Ground factor interpretation in participants' own words: their audio rationales and their written card comments.",
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
@@ -920,7 +920,7 @@
             },
             "factor_note": {
                 "label": "Factor narrative",
-                "placeholder": "Write the interpretive narrative for this factor — the discourse, voices, and tensions it foregrounds.",
+                "placeholder": "Write the interpretive narrative for this factor: the discourse, voices, and tensions it foregrounds.",
                 "empty_hint": "Add an interpretive narrative for this factor",
                 "char_count": "{{n}}/{{max}}",
                 "edit_aria": "Edit factor {{n}} narrative",
@@ -960,11 +960,11 @@
                 "kaiser": "Kaiser",
                 "parallel": "Parallel analysis",
                 "map": "Velicer's MAP",
-                "advisory": "Advisory only — Q-method retention also depends on interpretability and stability (Watts & Stenner 2012).",
+                "advisory": "Advisory only. Q-method retention also depends on interpretability and stability (Watts & Stenner 2012).",
                 "preview_range_title": "Preview range",
-                "preview_range_disabled": "Preview range supports PCA + varimax only. Centroid extraction and judgmental rotation are path-dependent — commit a real run to inspect.",
+                "preview_range_disabled": "Preview range supports PCA + varimax only. Centroid extraction and judgmental rotation are path-dependent; commit a real run to inspect.",
                 "select_k": "{{k}} factors",
-                "empty_factor": "Empty factor — over-factorisation",
+                "empty_factor": "Empty factor (over-factorisation)",
                 "cumvar": "cumvar %",
                 "pct_flagged": "% flagged",
                 "n_distinguishing": "# distinguishing",
@@ -976,7 +976,7 @@
             "interpret": {
                 "def_sorts": "Defining sorts: {{n}}",
                 "statements_title": "Statements",
-                "narrative_title": "Narrative — F{{n}}",
+                "narrative_title": "F{{n}} narrative",
                 "insert_comment_quote": "Insert comment as quote",
                 "focus_mode": "Per-factor focus",
                 "overview_mode": "Overview",
@@ -988,12 +988,12 @@
                 "run_label": "Run #{{id}} ({{n}} factors)",
                 "pinned": "Comparing with run #{{id}}",
                 "phi": "φ = {{phi}}",
-                "ambiguous": "ambiguous match — interpret deltas with care",
+                "ambiguous": "ambiguous match (interpret deltas with care)",
                 "unpin": "Unpin",
                 "delta_z_aria": "Δz {{delta}} vs compare run",
                 "delta_loading_aria": "Δloading {{delta}} vs compare run"
             },
-            "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}\""
+            "quote_insert_format": "> {{text}}\n> {{p}}, on statement {{code}}: \"{{stmt}}\""
         },
         "project": {
             "remove_member": "Remove member",
@@ -1043,7 +1043,7 @@
                 "slug_description": "The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only.",
                 "slug_locked": "The URL slug can only be changed while the study is in draft mode."
             },
-            "state_draft": "Draft mode — links work after you activate the study.",
+            "state_draft": "Draft mode. Links will work once you activate the study.",
             "state_closed": "This study is closed. Existing links remain visible but new participants cannot start.",
             "state_archived": "This study is archived. All recruitment data is read-only.",
             "empty_title": "No recruitment links yet",
@@ -1138,7 +1138,7 @@
                 "usage": "Capacity",
                 "status": "State",
                 "actions": "Manage",
-                "type_help": "Public, Single-use, or Capacity-limited — see strategy descriptions in the \"New access link\" dialog."
+                "type_help": "Public, Single-use, or Capacity-limited. See strategy descriptions in the \"New access link\" dialog."
             },
             "status": {
                 "public": "Public",
@@ -1237,6 +1237,9 @@
             "n_active_other": "{{count}} active",
             "n_participants_total_one": "{{count}} participant",
             "n_participants_total_other": "{{count}} participants",
+            "concourse_n_items_one": "{{count}} statement",
+            "concourse_n_items_other": "{{count}} statements",
+            "concourse_open_hint": "Curate candidate statements",
             "created": "Created",
             "no_studies": "No studies found. Create your first study to get started!",
             "import_study": "Import study",
@@ -1321,7 +1324,7 @@
             "package_dialog": {
                 "title": "Download research package",
                 "description": "Bundles all study data into a single ZIP for OSF / pre-registration.",
-                "discussion_hint": "Adds memo/memo-discussion.md with all comment threads (signed and dated). Off by default — keep your export clean unless you want the deliberation trail."
+                "discussion_hint": "Adds memo/memo-discussion.md with all comment threads (signed and dated). Off by default; keep your export clean unless you want the deliberation trail."
             }
         },
         "import": {
@@ -1813,9 +1816,9 @@
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
                     "locked": "Design locked",
                     "locked_desc": "Structural changes (statement codes, grid) are disabled because the study has collected data or is no longer in draft mode. You can still edit text translations.",
-                    "locked_active": "Study is active — switch to draft to edit",
-                    "locked_paused": "Study is paused — switch to draft to edit",
-                    "locked_closed": "Study is closed — design is archived",
+                    "locked_active": "This study is active. Switch to draft mode to edit.",
+                    "locked_paused": "This study is paused. Switch to draft mode to edit.",
+                    "locked_closed": "This study is closed. The design is archived.",
                     "mismatch_title": "Grid capacity mismatch",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
                     "unlock_hint": "Go to data explorer to purge sessions and unlock structure"
@@ -2438,7 +2441,7 @@
         "link_copied": "Link copied!",
         "instruction": "To continue on a different device, save this link:",
         "instruction_same_browser": "If you return on this browser, your progress will be saved automatically.",
-        "instruction_detail": "Keep this link private — it gives access to your session.",
+        "instruction_detail": "Keep this link private. It gives access to your session.",
         "resume_url": "Resume URL",
         "saving": "Saving...",
         "saved": "Saved",
@@ -2468,7 +2471,7 @@
         "button": "Request my data deletion",
         "confirm_title": "Erase your personal data?",
         "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
-        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data — they no longer link to you.",
+        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
         "confirm_irreversible": "This action is immediate and cannot be undone.",
         "confirm_action": "Yes, erase my data",
         "confirm_in_progress": "Erasing…",

@@ -10,7 +10,8 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DEFAULT_STUDY_CONTENT, AVAILABLE_LANGUAGES } from '@/constants/studyDefaults';
+import { DEFAULT_STUDY_CONTENT } from '@/constants/studyDefaults';
+import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 import {
     Dialog,
     DialogContent,
@@ -261,7 +262,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                                         </p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        {AVAILABLE_LANGUAGES.map((lang) => (
+                                        {SUPPORTED_LANGUAGES.map((lang) => (
                                             <FormField
                                                 key={lang.code}
                                                 control={form.control}

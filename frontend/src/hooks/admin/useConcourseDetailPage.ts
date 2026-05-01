@@ -60,6 +60,7 @@ import type {
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import { usePermission } from '@/hooks/usePermission';
+import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 
 // ────────────────────────────────────────────────────────────────
 // Pure helpers (exported for unit tests)
@@ -94,29 +95,6 @@ export function csvEscape(value: string): string {
     }
     return value;
 }
-
-const COMMON_LANGUAGE_CODES = [
-    'en',
-    'fr',
-    'fi',
-    'de',
-    'es',
-    'it',
-    'pt',
-    'nl',
-    'sv',
-    'da',
-    'no',
-    'pl',
-    'cs',
-    'ja',
-    'zh',
-    'ko',
-    'ar',
-    'hi',
-    'ru',
-    'tr',
-];
 
 interface CommonLanguage {
     code: string;
@@ -444,10 +422,15 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
         return counts;
     }, [languages, concourse?.items]);
 
+    // Concourse statement languages are restricted to the same set as the
+    // study UI (en/fr/fi). A statement language outside the UI set would not
+    // be selectable when creating a study, so allowing wider codes here is a
+    // dead-end. Existing items in other codes remain visible (`languages` is
+    // derived from data) — the picker simply does not offer to add more.
     const commonLanguages = useMemo(
         () =>
-            COMMON_LANGUAGE_CODES.filter((c) => !languages.includes(c))
-                .map((code) => ({ code, name: langDisplayName(code) }))
+            SUPPORTED_LANGUAGES.filter((l) => !languages.includes(l.code))
+                .map((l) => ({ code: l.code, name: langDisplayName(l.code) }))
                 .sort((a, b) => a.name.localeCompare(b.name)),
         [languages, langDisplayName]
     );

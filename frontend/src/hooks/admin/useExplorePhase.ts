@@ -303,7 +303,7 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
             {
                 onSuccess: async (data) => {
                     toast.success(
-                        t('admin.analysis.success', 'Analysis complete — {{n}} factors extracted', {
+                        t('admin.analysis.success', 'Analysis complete. {{n}} factors extracted.', {
                             n: data.n_factors,
                         })
                     );

@@ -34,10 +34,14 @@ vi.mock('@/store/useAdminStore', () => ({
     useAdminStore: () => ({ setActiveStudy }),
 }));
 
-const { mockStudiesHook } = vi.hoisted(() => ({ mockStudiesHook: vi.fn() }));
+const { mockStudiesHook, mockConcoursesHook } = vi.hoisted(() => ({
+    mockStudiesHook: vi.fn(),
+    mockConcoursesHook: vi.fn(() => ({ data: { items: [] }, isLoading: false })),
+}));
 
 vi.mock('@/api/generated', () => ({
     useListStudiesApiAdminStudiesGet: mockStudiesHook,
+    useListConcoursesApiAdminConcoursesGet: mockConcoursesHook,
 }));
 
 function makeStudy(overrides: Partial<StudyRead> & Pick<StudyRead, 'id' | 'slug'>): StudyRead {

@@ -12,6 +12,10 @@ vi.mock('@/api/generated', async () => {
             data: { items: [] },
             isLoading: false,
         }),
+        useListConcoursesApiAdminConcoursesGet: () => ({
+            data: { items: [] },
+            isLoading: false,
+        }),
     };
 });
 

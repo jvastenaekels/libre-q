@@ -45,16 +45,14 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { usePermission } from '@/hooks/usePermission';
 import { useSidebar } from '@/components/ui/sidebar';
+import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 
 function NavLanguage() {
     const { i18n, t } = useTranslation();
     const currentLang = i18n.language;
-
-    const languages = [
-        { code: 'en', label: 'EN', flag: '🇬🇧', name: 'English' },
-        { code: 'fr', label: 'FR', flag: '🇫🇷', name: 'Français' },
-        { code: 'fi', label: 'FI', flag: '🇫🇮', name: 'Suomi' },
-    ];
+    const currentCodeUpper = SUPPORTED_LANGUAGES.find(
+        (l) => l.code === currentLang
+    )?.code.toUpperCase();
 
     return (
         <SidebarMenu>
@@ -63,10 +61,7 @@ function NavLanguage() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton size="sm" className="text-muted-foreground">
                             <Globe className="size-4" />
-                            <span>
-                                {languages.find((l) => l.code === currentLang)?.label ||
-                                    t('layout.language')}
-                            </span>
+                            <span>{currentCodeUpper || t('layout.language')}</span>
                             <ChevronsUpDown className="ml-auto size-3" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -75,7 +70,7 @@ function NavLanguage() {
                             {t('layout.change_lang_title')}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {languages.map((lang) => (
+                        {SUPPORTED_LANGUAGES.map((lang) => (
                             <DropdownMenuItem
                                 key={lang.code}
                                 onSelect={() => i18n.changeLanguage(lang.code)}
@@ -87,8 +82,8 @@ function NavLanguage() {
                                 <span className="text-sm" aria-hidden="true">
                                     {lang.flag}
                                 </span>
-                                <span className="text-sm">{lang.label}</span>
-                                <span className="sr-only">{lang.name}</span>
+                                <span className="text-sm">{lang.code.toUpperCase()}</span>
+                                <span className="sr-only">{lang.label}</span>
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>

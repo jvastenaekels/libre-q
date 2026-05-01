@@ -452,8 +452,8 @@
                 "section_title": "Esilajitteluvaihe",
                 "toggle_label": "Ota esilajittelu käyttöön (samaa mieltä / neutraali / eri mieltä)",
                 "toggle_help": "Suositellaan suurille Q-joukoille (>40 väittämää). Noin 38 % julkaistuista Q-tutkimuksista käyttää tätä vaihetta (Dieteren et al. 2023).",
-                "lock_banner": "Lukittu — {{count}} osallistuja(a) on aloittanut kyselyn. Arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
-                "deck_mode_note": "Pois käytöstä — osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."
+                "lock_banner": "Lukittu. {{count}} osallistuja(a) on aloittanut kyselyn; arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
+                "deck_mode_note": "Pois käytöstä. Osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."
             }
         },
         "study": {
@@ -579,7 +579,7 @@
             "title": "Lausekokoelma",
             "description": "Hallitse ehdokaslauseita Q-metodologiatutkimustasi varten",
             "default_title": "Lausekokoelma",
-            "default_title_for_project": "{{project}} — Lausekokoelma",
+            "default_title_for_project": "{{project}}: Lausekokoelma",
             "create": "Uusi lausekokoelma",
             "create_success": "Lausekokoelma luotu",
             "create_error": "Lausekokoelman luonti epäonnistui",
@@ -690,7 +690,7 @@
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
-            "desc": "Valitse kohteita lausekokoelmasta tuotavaksi tutkimuksen lauseiksi. Kohteet kopioidaan — lausekokoelman muutokset eivät vaikuta tutkimukseen.",
+            "desc": "Valitse kohteita lausekokoelmasta tuotavaksi tutkimuksen lauseiksi. Kohteet kopioidaan; lausekokoelman muutokset eivät vaikuta tutkimukseen.",
             "button_label": "Tuo lausekokoelmasta",
             "select_concourse": "Lausekokoelma",
             "select_placeholder": "Valitse lausekokoelma...",
@@ -719,7 +719,7 @@
         },
         "analysis": {
             "title": "Analyysi",
-            "description": "Q-lajittelutietojen faktorianalyysi — poimi näkökulmat osallistujien vastauksista",
+            "description": "Q-lajittelutietojen faktorianalyysi: poimi näkökulmat osallistujien vastauksista",
             "configuration": "Asetukset",
             "configuration_description": "Valitse poimintamenetelmä, faktorien lukumäärä ja rotaatio",
             "extraction_method": "Poiminta",
@@ -731,7 +731,7 @@
             "run_will_replace": "Analyysin suorittaminen uudelleen korvaa nykyisen tulosnäkymän. Vertaile suorituksia historiapaneelin avulla.",
             "running": "Analysoidaan...",
             "reanalyzing": "Analysoidaan uudelleen...",
-            "success": "Analyysi valmis — {{n}} faktoria poimittu",
+            "success": "Analyysi valmis. {{n}} faktoria poimittu.",
             "error": "Analyysi epäonnistui: {{message}}",
             "scree_hint": "Jokainen palkki näyttää, kuinka paljon varianssia faktori selittää (sen ominaisarvo). Katkoviiva merkitsee ominaisarvoa = 1 (Kaiserin kriteeri). Napsauta palkkia valitaksesi poimittavien faktorien lukumäärä.",
             "kaiser_suggestion": "{{n}} faktorilla on ominaisarvo yli 1 (Kaiserin kriteeri)",
@@ -857,7 +857,7 @@
                 "title": "Analysis history",
                 "loading": "Loading history…",
                 "fetch_error": "Could not load analysis history.",
-                "empty": "No previous analyses for this study yet — run one to start the audit trail.",
+                "empty": "No previous analyses for this study yet. Run one to start the audit trail.",
                 "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
                 "load_error": "Failed to load the analysis run.",
                 "load_run_aria": "Load analysis run from {{date}}",
@@ -880,7 +880,7 @@
                 "delete_confirm": "Delete",
                 "deleted": "Analysis run deleted.",
                 "delete_error": "Failed to delete the run.",
-                "viewing_banner": "Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}",
+                "viewing_banner": "Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
                 "back_to_current": "Back to current"
             },
             "factor_voices": {
@@ -889,7 +889,7 @@
                 "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
                 "loading": "Loading recordings…",
                 "error": "Could not load audio recordings. Please try again.",
-                "context": "Ground factor interpretation in participants' own words — their audio rationales and their written card comments.",
+                "context": "Ground factor interpretation in participants' own words: their audio rationales and their written card comments.",
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
@@ -897,7 +897,7 @@
             },
             "factor_note": {
                 "label": "Factor narrative",
-                "placeholder": "Write the interpretive narrative for this factor — the discourse, voices, and tensions it foregrounds.",
+                "placeholder": "Write the interpretive narrative for this factor: the discourse, voices, and tensions it foregrounds.",
                 "empty_hint": "Add an interpretive narrative for this factor",
                 "char_count": "{{n}}/{{max}}",
                 "edit_aria": "Edit factor {{n}} narrative",
@@ -912,11 +912,11 @@
                 "kaiser": "Kaiser",
                 "parallel": "Rinnakkaisanalyysi",
                 "map": "Velicerin MAP",
-                "advisory": "Vain ohjaava — Q-menetelmän tekijöiden säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012).",
+                "advisory": "Vain ohjaava. Q-menetelmän tekijöiden säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012).",
                 "preview_range_title": "Esikatselu k:lle",
-                "preview_range_disabled": "Esikatselu tukee vain PCA + varimax -yhdistelmää. Centroid-poiminta ja arvioon perustuva rotaatio ovat polkuriippuvaisia — aja oikea analyysi tarkastellaksesi.",
+                "preview_range_disabled": "Esikatselu tukee vain PCA + varimax -yhdistelmää. Centroid-poiminta ja arvioon perustuva rotaatio ovat polkuriippuvaisia; aja oikea analyysi tarkastellaksesi.",
                 "select_k": "{{k}} tekijää",
-                "empty_factor": "Tyhjä tekijä — ylifaktoroitu",
+                "empty_factor": "Tyhjä tekijä (ylifaktoroitu)",
                 "cumvar": "kum. %",
                 "pct_flagged": "% flagattu",
                 "n_distinguishing": "# erottavia",
@@ -928,7 +928,7 @@
             "interpret": {
                 "def_sorts": "Määrittäviä lajitteluja: {{n}}",
                 "statements_title": "Väittämät",
-                "narrative_title": "Narratiivi — F{{n}}",
+                "narrative_title": "F{{n}} narratiivi",
                 "insert_comment_quote": "Lisää kommentti lainauksena",
                 "focus_mode": "Tekijäkohtainen näkymä",
                 "overview_mode": "Yleisnäkymä",
@@ -940,12 +940,12 @@
                 "run_label": "Ajo #{{id}} ({{n}} tekijää)",
                 "pinned": "Verrataan ajoon #{{id}}",
                 "phi": "φ = {{phi}}",
-                "ambiguous": "epäselvä vastaavuus — tulkitse delta-arvoja varoen",
+                "ambiguous": "epäselvä vastaavuus (tulkitse delta-arvoja varoen)",
                 "unpin": "Poista kiinnitys",
                 "delta_z_aria": "Δz {{delta}} vs vertailuajo",
                 "delta_loading_aria": "Δlataus {{delta}} vs vertailuajo"
             },
-            "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}\""
+            "quote_insert_format": "> {{text}}\n> {{p}}, väittämästä {{code}}: \"{{stmt}}\""
         },
         "project": {
             "remove_member": "Poista jäsen",
@@ -995,7 +995,7 @@
                 "slug_description": "Tutkimuksen URL-osoitteessa käytettävä yksilöllinen tunniste. Vain pienet kirjaimet, numerot ja väliviivat.",
                 "slug_locked": "URL-tunnistetta voi muuttaa vain kun tutkimus on luonnostilassa."
             },
-            "state_draft": "Luonnostila — linkit toimivat aktivoinnin jälkeen.",
+            "state_draft": "Luonnostila. Linkit toimivat tutkimuksen aktivoinnin jälkeen.",
             "state_closed": "Tämä tutkimus on suljettu. Olemassa olevat linkit näkyvät edelleen, mutta uudet osallistujat eivät voi aloittaa.",
             "state_archived": "Tämä tutkimus on arkistoitu. Kaikki rekrytointitiedot ovat vain luku -tilassa.",
             "empty_title": "Ei rekrytointilinkkejä vielä",
@@ -1090,7 +1090,7 @@
                 "usage": "Kapasiteetti",
                 "status": "Tila",
                 "actions": "Hallitse",
-                "type_help": "Julkinen, kertakäyttöinen tai kapasiteettirajoitettu — katso strategiakuvaukset \"Uusi käyttöoikeuslinkki\" -valintaikkunasta."
+                "type_help": "Julkinen, kertakäyttöinen tai kapasiteettirajoitettu. Katso strategiakuvaukset \"Uusi käyttöoikeuslinkki\" -valintaikkunasta."
             },
             "status": {
                 "public": "Julkinen",
@@ -1189,6 +1189,9 @@
             "n_active_other": "{{count}} aktiivista",
             "n_participants_total_one": "{{count}} osallistuja",
             "n_participants_total_other": "{{count}} osallistujaa",
+            "concourse_n_items_one": "{{count}} väittämä",
+            "concourse_n_items_other": "{{count}} väittämää",
+            "concourse_open_hint": "Kerää ehdokasväittämät",
             "created": "Luotu",
             "no_studies": "Ei tutkimuksia. Luo ensimmäinen tutkimuksesi aloittaaksesi!",
             "import_study": "Tuo tutkimus",
@@ -1273,7 +1276,7 @@
             "package_dialog": {
                 "title": "Lataa tutkimuspaketti",
                 "description": "Kokoaa kaikki tutkimustiedot yhdeksi ZIP-tiedostoksi OSF:ää / esirekisteröintiä varten.",
-                "discussion_hint": "Lisää memo/memo-discussion.md kaikilla kommenttiketjuilla (allekirjoitettuina ja päivättyinä). Oletuksena pois päältä — pidä vientisi siistinä, ellei sinulla ole tarvetta harkintajäljelle."
+                "discussion_hint": "Lisää memo/memo-discussion.md kaikilla kommenttiketjuilla (allekirjoitettuina ja päivättyinä). Oletuksena pois päältä; pidä vientisi siistinä, ellei sinulla ole tarvetta harkintajäljelle."
             }
         },
         "import": {
@@ -1764,9 +1767,9 @@
                     "tooltip_desc": "Q-metodologiassa pakotettu jakauma on yleensä lähes normaali. Tämä pakottaa osallistujan tekemään vaikeita valintoja ja erottelemaan kohteet selkeästi.",
                     "locked": "Suunnittelu lukittu",
                     "locked_desc": "Rakenteelliset muutokset (väittämäkoodit, ruudukko) on poistettu käytöstä, koska tutkimus on kerännyt aineistoa tai se ei ole enää luonnostilassa. Voit silti muokata käännöksiä.",
-                    "locked_active": "Tutkimus aktiivinen — palauta luonnostilaan muokataksesi",
-                    "locked_paused": "Tutkimus keskeytetty — palauta luonnostilaan muokataksesi",
-                    "locked_closed": "Tutkimus suljettu — suunnittelu on arkistoitu",
+                    "locked_active": "Tämä tutkimus on aktiivinen. Vaihda luonnostilaan muokataksesi.",
+                    "locked_paused": "Tämä tutkimus on tauolla. Vaihda luonnostilaan muokataksesi.",
+                    "locked_closed": "Tämä tutkimus on suljettu. Suunnittelu on arkistoitu.",
                     "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
@@ -2292,9 +2295,9 @@
             "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi."
         },
         "memo": {
-            "title_concourse": "Kokoelman muistio",
+            "title_concourse": "Valintamuistio",
             "title_study": "Metodologiamuistio",
-            "summary_empty_concourse": "Valinnainen · läpinäkyvyyttä kuratointiprosessiin",
+            "summary_empty_concourse": "Miten ja miksi rakensit tämän kokoelman",
             "summary_empty_study": "Valinnainen · replikointiin ja esirekisteröintiin",
             "summary_filled_one": "{{n}} merkintä · avaa napsauttamalla",
             "summary_filled_other": "{{n}} merkintää · avaa napsauttamalla",
@@ -2438,7 +2441,7 @@
         "link_copied": "Linkki kopioitu!",
         "instruction": "Jatkaaksesi toisella laitteella, tallenna tämä linkki:",
         "instruction_same_browser": "Jos palaat tällä selaimella, edistymisesi tallennetaan automaattisesti.",
-        "instruction_detail": "Pidä tämä linkki yksityisenä — se antaa pääsyn istuntoosi.",
+        "instruction_detail": "Pidä tämä linkki yksityisenä. Se antaa pääsyn istuntoosi.",
         "resume_url": "Jatkolinkki",
         "saving": "Tallennetaan...",
         "saved": "Tallennettu",
@@ -2468,7 +2471,7 @@
         "button": "Request my data deletion",
         "confirm_title": "Erase your personal data?",
         "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
-        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data — they no longer link to you.",
+        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
         "confirm_irreversible": "This action is immediate and cannot be undone.",
         "confirm_action": "Yes, erase my data",
         "confirm_in_progress": "Erasing…",

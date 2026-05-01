@@ -104,7 +104,7 @@ export function CompareBar({
                             <span>
                                 {t(
                                     'admin.analysis.compare.ambiguous',
-                                    'ambiguous match — interpret deltas with care'
+                                    'ambiguous match (interpret deltas with care)'
                                 )}
                             </span>
                         </>

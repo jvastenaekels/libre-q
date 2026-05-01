@@ -116,7 +116,7 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                         rows={4}
                         placeholder={t(
                             'admin.analysis.factor_note.placeholder',
-                            'Write the interpretive narrative for this factor — the discourse, voices, and tensions it foregrounds.'
+                            'Write the interpretive narrative for this factor: the discourse, voices, and tensions it foregrounds.'
                         )}
                         className="w-full text-xs border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-400 leading-snug"
                         aria-label={t(

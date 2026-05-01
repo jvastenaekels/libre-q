@@ -295,8 +295,8 @@ export default function ConcourseDetailPage() {
                             size="icon"
                             className="rounded-xl relative"
                             onClick={() => setMemoOpen(true)}
-                            aria-label={t('admin.memo.title_concourse', 'Construction memo')}
-                            title={t('admin.memo.title_concourse', 'Construction memo')}
+                            aria-label={t('admin.memo.title_concourse', 'Selection notes')}
+                            title={t('admin.memo.title_concourse', 'Selection notes')}
                         >
                             <NotebookPen className="size-4" />
                             {memoUnreadCount > 0 && (
@@ -313,12 +313,12 @@ export default function ConcourseDetailPage() {
                 <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
                     <SheetHeader>
                         <SheetTitle>
-                            {t('admin.memo.title_concourse', 'Construction memo')}
+                            {t('admin.memo.title_concourse', 'Selection notes')}
                         </SheetTitle>
                         <SheetDescription>
                             {t(
                                 'admin.memo.summary_empty_concourse',
-                                'Optional · for transparency about the curation process'
+                                'How and why you built this concourse'
                             )}
                         </SheetDescription>
                     </SheetHeader>

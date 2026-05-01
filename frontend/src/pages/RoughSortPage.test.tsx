@@ -96,7 +96,7 @@ describe('RoughSortPage', () => {
 
         // Check for Hint (now at bottom)
         expect(
-            screen.getByText('This is spontaneous — you can change your mind right after.')
+            screen.getByText('This is spontaneous. You can change your mind right after.')
         ).toBeTruthy();
         // Check for Instruction
         expect(screen.getByText('Test Instruction')).toBeTruthy();
@@ -274,7 +274,7 @@ describe('RoughSortPage', () => {
             vi.advanceTimersByTime(2000);
         });
         expect(
-            screen.getByText('This is spontaneous — you can change your mind right after.')
+            screen.getByText('This is spontaneous. You can change your mind right after.')
         ).toBeTruthy();
 
         // Simulate 5 sorts
@@ -287,7 +287,7 @@ describe('RoughSortPage', () => {
 
         // Tip should be gone
         expect(
-            screen.queryByText('This is spontaneous — you can change your mind right after.')
+            screen.queryByText('This is spontaneous. You can change your mind right after.')
         ).toBeNull();
 
         vi.useRealTimers();
@@ -357,7 +357,7 @@ describe('RoughSortPage', () => {
             vi.advanceTimersByTime(2000); // Trigger tip
         });
 
-        const tip = screen.getByText('This is spontaneous — you can change your mind right after.');
+        const tip = screen.getByText('This is spontaneous. You can change your mind right after.');
         expect(tip).toBeTruthy();
 
         const closeBtn = screen.getByLabelText('Close tip');

@@ -35,7 +35,7 @@ export default function ConcourseListPage() {
         // results, and audit logs across multiple projects show distinct names.
         // Falls back to the bare 'Concourse' when the project title is unset.
         const defaultTitle = workspace.title
-            ? t('admin.concourse.default_title_for_project', '{{project}} — Concourse', {
+            ? t('admin.concourse.default_title_for_project', '{{project}} concourse', {
                   project: workspace.title,
               })
             : t('admin.concourse.default_title', 'Concourse');

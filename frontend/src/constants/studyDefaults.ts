@@ -161,9 +161,3 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         ],
     },
 };
-
-export const AVAILABLE_LANGUAGES = [
-    { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'fr', label: 'Français', flag: '🇫🇷' },
-    { code: 'fi', label: 'Suomi', flag: '🇫🇮' },
-];

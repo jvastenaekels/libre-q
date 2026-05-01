@@ -30,7 +30,7 @@ export function PreviewRangeTable({ rows, onSelect, disabled }: Props) {
                     <p className="text-sm text-slate-600">
                         {t(
                             'admin.analysis.explore.preview_range_disabled',
-                            'Preview range supports PCA + varimax only. Centroid extraction and judgmental rotation are path-dependent — commit a real run to inspect.'
+                            'Preview range supports PCA + varimax only. Centroid extraction and judgmental rotation are path-dependent; commit a real run to inspect.'
                         )}
                     </p>
                 </CardContent>
@@ -68,7 +68,7 @@ export function PreviewRangeTable({ rows, onSelect, disabled }: Props) {
                                                 className="inline ml-1 h-3 w-3 text-amber-500"
                                                 aria-label={t(
                                                     'admin.analysis.explore.empty_factor',
-                                                    'Empty factor — over-factorisation'
+                                                    'Empty factor (over-factorisation)'
                                                 )}
                                             />
                                         )}

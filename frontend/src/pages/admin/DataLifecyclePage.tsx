@@ -503,7 +503,7 @@ export default function DataLifecyclePage() {
                             <span className="block">
                                 {t(
                                     'admin.lifecycle.confirm_preserved',
-                                    'Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.'
+                                    'Q-sort statement rankings will be preserved as anonymous research data. They will no longer link to any individual.'
                                 )}
                             </span>
                             <span className="block font-medium text-slate-700">

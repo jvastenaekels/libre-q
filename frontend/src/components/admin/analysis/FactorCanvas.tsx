@@ -211,7 +211,7 @@ export function FactorCanvas({
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg font-black text-slate-900">
-                        {t('admin.analysis.interpret.narrative_title', 'Narrative — F{{n}}', {
+                        {t('admin.analysis.interpret.narrative_title', 'F{{n}} narrative', {
                             n: interpret.activeFactor,
                         })}
                     </CardTitle>
@@ -238,7 +238,7 @@ function formatQuote(t: TFn, comment: ParticipantCardComment, participantLabel: 
         stmtFull.length > QUOTE_TRUNCATE ? `${stmtFull.slice(0, QUOTE_TRUNCATE)}…` : stmtFull;
     return t(
         'admin.analysis.quote_insert_format',
-        '> {{text}}\n> — {{p}}, on statement {{code}}: "{{stmt}}"',
+        '> {{text}}\n> {{p}}, on statement {{code}}: "{{stmt}}"',
         {
             text: comment.comment,
             p: participantLabel,

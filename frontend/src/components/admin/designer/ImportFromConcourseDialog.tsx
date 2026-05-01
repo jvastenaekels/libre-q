@@ -156,7 +156,7 @@ export function ImportFromConcourseDialog({
                     <DialogDescription className="text-sm text-slate-500">
                         {t(
                             'admin.concourse_import.desc',
-                            'Select items from a concourse to import as study statements. Items are copied — changes to the concourse will not affect the study.'
+                            'Select items from a concourse to import as study statements. Items are copied; changes to the concourse will not affect the study.'
                         )}
                     </DialogDescription>
                 </DialogHeader>

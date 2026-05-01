@@ -64,7 +64,7 @@ export function ScreeWithDiagnostics({
                 <p className="text-xs text-slate-500 italic">
                     {t(
                         'admin.analysis.explore.advisory',
-                        'Advisory only — Q-method retention also depends on interpretability and stability (Watts & Stenner 2012).'
+                        'Advisory only. Q-method retention also depends on interpretability and stability (Watts & Stenner 2012).'
                     )}
                 </p>
             </CardContent>

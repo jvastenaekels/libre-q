@@ -121,7 +121,7 @@ const RecruitmentPage = () => {
                     <FileEdit className="size-4 shrink-0" />
                     {t(
                         'admin.recruitment.state_draft',
-                        'Draft mode — links work after you activate the study.'
+                        'Draft mode. Links will work once you activate the study.'
                     )}
                 </div>
             )}
@@ -790,7 +790,7 @@ const RecruitmentPage = () => {
                                     className="py-4 text-2xs font-black text-slate-400 cursor-help"
                                     title={t(
                                         'admin.recruitment.table.type_help',
-                                        'Public, Single-use, or Capacity-limited — see strategy descriptions in the “New access link” dialog.'
+                                        'Public, Single-use, or Capacity-limited. See strategy descriptions in the “New access link” dialog.'
                                     )}
                                 >
                                     {t('admin.recruitment.table.type', 'Type')}
