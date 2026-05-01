@@ -588,172 +588,210 @@ class StudyService:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def validate_for_activation(study: Study) -> list[str]:
-        """
-        Comprehensive check to see if a study is ready for research.
-        Returns a list of human-readable error messages (JSON encoded for i18n).
-        """
-        errors = []
+    def _activation_error(key: str, **kwargs: Any) -> str:
+        """Encode an activation error as the i18n-keyed JSON string the
+        frontend expects. Used by every `_check_*` helper below."""
+        return json.dumps({"key": f"admin.design.validation.errors.{key}", **kwargs})
 
-        def add_error(key: str, **kwargs: Any) -> None:
-            errors.append(
-                json.dumps({"key": f"admin.design.validation.errors.{key}", **kwargs})
-            )
-
-        # 1. Statements Exist
+    @staticmethod
+    def _check_statements(study: Study) -> list[str]:
         if not study.statements:
-            add_error("no_statements")
+            return [StudyService._activation_error("no_statements")]
+        return []
 
-        # 2. Grid Config exists and matches statements
+    @staticmethod
+    def _check_grid_capacity(study: Study) -> list[str]:
+        """Distribution-mode-aware capacity rule:
+
+        - ``forced`` / ``flexible``: total capacity must equal the Q-set size
+          (Brown 1980; Watts & Stenner 2012). Forced enforces per-column too
+          at submission; flexible relaxes per-column to a soft hint.
+        - ``free``: grid must fit every statement (sum >= len). Columns may
+          declare extra capacity that absorbs overflow at sort time.
+        """
         if not study.grid_config:
-            add_error("no_grid")
+            return [StudyService._activation_error("no_grid")]
+
+        total_capacity = sum(int(col.get("capacity", 0)) for col in study.grid_config)
+        stmt_count = len(study.statements)
+        mode = getattr(study, "distribution_mode", DistributionMode.forced)
+        if mode is None:
+            mode = DistributionMode.forced
+
+        if mode == DistributionMode.free:
+            capacity_ok = total_capacity >= stmt_count
         else:
-            total_capacity = sum(
-                int(col.get("capacity", 0)) for col in study.grid_config
-            )
-            stmt_count = len(study.statements)
-            # Distribution-mode-aware capacity rule:
-            #   forced/flexible — total capacity must equal the Q-set size
-            #     (Brown 1980; Watts & Stenner 2012). Forced enforces per-column
-            #     too at submission; flexible relaxes per-column to a soft hint.
-            #   free — the grid must fit every statement (sum >= len). Columns
-            #     may declare extra capacity that absorbs overflow at sort time.
-            mode = getattr(study, "distribution_mode", DistributionMode.forced)
-            if mode is None:
-                mode = DistributionMode.forced
-            if mode == DistributionMode.free:
-                capacity_ok = total_capacity >= stmt_count
-            else:
-                capacity_ok = total_capacity == stmt_count
-            if not capacity_ok:
-                add_error(
-                    "capacity_mismatch",
-                    total=total_capacity,
-                    count=stmt_count,
+            capacity_ok = total_capacity == stmt_count
+
+        if not capacity_ok:
+            return [
+                StudyService._activation_error(
+                    "capacity_mismatch", total=total_capacity, count=stmt_count
                 )
+            ]
+        return []
 
-        # 3. Minimum Translations
+    @staticmethod
+    def _check_translations(study: Study) -> list[str]:
         if not study.translations:
-            add_error("no_translations")
-        else:
-            # Check if default language has a translation
-            default_lang = study.default_language or "en"
-            has_default = any(
-                t.language_code == default_lang for t in study.translations
-            )
-            if not has_default:
-                # If we have other translations, the resolver will fallback to the first available.
-                # We only error if there are NO translations at all (handled above).
-                # However, it's good practice to have the default language translation.
-                # To be flexible, we'll allow activation as long as SOMETHING is there.
-                pass
+            return [StudyService._activation_error("no_translations")]
 
-            # Check for missing titles in any translation
-            for t in study.translations:
-                if not t.title or t.title.strip() == "":
-                    add_error("missing_title", lang=t.language_code)
-
-                if not t.consent_title or t.consent_title.strip() == "":
-                    add_error("missing_consent_title", lang=t.language_code)
-
-                if not t.consent_description or t.consent_description.strip() == "":
-                    add_error("missing_consent_description", lang=t.language_code)
-
-                if (
-                    not t.condition_of_instruction
-                    or t.condition_of_instruction.strip() == ""
-                ):
-                    add_error("missing_grid_instructions", lang=t.language_code)
-
-                # Check process steps
-                for i, step in enumerate(t.process_steps):
-                    title = step.get("title")
-                    if not title or title.strip() == "":
-                        add_error(
+        errors: list[str] = []
+        for t in study.translations:
+            if not t.title or t.title.strip() == "":
+                errors.append(
+                    StudyService._activation_error(
+                        "missing_title", lang=t.language_code
+                    )
+                )
+            if not t.consent_title or t.consent_title.strip() == "":
+                errors.append(
+                    StudyService._activation_error(
+                        "missing_consent_title", lang=t.language_code
+                    )
+                )
+            if not t.consent_description or t.consent_description.strip() == "":
+                errors.append(
+                    StudyService._activation_error(
+                        "missing_consent_description", lang=t.language_code
+                    )
+                )
+            if (
+                not t.condition_of_instruction
+                or t.condition_of_instruction.strip() == ""
+            ):
+                errors.append(
+                    StudyService._activation_error(
+                        "missing_grid_instructions", lang=t.language_code
+                    )
+                )
+            for i, step in enumerate(t.process_steps):
+                title = step.get("title")
+                if not title or title.strip() == "":
+                    errors.append(
+                        StudyService._activation_error(
                             "missing_step_title", index=i + 1, lang=t.language_code
                         )
+                    )
+        return errors
 
-        # 4. Questions (Pre/Post) have labels for all study languages
-        def check_questions(config: dict[str, Any], section: str) -> None:
-            fields = {}
+    @staticmethod
+    def _check_questions(study: Study, study_langs: set[str]) -> list[str]:
+        """Validate that every presort and postsort question — and every
+        option of every question — has a non-empty label in every active
+        study language. Legacy string labels count as English-only."""
+
+        def fields_of(config: dict[str, Any], section: str) -> dict[str, Any]:
             if section == "presort":
                 if "fields" in config:
-                    fields = config["fields"]
-                elif "enabled" not in config:
-                    fields = config
-            else:  # postsort
-                fields = config.get("questions", {})
+                    return config["fields"]  # type: ignore[no-any-return]
+                if "enabled" not in config:
+                    return config
+                return {}
+            return config.get("questions", {})  # type: ignore[no-any-return]
 
-            for q_id, q_config in fields.items():
+        def label_in_lang(label: Any, lang: str) -> Any:
+            if isinstance(label, dict):
+                return label.get(lang)
+            if lang == "en":
+                return label
+            return None
+
+        def is_empty_label(value: Any) -> bool:
+            if not value:
+                return True
+            return isinstance(value, str) and value.strip() == ""
+
+        def option_label_in_lang(opt: Any, lang: str) -> Any:
+            if isinstance(opt, dict):
+                opt_label_obj = opt.get("label")
+                if isinstance(opt_label_obj, dict):
+                    return opt_label_obj.get(lang)
+                if lang == "en":
+                    return opt_label_obj
+                return None
+            if lang == "en":
+                return opt
+            return None
+
+        errors: list[str] = []
+        for section, config in (
+            ("presort", study.presort_config),
+            ("postsort", study.postsort_config),
+        ):
+            if not config:
+                continue
+            for q_id, q_config in fields_of(config, section).items():
                 label = q_config.get("label")
+                options = q_config.get("options", [])
                 for lang in study_langs:
-                    lang_label = None
-                    if isinstance(label, dict):
-                        lang_label = label.get(lang)
-                    elif lang == "en":  # Legacy string fallback to en
-                        lang_label = label
-
-                    if not lang_label or (
-                        isinstance(lang_label, str) and lang_label.strip() == ""
-                    ):
-                        add_error(
-                            "missing_question_label",
-                            id=q_id,
-                            lang=lang,
-                            section=section,
+                    if is_empty_label(label_in_lang(label, lang)):
+                        errors.append(
+                            StudyService._activation_error(
+                                "missing_question_label",
+                                id=q_id,
+                                lang=lang,
+                                section=section,
+                            )
                         )
-
-                    # Check options
-                    options = q_config.get("options", [])
-                    if options:
-                        for i, opt in enumerate(options):
-                            opt_label = None
-                            if isinstance(opt, dict):
-                                opt_label_obj = opt.get("label")
-                                if isinstance(opt_label_obj, dict):
-                                    opt_label = opt_label_obj.get(lang)
-                                elif lang == "en":
-                                    opt_label = opt_label_obj
-                            elif lang == "en":  # Legacy string
-                                opt_label = opt
-
-                            if not opt_label or (
-                                isinstance(opt_label, str) and opt_label.strip() == ""
-                            ):
-                                add_error(
+                    for i, opt in enumerate(options):
+                        if is_empty_label(option_label_in_lang(opt, lang)):
+                            errors.append(
+                                StudyService._activation_error(
                                     "missing_option_label",
                                     id=q_id,
                                     index=i + 1,
                                     lang=lang,
                                     section=section,
                                 )
+                            )
+        return errors
 
-        study_langs = {t.language_code for t in study.translations}
-        if study.presort_config:
-            check_questions(study.presort_config, "presort")
-        if study.postsort_config:
-            check_questions(study.postsort_config, "postsort")
-
-        # 5. Statements have translations for all study languages
+    @staticmethod
+    def _check_statement_translations(study: Study, study_langs: set[str]) -> list[str]:
+        errors: list[str] = []
         for s in study.statements:
             s_langs = {st.language_code for st in s.translations}
             missing = study_langs - s_langs
             if missing:
-                add_error(
-                    "missing_statement_translation",
-                    code=s.code,
-                    missing=", ".join(missing),
+                errors.append(
+                    StudyService._activation_error(
+                        "missing_statement_translation",
+                        code=s.code,
+                        missing=", ".join(missing),
+                    )
                 )
-
-            # Check for empty text in translations (only for active languages)
             for st in s.translations:
                 if st.language_code in study_langs and (
                     not st.text or st.text.strip() == ""
                 ):
-                    add_error(
-                        "empty_statement_text", code=s.code, lang=st.language_code
+                    errors.append(
+                        StudyService._activation_error(
+                            "empty_statement_text",
+                            code=s.code,
+                            lang=st.language_code,
+                        )
                     )
+        return errors
 
+    @staticmethod
+    def validate_for_activation(study: Study) -> list[str]:
+        """Comprehensive check to see if a study is ready for research.
+
+        Returns a list of i18n-encoded error messages (one JSON string per
+        error). The router consumes this list as-is, so the format is part
+        of the contract.
+        """
+        errors: list[str] = []
+        errors.extend(StudyService._check_statements(study))
+        errors.extend(StudyService._check_grid_capacity(study))
+        errors.extend(StudyService._check_translations(study))
+
+        # Question and statement-translation checks need the active-language
+        # set; they are no-ops when no translations exist (study_langs empty).
+        study_langs = {t.language_code for t in study.translations}
+        errors.extend(StudyService._check_questions(study, study_langs))
+        errors.extend(StudyService._check_statement_translations(study, study_langs))
         return errors
 
     # ------------------------------------------------------------------
