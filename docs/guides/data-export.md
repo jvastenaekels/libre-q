@@ -13,7 +13,7 @@ For the corresponding API endpoints (with rate limits and authorisation), see [`
 | **CSV (wide)** | Spreadsheet inspection, Excel / SPSS / Stata. | One row per non-discarded participant. |
 | **PQMethod ZIP** | PQMethod or Ken-Q desktop analysis. | `.dat` + `.sta`, completed participants only. |
 | **R-Kit ZIP** | R analysis with the `qmethod` package. | CSV + auto-generated R script. |
-| **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata. |
+| **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata + memos (methodology + analysis trail). |
 | **JSON dump** | Backups; bespoke pipelines. | Complete study + every participant placement. |
 
 Discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump. (Pilot-mode previews never reach the database, so they cannot appear in any export.)

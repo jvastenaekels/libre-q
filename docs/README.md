@@ -13,7 +13,7 @@ Step-by-step lessons that guide you through using Qualis for the first time.
 | [Your First Study](tutorials/your-first-study.md) | Create a project, design a Q-methodology study, and publish it |
 | [Collecting Responses](tutorials/collecting-responses.md) | Set up recruitment links, share with participants, monitor responses |
 | [Analyzing Results](tutorials/analyzing-results.md) | Run factor analysis, interpret loadings and arrays, export data |
-| [Local Development Setup](tutorials/local-development.md) | Clone, install, run locally, and make your first code change |
+| [Development Workflow](contributing/development.md) | Clone, install, run locally, daily Make targets, releases |
 
 ---
 

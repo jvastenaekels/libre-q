@@ -29,7 +29,27 @@ To exclude a response, use **Discard** from the row's action menu and provide a 
 
 ## Run analysis
 
-The **Analysis** page runs PCA or centroid extraction with optional varimax rotation. Each run is persisted to an audit trail (the history panel at the top of the page); past runs can be reloaded, annotated, or deleted. Results are immutable. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis) for the full set of controls and outputs.
+The **Analysis** page runs PCA or centroid extraction with optional varimax rotation. Each run is persisted to an audit trail (the history panel at the top of the page); past runs can be reloaded, annotated, or deleted. Results are immutable. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis) for the full set of controls and outputs — including the **Explorer panel** (preview-range diagnostics for choosing the factor count) and **Compare** (Tucker φ congruence between two runs).
+
+## Choose a distribution mode
+
+The Q-sort tab exposes three distribution modes (`forced` / `free` / `flexible`). The choice is methodologically loaded:
+
+- **Forced** is the classical Brown-school default. Per-column slot counts are enforced at activation and submission, so participants commit to specific trade-offs and Q-sorts are directly comparable.
+- **Free** lets columns absorb overflow at sort time. The slot constraint becomes an upper hint rather than a rule. Some critical-Q practitioners argue this is the only honest treatment of subjectivity (Watts & Stenner 2012, ch. 4).
+- **Flexible** keeps the total enforced but treats per-column capacities as soft hints with a designer warning.
+
+The setting is reversible until activation. If your study is already active and you want to switch modes, you must clone it as a new draft. See [`configuration.md`](../reference/configuration.md#distribution_mode) for the formal field reference.
+
+## Use memos as a design and analysis log
+
+Memos are short markdown notes attached to a study (or a concourse) and surfaced via the toolbar drawer on every admin page of that parent. Three suggested categories:
+
+- **Methodology memos** — rationale for the CoI, the distribution mode, the rough-sort toggle, the language(s) supported. Write these *during* design, not afterwards. They protect against reviewer questions ("why forced?", "why N=12?") and against your own future self contradicting earlier choices.
+- **Analysis memos** — notes on factor decisions during the refinement workflow (number of factors retained, flagging overrides, why a particular factor was dropped or split). See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) once that tutorial lands.
+- **General memos** — anything else worth tracking (recruitment observations, team coordination).
+
+Threaded comments under each memo support `@mentions` of project members; mentioned users see an unread badge on the toolbar icon until they open the drawer. Memos are included in the Research Package export, making the analytic trail reproducible by anyone with the archive.
 
 ## Export
 

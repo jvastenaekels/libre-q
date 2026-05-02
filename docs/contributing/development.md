@@ -1,6 +1,120 @@
 # Development Workflow
 
-Daily-use commands and tooling for working on Qualis. For first-time setup (clone, install, database, running the dev servers), follow the [Local Development tutorial](../../tutorials/local-development.md). This guide assumes the tutorial has been completed once.
+How to set up Qualis locally and the daily commands to keep the dev loop fast. Covers first-time setup (clone, install, database, dev servers) and the recurring tooling you reach for once you are running.
+
+For the architectural overview, see [`../explanation/architecture.md`](../explanation/architecture.md).
+
+---
+
+## Prerequisites
+
+- Git, Python 3.13+, Node.js 24+, PostgreSQL 15+, and a Unix-like environment (Linux, macOS, or WSL).
+
+If PostgreSQL is not yet installed:
+
+- **macOS:** `brew install postgresql@15 && brew services start postgresql@15`
+- **Debian/Ubuntu:** `sudo apt install postgresql-15 && sudo service postgresql start`
+- **Windows:** Use [Postgres.app](https://postgresapp.com/) under WSL, or the [official installer](https://www.postgresql.org/download/windows/).
+
+---
+
+## First-time setup
+
+### Clone
+
+```bash
+git clone https://github.com/jvastenaekels/qualis.git
+cd qualis
+```
+
+The repository is a monorepo:
+
+```
+qualis/
+  backend/        # FastAPI application (Python)
+  frontend/       # React SPA (TypeScript)
+  docs/           # Documentation
+  Makefile        # Common commands
+```
+
+### Install dependencies
+
+```bash
+make install
+```
+
+This runs `cd backend && uv sync` (Python deps into `backend/.venv/`) and `cd frontend && npm install`. If `uv` is not installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+
+### Set up the database
+
+```bash
+psql -U postgres
+# In the psql shell:
+CREATE DATABASE qualis_dev;
+CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
+GRANT ALL PRIVILEGES ON DATABASE qualis_dev TO qualis_user;
+\q
+```
+
+### Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Minimum local-dev variables:
+
+```bash
+DATABASE_URL=postgresql+asyncpg://qualis_user:qualis_pass@localhost:5432/qualis_dev
+SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+IP_HASH_SALT=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+ENVIRONMENT=development
+ACCESS_TOKEN_EXPIRE_MINUTES=480
+FRONTEND_URL=http://localhost:5173
+```
+
+For the full set of variables and what they do, see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
+
+### Run migrations
+
+```bash
+make migrate
+```
+
+Applies the Alembic chain to the empty database.
+
+### Bootstrap an admin account
+
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`, then:
+
+```bash
+cd backend && uv run python init_db.py && cd ..
+```
+
+### (Optional) Seed an example study
+
+```bash
+cd backend && uv run python seed.py data/example-study.json && cd ..
+```
+
+After seeding, you can walk the participant flow at <http://localhost:5173/remote-work-perspectives>.
+
+### Run the dev servers
+
+Two terminals:
+
+```bash
+make run-backend     # FastAPI on :8000, hot-reload
+make run-frontend    # Vite on :5173, HMR
+```
+
+Verify: <http://localhost:8000/docs> (Swagger) and <http://localhost:5173>. Log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+
+### Verify the dev loop
+
+Edit a visible string in `frontend/src/pages/admin/AdminDashboard.tsx`, save, watch the browser update via HMR. Revert.
+
+---
 
 ## Pre-commit hooks
 
@@ -52,7 +166,44 @@ Two fitness functions run via `make check`:
 | `make db-reset` | Drop and recreate all tables. **Destroys local data.** |
 | `cd backend && uv run python seed.py data/example-study.json` | Update or create a study from a JSON definition. Backend must be running. |
 
-For the migration chain and conventions, see the "Database Migrations" section in [`CLAUDE.md`](../../../CLAUDE.md).
+For the migration chain and conventions, see the "Database Migrations" section in [`CLAUDE.md`](../../CLAUDE.md).
+
+## Code map
+
+### Backend
+
+| Path | Description |
+| ---- | ----------- |
+| `app/main.py` | FastAPI application entry point |
+| `app/models/` | SQLAlchemy models, one module per subdomain (user, project, study, participant, recruitment, concourse, analysis, memo) |
+| `app/schemas/` | Pydantic request/response models, one module per subdomain |
+| `app/routers/` | API route handlers |
+| `app/routers/admin/` | Admin API routes (studies, projects, exports, analysis, memos) |
+| `app/services/` | Business logic services |
+| `app/core/config.py` | Application configuration |
+| `alembic/` | Database migration scripts |
+| `tests/` | pytest test suite |
+
+### Frontend
+
+| Path | Description |
+| ---- | ----------- |
+| `src/pages/` | Page-level components (one per route) |
+| `src/pages/admin/` | Researcher dashboard pages |
+| `src/components/admin/` | Reusable admin UI components |
+| `src/components/admin/analysis/` | Analysis result visualizations |
+| `src/store/` | Zustand state management stores |
+| `src/api/` | Generated API client (Orval) |
+| `public/locales/` | i18n translation files (en, fr, fi) |
+
+## Common troubleshooting
+
+| Symptom | Fix |
+| ------- | --- |
+| "Database connection refused" | Verify PostgreSQL is running and `DATABASE_URL` in `.env` is correct. |
+| "Module not found" (Python) | Use the venv via `uv run …` rather than the system Python. |
+| Frontend build errors after `git pull` | `cd frontend && rm -rf node_modules && npm install`. |
+| Migration errors | `make db-reset` (destroys local data) and re-run `make migrate`. |
 
 ## Releases
 
