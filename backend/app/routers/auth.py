@@ -87,6 +87,16 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # 2.6 Email verification gate (added by T10 of auth-email-flows).
+    # Must run AFTER password check so wrong-password against an unverified
+    # account returns 401, not 403 (preventing account enumeration via the
+    # response code).
+    if settings.EMAIL_VERIFICATION_REQUIRED and user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="email_not_verified",
+        )
+
     # 2.5 Check 2FA
     if user.is_totp_enabled:
         if not x_totp_token:

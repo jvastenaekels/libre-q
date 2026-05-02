@@ -439,3 +439,82 @@ class TestEmailVerify:
             )
         assert r.status_code == 200
         assert not any("email-verification" in rec.message for rec in caplog.records)
+
+
+@pytest.mark.asyncio
+class TestLoginVerificationGuard:
+    async def test_unverified_user_login_returns_403(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        from app.utils.security import get_password_hash
+        u = User(
+            email="unverified@example.com",
+            hashed_password=get_password_hash("pass123"),
+            is_active=True,  # is_active alone is not enough — verification gate is separate
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "unverified@example.com", "password": "pass123"},
+        )
+        assert r.status_code == 403
+        assert "email_not_verified" in r.json()["message"]
+
+    async def test_verified_user_login_succeeds(
+        self, client: AsyncClient, test_user: User
+    ):
+        # test_user fixture must now set email_verified_at — otherwise all auth tests fail
+        from tests.conftest import TEST_PASSWORD
+        r = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        assert r.status_code == 200
+
+    async def test_kill_switch_disables_check(
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
+    ):
+        from app.core.config import settings
+        from app.utils.security import get_password_hash
+
+        monkeypatch.setattr(settings, "EMAIL_VERIFICATION_REQUIRED", False)
+        u = User(
+            email="ks@example.com",
+            hashed_password=get_password_hash("pass123"),
+            is_active=True,
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "ks@example.com", "password": "pass123"},
+        )
+        assert r.status_code == 200
+
+    async def test_password_check_runs_before_verification_check(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        # An attacker submitting wrong password against an unverified account
+        # must get 401 (Incorrect credentials), NOT 403 (email_not_verified) —
+        # otherwise the response code itself becomes an oracle revealing
+        # whether an unverified account exists for that email.
+        from app.utils.security import get_password_hash
+        u = User(
+            email="enum-probe@example.com",
+            hashed_password=get_password_hash("realpass"),
+            is_active=True,
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "enum-probe@example.com", "password": "WRONGpass"},
+        )
+        assert r.status_code == 401  # not 403 — password check runs first
