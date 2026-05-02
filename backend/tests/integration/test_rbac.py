@@ -25,7 +25,7 @@ class TestProjectRBAC:
         # researcher membership
         db.add(
             ProjectMember(
-                project_id=ws.id, user_id=researcher.id, role=ProjectRole.researcher
+                project_id=ws.id, user_id=researcher.id, role=ProjectRole.member
             )
         )
         # viewer membership
@@ -80,7 +80,7 @@ class TestStudyRBAC:
         [
             (ProjectRole.owner, 200, 200, 403),  # Delete is Superuser only
             (
-                ProjectRole.researcher,
+                ProjectRole.member,
                 200,
                 200,
                 403,
