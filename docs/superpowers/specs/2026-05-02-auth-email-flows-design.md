@@ -22,7 +22,9 @@ This spec adds four flows:
 | 2FA disable (recovery) | signed link | force `is_totp_enabled=False` |
 | 2FA login via email-OTP | 6-digit code | submitted as `x-totp-token` header |
 
-Registration via a valid `invitation_token` skips email verification (the token already proves email ownership).
+**Important rule (post-brainstorming amendment, 2026-05-02)** — Registration via a valid `invitation_token` does **NOT** skip email verification when `email_verification_active` is True. The original brainstorming decision (D: "invitation skips verification") was reversed by the user during execution: invitation grants project membership, not a verified-email shortcut. The original argument ("the token already proves email ownership") is rejected because the invitation could have been issued to the wrong address by the project admin, or the token could have been forwarded — verifying the email is a real, independent check.
+
+When SMTP is unconfigured, the SMTP-fallback rule still applies: invited and self-signup users are both created active+verified (because no verification email could be delivered).
 
 ## Approach
 
@@ -156,8 +158,9 @@ No `EmailVerificationService` class — each flow is `encode → email` and `dec
 ### Modified
 
 **`POST /auth/register`** :
-- If valid `invitation_token` matching the supplied email → `email_verified_at = NOW()`, `is_active = True` (current behavior preserved).
-- Otherwise → `is_active = False`, `email_verified_at = NULL`, send verification email.
+- Invitation membership (when a valid `invitation_token` matches the email) is **always** applied — the project membership is created either way.
+- The verification gate runs independently: if `settings.email_verification_active` (i.e., SMTP is configured AND `EMAIL_VERIFICATION_REQUIRED=True`), the new user is created `is_active=False, email_verified_at=NULL` and a verification email is sent. Otherwise (SMTP unconfigured or operator opted out), the user is created `is_active=True, email_verified_at=NOW()` and no email is sent.
+- This means **invited users still verify their email when SMTP is active** — the invitation token grants project access, not an email-verification shortcut.
 - Response body becomes `{user, requires_email_verification: bool}` instead of bare `User`.
 
 **`POST /auth/token`** :
