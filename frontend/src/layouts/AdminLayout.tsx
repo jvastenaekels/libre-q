@@ -18,6 +18,7 @@ import { useGetParticipantApiAdminStudiesParticipantsParticipantIdGet } from '@/
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Footer } from '@/components/Footer';
 
 export default function AdminLayout() {
     const location = useLocation();
@@ -62,7 +63,7 @@ export default function AdminLayout() {
             recruitment: t('admin.breadcrumbs.recruitment'),
             data: t('admin.breadcrumbs.data', 'Data'),
             privacy: t('admin.breadcrumbs.privacy', 'Data privacy'),
-            profile: t('admin.breadcrumbs.profile', 'Profile'),
+            account: t('admin.breadcrumbs.account', 'Account settings'),
             analysis: t('admin.breadcrumbs.analysis', 'Analysis'),
             exports: t('admin.breadcrumbs.exports'),
             settings: t('admin.breadcrumbs.settings'),
@@ -172,6 +173,7 @@ export default function AdminLayout() {
                         }}
                     />
                 </div>
+                <Footer />
             </SidebarInset>
         </SidebarProvider>
     );
