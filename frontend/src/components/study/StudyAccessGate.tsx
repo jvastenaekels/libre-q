@@ -105,12 +105,6 @@ export const StudyAccessGate: React.FC<StudyAccessGateProps> = ({
                     </form>
                 </CardContent>
             </Card>
-
-            <p className="mt-8 text-slate-400 text-xs font-medium flex items-center gap-2">
-                <span className="w-8 h-px bg-slate-200" />
-                Powered by Qualis
-                <span className="w-8 h-px bg-slate-200" />
-            </p>
         </div>
     );
 };
