@@ -48,6 +48,7 @@ import { useStudyLocaleSync } from '../hooks/study/useStudyLocaleSync';
 import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
 import type { StudyStatusType } from '../pages/StudyStatusPage';
+import { Footer } from '@/components/Footer';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -893,6 +894,11 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-sticky pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     {headerAction}
                 </div>
+            )}
+
+            {/* Global attribution footer — hidden on the two immersive Q-sort screens */}
+            {!['/fine-sort', '/rough-sort'].some((p) => location.pathname.endsWith(p)) && (
+                <Footer />
             )}
         </div>
     );

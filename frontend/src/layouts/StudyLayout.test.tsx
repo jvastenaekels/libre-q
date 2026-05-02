@@ -591,3 +591,65 @@ describe('Network & Password Features', () => {
         expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
     });
 });
+
+describe('Layout Global Footer', () => {
+    beforeEach(() => {
+        useConfigStore.setState({
+            config: {
+                title: 'Test Study',
+                slug: 'slug',
+                statements: [],
+                grid_config: [],
+                presort_config: {},
+                postsort_config: {},
+                available_languages: ['en'],
+                require_code: false,
+                require_consent: true,
+                consent_text: 'Consent',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
+            } as any,
+            isLoading: false,
+            error: null,
+        });
+        useSessionStore.setState({
+            token: null,
+            hasConsented: true,
+            currentStep: 1,
+            maxReachedStep: 1,
+            language: 'en',
+            isCompleted: false,
+            confirmationCode: null,
+            isSaving: false,
+        });
+    });
+
+    it('renders the global Footer on /welcome', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/welcome'] }
+        );
+        expect(screen.getByRole('link', { name: 'footer.github_aria' })).toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /fine-sort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/fine-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/fine-sort'] }
+        );
+        expect(screen.queryByRole('link', { name: 'footer.github_aria' })).not.toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /rough-sort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/rough-sort'] }
+        );
+        expect(screen.queryByRole('link', { name: 'footer.github_aria' })).not.toBeInTheDocument();
+    });
+});
