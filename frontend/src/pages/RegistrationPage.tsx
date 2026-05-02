@@ -186,7 +186,7 @@ const RegistrationPage = () => {
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-6">
+        <div className="flex flex-1 flex-col items-center justify-center bg-slate-50 p-6">
             <div className="w-full max-w-[420px] space-y-8">
                 <div className="text-center space-y-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-2xs font-bold mb-4">

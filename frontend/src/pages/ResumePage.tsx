@@ -66,7 +66,7 @@ export default function ResumePage() {
     if (error) {
         const screen = screens[error];
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
+            <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
                 <div className="max-w-md text-center space-y-4">
                     <p className="text-slate-600 text-lg">{screen.message}</p>
                     {screen.showStudyLink && slug && (
@@ -92,7 +92,7 @@ export default function ResumePage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
+        <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
             <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             <p className="text-slate-500 font-bold text-xl">
                 {t('resume.loading', 'Restoring your session...')}
