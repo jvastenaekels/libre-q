@@ -1,6 +1,6 @@
 [project]
 name = "qualis-backend"
-version = "0.5.0"
+version = "0.6.0"
 description = "Backend for Qualis"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -79,6 +79,10 @@ module = [
     "app.utils.script_utils",
     # Optional rough_sort phase 1 — pure state-machine helper
     "app.utils.study_flow",
+    # auth email flows (v0.6.0)
+    "app.services.email_token_consume_service",
+    "app.services.email_otp_service",
+    "app.middleware.log_scrub",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
