@@ -31,7 +31,15 @@ test.describe('Project Management E2E Tests (Real Backend)', () => {
         await expect(page.getByText(/project updated/i)).toBeVisible();
         await expect(page).toHaveURL(/\/updated-.*\/settings/);
 
-        // Verify team members table is visible
+        // Team management was moved out of Project settings into a dedicated
+        // /members page (commit 39d08d63 — feat(admin): split team members
+        // into a dedicated /members page). Navigate to that page to verify
+        // the team table.
+        await page
+            .getByRole('link', { name: /team members/i })
+            .last()
+            .click();
+        await expect(page).toHaveURL(/\/updated-.*\/members/);
         await expect(page.locator('table')).toBeVisible();
     });
 });
