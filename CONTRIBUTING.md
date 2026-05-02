@@ -8,7 +8,7 @@ This file is a quick orientation. The full contributor documentation lives under
 
 ## Quick start for contributors
 
-1. **Set up the project** — follow the [Quick Start in the README](README.md#quick-start), then [`docs/tutorials/local-development.md`](docs/tutorials/local-development.md) for the full development environment (database, migrations, seed data).
+1. **Set up the project** — follow the [Quick Start in the README](README.md#quick-start), then [`docs/contributing/development.md`](docs/contributing/development.md) for the full development environment (database, migrations, seed data).
 2. **Read the guidelines** below before writing code.
 3. **Open an issue first** for non-trivial changes (>50 lines or any new feature) so we can align on approach.
 4. **Run `make ci` locally** before pushing; CI runs the same checks on push and PR.
@@ -22,7 +22,7 @@ This file is a quick orientation. The full contributor documentation lives under
 | Fix a bug or add a feature | [`docs/contributing/coding-standards.md`](docs/contributing/coding-standards.md) |
 | Touch backend code | [`docs/contributing/backend-guidelines.md`](docs/contributing/backend-guidelines.md) |
 | Touch frontend code | [`docs/contributing/frontend-guidelines.md`](docs/contributing/frontend-guidelines.md) |
-| Set up a dev environment | [`docs/tutorials/local-development.md`](docs/tutorials/local-development.md) |
+| Set up a dev environment | [`docs/contributing/development.md`](docs/contributing/development.md) |
 | Run tests | [`Makefile`](Makefile) targets `test`, `e2e`, `ci`, `ci-full` |
 | Add a database migration | [`CLAUDE.md`](CLAUDE.md) "Database Migrations" section + `make migration-new` |
 | Use AI assistants effectively | [`docs/contributing/agent-instructions.md`](docs/contributing/agent-instructions.md) and [`docs/contributing/prompting-strategy.md`](docs/contributing/prompting-strategy.md) |

@@ -109,4 +109,4 @@ You ran a complete factor analysis end-to-end and saw what each tab surfaces. Wi
 
 ## Next steps
 
-You have now finished the researcher workflow. For developer-oriented content, see the [Local Development Setup](local-development.md) tutorial.
+You have now finished the researcher workflow. For developer-oriented content, see the [Development Workflow guide](../contributing/development.md).

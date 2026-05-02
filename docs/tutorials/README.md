@@ -14,14 +14,12 @@ Each tutorial is hands-on: you will follow along and build something real as you
 
 ## For Developers
 
-| Tutorial | Description | Time |
-|----------|-------------|------|
-| [Local Development Setup](local-development.md) | Clone the repository, install all dependencies, run the backend and frontend locally, and make your first code change. | ~20 min |
+Developer setup has moved out of the tutorials section into the contributing guide: see [`../contributing/development.md`](../contributing/development.md) for the full first-time setup, daily Make targets, API client synchronisation, and release workflow.
 
 ## Prerequisites
 
 - **Researchers:** A modern web browser (Chrome, Firefox, Safari, or Edge). No software installation required if using a hosted instance.
-- **Developers:** Git, Python 3.13+, Node.js 24+, and PostgreSQL 15+. See the [local development tutorial](local-development.md) for full setup instructions.
+- **Developers:** Git, Python 3.13+, Node.js 24+, and PostgreSQL 15+. See the [Development Workflow guide](../contributing/development.md) for full setup instructions.
 
 ## How to Use These Tutorials
 

@@ -17,7 +17,7 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **Time required:** ~30 minutes
 
-**Prerequisites:** A Qualis account with researcher-level access. If you are running Qualis locally, see the [Local Development Setup](local-development.md) tutorial first.
+**Prerequisites:** A Qualis account with researcher-level access. If you are running Qualis locally, see the [Development Workflow guide](../contributing/development.md) first.
 
 ---
 
@@ -47,13 +47,13 @@ You are now inside your new project. The sidebar shows project-level navigation.
 
 Qualis creates the study in **Draft** state and takes you to the **Study Designer** page. The designer has seven tabs:
 
-- **General** -- Title, description, consent form
-- **Presort** -- Pre-sorting questionnaire
-- **Instruction** -- Condition of instruction for the Q-sort
-- **Grid & Q-Set** -- Statements and forced-distribution grid
-- **Post-sort** -- Post-sorting questionnaire
-- **Branding** -- Logo, colors, partner logos
-- **Interface** -- UI label customization and behavioral options
+- **General** 👋 — title, description, consent form
+- **Pre-sort** 📋 — pre-sorting questionnaire (demographics, eligibility)
+- **Condition** 🎯 — Condition of Instruction, plus the rough-sort toggle and post-sort defaults
+- **Q-sort** 🧩 — statements and the distribution grid (forced, free, or flexible)
+- **Post-sort** 💬 — post-sorting questionnaire
+- **Theme** 🎨 — logo, colors, partner logos
+- **Interface** ✨ — UI label customization and behavioral options
 
 ---
 
@@ -90,11 +90,11 @@ The General tab is where you define what participants see before they begin.
 
 ---
 
-## Step 4: Add Presort Questions (Presort Tab)
+## Step 4: Add Presort Questions (Pre-sort Tab)
 
 Presort questions collect demographic or background information before participants begin sorting.
 
-1. Click the **Presort** tab.
+1. Click the **Pre-sort** tab.
 2. Click **Add Question** and configure the first question:
    - **Field key:** `work_arrangement`
    - **Type:** Select (dropdown)
@@ -113,26 +113,36 @@ Presort questions collect demographic or background information before participa
 
 ---
 
-## Step 5: Write the Condition of Instruction (Instruction Tab)
+## Step 5: Write the Condition of Instruction (Condition Tab)
 
 The Condition of Instruction tells participants the mental frame through which they should sort the statements.
 
-1. Click the **Instruction** tab.
+1. Click the **Condition** tab.
 2. Enter the following (Markdown supported):
 
    > Please sort the following statements based on **your personal experience and opinion about remote work**. Think about how strongly you agree or disagree with each statement as it relates to your own working life. There are no right or wrong answers. Sort the statements from **most disagree** (left) to **most agree** (right).
 
 3. Click **Save**.
 
+> **Writing a non-leading Condition of Instruction.**
+>
+> The CoI is the most consequential single sentence in your study. A small phrasing change shifts the entire viewpoint participants surface. Some heuristics:
+>
+> - **Anchor the sort in lived experience or position**, not in evaluation: *"sort according to your personal experience of remote work"* invites a phenomenological frame; *"sort by what is true about remote work"* invites a normative frame and constrains the viewpoints you'll discover.
+> - **Avoid moral framings** (*"good vs bad"*, *"right vs wrong"*) unless that is exactly the question — they collapse subjectivity onto a single axis.
+> - **Pilot the CoI on three or four colleagues** and ask them to paraphrase it back. If three of them paraphrase differently, the CoI is ambiguous.
+>
+> Critical Q-methodologists treat CoI design as a reflexive moment in itself: the choice of frame is a research decision worth documenting. The Condition tab is also where the **rough-sort toggle** and the post-sort defaults live — see Step 8 for a discussion of when to enable rough-sort.
+
 ---
 
-## Step 6: Add Statements and Configure the Grid (Grid & Q-Set Tab)
+## Step 6: Add Statements and Configure the Grid (Q-sort Tab)
 
 This is the core of your Q study.
 
 ### 6a: Add Statements
 
-1. Click the **Grid & Q-Set** tab.
+1. Click the **Q-sort** tab.
 2. Add each statement with a code and text:
 
 | Code | Statement Text |
@@ -150,7 +160,7 @@ This is the core of your Q study.
 | S11  | Working remotely has improved my overall quality of life. |
 | S12  | In-person collaboration is essential for creative work. |
 
-### 6b: Configure the Forced-Distribution Grid
+### 6b: Configure the Distribution Grid
 
 For 12 statements, use a 7-column grid ranging from -3 to +3:
 
@@ -158,7 +168,17 @@ For 12 statements, use a 7-column grid ranging from -3 to +3:
 |-------|----|----|----|----|----|----|----|
 | Slots |  1 |  1 |  2 |  4 |  2 |  1 |  1 |
 
-The pyramid shape is intentional: it has more slots in the middle and fewer at the extremes. Participants are forced to commit to which statements are *most* and *least* representative of their view, rather than rating everything as a mild agreement. The total slot count must equal the statement count — 12 slots, 12 statements. The designer shows a warning banner if these do not match.
+The pyramid shape is intentional: it has more slots in the middle and fewer at the extremes. The total slot count must equal the statement count — 12 slots, 12 statements. The designer shows a warning banner if these do not match.
+
+> **Forced vs free vs flexible distribution — the methodological choice.**
+>
+> Qualis supports three distribution modes (the default is **forced**):
+>
+> - **Forced** — participants must fit their sort into the per-column slot counts; columns fill exactly. Compels trade-offs ("you can only have one statement at +3"), which makes Q-sorts comparable across participants in classical Brown-school analysis (Brown 1980; Watts & Stenner 2012).
+> - **Free** — slot counts are upper hints; columns may absorb overflow at sort time. The total submitted count must still equal the Q-set size, but column capacities are not enforced. Some critical-Q practitioners argue forced distributions impose an artificial structure on subjectivity (Brown et al. 2015; Watts & Stenner 2012, ch. 4).
+> - **Flexible** — total enforced, per-column hints are soft (designer warns but does not block). Qualis-specific compromise.
+>
+> For this tutorial we use **forced** — the most common starting point and the cleanest pedagogical example. The mode lives on the Q-sort tab and is reversible until activation. For the formal field reference, see [`configuration.md`](../reference/configuration.md#distribution_mode).
 
 Click **Save**.
 
@@ -177,28 +197,48 @@ Click **Save**.
 
 ---
 
-## Step 8: Optional -- Customize Branding and Interface
+## Step 8: Decide on the rough-sort step
 
-### Branding (Branding Tab)
+The **rough-sort** is a 3-pile triage (agree / neutral / disagree) that precedes the fine-sort grid. The toggle lives on the **Condition** tab → *Rough-sort enabled*. It is **on by default**.
+
+> **Rough-sort: should you enable it?**
+>
+> Only ~38% of published Q studies use a rough-sort step (Dieteren et al. 2023). It lowers cognitive load before participants commit to specific positions, which can help on long Q-sets (40+ statements) or with younger / less experienced participants. On a short, well-instructed sort it adds friction without much benefit.
+>
+> For this tutorial (12 statements, brief CoI), **disable** the rough-sort: open the Condition tab, find the *Rough-sort enabled* toggle, switch it off. Participants will go directly from pre-sort to the fine-sort grid via a horizontally-scrollable deck.
+
+## Step 9: Optional — Customize Theme and Interface
+
+### Theme tab
 
 Upload a **logo**, set an **accent color**, and add **partner logos** that appear on the welcome page.
 
-### Interface (Interface Tab)
+### Interface tab
 
 - **Randomize statement order**: Recommended to reduce ordering bias.
 - **Show statement codes**: Useful for think-aloud protocols.
 
 ---
 
-## Step 9: Preview Your Study
+## Step 10: Preview Your Study
 
 1. In the designer toolbar, click the **Preview** button. This opens the study in a new tab in pilot mode.
-2. Walk through the entire participant flow: **Welcome, Consent, Presort, Rough Sort, Fine Sort, Post-Sort.** Qualis splits the sort into two stages: a quick triage (the *rough sort*: agree / neutral / disagree) followed by drag-into-grid placement (the *fine sort*). The rough sort lowers cognitive load before the participant has to commit to specific positions.
+2. Walk through the participant flow: **Welcome, Consent, Pre-sort, Fine Sort, Post-Sort.** (If you re-enabled rough-sort, an extra triage step appears between Pre-sort and Fine Sort.)
 3. At the end you get a local `PILOT-XXXXX` confirmation code. Nothing is persisted to the database — you can preview as many times as you like without polluting the eventual dataset.
 
 ---
 
-## Step 10: Activate Your Study
+## Step 11: Open a methodology memo
+
+Click the **Memos** button in the toolbar. A drawer opens. Add a methodology memo and write a short note — even one paragraph — recording the design decisions you just made: why this CoI, why forced distribution, why no rough-sort, why 12 statements.
+
+Five minutes now, hours saved later when a co-author asks why forced over free, or when you write the methods section. Memos travel with the Research Package export, so the audit trail stays attached to the data.
+
+> **Why this matters for both schools.** Classical Brown-school papers need a clear methodology memo because reviewers ask about extraction, rotation, and flagging. In critical-Q work, the memo is itself part of the analytical artefact: the design choices it records shape which subjectivities the study can surface.
+
+---
+
+## Step 12: Activate Your Study
 
 1. Return to the Study Designer.
 2. Click the **Activate Study** button.
@@ -215,10 +255,10 @@ You now have a fully configured Q-methodology study with:
 - A project to organize your research
 - A welcome page with title, description, and objective
 - An informed consent form
-- Two presort demographic questions
-- A condition of instruction
+- Two pre-sort demographic questions
+- A condition of instruction (with a methodology memo capturing why you chose it)
 - 12 statements about remote work
-- A 7-column forced-distribution grid (-3 to +3)
+- A 7-column forced-distribution grid (-3 to +3); rough-sort disabled
 - Post-sort feedback for extreme placements
 
 ## Next Steps
