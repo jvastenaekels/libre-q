@@ -44,6 +44,7 @@ import RequireAdmin from './components/auth/RequireAdmin';
 import AdminLayout from './layouts/AdminLayout';
 import ProjectLayout from './layouts/ProjectLayout';
 import StudyFocusLayout from './layouts/StudyFocusLayout';
+import { PublicPageLayout } from './layouts/PublicPageLayout';
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
@@ -53,7 +54,7 @@ const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 const DataPrivacyPage = lazy(() => import('./pages/admin/DataPrivacyPage'));
 const GeneralSettingsPage = lazy(() => import('./pages/admin/GeneralSettingsPage'));
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
-const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
+const AccountSettingsPage = lazy(() => import('./pages/admin/AccountSettingsPage'));
 const ProjectSettingsPage = lazy(() => import('./pages/admin/ProjectSettingsPage'));
 const ProjectMembersPage = lazy(() => import('./pages/admin/ProjectMembersPage'));
 const ConcourseListPage = lazy(() => import('./pages/admin/ConcourseListPage'));
@@ -80,39 +81,75 @@ import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <LandingPage />,
+        element: (
+            <PublicPageLayout>
+                <LandingPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/login',
-        element: <LoginPage />,
+        element: (
+            <PublicPageLayout>
+                <LoginPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/register',
-        element: <RegistrationPage />,
+        element: (
+            <PublicPageLayout>
+                <RegistrationPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/verify-email',
-        element: <EmailVerifyPage />,
+        element: (
+            <PublicPageLayout>
+                <EmailVerifyPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/verify-email-sent',
-        element: <EmailVerificationSentPage />,
+        element: (
+            <PublicPageLayout>
+                <EmailVerificationSentPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/forgot-password',
-        element: <PasswordResetRequestPage />,
+        element: (
+            <PublicPageLayout>
+                <PasswordResetRequestPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/reset-password',
-        element: <PasswordResetConfirmPage />,
+        element: (
+            <PublicPageLayout>
+                <PasswordResetConfirmPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/2fa/recover',
-        element: <TwoFactorRecoveryPage />,
+        element: (
+            <PublicPageLayout>
+                <TwoFactorRecoveryPage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/2fa/disable',
-        element: <TwoFactorDisablePage />,
+        element: (
+            <PublicPageLayout>
+                <TwoFactorDisablePage />
+            </PublicPageLayout>
+        ),
     },
     {
         path: '/hub',
@@ -120,7 +157,11 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <ResearcherHub />,
+                element: (
+                    <PublicPageLayout>
+                        <ResearcherHub />
+                    </PublicPageLayout>
+                ),
             },
         ],
     },
@@ -177,8 +218,8 @@ const router = createBrowserRouter([
                                 element: <ConcourseDetailPage />,
                             },
                             {
-                                path: 'profile',
-                                element: <ProfilePage />,
+                                path: 'account',
+                                element: <AccountSettingsPage />,
                             },
                         ],
                     },
@@ -265,12 +306,20 @@ const router = createBrowserRouter([
     // Resume route (outside StudyLayout to avoid consent guards and loader)
     {
         path: '/study/:slug/resume/:token',
-        element: <ResumePage />,
+        element: (
+            <PublicPageLayout>
+                <ResumePage />
+            </PublicPageLayout>
+        ),
     },
     // Reset route (outside StudyLayout to avoid submission guard redirect)
     {
         path: '/study/:slug/reset',
-        element: <ResetPage />,
+        element: (
+            <PublicPageLayout>
+                <ResetPage />
+            </PublicPageLayout>
+        ),
     },
     // Participant routes
     {
