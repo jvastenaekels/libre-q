@@ -177,7 +177,24 @@
             "error_401": "E-mail ou mot de passe invalide",
             "error_generic": "Une erreur est survenue. Veuillez réessayer.",
             "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
-            "reason_auth_required": "Veuillez vous connecter pour continuer."
+            "reason_auth_required": "Veuillez vous connecter pour continuer.",
+            "forgot_password_link": "Mot de passe oublié ?",
+            "reset_success_banner": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe."
+        },
+        "password_reset": {
+            "request_title": "Réinitialiser votre mot de passe",
+            "request_body": "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation.",
+            "request_submit": "Envoyer le lien de réinitialisation",
+            "request_success": "Si l'adresse e-mail existe, un lien de réinitialisation est en route.",
+            "confirm_title": "Choisissez un nouveau mot de passe",
+            "confirm_submit": "Réinitialiser le mot de passe",
+            "success_redirect": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+            "link_expired": "Ce lien a expiré ou a déjà été utilisé.",
+            "too_short": "Le mot de passe doit comporter au moins 8 caractères.",
+            "mismatch": "Les mots de passe ne correspondent pas.",
+            "missing_token": "Aucun jeton de réinitialisation dans l'URL.",
+            "new_password_placeholder": "Nouveau mot de passe",
+            "confirm_placeholder": "Confirmer le mot de passe"
         },
         "email": {
             "verification_sent": {

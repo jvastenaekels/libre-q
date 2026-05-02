@@ -69,6 +69,7 @@ import type {
     ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams,
     PasswordChange,
     PasswordConfirm,
+    PasswordResetConfirm,
     PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
     PreviewRangeRequest,
     ProgressUpdate,
@@ -477,16 +478,19 @@ export const useLoginForAccessTokenApiTokenPost = <
 /**
  * Register a new user, optionally via an invitation token.
 
-- Invited path (valid invitation_token matching the email): is_active=True,
-  email_verified_at=NOW(), requires_email_verification=False.
-- Self-signup path (no invitation token), when verification is active
-  (EMAIL_VERIFICATION_REQUIRED=True AND SMTP is configured): is_active=False,
-  email_verified_at=NULL, verification email sent,
-  requires_email_verification=True.
-- Self-signup path with verification inactive (operator disabled it OR
-  SMTP not configured): is_active=True, email_verified_at=NOW(),
-  requires_email_verification=False — never lock users out of a deployment
-  that cannot deliver verification mail.
+The verification gate depends only on whether verification is active
+(EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation
+tokens grant project membership but never bypass the gate
+(spec amendment 2026-05-02).
+
+- Verification active (any path): is_active=False, email_verified_at=NULL,
+  verification email sent, requires_email_verification=True. If an
+  invitation token was provided, the project membership is still created
+  so access applies as soon as verification completes.
+- Verification inactive (operator disabled it OR SMTP not configured):
+  is_active=True, email_verified_at=NOW(), requires_email_verification=False.
+  Membership (if any) is applied in the same transaction. This SMTP-fallback
+  rule keeps the app usable on deployments that cannot deliver mail.
  * @summary Register User
  */
 export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {
@@ -1095,6 +1099,189 @@ export const useResendVerificationApiEmailVerifyResendPost = <
     TContext
 > => {
     const mutationOptions = getResendVerificationApiEmailVerifyResendPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Request a password-reset email.
+
+Always returns 200 (anti-enum). If a user exists with the submitted
+email, a fresh JWT carrying a `pwa` (password_changed_at epoch) claim
+is emailed; otherwise a fake bcrypt call equalises latency. The
+`pwa` claim is the replay-defense token: confirm-time compares it
+to the user's current password_changed_at, so a token issued before
+the password was last rotated is rejected.
+ * @summary Password Reset Request
+ */
+export const passwordResetRequestApiPasswordResetRequestPost = (
+    emailRequest: EmailRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/password/reset/request`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailRequest,
+        signal,
+    });
+};
+
+export const getPasswordResetRequestApiPasswordResetRequestPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>,
+        TError,
+        { data: EmailRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationKey = ['passwordResetRequestApiPasswordResetRequestPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>,
+        { data: EmailRequest }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return passwordResetRequestApiPasswordResetRequestPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type PasswordResetRequestApiPasswordResetRequestPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>
+>;
+export type PasswordResetRequestApiPasswordResetRequestPostMutationBody = EmailRequest;
+export type PasswordResetRequestApiPasswordResetRequestPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Password Reset Request
+ */
+export const usePasswordResetRequestApiPasswordResetRequestPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>,
+            TError,
+            { data: EmailRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof passwordResetRequestApiPasswordResetRequestPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getPasswordResetRequestApiPasswordResetRequestPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Consume a password-reset JWT, rotate the password, kill in-flight OTPs.
+
+Returns 400 (not 200 anti-enum) on token/user/pwa failure: the token
+itself is the secret, and an attacker cannot guess valid ones, so a
+specific status here does not enable enumeration.
+ * @summary Password Reset Confirm
+ */
+export const passwordResetConfirmApiPasswordResetConfirmPost = (
+    passwordResetConfirm: PasswordResetConfirm,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/password/reset/confirm`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: passwordResetConfirm,
+        signal,
+    });
+};
+
+export const getPasswordResetConfirmApiPasswordResetConfirmPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>,
+        TError,
+        { data: PasswordResetConfirm },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>,
+    TError,
+    { data: PasswordResetConfirm },
+    TContext
+> => {
+    const mutationKey = ['passwordResetConfirmApiPasswordResetConfirmPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>,
+        { data: PasswordResetConfirm }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return passwordResetConfirmApiPasswordResetConfirmPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type PasswordResetConfirmApiPasswordResetConfirmPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>
+>;
+export type PasswordResetConfirmApiPasswordResetConfirmPostMutationBody = PasswordResetConfirm;
+export type PasswordResetConfirmApiPasswordResetConfirmPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Password Reset Confirm
+ */
+export const usePasswordResetConfirmApiPasswordResetConfirmPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>,
+            TError,
+            { data: PasswordResetConfirm },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof passwordResetConfirmApiPasswordResetConfirmPost>>,
+    TError,
+    { data: PasswordResetConfirm },
+    TContext
+> => {
+    const mutationOptions =
+        getPasswordResetConfirmApiPasswordResetConfirmPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -13779,6 +13966,28 @@ export const getResendVerificationApiEmailVerifyResendPostResponseMock = (
     ...overrideResponse,
 });
 
+export const getPasswordResetRequestApiPasswordResetRequestPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getPasswordResetConfirmApiPasswordResetConfirmPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getCreateStudyApiAdminStudiesPostResponseMock = (
     overrideResponse: Partial<StudyRead> = {}
 ): StudyRead => ({
@@ -18452,6 +18661,58 @@ export const getResendVerificationApiEmailVerifyResendPostMockHandler = (
     );
 };
 
+export const getPasswordResetRequestApiPasswordResetRequestPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/password/reset/request',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getPasswordResetRequestApiPasswordResetRequestPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/password/reset/confirm',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getPasswordResetConfirmApiPasswordResetConfirmPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getCreateStudyApiAdminStudiesPostMockHandler = (
     overrideResponse?:
         | StudyRead
@@ -20946,6 +21207,8 @@ export const getQualisAPIMock = () => [
     getDisableTotpApiMe2faDisablePostMockHandler(),
     getVerifyEmailApiEmailVerifyPostMockHandler(),
     getResendVerificationApiEmailVerifyResendPostMockHandler(),
+    getPasswordResetRequestApiPasswordResetRequestPostMockHandler(),
+    getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler(),
     getCreateStudyApiAdminStudiesPostMockHandler(),
     getListStudiesApiAdminStudiesGetMockHandler(),
     getGetStudyApiAdminStudiesSlugGetMockHandler(),

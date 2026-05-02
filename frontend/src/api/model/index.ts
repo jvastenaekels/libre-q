@@ -205,6 +205,7 @@ export * from './partnerLogo';
 export * from './partnerLogoUrl';
 export * from './passwordChange';
 export * from './passwordConfirm';
+export * from './passwordResetConfirm';
 export * from './previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams';
 export * from './previewRangeRequest';
 export * from './previewRangeRequestExtraction';

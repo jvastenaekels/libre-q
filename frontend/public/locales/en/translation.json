@@ -177,7 +177,24 @@
             "error_401": "Invalid email or password",
             "error_generic": "Something went wrong. Please try again.",
             "reason_session_expired": "Your session has expired. Please sign in again.",
-            "reason_auth_required": "Please sign in to continue."
+            "reason_auth_required": "Please sign in to continue.",
+            "forgot_password_link": "Forgot password?",
+            "reset_success_banner": "Password updated. You can now sign in with your new password."
+        },
+        "password_reset": {
+            "request_title": "Reset your password",
+            "request_body": "Enter your email and we'll send a reset link.",
+            "request_submit": "Send reset link",
+            "request_success": "If the email exists, a reset link is on its way.",
+            "confirm_title": "Choose a new password",
+            "confirm_submit": "Reset password",
+            "success_redirect": "Password updated. You can now sign in with your new password.",
+            "link_expired": "This link has expired or has already been used.",
+            "too_short": "Password must be at least 8 characters.",
+            "mismatch": "Passwords do not match.",
+            "missing_token": "No reset token in the URL.",
+            "new_password_placeholder": "New password",
+            "confirm_placeholder": "Confirm password"
         },
         "email": {
             "verification_sent": {

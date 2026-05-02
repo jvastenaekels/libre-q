@@ -33,6 +33,8 @@ const FineSortPage = lazy(() => import('./pages/FineSortPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
 const EmailVerifyPage = lazy(() => import('./pages/EmailVerifyPage'));
 const EmailVerificationSentPage = lazy(() => import('./pages/EmailVerificationSentPage'));
+const PasswordResetRequestPage = lazy(() => import('./pages/PasswordResetRequestPage'));
+const PasswordResetConfirmPage = lazy(() => import('./pages/PasswordResetConfirmPage'));
 import LoginPage from './pages/LoginPage';
 
 // Admin imports
@@ -93,6 +95,14 @@ const router = createBrowserRouter([
     {
         path: '/verify-email-sent',
         element: <EmailVerificationSentPage />,
+    },
+    {
+        path: '/forgot-password',
+        element: <PasswordResetRequestPage />,
+    },
+    {
+        path: '/reset-password',
+        element: <PasswordResetConfirmPage />,
     },
     {
         path: '/hub',

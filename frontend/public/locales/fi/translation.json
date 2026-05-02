@@ -177,7 +177,24 @@
             "error_401": "Virheellinen sähköposti tai salasana",
             "error_generic": "Jotain meni vikaan. Yritä uudelleen.",
             "reason_session_expired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
-            "reason_auth_required": "Kirjaudu sisään jatkaaksesi."
+            "reason_auth_required": "Kirjaudu sisään jatkaaksesi.",
+            "forgot_password_link": "Unohditko salasanan?",
+            "reset_success_banner": "Salasana päivitetty. Voit nyt kirjautua sisään uudella salasanallasi."
+        },
+        "password_reset": {
+            "request_title": "Nollaa salasanasi",
+            "request_body": "Syötä sähköpostiosoitteesi ja lähetämme sinulle nollauslinkin.",
+            "request_submit": "Lähetä nollauslinkki",
+            "request_success": "Jos sähköpostiosoite on olemassa, nollauslinkki on matkalla.",
+            "confirm_title": "Valitse uusi salasana",
+            "confirm_submit": "Nollaa salasana",
+            "success_redirect": "Salasana päivitetty. Voit nyt kirjautua sisään uudella salasanallasi.",
+            "link_expired": "Tämä linkki on vanhentunut tai se on jo käytetty.",
+            "too_short": "Salasanan on oltava vähintään 8 merkkiä pitkä.",
+            "mismatch": "Salasanat eivät täsmää.",
+            "missing_token": "Nollausavainta ei löydy URL-osoitteesta.",
+            "new_password_placeholder": "Uusi salasana",
+            "confirm_placeholder": "Vahvista salasana"
         },
         "email": {
             "verification_sent": {

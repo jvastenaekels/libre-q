@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
     useLoginForAccessTokenApiTokenPost,
     useReadUsersMeApiMeGet,
@@ -23,6 +23,9 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const resetSuccess =
+        (location.state as { resetSuccess?: boolean } | null)?.resetSuccess === true;
     const setAuth = useAuthStore((state) => state.setAuth);
 
     const loginMutation = useLoginForAccessTokenApiTokenPost();
@@ -124,6 +127,25 @@ const LoginPage = () => {
                                 {t('auth.login.card_title')}
                             </CardTitle>
                         </CardHeader>
+                        {resetSuccess && (
+                            <div className="px-6 pb-2">
+                                <div
+                                    role="status"
+                                    className="flex items-start gap-2 px-3 py-2 rounded-md text-sm bg-emerald-50 border border-emerald-200 text-emerald-800"
+                                >
+                                    <Info
+                                        className="h-4 w-4 mt-0.5 flex-shrink-0 text-emerald-600"
+                                        aria-hidden="true"
+                                    />
+                                    <span>
+                                        {t(
+                                            'auth.login.reset_success_banner',
+                                            'Password updated. You can now sign in with your new password.'
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                         {(() => {
                             const reason = searchParams.get('reason');
                             if (reason !== 'session_expired' && reason !== 'auth_required') {
@@ -169,7 +191,17 @@ const LoginPage = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="password">{t('auth.login.password_label')}</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password">
+                                        {t('auth.login.password_label')}
+                                    </Label>
+                                    <Link
+                                        to="/forgot-password"
+                                        className="text-xs text-slate-500 hover:text-slate-700 underline"
+                                    >
+                                        {t('auth.login.forgot_password_link', 'Forgot password?')}
+                                    </Link>
+                                </div>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                     <Input
