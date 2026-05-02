@@ -284,6 +284,12 @@ async def update_project_member(
             status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
         )
 
+    if member_in.role == ProjectRole.owner:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OWNER_ROLE_IMMUTABLE",
+        )
+
     previous_role = member.role
     try:
         member.role = member_in.role
@@ -423,6 +429,12 @@ async def create_invitation(
     """
     Invite a user to the project.
     """
+    if invitation_in.role == ProjectRole.owner:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OWNER_ROLE_IMMUTABLE",
+        )
+
     token = create_invitation_token(
         email=invitation_in.email,
         project_id=project.id,
