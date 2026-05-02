@@ -130,7 +130,7 @@ export default function ProjectMembersPage() {
 
     // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
     const userInProject = members?.find((m: any) => m.user_id === currentUser?.id);
-    const isAdmin = userInProject?.role === 'owner';
+    const isOwner = userInProject?.role === 'owner';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -224,7 +224,7 @@ export default function ProjectMembersPage() {
                                                         )
                                                     }
                                                     disabled={
-                                                        !isAdmin ||
+                                                        !isOwner ||
                                                         member.user_id === currentUser?.id
                                                     }
                                                 >
@@ -233,7 +233,7 @@ export default function ProjectMembersPage() {
                                                             'w-[120px] h-8 rounded-lg text-xs font-bold border-none shadow-none focus:ring-0',
                                                             member.role === 'owner'
                                                                 ? 'bg-indigo-50 text-indigo-700'
-                                                                : member.role === 'researcher'
+                                                                : member.role === 'member'
                                                                   ? 'bg-emerald-50 text-emerald-700'
                                                                   : 'bg-slate-100 text-slate-600'
                                                         )}
@@ -248,10 +248,13 @@ export default function ProjectMembersPage() {
                                                             Owner
                                                         </SelectItem>
                                                         <SelectItem
-                                                            value="researcher"
+                                                            value="member"
                                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                                         >
-                                                            Researcher
+                                                            {t(
+                                                                'admin.project.roles.member',
+                                                                'Member'
+                                                            )}
                                                         </SelectItem>
                                                         <SelectItem
                                                             value="viewer"
@@ -278,7 +281,7 @@ export default function ProjectMembersPage() {
                                                         )
                                                     }
                                                     disabled={
-                                                        !isAdmin ||
+                                                        !isOwner ||
                                                         member.user_id === currentUser?.id
                                                     }
                                                     aria-label={t(
@@ -322,7 +325,7 @@ export default function ProjectMembersPage() {
                             <p className="text-xs font-medium text-indigo-900/70 leading-relaxed">
                                 {t('admin.projects.settings.team.growth_desc')}
                             </p>
-                            <InviteMemberModal slug={slug} isAdmin={isAdmin} />
+                            <InviteMemberModal slug={slug} isOwner={isOwner} />
                         </CardContent>
                     </Card>
 
@@ -352,12 +355,14 @@ export default function ProjectMembersPage() {
                                 <div className="space-y-1">
                                     <span className="text-2xs font-black text-slate-900 block">
                                         {t(
-                                            'admin.projects.settings.team.permissions_matrix.researcher.label'
+                                            'admin.projects.settings.team.permissions_matrix.member.label',
+                                            'Member'
                                         )}
                                     </span>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
-                                            'admin.projects.settings.team.permissions_matrix.researcher.desc'
+                                            'admin.projects.settings.team.permissions_matrix.member.desc',
+                                            'Can manage studies, concourses, and participants.'
                                         )}
                                     </p>
                                 </div>
@@ -414,10 +419,10 @@ export default function ProjectMembersPage() {
     );
 }
 
-function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }) {
+function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }) {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
-    const [role, setRole] = useState<ProjectRole>('researcher');
+    const [role, setRole] = useState<ProjectRole>('member');
     const [open, setOpen] = useState(false);
     const [inviteUrl, setInviteUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -454,7 +459,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
             <DialogTrigger asChild>
                 <Button
                     className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/20 border-none"
-                    disabled={!isAdmin}
+                    disabled={!isOwner}
                 >
                     <UserPlus className="size-4 mr-2" />
                     {t('admin.projects.settings.team.invite_button')}
@@ -496,22 +501,16 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl border-slate-200 bg-white shadow-2xl">
                                         <SelectItem
-                                            value="researcher"
+                                            value="member"
                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                         >
-                                            Researcher
+                                            {t('admin.project.roles.member', 'Member')}
                                         </SelectItem>
                                         <SelectItem
                                             value="viewer"
                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                         >
-                                            Viewer
-                                        </SelectItem>
-                                        <SelectItem
-                                            value="owner"
-                                            className="text-xs font-bold py-2 rounded-lg m-1"
-                                        >
-                                            Admin (Owner)
+                                            {t('admin.project.roles.viewer', 'Viewer')}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>

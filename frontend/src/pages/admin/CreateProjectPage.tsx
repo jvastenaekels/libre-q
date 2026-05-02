@@ -25,7 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import ApiClient from '@/api/client';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { ProjectWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/api/model/projectWithRole';
 
 const schema = z.object({
     title: z.string().min(3, 'Title must be at least 3 characters'),
