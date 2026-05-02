@@ -78,6 +78,8 @@ const RecruitmentPage = () => {
         slugForm,
         accessForm,
         passwordEnabled,
+        showWindowPickers,
+        setShowWindowPickers,
         onSlugSubmit,
         onAccessRulesSubmit,
         isCreateModalOpen,
@@ -355,12 +357,15 @@ const RecruitmentPage = () => {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                 <div className="space-y-0.5">
-                                    <p className="text-sm font-bold text-slate-700">
+                                    <Label
+                                        htmlFor="password-toggle"
+                                        className="text-sm font-bold text-slate-700"
+                                    >
                                         {t(
                                             'admin.recruitment.access_rules.password_toggle',
                                             'Require a password'
                                         )}
-                                    </p>
+                                    </Label>
                                     <p className="text-xs text-slate-500">
                                         {t(
                                             'admin.recruitment.access_rules.password_toggle_desc',
@@ -369,6 +374,7 @@ const RecruitmentPage = () => {
                                     </p>
                                 </div>
                                 <Switch
+                                    id="password-toggle"
                                     checked={passwordEnabled}
                                     onCheckedChange={(checked) => {
                                         accessForm.setValue('passwordEnabled', checked, {
@@ -440,7 +446,10 @@ const RecruitmentPage = () => {
                         <div className="space-y-4">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="space-y-0.5">
-                                    <Label className="text-sm font-black text-slate-700">
+                                    <Label
+                                        htmlFor="window-toggle"
+                                        className="text-sm font-black text-slate-700"
+                                    >
                                         {t(
                                             'admin.recruitment.access_rules.window_toggle',
                                             'Limit collection window'
@@ -454,34 +463,27 @@ const RecruitmentPage = () => {
                                     </p>
                                 </div>
                                 <Switch
-                                    checked={
-                                        !!accessForm.watch('startDate') ||
-                                        !!accessForm.watch('endDate') ||
-                                        accessForm.watch('windowEnabledOverride') === true
-                                    }
+                                    id="window-toggle"
+                                    checked={showWindowPickers}
                                     onCheckedChange={(checked) => {
-                                        if (checked) {
-                                            accessForm.setValue('windowEnabledOverride', true, {
-                                                shouldDirty: true,
-                                            });
-                                        } else {
-                                            accessForm.setValue('startDate', '', {
-                                                shouldDirty: true,
-                                            });
-                                            accessForm.setValue('endDate', '', {
-                                                shouldDirty: true,
-                                            });
-                                            accessForm.setValue('windowEnabledOverride', false, {
-                                                shouldDirty: true,
-                                            });
+                                        setShowWindowPickers(checked);
+                                        if (!checked) {
+                                            if (accessForm.getValues('startDate')) {
+                                                accessForm.setValue('startDate', '', {
+                                                    shouldDirty: true,
+                                                });
+                                            }
+                                            if (accessForm.getValues('endDate')) {
+                                                accessForm.setValue('endDate', '', {
+                                                    shouldDirty: true,
+                                                });
+                                            }
                                         }
                                     }}
                                     disabled={isArchived}
                                 />
                             </div>
-                            {(!!accessForm.watch('startDate') ||
-                                !!accessForm.watch('endDate') ||
-                                accessForm.watch('windowEnabledOverride') === true) && (
+                            {showWindowPickers && (
                                 <>
                                     <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
                                         {t(

@@ -72,11 +72,6 @@ export const accessRulesSchema = z.object({
     accessPassword: z.string().optional().or(z.literal('')),
     startDate: z.string().optional().or(z.literal('')),
     endDate: z.string().optional().or(z.literal('')),
-    // Wave D: when both dates are empty but the user explicitly toggled the
-    // window on (intent to set, no value yet), persist that intent so the
-    // pickers stay visible across re-renders without polluting the API
-    // payload. Server-side ignores this field.
-    windowEnabledOverride: z.boolean().optional(),
 });
 
 export type AccessRulesValues = z.infer<typeof accessRulesSchema>;
@@ -120,6 +115,8 @@ export interface RecruitmentPageApi {
     slugForm: UseFormReturn<SlugFormValues>;
     accessForm: UseFormReturn<AccessRulesValues>;
     passwordEnabled: boolean;
+    showWindowPickers: boolean;
+    setShowWindowPickers: (value: boolean) => void;
     onSlugSubmit: (data: SlugFormValues) => Promise<void>;
     onAccessRulesSubmit: (data: AccessRulesValues) => Promise<void>;
 
@@ -185,9 +182,15 @@ export function useRecruitmentPage(): RecruitmentPageApi {
             accessPassword: '',
             startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
             endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
-            windowEnabledOverride: false,
         },
     });
+
+    // The "Limit collection window" toggle is a UI affordance, not a form
+    // field: it expands the date pickers without polluting the API payload
+    // or the form's dirty state. Initial value follows the persisted dates.
+    const [showWindowPickers, setShowWindowPickers] = useState(
+        !!study.start_date || !!study.end_date
+    );
 
     useEffect(() => {
         if (study) {
@@ -196,8 +199,8 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 accessPassword: '',
                 startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
                 endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
-                windowEnabledOverride: false,
             });
+            setShowWindowPickers(!!study.start_date || !!study.end_date);
         }
     }, [study, accessForm]);
 
@@ -399,6 +402,8 @@ export function useRecruitmentPage(): RecruitmentPageApi {
         slugForm,
         accessForm,
         passwordEnabled,
+        showWindowPickers,
+        setShowWindowPickers,
         onSlugSubmit,
         onAccessRulesSubmit,
         isCreateModalOpen,
