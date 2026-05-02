@@ -40,9 +40,9 @@ Practical guides for accomplishing specific goals.
 
 | Guide | Description |
 |-------|-------------|
-| [Development Setup](guides/contributing/development.md) | Clone, install, run locally, and daily workflow tools |
-| [Testing](guides/contributing/testing.md) | Test stack, writing tests, CI pipeline |
-| [Style Guide](guides/contributing/style-guide.md) | Documentation style conventions |
+| [Development Setup](contributing/development.md) | Clone, install, run locally, and daily workflow tools |
+| [Testing](contributing/testing.md) | Test stack, writing tests, CI pipeline |
+| [Style Guide](contributing/style-guide.md) | Documentation style conventions |
 
 ---
 
@@ -56,7 +56,6 @@ Dry, accurate technical descriptions of the system.
 | [Configuration Options](reference/configuration.md) | Study fields and application environment variables |
 | [Admin Dashboard](reference/admin-dashboard.md) | Page-by-page catalog of the admin UI |
 | [Frontend Components](reference/components.md) | Sorting primitives + component index |
-| [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export wrapper |
 | [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export format specification |
 
 ---
