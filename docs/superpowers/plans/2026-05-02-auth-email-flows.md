@@ -2989,6 +2989,37 @@ git add backend/scripts CLAUDE.md CONTRIBUTING.md backend/pyproject.toml
 git commit -m "feat(auth): cleanup script + mypy strict + dev SMTP docs"
 ```
 
+- [ ] **Step 6: Bump version + tag release**
+
+Bump from `0.5.0` → `0.6.0` (minor — meaningful new feature, no breaking changes).
+
+```bash
+# backend
+sed -i 's/^version = "0.5.0"/version = "0.6.0"/' backend/pyproject.toml
+
+# frontend (top-level "version" field)
+sed -i 's/"version": "0.5.0"/"version": "0.6.0"/' frontend/package.json
+
+# verify
+grep '^version\|"version"' backend/pyproject.toml frontend/package.json
+```
+
+Run `make ci` one final time to make sure version bump didn't break anything (lockfile sync, etc.):
+
+```bash
+cd /home/julien/tools/qualis && make ci
+```
+
+Commit and tag:
+
+```bash
+git add backend/pyproject.toml frontend/package.json
+git commit -m "chore(release): 0.6.0"
+git tag -a v0.6.0 -m "Release 0.6.0 — auth email flows (verification, password reset, 2FA email-OTP, 2FA self-serve disable)"
+```
+
+(Push the tag manually after the PR merges — do not push from a feature branch.)
+
 ---
 
 # Self-review
