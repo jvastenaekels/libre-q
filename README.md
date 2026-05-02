@@ -207,7 +207,7 @@ Contributions are welcome. Please read the guidelines before submitting a PR:
 - [Coding Standards](docs/contributing/coding-standards.md)
 - [Frontend Guidelines](docs/contributing/frontend-guidelines.md)
 - [Backend Guidelines](docs/contributing/backend-guidelines.md)
-- [Development Setup](docs/guides/contributing/development.md)
+- [Development Setup](docs/contributing/development.md)
 
 ---
 

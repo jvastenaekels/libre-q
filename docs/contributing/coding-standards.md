@@ -19,7 +19,7 @@ Write a failing test before the implementation. The test fixes the intent and th
 - **Backend**: pytest with `conftest.py` fixtures. Database tests run inside transactions that roll back between tests.
 - **E2E**: Playwright for critical happy paths only — execution is slow.
 
-See [`../guides/contributing/testing.md`](../guides/contributing/testing.md) for the test stack and conventions.
+See [`testing.md`](testing.md) for the test stack and conventions.
 
 ## 3. No magic
 
