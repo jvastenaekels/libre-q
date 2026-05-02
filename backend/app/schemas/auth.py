@@ -1,6 +1,6 @@
 """Authentication and TOTP schemas."""
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class Token(BaseModel):
@@ -41,3 +41,10 @@ class EmailRequest(BaseModel):
     """Schema for submitting an email address (resend flows)."""
 
     email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    """Schema for confirming a password reset via email-link JWT."""
+
+    token: str
+    new_password: str = Field(min_length=8)

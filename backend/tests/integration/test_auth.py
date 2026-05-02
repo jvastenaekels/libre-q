@@ -719,3 +719,159 @@ class TestSMTPUnconfiguredFallback:
         )
         assert r.status_code == 403
         assert "email_not_verified" in r.json()["message"]
+
+
+@pytest.mark.asyncio
+class TestPasswordReset:
+    async def test_request_unknown_email_returns_200(self, client: AsyncClient):
+        r = await client.post(
+            "/api/password/reset/request", json={"email": "ghost@example.com"}
+        )
+        assert r.status_code == 200
+
+    async def test_request_known_email_logs_email(
+        self, client: AsyncClient, test_user: User, caplog
+    ):
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/password/reset/request", json={"email": test_user.email}
+            )
+        assert r.status_code == 200
+        assert any("password-reset" in rec.message for rec in caplog.records)
+
+    async def test_constant_time_unknown_vs_known_within_500ms(
+        self, client: AsyncClient, test_user: User
+    ):
+        # Loose bound (CI variance) — the test is qualitative: both paths
+        # do roughly the same amount of work (one bcrypt either way).
+        import time
+        t0 = time.perf_counter()
+        await client.post(
+            "/api/password/reset/request", json={"email": "ghost@example.com"}
+        )
+        t1 = time.perf_counter()
+        await client.post(
+            "/api/password/reset/request", json={"email": test_user.email}
+        )
+        t2 = time.perf_counter()
+        # Within 500ms of each other on CI hardware
+        assert abs((t2 - t1) - (t1 - t0)) < 0.5
+
+    async def test_confirm_rotates_password(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from datetime import timedelta
+        from app.utils.security import create_email_token, verify_password
+        from tests.conftest import TEST_PASSWORD
+
+        await db.refresh(test_user)
+        original_pca = test_user.password_changed_at
+        token = create_email_token(
+            test_user.email, "password_reset",
+            expires_delta=timedelta(hours=1),
+            password_changed_at=original_pca,
+        )
+        r = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "newSecret123"},
+        )
+        assert r.status_code == 200
+
+        await db.refresh(test_user)
+        assert verify_password("newSecret123", test_user.hashed_password)
+        assert not verify_password(TEST_PASSWORD, test_user.hashed_password)
+        assert test_user.password_changed_at > original_pca
+
+    async def test_confirm_replay_after_rotation_fails(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from datetime import timedelta
+        from app.utils.security import create_email_token
+
+        await db.refresh(test_user)
+        token = create_email_token(
+            test_user.email, "password_reset",
+            expires_delta=timedelta(hours=1),
+            password_changed_at=test_user.password_changed_at,
+        )
+        r1 = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "first123abc"},
+        )
+        assert r1.status_code == 200
+
+        r2 = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "second123abc"},
+        )
+        assert r2.status_code == 400
+        # Specifically the pwa-mismatch path
+        assert "consumed" in r2.json()["message"].lower() or \
+               "invalid" in r2.json()["message"].lower()
+
+    async def test_confirm_expired_token_returns_400(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from datetime import timedelta
+        from app.utils.security import create_email_token
+
+        await db.refresh(test_user)
+        token = create_email_token(
+            test_user.email, "password_reset",
+            expires_delta=timedelta(seconds=-1),
+            password_changed_at=test_user.password_changed_at,
+        )
+        r = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "anything123"},
+        )
+        assert r.status_code == 400
+
+    async def test_confirm_unknown_user_returns_400(self, client: AsyncClient):
+        from datetime import datetime, timedelta, timezone
+        from app.utils.security import create_email_token
+
+        token = create_email_token(
+            "ghost@example.com", "password_reset",
+            expires_delta=timedelta(hours=1),
+            password_changed_at=datetime.now(timezone.utc),
+        )
+        r = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "anything123"},
+        )
+        assert r.status_code == 400
+
+    async def test_confirm_invalidates_active_otps(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from datetime import timedelta
+        from app.models import TwoFAEmailOTPCode
+        from app.services.email_otp_service import issue_otp
+        from app.utils.security import create_email_token
+        from sqlalchemy import select
+
+        # Issue an OTP (simulating an in-flight 2FA login attempt)
+        await issue_otp(db, test_user)
+        await db.commit()
+        await db.refresh(test_user)
+
+        token = create_email_token(
+            test_user.email, "password_reset",
+            expires_delta=timedelta(hours=1),
+            password_changed_at=test_user.password_changed_at,
+        )
+        r = await client.post(
+            "/api/password/reset/confirm",
+            json={"token": token, "new_password": "newone123"},
+        )
+        assert r.status_code == 200
+
+        # All previously-active OTPs are now used_at-stamped
+        result = await db.execute(
+            select(TwoFAEmailOTPCode).where(
+                TwoFAEmailOTPCode.user_id == test_user.id,
+                TwoFAEmailOTPCode.used_at.is_(None),
+            )
+        )
+        assert result.scalar_one_or_none() is None

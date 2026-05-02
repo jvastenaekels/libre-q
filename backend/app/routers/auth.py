@@ -25,7 +25,8 @@ from app.utils.security import (
     get_totp_uri,
     verify_totp_token,
 )
-from app.utils.email import send_email_verification
+from app.utils.email import send_email_verification, send_password_reset
+from app.services.email_otp_service import invalidate_active_otps
 from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
@@ -38,7 +39,7 @@ from app.schemas import (
     TOTPSetup,
     TOTPVerify,
 )
-from app.schemas.auth import EmailRequest, EmailTokenSubmit
+from app.schemas.auth import EmailRequest, EmailTokenSubmit, PasswordResetConfirm
 from app.schemas.responses import AckResponse, TOTPEnableResponse
 from app.limiter import limiter, email_hash_key_func_sync, _get_real_ip
 from fastapi import Request
@@ -470,4 +471,84 @@ async def resend_verification(
         # Constant-time padding to equalize latency vs the real bcrypt path
         get_password_hash("anti-enum-padding")
 
+    return AckResponse(status="ok")
+
+
+@router.post("/password/reset/request", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def password_reset_request(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Request a password-reset email.
+
+    Always returns 200 (anti-enum). If a user exists with the submitted
+    email, a fresh JWT carrying a `pwa` (password_changed_at epoch) claim
+    is emailed; otherwise a fake bcrypt call equalises latency. The
+    `pwa` claim is the replay-defense token: confirm-time compares it
+    to the user's current password_changed_at, so a token issued before
+    the password was last rotated is rejected.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    # Constant-time: run one bcrypt on BOTH paths so the unknown path
+    # (anti-enum padding) and the known path (where no real bcrypt is
+    # needed — JWT signing is cheap) take comparable time. Without this
+    # equalisation, an attacker could distinguish the two by timing the
+    # response (known is much faster than unknown).
+    get_password_hash("anti-enum-padding")
+
+    if user is not None:
+        token = create_email_token(
+            email=user.email,
+            purpose="password_reset",
+            expires_delta=timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS),
+            password_changed_at=user.password_changed_at,
+        )
+        url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+        send_password_reset(user.email, url)
+
+    return AckResponse(status="ok")
+
+
+@router.post("/password/reset/confirm", response_model=AckResponse)
+async def password_reset_confirm(
+    payload: PasswordResetConfirm, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Consume a password-reset JWT, rotate the password, kill in-flight OTPs.
+
+    Returns 400 (not 200 anti-enum) on token/user/pwa failure: the token
+    itself is the secret, and an attacker cannot guess valid ones, so a
+    specific status here does not enable enumeration.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="password_reset")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=400, detail="invalid_token")
+
+    pwa_in_token = claims.get("pwa")
+    pwa_now = int(user.password_changed_at.timestamp())
+    if pwa_in_token != pwa_now:
+        # Token was issued before the current password — already consumed
+        raise HTTPException(status_code=400, detail="token_already_consumed")
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    user.password_changed_at = datetime.now(timezone.utc)
+    await invalidate_active_otps(db, user)
+    await db.commit()
+
+    log_admin_action(
+        actor_user_id=user.id,
+        action="password_reset_confirm",
+        resource="user",
+        resource_id=user.id,
+    )
     return AckResponse(status="ok")

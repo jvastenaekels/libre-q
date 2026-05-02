@@ -32,6 +32,7 @@ from .audio import (
 from .auth import (
     EmailRequest,
     EmailTokenSubmit,
+    PasswordResetConfirm,
     TOTPSetup,
     TOTPVerify,
     Token,
@@ -154,6 +155,7 @@ __all__ = [
     # auth
     "EmailRequest",
     "EmailTokenSubmit",
+    "PasswordResetConfirm",
     "TOTPSetup",
     "TOTPVerify",
     "Token",
