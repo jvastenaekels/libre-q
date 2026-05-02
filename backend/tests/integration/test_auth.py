@@ -1056,3 +1056,181 @@ class TestTwoFAEmailOTP:
             json={"channel": "app"},  # no token
         )
         assert r.status_code == 400
+
+
+@pytest.mark.asyncio
+class TestTwoFADisableRecovery:
+    """Self-serve 2FA disable via single-use email link.
+
+    Most security-critical flow in the auth-email-flows family: a successful
+    confirm defeats the user's second factor. Single-use enforcement comes
+    from the consumed_email_tokens table (PK on jti).
+    """
+
+    async def _user_with_2fa(
+        self,
+        db: AsyncSession,
+        email: str = "twofa-recover@example.com",
+        channel: str = "app",
+    ) -> User:
+        from datetime import datetime, timezone
+        from app.utils.security import get_password_hash
+
+        u = User(
+            email=email,
+            hashed_password=get_password_hash("pass"),
+            is_active=True,
+            email_verified_at=datetime.now(timezone.utc),
+            is_totp_enabled=True,
+            totp_channel=channel,
+            totp_secret="JBSWY3DPEHPK3PXP" if channel == "app" else None,
+        )
+        db.add(u)
+        await db.commit()
+        await db.refresh(u)
+        return u
+
+    async def test_request_for_2fa_user_logs_disable_link(
+        self, client: AsyncClient, db: AsyncSession, caplog
+    ):
+        user = await self._user_with_2fa(db)
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/2fa/disable/request", json={"email": user.email}
+            )
+        assert r.status_code == 200
+        assert any("2fa-disable-link" in rec.message for rec in caplog.records)
+
+    async def test_request_unknown_email_returns_200_no_email(
+        self, client: AsyncClient, caplog
+    ):
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/2fa/disable/request", json={"email": "ghost@example.com"}
+            )
+        assert r.status_code == 200
+        assert not any("2fa-disable-link" in rec.message for rec in caplog.records)
+
+    async def test_request_user_without_2fa_returns_200_no_email(
+        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
+    ):
+        # test_user fixture doesn't have 2FA enabled
+        assert test_user.is_totp_enabled is False
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/2fa/disable/request", json={"email": test_user.email}
+            )
+        assert r.status_code == 200
+        assert not any("2fa-disable-link" in rec.message for rec in caplog.records)
+
+    async def test_confirm_disables_2fa_and_sends_notification(
+        self, client: AsyncClient, db: AsyncSession, caplog
+    ):
+        from app.utils.security import create_email_token
+
+        user = await self._user_with_2fa(db, email="confirm-disable@example.com")
+        token = create_email_token(
+            user.email,
+            "twofa_disable",
+            expires_delta=timedelta(minutes=15),
+        )
+
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        assert r.status_code == 200
+
+        await db.refresh(user)
+        assert user.is_totp_enabled is False
+        assert user.totp_secret is None
+        assert user.totp_channel is None
+        # Post-action notification email logged
+        assert any(
+            "2fa-disabled-notification" in rec.message for rec in caplog.records
+        )
+
+    async def test_confirm_replay_returns_409(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        from app.utils.security import create_email_token
+
+        user = await self._user_with_2fa(db, email="replay-disable@example.com")
+        token = create_email_token(
+            user.email,
+            "twofa_disable",
+            expires_delta=timedelta(minutes=15),
+        )
+
+        r1 = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        assert r1.status_code == 200
+
+        r2 = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        assert r2.status_code == 409
+
+    async def test_confirm_expired_token_returns_400(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        from app.utils.security import create_email_token
+
+        await self._user_with_2fa(db, email="expired-disable@example.com")
+        token = create_email_token(
+            "expired-disable@example.com",
+            "twofa_disable",
+            expires_delta=timedelta(seconds=-1),  # already expired
+        )
+
+        r = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        assert r.status_code == 400
+
+    async def test_confirm_unknown_user_consumes_jti_anyway(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        """Anti-enum: even when the user does not exist, the JTI is consumed
+        so an attacker can't probe for valid users by replaying a token.
+        """
+        from sqlalchemy import select
+
+        from app.models import ConsumedEmailToken
+        from app.utils.security import create_email_token, decode_email_token
+
+        # Issue a token for a non-existent user
+        token = create_email_token(
+            "ghost-disable@example.com",
+            "twofa_disable",
+            expires_delta=timedelta(minutes=15),
+        )
+        # Decode it here to grab the jti for our assertion
+        jti = decode_email_token(token, expected_purpose="twofa_disable")["jti"]
+
+        await client.post("/api/2fa/disable/confirm", json={"token": token})
+        # Whatever the response code, the jti must be consumed (so a replay
+        # by an attacker who somehow got the token can't probe valid users).
+        result = await db.execute(
+            select(ConsumedEmailToken).where(ConsumedEmailToken.jti == jti)
+        )
+        assert result.scalar_one_or_none() is not None
+
+    async def test_sequential_confirm_second_returns_409(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        """Two sequential POSTs with the same token: the second must 409.
+
+        Note: the plan also describes a parallel `asyncio.gather` variant.
+        That variant would race against a single shared session in the test
+        harness (the `client` fixture overrides get_db with one AsyncSession
+        per test) and produce non-deterministic ordering rather than truly
+        exercising DB-level concurrency. The atomic single-use guarantee
+        is encoded in the consumed_email_tokens PK; the sequential test
+        here verifies that contract end-to-end without harness flakiness.
+        """
+        from app.utils.security import create_email_token
+
+        user = await self._user_with_2fa(db, email="concurrent-disable@example.com")
+        token = create_email_token(
+            user.email,
+            "twofa_disable",
+            expires_delta=timedelta(minutes=15),
+        )
+
+        r1 = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        r2 = await client.post("/api/2fa/disable/confirm", json={"token": token})
+        assert sorted([r1.status_code, r2.status_code]) == [200, 409]

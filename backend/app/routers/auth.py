@@ -28,6 +28,8 @@ from app.utils.security import (
 from app.utils.email import (
     send_email_verification,
     send_password_reset,
+    send_twofa_disable_link,
+    send_twofa_disabled_notification,
     send_twofa_login_otp,
 )
 from app.services.email_otp_service import (
@@ -36,6 +38,7 @@ from app.services.email_otp_service import (
     issue_otp,
     verify_otp,
 )
+from app.services.email_token_consume_service import mark_jti_consumed
 from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
@@ -640,6 +643,97 @@ async def password_reset_confirm(
     log_admin_action(
         actor_user_id=user.id,
         action="password_reset_confirm",
+        resource="user",
+        resource_id=user.id,
+    )
+    return AckResponse(status="ok")
+
+
+@router.post("/2fa/disable/request", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def twofa_disable_request(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Self-serve 2FA disable — request the link.
+
+    Anti-enum: returns 200 regardless of whether the user exists or has
+    2FA enabled. A bcrypt call equalises latency on the no-op path so the
+    response time doesn't leak account state.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None and user.is_totp_enabled:
+        token = create_email_token(
+            email=user.email,
+            purpose="twofa_disable",
+            expires_delta=timedelta(
+                minutes=settings.TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES
+            ),
+        )
+        url = f"{settings.FRONTEND_URL}/2fa/disable?token={token}"
+        send_twofa_disable_link(user.email, url)
+    else:
+        # Constant-time padding: bcrypt of a fixed dummy
+        get_password_hash("anti-enum-padding")
+
+    return AckResponse(status="ok")
+
+
+@router.post("/2fa/disable/confirm", response_model=AckResponse)
+async def twofa_disable_confirm(
+    request: Request,
+    payload: EmailTokenSubmit,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Self-serve 2FA disable — confirm via single-use JWT.
+
+    Single-use enforced via the consumed_email_tokens table (jti PK).
+    The mark_jti_consumed call is atomic — concurrent attempts on the
+    same token: exactly one inserts, the other hits a PK collision and
+    we map it to 409.
+
+    The jti is consumed BEFORE the user lookup so that an attacker who
+    somehow obtained a token cannot probe for valid email addresses by
+    replaying it; whether or not the user exists, the token is burned.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="twofa_disable")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    jti = claims["jti"]
+
+    # Atomic: consume first, then act. PK collision = already consumed.
+    try:
+        await mark_jti_consumed(db, jti, purpose="twofa_disable")
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail="token_already_consumed")
+
+    # User lookup happens AFTER consume so the jti is burned regardless.
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        # Persist the consumed jti even for unknown users (anti-enum).
+        await db.commit()
+        return AckResponse(status="ok")
+
+    user.is_totp_enabled = False
+    user.totp_secret = None
+    user.totp_channel = None
+    await db.commit()
+
+    when = datetime.now(timezone.utc).isoformat()
+    ip = request.client.host if request.client else None
+    send_twofa_disabled_notification(user.email, when=when, ip_hint=ip)
+
+    log_admin_action(
+        actor_user_id=user.id,
+        action="twofa_disable_confirm",
         resource="user",
         resource_id=user.id,
     )
