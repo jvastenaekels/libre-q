@@ -1,6 +1,6 @@
 """Authentication and TOTP schemas."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class Token(BaseModel):
@@ -29,3 +29,15 @@ class TOTPVerify(BaseModel):
     """Schema for TOTP verification."""
 
     token: str
+
+
+class EmailTokenSubmit(BaseModel):
+    """Schema for submitting an email-link JWT (verify, password-reset, etc.)."""
+
+    token: str
+
+
+class EmailRequest(BaseModel):
+    """Schema for submitting an email address (resend flows)."""
+
+    email: EmailStr

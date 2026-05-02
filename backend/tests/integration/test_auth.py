@@ -337,3 +337,105 @@ async def test_rate_limiting_login(client: AsyncClient):
             limit_hit = True
             break
     assert limit_hit
+
+
+@pytest.mark.asyncio
+class TestEmailVerify:
+    async def _new_unverified(self, db: AsyncSession, email: str) -> User:
+        from app.utils.security import get_password_hash
+        u = User(
+            email=email,
+            hashed_password=get_password_hash("pass"),
+            is_active=False,
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+        await db.refresh(u)
+        return u
+
+    async def test_verify_with_valid_token_activates_user(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        from datetime import timedelta
+        from app.utils.security import create_email_token
+
+        user = await self._new_unverified(db, "verifyme@example.com")
+        token = create_email_token(user.email, "email_verify", timedelta(hours=24))
+
+        r = await client.post("/api/email/verify", json={"token": token})
+        assert r.status_code == 200
+
+        await db.refresh(user)
+        assert user.is_active is True
+        assert user.email_verified_at is not None
+
+    async def test_verify_already_verified_is_idempotent(
+        self, client: AsyncClient, db: AsyncSession
+    ):
+        from datetime import timedelta, datetime, timezone
+        from app.utils.security import create_email_token
+
+        user = await self._new_unverified(db, "verified@example.com")
+        user.email_verified_at = datetime.now(timezone.utc)
+        user.is_active = True
+        await db.commit()
+
+        token = create_email_token(user.email, "email_verify", timedelta(hours=24))
+        r = await client.post("/api/email/verify", json={"token": token})
+        assert r.status_code == 200
+
+    async def test_verify_with_expired_token_returns_400(self, client: AsyncClient):
+        from datetime import timedelta
+        from app.utils.security import create_email_token
+
+        token = create_email_token(
+            "anyone@example.com", "email_verify", timedelta(seconds=-1)
+        )
+        r = await client.post("/api/email/verify", json={"token": token})
+        assert r.status_code == 400
+
+    async def test_verify_unknown_user_silent_200(self, client: AsyncClient):
+        # JWT valid but no matching user — must NOT 4xx (anti-enum)
+        from datetime import timedelta
+        from app.utils.security import create_email_token
+
+        token = create_email_token(
+            "ghost@example.com", "email_verify", timedelta(hours=24)
+        )
+        r = await client.post("/api/email/verify", json={"token": token})
+        assert r.status_code == 200
+
+    async def test_resend_unknown_email_returns_200_anti_enum(self, client: AsyncClient):
+        r = await client.post(
+            "/api/email/verify/resend", json={"email": "ghost@example.com"}
+        )
+        assert r.status_code == 200
+
+    async def test_resend_for_unverified_user_logs_email(
+        self, client: AsyncClient, db: AsyncSession, caplog
+    ):
+        await self._new_unverified(db, "resendme@example.com")
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/email/verify/resend",
+                json={"email": "resendme@example.com"},
+            )
+        assert r.status_code == 200
+        assert any("email-verification" in rec.message for rec in caplog.records)
+
+    async def test_resend_for_verified_user_does_NOT_log(
+        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
+    ):
+        # test_user has email_verified_at set (per T10 fixture update; if not yet, set it)
+        from datetime import datetime, timezone
+        if test_user.email_verified_at is None:
+            test_user.email_verified_at = datetime.now(timezone.utc)
+            await db.commit()
+
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/email/verify/resend", json={"email": test_user.email}
+            )
+        assert r.status_code == 200
+        assert not any("email-verification" in rec.message for rec in caplog.records)

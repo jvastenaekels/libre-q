@@ -29,7 +29,14 @@ from .audio import (
     AudioUploadResponse,
     ParticipantAudioRecording,
 )
-from .auth import TOTPSetup, TOTPVerify, Token, TokenData
+from .auth import (
+    EmailRequest,
+    EmailTokenSubmit,
+    TOTPSetup,
+    TOTPVerify,
+    Token,
+    TokenData,
+)
 from .common import PaginatedResponse
 from .participants import (
     ConsentInput,
@@ -145,6 +152,8 @@ __all__ = [
     "AudioUploadResponse",
     "ParticipantAudioRecording",
     # auth
+    "EmailRequest",
+    "EmailTokenSubmit",
     "TOTPSetup",
     "TOTPVerify",
     "Token",

@@ -17,6 +17,7 @@ from app.models import User
 from app.utils.security import (
     create_access_token,
     create_email_token,
+    decode_email_token,
     verify_password,
     get_password_hash,
     decode_invitation_token,
@@ -25,6 +26,7 @@ from app.utils.security import (
     verify_totp_token,
 )
 from app.utils.email import send_email_verification
+from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
     UserRead,
@@ -36,8 +38,9 @@ from app.schemas import (
     TOTPSetup,
     TOTPVerify,
 )
+from app.schemas.auth import EmailRequest, EmailTokenSubmit
 from app.schemas.responses import AckResponse, TOTPEnableResponse
-from app.limiter import limiter
+from app.limiter import limiter, email_hash_key_func_sync, _get_real_ip
 from fastapi import Request
 
 router = APIRouter()
@@ -374,3 +377,68 @@ async def disable_totp(
             detail="An unexpected error occurred while disabling 2FA",
         )
     return AckResponse(status="disabled")
+
+
+@router.post("/email/verify", response_model=AckResponse)
+async def verify_email(
+    payload: EmailTokenSubmit, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Consume an email-verification JWT and activate the user account.
+
+    Idempotent: re-verifying an already-verified account returns 200 silently.
+    Anti-enum: a valid JWT whose email matches no user also returns 200.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="email_verify")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        # Anti-enum: respond 200, do nothing
+        return AckResponse(status="ok")
+
+    if user.email_verified_at is None:
+        user.email_verified_at = datetime.now(timezone.utc)
+        user.is_active = True
+        await db.commit()
+        log_admin_action(
+            actor_user_id=user.id,
+            action="email_verify",
+            resource="user",
+            resource_id=user.id,
+        )
+    return AckResponse(status="ok")
+
+
+@router.post("/email/verify/resend", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def resend_verification(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Resend a verification email to an unverified account.
+
+    Always returns 200 (anti-enum). If the user exists and is unverified,
+    a fresh token is emailed. Otherwise, a fake bcrypt call equalises latency
+    so callers cannot distinguish the two code paths by timing.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None and user.email_verified_at is None:
+        token = create_email_token(
+            email=user.email,
+            purpose="email_verify",
+            expires_delta=timedelta(hours=settings.EMAIL_VERIFY_TOKEN_EXPIRE_HOURS),
+        )
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_email_verification(user.email, verify_url)
+    else:
+        # Constant-time padding to equalize latency vs the real bcrypt path
+        get_password_hash("anti-enum-padding")
+
+    return AckResponse(status="ok")

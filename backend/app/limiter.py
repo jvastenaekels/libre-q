@@ -69,6 +69,32 @@ async def email_hash_key_func(request: Request) -> str:
     return "email:" + hashlib.sha256(email.encode("utf-8")).hexdigest()[:32]
 
 
+def email_hash_key_func_sync(request: Request) -> str:
+    """Sync version of email_hash_key_func for use with slowapi decorators.
+
+    slowapi's ``@limiter.limit(key_func=...)`` calls the key function
+    synchronously (no await), so an async key_func cannot be passed directly.
+    This version reads ``request._body`` — the body cache that Starlette
+    populates after the first ``await request.body()`` call — which is always
+    available when slowapi invokes the key_func (after the ASGI body has been
+    read by the framework).  Falls back to IP when the cache is cold or the
+    body has no ``email`` field.
+    """
+    import json
+
+    try:
+        raw: bytes = getattr(request, "_body", b"") or b""
+        body = json.loads(raw) if raw else {}
+        email = (
+            str(body.get("email", "")).lower().strip() if isinstance(body, dict) else ""
+        )
+    except Exception:
+        email = ""
+    if not email:
+        return _get_real_ip(request)
+    return "email:" + hashlib.sha256(email.encode("utf-8")).hexdigest()[:32]
+
+
 if is_testing:
     # Disable rate limiting during tests
     limiter = Limiter(key_func=_get_real_ip, enabled=False)
