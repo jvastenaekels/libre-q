@@ -28,15 +28,16 @@ class TestCreateEmailToken:
         assert "jti" in payload and len(payload["jti"]) >= 16
 
     def test_password_reset_carries_pwa_claim(self):
-        ts = int(datetime(2026, 5, 1, 12, 0, tzinfo=timezone.utc).timestamp())
+        dt = datetime(2026, 5, 1, 12, 0, tzinfo=timezone.utc)
+        ts_us = int(dt.timestamp() * 1_000_000)
         token = create_email_token(
             email="alice@example.com",
             purpose="password_reset",
             expires_delta=timedelta(hours=1),
-            password_changed_at=datetime.fromtimestamp(ts, tz=timezone.utc),
+            password_changed_at=datetime.fromtimestamp(ts_us / 1_000_000, tz=timezone.utc),
         )
         payload = decode_email_token(token, expected_purpose="password_reset")
-        assert payload["pwa"] == ts
+        assert payload["pwa"] == ts_us
 
     def test_password_reset_requires_pwa_arg(self):
         with pytest.raises(ValueError, match="password_changed_at"):

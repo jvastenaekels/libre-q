@@ -630,7 +630,7 @@ async def password_reset_confirm(
         raise HTTPException(status_code=400, detail="invalid_token")
 
     pwa_in_token = claims.get("pwa")
-    pwa_now = int(user.password_changed_at.timestamp())
+    pwa_now = int(user.password_changed_at.timestamp() * 1_000_000)
     if pwa_in_token != pwa_now:
         # Token was issued before the current password — already consumed
         raise HTTPException(status_code=400, detail="token_already_consumed")

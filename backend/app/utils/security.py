@@ -131,7 +131,7 @@ def create_email_token(
         "jti": secrets.token_urlsafe(16),
     }
     if password_changed_at is not None:
-        payload["pwa"] = int(password_changed_at.timestamp())
+        payload["pwa"] = int(password_changed_at.timestamp() * 1_000_000)
 
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
