@@ -39,6 +39,12 @@ export default function CreateProjectPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { setCurrentProject, setProjects, projects } = useAuthStore();
+    const ownedQuota = useAuthStore((s) => s.user?.owned_project_quota);
+    const ownedQuotaFull =
+        ownedQuota !== undefined &&
+        ownedQuota !== null &&
+        ownedQuota.limit !== null &&
+        ownedQuota.count >= ownedQuota.limit;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const queryClient = useQueryClient();
 
@@ -168,33 +174,54 @@ export default function CreateProjectPage() {
                                     </FormItem>
                                 )}
                             />
-                            <div className="flex justify-end gap-3 pt-4">
-                                <Button
-                                    variant="outline"
-                                    type="button"
-                                    className="h-11 rounded-xl px-6 border-slate-200 font-bold text-slate-600 hover:bg-slate-50"
-                                    onClick={() => navigate(-1)}
-                                >
-                                    <ArrowLeft className="size-4 mr-2" />
-                                    {t('admin.project.create.cancel')}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm border-none"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <Globe className="size-4 mr-2 animate-spin" />
-                                            {t('admin.project.create.creating')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Save className="size-4 mr-2" />
-                                            {t('admin.project.create.create_button')}
-                                        </>
+                            <div className="flex flex-col gap-3 pt-4">
+                                {ownedQuota !== undefined &&
+                                    ownedQuota !== null &&
+                                    ownedQuota.limit !== null && (
+                                        <p className="text-sm text-slate-600 text-right">
+                                            {t('admin.projects.create.quota', {
+                                                count: ownedQuota.count,
+                                                limit: ownedQuota.limit,
+                                                defaultValue: '{{count}}/{{limit}} owned projects',
+                                            })}
+                                        </p>
                                     )}
-                                </Button>
+                                <div className="flex justify-end gap-3">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        className="h-11 rounded-xl px-6 border-slate-200 font-bold text-slate-600 hover:bg-slate-50"
+                                        onClick={() => navigate(-1)}
+                                    >
+                                        <ArrowLeft className="size-4 mr-2" />
+                                        {t('admin.project.create.cancel')}
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm border-none"
+                                        disabled={isSubmitting || ownedQuotaFull}
+                                        title={
+                                            ownedQuotaFull
+                                                ? t(
+                                                      'admin.projects.create.quota_full_tooltip',
+                                                      "You've reached your owned-project limit."
+                                                  )
+                                                : undefined
+                                        }
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Globe className="size-4 mr-2 animate-spin" />
+                                                {t('admin.project.create.creating')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save className="size-4 mr-2" />
+                                                {t('admin.project.create.create_button')}
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
                         </form>
                     </Form>
