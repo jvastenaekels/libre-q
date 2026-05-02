@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { parseApiErrorSync } from '@/lib/error-utils';
+import { parseApiErrorSync, resolveApiErrorKey } from '@/lib/error-utils';
 import { Briefcase, Plus, Save, ArrowLeft, Globe } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getListProjectsApiAdminProjectsGetQueryKey } from '@/api/generated';
@@ -97,13 +97,23 @@ export default function CreateProjectPage() {
             toast.success(t('admin.project.create.success'));
             navigate(`/app/${newProject.slug}/settings`);
         } catch (error: unknown) {
-            const message = parseApiErrorSync(
-                error,
-                t('admin.project.create.error', 'Could not create project. Try again.')
+            const { key, fallback } = resolveApiErrorKey(
+                error as { code?: string; message?: string }
             );
-            toast.error(t('admin.project.create.error', 'Could not create project. Try again.'), {
-                description: message,
-            });
+            if (key) {
+                toast.error(t(key, fallback));
+            } else {
+                const message = parseApiErrorSync(
+                    error,
+                    t('admin.project.create.error', 'Could not create project. Try again.')
+                );
+                toast.error(
+                    t('admin.project.create.error', 'Could not create project. Try again.'),
+                    {
+                        description: message,
+                    }
+                );
+            }
         } finally {
             setIsSubmitting(false);
         }

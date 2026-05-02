@@ -52,7 +52,7 @@ import {
     useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete,
     useCreateInvitationApiAdminProjectsSlugInvitationsPost,
 } from '@/api/generated';
-import { parseApiErrorSync } from '@/lib/error-utils';
+import { parseApiErrorSync, resolveApiErrorKey } from '@/lib/error-utils';
 
 export default function ProjectMembersPage() {
     const { slug } = useLoaderData() as { slug: string };
@@ -87,8 +87,13 @@ export default function ProjectMembersPage() {
             toast.success(t('admin.projects.settings.team.role_update_success'));
             refetchMembers();
         } catch (err) {
+            const { key, fallback } = resolveApiErrorKey(
+                err as { code?: string; message?: string }
+            );
             toast.error(
-                parseApiErrorSync(err, t('admin.projects.settings.team.role_update_error'))
+                key
+                    ? t(key, fallback)
+                    : parseApiErrorSync(err, t('admin.projects.settings.team.role_update_error'))
             );
         }
     };
@@ -463,8 +468,13 @@ function InviteMemberModal({
             setInviteUrl(result.invite_url || null);
             toast.success(t('admin.projects.settings.team.invite_modal.success'));
         } catch (err) {
+            const { key, fallback } = resolveApiErrorKey(
+                err as { code?: string; message?: string }
+            );
             toast.error(
-                parseApiErrorSync(err, t('admin.projects.settings.team.invite_modal.error'))
+                key
+                    ? t(key, fallback)
+                    : parseApiErrorSync(err, t('admin.projects.settings.team.invite_modal.error'))
             );
         }
     };
