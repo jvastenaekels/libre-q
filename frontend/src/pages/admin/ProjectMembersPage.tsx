@@ -96,7 +96,7 @@ export default function ProjectMembersPage() {
     const requestRemoveMember = (userId: number, name: string) => {
         if (userId === currentUser?.id) {
             toast.error(
-                t('admin.profile.personal.cannot_remove_self', 'You cannot remove yourself')
+                t('admin.account.personal.cannot_remove_self', 'You cannot remove yourself')
             );
             return;
         }

@@ -7,7 +7,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../../test-utils/test-utils';
-import ProfilePage from './ProfilePage';
+import AccountSettingsPage from './AccountSettingsPage';
 
 vi.mock('@/hooks/useAuth', () => ({
     useAuth: () => ({
@@ -43,13 +43,13 @@ vi.mock('@/api/generated', async () => {
     };
 });
 
-describe('ProfilePage 2FA channel selector', () => {
+describe('AccountSettingsPage 2FA channel selector', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     it('renders the channel selector when entering 2FA setup mode', async () => {
-        renderWithProviders(<ProfilePage />);
+        renderWithProviders(<AccountSettingsPage />);
         fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
 
         await waitFor(() => {
@@ -65,7 +65,7 @@ describe('ProfilePage 2FA channel selector', () => {
     });
 
     it('selecting email channel + enable calls enableMutation with {channel: email}', async () => {
-        renderWithProviders(<ProfilePage />);
+        renderWithProviders(<AccountSettingsPage />);
         fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
 
         await waitFor(() => expect(screen.getByText(/how should we deliver/i)).toBeInTheDocument());
@@ -84,7 +84,7 @@ describe('ProfilePage 2FA channel selector', () => {
     });
 
     it('app channel keeps the QR-code + 6-digit-code form visible', async () => {
-        renderWithProviders(<ProfilePage />);
+        renderWithProviders(<AccountSettingsPage />);
         fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
 
         await waitFor(() => expect(screen.getByText(/how should we deliver/i)).toBeInTheDocument());

@@ -115,7 +115,7 @@ export const LegacyRedirect = () => {
     if (pathParts[0] === 'admin' && pathParts[1] === 'profile') {
         const firstProj = projects?.[0];
         if (firstProj) {
-            return <Navigate to={`/app/${firstProj.slug}/profile`} replace />;
+            return <Navigate to={`/app/${firstProj.slug}/account`} replace />;
         }
         return <Navigate to="/hub" replace />;
     }

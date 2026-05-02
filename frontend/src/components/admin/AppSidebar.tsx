@@ -145,11 +145,11 @@ function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
                         <DropdownMenuGroup>
                             <DropdownMenuItem
                                 onSelect={() =>
-                                    navigate(projectSlug ? `/app/${projectSlug}/profile` : '/hub')
+                                    navigate(projectSlug ? `/app/${projectSlug}/account` : '/hub')
                                 }
                             >
                                 <BadgeCheck className="mr-2 h-4 w-4" />
-                                {t('admin.layout.profile', 'Profile')}
+                                {t('admin.layout.account', 'Account settings')}
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />

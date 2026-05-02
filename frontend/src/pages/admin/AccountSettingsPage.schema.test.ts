@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { makeProfileSchema, makePasswordSchema } from './ProfilePage';
+import { makeProfileSchema, makePasswordSchema } from './AccountSettingsPage';
 
 const t = (_key: string, fallback: string) => fallback;
 
-describe('ProfilePage zod schemas', () => {
+describe('AccountSettingsPage zod schemas', () => {
     describe('profileSchema', () => {
         const schema = makeProfileSchema(t);
 

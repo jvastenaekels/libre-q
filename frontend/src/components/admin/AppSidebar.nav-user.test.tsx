@@ -17,24 +17,24 @@ vi.mock('@/api/generated', async () => {
 });
 
 function ProbePage() {
-    return <div data-testid="profile-page">profile</div>;
+    return <div data-testid="account-page">account</div>;
 }
 
-describe('AppSidebar NavUser → Profile', () => {
-    it('navigates to /app/<projectSlug>/profile when Profile is clicked', async () => {
+describe('AppSidebar NavUser → Account settings', () => {
+    it('navigates to /app/<projectSlug>/account when Account settings is clicked', async () => {
         renderWithProviders(
             <SidebarProvider>
                 <Routes>
                     <Route path="/app/:projectSlug/dashboard" element={<AppSidebar />} />
-                    <Route path="/app/:projectSlug/profile" element={<ProbePage />} />
+                    <Route path="/app/:projectSlug/account" element={<ProbePage />} />
                 </Routes>
             </SidebarProvider>,
             { initialEntries: ['/app/demo/dashboard'] }
         );
 
         await userEvent.click(screen.getByRole('button', { name: /ada lovelace/i }));
-        await userEvent.click(screen.getByRole('menuitem', { name: /profile/i }));
+        await userEvent.click(screen.getByRole('menuitem', { name: /account settings/i }));
 
-        await waitFor(() => expect(screen.getByTestId('profile-page')).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByTestId('account-page')).toBeInTheDocument());
     });
 });

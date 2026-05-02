@@ -1,21 +1,21 @@
 import { test, expect } from '../fixtures/db-setup';
 
-test.describe('Admin Profile Management', () => {
-    test('should navigate to profile, update name, and validate password change', async ({
+test.describe('Admin Account settings', () => {
+    test('should navigate to account settings, update name, and validate password change', async ({
         page,
         testDb,
     }) => {
         await testDb.loginToAdminUI(page);
         const email = testDb.getUserEmail();
 
-        // Verify sidebar profile link
+        // Verify sidebar account-settings link
         await page.getByText(email).click();
-        await expect(page.getByRole('menuitem', { name: 'Profile' })).toBeVisible();
+        await expect(page.getByRole('menuitem', { name: 'Account settings' })).toBeVisible();
         await expect(page.getByRole('menuitem', { name: 'Log out' })).toBeVisible();
 
-        // Navigate to profile
-        await page.getByRole('menuitem', { name: 'Profile' }).click();
-        await expect(page).toHaveURL(/\/profile/);
+        // Navigate to account settings
+        await page.getByRole('menuitem', { name: 'Account settings' }).click();
+        await expect(page).toHaveURL(/\/account/);
 
         // Verify email is read-only
         await expect(page.getByLabel('Email')).toBeDisabled();
@@ -33,11 +33,11 @@ test.describe('Admin Profile Management', () => {
         // Fill BOTH fields so only the min-length error surfaces (zod stops
         // at the first invalid field's message in shadcn FormMessage when
         // multiple fields fail; the schema-level coverage of the empty-
-        // currentPassword case lives in ProfilePage.schema.test.ts).
+        // currentPassword case lives in AccountSettingsPage.schema.test.ts).
         await page.getByLabel('Current Password').fill('placeholder-current');
         await page.getByLabel('New Password').fill('123');
         await page.getByRole('button', { name: /change password/i }).click();
-        // Locale renders "Min 8 characters" (admin.profile.password.validation.min_length).
+        // Locale renders "Min 8 characters" (admin.account.password.validation.min_length).
         await expect(page.getByText('Min 8 characters')).toBeVisible();
 
         // Validate password change — wrong current password.
