@@ -77,6 +77,12 @@ class Settings(BaseSettings):
     TWOFA_EMAIL_OTP_EXPIRE_MINUTES: int = 5
     TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: int = 30
 
+    # Email verification & password-reset token lifetimes
+    EMAIL_VERIFICATION_REQUIRED: bool = True
+    EMAIL_VERIFY_TOKEN_EXPIRE_HOURS: int = 24
+    PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 1
+    TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES: int = 15
+
     # Audio Recording Limits
     AUDIO_MAX_FILE_SIZE_MB: int = 10
     AUDIO_MAX_DURATION_SECONDS: int = 300  # 5 minutes

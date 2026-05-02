@@ -1,5 +1,6 @@
 """Rate limiting configuration using SlowAPI."""
 
+import hashlib
 import os
 
 from slowapi import Limiter
@@ -36,6 +37,36 @@ def _get_real_ip(request: Request) -> str:
         return forwarded.split(",")[0].strip()
 
     return direct_peer
+
+
+async def email_hash_key_func(request: Request) -> str:
+    """Rate-limit key based on lowercased-email hash, for anti-enumeration.
+
+    Reads the JSON body's ``email`` field and returns a SHA-256 prefix so
+    that brute-force attempts on a specific address are limited regardless
+    of source IP.  Falls back to the per-request IP key (_get_real_ip) when
+    the body is missing, unparseable, or contains no ``email`` field — this
+    keeps the limiter functional even when a misconfigured client omits the
+    field.  The IP-based limiter is still applied separately on every
+    endpoint that uses this key, so the fallback is defense-in-depth, not
+    the primary gate.
+
+    Body-reading safety: ``Request.body()`` (called internally by
+    ``Request.json()``) stores its bytes on ``request._body`` after the
+    first read.  Subsequent reads by Starlette / FastAPI hit the cache, so
+    calling this key_func first does *not* consume the stream for the route
+    handler.
+    """
+    try:
+        body = await request.json()
+        email = (
+            str(body.get("email", "")).lower().strip() if isinstance(body, dict) else ""
+        )
+    except Exception:
+        email = ""
+    if not email:
+        return _get_real_ip(request)
+    return "email:" + hashlib.sha256(email.encode("utf-8")).hexdigest()[:32]
 
 
 if is_testing:
