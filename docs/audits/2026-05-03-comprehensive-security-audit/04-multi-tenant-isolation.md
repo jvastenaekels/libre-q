@@ -279,7 +279,7 @@ mechanism. Filed as **F-04-001** below.
 | blocker | 0 |
 | major | 0 |
 | minor | 0 |
-| observation | 1 |
+| observation | 2 |
 
 ## Findings
 
@@ -301,6 +301,31 @@ routes) will surface here before merge.
 
 This is filed as an observation — not a finding — because nothing is broken; the
 harness's value is preventing future regressions, not fixing an existing leak.
+
+### F-04-002 — Recruitment-token cross-study replay rejected (observation)
+
+**Severity:** observation
+**Status:** safe — explicit study-id check in token validator
+**Files:** `backend/app/services/recruitment_service.py:126-146`,
+          `backend/app/routers/submissions.py:96-103`,
+          `backend/app/services/submission_service.py:514-521`,
+          `backend/tests/security/wave_3/test_recruitment_token_replay.py`
+**Disposition:** false positive — the token validator already pins
+`link.study_id == study_id`.
+
+Concern: a recruitment token issued for Study A could be replayed against
+Study B's `/api/study/{slug}` or submission endpoint, granting unauthorised
+access to a study the holder shouldn't enter.
+
+Reality: `RecruitmentService.validate_link_token(db, study_id, token)` looks
+up the link by token then explicitly returns `None` when
+`link.study_id != study_id`. Both call sites
+(`GET /api/study/{slug}` in `submissions.py:98` and the participant-submit
+flow in `submission_service.py:517`) pass `study.id` derived from the URL
+slug. A cross-study replay therefore fails token validation and the handler
+raises 403 "Invalid, expired, or full recruitment link". The regression test
+exercises both directions (A→B and B→A) and pins the 403 denial, plus a
+sanity 200 on the legitimate own-study path.
 
 ## Resolved since prior
 
