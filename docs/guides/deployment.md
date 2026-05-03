@@ -214,10 +214,38 @@ Email-driven auth flows (sign-up verification, password reset, 2FA email-OTP, 2F
 | `TWOFA_EMAIL_OTP_EXPIRE_MINUTES` | `10` | Validity window for each 2FA email-OTP code. |
 | `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS` | `30` | Minimum interval between OTP resend requests per user. |
 
-**Cron cleanup:** consumed email tokens (2FA-disable JTIs) accumulate in the `consumed_email_tokens` table. Once SMTP is active, schedule a daily cron to prune stale rows:
+**Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.
+
+> [!IMPORTANT]
+> This cleanup is **operator-side**. The application does not auto-schedule it. On Scalingo, configure the [Scalingo Scheduler addon](https://doc.scalingo.com/platform/app/task-scheduling/scalingo-scheduler) (free) with a daily cron entry. Other platforms: add the equivalent system cron / scheduled-task entry.
+
+### Scalingo cron config
+
+Add the addon and a `cron.json` at the repo root:
 
 ```bash
-PYTHONPATH=backend uv --project backend run python backend/scripts/cleanup_consumed_email_tokens.py
+scalingo --app qualis addons-add scheduler scheduler-sandbox
 ```
 
-This deletes rows older than 7 days and is safe to run while the app is live.
+`cron.json`:
+
+```json
+{
+  "jobs": [
+    {
+      "command": "0 4 * * * cd backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py",
+      "size": "S"
+    }
+  ]
+}
+```
+
+Deploy normally. The job runs daily at 04:00 UTC and prints `deleted=<n>` to the scheduler log.
+
+### Manual one-off run
+
+```bash
+scalingo --app qualis run -- bash -c "cd backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py"
+```
+
+Without the cron, the table will grow proportionally to the rate of consumed email tokens (negligible risk for low-traffic deployments; meaningful storage drift over months at production scale).

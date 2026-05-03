@@ -1,0 +1,43 @@
+# Dependabot config — weekly security & version updates (Wave 6 Task 10).
+#
+# Closes the Wave 6 spec item: "Dependabot / Renovate config presence."
+#
+# Three ecosystems:
+#   * pip — reads backend/pyproject.toml. Qualis uses `uv` not pip
+#     directly; Dependabot's pip ecosystem still parses pyproject.toml
+#     for direct dependencies and proposes minor / patch upgrades.
+#     Lockfile (uv.lock) is regenerated locally during PR review.
+#   * npm — frontend/package-lock.json is the source of truth.
+#   * github-actions — pinning policy keeps third-party actions on
+#     SHAs (see ci.yml header); Dependabot proposes SHA + comment-tag
+#     updates as the upstream releases new versions.
+#
+# Pull requests are opened in batches; the audit workflow gates merges.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "backend"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci"
