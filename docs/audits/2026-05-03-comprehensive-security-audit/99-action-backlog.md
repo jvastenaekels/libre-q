@@ -221,6 +221,20 @@ Cumulative across all seven waves. Items move through:
   NER/PII-redaction models out of scope for a research instrument). A Wave 4b
   inline-redaction admin UI is filed below. Source:
   `05-consent-anonymisation.md#f-05-003`.
+- F-05-004 (severity=minor) — Audio S3 keys leaked `study_slug` + `participant_token`
+  in the path and as object metadata.
+  **closed** — added `_hashed_audio_prefix` in storage_service; new uploads use
+  `audio/<sha256(slug|token|salt)[:32]>/<timestamp>_<question>.ext`. Stripped
+  slug + participant from the S3 Metadata block (only sanitised question kept
+  for operator debugging). Pre-existing rows retain their legacy keys; the
+  per-row `s3_key` makes both formats addressable for delete/download. Source:
+  `05-consent-anonymisation.md#f-05-004`.
+- F-05-005 (severity=observation) — Audio S3 anonymisation is fail-open; orphan
+  objects survive on S3-side outages. No bucket lifecycle policy.
+  **observation; deferred to operator + Wave 7** — fail-open is the right
+  posture for legal erasure; the bucket-side lifecycle policy must live in
+  S3/Cellar configuration and is documented as operator obligation #5 in the
+  GDPR memo. Source: `05-consent-anonymisation.md#f-05-005`.
 
 ### Wave 4b backlog (deferred)
 

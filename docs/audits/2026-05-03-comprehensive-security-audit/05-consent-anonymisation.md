@@ -356,8 +356,8 @@ Code references for each transition handler:
 |----------|-------|
 | blocker | 0 |
 | major | 1 |
-| minor | 1 |
-| observation | 1 |
+| minor | 2 |
+| observation | 2 |
 
 ## Findings
 
@@ -524,6 +524,108 @@ enhancement).
 
 **Source:** Wave 4 inventory §2.2 (Promise 3 verdict PARTIAL),
 §2.4 PII table row `qsort_entries.card_comment`.
+
+### F-05-004 — Audio S3 keys leak study slug + participant token
+
+**Severity:** minor
+
+**Location:** `backend/app/services/storage_service.py:126` (key construction),
+`:141-145` (object metadata block).
+
+**Vulnerability:** the audio key pattern `audio/{study_slug}/{participant_token}/{timestamp}_{question}{ext}`
+exposed two pieces of data to anyone with `s3:ListBucket` permission:
+- the study slug (existence + per-study object counts)
+- the participant_token (a UUID that, pre-anonymisation, mapped 1:1 to a
+  `participants.session_token` row in the DB — a re-identification key)
+
+The S3 object metadata block additionally stored `study=study_slug,
+participant=str(participant_token), question=question_key`, exposed
+through `HeadObject` to any viewer with the key.
+
+This is a **defence-in-depth concern**, not an application-auth leak:
+- The application never exposes ListBucket to clients; keys are only
+  addressable via `download_object` and `delete_audio` after the auth
+  check.
+- The threat model is operator IAM mis-configuration, S3-side audit
+  log mining, or the operator themselves running list-bucket queries
+  for support purposes.
+- The hardening cost is low and the privacy upside is real.
+
+Severity is **minor** because the leak surface is operator-side, not
+attacker-side via the application; and because anonymisation reliably
+deletes the S3 objects (so post-anonymisation the keys are gone too —
+verified in F-05-005).
+
+**Remediation:**
+- Added `_hashed_audio_prefix(study_slug, participant_token)` in
+  `storage_service.py`. Returns a 32-char hex SHA-256 of
+  `(study_slug | participant_token | IP_HASH_SALT)`. Reuses
+  `IP_HASH_SALT` (one var for the whole GDPR config). Production
+  refuses to start without it.
+- New uploads use `audio/{hashed_prefix}/{timestamp}_{safe_question}{ext}`.
+  A ListBucket viewer sees only opaque hex paths; per-row `s3_key`
+  remains deterministic for delete/download flows.
+- Stripped `study=…, participant=…` from the S3 object metadata block;
+  only `question=safe_question_key` remains (operator debugging
+  context, not a participant identifier).
+- Pre-existing rows retain their legacy keys on disk; anonymisation
+  deletes by the per-row stored `s3_key`, so both formats coexist
+  safely. No migration needed.
+
+**Test:** `backend/tests/security/wave_4/test_audio_s3_keys.py` —
+`TestHashedAudioPrefix` (6 cases pin format, determinism, salt usage,
+study/participant separation), `TestUploadKeyPattern` (2 cases pin
+upload-time key + metadata stripping), `TestHashedPrefixIsStableAcrossRuntimes`
+(1 case pins the input → output mapping verbatim against `hashlib`).
+
+Existing storage-service tests
+(`backend/tests/unit/test_storage_service.py`) updated to assert the
+new pattern.
+
+**Status:** closed.
+
+**Source:** Wave 4 inventory §2.3 stage 3 last paragraph, §2.4 PII
+table row `audio_recordings.s3_key`.
+
+### F-05-005 — Audio S3 lifecycle (operator obligation)
+
+**Severity:** observation
+
+**Location:** `backend/app/services/study_data_service.py:117-130`
+(anonymisation S3 delete loop), bucket-side configuration (operator).
+
+**Concern:** the anonymisation pipeline already deletes every
+`audio_recordings` row's S3 object before nulling the participant's
+PII. Failures are logged at warning level and DB anonymisation
+continues — a **deliberate fail-open posture: a transient S3 outage
+must not block legal erasure**. This means an audio object can
+**orphan in the bucket** if S3 was unavailable during the anonymisation
+call.
+
+A bucket-side **lifecycle policy** (e.g., auto-delete after 365 days)
+would be a defence-in-depth net for orphans, plus a privacy floor for
+any audio that the operator is slow to anonymise. It cannot be shipped
+from application code: it lives in the S3/Cellar bucket configuration
+(JSON / Terraform / web console). Documenting this as **operator
+obligation #5** in the Wave 7 GDPR memo (already drafted in
+§"GDPR-memo material" / "(c) Operator obligations" of this document).
+
+**Remediation: documented; not fixed in code.**
+
+**Test:** `backend/tests/security/wave_4/test_audio_s3_keys.py
+::TestAnonymisationDeletesS3Audio` — pins:
+- every per-participant `audio_recordings` row triggers
+  `storage_service.delete_audio(s3_key)` during anonymisation;
+- the DB anonymisation completes even when S3 deletion raises
+  (fail-open — fail-closed would block legal erasure on infra
+  outage);
+- the `audio_recordings` rows are removed regardless of S3 fate.
+
+**Status:** observation; deferred to operator (S3 lifecycle policy)
++ Wave 7 (memo write-up).
+
+**Source:** Wave 4 inventory §2.3 stage 6 (bullet about fail-open
+posture), §"(c) Operator obligations" item 5.
 
 ## GDPR-memo material (load-bearing for Wave 7)
 
