@@ -279,7 +279,7 @@ mechanism. Filed as **F-04-001** below.
 | blocker | 0 |
 | major | 0 |
 | minor | 0 |
-| observation | 4 |
+| observation | 5 |
 
 ## Findings
 
@@ -383,6 +383,47 @@ it tells the *caller* whether the code is taken, never the participant.
 The regression test exercises both directions plus a static check that the
 handler source still contains `Study.slug == slug` — a future refactor that
 drops the join would break the test.
+
+### F-04-005 — Bulk-export filter correctness (observation)
+
+**Severity:** observation
+**Status:** safe — every export filters by `study_id` at the SQL level;
+no body- or header-trusted tenant claims accepted
+**Files:** `backend/app/routers/admin/exports.py`,
+          `backend/app/routers/admin/studies_import_export.py`,
+          `backend/app/services/study_data_service.py:214-355`,
+          `backend/tests/security/wave_3/test_export_filter.py`
+**Disposition:** false positive — the cross-tenant IDOR harness already
+covered the path-derived case (Task 3); this task widened the inspection
+to body/header inputs and the in-Python participant-JSON filter.
+
+Concern: an export endpoint that accepts a tenant identifier from the
+body, header, or query string would let a member of one study widen the
+result set to siblings or other tenants entirely, exfiltrating raw
+participant payloads at scale.
+
+Reality:
+- All eight admin export endpoints (CSV, PQMethod, R-Kit, dump,
+  participant CSV/JSON/audio, research package) derive `study.id` from
+  `check_study_permission(StudyRole.editor)` (path-bound). No alternate
+  source of `study_id` is read.
+- All `Participant` queries filter `Participant.study_id == study.id`
+  at the SQL level. The participant-id endpoints additionally pin
+  `Participant.id == participant_id` as defence-in-depth.
+- The single in-Python filter — `export_participant_json` (exports.py:240)
+  — calls `StudyDataService.get_study_full_dump(db, study.id)` and then
+  picks the requested `participant_id` from the returned list. Because
+  the upstream dump is already SQL-scoped to `study.id`, the in-Python
+  filter cannot return a participant from another study. The regression
+  test verifies this directly via service-level call.
+- The only non-path query parameter is `include_discussion: bool` on
+  the research-package endpoint — a boolean toggle, not a tenant claim.
+
+The regression test pins five behaviours: cross-study `participant_id`
+on JSON / CSV / audio export → 404; `get_study_full_dump` only returns
+target-study participants; extraneous `?study_id=X&project_id=Y` query
+params do not influence CSV export filename or content (verified via
+Content-Disposition).
 
 ## Resolved since prior
 
