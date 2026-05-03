@@ -9,24 +9,65 @@ form the two-line defense against URL-token leakage (URL → access logs +
 URL → third-party Referer header). The body of consume requests is POST,
 so the only place the token appears is the GET that loads the page,
 which this filter rewrites in the access-log line.
+
+Scope of redaction:
+
+* Sensitive query keys ``token``, ``otp``, ``code`` (case-insensitive).
+  ``token`` covers email-verify / password-reset / 2FA-disable /
+  email-change consume URLs; ``otp`` and ``code`` cover any 2FA-email
+  verification path that happens to surface the code in a query string
+  (defence-in-depth — the code is normally POSTed in the body).
+
+Scope of attachment:
+
+* ``uvicorn.access`` — the access logger that renders every request line
+  (the original target).
+* ``app.middleware.errors`` — formats ``request.url`` directly into 500
+  / IntegrityError / ServiceError lines (lines 95, 153, 182). Without
+  this filter, a 5xx during a token-link consume would log the raw
+  token in the application-error pipeline.
+* ``app.routers.logs`` — the ``frontend_error`` logger that records
+  client-side error reports; their context payloads may include URLs
+  with sensitive query params.
+
+Other application loggers do not currently emit URLs with sensitive
+params; if a future contributor adds one, ``install_access_log_scrub``
+is the single point to extend (see ``_TARGET_LOGGER_NAMES``). Wave 6
+backlog tracks adding a CI lint rule that flags new ``request.url`` /
+``request.query_string`` formatting in non-attached loggers.
 """
 
 import logging
 import re
 
-_TOKEN_RE = re.compile(r"([?&])([Tt]oken)=[^&]*")
+# Match ``?key=…`` or ``&key=…`` for any sensitive key, case-insensitive,
+# stopping at the next ``&`` or end-of-string. The first capture group
+# preserves the separator (``?`` or ``&``); the second preserves the
+# original key casing in the redacted output.
+_TOKEN_RE = re.compile(r"([?&])(token|otp|code)=[^&]*", re.IGNORECASE)
+
+# Loggers that may emit URLs containing sensitive query params. Keep
+# this list narrow: every entry must have an audited reason. See module
+# docstring for the rationale on each.
+_TARGET_LOGGER_NAMES: tuple[str, ...] = (
+    "uvicorn.access",
+    "app.middleware.errors",
+    "app.routers.logs",
+)
 
 
 def scrub_token_query(path_with_query: str) -> str:
-    """Replace `?token=...` (any case) with `?token=REDACTED`."""
+    """Replace ``?token=…`` / ``?otp=…`` / ``?code=…`` (any case) with
+    ``?<key>=REDACTED``. The key casing is preserved so log lines
+    remain visually faithful to the original request."""
     return _TOKEN_RE.sub(r"\1\2=REDACTED", path_with_query)
 
 
 class TokenLogScrubFilter(logging.Filter):
-    """Logging filter applied to the uvicorn access logger.
+    """Logging filter applied to access + selected application loggers.
 
     Mutates the log record's args so the rendered message never contains
-    the raw token value.
+    the raw token / OTP / code value.
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -38,7 +79,11 @@ class TokenLogScrubFilter(logging.Filter):
 
 
 def install_access_log_scrub() -> None:
-    """Attach the scrub filter to uvicorn.access logger. Idempotent."""
-    logger = logging.getLogger("uvicorn.access")
-    if not any(isinstance(f, TokenLogScrubFilter) for f in logger.filters):
-        logger.addFilter(TokenLogScrubFilter())
+    """Attach the scrub filter to every logger in ``_TARGET_LOGGER_NAMES``.
+
+    Idempotent — repeated calls do not stack duplicate filters.
+    """
+    for name in _TARGET_LOGGER_NAMES:
+        logger = logging.getLogger(name)
+        if not any(isinstance(f, TokenLogScrubFilter) for f in logger.filters):
+            logger.addFilter(TokenLogScrubFilter())

@@ -306,7 +306,7 @@ Derived properties consulted from in-scope files:
 |----------|-------|
 | blocker | 0 |
 | major | 6 |
-| minor | 2 |
+| minor | 3 |
 | observation | 3 |
 
 ## Findings
@@ -933,6 +933,92 @@ Derived properties consulted from in-scope files:
   4-test boundary suite — within-leeway `exp`, outside-leeway `exp`,
   within-leeway `iat`, outside-leeway `iat`; one final test pins the
   default leeway to 30s so a future config drift is caught).
+
+### F-03-013 — Log-scrub regex too narrow + applies only to `uvicorn.access`
+
+- **Severity:** minor
+- **Audience:** internal-audit
+- **Location:**
+  - `backend/app/middleware/log_scrub.py:17` (pre-fix regex
+    `([?&])([Tt]oken)=[^&]*` — only `token` / `Token`).
+  - `backend/app/middleware/log_scrub.py:40-44` (pre-fix
+    `install_access_log_scrub` — attaches the filter to
+    `uvicorn.access` only).
+  - `backend/app/middleware/errors.py:95, 153, 182` — three
+    application logger sites that format `request.url` (which
+    includes the query string) directly into 500 / IntegrityError /
+    ServiceError lines.
+- **Tool:** static review + corpus regression test.
+- **Observation:** Two coupled gaps in the URL-token scrubber.
+  - **Regex narrowness.** The pre-fix pattern only matched the
+    `token` and `Token` casings. A request for
+    `?TOKEN=…` (uppercase) or for an alternate key like `?otp=…`
+    or `?code=…` (the 2FA-email verification path could surface a
+    code in a query string in a future endpoint variant)
+    flowed through the access log unredacted. The
+    `Referrer-Policy: no-referrer` defence still blocks third-party
+    leakage, but the access-log line is the second leg of the
+    two-line defence and was a partial pass.
+  - **Logger coverage.** The filter attached only to
+    `uvicorn.access`. `app.middleware.errors` formats
+    `request.url` into three logger lines — the 500 fallback
+    (`global_exception_handler`, line 182), the SQLAlchemy
+    integrity-error path (`sqlalchemy_exception_handler`, line 95),
+    and the generic ServiceError 500 path (line 153). A 5xx during
+    a token-link consume (DB outage, unhandled exception, etc.)
+    therefore wrote the raw token to the application-error
+    pipeline. Severity is **minor** rather than observation
+    because at least one application logger
+    (`app.middleware.errors`) demonstrably emits a URL with the
+    sensitive query param today — not a hypothetical future
+    contributor. `app.routers.logs` (`frontend_error`) is also in
+    scope: client-side error-report payloads may carry path-with-
+    query strings and the same redaction must apply.
+- **Impact:** in operation, the most likely leak path is a 5xx
+  during `/api/email/verify?token=…` or
+  `/api/password/reset/confirm?token=…&k=v` — the token survives
+  in `app.middleware.errors`'s log line for the token's full
+  lifetime (24h verify, 1h reset, 15m 2FA-disable). The exposure
+  scenario is an operator with log access (a deployment
+  prerequisite the threat model already accepts) reading a token
+  before the legitimate user consumes it. With Wave 2 ↑'s tighter
+  single-use semantics (F-03-002 / F-03-010 / F-03-011) the
+  post-consume window is closed, so the residual exposure is the
+  pre-consume window — bounded by token lifetime. Defence-in-
+  depth, not a primary boundary.
+- **Recommendation:** broaden both axes.
+  - Regex: match `token`, `otp`, and `code` keys
+    case-insensitively
+    (`re.compile(r"([?&])(token|otp|code)=[^&]*", re.IGNORECASE)`)
+    and preserve the original key casing in the redacted output
+    so log lines stay visually faithful.
+  - Logger attachment: extend `install_access_log_scrub` to walk
+    a small named list (`_TARGET_LOGGER_NAMES = ("uvicorn.access",
+    "app.middleware.errors", "app.routers.logs")`) and attach the
+    same filter to each. Idempotency is preserved (no duplicate
+    filters on repeated calls). Document the contract in the
+    module docstring so a future contributor adding a new
+    URL-emitting logger has a single place to extend. A CI lint
+    rule that flags new `request.url` / `request.query_string`
+    formatting in non-attached loggers is deferred to Wave 6
+    (build/CI hardening).
+- **Effort:** S — one regex change, one constant added, one
+  attachment loop. No new dependency, no schema change, no
+  behaviour change for legitimate traffic.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** none filed (minor severity, defence-in-
+  depth). The pre-fix gap is reproducible via a 9-case corpus in
+  the regression test (3 cases fail pre-fix on the regex axis;
+  3 more fail pre-fix on the application-logger axis).
+- **Regression test:**
+  `backend/tests/security/wave_2/test_log_scrub.py` (14 tests:
+  9 corpus entries — 6 redact, 3 negative no-ops including the
+  `name=token` value-not-key case; 2 end-to-end filter tests on
+  `LogRecord` for `token` and `otp`; 1 idempotency test;
+  1 attachment test that pins coverage of `app.middleware.errors`
+  and `app.routers.logs`; 1 end-to-end test that emits an
+  `app.middleware.errors` line containing `?token=…` and asserts
+  the rendered message carries `token=REDACTED`).
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 

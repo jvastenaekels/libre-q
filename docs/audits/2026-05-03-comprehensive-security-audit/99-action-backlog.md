@@ -121,6 +121,25 @@ Cumulative across all seven waves. Items move through:
   time via DB unique constraint, not at PATCH time). Pinned by
   `backend/tests/security/wave_2/test_email_change_confirmation.py`
   (10 tests across 6 classes). Source: `03-auth-email-flows.md#f-03-011`.
+- F-03-013 (severity=minor) — Log-scrub regex too narrow + filter
+  attached only to `uvicorn.access`. Pre-fix the regex matched
+  only `token` / `Token` (missing `TOKEN` and alternate keys
+  `otp` / `code`), and only the access logger was filtered —
+  `app.middleware.errors` formatted `request.url` directly into
+  500 / IntegrityError / ServiceError lines so a 5xx during a
+  token-link consume could leak the raw token through the
+  application-error pipeline. **closed** in this PR (Wave 2
+  Task 9): broadened the regex to `(token|otp|code)` with
+  `re.IGNORECASE`, preserved the key casing in the redacted
+  output, and extended `install_access_log_scrub` to attach the
+  same filter to `app.middleware.errors` and `app.routers.logs`
+  in addition to `uvicorn.access` (named list documented in the
+  module docstring). Pinned by
+  `backend/tests/security/wave_2/test_log_scrub.py` (14 tests:
+  9-case corpus including `name=token` value-not-key negative
+  case, idempotency, application-logger attachment, end-to-end
+  redaction through `app.middleware.errors`). Defence-in-depth;
+  no exploit filed. Source: `03-auth-email-flows.md#f-03-013`.
 - F-03-012 (severity=observation) — JWT clock-skew leeway not configured.
   Every `jwt.decode` call ran with the default `leeway=0`: an `exp` that
   had passed by even one millisecond on the verifier's clock, or an
@@ -188,6 +207,16 @@ _pending Wave 4 plan._
 - NEW (severity=observation) — Consider promoting transitive CVE-fixed deps (pygments, python-dotenv,
   requests) to direct entries in `backend/pyproject.toml` with a `>=<fix-version>` floor. Defence-in-depth
   against transitive-constraint drift. Source: Wave 1 review note.
+- NEW (severity=observation) — Add a CI lint rule (semgrep / ast-grep /
+  ruff custom check) that flags new `request.url` /
+  `request.query_string` formatting in loggers not listed in
+  `app.middleware.log_scrub._TARGET_LOGGER_NAMES`. Today the
+  scrubber covers `uvicorn.access`, `app.middleware.errors`, and
+  `app.routers.logs` (the only application loggers that emit URLs);
+  the lint rule prevents a future contributor from quietly
+  introducing a fourth URL-emitting logger that bypasses the
+  scrubber. Pairs with the F-03-013 fix. Source:
+  `03-auth-email-flows.md#f-03-013`.
 
 ## Wave 7 — Deliverables
 _pending Wave 7 plan._
