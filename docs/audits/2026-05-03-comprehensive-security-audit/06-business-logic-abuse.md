@@ -335,12 +335,83 @@ implementer — preference is "do the backend half" (plan line 154).
 |----------|-------|
 | blocker | 0 |
 | major | 0 |
-| minor | 0 |
+| minor | 1 |
 | observation | 0 |
+| n/a | 0 |
 
 ## Findings
 
-_Populated by Tasks 3-9._
+### F-06-001 — Resume-code per-code rate-limit lockout (distributed brute-force)
+
+**Severity:** minor
+
+**Category:** business-logic abuse / rate limiting.
+
+**Location:** `backend/app/routers/participants.py:222-223` (decorators on
+`resume_session`), `backend/app/limiter.py:42-72` (new
+`resume_code_key_func_sync`), `backend/app/resume_codes.py:640-680`
+(code generator).
+
+**Vulnerability:** `GET /api/study/{slug}/resume/{code}` carried only a
+per-IP rate limit of `30/minute`. Resume codes are
+`adjective-noun-NNN` triples drawn from ~100 adjectives × ~100 nouns ×
+900 numeric suffixes ≈ **9 × 10⁶** combinations per locale. A
+distributed brute-forcer paying out across many source IPs is unbounded
+by a per-IP limiter — the per-IP cap only forces the attacker to use
+more sources, not to slow down attempts against one specific
+participant's code. At a sustained 30/minute per IP × 100 IPs =
+3 000/minute = 4.32 M/day, the full 9M space is enumerable in ~2 days.
+Hitting one specific code requires the same campaign with no payoff
+shrinkage from per-IP keying alone.
+
+A correct guess returns the participant's `session_token`,
+`draft_responses`, `last_step_reached`, and `resume_code` itself
+(`ResumeResponse`, `participants.py:276-282`). The `session_token` is
+then sufficient to act as the participant for all write routes
+(`/save-draft`, `/submit`, `/audio/upload`, etc.), so a brute-forced
+code is a full participant takeover.
+
+The cross-study lookup gate from Wave 3 F-04-004 is **still in place**
+(`participants.py:250-254` joins on `Study.slug == slug`); this finding
+addresses a different surface, the per-code rate budget.
+
+**Remediation:** added a second slowapi limit keyed by
+`sha256(slug|code)` at `10/hour` per code, layered on top of the
+existing per-IP `30/minute`. The new key function
+(`limiter.resume_code_key_func_sync`) extracts the path params,
+lowercases the code (mirroring the handler's normalisation), prefixes
+the digest with `resume:` to namespace it on shared limiter storage,
+and falls back to the per-IP key when path params are absent. With
+10 attempts/hour per code, the cost of guessing one specific code in
+the 9M space rises to ~9M / 10 / hour ≈ 100 years — well below the
+threshold of practical concern. The per-IP limit stays so a single
+abusive client can't burn every IP-key budget on the entire user base.
+
+The lockout is **soft** (window-based slowapi limit) rather than a
+DB-backed hard lockout; rationale: a hard lockout against a single
+code creates a denial-of-service amplification (an attacker can force
+a legitimate participant out of their own session by burning their
+code's budget). The 10/hour cap is well above legitimate usage (a
+participant typing their own code with 1-2 typos on resume) but well
+below brute-force throughput.
+
+**Suggested follow-up (deferred):** if telemetry ever shows persistent
+campaigns hitting the per-code cap, escalate to a full DB-backed
+lockout with admin-side reset. Today the slowapi limit is sufficient
+and avoids the schema migration.
+
+**Test:** `backend/tests/security/wave_5/test_resume_code_brute_force.py`
+— 7 cases pin the key-function behaviour (per-(slug,code) isolation,
+case-normalisation, IP-independence, namespace prefix, fallback) and a
+static assertion that the decorator chain on `resume_session`
+includes `key_func=resume_code_key_func_sync`. We don't drive the
+runtime limiter inside the test process — slowapi is disabled in the
+test harness — but the static gate prevents a future refactor from
+silently dropping the per-code limit.
+
+**Status:** closed.
+
+**Source:** Wave 5 inventory §"Resume-code (F-06-001 surface)".
 
 ## Resolved since prior
 
