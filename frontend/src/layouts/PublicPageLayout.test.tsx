@@ -17,7 +17,7 @@ describe('PublicPageLayout', () => {
             </PublicPageLayout>
         );
         expect(screen.getByTestId('page-content')).toBeInTheDocument();
-        // Footer signature: the GitHub icon link with its aria-label
-        expect(screen.getByRole('link', { name: /View source on GitHub/i })).toBeInTheDocument();
+        // Footer signature: the "Powered by Qualis" attribution link to the repo.
+        expect(screen.getByRole('link', { name: /Powered by Qualis/i })).toBeInTheDocument();
     });
 });
