@@ -157,9 +157,19 @@ Prior bug it patched. The `researcher`/`member` rename is mostly cosmetic — wh
 ### Cross-tenant access matrix
 
 **Harness:** `backend/tests/security/wave_3/test_admin_idor_harness.py`
-**Run at commit:** `76aa9804`
-**Wall-clock:** 210s (3m 30s) for 82 parametrised cases + 1 coverage assertion.
-**Result:** 82 passed / 0 failed (out of 89 inventory routes; 7 not applicable, see below).
+**Run at commit:** `76aa9804` (initial); updated after review feedback #1.
+**Wall-clock:** ~141s for 95 parametrised cases + 1 coverage assertion.
+**Result:** 95 passed / 0 failed (82 original A_HEADER/A_SLUG/B cases + 12 new
+B_VALID_HEADER pin-down cases + 1 coverage assertion; 7 routes not applicable, see below).
+
+**B_VALID_HEADER pattern (added in review feedback #1).** For each `A_HEADER` route
+whose path contains a project-scoped object id (concourse id, item id, or tag id), the
+harness adds a second case that sends a *valid* ``X-Project-ID = project_a.id`` header
+(Bob IS a member of A — dep layer accepts) while putting the foreign B-object id in the
+path. The denial must come from the **inline service guard** (e.g.
+``concourse.project_id != project.id``, ``_verify_concourse_ownership``,
+``ConcourseService.delete_tag`` project filter). 12 routes covered; all 12 pass, pinning
+the guards against future refactors that might silently remove them while keeping the dep.
 
 Each row sends a request as Bob (project-A member) targeting a project-B object id (or
 `X-Project-ID` header). The expected response is a 403 (header-based dependency) or
@@ -298,6 +308,15 @@ regression guard: any future change that breaks one of the two membership
 mechanisms (header-based `require_project_role` or slug-based `check_*_permission`)
 or the bespoke inline checks (memos, recruitment-link delete, participant-id
 routes) will surface here before merge.
+
+**B_VALID_HEADER pattern (added after review feedback #1).** 12 additional pin-down
+cases cover the canonical Pattern-B attack vector: Bob sends a valid
+``X-Project-ID = project_a.id`` (dep layer accepts) but a foreign concourse/item/tag
+id from project B in the path. All 12 cases pass, confirming that the inline service
+guards (`concourse.project_id != project.id`, `_verify_concourse_ownership`,
+`ConcourseService.delete_tag` project filter) provide the second line of defence
+independent of the dep layer. Total harness: 82 original + 12 B_VALID_HEADER = 94
+parametrised cases + 1 coverage assertion = 95 tests.
 
 This is filed as an observation — not a finding — because nothing is broken; the
 harness's value is preventing future regressions, not fixing an existing leak.

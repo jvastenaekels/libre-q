@@ -28,6 +28,27 @@ body that satisfies request validation, and the set of denial status
 codes the route may legitimately return. A status code outside the set
 is a candidate finding for Task 4 — the harness records it but does not
 fix anything.
+
+Pattern legend
+--------------
+- **A_HEADER**: Bob sends ``X-Project-ID = project_b.id``. The dep layer
+  (``require_project_role``) rejects because Bob is not a member of B.
+  Tests the *dependency layer* only.
+- **A_SLUG**: harness puts B's slug in the path. ``check_*_permission``
+  finds no membership row for Bob in B's slug-named project → 404.
+- **B**: harness puts B's object id in the path with Bob's bearer. A
+  bespoke inline check resolves the object's parent project and finds no
+  Bob membership → 403/404.
+- **B_VALID_HEADER**: the canonical Pattern-B attack. Bob sends a *valid*
+  ``X-Project-ID = project_a.id`` (he IS a member of A, so the dep layer
+  accepts the request) but supplies a foreign object id from project B in
+  the path (e.g. ``concourse_in_b.id``). Whether the cross-tenant object
+  leaks depends entirely on **inline service guards** (e.g.
+  ``concourses.py:170`` checks ``concourse.project_id != project.id``).
+  These are *pin-down tests* — the inline guards already exist in
+  production; the cases ensure a future refactor that drops a guard while
+  keeping the dependency will surface here before merge.
+  Expected: ``{403, 404}``.
 """
 
 from __future__ import annotations
@@ -41,7 +62,7 @@ from httpx import AsyncClient
 from .conftest import TenancyFixtures
 
 
-Pattern = Literal["A_HEADER", "A_SLUG", "B"]
+Pattern = Literal["A_HEADER", "A_SLUG", "B", "B_VALID_HEADER"]
 
 
 @dataclass(frozen=True)
@@ -63,6 +84,10 @@ class Route:
           on a slug in the path; harness sends B's slug with A's bearer.
         - ``B``: bespoke inline check on an opaque object id in the path;
           harness sends B's object id with A's bearer.
+        - ``B_VALID_HEADER``: pin-down for inline service guards. Harness
+          sends A's id in the ``X-Project-ID`` header (dep layer accepts)
+          but puts B's object id in the path. The inline guard (e.g.
+          ``concourse.project_id != project.id``) must produce 403/404.
     body
         Minimal JSON body satisfying request validation. ``None`` for
         GET / DELETE without a body.
@@ -754,6 +779,118 @@ def _format_path(template: str, fx: TenancyFixtures) -> str:
     return template.format(**fx.path_substitutions_b)
 
 
+# --- B_VALID_HEADER routes — pin-down tests for inline service guards --------
+#
+# These are the canonical Pattern-B attack: Bob sends a *valid*
+# X-Project-ID = project_a.id (dep layer accepts; Bob IS a member of A) but
+# supplies a foreign object id from project B in the path. The inline service
+# guard must catch it and return 403 or 404.
+#
+# Only A_HEADER routes whose path contains a project-scoped object id appear
+# here. Routes with no path id (POST /concourses, GET /concourses, etc.),
+# body-only id routes (studies/import), or superuser-gated routes (users/{id})
+# are not applicable and are omitted.
+
+ROUTES_B_VALID_HEADER: list[Route] = [
+    # concourses.py — tag delete: service filters tag by project.id
+    Route(
+        "DELETE",
+        "/api/admin/concourses/tags/{concourse_tag_in_b_id}",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — GET concourse: concourse.project_id != project.id → 404
+    Route(
+        "GET",
+        "/api/admin/concourses/{concourse_in_b_id}",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — PATCH concourse: service update_concourse checks project.id
+    Route(
+        "PATCH",
+        "/api/admin/concourses/{concourse_in_b_id}",
+        "B_VALID_HEADER",
+        _CONCOURSE_UPDATE_BODY,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — DELETE concourse: concourse.project_id != project.id → 404
+    Route(
+        "DELETE",
+        "/api/admin/concourses/{concourse_in_b_id}",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — POST items: _verify_concourse_ownership(concourse_id, project.id)
+    Route(
+        "POST",
+        "/api/admin/concourses/{concourse_in_b_id}/items",
+        "B_VALID_HEADER",
+        _CONCOURSE_ITEM_CREATE_BODY,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — POST items/bulk: same ownership guard
+    Route(
+        "POST",
+        "/api/admin/concourses/{concourse_in_b_id}/items/bulk",
+        "B_VALID_HEADER",
+        _CONCOURSE_ITEM_BULK_BODY,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — POST items/import: same ownership guard
+    Route(
+        "POST",
+        "/api/admin/concourses/{concourse_in_b_id}/items/import",
+        "B_VALID_HEADER",
+        _CONCOURSE_ITEM_IMPORT_BODY,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — PATCH item: _verify_concourse_ownership + _verify_item_ownership
+    Route(
+        "PATCH",
+        "/api/admin/concourses/{concourse_in_b_id}/items/{concourse_item_in_b_id}",
+        "B_VALID_HEADER",
+        _CONCOURSE_ITEM_UPDATE_BODY,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — DELETE item: same dual ownership guard
+    Route(
+        "DELETE",
+        "/api/admin/concourses/{concourse_in_b_id}/items/{concourse_item_in_b_id}",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — GET item versions: _verify_concourse_ownership + _verify_item_ownership
+    Route(
+        "GET",
+        "/api/admin/concourses/{concourse_in_b_id}/items/{concourse_item_in_b_id}/versions",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — GET item comments: same dual ownership guard
+    Route(
+        "GET",
+        "/api/admin/concourses/{concourse_in_b_id}/items/{concourse_item_in_b_id}/comments",
+        "B_VALID_HEADER",
+        None,
+        frozenset({403, 404}),
+    ),
+    # concourses.py — POST item comment: same dual ownership guard
+    Route(
+        "POST",
+        "/api/admin/concourses/{concourse_in_b_id}/items/{concourse_item_in_b_id}/comments",
+        "B_VALID_HEADER",
+        _CONCOURSE_ITEM_COMMENT_BODY,
+        frozenset({403, 404}),
+    ),
+]
+
+
 @pytest.mark.asyncio
 class TestProjectAMemberCannotAccessProjectBResource:
     """Cross-tenant denial harness over the 89 admin endpoints."""
@@ -803,6 +940,49 @@ class TestProjectAMemberCannotAccessProjectBResource:
             f"Cross-tenant leak candidate: {route.method} {path} "
             f"(pattern={route.pattern}) returned {response.status_code} — "
             f"expected one of {sorted(route.expected)}. "
+            f"Body preview: {response.text[:200]}"
+        )
+
+    @pytest.mark.parametrize(
+        "route",
+        ROUTES_B_VALID_HEADER,
+        ids=lambda r: f"{r.method}_{r.path_template}",
+    )
+    async def test_inline_guard_with_valid_header(
+        self,
+        route: Route,
+        tenancy: TenancyFixtures,
+        client: AsyncClient,
+    ) -> None:
+        """Bob sends a *valid* X-Project-ID (project A) but a foreign path id.
+
+        Pattern: **B_VALID_HEADER** — the dep layer (``require_project_role``)
+        accepts the request because Bob is legitimately a member of A and the
+        ``X-Project-ID`` header names A. The denial must therefore come from
+        the **inline service guard** (e.g. ``concourse.project_id != project.id``
+        or ``_verify_concourse_ownership``). These are pin-down tests: the
+        guards already exist; the cases ensure a future refactor cannot
+        silently remove a guard while keeping the dependency layer intact.
+        """
+        path = _format_path(route.path_template, tenancy)
+        headers = {
+            "Authorization": f"Bearer {tenancy.token_a_member}",
+            "X-Project-ID": str(tenancy.project_a.id),
+        }
+
+        response = await client.request(
+            route.method,
+            path,
+            headers=headers,
+            json=route.body,
+        )
+
+        assert response.status_code in route.expected, (
+            f"Inline-guard leak candidate: {route.method} {path} "
+            f"(pattern={route.pattern}) returned {response.status_code} — "
+            f"expected one of {sorted(route.expected)}. "
+            f"A valid X-Project-ID header was sent; denial must come from "
+            f"the inline service guard, not the dep layer. "
             f"Body preview: {response.text[:200]}"
         )
 
