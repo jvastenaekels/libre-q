@@ -336,7 +336,7 @@ implementer — preference is "do the backend half" (plan line 154).
 | blocker | 0 |
 | major | 0 |
 | minor | 1 |
-| observation | 0 |
+| observation | 1 |
 | n/a | 0 |
 
 ## Findings
@@ -412,6 +412,68 @@ silently dropping the per-code limit.
 **Status:** closed.
 
 **Source:** Wave 5 inventory §"Resume-code (F-06-001 surface)".
+
+### F-06-002 — Draft-responses session-token bearer model (shared-device threat)
+
+**Severity:** observation
+
+**Category:** business-logic abuse / authentication model.
+
+**Location:** `backend/app/routers/participants.py:108-218` (save_draft,
+withdraw_draft, resume_session — all three touch
+`Participant.draft_responses`).
+
+**Observation:** the participant's draft answers are pinned to one
+column (`Participant.draft_responses`) and gated by the
+`session_token` UUID across three routes:
+
+| Route | Auth | Purpose |
+|-------|------|---------|
+| `PUT /save-draft` | `session_token` in body | overwrite draft |
+| `GET /resume/{code}` | resume code in path (returns `session_token`) | read draft |
+| `DELETE /draft?session_token=…` | `session_token` in query | clear draft |
+
+The auth model is purely bearer-by-token: possession of the token =
+the right to read and write the draft. There is no cookie-, JWT-, or
+device-binding layer.
+
+**Threat model.** The brute-force surface is bounded by:
+
+- Wave 3 F-04-004: cross-study lookup is rejected
+  (`participants.py:250-254`, joins on `Study.slug == slug`).
+- Wave 5 F-06-001: per-code rate limit (10/hour layered on the
+  per-IP 30/minute) makes the 9M-entropy resume-code space
+  practically un-enumerable.
+- The `session_token` itself is a `uuid4` (122 bits) with a unique
+  index — directly guessing a token is computationally infeasible.
+
+**What survives is a shared-device threat:** if a participant leaves
+the resume URL on a shared computer (kiosk, library terminal, family
+laptop), the next user who visits `/resume/<code>` receives the
+`session_token` and can read, overwrite, or clear the prior
+participant's draft. The default consent text already addresses this
+by asking participants to complete in one session and to use a
+private device; a Q-methodology study is not a high-value target for
+hijacking (the data is research opinion, not credentials), and
+binding to a device would break the explicit "resume on another
+device" UX promise.
+
+**No code change.** The model is intentional and the consent text
+already covers the residual scenario. Filed as observation so the
+audit trail records the deliberate trade-off.
+
+**Test:** `backend/tests/security/wave_5/test_draft_responses_isolation.py`
+— 8 cases pin (i) the bearer model works for legitimate token
+holders on save/withdraw, (ii) a token from study A on study B's
+slug is rejected (cross-study lookup), (iii) a random/unknown
+token returns 404 on both write paths, (iv) `study.state == active`
+gate fires on save-draft, and (v) a static guard on the participants
+router asserting that no JWT-bearer admin auth (`get_current_user`)
+has been added to the participant flow.
+
+**Status:** closed (observation; pinned by regression test).
+
+**Source:** Wave 5 inventory §"Draft-responses (F-06-002 surface)".
 
 ## Resolved since prior
 
