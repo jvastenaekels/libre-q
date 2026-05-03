@@ -44,6 +44,14 @@ Cumulative across all seven waves. Items move through:
   `backend/tests/security/wave_2/test_consumed_tokens_cleanup.py`. **deferred**
   to Wave 6 supply-chain hardening (Procfile / scheduler wiring). Source:
   `03-auth-email-flows.md#f-03-003`.
+- F-03-004 (severity=major) — OTP brute-force exposure: no per-account 24h cap on
+  wrong verification attempts. Pre-fix attack ceiling = 14 400 guesses/day/account
+  against 6-digit entropy (~1.44 % daily success). **closed** in Wave 2 Task 4:
+  `verify_otp` now sums `attempts` over rows in a rolling 24h window and raises
+  `OTPLockoutError` (HTTP 429 `twofa_locked`) at cap=30, dropping the ceiling to
+  0.003 %. No migration; reuses the existing `attempts` column. Pinned by
+  `backend/tests/security/wave_2/test_otp_brute_force.py` (4 tests). Source:
+  `03-auth-email-flows.md#f-03-004`.
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._

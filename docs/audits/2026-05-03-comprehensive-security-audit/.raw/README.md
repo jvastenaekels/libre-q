@@ -22,4 +22,4 @@ is committed so the audit is auditable.
 
 | File | Finding | PRE-FIX assertion | POST-FIX assertion |
 |------|---------|-------------------|--------------------|
-| _empty for Wave 1_ | | | |
+| `exploits/F-03-004.py` | F-03-004 (OTP brute-force, Wave 2 Task 4) | 100 wrong OTP attempts run unimpeded across 20 issue/verify cycles → script exits 1 | `OTPLockoutError` raised at attempt 30 (cap kicks in) → script exits 0 |

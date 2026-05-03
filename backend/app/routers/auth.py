@@ -33,6 +33,7 @@ from app.utils.email import (
     send_twofa_login_otp,
 )
 from app.services.email_otp_service import (
+    OTPLockoutError,
     OTPRateLimitError,
     invalidate_active_otps,
     issue_otp,
@@ -136,7 +137,27 @@ async def login_for_access_token(
                 send_twofa_login_otp(user.email, code)
                 return Token(requires_2fa=True, channel="email")
 
-            ok = await verify_otp(db, user, x_totp_token)
+            try:
+                ok = await verify_otp(db, user, x_totp_token)
+            except OTPLockoutError as exc:
+                # F-03-004: per-account 24h wrong-attempt cap reached.
+                # The cap check is a read-only SELECT (no row mutation
+                # before the raise), so the session has nothing pending
+                # to roll back. Audit-log the lockout, then 429. The
+                # lockout is rolling — older rows age out of the 24h
+                # window so legitimate users recover without admin
+                # intervention.
+                log_admin_action(
+                    actor_user_id=user.id,
+                    action="twofa_login_locked",
+                    resource="user",
+                    resource_id=user.id,
+                    channel="email",
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="twofa_locked",
+                ) from exc
             await db.commit()
             if not ok:
                 log_admin_action(

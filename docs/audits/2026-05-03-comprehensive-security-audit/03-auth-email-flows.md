@@ -305,7 +305,7 @@ Derived properties consulted from in-scope files:
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
-| major | 0 |
+| major | 1 |
 | minor | 1 |
 | observation | 2 |
 
@@ -427,6 +427,83 @@ Derived properties consulted from in-scope files:
   `backend/tests/security/wave_2/test_consumed_tokens_cleanup.py` (2 tests:
   cleanup deletes only rows older than the cutoff; cleanup against a fresh
   denylist is a no-op).
+
+### F-03-004 — OTP brute-force exposure (no per-account 24h cap)
+
+- **Severity:** major
+- **Audience:** internal-audit
+- **Location:**
+  - `backend/app/services/email_otp_service.py:66-76` (pre-fix `verify_otp`)
+  - `backend/app/routers/auth.py:128-152` (pre-fix `/token` email-channel branch)
+  - `backend/app/core/config.py:77-78` (`TWOFA_EMAIL_OTP_EXPIRE_MINUTES`,
+    `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS`)
+- **Tool:** static review + exploit script
+  (`.raw/exploits/F-03-004.py`)
+- **Observation:** The 6-digit OTP carries ~19.93 bits of entropy
+  (10⁶ codes). Three rate-limit layers operate on the verify path
+  pre-fix: the per-row `attempts >= 5` cap (`email_otp_service.py:70`),
+  the 30 s `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS` resend cooldown
+  (`email_otp_service.py:46-51`), and the IP-keyed `5/minute` slowapi
+  limit on `/token` (`auth.py:79`). None of them caps wrong attempts
+  *per account over a long window*. Once an attacker holds the
+  email/password pair (e.g. via prior breach or password reuse), they
+  can spin a fresh code every 30 s — 2 codes/min × 60 × 24 = 2 880
+  codes/day × 5 attempts/code = **14 400 wrong guesses/day per
+  account**. Against 6-digit entropy that is a ~1.44 % daily success
+  probability and ~9.6 % over a week. The IP limit is irrelevant
+  beyond the first request: the attacker can rotate IPs, and the
+  attack is bound by the per-user cooldown, not the per-IP route limit.
+  Severity is **major** rather than blocker because the attack still
+  requires an authenticated identity (correct email + password); but
+  it punches through 2FA, which is exactly the case 2FA is meant to
+  defend against. The exploit script demonstrates the gap by patching
+  the cooldown to 0 s and running 100 wrong attempts without a single
+  lockout response.
+- **Impact:** an attacker who has a victim's password (post-breach,
+  credential-stuffing, phishing) defeats email-channel 2FA in roughly
+  one week of unattended brute-forcing per account, with no signal to
+  the victim other than 2 880/day login-OTP emails. The login-OTP
+  email contains the plaintext code, so any concurrent mailbox-read
+  attack also lands the code; but the brute-force path bypasses the
+  mailbox channel entirely.
+- **Recommendation:** add a per-account 24h ceiling on wrong
+  verification attempts. Implementation: in `verify_otp`, sum
+  `TwoFAEmailOTPCode.attempts` over rows with `created_at` in the last
+  24h; if the running sum has reached `TWOFA_OTP_WRONG_ATTEMPT_CAP_24H`
+  (default 30), raise `OTPLockoutError` before the per-row
+  branch. The router maps the exception to HTTP 429 with detail
+  `twofa_locked` and emits a `twofa_login_locked` audit row. The cap
+  is a **rolling** window — older rows age out as their `created_at`
+  passes 24h, so legitimate users recover without admin intervention
+  even after a sustained attack. No migration is required: the
+  existing `attempts` column is already a per-row counter.
+  At cap=30 the daily attack ceiling collapses from 14 400 → 30
+  guesses/day, i.e. a 0.003 % daily probability per account.
+  Per-IP rate limits on the OTP-issue path are deliberately **not**
+  added: `/token` is the OTP-issue endpoint, and the existing
+  `5/minute` per-IP limit is already calibrated for legitimate login
+  traffic. Tightening it further would degrade UX for real users
+  while adding no defense the per-account cap doesn't already
+  provide (the per-account cap is account-scoped, so attacker IP
+  rotation does not help). The per-account cap also bounds the
+  pre-fix log-flooding attack (an attacker spinning codes to send
+  thousands of legit-looking 2FA emails to the victim).
+- **Effort:** S — one new helper (`_count_wrong_attempts_24h`),
+  one new exception (`OTPLockoutError`), one new constant
+  (`TWOFA_OTP_WRONG_ATTEMPT_CAP_24H`), one router try/except branch
+  with audit logging; no migration, no schema change.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** `.raw/exploits/F-03-004.py`. PRE-FIX (without
+  the cap) the script runs 100 wrong attempts across 20 issue/verify
+  cycles unimpeded and exits 1. POST-FIX it observes
+  `OTPLockoutError` at attempt 30 and exits 0. The 30 s resend
+  cooldown is patched to 0 s so the script runs in <10 s of
+  wall-clock instead of ~50 minutes.
+- **Regression test:** `backend/tests/security/wave_2/test_otp_brute_force.py`
+  (4 tests: service-layer raise at cap+1; below-cap returns False
+  without raising; router maps to HTTP 429 `twofa_locked`; rolling
+  window — rows older than 24h drop out of the cap and verification
+  resumes).
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 
