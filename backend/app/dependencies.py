@@ -3,7 +3,6 @@
 from collections.abc import Callable, Coroutine
 from typing import TYPE_CHECKING, Annotated, Any, cast
 
-import jwt
 from fastapi import Depends, HTTPException, Path, Query, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
@@ -12,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.config import settings
 from app.database import get_db
 from app.models import (
     Study,
@@ -21,6 +19,7 @@ from app.models import (
     ProjectMember,
     ProjectRole,
 )
+from app.utils.security import decode_access_token
 
 if TYPE_CHECKING:
     from app.models import Project
@@ -32,16 +31,25 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ) -> User:
-    """Validate JWT token and retrieve the current user."""
+    """Validate JWT token and retrieve the current user.
+
+    Beyond the signature/expiry check, we re-validate the token's
+    ``iat`` claim against ``user.password_changed_at`` (F-03-010): a
+    token issued before the user's last password rotation is rejected
+    so a password reset / change effectively kills in-flight access
+    tokens. Legacy tokens (no ``iat`` claim) are treated as iat=0;
+    because ``password_changed_at`` is set at user creation
+    (``server_default=NOW()``), every legacy token is rejected on the
+    first request after this code rolls out. This is the intentional
+    upgrade cliff — legacy holders re-login once.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = decode_access_token(token)
         sub = payload.get("sub")
         if sub is None:
             raise credentials_exception
@@ -55,6 +63,18 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if user is None:
+        raise credentials_exception
+
+    # F-03-010: reject access tokens minted before the user's current
+    # password_changed_at. Legacy tokens with no iat claim default to 0
+    # (epoch) so they are also rejected after the next password change.
+    # Equality (iat == pwa) is allowed: at one-second resolution, an
+    # issue and a rotation occurring in the same wall-clock second
+    # must not invalidate each other (false-rejection guard).
+    token_iat_raw = payload.get("iat")
+    token_iat = int(token_iat_raw) if token_iat_raw is not None else 0
+    pwa_epoch = int(user.password_changed_at.timestamp())
+    if token_iat < pwa_epoch:
         raise credentials_exception
 
     return user

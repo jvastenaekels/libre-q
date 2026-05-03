@@ -487,8 +487,9 @@ class TestEmailVerify:
         from datetime import timedelta
         from app.utils.security import create_email_token
 
+        # F-03-012: expiry must exceed JWT_LEEWAY_SECONDS (default 30s).
         token = create_email_token(
-            "anyone@example.com", "email_verify", timedelta(seconds=-1)
+            "anyone@example.com", "email_verify", timedelta(seconds=-60)
         )
         r = await client.post("/api/email/verify", json={"token": token})
         assert r.status_code == 400
@@ -818,9 +819,10 @@ class TestPasswordReset:
         from app.utils.security import create_email_token
 
         await db.refresh(test_user)
+        # F-03-012: expiry must exceed JWT_LEEWAY_SECONDS (default 30s).
         token = create_email_token(
             test_user.email, "password_reset",
-            expires_delta=timedelta(seconds=-1),
+            expires_delta=timedelta(seconds=-60),
             password_changed_at=test_user.password_changed_at,
         )
         r = await client.post(
@@ -1172,10 +1174,11 @@ class TestTwoFADisableRecovery:
         from app.utils.security import create_email_token
 
         await self._user_with_2fa(db, email="expired-disable@example.com")
+        # F-03-012: expiry must exceed JWT_LEEWAY_SECONDS (default 30s).
         token = create_email_token(
             "expired-disable@example.com",
             "twofa_disable",
-            expires_delta=timedelta(seconds=-1),  # already expired
+            expires_delta=timedelta(seconds=-60),  # past leeway window
         )
 
         r = await client.post("/api/2fa/disable/confirm", json={"token": token})

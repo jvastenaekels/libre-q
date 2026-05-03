@@ -11,7 +11,13 @@ from typing_extensions import Required
 
 from app.core.config import settings
 
-EmailTokenPurpose = Literal["email_verify", "password_reset", "twofa_disable"]
+EmailTokenPurpose = Literal[
+    "email_verify",
+    "password_reset",
+    "twofa_disable",
+    "email_change_confirm",
+    "email_change_cancel",
+]
 
 EMAIL_TOKEN_ISSUER = "qualis"
 EMAIL_TOKEN_AUDIENCE = "auth-email"
@@ -26,6 +32,7 @@ class EmailTokenPayload(TypedDict, total=False):
     iat: Required[int]
     jti: Required[str]
     pwa: int  # password_reset only
+    new_email: str  # email_change_confirm only — anti-tamper anchor
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -46,15 +53,25 @@ def get_password_hash(password: str) -> str:
 def create_access_token(
     subject: str | object, expires_delta: timedelta | None = None
 ) -> str:
-    """Create a JWT access token."""
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+    """Create a JWT access token.
 
-    to_encode = {"exp": expire, "sub": str(subject)}
+    The token carries an ``iat`` (issued-at) claim used by
+    ``dependencies.get_current_user`` to invalidate sessions after a
+    password change. ``iat`` is compared at decode time against the
+    user's current ``password_changed_at``: tokens issued before the
+    rotation are rejected (F-03-010).
+    """
+    now = datetime.now(timezone.utc)
+    if expires_delta:
+        expire = now + expires_delta
+    else:
+        expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode = {
+        "exp": expire,
+        "iat": int(now.timestamp()),
+        "sub": str(subject),
+    }
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
@@ -90,6 +107,25 @@ def create_invitation_token(
     return encoded_jwt
 
 
+def decode_access_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
+    """Decode + validate an access JWT minted by ``create_access_token``.
+
+    Centralises the access-token decode path so the clock-skew leeway
+    (``settings.JWT_LEEWAY_SECONDS``, F-03-012) is applied uniformly.
+    Callers (currently ``dependencies.get_current_user``) layer their
+    own checks on top — sub presence, ``iat`` vs ``password_changed_at``
+    (F-03-010), etc. The return type is `dict[str, Any]` for the same
+    reason as ``decode_invitation_token``: JWT payloads carry untyped
+    wire data and callers downcast individual fields.
+    """
+    return jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        leeway=settings.JWT_LEEWAY_SECONDS,
+    )
+
+
 def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
     """Decode and validate an invitation token.
 
@@ -97,7 +133,12 @@ def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[expli
     untyped wire data; callers downcast individual fields. Using
     `Any` here is a deliberate exception to the strict module rule.
     """
-    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    payload = jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        leeway=settings.JWT_LEEWAY_SECONDS,
+    )
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
     return payload
@@ -108,17 +149,26 @@ def create_email_token(
     purpose: EmailTokenPurpose,
     expires_delta: timedelta,
     password_changed_at: datetime | None = None,
+    new_email: str | None = None,
 ) -> str:
     """Issue a signed JWT for one of the link-based auth-email flows.
 
     For purpose='password_reset', password_changed_at is REQUIRED — its
     epoch-second value is encoded as `pwa` claim and re-validated at
     consume time as replay defense (a rotated password kills the token).
+
+    For purpose='email_change_confirm', new_email is REQUIRED — the
+    requested target address is anchored in the token so an attacker
+    who exfiltrates the link cannot redirect the swap to a different
+    address. The router cross-checks this claim against the user's
+    current ``pending_email`` at consume time (F-03-011).
     """
     if purpose == "password_reset" and password_changed_at is None:
         raise ValueError(
             "password_reset token requires password_changed_at for replay defense"
         )
+    if purpose == "email_change_confirm" and new_email is None:
+        raise ValueError("email_change_confirm token requires new_email anchor")
 
     now = datetime.now(tz=timezone.utc)
     payload: dict[str, Any] = {  # type: ignore[explicit-any]
@@ -132,6 +182,8 @@ def create_email_token(
     }
     if password_changed_at is not None:
         payload["pwa"] = int(password_changed_at.timestamp() * 1_000_000)
+    if new_email is not None:
+        payload["new_email"] = new_email
 
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
@@ -139,7 +191,11 @@ def create_email_token(
 def decode_email_token(
     token: str, expected_purpose: EmailTokenPurpose
 ) -> EmailTokenPayload:
-    """Decode + validate an auth-email JWT. Raises ValueError on any failure."""
+    """Decode + validate an auth-email JWT. Raises ValueError on any failure.
+
+    Applies ``settings.JWT_LEEWAY_SECONDS`` of clock-skew tolerance on
+    both ``exp`` and ``iat`` (F-03-012).
+    """
     try:
         raw = jwt.decode(
             token,
@@ -147,6 +203,7 @@ def decode_email_token(
             algorithms=[settings.ALGORITHM],
             audience=EMAIL_TOKEN_AUDIENCE,
             issuer=EMAIL_TOKEN_ISSUER,
+            leeway=settings.JWT_LEEWAY_SECONDS,
         )
     except jwt.ExpiredSignatureError as e:
         raise ValueError("token expired") from e

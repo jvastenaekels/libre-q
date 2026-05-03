@@ -562,7 +562,7 @@
             "personal": {
                 "title": "Informations personnelles",
                 "email": "Adresse e-mail",
-                "email_locked": "Contactez un administrateur pour modifier.",
+                "email_locked": "La modification de l'e-mail via l'API arrivera bientôt sur cette page ; le support back-end est déjà en place.",
                 "name": "Nom complet",
                 "save": "Enregistrer",
                 "saving": "Enregistrement...",

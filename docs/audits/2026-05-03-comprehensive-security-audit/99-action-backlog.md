@@ -22,8 +22,165 @@ Cumulative across all seven waves. Items move through:
 
 ## Wave 2 — Auth-email flows
 
-- F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT access token lifetime is 8h with no refresh / no revocation on password change.
-  Scheduled for Wave 2. Source: `01-prior-findings-status.md#f-01-010`.
+- F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT lifetime + revocation.
+  **Partially closed**: access-token revocation on password change shipped via F-03-010
+  (commit `94d33870`). The refresh-token rotation half is **deferred to Wave 2b**.
+  Source: `01-prior-findings-status.md#f-01-010`.
+- F-03-001 (severity=observation) — JTI replay race in 2FA-disable confirm.
+  **closed** in Wave 2 Task 3: false positive. Inventory + re-read confirmed the
+  read-then-insert pattern (`is_jti_consumed`) has no production callers; the live
+  gate is the PK-collision pattern in `auth.py:719-722`. Pinned by
+  `backend/tests/security/wave_2/test_jti_replay.py`. Source:
+  `03-auth-email-flows.md#f-03-001`.
+- F-03-002 (severity=observation) — Email-verify and password-reset tokens have no
+  JTI denylist (benign-by-gate). Single-use is enforced by adjacent DB state
+  (`email_verified_at IS NULL` for verify, `pwa` round-trip for reset).
+  **closed** in Wave 2 Task 3: as designed. Pinned by
+  `backend/tests/security/wave_2/test_email_verify_replay.py` and
+  `backend/tests/security/wave_2/test_password_reset_replay.py`. Source:
+  `03-auth-email-flows.md#f-03-002`.
+- F-03-003 (severity=minor) — `consumed_email_tokens` cleanup script not
+  auto-scheduled. Documented operator action in `docs/guides/deployment.md:217-223`;
+  no Procfile or scheduler entry. Volume bound is ~100 KB/year, no security
+  boundary. Cleanup contract pinned by
+  `backend/tests/security/wave_2/test_consumed_tokens_cleanup.py`. **deferred**
+  to Wave 6 supply-chain hardening (Procfile / scheduler wiring). Source:
+  `03-auth-email-flows.md#f-03-003`.
+- F-03-004 (severity=major) — OTP brute-force exposure: no per-account 24h cap on
+  wrong verification attempts. Pre-fix attack ceiling = 14 400 guesses/day/account
+  against 6-digit entropy (~1.44 % daily success). **closed** in commit `60c58005`
+  (Wave 2 Task 4): `verify_otp` now sums `attempts` over rows in a rolling 24h
+  window and raises `OTPLockoutError` (HTTP 429 `twofa_locked`) at cap=30, dropping
+  the ceiling to 0.003 %. No migration; reuses the existing `attempts` column.
+  Pinned by `backend/tests/security/wave_2/test_otp_brute_force.py` (4 tests).
+  Source: `03-auth-email-flows.md#f-03-004`.
+- F-03-005 (severity=major) — `/api/token` enumeration via timing differential.
+  Pre-fix the unknown-email arm skipped `verify_password`, leaking existence at
+  ~339 ms mean delta over N=100. **closed** in commit `f76d0ada` (Wave 2 Task 5):
+  added a fixed decoy bcrypt hash (`_LOGIN_DECOY_HASH`) and run `verify_password`
+  against it on the no-such-user branch; both 401 arms now spend a bcrypt cycle.
+  Pinned by `backend/tests/security/wave_2/test_email_enumeration.py::TestTokenEnumeration`
+  (status+body equality, mean delta < 30 ms). Exploit script:
+  `.raw/exploits/F-03-005.py`. Source: `03-auth-email-flows.md#f-03-005`.
+- F-03-006 (severity=major) — `/api/email/verify/resend` enumeration via timing
+  differential. Pre-fix the bcrypt anti-enum pad sat in the `else` branch only,
+  leaking known-unverified emails at ~533 ms mean delta. **closed** in commit
+  `f76d0ada` (Wave 2 Task 5): moved `get_password_hash` out of `else` so it runs
+  unconditionally, mirroring the password-reset-request pattern. Pinned by
+  `backend/tests/security/wave_2/test_email_enumeration.py::TestVerifyResendEnumeration`.
+  Exploit script: `.raw/exploits/F-03-006.py`.
+  Source: `03-auth-email-flows.md#f-03-006`.
+- F-03-007 (severity=major) — `/api/2fa/disable/request` enumeration via timing
+  differential. Pre-fix same pattern as F-03-006, leaking accounts with email-channel
+  2FA enabled at ~595 ms mean delta. **closed** in commit `f76d0ada` (Wave 2
+  Task 5): moved the `get_password_hash` pad out of `else`. Pinned by
+  `backend/tests/security/wave_2/test_email_enumeration.py::TestTwofaDisableRequestEnumeration`.
+  Exploit script: `.raw/exploits/F-03-007.py`.
+  Source: `03-auth-email-flows.md#f-03-007`.
+- F-03-008 (severity=minor) — `/api/register` enumeration via response body and
+  status (400 `"already exists"` vs 201 user record). **deferred** to Wave 5
+  (business-logic abuse): closing this requires a registration redesign
+  (return 200 always, send distinct emails to existing-vs-new users) which
+  trades enumeration resistance for signup UX — a product decision, not a
+  one-line patch. Bounded today by the `5/minute` per-IP rate limit. Source:
+  `03-auth-email-flows.md#f-03-008`.
+- F-03-009 (severity=observation) — `/api/password/reset/request` residual
+  timing-floor differential. The endpoint is already constant-time at the
+  bcrypt level (correct by design pre-Wave-2); the residual ~130 ms minimum-floor
+  delta comes from JWT signing + email logging on the success branch. Below
+  remediation threshold; the fix would be a refactor moving JWT/email work to
+  a background task. **closed (no code change)** — pinned by
+  `TestPasswordResetRequestEnumeration` in `test_email_enumeration.py`.
+  Source: `03-auth-email-flows.md#f-03-009`.
+- F-03-010 (severity=major) — Access tokens not invalidated by password change.
+  Pre-fix `create_access_token` minted JWTs without `iat`, and
+  `get_current_user` never consulted `password_changed_at`; a leaked bearer
+  token survived the full 8h `ACCESS_TOKEN_EXPIRE_MINUTES` window even after
+  the user explicitly rotated their password. Closes the access-token half
+  of the F-01-010 carry-over. **closed** in commit `94d33870` (Wave 2
+  Task 6): `create_access_token` now embeds `iat`; `get_current_user`
+  rejects tokens with `iat < int(user.password_changed_at.timestamp())`;
+  `change_password` bumps `password_changed_at`. Pinned by
+  `backend/tests/security/wave_2/test_session_invalidation.py` (5 tests).
+  Exploit script: `.raw/exploits/F-03-010.py`. Source:
+  `03-auth-email-flows.md#f-03-010`.
+- F-03-011 (severity=major) — No email-change confirmation flow.
+  Pre-fix `PATCH /me` wrote `user_update.email` straight to `users.email`
+  with no second-factor email loop: no notification to the old address,
+  no token issued to either side, no path back for the legitimate owner.
+  Any transient authenticated-session compromise (XSS, stolen bearer,
+  hijacked browser) converted into permanent account control. **closed**
+  in commit `3fb51da8` (Wave 2 Task 7): added `users.pending_email`
+  column (migration `a3f1c2e9b4d7`); `PATCH /me` now parks the requested
+  address on `pending_email` and dispatches confirm-link to NEW + cancel-link
+  to OLD; new endpoints `/api/email-change/confirm` (swap) and
+  `/api/email-change/cancel` (clear). Confirm token carries `new_email`
+  claim cross-checked against `pending_email` for single-use semantics
+  without JTI denylist. PATCH /me responds uniformly whether the target
+  is free or taken (anti-enumeration; address-taken case fails at confirm
+  time via DB unique constraint, not at PATCH time). Pinned by
+  `backend/tests/security/wave_2/test_email_change_confirmation.py`
+  (10 tests across 6 classes). Source: `03-auth-email-flows.md#f-03-011`.
+- F-03-013 (severity=minor) — Log-scrub regex too narrow + filter
+  attached only to `uvicorn.access`. Pre-fix the regex matched
+  only `token` / `Token` (missing `TOKEN` and alternate keys
+  `otp` / `code`), and only the access logger was filtered —
+  `app.middleware.errors` formatted `request.url` directly into
+  500 / IntegrityError / ServiceError lines so a 5xx during a
+  token-link consume could leak the raw token through the
+  application-error pipeline. **closed** in commit `c0064ecf`
+  (Wave 2 Task 9): broadened the regex to `(token|otp|code)` with
+  `re.IGNORECASE`, preserved the key casing in the redacted
+  output, and extended `install_access_log_scrub` to attach the
+  same filter to `app.middleware.errors` and `app.routers.logs`
+  in addition to `uvicorn.access` (named list documented in the
+  module docstring). Pinned by
+  `backend/tests/security/wave_2/test_log_scrub.py` (14 tests:
+  9-case corpus including `name=token` value-not-key negative
+  case, idempotency, application-logger attachment, end-to-end
+  redaction through `app.middleware.errors`). Defence-in-depth;
+  no exploit filed. Source: `03-auth-email-flows.md#f-03-013`.
+- F-03-012 (severity=observation) — JWT clock-skew leeway not configured.
+  Every `jwt.decode` call ran with the default `leeway=0`: an `exp` that
+  had passed by even one millisecond on the verifier's clock, or an
+  access-JWT `iat` lying in the future on the verifier's clock, was
+  rejected outright. No exploit — operational hygiene: legitimate
+  users on hosts with NTP drift saw false 401s. **closed** in commit
+  `d605e770` (Wave 2 Task 8): added `JWT_LEEWAY_SECONDS=30` config; introduced
+  `decode_access_token` wrapper so the access-JWT path joins the
+  `decode_email_token` / `decode_invitation_token` wrappers; all three
+  wrappers pass `leeway=settings.JWT_LEEWAY_SECONDS` to `jwt.decode`.
+  Pinned by `backend/tests/security/wave_2/test_clock_skew.py`
+  (13 tests across 4 classes: each wrapper gets within-leeway and
+  outside-leeway boundaries on both `exp` and `iat`; default value is
+  pinned at 30s). Source: `03-auth-email-flows.md#f-03-012`.
+
+### Wave 2b — deferred follow-ups (carry-over from Wave 2)
+
+- F-03-011 follow-up — Wire frontend pending-email UX.
+  Status: deferred from Wave 2 (Task 7).
+  Scope: `AccountSettingsPage` to display pending_email hint, cancel-pending-change button,
+  resend-confirmation button, refresh after confirm/cancel webhook.
+  F-03-011 ships the backend dual-confirmation flow but `AccountSettingsPage`
+  still renders the email field as `disabled` (the old "contact an admin to
+  change" UX). Re-enabling email editing in the UI requires: (a) display a
+  "Pending: <new>" hint inline with the email field when `user.pending_email`
+  is set; (b) surface a "cancel pending change" affordance that calls
+  `/api/email-change/cancel` with a token the user receives by email (not in
+  the SPA); (c) surface a "resend confirmation link" affordance (currently
+  achievable by re-submitting `PATCH /me` with the same address — the
+  duplicate-PATCH idempotence guard means the user must edit-then-revert to
+  re-issue, which is awkward); (d) host the `/email-change/confirm` and
+  `/email-change/cancel` consume pages in the SPA so the link in the email
+  lands on a Qualis page rather than a 404. Out of scope for Wave 2 (~30
+  minutes was the threshold; the four-item list above is half a day).
+  Source: `03-auth-email-flows.md#f-03-011` (frontend disposition).
+- F-01-010 refresh-token rotation (deferred from Wave 2 Task 10).
+  Status: deferred to Wave 2b PR.
+  Scope: refresh_tokens table + service + /refresh + /logout endpoints + login
+  response shape change + frontend auto-refresh integration + multi-device session
+  tracking + revocation on password change.
+  Source: `01-prior-findings-status.md#f-01-010`, `03-auth-email-flows.md#f-01-010`.
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._
@@ -32,7 +189,12 @@ _pending Wave 3 plan._
 _pending Wave 4 plan._
 
 ## Wave 5 — Business-logic abuse
-_pending Wave 5 plan._
+
+- F-03-008 (carry-over from Wave 2, severity=minor) — `/api/register` body+status
+  email enumeration. Closing this requires a registration redesign (return 200
+  always, send distinct "you already have an account" vs verification emails)
+  which trades enumeration resistance for signup UX. Source:
+  `03-auth-email-flows.md#f-03-008`.
 
 ## Wave 6 — Supply chain
 
@@ -54,6 +216,16 @@ _pending Wave 5 plan._
 - NEW (severity=observation) — Consider promoting transitive CVE-fixed deps (pygments, python-dotenv,
   requests) to direct entries in `backend/pyproject.toml` with a `>=<fix-version>` floor. Defence-in-depth
   against transitive-constraint drift. Source: Wave 1 review note.
+- NEW (severity=observation) — Add a CI lint rule (semgrep / ast-grep /
+  ruff custom check) that flags new `request.url` /
+  `request.query_string` formatting in loggers not listed in
+  `app.middleware.log_scrub._TARGET_LOGGER_NAMES`. Today the
+  scrubber covers `uvicorn.access`, `app.middleware.errors`, and
+  `app.routers.logs` (the only application loggers that emit URLs);
+  the lint rule prevents a future contributor from quietly
+  introducing a fourth URL-emitting logger that bypasses the
+  scrubber. Pairs with the F-03-013 fix. Source:
+  `03-auth-email-flows.md#f-03-013`.
 
 ## Wave 7 — Deliverables
 _pending Wave 7 plan._

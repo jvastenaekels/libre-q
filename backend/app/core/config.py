@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
     IP_HASH_SALT: str = "CHANGEME-insecure-dev-only"
+    # Clock-skew tolerance for JWT validation (F-03-012). Applied to all
+    # `jwt.decode` paths (access JWT, email-link JWTs, invitation JWT). 30s
+    # is tight enough to bound the post-`exp` replay window and absorb
+    # normal NTP drift between issuer/verifier; raise only if you observe
+    # legitimate validation failures attributable to clock skew.
+    JWT_LEEWAY_SECONDS: int = 30
 
     # Database
     DATABASE_URL: str | None = None
@@ -76,12 +82,27 @@ class Settings(BaseSettings):
     # 2FA — Email OTP channel
     TWOFA_EMAIL_OTP_EXPIRE_MINUTES: int = 5
     TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: int = 30
+    # Per-account brute-force ceiling: total wrong OTP attempts allowed
+    # in a rolling 24h window before verification is locked out for the
+    # account. 30 wrong / day caps the daily brute-force success
+    # probability at 30 / 10^6 = 0.003 %. The window is rolling — once
+    # the oldest contributing rows pass 24h the user can verify again,
+    # no admin intervention required.
+    TWOFA_OTP_WRONG_ATTEMPT_CAP_24H: int = Field(default=30, ge=1)
 
     # Email verification & password-reset token lifetimes
     EMAIL_VERIFICATION_REQUIRED: bool = True
     EMAIL_VERIFY_TOKEN_EXPIRE_HOURS: int = 24
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 1
     TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES: int = 15
+    # Email-change dual-confirmation flow (F-03-011). The confirmation
+    # link goes to the new address and must be short-lived (an attacker
+    # who briefly accesses the new mailbox should not get a multi-day
+    # window). The cancellation link goes to the old address and is
+    # given a longer window so a legitimate owner who is travelling
+    # still has time to react.
+    EMAIL_CHANGE_CONFIRM_TOKEN_EXPIRE_HOURS: int = 1
+    EMAIL_CHANGE_CANCEL_TOKEN_EXPIRE_HOURS: int = 24
 
     # Audio Recording Limits
     AUDIO_MAX_FILE_SIZE_MB: int = 10

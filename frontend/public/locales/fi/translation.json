@@ -562,7 +562,7 @@
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
                 "email": "Sähköpostiosoite",
-                "email_locked": "Pyydä ylläpitäjää muuttamaan.",
+                "email_locked": "Sähköpostin vaihto API:n kautta on tulossa pian tälle sivulle; taustatuki on jo käytössä.",
                 "name": "Koko nimi",
                 "save": "Tallenna",
                 "saving": "Tallennetaan...",

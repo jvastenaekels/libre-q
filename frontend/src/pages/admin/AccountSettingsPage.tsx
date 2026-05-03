@@ -227,7 +227,7 @@ const AccountSettingsPage = () => {
                                             <p className="text-2xs text-slate-400 italic">
                                                 {t(
                                                     'admin.account.personal.email_locked',
-                                                    'Contact an admin to change.'
+                                                    'Email changes via the API are coming soon to this page; backend support is live.'
                                                 )}
                                             </p>
                                         </FormItem>
