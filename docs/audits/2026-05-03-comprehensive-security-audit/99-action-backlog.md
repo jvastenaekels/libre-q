@@ -235,6 +235,37 @@ Cumulative across all seven waves. Items move through:
   posture for legal erasure; the bucket-side lifecycle policy must live in
   S3/Cellar configuration and is documented as operator obligation #5 in the
   GDPR memo. Source: `05-consent-anonymisation.md#f-05-005`.
+- F-05-006 (severity=minor) — Per-participant exports (CSV / JSON / audio) included
+  anonymised rows; `card_comment` (preserved per F-05-003) rode through to follow-up
+  consumers.
+  **closed** in commit `6a81a5f8` — added `Participant.anonymised_at IS NULL` filter
+  to all three per-participant export endpoints in `routers/admin/exports.py`. Bulk
+  exports (CSV/PQMethod/R-Kit/dump/package) intentionally unchanged: analysis exports
+  zero out PII columns but anonymised rows still contribute to factor stats. Source:
+  `05-consent-anonymisation.md#f-05-006`.
+- F-05-007 (severity=observation) — No participant-facing Article 15 self-export
+  endpoint.
+  **observation; deferred to Wave 7** — operator satisfies Art. 15 today via the
+  admin per-participant CSV/JSON endpoints; one-month response window doesn't
+  require a self-service portal. A self-serve `GET /api/study/{slug}/personal-data`
+  is documented as a Wave 7 follow-up. Source: `05-consent-anonymisation.md#f-05-007`.
+- F-05-008 (severity=minor) — Lifecycle mutations (discard / undiscard / per-participant
+  erase / clear_all_participants / participant self-erase) emitted no `log_admin_action`
+  audit row.
+  **closed** in commit `7f736f47` — added audit logging at five sites with mode
+  discriminator (`admin_mediated`, `participant_self`, `bulk_anonymise`). Source:
+  `05-consent-anonymisation.md#f-05-008`.
+- F-05-009 (severity=observation) — Anonymisation-as-Article-17 position.
+  **observation; documented** — anonymised data falls outside GDPR scope per
+  Recital 26 (no longer personal data); Qualis treats anonymisation as the legal
+  Art. 17 endpoint while preserving qsort entries as anonymous research data.
+  No code change. Source: `05-consent-anonymisation.md#f-05-009`.
+- F-05-010 (severity=minor) — Raw `request.client.host` emitted in `frontend_error`
+  logger payload via `routers/logs.py:36-45`.
+  **closed** in commit `8a4c8d6c` — IP now hashed via `hash_ip()` before logging;
+  payload key renamed `ip` → `ip_hash`. Uvicorn access-log raw IP is operator-side
+  fluentd config — documented in Wave 7 GDPR memo §(c) operator obligation #2.
+  Source: `05-consent-anonymisation.md#f-05-010`.
 
 ### Wave 4b backlog (deferred)
 
