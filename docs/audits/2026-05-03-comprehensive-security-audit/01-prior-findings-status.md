@@ -20,7 +20,7 @@ branched from `main`) reflects the post-fix state.
 | F-01-007 | CORS `allow_headers: ["*"]` | major | fixed | `c943cc89` | `backend/app/main.py:154-161` now declares an explicit allow-list: `Authorization`, `Content-Type`, `Accept`, `Accept-Language`, `X-Project-ID`, `X-Requested-With`. |
 | F-01-008 | `i18next-http-backend` path traversal CVE | major | fixed | `c943cc89` | `frontend/package.json` pins `"i18next-http-backend": "^3.0.6"` (≥ 3.0.5). |
 | F-01-009 | `python-multipart` DoS (CVE-2026-40347) | minor | fixed | `728860de` | `backend/pyproject.toml` pins `"python-multipart>=0.0.26"`. |
-| F-01-010 | JWT 8h lifetime, no refresh, no revocation on password change | minor | still-open | — | `ACCESS_TOKEN_EXPIRE_MINUTES = 480` (unchanged in `backend/app/core/config.py:18`). The `pwa` (`password_changed_at` epoch) claim exists on **password-reset** tokens only (`utils/security.py:110-134`); access tokens still have no `password_version`/`pwa` claim, and `dependencies.py` does not re-check on decode. Password change does not invalidate live access tokens. |
+| F-01-010 | JWT 8h lifetime, no refresh, no revocation on password change | minor | partial-fix | `94d33870` | F-03-010 closed access-token side; refresh-token rotation deferred to Wave 2b |
 | F-01-011 | Gitleaks findings are documentation/test false positives | observation | fixed | `894d8a0e` | `.gitleaksignore` covers all 9 prior FPs (canonical AWS sample key + RFC-9562 sample UUIDs in tests/docs) and was extended in Task 4 to also cover the FPs surfaced by re-running gitleaks at the new commit. |
 | F-01-012 | No RGPD Art. 17 individual erasure endpoint | major | fixed | `8678466e` | `DELETE /api/admin/studies/{slug}/participants/{participant_id}/personal-data` exists at `backend/app/routers/admin/studies_participants.py:179-225`, gated on `StudyRole.editor`, calls `StudyDataService.anonymise_participant` which nulls PII columns, deletes audio recordings from S3, rotates `session_token`, and stamps `anonymised_at`. The strategy is anonymisation-rather-than-hard-delete (Q-sort rankings preserved as anonymous research data) — explicitly justified in the docstring. Companion participant-initiated endpoint `DELETE /api/study/{slug}/personal-data` is also referenced. |
 | F-01-013 | CSP `style-src 'unsafe-inline'` | minor | still-open | — | `backend/app/middleware/security.py:27` still emits `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;`. No nonce/hash strategy adopted. The original finding flagged this as a known trade-off (Tailwind utility classes); no remediation has been attempted. |
@@ -30,15 +30,15 @@ branched from `main`) reflects the post-fix state.
 
 ### F-01-010 — JWT access token lifetime is 8 hours with no refresh token mechanism
 
-- **Status:** still-open
-- **Evidence:**
-  - `backend/app/core/config.py:18` — `ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours` (unchanged from the original audit).
-  - `backend/app/utils/security.py:46-60` — `create_access_token` payload is `{"exp": expire, "sub": str(subject)}`; no `pwa`, no `password_version`, no `iat`/`jti` revocation hook.
-  - `backend/app/utils/security.py:28` declares `pwa: int  # password_reset only` — explicitly scoping the password-changed-at claim to password-reset tokens only.
-  - `backend/app/dependencies.py` decode path has no `pwa` re-check against `user.password_changed_at` (the check is only in `routers/auth.py:639-641` for the password-reset confirm endpoint).
-  - `routers/auth.py:646` — when password changes, `user.password_changed_at` is updated, but no token-invalidation broadcast / version bump is performed against access tokens.
-- **Plan:** scheduled for Wave 2 (axis: auth / JWT / sessions) — entry added to
-  `99-action-backlog.md`.
+- **Status:** partial-fix
+- **Access-token side (closed):** commit `94d33870` (Wave 2 F-03-010): `create_access_token`
+  now embeds `iat`; `get_current_user` rejects tokens with `iat < int(user.password_changed_at.timestamp())`;
+  `change_password` bumps `password_changed_at`. Tokens minted before a password change are
+  now invalidated on the next request. See `99-action-backlog.md` Wave 2 entry for F-03-010.
+- **Refresh-token side (deferred):** refresh_tokens table, /refresh + /logout endpoints,
+  login response shape change, frontend auto-refresh, multi-device session tracking,
+  JWT lifetime reduction (8h → 15min) — deferred to Wave 2b PR.
+  See `99-action-backlog.md` Wave 2b section for the deferred work item.
 
 ### F-01-013 — CSP `style-src 'unsafe-inline'` reduces XSS protection
 
@@ -59,8 +59,9 @@ branched from `main`) reflects the post-fix state.
 ## Summary
 
 - fixed: 11
+- partial-fix: 1
 - regressed: 0
-- still-open: 2
+- still-open: 1
 - n/a: 1
 
 Total: 14.

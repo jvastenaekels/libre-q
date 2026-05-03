@@ -307,7 +307,7 @@ Derived properties consulted from in-scope files:
 | blocker | 0 |
 | major | 6 |
 | minor | 3 |
-| observation | 3 |
+| observation | 4 |
 
 ## Findings
 
@@ -1022,10 +1022,16 @@ Derived properties consulted from in-scope files:
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 
-_Status section filled by Task 10._
+**Status:** **partially closed**.
 
-**Status update (2026-05-03):** Access-token half closed by F-03-010
-(commit `94d33870`); refresh-token half pending Task 10.
+- ✅ Access-token revocation on password change — closed by F-03-010 in commit `94d33870`.
+  Tokens issued before `password_changed_at` advances are now rejected by `get_current_user`.
+- ⏭️ Refresh-token rotation, multi-device session tracking, /logout endpoint, JWT lifetime
+  reduction (8h → 15min) — **deferred to Wave 2b PR**. The F-03-010 fix mitigates the
+  immediate compromise-then-reset gap; refresh tokens are the long-term hardening
+  needed to drop access-token lifetime safely.
+
+See `99-action-backlog.md` Wave 2b section for the deferred work item.
 
 ## Resolved since prior
 

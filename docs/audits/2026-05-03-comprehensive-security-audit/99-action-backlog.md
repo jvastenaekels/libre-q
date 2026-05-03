@@ -22,10 +22,10 @@ Cumulative across all seven waves. Items move through:
 
 ## Wave 2 — Auth-email flows
 
-- F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT access token lifetime is 8h with no refresh / no revocation on password change.
-  Scheduled for Wave 2. Access-token revocation half closed by F-03-010
-  (Wave 2 Task 6, commit `94d33870`); refresh-token half pending Wave 2
-  Task 10. Source: `01-prior-findings-status.md#f-01-010`.
+- F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT lifetime + revocation.
+  **Partially closed**: access-token revocation on password change shipped via F-03-010
+  (commit `94d33870`). The refresh-token rotation half is **deferred to Wave 2b**.
+  Source: `01-prior-findings-status.md#f-01-010`.
 - F-03-001 (severity=observation) — JTI replay race in 2FA-disable confirm.
   **closed** in Wave 2 Task 3: false positive. Inventory + re-read confirmed the
   read-then-insert pattern (`is_jti_consumed`) has no production callers; the live
@@ -128,8 +128,8 @@ Cumulative across all seven waves. Items move through:
   `app.middleware.errors` formatted `request.url` directly into
   500 / IntegrityError / ServiceError lines so a 5xx during a
   token-link consume could leak the raw token through the
-  application-error pipeline. **closed** in this PR (Wave 2
-  Task 9): broadened the regex to `(token|otp|code)` with
+  application-error pipeline. **closed** in commit `c0064ecf`
+  (Wave 2 Task 9): broadened the regex to `(token|otp|code)` with
   `re.IGNORECASE`, preserved the key casing in the redacted
   output, and extended `install_access_log_scrub` to attach the
   same filter to `app.middleware.errors` and `app.routers.logs`
@@ -145,8 +145,8 @@ Cumulative across all seven waves. Items move through:
   had passed by even one millisecond on the verifier's clock, or an
   access-JWT `iat` lying in the future on the verifier's clock, was
   rejected outright. No exploit — operational hygiene: legitimate
-  users on hosts with NTP drift saw false 401s. **closed** in this
-  PR (Wave 2 Task 8): added `JWT_LEEWAY_SECONDS=30` config; introduced
+  users on hosts with NTP drift saw false 401s. **closed** in commit
+  `d605e770` (Wave 2 Task 8): added `JWT_LEEWAY_SECONDS=30` config; introduced
   `decode_access_token` wrapper so the access-JWT path joins the
   `decode_email_token` / `decode_invitation_token` wrappers; all three
   wrappers pass `leeway=settings.JWT_LEEWAY_SECONDS` to `jwt.decode`.
@@ -157,7 +157,10 @@ Cumulative across all seven waves. Items move through:
 
 ### Wave 2b — deferred follow-ups (carry-over from Wave 2)
 
-- NEW (severity=observation) — Wire frontend pending-email UX.
+- F-03-011 follow-up — Wire frontend pending-email UX.
+  Status: deferred from Wave 2 (Task 7).
+  Scope: `AccountSettingsPage` to display pending_email hint, cancel-pending-change button,
+  resend-confirmation button, refresh after confirm/cancel webhook.
   F-03-011 ships the backend dual-confirmation flow but `AccountSettingsPage`
   still renders the email field as `disabled` (the old "contact an admin to
   change" UX). Re-enabling email editing in the UI requires: (a) display a
@@ -172,6 +175,12 @@ Cumulative across all seven waves. Items move through:
   lands on a Qualis page rather than a 404. Out of scope for Wave 2 (~30
   minutes was the threshold; the four-item list above is half a day).
   Source: `03-auth-email-flows.md#f-03-011` (frontend disposition).
+- F-01-010 refresh-token rotation (deferred from Wave 2 Task 10).
+  Status: deferred to Wave 2b PR.
+  Scope: refresh_tokens table + service + /refresh + /logout endpoints + login
+  response shape change + frontend auto-refresh integration + multi-device session
+  tracking + revocation on password change.
+  Source: `01-prior-findings-status.md#f-01-010`, `03-auth-email-flows.md#f-01-010`.
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._
