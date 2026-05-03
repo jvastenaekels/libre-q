@@ -22,6 +22,12 @@ def test_pyjwt_rejects_unknown_crit_header() -> None:
     import json
     import jwt
 
+    installed = tuple(int(x) for x in jwt.__version__.split(".")[:2])
+    assert installed >= (2, 12), (
+        f"pyjwt {jwt.__version__} predates the CVE-2026-32597 fix (≥2.12.0). "
+        "Run `uv sync` to pull the locked version."
+    )
+
     secret = "test-secret"
     header = {"alg": "HS256", "crit": ["x-custom-policy"], "x-custom-policy": "x"}
     payload = {"sub": "attacker"}

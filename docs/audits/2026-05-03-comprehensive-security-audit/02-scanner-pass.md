@@ -86,11 +86,11 @@ not formal F-01 findings (pyjwt, pytest, python-multipart already covered).
 - **Audience:** [Prod] [Self-hoster]
 - **Location:** `frontend/package.json` (`xlsx: *`), consumer `frontend/src/utils/analysisXlsxExport.ts:3`
 - **Tool:** npm 11.12.1 (audit)
-- **Observation:** npm audit reports `xlsx` (range `*`) with two high-severity advisories: GHSA-4r6h-8v6p-xvw6 (Prototype Pollution in `_.unset` / `_.omit`, CVSS 7.8) and GHSA-5pgg-2g8v-p4x9 (ReDoS, CVSS 7.5). `fixAvailable: false`. Both require attacker-controlled XLSX **input** to be parsed; Qualis only **writes** XLSX files (`analysisXlsxExport.ts` calls `aoa_to_sheet` / `book_new` / `writeFile`). The test suite does parse XLSX, but only files it has just written. Acceptance is documented in `SECURITY.md:25-29` with a mitigation plan if reachability changes (switch to ExcelJS or vendor SheetJS Pro).
+- **Observation:** npm audit reports `xlsx` (range `*`) with two high-severity advisories: GHSA-4r6h-8v6p-xvw6 (Prototype Pollution in `_.unset` / `_.omit`, CVSS 7.8) and GHSA-5pgg-2g8v-p4x9 (ReDoS, CVSS 7.5). `fixAvailable: false`. Both require attacker-controlled XLSX **input** to be parsed; Qualis only **writes** XLSX files (`analysisXlsxExport.ts` calls `aoa_to_sheet` / `book_new` / `writeFile`). The test suite does parse XLSX, but only files it has just written. Acceptance is documented in `SECURITY.md:25-31` with a mitigation plan if reachability changes (switch to ExcelJS or vendor SheetJS Pro).
 - **Impact:** No reachable exploit path in the current codebase. SoftwareX reviewers, JOSS reviewers, and self-hosters running `npm audit` will see the high-severity flag and need to consult `SECURITY.md` for the rationale. Filing it here gives the audit trail visibility even though no action is taken.
 - **Recommendation:** No-op for this PR. Re-evaluate at any change to `analysisXlsxExport.ts` that adds XLSX **parsing**. Watch for `xlsx` upstream releases or a SheetJS Community fork that publishes a CVE-fix version.
 - **Effort:** L (only if a parsing path is ever added; switch to ExcelJS)
-- **Disposition:** deferred to backlog (accepted risk per SECURITY.md:25-29)
+- **Disposition:** deferred to backlog (accepted risk per SECURITY.md:25-31)
 
 ---
 
@@ -165,7 +165,7 @@ The following items appeared in the 2026-04-25 raw outputs but are absent from t
 - **DOMPurify XSS CVEs** (F-01-005, major) — resolved by commit `c943cc89` (`dompurify ^3.4.1`). No longer in npm-audit.
 - **CORS `allow_headers: ["*"]`** (F-01-007, major) — resolved by commit `c943cc89` (explicit allow-list).
 - **`i18next-http-backend` path traversal** (F-01-008, major) — resolved by commit `c943cc89` (`^3.0.6`). No longer in npm-audit.
-- **`xlsx` accepted-risk documentation** (F-01-006, major) — resolved by commit `c943cc89` (`SECURITY.md:25-29`); the underlying CVEs are still present and re-tracked here as F-02-005 for visibility (severity reduced to minor reflecting the documented non-reachability).
+- **`xlsx` accepted-risk documentation** (F-01-006, major) — resolved by commit `c943cc89` (`SECURITY.md:25-31`); the underlying CVEs are still present and re-tracked here as F-02-005 for visibility (severity reduced to minor reflecting the documented non-reachability).
 - **No RGPD Art. 17 erasure endpoint** (F-01-012, major) — resolved by commit `8678466e` (`DELETE /api/admin/studies/{slug}/participants/{participant_id}/personal-data`).
 - **Gitleaks 9 doc/test false positives** (F-01-011, observation) — resolved by commit `894d8a0e` plus extension in commit `bb3413d3` (`.gitleaksignore` covers AWS canonical sample key + RFC-9562 sample UUIDs).
 - **Bandit `auth.py`/`main.py`/`study_service.py`/`concourse_service.py` low-sev triage** (F-01-014, observation) — no longer reported at the configured threshold (only the two B105 false positives in `security.py` remain, listed below).
@@ -175,5 +175,5 @@ The following items appeared in the 2026-04-25 raw outputs but are absent from t
 
 For visibility (these were reviewed and intentionally not given an `F-02-NNN` ID):
 
-- `bandit B105 backend/app/utils/security.py:16,17` — string literals `'qualis'` and `'auth-email'` are JWT token-type constants used as `aud`/payload type discriminators (`SIGNUP_TOKEN_AUDIENCE`, `AUTH_EMAIL_TOKEN_TYPE`), not passwords. Confirmed false positive; bandit's `B105` is a literal-string heuristic with no semantic awareness.
+- `bandit B105 backend/app/utils/security.py:16,17` — string literals `'qualis'` and `'auth-email'` are the `EMAIL_TOKEN_ISSUER` and `EMAIL_TOKEN_AUDIENCE` JWT claim values, not passwords. Confirmed false positive; bandit's `B105` is a literal-string heuristic with no semantic awareness.
 - `gitleaks` — all 14 hits in this pass are documentation/test false positives (canonical AWS sample key `AKIAIOSFODNN7EXAMPLE` in `docs/guides/s3-setup.md` and `docs/reference/api.md`; RFC-9562 sample UUIDs `123e4567-e89b-12d3-a456-426614174000` and `eadf28c4-…` in `backend/tests/integration/`). Triaged in Task 4; allowlisted via `.gitleaksignore` (final-pass `gitleaks-final.json` is clean). See the file's inline rationales for the full list.

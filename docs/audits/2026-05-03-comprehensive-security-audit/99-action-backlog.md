@@ -14,7 +14,7 @@ Cumulative across all seven waves. Items move through:
 - F-02-004 (severity=observation) — pip 26.0 (CVE-2026-3219 tar/zip confusion).
   **deferred** — no fix-version available upstream as of 2026-05-03. Revisit at Wave 6 dep audit.
 - F-02-005 (severity=minor) — xlsx (Prototype Pollution / ReDoS — no fix available).
-  **deferred** — accepted-risk per `SECURITY.md:25-29` (Qualis writes XLSX only, never parses untrusted input).
+  **deferred** — accepted-risk per `SECURITY.md:25-31` (Qualis writes XLSX only, never parses untrusted input).
 - F-02-008 (severity=observation) — semgrep `avoid-sqlalchemy-text` in `backend/app/routers/test.py` (env-gated test router).
   **deferred** — false positive; env-gated router uses hardcoded literals only, no untrusted input.
 - F-02-009 (severity=observation) — semgrep `avoid-sqlalchemy-text` in operational migration scripts.
@@ -63,6 +63,6 @@ _pending Wave 7 plan._
 Items deferred indefinitely (no target wave scheduled yet, or no upstream fix available):
 
 - F-02-004 (pip 26.0, CVE-2026-3219) — no upstream fix available as of 2026-05-03; see Wave 1 entry.
-- F-02-005 (xlsx Prototype Pollution/ReDoS) — accepted-risk per `SECURITY.md:25-29`; see Wave 1 entry.
+- F-02-005 (xlsx Prototype Pollution/ReDoS) — accepted-risk per `SECURITY.md:25-31`; see Wave 1 entry.
 - F-02-008 (semgrep test-router false positive) — false positive, env-gated; see Wave 1 entry.
 - F-02-009 (semgrep migration-script false positive) — false positive, no untrusted input; see Wave 1 entry.
