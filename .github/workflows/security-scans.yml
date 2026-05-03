@@ -122,7 +122,9 @@ jobs:
         with:
           python-version: "3.13"
       - name: Install semgrep
-        run: pip install semgrep==1.95.0
+        # setuptools is required at runtime by semgrep's pkg_resources usage;
+        # Python 3.12+ slim envs no longer ship it by default.
+        run: pip install --upgrade setuptools && pip install semgrep==1.95.0
       - name: Run semgrep (OWASP Top Ten)
         # --error: exit non-zero on any finding (semgrep's own "error"
         # severity is high+). The OWASP Top Ten ruleset is the spec

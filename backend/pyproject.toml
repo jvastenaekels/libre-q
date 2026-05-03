@@ -348,7 +348,14 @@ warn_return_any = true
 strict_equality = true
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
+# Security-floor pins (Wave 6): pygments, python-dotenv, requests are transitive
+# deps promoted to direct entries to prevent future downgrade past the
+# CVE-fix versions (Wave 1 F-02-001/002/003). They are not imported by app
+# code; the pyproject pin is purely a floor.
+DEP002 = [
+    "asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic",
+    "pygments", "python-dotenv", "requests",
+]
 DEP003 = ["botocore"]  # Transitive dependency of boto3
 
 [tool.importlinter]
