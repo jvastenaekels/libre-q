@@ -25,6 +25,14 @@ dependencies = [
     "numpy>=2.2.0",
     "sentry-sdk[fastapi]>=2.0.0",
     "typing-extensions>=4.12.0",
+    # Wave 1 transitive-CVE floors promoted to direct entries (Wave 6 Task 7).
+    # These are pulled transitively, but pinning here prevents a future
+    # `uv lock` from quietly downgrading below the CVE-fix versions if a
+    # transitive constraint loosens. Backed by tests/security/wave_6/
+    # test_supply_chain_pinning.py::test_pyproject_pins_wave1_cve_floors.
+    "pygments>=2.20.0",       # CVE-2026-4539 floor (Wave 1 F-02-001)
+    "python-dotenv>=1.2.2",   # CVE-2026-28684 floor (Wave 1 F-02-002)
+    "requests>=2.33.0",       # CVE-2026-25645 floor (Wave 1 F-02-003)
 ]
 
 [dependency-groups]
