@@ -335,7 +335,7 @@ implementer — preference is "do the backend half" (plan line 154).
 |----------|-------|
 | blocker | 0 |
 | major | 0 |
-| minor | 2 |
+| minor | 3 |
 | observation | 3 |
 | n/a | 1 |
 
@@ -710,8 +710,113 @@ qsort_entries, same confirmation_code, `already_submitted=True`;
 
 **Source:** Wave 5 inventory §"Submission idempotency (F-06-006 surface)".
 
+### F-06-007 — `/api/register` body+status email enumeration (closes Wave 2 F-03-008)
+
+**Severity:** minor.
+
+**Category:** business-logic abuse / account enumeration.
+
+**Location:**
+`backend/app/routers/auth.py:227-354` (the entire `register_user` body
+was rewritten),
+`backend/app/utils/email.py:153-185` (new
+`send_register_already_registered`).
+
+**Vulnerability:** `POST /api/register` had two body+status oracles
+that disclosed whether a given email was already registered:
+
+- **400 pre-check at `auth.py:256-260`** — a SELECT on `users.email`
+  short-circuited duplicate emails with
+  `HTTPException(400, "A user with this email already exists.")`.
+  The 400 status alone was the enumeration oracle; the detail string
+  corroborated.
+- **409 race fallback at `auth.py:323-331`** — an `IntegrityError`
+  raised in the create path returned
+  `HTTPException(409, "A user with this email likely already exists")`
+  on the rare race where two simultaneous registrations collided on
+  the same email.
+
+The original Wave 2 finding (F-03-008,
+`docs/audits/.../03-auth-email-flows.md:623`) classified this as
+**minor** — the rate limit is `5/minute` per IP, so a campaign at
+the ceiling can enumerate ~7 200 addresses/day per source IP. Bounded,
+but unrecoverable without a redesign that ships uniform responses
+across both arms; that redesign is what F-06-007 carries.
+
+**Remediation (backend half — Wave 5b carries the UX half):**
+
+1. **Always-201 contract.** Both arms (fresh email and already
+   registered) now return `201 Created` with an identical body
+   shape. The synthesized response carries a placeholder `user`
+   (id=0, the submitted email, `is_active=False`, no admin/totp
+   flags) and `requires_email_verification` derived from the
+   operator setting — same value on both arms, so the operator
+   setting itself doesn't leak.
+2. **Out-of-band notification.** A duplicate-email request now
+   dispatches a new email helper,
+   `send_register_already_registered`, to the registered address
+   carrying a single-use password-reset link (with the standard
+   `pwa` claim binding it to the existing account's
+   `password_changed_at`). A legitimate owner who forgot they had
+   an account can recover; an attacker probing the API gets no
+   signal from the response.
+3. **Constant-time bcrypt.** `get_password_hash(user_in.password)`
+   now runs unconditionally before the existence-check SELECT, so
+   the duplicate and fresh arms spend the same wall-clock on the
+   bcrypt cost-12 hash. Without this, a duplicate-email request
+   would short-circuit before bcrypt ran, restoring a timing
+   differential.
+4. **Race fallback folded.** The IntegrityError path now folds
+   into the same anti-enumeration response (dispatches the
+   notification email, returns the generic shape) instead of
+   raising 409.
+5. **Invitation processing skipped on duplicate path.** A
+   duplicate-email request with a valid invitation token does
+   not create the project membership — that would let an attacker
+   accept an invitation to a project as the existing user without
+   proving ownership of the email. The duplicate-email path is
+   strictly notify-and-respond; the legitimate owner can sign in
+   and re-accept the invitation through a separate flow.
+
+The frontend uses `result.requires_email_verification` to navigate
+to the verify-email-sent page; the duplicate path returns
+`requires_email_verification=True` (when verification is active),
+so the user is told "check your email" — the actual email is the
+"you already have an account" notification, which honours the UX.
+
+**UX half deferred to Wave 5b:** the registration page still shows
+an "account created" success message after the always-201 response.
+A more honest "if this email is unregistered, check your inbox to
+verify; if it's registered, check your inbox to recover" copy needs
+i18n updates across en/fr/fi and a confirm-modal review with the
+stakeholders. Frontend message change tracked in Wave 5b backlog.
+
+**Test:**
+`backend/tests/security/wave_5/test_register_enumeration.py` —
+7 cases pin: status equality across arms (both 201), body equality
+modulo the submitted email, no leaked "already exists" string in
+either body, the duplicate arm calls
+`send_register_already_registered` with the registered address +
+reset_url, the fresh arm does not, and two static guards (bcrypt
+runs before SELECT, the prior 400/409 detail strings are gone).
+
+The pre-existing `backend/tests/integration/test_auth.py::TestRegistration`
+suite (53 cases including 11 register-related) was updated:
+`test_register_duplicate_email` now asserts the 201 contract instead
+of 400; all other tests unchanged. Full integration auth suite
+green.
+
+**Status:** closed (backend half). Closes Wave 2 carry-over **F-03-008**.
+
+**Source:** `03-auth-email-flows.md#f-03-008`, Wave 5 inventory
+§"F-03-008 register enumeration (carry-over)".
+
 ## Resolved since prior
 
-_Listed by Task 10 if any prior business-logic findings closed since Wave 2/3/4._
+- **F-03-008** (Wave 2, severity=minor) — `/api/register` body+status
+  email enumeration. **Closed** by F-06-007 above (always-201 contract
+  + out-of-band "you already have an account" email + constant-time
+  bcrypt). Backend half ships in Wave 5; UX half (registration page
+  copy reformulation) deferred to Wave 5b backlog.
 
 ## False positives — not filed
