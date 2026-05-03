@@ -630,7 +630,9 @@ describe('Layout Global Footer', () => {
             </Routes>,
             { initialEntries: ['/study/slug/welcome'] }
         );
-        expect(screen.getByRole('link', { name: 'footer.github_aria' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).toBeInTheDocument();
     });
 
     it('hides the global Footer on /fine-sort', () => {
@@ -640,7 +642,9 @@ describe('Layout Global Footer', () => {
             </Routes>,
             { initialEntries: ['/study/slug/fine-sort'] }
         );
-        expect(screen.queryByRole('link', { name: 'footer.github_aria' })).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
     });
 
     it('hides the global Footer on /rough-sort', () => {
@@ -650,6 +654,8 @@ describe('Layout Global Footer', () => {
             </Routes>,
             { initialEntries: ['/study/slug/rough-sort'] }
         );
-        expect(screen.queryByRole('link', { name: 'footer.github_aria' })).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
     });
 });

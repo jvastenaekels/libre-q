@@ -21,27 +21,29 @@ describe('Footer', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
-    it('renders the AGPLv3 link to the LICENSE file, hidden on small screens', () => {
+    it('renders the AGPLv3 link to the LICENSE file, visible on all screen sizes', () => {
         renderWithProviders(<Footer />);
         const link = screen.getByRole('link', { name: 'AGPLv3' });
         expect(link).toHaveAttribute('href', LICENSE_URL);
         expect(link).toHaveAttribute('target', '_blank');
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-        expect(link.className).toContain('hidden');
-        expect(link.className).toContain('sm:inline');
-    });
-
-    it('renders the GitHub icon link with aria-label', () => {
-        renderWithProviders(<Footer />);
-        const link = screen.getByRole('link', { name: /View source on GitHub/i });
-        expect(link).toHaveAttribute('href', REPO_URL);
-        expect(link).toHaveAttribute('target', '_blank');
-        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+        // Mobile must keep the LICENSE link reachable — no `hidden` class.
+        expect(link.className).not.toContain('hidden');
     });
 
     it('renders the mini Qualis logo as a decorative image', () => {
         renderWithProviders(<Footer />);
         const img = screen.getByAltText('');
         expect(img).toHaveAttribute('src', '/qualis-logo.svg');
+    });
+
+    it('does NOT render a separate GitHub icon link', () => {
+        renderWithProviders(<Footer />);
+        // Only two links remain: the Powered-by attribution and the LICENSE link.
+        // The previous redundant GitHub icon link has been removed.
+        const links = screen.getAllByRole('link');
+        expect(links).toHaveLength(2);
+        // No link is labelled "View source on GitHub" anymore.
+        expect(screen.queryByRole('link', { name: /GitHub/i })).toBeNull();
     });
 });
