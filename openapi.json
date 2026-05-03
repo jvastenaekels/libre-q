@@ -6251,6 +6251,54 @@
         }
       }
     },
+    "/api/study/{slug}/draft": {
+      "delete": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Withdraw Draft",
+        "description": "Participant-initiated withdrawal of in-flight draft responses.\n\nHonours the consent-text promise that \"If you withdraw before\nfinalizing your sort, no partial data will be retained\" by clearing\nthe participant's ``draft_responses`` JSON column on demand. This is\nthe lightweight counterpart to the GDPR Art. 17 self-erase route\n(``DELETE /personal-data``): drafts are pre-submission scratch state,\nnot permanent research data, so a fast self-serve \"I want to start\nover\" path is appropriate.\n\nAuthentication: the ``session_token`` query parameter is the bearer\nof the right \u2014 only someone in possession of the original token\nissued at consent can clear that participant's draft. Same model as\nthe resume flow.\n\nScope: only ``draft_responses`` is cleared. The ``last_step_reached``\ncounter is reset to 1 so the resume flow brings the participant back\nto the start of the Q-sort (consent step is already past). All other\nPII columns (hashed IP, UA, consent_hash, presort_answers,\npostsort_answers) are untouched \u2014 operators who require full\npre-submission erasure should call the Art. 17 ``DELETE\n/personal-data`` route instead, which is also rate-limited and\nidempotent.\n\nIdempotent: repeated calls return 204; a participant whose draft is\nalready empty / already submitted is a no-op (only the\n``draft_responses`` column is rewritten, never row-deleted).",
+        "operationId": "withdraw_draft_api_study__slug__draft_delete",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Study Slug",
+              "description": "The distinct slug of the study"
+            },
+            "description": "The distinct slug of the study"
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/study/{slug}/resume/{code}": {
       "get": {
         "tags": [

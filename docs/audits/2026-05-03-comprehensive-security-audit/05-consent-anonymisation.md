@@ -355,13 +355,77 @@ Code references for each transition handler:
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
-| major | 0 |
+| major | 1 |
 | minor | 0 |
 | observation | 0 |
 
 ## Findings
 
-_Populated as findings are filed by Tasks 3-9._
+### F-05-001 — No pre-submission withdrawal mechanism (consent text false)
+
+**Severity:** major
+
+**Location:** `backend/app/routers/participants.py`, `backend/app/services/study_defaults.py:109` (consent text), `backend/app/models/participant.py:96` (`draft_responses` column).
+
+**Vulnerability:** the default consent text shipped with every Qualis study
+promised "Pre-submission: If you withdraw before finalizing your sort, no
+partial data will be retained." The implementation contradicted this in three
+ways:
+
+1. **No participant-side withdrawal endpoint existed.** The only
+   ``DELETE`` route accessible by ``session_token`` was
+   ``/personal-data`` — a full GDPR Art. 17 erasure that nukes the
+   row's hashed IP, raw UA, presort/postsort/draft answers, audio
+   recordings, etc. Disproportionate for "I want to start over" UX, and
+   non-discoverable as a withdrawal channel (rate-limited 10/min,
+   documented as Art. 17 only).
+2. **Closing the browser left ``draft_responses`` populated.** Every
+   ``PUT /save-draft`` wrote the participant's in-flight free-text
+   answers into ``participants.draft_responses`` (JSON column). Nothing
+   cleared it on abandonment — the row persisted at ``status='started'``
+   forever, with consent_hash, hashed IP, raw UA, and free-text draft
+   data, until manual admin cleanup or study hard-delete.
+3. **No retention sweep for abandoned sessions.** A grep of
+   ``backend/scripts/`` and ``backend/app/`` found only the email-token
+   cleanup (Wave 2) and the memo cleanup; nothing for participant rows.
+   ``Participant.is_expired`` is a property consulted by the resume
+   endpoint to refuse old tokens; it does not delete rows.
+
+The severity is **major** because the consent text — the legal artefact
+the participant agreed to — was actively misleading. The participant
+who closed the browser believing "no partial data will be retained"
+had their hashed IP, UA, consent_hash, ``last_step_reached`` and
+free-text ``draft_responses`` retained indefinitely. This is not a
+data-leakage gap (no extra party gains access), but it is a consent
+integrity gap.
+
+**Remediation:**
+- Added ``DELETE /api/study/{slug}/draft?session_token=…`` — clears
+  ``draft_responses`` to ``None`` and resets ``last_step_reached`` to 1
+  for the matching row. Authenticated by ``session_token`` (same bearer
+  model as resume / save-draft / Art. 17 erasure). Rate-limited
+  ``10/minute``. Idempotent. No-op once the participant has submitted
+  (the consent promise applies pre-submission only).
+- The frontend "I want to start over" UX (button on the resume screen
+  and the post-consent landing) is **deferred to Wave 4b** as an
+  out-of-scope front-end change (>30 min UI work).
+- An operator-side abandoned-draft sweeper script
+  (``scripts/cleanup_abandoned_sessions.py``) is **deferred to Wave 4b**
+  so the consent-text promise also covers participants who never come
+  back to click withdraw. Recommended cadence: weekly cron, removing
+  participants with ``status='started' AND submitted_at IS NULL AND
+  last_step_reached_at < now() - SESSION_TTL_DAYS``.
+
+**Test:** ``backend/tests/security/wave_4/test_withdrawal.py`` —
+5 cases pin the new endpoint behaviour: clears matching row,
+404 on unknown token, 404 on cross-study token reuse, no-op on
+already-submitted, idempotent on repeated calls.
+
+**Status:** closed (backend half); Wave 4b backlog tracks the frontend
+button and the operator sweeper.
+
+**Source:** Wave 4 inventory §2.2 (Promise 2), §2.3 stage 3 + lifecycle
+"close-browser-forever → STUCK" arrow.
 
 ## GDPR-memo material (load-bearing for Wave 7)
 

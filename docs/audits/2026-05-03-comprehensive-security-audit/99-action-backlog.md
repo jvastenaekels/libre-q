@@ -198,7 +198,23 @@ Cumulative across all seven waves. Items move through:
   **deferred to backlog** — `MAX_MEMBERS_PER_PROJECT` defaults to 0 (unlimited) in OSS; over-fill is recoverable post-hoc and not billing-relevant. Recommended fix when revisited: `SELECT … FOR UPDATE` on the project sentinel row, or DB-level cap constraint. Source: `04-multi-tenant-isolation.md#f-04-006`. Filed in commit `14058c16`.
 
 ## Wave 4 — Consent & anonymisation pipeline
-_pending Wave 4 plan._
+
+- F-05-001 (severity=major) — No pre-submission withdrawal mechanism; consent text
+  promised "no partial data will be retained" but `draft_responses` survived
+  abandoned sessions indefinitely.
+  **closed (backend half)** — added `DELETE /api/study/{slug}/draft?session_token=…`
+  in commit `<head>`. Frontend "I want to start over" button and operator-side
+  abandoned-draft sweeper script deferred to Wave 4b. Source:
+  `05-consent-anonymisation.md#f-05-001`.
+
+### Wave 4b backlog (deferred)
+
+- (Wave 4b, frontend) — Add a "Withdraw / Start over" button on the resume screen
+  and the post-consent landing that calls `DELETE /api/study/{slug}/draft`.
+  Requires translation keys (`en`, `fr`, `fi`) and a confirm modal.
+- (Wave 4b, operator) — Add `backend/scripts/cleanup_abandoned_sessions.py` that
+  removes participants with `status='started' AND submitted_at IS NULL AND
+  last_step_reached_at < now() - SESSION_TTL_DAYS`. Recommended cadence: weekly cron.
 
 ## Wave 5 — Business-logic abuse
 
