@@ -107,6 +107,25 @@ def create_invitation_token(
     return encoded_jwt
 
 
+def decode_access_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
+    """Decode + validate an access JWT minted by ``create_access_token``.
+
+    Centralises the access-token decode path so the clock-skew leeway
+    (``settings.JWT_LEEWAY_SECONDS``, F-03-012) is applied uniformly.
+    Callers (currently ``dependencies.get_current_user``) layer their
+    own checks on top — sub presence, ``iat`` vs ``password_changed_at``
+    (F-03-010), etc. The return type is `dict[str, Any]` for the same
+    reason as ``decode_invitation_token``: JWT payloads carry untyped
+    wire data and callers downcast individual fields.
+    """
+    return jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        leeway=settings.JWT_LEEWAY_SECONDS,
+    )
+
+
 def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
     """Decode and validate an invitation token.
 
@@ -114,7 +133,12 @@ def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[expli
     untyped wire data; callers downcast individual fields. Using
     `Any` here is a deliberate exception to the strict module rule.
     """
-    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    payload = jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+        leeway=settings.JWT_LEEWAY_SECONDS,
+    )
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
     return payload
@@ -167,7 +191,11 @@ def create_email_token(
 def decode_email_token(
     token: str, expected_purpose: EmailTokenPurpose
 ) -> EmailTokenPayload:
-    """Decode + validate an auth-email JWT. Raises ValueError on any failure."""
+    """Decode + validate an auth-email JWT. Raises ValueError on any failure.
+
+    Applies ``settings.JWT_LEEWAY_SECONDS`` of clock-skew tolerance on
+    both ``exp`` and ``iat`` (F-03-012).
+    """
     try:
         raw = jwt.decode(
             token,
@@ -175,6 +203,7 @@ def decode_email_token(
             algorithms=[settings.ALGORITHM],
             audience=EMAIL_TOKEN_AUDIENCE,
             issuer=EMAIL_TOKEN_ISSUER,
+            leeway=settings.JWT_LEEWAY_SECONDS,
         )
     except jwt.ExpiredSignatureError as e:
         raise ValueError("token expired") from e

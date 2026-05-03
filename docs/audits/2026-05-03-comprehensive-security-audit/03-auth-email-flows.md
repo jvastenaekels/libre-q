@@ -307,7 +307,7 @@ Derived properties consulted from in-scope files:
 | blocker | 0 |
 | major | 6 |
 | minor | 2 |
-| observation | 2 |
+| observation | 3 |
 
 ## Findings
 
@@ -877,6 +877,62 @@ Derived properties consulted from in-scope files:
   expired confirm token rejected; PATCH /me uniform-by-response
   for taken-vs-free target; second PATCH replaces pending and
   invalidates the prior confirm token).
+
+### F-03-012 — JWT clock-skew leeway not configured
+
+- **Severity:** observation
+- **Audience:** internal-audit
+- **Location:**
+  - `backend/app/utils/security.py:117` (pre-fix `decode_invitation_token`)
+  - `backend/app/utils/security.py:172` (pre-fix `decode_email_token`)
+  - `backend/app/dependencies.py:52` (pre-fix `get_current_user`
+    raw-decode path)
+- **Tool:** static review
+- **Observation:** Every `jwt.decode` call in the backend ran with the
+  default `leeway=0`. A token whose `exp` had passed by even one
+  millisecond on the verifier's clock — or, post-F-03-010, an access
+  token whose `iat` lay in the future on the verifier's clock — was
+  rejected outright. The codebase ran with **no** explicit leeway
+  anywhere (`grep -rn 'leeway' backend/app/` returned zero hits
+  pre-fix). All four token types (access JWT, email-verify JWT,
+  password-reset JWT, 2FA-disable JWT, invitation JWT) shared the same
+  zero-tolerance window. Severity is **observation** rather than minor
+  because no existing leeway value was excessive (the alternative risk
+  case — a >120s leeway widening the post-`exp` replay window — does
+  not exist in this codebase). The finding is operational hygiene: a
+  modest tolerance prevents legitimate-user lockouts from NTP drift
+  without enlarging any meaningful attack window.
+- **Impact:** legitimate users whose browser clock or whose
+  application server's clock drift relative to the issuer (within
+  normal NTP-failure modes — measured single-digit seconds in healthy
+  fleets, occasional tens of seconds during NTP recovery) see false
+  401s on the access-JWT path or false `400 token invalid` on the
+  email-link consume paths. No security boundary is crossed.
+- **Recommendation:** add a `JWT_LEEWAY_SECONDS = 30` config setting
+  and pass it as `leeway=settings.JWT_LEEWAY_SECONDS` to every
+  `jwt.decode` call. 30s is tight enough to bound the post-`exp`
+  replay window (an attacker racing with token expiry gets at most 30
+  extra seconds of validity, well under the existing 5-minute / 15-
+  minute / 1-hour / 8-hour token lifetimes) and loose enough to
+  absorb normal clock drift between issuer and verifier without
+  operator intervention. Centralise the value in a single config
+  setting (no magic-numbered duplicates across decode wrappers) and
+  introduce a `decode_access_token` wrapper in
+  `app/utils/security.py` so the access-JWT path joins the
+  `decode_email_token` / `decode_invitation_token` wrappers — three
+  decode wrappers, one canonical leeway source.
+- **Effort:** S — one config field, one new wrapper, one keyword
+  argument added to two existing wrappers, one import swap in
+  `dependencies.py`.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** none (observation severity; no exploit
+  scenario — the finding closes a UX gap, not a security gap).
+- **Regression test:** `backend/tests/security/wave_2/test_clock_skew.py`
+  (13 tests across 4 classes: `decode_email_token`,
+  `decode_access_token`, `decode_invitation_token` each get a
+  4-test boundary suite — within-leeway `exp`, outside-leeway `exp`,
+  within-leeway `iat`, outside-leeway `iat`; one final test pins the
+  default leeway to 30s so a future config drift is caught).
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 

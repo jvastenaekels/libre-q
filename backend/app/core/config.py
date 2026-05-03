@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
     IP_HASH_SALT: str = "CHANGEME-insecure-dev-only"
+    # Clock-skew tolerance for JWT validation (F-03-012). Applied to all
+    # `jwt.decode` paths (access JWT, email-link JWTs, invitation JWT). 30s
+    # is tight enough to bound the post-`exp` replay window and absorb
+    # normal NTP drift between issuer/verifier; raise only if you observe
+    # legitimate validation failures attributable to clock skew.
+    JWT_LEEWAY_SECONDS: int = 30
 
     # Database
     DATABASE_URL: str | None = None

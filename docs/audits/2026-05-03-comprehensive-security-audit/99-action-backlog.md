@@ -121,6 +121,20 @@ Cumulative across all seven waves. Items move through:
   time via DB unique constraint, not at PATCH time). Pinned by
   `backend/tests/security/wave_2/test_email_change_confirmation.py`
   (10 tests across 6 classes). Source: `03-auth-email-flows.md#f-03-011`.
+- F-03-012 (severity=observation) — JWT clock-skew leeway not configured.
+  Every `jwt.decode` call ran with the default `leeway=0`: an `exp` that
+  had passed by even one millisecond on the verifier's clock, or an
+  access-JWT `iat` lying in the future on the verifier's clock, was
+  rejected outright. No exploit — operational hygiene: legitimate
+  users on hosts with NTP drift saw false 401s. **closed** in this
+  PR (Wave 2 Task 8): added `JWT_LEEWAY_SECONDS=30` config; introduced
+  `decode_access_token` wrapper so the access-JWT path joins the
+  `decode_email_token` / `decode_invitation_token` wrappers; all three
+  wrappers pass `leeway=settings.JWT_LEEWAY_SECONDS` to `jwt.decode`.
+  Pinned by `backend/tests/security/wave_2/test_clock_skew.py`
+  (13 tests across 4 classes: each wrapper gets within-leeway and
+  outside-leeway boundaries on both `exp` and `iat`; default value is
+  pinned at 30s). Source: `03-auth-email-flows.md#f-03-012`.
 
 ### Wave 2b — deferred follow-ups (carry-over from Wave 2)
 

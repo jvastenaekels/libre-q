@@ -91,10 +91,12 @@ class TestCreateEmailToken:
             decode_email_token(forged, expected_purpose="email_verify")
 
     def test_decode_rejects_expired(self):
+        # Must exceed JWT_LEEWAY_SECONDS (default 30s, F-03-012). A
+        # 60-second-old token is unambiguously past the leeway window.
         token = create_email_token(
             email="alice@example.com",
             purpose="email_verify",
-            expires_delta=timedelta(seconds=-1),
+            expires_delta=timedelta(seconds=-60),
         )
         with pytest.raises(ValueError, match="expired"):
             decode_email_token(token, expected_purpose="email_verify")

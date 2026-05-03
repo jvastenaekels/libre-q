@@ -3,7 +3,6 @@
 from collections.abc import Callable, Coroutine
 from typing import TYPE_CHECKING, Annotated, Any, cast
 
-import jwt
 from fastapi import Depends, HTTPException, Path, Query, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
@@ -12,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.config import settings
 from app.database import get_db
 from app.models import (
     Study,
@@ -21,6 +19,7 @@ from app.models import (
     ProjectMember,
     ProjectRole,
 )
+from app.utils.security import decode_access_token
 
 if TYPE_CHECKING:
     from app.models import Project
@@ -49,9 +48,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = decode_access_token(token)
         sub = payload.get("sub")
         if sub is None:
             raise credentials_exception
