@@ -65,3 +65,10 @@ docs/audits/*/.raw/*
 # Stray playwright MCP run dumps (keep ux-audit/ contents)
 .playwright-mcp/page-*.yml
 .playwright-mcp/console-*.log
+
+# Stray Playwright test-report / trace-viewer / snapshot dumps that have
+# leaked to the repo root before — pin them so they cannot be re-committed.
+/index.html
+/trace/
+/data/
+/TODO.md
