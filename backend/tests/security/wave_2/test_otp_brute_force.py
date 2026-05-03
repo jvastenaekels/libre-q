@@ -21,9 +21,10 @@ Post-fix invariant
 ``email_otp_service.verify_otp`` now sums the per-row ``attempts``
 counter over rows created in the last 24h and raises
 ``OTPLockoutError`` once the running total reaches
-``TWOFA_OTP_WRONG_ATTEMPT_CAP_24H`` (30 by default). The sum-based
-window means the cap is independent of how many fresh codes the
-attacker rotates through. The router maps the exception to HTTP 429.
+``settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H`` (30 by default). The
+sum-based window means the cap is independent of how many fresh codes
+the attacker rotates through. The router maps the exception to HTTP
+429.
 
 Tests in this module pin three properties:
 
@@ -46,14 +47,16 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import TwoFAEmailOTPCode, User
 from app.services.email_otp_service import (
     OTPLockoutError,
-    TWOFA_OTP_WRONG_ATTEMPT_CAP_24H,
     issue_otp,
     verify_otp,
 )
 from app.utils.security import get_password_hash
+
+TWOFA_OTP_WRONG_ATTEMPT_CAP_24H = settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H
 
 
 async def _user_with_email_2fa(db: AsyncSession, email: str) -> User:

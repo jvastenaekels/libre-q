@@ -155,6 +155,39 @@ def test_install_attaches_to_application_loggers() -> None:
         )
 
 
+def test_filter_redacts_fstring_msg_when_args_empty() -> None:
+    """The fix for the f-string bypass: when a logger is called with a
+    pre-formatted message string (typical of f-string calls), the filter
+    must rewrite record.msg, not just record.args.
+
+    Pre-fix: f-string call sites in ``app.middleware.errors`` (lines 80,
+    95, 153, 182) passed the rendered URL inside ``record.msg`` with
+    ``record.args`` empty; the filter's ``if record.args and …``
+    short-circuit let the raw token reach handlers. Post-fix the
+    second branch scrubs ``record.msg`` directly.
+    """
+    install_access_log_scrub()
+    target = logging.getLogger("app.middleware.errors")
+    captured: list[logging.LogRecord] = []
+
+    class _Capture(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            captured.append(record)
+
+    h = _Capture()
+    target.addHandler(h)
+    try:
+        url = "/api/email/verify?token=SECRET_JWT"
+        # f-string call: msg is pre-formatted, args is empty
+        target.error(f"Service error on GET {url}: boom")
+        assert len(captured) == 1
+        rendered = captured[0].getMessage()
+        assert "SECRET_JWT" not in rendered, rendered
+        assert "token=REDACTED" in rendered, rendered
+    finally:
+        target.removeHandler(h)
+
+
 def test_application_logger_emits_redacted_url(
     caplog: pytest.LogCaptureFixture,
 ) -> None:

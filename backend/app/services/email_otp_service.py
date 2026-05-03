@@ -11,10 +11,11 @@ same user and enforces a 30-second resend cooldown.
 Brute-force defence (F-03-004): wrong-attempt counter per row caps a
 single code at 5 guesses, but an attacker can rotate fresh codes every
 30s. To prevent ~14k guesses/day per account, ``verify_otp`` also
-enforces a per-account 24h ceiling of 30 wrong attempts (sum of
-``attempts`` across all rows in the last 24h). Once the ceiling is hit,
-``verify_otp`` raises ``OTPLockoutError`` until older rows age out of
-the window.
+enforces a per-account 24h ceiling of wrong attempts (sum of
+``attempts`` across all rows in the last 24h), configured via
+``settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H`` (default 30). Once the
+ceiling is hit, ``verify_otp`` raises ``OTPLockoutError`` until older
+rows age out of the window.
 """
 
 import secrets
@@ -27,14 +28,6 @@ from app.core.config import settings
 from app.models import TwoFAEmailOTPCode, User
 from app.utils.security import get_password_hash, verify_password
 
-# Per-account brute-force ceiling: total wrong OTP attempts allowed in a
-# rolling 24h window before verification is locked out for the account.
-# 30 wrong / day caps the daily brute-force success probability at
-# 30 / 10^6 = 0.003 % (vs 1.44 % at the 14k-attempt baseline). The window
-# is rolling — once the oldest contributing rows pass 24h the user can
-# verify again, no admin intervention required.
-TWOFA_OTP_WRONG_ATTEMPT_CAP_24H: int = 30
-
 
 class OTPRateLimitError(Exception):
     """Raised when issue_otp is called within the resend cooldown window."""
@@ -42,7 +35,8 @@ class OTPRateLimitError(Exception):
 
 class OTPLockoutError(Exception):
     """Raised when ``verify_otp`` is called after the per-account 24h
-    wrong-attempt cap (``TWOFA_OTP_WRONG_ATTEMPT_CAP_24H``) is reached.
+    wrong-attempt cap (``settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H``) is
+    reached.
 
     This is independent from the per-row ``attempts >= 5`` cap: the
     per-row cap kills one code, the 24h cap kills further verification
@@ -113,24 +107,24 @@ async def verify_otp(db: AsyncSession, user: User, code: str) -> bool:
     """Verify a candidate code. Marks used_at on success, increments attempts on failure.
 
     Raises ``OTPLockoutError`` if the per-account 24h wrong-attempt cap
-    (``TWOFA_OTP_WRONG_ATTEMPT_CAP_24H``) has already been reached. The
-    cap is checked **before** this call's attempt is counted — so the
-    Nth-and-final wrong attempt still returns False (incrementing the
-    counter to N), and the (N+1)th call raises. This keeps the failure
-    response identical for legitimate users who happen to mistype on
-    their last allowed attempt; only sustained attack triggers the
-    raise.
+    (``settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H``) has already been
+    reached. The cap is checked **before** this call's attempt is
+    counted — so the Nth-and-final wrong attempt still returns False
+    (incrementing the counter to N), and the (N+1)th call raises. This
+    keeps the failure response identical for legitimate users who
+    happen to mistype on their last allowed attempt; only sustained
+    attack triggers the raise.
     """
     now = datetime.now(tz=timezone.utc)
 
     # Per-account 24h ceiling — checked before the per-row gate so an
     # attacker cannot reset the counter by spinning a fresh row.
+    cap = settings.TWOFA_OTP_WRONG_ATTEMPT_CAP_24H
     wrong_in_window = await _count_wrong_attempts_24h(db, user)
-    if wrong_in_window >= TWOFA_OTP_WRONG_ATTEMPT_CAP_24H:
+    if wrong_in_window >= cap:
         raise OTPLockoutError(
             f"OTP verification locked: {wrong_in_window} wrong attempts in "
-            f"the last 24h (cap {TWOFA_OTP_WRONG_ATTEMPT_CAP_24H}). "
-            "Try again later."
+            f"the last 24h (cap {cap}). Try again later."
         )
 
     row = await _get_active_code(db, user)

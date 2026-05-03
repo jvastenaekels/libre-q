@@ -37,10 +37,11 @@ async def get_current_user(
     ``iat`` claim against ``user.password_changed_at`` (F-03-010): a
     token issued before the user's last password rotation is rejected
     so a password reset / change effectively kills in-flight access
-    tokens. Legacy tokens minted before ``iat`` was added (no claim)
-    are treated as "issued at the epoch" and therefore rejected after
-    any password change — at the cost of forcing legacy holders to
-    re-login once.
+    tokens. Legacy tokens (no ``iat`` claim) are treated as iat=0;
+    because ``password_changed_at`` is set at user creation
+    (``server_default=NOW()``), every legacy token is rejected on the
+    first request after this code rolls out. This is the intentional
+    upgrade cliff — legacy holders re-login once.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -67,9 +68,9 @@ async def get_current_user(
     # F-03-010: reject access tokens minted before the user's current
     # password_changed_at. Legacy tokens with no iat claim default to 0
     # (epoch) so they are also rejected after the next password change.
-    # Equality (iat == pwa) is allowed: a token issued in the same
-    # second the password rotated is still valid (the rotation handler
-    # re-mints credentials in that same handler).
+    # Equality (iat == pwa) is allowed: at one-second resolution, an
+    # issue and a rotation occurring in the same wall-clock second
+    # must not invalidate each other (false-rejection guard).
     token_iat_raw = payload.get("iat")
     token_iat = int(token_iat_raw) if token_iat_raw is not None else 0
     pwa_epoch = int(user.password_changed_at.timestamp())

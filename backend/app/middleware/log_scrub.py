@@ -66,8 +66,19 @@ def scrub_token_query(path_with_query: str) -> str:
 class TokenLogScrubFilter(logging.Filter):
     """Logging filter applied to access + selected application loggers.
 
-    Mutates the log record's args so the rendered message never contains
-    the raw token / OTP / code value.
+    Mutates the log record so the rendered message never contains the
+    raw token / OTP / code value. Handles two distinct call shapes:
+
+    * **Lazy formatting** — ``logger.error("... %s ...", request.url)``.
+      ``record.args`` is a tuple of substitution values; we scrub each
+      string entry. ``record.msg`` carries only the format template
+      (no sensitive value).
+    * **Pre-formatted message** — ``logger.error(f"... {request.url} ...")``
+      or ``logger.error("..." + url)``. ``record.args`` is empty and
+      ``record.msg`` already contains the rendered, sensitive string.
+      We scrub ``record.msg`` directly. This path covers third-party
+      libraries and future contributor mistakes that don't use lazy
+      formatting.
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -75,6 +86,8 @@ class TokenLogScrubFilter(logging.Filter):
             record.args = tuple(
                 scrub_token_query(a) if isinstance(a, str) else a for a in record.args
             )
+        elif isinstance(record.msg, str) and not record.args:
+            record.msg = scrub_token_query(record.msg)
         return True
 
 
