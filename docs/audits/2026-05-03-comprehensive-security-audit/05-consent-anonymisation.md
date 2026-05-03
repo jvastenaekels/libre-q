@@ -356,8 +356,8 @@ Code references for each transition handler:
 |----------|-------|
 | blocker | 0 |
 | major | 1 |
-| minor | 0 |
-| observation | 0 |
+| minor | 1 |
+| observation | 1 |
 
 ## Findings
 
@@ -426,6 +426,104 @@ button and the operator sweeper.
 
 **Source:** Wave 4 inventory §2.2 (Promise 2), §2.3 stage 3 + lifecycle
 "close-browser-forever → STUCK" arrow.
+
+### F-05-002 — `user_agent` stored raw at write time (consent-text gap)
+
+**Severity:** minor
+
+**Location:** `backend/app/services/submission_service.py:79, :132, :361, :442`,
+`backend/app/utils/crypto.py`, `backend/app/models/participant.py:66`.
+
+**Vulnerability:** the consent text promised "Direct identifiers (such as IP
+addresses) are immediately converted into an anonymous code and are never
+stored in their original format." The example list ("such as IP addresses")
+is non-exhaustive. The implementation hashed `participants.ip_address` at
+the service-layer entry point (`hash_ip` at `submission_service.py:53,
+:504`) but persisted `participants.user_agent` raw — on every consent and
+every submit. UA strings carry browser/OS/version detail and on rare
+browsers (or for automation tooling minting unusual strings) can be a
+quasi-identifier. Anonymisation did NULL the column, so the gap was
+write-time only — but every non-anonymised participant row carried a raw,
+re-identifiable UA string for as long as the operator delayed their
+retention sweep.
+
+Severity is **minor** because:
+- UA strings are quasi-identifiers, not direct PII (IP, email).
+- The pre-existing `is_discarded` and `anonymised_at` lifecycle still
+  contained the data correctly under operator policy.
+- The defence-in-depth fix is straightforward (hash at write, mirroring
+  the IP path).
+
+But it is a **consent-integrity gap**: the participant who read the
+consent text and saw "such as IP addresses" had a reasonable expectation
+that the same treatment applied to the only other direct technical
+identifier the platform captures.
+
+**Remediation:**
+- Added `hash_user_agent(ua)` in `backend/app/utils/crypto.py`. Format:
+  `"<device_class>:<sha256[:56]>"` where `device_class` is `"mobile"` or
+  `"desktop"` (substring heuristic on the raw UA, case-insensitive). The
+  class prefix preserves the existing per-study device-breakdown stat
+  (`StudyDataService.get_study_stats`) which uses the same substring
+  heuristic. Reuses `IP_HASH_SALT` (one variable for the whole GDPR config)
+  and refuses to start in production without it.
+- `record_consent` and `process_submission` both call `hash_user_agent` at
+  the entry point; no raw UA reaches the `participants` table from any
+  application path.
+- Pre-existing rows are unaffected (non-additive backfill would require a
+  schema migration; deferred to operator at next anonymisation pass — a
+  bulk-anonymise covers all existing rows).
+- The CSV export's `User_Agent` column now emits the hashed value; the
+  format `"mobile:abc..."` is self-describing.
+
+**Test:** `backend/tests/security/wave_4/test_anonymisation_pipeline.py`
+— `TestHashUserAgent` (8 cases pin format, determinism, salt usage, no
+leakage of raw UA into the hash); `TestWriteTimeHashing` (2 cases pin
+the entry-point hashing in `record_consent`).
+
+**Status:** closed.
+
+**Source:** Wave 4 inventory §2.2 (Promise 1, gap 2), §2.3 stage 2,
+§2.4 PII table row `participants.user_agent`.
+
+### F-05-003 — `qsort_entries.card_comment` preserved through anonymisation
+
+**Severity:** observation
+
+**Location:** `backend/app/services/study_data_service.py:73-160` (anonymisation
+path); `backend/app/models/participant.py:142` (`card_comment` column).
+
+**Vulnerability:** when `StudyDataService.anonymise_participant` runs, it
+clears the participant's `presort_answers` and `postsort_answers` blobs
+(set to `{}`) but does not touch `qsort_entries.card_comment`. A
+participant who wrote PII into a per-card comment ("My address is 12 Main
+St…") has that text preserved verbatim and exposed in CSV / R-kit /
+PQMethod exports of the post-anonymisation row.
+
+This is **defensible as a documented operator obligation**, not a code
+bug: the consent text itself flags it ("Qualitative comments may be
+quoted to contextualize these factors but will be screened to remove
+revealing details"). Qualis cannot do the screening programmatically —
+it would require NER / PII-redaction models that are out of scope for a
+research instrument. The screening is the researcher's job.
+
+**Remediation: documented as operator obligation; NOT fixed in code.**
+- The Wave 7 GDPR memo for self-hosters lists card-comment screening as
+  operator obligation #4 (already drafted in §"GDPR-memo material" /
+  "(c) Operator obligations" of this document).
+- A Wave 4b enhancement could ship an admin UI for inline card-comment
+  redaction (researcher reviews each comment, marks each as keep / scrub /
+  pseudonymise). Filed in Wave 4b backlog.
+
+**Test:** `backend/tests/security/wave_4/test_anonymisation_pipeline.py`
+— `TestAnonymisationPipeline.test_card_comment_preserved_as_research_data`
+pins the current behaviour so an accidental future wipe surfaces in CI.
+
+**Status:** observation; deferred (operator obligation + Wave 4b UI
+enhancement).
+
+**Source:** Wave 4 inventory §2.2 (Promise 3 verdict PARTIAL),
+§2.4 PII table row `qsort_entries.card_comment`.
 
 ## GDPR-memo material (load-bearing for Wave 7)
 

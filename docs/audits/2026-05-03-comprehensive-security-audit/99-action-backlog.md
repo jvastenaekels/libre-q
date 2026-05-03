@@ -203,9 +203,24 @@ Cumulative across all seven waves. Items move through:
   promised "no partial data will be retained" but `draft_responses` survived
   abandoned sessions indefinitely.
   **closed (backend half)** — added `DELETE /api/study/{slug}/draft?session_token=…`
-  in commit `<head>`. Frontend "I want to start over" button and operator-side
+  in commit `9679e564`. Frontend "I want to start over" button and operator-side
   abandoned-draft sweeper script deferred to Wave 4b. Source:
   `05-consent-anonymisation.md#f-05-001`.
+- F-05-002 (severity=minor) — `user_agent` stored raw at write time, contradicting
+  the consent text's "such as IP addresses" non-exhaustive direct-identifier
+  promise.
+  **closed** — added `hash_user_agent` (SHA-256 + IP_HASH_SALT, prefixed with
+  `"mobile"`/`"desktop"` device class to preserve the per-study device
+  breakdown). Hashing now happens at the `record_consent` and `process_submission`
+  entry points; no raw UA reaches the participants table. Source:
+  `05-consent-anonymisation.md#f-05-002`.
+- F-05-003 (severity=observation) — `qsort_entries.card_comment` preserved through
+  anonymisation; participant-supplied free text may contain PII.
+  **observation; deferred** — documented as operator screening obligation per
+  the consent text; cannot be fixed programmatically (would require
+  NER/PII-redaction models out of scope for a research instrument). A Wave 4b
+  inline-redaction admin UI is filed below. Source:
+  `05-consent-anonymisation.md#f-05-003`.
 
 ### Wave 4b backlog (deferred)
 
@@ -215,6 +230,10 @@ Cumulative across all seven waves. Items move through:
 - (Wave 4b, operator) — Add `backend/scripts/cleanup_abandoned_sessions.py` that
   removes participants with `status='started' AND submitted_at IS NULL AND
   last_step_reached_at < now() - SESSION_TTL_DAYS`. Recommended cadence: weekly cron.
+- (Wave 4b, frontend) — Inline card-comment redaction admin UI: researcher
+  reviews each comment per-participant before export, marks each as keep /
+  scrub / pseudonymise. Out of scope for the backend-only audit PR. Source:
+  F-05-003.
 
 ## Wave 5 — Business-logic abuse
 
