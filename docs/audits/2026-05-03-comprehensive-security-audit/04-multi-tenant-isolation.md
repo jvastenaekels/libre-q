@@ -18,7 +18,145 @@ No carry-overs from Wave 1 or Wave 2 — fresh ground.
 
 ## Inventory
 
-_Filled by Task 2 (admin endpoint table) and Task 3 (cross-tenant access matrix)._
+### Admin endpoint inventory
+
+89 endpoints across 12 router modules (counted by `grep -cE '@router\.(get|post|put|patch|delete)' backend/app/routers/admin/*.py`).
+
+**Pattern legend:**
+
+- **A — Project-scoped via path or header.** Project membership is verified by a single dependency (`check_project_permission(slug)`, `check_study_permission(slug)`, `require_project_role(role)`, or `get_current_project`). The dependency joins `ProjectMember` against the URL's project/study slug or the `X-Project-ID` header. Cross-tenant leakage is only possible if the dependency itself is broken.
+- **B — Object-scoped via path** (path carries an opaque object id like `{participant_id}`, `{eid}`, `{cid}`, `{tag_id}`, `{link_id}`, `{user_id}` without a co-located project/study slug, or carries `{cid}`/`{sid}` for memos). Handler must look up the object's parent project, then check membership. **Highest-risk pattern.** Each of these warrants per-route harness coverage.
+- **C — Top-level enumeration / global** (`/api/admin/projects` list, `/api/admin/users`, invitation accept/verify, `/admin/memo/templates`, `/api/admin/studies/validate-import`, `/api/admin/studies/import`). Filtering or auth must happen in-handler.
+
+`role_dep` notation: `member+` = member-or-higher (member, owner). `editor+` = StudyRole editor or above (mapped from project member/owner). `superuser` = `check_superuser` only. `auth` = only `get_current_user` runs (membership check is inline).
+
+| Method | Path | Source file:line | Pattern | role_dep | Project-scoping mechanism | Notes |
+|---|---|---|---|---|---|---|
+| GET | /api/admin/projects | projects.py:41 | C | auth | filter `WHERE ProjectMember.user_id = current_user.id` | enumeration scoped to caller's memberships |
+| POST | /api/admin/projects | projects.py:85 | C | auth | new project, owner-quota gated via `assert_can_create_owned_project` | |
+| GET | /api/admin/projects/{slug} | projects.py:159 | A | auth | inline join `Project.slug + ProjectMember.user_id` (404 if no membership) | role used only for response payload |
+| PATCH | /api/admin/projects/{slug} | projects.py:195 | A | owner | `check_project_permission(owner)` | |
+| GET | /api/admin/projects/{slug}/members | projects.py:253 | A | viewer+ | `check_project_permission(viewer)` | |
+| PATCH | /api/admin/projects/{slug}/members/{user_id} | projects.py:286 | A | owner | `check_project_permission(owner)`; rejects `role=owner` (`OWNER_ROLE_IMMUTABLE`) | |
+| DELETE | /api/admin/projects/{slug}/members/{user_id} | projects.py:347 | A | owner | `check_project_permission(owner)` + self-removal guard | |
+| DELETE | /api/admin/projects/{slug} | projects.py:399 | A | owner | `check_project_permission(owner)`; refuses if studies remain | |
+| POST | /api/admin/projects/{slug}/invitations | projects.py:449 | A | owner | `check_project_permission(owner)`; quota-gated (`assert_can_add_member`); rejects `role=owner` | |
+| GET | /api/admin/invitations/verify | invitations.py:18 | C | none | unauthenticated; decodes JWT-ish invitation token | leaks `project_name` if token valid; expected behaviour |
+| POST | /api/admin/invitations/accept | invitations.py:53 | C | auth | token email must equal `current_user.email`; quota-gated | adds caller as member |
+| GET | /api/admin/recruitment/{slug}/links | recruitment.py:22 | A | viewer+ | `check_study_permission(viewer)` | |
+| POST | /api/admin/recruitment/{slug}/links | recruitment.py:31 | A | editor+ | `check_study_permission(editor)` | |
+| DELETE | /api/admin/recruitment/links/{link_id} | recruitment.py:58 | B | editor+ (inline) | inline join `RecruitmentLink → Study → ProjectMember` + ROLE_MAP/STUDY hierarchy check | bespoke inline check; review carefully |
+| GET | /api/concourses/{cid}/memo | memos.py:118 | B | viewer+ | `db.get(Concourse, cid)` then `_check_member(c.project_id, viewer)` | path is `/api/admin/concourses/{cid}/memo` (memos router carries its own `/admin` prefix and is mounted at `/api`) |
+| GET | /api/admin/studies/{sid}/memo | memos.py:136 | B | viewer+ | `db.get(Study, sid)` then `_check_member(s.project_id, viewer)` | sid is **integer id**, not slug — distinct from other studies/{slug} routes |
+| GET | /api/admin/concourses/{cid}/memo/unread | memos.py:154 | B | viewer+ | same as above, plus ISO-8601 cutoff | |
+| GET | /api/admin/studies/{sid}/memo/unread | memos.py:181 | B | viewer+ | same | sid integer id |
+| GET | /api/admin/memo/templates | memos.py:208 | C | auth | none — returns static template list | parent_type query arg only |
+| POST | /api/admin/concourses/{cid}/memo/entries | memos.py:219 | B | member+ | `db.get(Concourse, cid)` then `_check_member(c.project_id, member)` | |
+| POST | /api/admin/studies/{sid}/memo/entries | memos.py:248 | B | member+ | `db.get(Study, sid)` then `_check_member(s.project_id, member)` | sid integer id |
+| PATCH | /api/admin/memo-entries/{eid} | memos.py:277 | B | member+ | `_resolve_entry_parent` walks back to project_id, then `_check_member(member)` | |
+| DELETE | /api/admin/memo-entries/{eid} | memos.py:299 | B | member+ | same | |
+| POST | /api/admin/memo-entries/{eid}/comments | memos.py:315 | B | viewer+ | resolve parent project; `validate_mentions` guards mentioned ids | |
+| PATCH | /api/admin/memo-comments/{cid} | memos.py:352 | B | viewer+ if author else owner | resolve via comment → entry → project | author-vs-moderator branching |
+| DELETE | /api/admin/memo-comments/{cid} | memos.py:371 | B | viewer+ if author else owner | same | soft delete |
+| POST | /api/admin/memo-comments/{cid}/resolve | memos.py:392 | B | member+ if entry author else owner | author-aware role gate | |
+| POST | /api/admin/memo-comments/{cid}/unresolve | memos.py:411 | B | member+ if entry author else owner | same | |
+| GET | /api/admin/studies/{slug}/participants | studies_participants.py:33 | A | viewer+ | `check_study_permission(viewer)` | |
+| GET | /api/admin/studies/participants/{participant_id} | studies_participants.py:62 | B | member+ (inline) | inline join `Participant → Study → ProjectMember` with `role.in_([owner, member])` | mode=mediated; viewer-role members are excluded |
+| PATCH | /api/admin/studies/participants/{participant_id}/discard | studies_participants.py:113 | B | member+ (inline) | inline join, same shape | |
+| DELETE | /api/admin/studies/{slug}/participants | studies_participants.py:158 | A | editor+ | `check_study_permission(editor)`; gated to `state=draft` | |
+| DELETE | /api/admin/studies/{slug}/participants/{participant_id}/personal-data | studies_participants.py:179 | A | editor+ | `check_study_permission(editor)`; verifies `participant.study_id == study.id` | GDPR Art. 17 admin-mediated |
+| GET | /api/admin/studies/{slug}/export/csv | exports.py:34 | A | editor+ | `check_study_permission(editor)` | streams CSV |
+| GET | /api/admin/studies/{slug}/export/pqmethod | exports.py:75 | A | editor+ | `check_study_permission(editor)` | streams ZIP |
+| GET | /api/admin/studies/{slug}/export/r-kit | exports.py:118 | A | editor+ | `check_study_permission(editor)` | |
+| GET | /api/admin/studies/{slug}/dump | exports.py:161 | A | editor+ | `check_study_permission(editor)` | full study JSON dump |
+| GET | /api/admin/studies/{slug}/participants/{participant_id}/export/csv | exports.py:175 | A | editor+ | `check_study_permission(editor)` + `participant.study_id == study.id` | |
+| GET | /api/admin/studies/{slug}/participants/{participant_id}/export/json | exports.py:224 | A | editor+ | full dump filtered by `participant_id`; 404 if not found | filter is in-Python (memory) — confirm |
+| GET | /api/admin/studies/{slug}/participants/{participant_id}/export/audio | exports.py:259 | A | editor+ | `check_study_permission(editor)` + `participant.study_id == study.id`; presigned ZIP | |
+| GET | /api/admin/studies/{slug}/export/package | exports.py:350 | A | editor+ | `check_study_permission(editor)` | full research package ZIP |
+| GET | /api/admin/studies/{slug}/data-inventory | lifecycle.py:121 | A | viewer+ | `check_study_permission(viewer)` | |
+| GET | /api/admin/studies/{slug}/anonymise-preview | lifecycle.py:225 | A | viewer+ | `check_study_permission(viewer)` | |
+| POST | /api/admin/studies/{slug}/anonymise-bulk | lifecycle.py:253 | A | editor+ | `check_study_permission(editor)` | mutates participant PII |
+| POST | /api/admin/studies | studies.py:46 | A | member+ | `require_project_role(member)` (X-Project-ID header) | creates study in active project |
+| GET | /api/admin/studies | studies.py:64 | A | auth (header) | `get_current_project` (X-Project-ID); filter `Study.project_id = project.id` | |
+| GET | /api/admin/studies/{slug} | studies.py:97 | A | viewer+ | `check_study_permission(viewer)` | |
+| PATCH | /api/admin/studies/{slug} | studies.py:116 | A | editor+ | `check_study_permission(editor)` | |
+| POST | /api/admin/studies/{slug}/validate | studies.py:148 | A | editor+ | `check_study_permission(editor)` | |
+| POST | /api/admin/studies/{slug}/state | studies.py:163 | A | editor+ | `check_study_permission(editor)` | |
+| POST | /api/admin/studies/{slug}/reset | studies.py:218 | A | owner | `check_study_permission(owner)` | wipes participants |
+| DELETE | /api/admin/studies/{slug} | studies.py:240 | A | owner + superuser | `check_study_permission(owner)` AND `current_user.is_superuser` | requires archived state |
+| POST | /api/admin/studies/{slug}/import-concourse | studies.py:282 | A | editor+ | `check_study_permission(editor)` | |
+| GET | /api/admin/studies/{slug}/stale-statements | studies.py:297 | A | editor+ | `check_study_permission(editor)` | |
+| POST | /api/admin/studies/{slug}/sync-statement/{statement_id} | studies.py:309 | A | editor+ | `check_study_permission(editor)` | concourse-sourced text sync |
+| POST | /api/admin/studies/{slug}/sync-all-stale | studies.py:337 | A | editor+ | `check_study_permission(editor)` | |
+| GET | /api/admin/studies/{slug}/analysis/eigenvalues | analysis.py:98 | A | viewer+ | `check_study_permission(viewer)` | |
+| POST | /api/admin/studies/{slug}/analysis/run | analysis.py:137 | A | editor+ | `check_study_permission(editor)` | persists AnalysisRun |
+| POST | /api/admin/studies/{slug}/analysis/preview-range | analysis.py:403 | A | viewer+ | `check_study_permission(viewer)` | |
+| GET | /api/admin/studies/{slug}/analysis/runs | analysis.py:509 | A | viewer+ | `check_study_permission(viewer)`; filter `AnalysisRun.study_id == study.id` | |
+| GET | /api/admin/studies/{slug}/analysis/runs/{run_id} | analysis.py:526 | A | viewer+ | `_load_run` filters `AnalysisRun.study_id == study.id` | path carries study slug, not just run_id |
+| PATCH | /api/admin/studies/{slug}/analysis/runs/{run_id} | analysis.py:551 | A | editor+ | same | |
+| DELETE | /api/admin/studies/{slug}/analysis/runs/{run_id} | analysis.py:597 | A | editor+ | same | |
+| GET | /api/admin/studies/{slug}/analysis/audios | analysis.py:622 | A | viewer+ | `check_study_permission(viewer)` + `Participant.study_id == study.id` filter on input ids | participant-id stuffing defended-in-depth |
+| GET | /api/admin/studies/{slug}/analysis/comments | analysis.py:723 | A | viewer+ | same | |
+| GET | /api/admin/studies/{slug}/stats | studies_import_export.py:52 | A | viewer+ | `check_study_permission(viewer)` | |
+| GET | /api/admin/studies/{slug}/export/config | studies_import_export.py:69 | A | viewer+ | `check_study_permission(viewer)` | study JSON config (no participant data) |
+| POST | /api/admin/studies/validate-import | studies_import_export.py:388 | C | auth (header) | `get_current_project` (membership only); pure validation, no DB write | |
+| POST | /api/admin/studies/import | studies_import_export.py:479 | C | member+ | `require_project_role(member)` (X-Project-ID); creates study in caller's project | new study lands in header-named project |
+| GET | /api/admin/studies/{slug}/storage-usage | studies_import_export.py:601 | A | viewer+ | `check_study_permission(viewer)` | |
+| GET | /api/admin/concourses/tags | concourses.py:56 | A | auth (header) | `get_current_project` filter by `project.id` | |
+| POST | /api/admin/concourses/tags | concourses.py:65 | A | member+ | `require_project_role(member)` | |
+| DELETE | /api/admin/concourses/tags/{tag_id} | concourses.py:83 | B | member+ | `require_project_role(member)` + service does `project_id` filter on the tag | tag_id is opaque; service guards |
+| POST | /api/admin/concourses | concourses.py:103 | A | member+ | `require_project_role(member)` (creates concourse in header project) | |
+| GET | /api/admin/concourses | concourses.py:130 | A | auth (header) | `get_current_project`; filter `Concourse.project_id = project.id` | |
+| GET | /api/admin/concourses/{concourse_id} | concourses.py:161 | B | auth (header) | `get_current_project` + explicit `if concourse.project_id != project.id: 404` | guard-after-fetch shape |
+| PATCH | /api/admin/concourses/{concourse_id} | concourses.py:183 | B | member+ | `require_project_role(member)` + service `update_concourse(project.id, concourse_id, ...)` | service is responsible for the cross-check |
+| DELETE | /api/admin/concourses/{concourse_id} | concourses.py:198 | B | owner | `require_project_role(owner)` + explicit `if concourse.project_id != project.id: 404` | |
+| POST | /api/admin/concourses/{concourse_id}/items | concourses.py:223 | B | member+ | `require_project_role(member)` + `_verify_concourse_ownership` | |
+| POST | /api/admin/concourses/{concourse_id}/items/bulk | concourses.py:244 | B | member+ | same | |
+| POST | /api/admin/concourses/{concourse_id}/items/import | concourses.py:267 | B | member+ | same | |
+| PATCH | /api/admin/concourses/{concourse_id}/items/{item_id} | concourses.py:290 | B | member+ | `require_project_role(member)` + `_verify_concourse_ownership` | |
+| DELETE | /api/admin/concourses/{concourse_id}/items/{item_id} | concourses.py:313 | B | member+ | same | |
+| GET | /api/admin/concourses/{concourse_id}/items/{item_id}/versions | concourses.py:338 | B | auth (header) | `get_current_project` + `_verify_concourse_ownership` + `_verify_item_ownership` | |
+| GET | /api/admin/concourses/{concourse_id}/items/{item_id}/comments | concourses.py:357 | B | auth (header) | same | |
+| POST | /api/admin/concourses/{concourse_id}/items/{item_id}/comments | concourses.py:376 | B | member+ | `require_project_role(member)` + ownership verifies | |
+| GET | /api/admin/users | users.py:21 | C | superuser | `check_superuser` only; lists all users | superuser-gated; no project scope |
+| POST | /api/admin/users | users.py:45 | C | superuser | `check_superuser` only | superuser-gated |
+| DELETE | /api/admin/users/{user_id} | users.py:82 | C | superuser | `check_superuser` + self-deletion guard | |
+
+**Pattern totals:** 51 type-A, 28 type-B, 10 type-C. Total: 89. No endpoints flagged as unfit.
+
+### Membership machinery
+
+`require_project_role(role)` (`backend/app/dependencies.py:170-193`) is a dependency factory that delegates to `get_current_project` (lines 94-133). `get_current_project` reads the **`X-Project-ID` header**, parses it as an integer, and queries `(Project, ProjectMember)` joined where `Project.id = X-Project-ID AND ProjectMember.user_id = current_user.id`. Missing header → 400; non-integer → 400; no membership row → 403 "Access to this project is denied". The returned `(Project, ProjectMember)` tuple is then handed to `require_project_role`, which compares the member's role against `PROJECT_ROLE_HIERARCHY` and rejects with 403 "Insufficient permissions" if below threshold.
+
+`check_project_permission(role)` (lines 196-239) and `check_study_permission(role)` (lines 242-293) take a different path: they read the **`{slug}`** path parameter directly (project slug or study slug) and run a single inline join against `ProjectMember` keyed on `current_user.id`. Missing row → **404** (not 403) "Project/Study not found or access denied", deliberately collapsing existence-disclosure with permission denial. Role check happens after the row is found, returning 403. `check_study_permission` additionally maps `ProjectRole → StudyRole` via the constant `ROLE_MAP` (`owner→owner, member→editor, viewer→viewer`) and uses `STUDY_ROLE_HIERARCHY` (numeric weights `30/20/10`).
+
+Role hierarchies (`dependencies.py:138-155`):
+
+- `PROJECT_ROLE_HIERARCHY = {owner: 40, member: 20, viewer: 10}`
+- `STUDY_ROLE_HIERARCHY = {owner: 30, editor: 20, viewer: 10}`
+- `ROLE_MAP = {ProjectRole.owner: StudyRole.owner, ProjectRole.member: StudyRole.editor, ProjectRole.viewer: StudyRole.viewer}`
+
+**Short-circuits.** No global super-admin bypass for project/study membership: `is_superuser` is checked only in `check_superuser` (`/api/admin/users` and `DELETE /api/admin/studies/{slug}` overlay) and in the import-export verifier. A superuser **without** project membership cannot reach project/study admin endpoints — confirmed by reading every dependency.
+
+**`password_changed_at` check (F-03-010 from Wave 2).** Lives in `get_current_user` (`dependencies.py:74-78`): every request decodes the JWT, fetches the user, and compares `int(token_iat) < int(user.password_changed_at.timestamp())`. Tokens minted before the user's last password rotation are rejected with 401. Equality is allowed (false-rejection guard for one-second-resolution clock collisions). This runs for **every** admin endpoint by virtue of being the root dependency of every other dependency in the chain.
+
+**Inline-join routes (Pattern B without a slug).** Five admin endpoints check membership inline rather than via a dependency factory: `GET /participants/{participant_id}`, `PATCH /participants/{participant_id}/discard`, `DELETE /recruitment/links/{link_id}`, the memo endpoints (`/concourses/{cid}/memo*`, `/studies/{sid}/memo*`, `/memo-entries/{eid}*`, `/memo-comments/{cid}*`), and the concourse-id routes that explicitly compare `concourse.project_id != project.id`. Each of these is a Task-3 harness target: harness must verify the bespoke check matches the dependency-factory contract and rejects cross-tenant ids with 403/404.
+
+### Migration cb2c7f6f0cfe
+
+`backend/db_migrations/versions/cb2c7f6f0cfe_rename_researcher_to_member_and_owner_.py` (revision `cb2c7f6f0cfe`, down-revision `fd88287d3f9b`).
+
+What it does:
+
+1. **Pre-flight guard.** Refuses to run if any project has more than one `owner` row in `project_members` — raises `RuntimeError` with the offending `project_id`s. Defence-in-depth in case a bug elsewhere created multiple owners.
+2. **Enum rename.** Recreates the `projectrole` Postgres enum as `{owner, member, viewer}` (dropping `researcher`). Recasts both `project_members.role` and `invitations.role` with `CASE WHEN role = 'researcher' THEN 'member' ELSE role END`. Drops the old enum and renames the new one back to `projectrole`.
+3. **Owner-uniqueness partial unique index.** `CREATE UNIQUE INDEX project_members_one_owner_per_project ON project_members (project_id) WHERE role = 'owner'`. DB-level guarantee that no project ever has two owners.
+
+Prior bug it patched. The `researcher`/`member` rename is mostly cosmetic — what matters is the **owner-uniqueness invariant**. Before the migration, the API enforced "Owner is set at creation, never reassigned" only at the application layer (`OWNER_ROLE_IMMUTABLE` rejection in PATCH/invite endpoints). There was no DB-level safeguard, so a race condition (two simultaneous PATCH requests, or a manual SQL fix-up) could in principle create a project with two owners — duplicating the highest-privilege role. The partial unique index closes that gap. (The design doc — `docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md` §9 — frames this explicitly as defence-in-depth.)
+
+### Cross-tenant access matrix
+
+_Filled by Task 3 after running the parametrised IDOR harness._
 
 ## Summary
 
