@@ -79,7 +79,7 @@ Cumulative across all seven waves. Items move through:
   Source: `03-auth-email-flows.md#f-03-007`.
 - F-03-008 (severity=minor) — `/api/register` enumeration via response body and
   status (400 `"already exists"` vs 201 user record). **closed (backend half)**
-  in Wave 5 by F-06-007 (commit `<F-06-007 sha>`): always-201 contract, identical
+  in Wave 5 by F-06-007 (commit `f60e754b`): always-201 contract, identical
   body shape across arms, out-of-band "you already have a Qualis account" email
   to the registered address with a recovery link, constant-time bcrypt before
   the existence SELECT, IntegrityError race-path folded into the same anti-enum
@@ -350,7 +350,7 @@ Cumulative across all seven waves. Items move through:
   "you already have a Qualis account" email with recovery link,
   constant-time bcrypt before existence SELECT,
   IntegrityError-race fallback folded into the same anti-enum
-  response. **closed (backend half)** in commit `<F-06-007 sha>`.
+  response. **closed (backend half)** in commit `f60e754b`.
   Pinned by `backend/tests/security/wave_5/test_register_enumeration.py`
   (7 tests). Source: `06-business-logic-abuse.md#f-06-007`.
 
