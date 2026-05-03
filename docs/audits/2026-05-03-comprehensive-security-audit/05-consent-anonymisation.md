@@ -356,8 +356,8 @@ Code references for each transition handler:
 |----------|-------|
 | blocker | 0 |
 | major | 1 |
-| minor | 3 |
-| observation | 3 |
+| minor | 4 |
+| observation | 4 |
 
 ## Findings
 
@@ -886,6 +886,117 @@ operator actions** are required for legal compliance:
   that removes participants with `status='started' AND submitted_at IS NULL AND
   last_step_reached_at < now() - SESSION_TTL_DAYS` — the consent-text promise
   on partial-data retention should not depend on operator memory.
+
+### F-05-008 — Lifecycle mutations on participant data leave no audit trail
+
+**Severity:** minor
+
+**Location:** `backend/app/routers/admin/studies_participants.py:113-155`
+(`discard_participant`), `:158-176` (`clear_all_participants`),
+`backend/app/routers/participants.py:285-333`
+(`participant_self_erase_personal_data`).
+
+**Vulnerability:** `app.audit` is the legal trail for admin actions on
+personal data. Two of the lifecycle endpoints
+(`bulk_anonymise_old_participants` at `lifecycle.py:300-310` and
+`admin_erase_participant_personal_data` at
+`studies_participants.py:216-224`) already emit a
+``log_admin_action(...)`` row on every mutation. Three did not:
+
+- **`discard_participant`** — flips `is_discarded` / sets
+  `discard_reason`; no audit row. Operators investigating "who marked
+  this row as discarded and why" had no application-side trail.
+- **`clear_all_participants`** — DRAFT-state hard delete of every
+  participant row plus their audio. No audit row, even though this
+  is the most destructive lifecycle action exposed.
+- **`participant_self_erase_personal_data`** — participant-initiated
+  Art. 17 erasure. The path converges on the same
+  `StudyDataService.anonymise_participant` as the admin paths but
+  emitted no audit log entry (no admin actor to attribute, but the
+  legal action — erasure of personal data — still warrants a row).
+
+This is **defensive observability**, not a confidentiality leak. The
+GDPR-memo "(c) Operator obligations" item 8 already names `app.audit`
+as the legal trail for these actions; the gap is that three of the
+endpoints failed to write to it.
+
+**Remediation:**
+- `discard_participant` now emits `action="discard"` /
+  `action="undiscard"` (resource=`participant`, includes
+  `study_id`, `previous_is_discarded`).
+- `clear_all_participants` now emits
+  `action="clear_all_participants"` (resource=`study`, includes
+  `slug`, `deleted_participants` count).
+- `participant_self_erase_personal_data` now emits
+  `action="erase_personal_data"` with `actor_user_id=None` and
+  `mode="participant_self"`, mirroring the admin path's
+  `mode="admin_mediated"` so an investigator can distinguish the two
+  channels in a single grep.
+
+The `actor_user_id=None` convention for system / participant actions
+matches the docstring of `log_admin_action` ("None only if the action
+is system-initiated"). Operators routing `app.audit` to a SIEM should
+filter by `mode=participant_self` to surface participant-initiated
+erasures separately from operator actions.
+
+**Test:** `backend/tests/security/wave_4/test_subject_rights.py`:
+- `test_article_17_audit_trail` (4 cases — discard / undiscard /
+  admin erase / participant self-erase) pins each new line and the
+  existing admin erase line as a regression guard.
+- `test_clear_all_participants_audit_trail` pins the
+  hard-delete trail.
+
+**Status:** closed.
+
+**Source:** Wave 4 inventory §2.3 stage 5 ("discard is missing from
+audit log"), stage 6 ("self-erase has no audit row"), §"(c) Operator
+obligations" item 8.
+
+### F-05-009 — Anonymisation as the legal Art. 17 endpoint (operator-facing position)
+
+**Severity:** observation
+
+**Location:** `backend/app/routers/participants.py:285-333` docstring;
+`backend/app/services/study_data_service.py:73-160`.
+
+**Position:** Qualis treats `StudyDataService.anonymise_participant` —
+not a hard `DELETE FROM participants` — as the legal endpoint of an
+individual Art. 17 ("right to erasure") request. Anonymisation:
+
+- nulls every direct-PII column (`ip_address`, `user_agent`,
+  `confirmation_code`, `resume_code`, `consent_hash`,
+  `draft_responses`),
+- empties the JSON survey blobs (`presort_answers={}`,
+  `postsort_answers={}`),
+- rotates `session_token` (the original token can never re-access),
+- deletes every `audio_recordings` row and S3 object,
+- preserves the participant's Q-sort entries and `card_comment` text
+  as anonymous research data per **GDPR Recital 26** ("the principles
+  of data protection should not apply to anonymous information,
+  namely information which does not relate to an identified or
+  identifiable natural person").
+
+This is an operator-facing position, not a code change. Hard-deleting
+the row would also lose the research contribution the participant
+already consented to (the consent text explicitly says Q-sort
+rankings are kept; the participant who wants the rankings gone too
+must contact the researcher directly).
+
+**Disposition:** documented in this audit as the rationale for
+F-05-008's audit-trail patch, in `participants.py:285-313` docstring,
+and in the Wave 7 GDPR memo's "(c) Operator obligations" item 7
+(discard policy & anonymisation as Art. 17 endpoint). No code change.
+
+**Test:** `backend/tests/security/wave_4/test_anonymisation_pipeline.py`
+already pins the post-anonymisation invariants (PII nulled, qsort
+preserved, session_token rotated). F-05-009 is a position note on
+those invariants, not a separate code path.
+
+**Status:** observation; no remediation in code.
+
+**Source:** Wave 4 inventory §2.3 stage 7 ("erased — there is no
+hard-delete endpoint for an individual participant"), GDPR Recital
+26.
 
 ## Resolved since prior
 

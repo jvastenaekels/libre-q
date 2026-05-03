@@ -275,3 +275,198 @@ async def test_article_15_after_anonymisation_is_moot(
     # Per F-05-006 — anonymised rows are excluded from the
     # per-participant follow-up channel.
     assert response.status_code == 404
+
+
+# -----------------------------------------------------------------------------
+# F-05-008 — Article 17 audit-trail completeness
+# -----------------------------------------------------------------------------
+
+
+async def _seed_unique_completed_participant(
+    db: AsyncSession,
+    study: Study,
+    statement: Statement,
+) -> Participant:
+    """Variant of _seed_completed_participant with a unique
+    confirmation_code so multiple participants can coexist in the
+    same test."""
+    p = Participant(
+        study_id=study.id,
+        session_token=uuid4(),
+        language_used="en",
+        status=ParticipantStatus.completed,
+        consent_hash="abc",
+        consented_at=datetime.now(timezone.utc),
+        submitted_at=datetime.now(timezone.utc),
+        ip_address=f"hashed-ip-{uuid4().hex[:8]}",
+        user_agent=f"mobile:hashed-ua-{uuid4().hex[:8]}",
+        confirmation_code=uuid4().hex[:8].upper(),
+        presort_answers={},
+        postsort_answers={},
+    )
+    db.add(p)
+    await db.flush()
+    db.add(
+        QSortEntry(
+            participant_id=p.id,
+            statement_id=statement.id,
+            grid_score=0,
+            card_comment="comment",
+        )
+    )
+    await db.commit()
+    await db.refresh(p)
+    return p
+
+
+@pytest.mark.asyncio
+async def test_article_17_audit_trail(
+    client: AsyncClient,
+    db: AsyncSession,
+    auth_token_factory,
+    caplog,
+) -> None:
+    """F-05-008 — every lifecycle action that mutates a participant's
+    ``is_discarded`` / ``anonymised_at`` state, or hard-deletes the
+    row, must emit an ``app.audit`` entry.
+
+    Pre-fix: discard, clear-all-participants, and participant
+    self-erase emitted no audit log row. Admin-mediated
+    erase_personal_data and bulk_anonymise already did. This test
+    pins the new lines so the trail does not regress.
+    """
+    import logging
+
+    owner = await _seed_owner(db)
+    study, statement = await _seed_study_with_owner(db, owner)
+    participant = await _seed_unique_completed_participant(db, study, statement)
+    headers = auth_token_factory(owner)
+
+    # ---- discard ----
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        response = await client.patch(
+            f"/api/admin/studies/participants/{participant.id}/discard",
+            headers=headers,
+            json={"is_discarded": True, "discard_reason": "test"},
+        )
+        assert response.status_code == 200, response.text
+        rendered = "\n".join(r.getMessage() for r in caplog.records)
+        assert "action=discard" in rendered, rendered
+        assert "resource=participant" in rendered, rendered
+        assert f"id={participant.id}" in rendered, rendered
+
+    # ---- undiscard ----
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        response = await client.patch(
+            f"/api/admin/studies/participants/{participant.id}/discard",
+            headers=headers,
+            json={"is_discarded": False, "discard_reason": None},
+        )
+        assert response.status_code == 200, response.text
+        rendered = "\n".join(r.getMessage() for r in caplog.records)
+        assert "action=undiscard" in rendered, rendered
+        assert "resource=participant" in rendered, rendered
+
+    # ---- admin erase_personal_data (regression — pre-existing) ----
+    # Re-seed: previous participant is about to be erased.
+    other = await _seed_unique_completed_participant(db, study, statement)
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        response = await client.delete(
+            f"/api/admin/studies/{study.slug}/participants/{other.id}/personal-data",
+            headers=headers,
+        )
+        assert response.status_code == 204, response.text
+        rendered = "\n".join(r.getMessage() for r in caplog.records)
+        assert "action=erase_personal_data" in rendered, rendered
+        assert "mode" in rendered and "admin_mediated" in rendered, rendered
+
+    # ---- participant self-erase (newly audited) ----
+    self_erase_p = await _seed_unique_completed_participant(db, study, statement)
+    self_token = self_erase_p.session_token
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        response = await client.delete(
+            f"/api/study/{study.slug}/personal-data?session_token={self_token}",
+        )
+        assert response.status_code == 204, response.text
+        rendered = "\n".join(r.getMessage() for r in caplog.records)
+        assert "action=erase_personal_data" in rendered, rendered
+        # The self-erase path has no admin actor → actor_user_id=None.
+        assert "actor_user_id=None" in rendered, rendered
+        assert "participant_self" in rendered, rendered
+
+
+@pytest.mark.asyncio
+async def test_clear_all_participants_audit_trail(
+    client: AsyncClient,
+    db: AsyncSession,
+    auth_token_factory,
+    caplog,
+) -> None:
+    """F-05-008 — the DRAFT-state hard delete of every participant
+    in a study must leave an audit trail."""
+    import logging
+
+    owner = await _seed_owner(db)
+    project = Project(
+        title=f"P-{uuid4().hex[:6]}",
+        slug=f"p-{uuid4().hex[:6]}",
+    )
+    db.add(project)
+    await db.flush()
+    db.add(
+        ProjectMember(
+            project_id=project.id, user_id=owner.id, role=ProjectRole.owner
+        )
+    )
+
+    study = Study(
+        slug=f"clear-{uuid4().hex[:6]}",
+        project_id=project.id,
+        state=StudyState.draft,  # Required for clear-all.
+        grid_config=[{"score": 0, "capacity": 1}],
+        presort_config={},
+        postsort_config={},
+    )
+    db.add(study)
+    await db.flush()
+    db.add(
+        StudyTranslation(
+            study_id=study.id,
+            language_code="en",
+            title="Clear-all study",
+            description="d",
+            instructions="i",
+            consent_title="c",
+            consent_description="cd",
+        )
+    )
+    # Add two participants so there's something to delete.
+    for _ in range(2):
+        db.add(
+            Participant(
+                study_id=study.id,
+                session_token=uuid4(),
+                language_used="en",
+                status=ParticipantStatus.started,
+                consent_hash="abc",
+                consented_at=datetime.now(timezone.utc),
+            )
+        )
+    await db.commit()
+
+    headers = auth_token_factory(owner)
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        response = await client.delete(
+            f"/api/admin/studies/{study.slug}/participants",
+            headers=headers,
+        )
+        assert response.status_code == 204, response.text
+        rendered = "\n".join(r.getMessage() for r in caplog.records)
+        assert "action=clear_all_participants" in rendered, rendered
+        assert "resource=study" in rendered, rendered
+        assert "deleted_participants" in rendered, rendered

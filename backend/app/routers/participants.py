@@ -313,6 +313,7 @@ async def participant_self_erase_personal_data(
     participants are no-ops).
     """
     from app.services.study_data_service import StudyDataService
+    from app.utils.audit import log_admin_action
 
     stmt = (
         select(Participant)
@@ -329,5 +330,22 @@ async def participant_self_erase_personal_data(
             detail="Session not found",
         )
 
+    was_already_anonymised = participant.anonymised_at is not None
+    participant_id = participant.id
+    study_id = participant.study_id
     await StudyDataService.anonymise_participant(db, participant)
+    # F-05-008: participant self-erase must also leave an audit trail.
+    # The participant is the actor; there is no admin user to attribute,
+    # so actor_user_id=None and the action carries the "self_erase" mode
+    # so an investigator can distinguish it from admin-mediated erasure.
+    log_admin_action(
+        actor_user_id=None,
+        action="erase_personal_data",
+        resource="participant",
+        resource_id=participant_id,
+        study_slug=slug,
+        study_id=study_id,
+        already_anonymised=was_already_anonymised,
+        mode="participant_self",
+    )
     return None
