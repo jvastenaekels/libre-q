@@ -278,7 +278,7 @@ mechanism. Filed as **F-04-001** below.
 |----------|-------|
 | blocker | 0 |
 | major | 0 |
-| minor | 0 |
+| minor | 1 |
 | observation | 5 |
 
 ## Findings
@@ -424,6 +424,57 @@ on JSON / CSV / audio export → 404; `get_study_full_dump` only returns
 target-study participants; extraneous `?study_id=X&project_id=Y` query
 params do not influence CSV export filename or content (verified via
 Content-Disposition).
+
+### F-04-006 — Quota check has TOCTOU race against concurrent member-add (minor)
+
+**Severity:** minor
+**Status:** open — no row-level lock between count and insert
+**Files:** `backend/app/services/quotas.py:32-104`,
+          `backend/app/routers/admin/invitations.py:98-110`,
+          `backend/app/routers/admin/projects.py:105, 449-468`,
+          `backend/tests/security/wave_3/test_quota_concurrency.py`
+
+`assert_can_add_member` and `assert_can_create_owned_project` follow a
+classic check-then-insert pattern with no concurrency guard:
+
+1. `SELECT COUNT(*) FROM project_members WHERE project_id = X` (or
+   `WHERE user_id = U AND role = owner` for owner-quota).
+2. If `count >= limit`: `raise QuotaExceeded`.
+3. Caller inserts the new `ProjectMember` row.
+
+There is no `with_for_update()` on the count query, no advisory lock
+(`pg_advisory_xact_lock`), and no isolation-level escalation. Two
+concurrent invitation-accepts on the same project, both running when
+`count = limit - 1`, both observe `count - 1` in step 1 and both pass
+step 2; both inserts then commit and the project lands at
+`count = limit + 1`.
+
+**Severity rationale.** Configured `MAX_MEMBERS_PER_PROJECT` defaults to
+`0` (unlimited) in `app.core.config`, so deployments that don't set the
+cap are unaffected. For deployments that *do* set the cap, the over-fill
+is bounded by the burst size of concurrent accepts, recoverable
+post-hoc, and not billing-relevant for the open-source codebase. Hence
+**minor**.
+
+**Recommended fix** (deferred to backlog):
+- Either acquire `SELECT … FOR UPDATE` on a project-level sentinel row
+  (e.g. `SELECT id FROM projects WHERE id = X FOR UPDATE` before the
+  count), serialising adds; or
+- Move the cap into a DB-level constraint (a CHECK + computed column,
+  or a trigger), removing the application-layer race entirely.
+
+**Concurrency-simulation caveat.** The in-process httpx test client
+serialises through one shared `AsyncSession` (the `db` fixture); we
+cannot fire true concurrent connections from inside one pytest. The
+finding is therefore based on **static analysis** (the SQL pattern is
+self-evidence) plus an *interleaved-count* in-process simulation that
+makes the race window visible: two consecutive `_count_members` calls
+without an intervening insert both observe the pre-insert count, which
+is the same observation each leg of the real race would make. The
+regression test pins the unguarded source pattern with negative
+assertions (`with_for_update` not in source, `advisory` not in source);
+when the fix lands, those assertions flip to confirm the lock is in
+place.
 
 ## Resolved since prior
 
