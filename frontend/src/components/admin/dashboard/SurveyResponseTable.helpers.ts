@@ -15,7 +15,7 @@ export interface SurveyAnswerItem {
     rawTranslations?: Record<string, string> | { language_code: string; text?: string }[];
 }
 
-export interface SurveyAnswerGroup {
+interface SurveyAnswerGroup {
     id: string;
     title: string;
     /** React node — same as value above. */
