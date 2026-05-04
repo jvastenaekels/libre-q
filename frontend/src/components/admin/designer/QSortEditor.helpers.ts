@@ -69,41 +69,60 @@ function pickBestLeftColumn(
  *    When only 1 slot remains and N is even-cols, parity-break by adding
  *    just one to the picked column.
  */
+interface DistributionContext {
+    centerIdx: number;
+    numColumns: number;
+    isOddCols: boolean;
+}
+
+/**
+ * Apply one increment step to the capacities array. Returns the delta added
+ * to the running total (1 for centre/parity-break/last-slot odd, 2 for the
+ * normal mirrored increment).
+ */
+function applyOneIncrementStep(
+    capacities: number[],
+    pickedIdx: number,
+    remaining: number,
+    ctx: DistributionContext
+): number {
+    if (ctx.isOddCols && pickedIdx === ctx.centerIdx) {
+        capacities[ctx.centerIdx] = (capacities[ctx.centerIdx] ?? 0) + 1;
+        return 1;
+    }
+    if (remaining >= 2) {
+        capacities[pickedIdx] = (capacities[pickedIdx] ?? 0) + 1;
+        const mirrorIdx = ctx.numColumns - 1 - pickedIdx;
+        capacities[mirrorIdx] = (capacities[mirrorIdx] ?? 0) + 1;
+        return 2;
+    }
+    if (ctx.isOddCols) {
+        capacities[ctx.centerIdx] = (capacities[ctx.centerIdx] ?? 0) + 1;
+        return 1;
+    }
+    // Even columns parity break: add the last unit to the picked column only.
+    capacities[pickedIdx] = (capacities[pickedIdx] ?? 0) + 1;
+    return 1;
+}
+
 export function computeAutoShapedCapacities(N: number, numColumns: number): number[] {
     if (numColumns === 0) return [];
     if (N === 0) return new Array(numColumns).fill(0);
 
-    const centerIdx = Math.floor(numColumns / 2);
-    const isOddCols = numColumns % 2 !== 0;
+    const ctx: DistributionContext = {
+        centerIdx: Math.floor(numColumns / 2),
+        numColumns,
+        isOddCols: numColumns % 2 !== 0,
+    };
     const ideal = computeIdealCapacities(N, numColumns);
     const minPerCol = computeMinPerColumn(N, numColumns);
     const capacities: number[] = new Array(numColumns).fill(minPerCol);
     let total = capacities.reduce((a, b) => a + b, 0);
 
     while (total < N) {
-        const bestIdx = pickBestLeftColumn(ideal, capacities, centerIdx, isOddCols);
+        const bestIdx = pickBestLeftColumn(ideal, capacities, ctx.centerIdx, ctx.isOddCols);
         if (bestIdx === -1) break;
-
-        if (isOddCols && bestIdx === centerIdx) {
-            capacities[centerIdx] = (capacities[centerIdx] ?? 0) + 1;
-            total += 1;
-            continue;
-        }
-
-        const remaining = N - total;
-        if (remaining >= 2) {
-            capacities[bestIdx] = (capacities[bestIdx] ?? 0) + 1;
-            const mirrorIdx = numColumns - 1 - bestIdx;
-            capacities[mirrorIdx] = (capacities[mirrorIdx] ?? 0) + 1;
-            total += 2;
-        } else if (isOddCols) {
-            capacities[centerIdx] = (capacities[centerIdx] ?? 0) + 1;
-            total += 1;
-        } else {
-            // Even columns parity break: add the last unit to the picked column only.
-            capacities[bestIdx] = (capacities[bestIdx] ?? 0) + 1;
-            total += 1;
-        }
+        total += applyOneIncrementStep(capacities, bestIdx, N - total, ctx);
     }
 
     return capacities;

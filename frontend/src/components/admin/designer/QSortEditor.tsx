@@ -92,6 +92,7 @@ interface SortableStatementItemProps {
     isSyncing?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — large declarative dnd-kit sortable item with conditional rendering for the edit/sync/stale states (no extractable algorithmic logic; the conditional JSX IS the surface)
 function SortableStatementItem({
     item,
     idx,
@@ -300,13 +301,13 @@ function SortableStatementItem({
 
 // CSV/TSV parsing moved to @/utils/parseCsvTsv (shared with ConcourseDetailPage).
 
-const QSortEditor = ({
-    readOnly,
-    structureLocked,
-}: {
+interface QSortEditorProps {
     readOnly?: boolean;
     structureLocked?: boolean;
-}) => {
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — page-level orchestrator (6 useEffects, multiple inline handlers, tabbed JSX shell). Pure-logic extractions done by W3b T1-T3 (autoShape / mergeParsedItem / applyCapacityDelta); what remains is glue.
+const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
     const { t } = useTranslation();
     const { draft, original, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
