@@ -1755,13 +1755,18 @@
                 "add_field": "Ajouter un champ",
                 "basic_fields": "Champs basiques",
                 "choice_fields": "Champs à choix",
+                "scale_fields": "Champs d'échelle",
                 "labels": {
                     "question": "Libellé de la question",
                     "required": "Champ obligatoire",
                     "options": "Options",
                     "multiple": "(choix multiples autorisés)",
                     "single": "(choix unique)",
-                    "placeholder": "Entrez votre question ici..."
+                    "placeholder": "Entrez votre question ici...",
+                    "scale": "Échelle d'évaluation",
+                    "scale_points": "Nombre de points",
+                    "scale_left": "Libellé extrémité gauche",
+                    "scale_right": "Libellé extrémité droite"
                 },
                 "types": {
                     "text": "Texte",
@@ -1772,7 +1777,8 @@
                     "dropdown": "Menu déroulant",
                     "radio": "Radio",
                     "checkboxes": "Cases à cocher",
-                    "text_audio": "Texte + Audio"
+                    "text_audio": "Texte + Audio",
+                    "rating": "Échelle"
                 },
                 "empty": {
                     "title": "Aucune question pour le moment",
@@ -1782,7 +1788,9 @@
                     "new_question": "Nouvelle question",
                     "option": "Option",
                     "enter_answer": "Entrez votre réponse...",
-                    "untitled": "Question sans titre"
+                    "untitled": "Question sans titre",
+                    "scale_left": "Pas du tout d'accord",
+                    "scale_right": "Tout à fait d'accord"
                 },
                 "actions": {
                     "add_option": "Ajouter une option",

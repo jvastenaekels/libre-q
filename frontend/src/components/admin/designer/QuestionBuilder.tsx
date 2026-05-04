@@ -36,6 +36,7 @@ import {
     Circle,
     Languages,
     Mic,
+    BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -73,19 +74,28 @@ type QuestionType =
     | 'email'
     | 'textarea'
     | 'radio'
-    | 'text_audio';
+    | 'text_audio'
+    | 'rating';
+
+type MultilangString = string | Record<string, string>;
 
 interface QuestionConfig {
     type: QuestionType;
-    label: string | Record<string, string>;
+    label: MultilangString;
     required: boolean;
     options?: (string | { label: Record<string, string>; value: string })[];
-    placeholder?: string | Record<string, string>;
+    placeholder?: MultilangString;
     min?: number;
     max?: number;
     minLength?: number;
     maxLength?: number;
     rows?: number; // For textarea
+    scale_points?: number; // For rating
+    scale_labels?: {
+        left?: MultilangString;
+        right?: MultilangString;
+        middle?: MultilangString;
+    };
     visibility_condition?: {
         depends_on: string;
         operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
@@ -231,6 +241,9 @@ const QuestionItem = (props: QuestionItemProps) => {
                                             )}
                                             {question.type === 'text_audio' && (
                                                 <Mic className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'rating' && (
+                                                <BarChart3 className="h-4 w-4" />
                                             )}
                                         </div>
                                         <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
@@ -522,6 +535,188 @@ const QuestionItem = (props: QuestionItemProps) => {
                                     </div>
                                 )}
 
+                                {question.type === 'rating' && (
+                                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                                        <Label className="text-2xs font-black text-slate-500">
+                                            {t('admin.design.questions.labels.scale')}
+                                        </Label>
+                                        <div className="grid gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-2xs font-bold text-slate-500">
+                                                    {t(
+                                                        'admin.design.questions.labels.scale_points'
+                                                    )}
+                                                </Label>
+                                                <Select
+                                                    value={String(question.scale_points ?? 5)}
+                                                    onValueChange={(val: string) =>
+                                                        onUpdate({
+                                                            ...question,
+                                                            scale_points: Number(val),
+                                                        })
+                                                    }
+                                                    disabled={readOnly}
+                                                >
+                                                    <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {[2, 3, 4, 5, 7, 10].map((n) => (
+                                                            <SelectItem key={n} value={String(n)}>
+                                                                {n}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                            {t(
+                                                                'admin.design.questions.labels.scale_left'
+                                                            )}
+                                                        </Label>
+                                                        <MultiLangFieldIcon
+                                                            activeLocale={activeLocale}
+                                                            translations={
+                                                                typeof question.scale_labels
+                                                                    ?.left === 'object'
+                                                                    ? question.scale_labels.left
+                                                                    : {
+                                                                          en:
+                                                                              (question.scale_labels
+                                                                                  ?.left as
+                                                                                  | string
+                                                                                  | undefined) ||
+                                                                              '',
+                                                                      }
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <Input
+                                                        readOnly={readOnly}
+                                                        value={
+                                                            (typeof question.scale_labels?.left ===
+                                                            'string'
+                                                                ? question.scale_labels.left
+                                                                : question.scale_labels?.left?.[
+                                                                      activeLocale
+                                                                  ]) || ''
+                                                        }
+                                                        placeholder={t(
+                                                            'admin.design.questions.defaults.scale_left'
+                                                        )}
+                                                        onChange={(
+                                                            e: React.ChangeEvent<HTMLInputElement>
+                                                        ) => {
+                                                            if (readOnly) return;
+                                                            const prev =
+                                                                question.scale_labels?.left;
+                                                            const next =
+                                                                typeof prev === 'object' &&
+                                                                prev !== null
+                                                                    ? {
+                                                                          ...prev,
+                                                                          [activeLocale]:
+                                                                              e.target.value,
+                                                                      }
+                                                                    : {
+                                                                          en:
+                                                                              (prev as
+                                                                                  | string
+                                                                                  | undefined) ||
+                                                                              '',
+                                                                          [activeLocale]:
+                                                                              e.target.value,
+                                                                      };
+                                                            onUpdate({
+                                                                ...question,
+                                                                scale_labels: {
+                                                                    ...question.scale_labels,
+                                                                    left: next,
+                                                                },
+                                                            });
+                                                        }}
+                                                        className="h-9 text-xs bg-white rounded-lg"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                            {t(
+                                                                'admin.design.questions.labels.scale_right'
+                                                            )}
+                                                        </Label>
+                                                        <MultiLangFieldIcon
+                                                            activeLocale={activeLocale}
+                                                            translations={
+                                                                typeof question.scale_labels
+                                                                    ?.right === 'object'
+                                                                    ? question.scale_labels.right
+                                                                    : {
+                                                                          en:
+                                                                              (question.scale_labels
+                                                                                  ?.right as
+                                                                                  | string
+                                                                                  | undefined) ||
+                                                                              '',
+                                                                      }
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <Input
+                                                        readOnly={readOnly}
+                                                        value={
+                                                            (typeof question.scale_labels?.right ===
+                                                            'string'
+                                                                ? question.scale_labels.right
+                                                                : question.scale_labels?.right?.[
+                                                                      activeLocale
+                                                                  ]) || ''
+                                                        }
+                                                        placeholder={t(
+                                                            'admin.design.questions.defaults.scale_right'
+                                                        )}
+                                                        onChange={(
+                                                            e: React.ChangeEvent<HTMLInputElement>
+                                                        ) => {
+                                                            if (readOnly) return;
+                                                            const prev =
+                                                                question.scale_labels?.right;
+                                                            const next =
+                                                                typeof prev === 'object' &&
+                                                                prev !== null
+                                                                    ? {
+                                                                          ...prev,
+                                                                          [activeLocale]:
+                                                                              e.target.value,
+                                                                      }
+                                                                    : {
+                                                                          en:
+                                                                              (prev as
+                                                                                  | string
+                                                                                  | undefined) ||
+                                                                              '',
+                                                                          [activeLocale]:
+                                                                              e.target.value,
+                                                                      };
+                                                            onUpdate({
+                                                                ...question,
+                                                                scale_labels: {
+                                                                    ...question.scale_labels,
+                                                                    right: next,
+                                                                },
+                                                            });
+                                                        }}
+                                                        className="h-9 text-xs bg-white rounded-lg"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {(question.type === 'select' ||
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
@@ -794,6 +989,22 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                     : undefined,
             placeholder: undefined,
             rows: qType === 'textarea' ? 4 : undefined,
+            scale_points: qType === 'rating' ? 5 : undefined,
+            scale_labels:
+                qType === 'rating'
+                    ? {
+                          left: {
+                              [activeLocale]: t('admin.design.questions.defaults.scale_left', {
+                                  lng: activeLocale,
+                              }),
+                          },
+                          right: {
+                              [activeLocale]: t('admin.design.questions.defaults.scale_right', {
+                                  lng: activeLocale,
+                              }),
+                          },
+                      }
+                    : undefined,
         };
 
         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
@@ -916,6 +1127,26 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             {t(`admin.design.questions.types.${field.label}`)}
                                         </Button>
                                     ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {!readOnly && !structureLocked && (
+                            <div className="space-y-4">
+                                <div className="text-2xs font-black text-slate-400">
+                                    {t('admin.design.questions.scale_fields')}
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    <Button
+                                        data-testid="add-question-rating"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => addQuestion('rating')}
+                                        className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                    >
+                                        <BarChart3 className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                        {t('admin.design.questions.types.rating')}
+                                    </Button>
                                 </div>
                             </div>
                         )}

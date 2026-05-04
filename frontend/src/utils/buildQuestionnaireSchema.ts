@@ -24,7 +24,8 @@ export interface QuestionnaireField {
         | 'radio'
         | 'date'
         | 'select'
-        | 'text_audio';
+        | 'text_audio'
+        | 'rating';
     required?: boolean;
     min?: number;
     max?: number;

@@ -62,6 +62,7 @@ export const PreSortFieldSchema = z.object({
         'email',
         'textarea',
         'text_audio',
+        'rating',
     ]),
     label: z.union([z.string(), z.record(z.string())]),
     required: z.boolean().optional(),
@@ -82,6 +83,14 @@ export const PreSortFieldSchema = z.object({
     minLength: z.number().optional(),
     maxLength: z.number().optional(),
     rows: z.number().optional(),
+    scale_points: z.number().int().min(2).max(10).optional(),
+    scale_labels: z
+        .object({
+            left: z.union([z.string(), z.record(z.string())]).optional(),
+            right: z.union([z.string(), z.record(z.string())]).optional(),
+            middle: z.union([z.string(), z.record(z.string())]).optional(),
+        })
+        .optional(),
     visibility_condition: VisibilityConditionSchema.optional(),
 });
 
