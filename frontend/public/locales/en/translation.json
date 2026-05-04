@@ -1803,13 +1803,18 @@
                 "add_field": "Add a new field",
                 "basic_fields": "Basic fields",
                 "choice_fields": "Choice fields",
+                "scale_fields": "Scale fields",
                 "labels": {
                     "question": "Question label",
                     "required": "Required field",
                     "options": "Options",
                     "multiple": "(Multiple selection allowed)",
                     "single": "(Single selection)",
-                    "placeholder": "Enter your question here..."
+                    "placeholder": "Enter your question here...",
+                    "scale": "Rating scale",
+                    "scale_points": "Number of points",
+                    "scale_left": "Left endpoint label",
+                    "scale_right": "Right endpoint label"
                 },
                 "types": {
                     "text": "Text",
@@ -1820,7 +1825,8 @@
                     "dropdown": "Dropdown",
                     "radio": "Radio",
                     "checkboxes": "Checkboxes",
-                    "text_audio": "Text + Audio"
+                    "text_audio": "Text + Audio",
+                    "rating": "Rating scale"
                 },
                 "empty": {
                     "title": "No questions yet",
@@ -1830,7 +1836,9 @@
                     "new_question": "New question",
                     "option": "Option",
                     "enter_answer": "Enter your answer...",
-                    "untitled": "Untitled question"
+                    "untitled": "Untitled question",
+                    "scale_left": "Strongly disagree",
+                    "scale_right": "Strongly agree"
                 },
                 "actions": {
                     "add_option": "Add option",

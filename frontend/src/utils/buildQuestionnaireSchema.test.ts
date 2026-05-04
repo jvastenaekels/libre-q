@@ -175,6 +175,32 @@ describe('buildQuestionnaireSchema', () => {
         });
     });
 
+    describe('rating', () => {
+        it('required rating rejects empty and accepts a numeric string', () => {
+            const schema = buildQuestionnaireSchema(
+                { satisfaction: Q({ type: 'rating', required: true }) },
+                {},
+                t
+            );
+            expect(schema.safeParse({ satisfaction: '' }).success).toBe(false);
+            expect(schema.safeParse({}).success).toBe(false);
+            expect(schema.safeParse({ satisfaction: '3' }).success).toBe(true);
+            expect(schema.safeParse({ satisfaction: '5' }).success).toBe(true);
+        });
+
+        it('optional rating accepts empty / null / missing', () => {
+            const schema = buildQuestionnaireSchema(
+                { satisfaction: Q({ type: 'rating', required: false }) },
+                {},
+                t
+            );
+            expect(schema.safeParse({}).success).toBe(true);
+            expect(schema.safeParse({ satisfaction: '' }).success).toBe(true);
+            expect(schema.safeParse({ satisfaction: null }).success).toBe(true);
+            expect(schema.safeParse({ satisfaction: '4' }).success).toBe(true);
+        });
+    });
+
     describe('shape integrity', () => {
         it('returns a ZodObject containing every key from the input map', () => {
             const questions = {

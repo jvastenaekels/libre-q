@@ -1717,13 +1717,18 @@
                 "add_field": "Lisää uusi kenttä",
                 "basic_fields": "Peruskentät",
                 "choice_fields": "Valintakentät",
+                "scale_fields": "Asteikkokentät",
                 "labels": {
                     "question": "Kysymyksen otsikko",
                     "required": "Pakollinen kenttä",
                     "options": "Vaihtoehdot",
                     "multiple": "(useita valintoja sallittu)",
                     "single": "(yksi valinta)",
-                    "placeholder": "Kirjoita kysymyksesi tähän..."
+                    "placeholder": "Kirjoita kysymyksesi tähän...",
+                    "scale": "Arviointiasteikko",
+                    "scale_points": "Pisteiden määrä",
+                    "scale_left": "Vasemman pään merkintä",
+                    "scale_right": "Oikean pään merkintä"
                 },
                 "types": {
                     "text": "Teksti",
@@ -1734,7 +1739,8 @@
                     "dropdown": "Pudotusvalikko",
                     "radio": "Radio-painike",
                     "checkboxes": "Valintaruudut",
-                    "text_audio": "Teksti + Ääni"
+                    "text_audio": "Teksti + Ääni",
+                    "rating": "Asteikko"
                 },
                 "empty": {
                     "title": "Ei vielä kysymyksiä",
@@ -1744,7 +1750,9 @@
                     "new_question": "Uusi kysymys",
                     "option": "Vaihtoehto",
                     "enter_answer": "Kirjoita vastauksesi...",
-                    "untitled": "Nimetön kysymys"
+                    "untitled": "Nimetön kysymys",
+                    "scale_left": "Täysin eri mieltä",
+                    "scale_right": "Täysin samaa mieltä"
                 },
                 "actions": {
                     "add_option": "Lisää vaihtoehto",
