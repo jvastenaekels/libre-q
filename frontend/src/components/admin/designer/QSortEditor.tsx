@@ -32,6 +32,7 @@ import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { ImportFromConcourseDialog } from './ImportFromConcourseDialog';
+import { computeAutoShapedCapacities } from './QSortEditor.helpers';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet,
@@ -703,72 +704,13 @@ const QSortEditor = ({
         updateDraft((d) => {
             if (!d.grid_config || d.grid_config.length === 0) return;
 
-            const numColumns = d.grid_config.length;
-            const N = totalStatements;
-            const centerIdx = Math.floor(numColumns / 2);
-            const isOddCols = numColumns % 2 !== 0;
+            const newCapacities = computeAutoShapedCapacities(
+                totalStatements,
+                d.grid_config.length
+            );
 
-            // 1. Generate Target Weights
-            // Standard Q-sorts are "quasi-normal" but flatter than pure binomial.
-            // We use a Power curve which produces a more professional forced-choice distribution.
-            const weights = [];
-            const maxDist = Math.max(centerIdx, numColumns - 1 - centerIdx);
-
-            for (let i = 0; i < numColumns; i++) {
-                const dist = Math.abs(i - centerIdx);
-                // 1.4 is a sweet spot for reproducing common research tables
-                weights.push((maxDist - dist + 1) ** 1.4);
-            }
-
-            const totalWeight = weights.reduce((a, b) => a + b, 0);
-            const idealCapacities = weights.map((w) => (w / totalWeight) * N);
-
-            // 2. Initial Distribution
-            // Start with minimum: 2 per col if N is large, 1 if medium, 0 if small
-            const minPerCol = N >= 40 ? 2 : N >= numColumns ? 1 : 0;
-            const newCapacities: number[] = new Array(numColumns).fill(minPerCol);
-            let currentTotal = newCapacities.reduce((a, b) => a + b, 0);
-
-            // 3. Greedy distribution with symmetry
-            while (currentTotal < N) {
-                let bestIdx = -1;
-                let maxDiff = -Infinity;
-
-                const limit = isOddCols ? centerIdx : centerIdx - 1;
-
-                for (let i = 0; i <= limit; i++) {
-                    const diff = (idealCapacities[i] ?? 0) - (newCapacities[i] ?? 0);
-                    if (diff > maxDiff) {
-                        maxDiff = diff;
-                        bestIdx = i;
-                    }
-                }
-
-                if (bestIdx === -1) break;
-
-                if (isOddCols && bestIdx === centerIdx) {
-                    newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
-                    currentTotal++;
-                } else {
-                    if (N - currentTotal >= 2) {
-                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
-                        const mirrorIdx = numColumns - 1 - bestIdx;
-                        newCapacities[mirrorIdx] = (newCapacities[mirrorIdx] ?? 0) + 1;
-                        currentTotal += 2;
-                    } else if (isOddCols) {
-                        newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
-                        currentTotal++;
-                    } else {
-                        // Even columns parity break
-                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
-                        currentTotal++;
-                    }
-                }
-            }
-
-            // Apply to draft
-            for (let i = 0; i < numColumns; i++) {
-                const col = d.grid_config?.[i];
+            for (let i = 0; i < newCapacities.length; i++) {
+                const col = d.grid_config[i];
                 const cap = newCapacities[i];
                 if (col && cap !== undefined) {
                     col.capacity = cap;
