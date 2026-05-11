@@ -275,7 +275,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
 
                             <div className="transform origin-center grayscale-[0.2] contrast-125 z-10 w-full flex justify-center">
-                                <SortingAnimation scale={scale} />
+                                <SortingAnimation scale={scale} roughSortEnabled={roughOn} />
                             </div>
                         </div>
                     </div>
