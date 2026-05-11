@@ -774,7 +774,7 @@
             "error": "Impossible d'importer les énoncés depuis le concours. Réessayez.",
             "no_accepted": "Aucun élément accepté dans ce concours. Décochez « Acceptés uniquement » pour tout voir.",
             "no_items": "Ce concours n'a aucun élément.",
-            "no_concourses": "Aucun concours dans cet espace de travail. Créez-en un d'abord."
+            "no_concourses": "Aucun concours dans ce projet. Créez-en un d'abord."
         },
         "concourse_sync": {
             "update_available": "Mettre à jour",
@@ -1028,16 +1028,16 @@
                 "settings": "Paramètres du projet",
                 "settings_desc": "Membres et profils",
                 "new_project": "Nouveau projet",
-                "new_project_desc": "Créer une nouvelle organisation"
+                "new_project_desc": "Créer un nouveau projet"
             },
             "create": {
                 "title": "Créer un projet",
                 "card_title": "Détails du projet",
                 "name_label": "Nom du projet",
-                "name_placeholder": "Mon groupe de recherche universitaire",
+                "name_placeholder": "Étude Q sur les attitudes climatiques",
                 "url_label": "URL du projet",
-                "url_placeholder": "mon-groupe-recherche",
-                "url_description": "Ceci sera utilisé dans l'URL de votre projet.",
+                "url_placeholder": "attitudes-climatiques-q",
+                "url_description": "Ce chemin identifie le projet sous /app/.",
                 "cancel": "Annuler",
                 "create_button": "Créer le projet",
                 "creating": "Création...",
@@ -1248,7 +1248,7 @@
             "receiving_responses": "Études recevant des réponses",
             "total_participants": "Participants au total",
             "all_studies": "Toutes les études",
-            "all_studies_description": "Toutes les études de cet espace de travail.",
+            "all_studies_description": "Toutes les études de ce projet.",
             "languages_count_one": "{{count}} langue",
             "languages_count_other": "{{count}} langues",
             "n_participants_one": "{{count}} participant",
@@ -2437,7 +2437,9 @@
             "n_active_other": "{{count}} actives",
             "collecting": "Collecte en cours",
             "no_studies": "Aucune étude",
-            "no_projects": "Aucun projet. Créez votre premier projet pour commencer."
+            "no_projects": "Aucun projet. Créez votre premier projet pour commencer.",
+            "no_projects_title": "Lancer votre premier projet de recherche",
+            "no_projects_body": "Créez un projet avant d'ajouter des concourses, des Q-sets ou des études."
         },
         "memo": {
             "title_concourse": "Notes de sélection",

@@ -52,7 +52,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 | Team collaboration (roles) | No | No | No | No | No | No | **Yes** |
 | Interop with PQMethod / R / Ken-Q formats | CSV out | KADE / PQMethod | Native | Imports PQMethod | Imports CSV/PQMethod | Yes (import & export) | **Yes** |
 | Self-hosted | Yes | Frontend only | Desktop | Yes (static site) | Desktop | Yes (local R) | **Yes** |
-| Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2/3) | **Yes (AGPL-3)** |
+| Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2+) | **Yes (AGPL-3)** |
 
 *"—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR.*
 

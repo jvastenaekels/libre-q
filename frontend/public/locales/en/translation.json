@@ -504,7 +504,9 @@
             "n_active_other": "{{count}} active",
             "collecting": "Collecting data",
             "no_studies": "No studies yet",
-            "no_projects": "No projects yet. Create your first project to get started."
+            "no_projects": "No projects yet. Create your first project to get started.",
+            "no_projects_title": "Start your first research project",
+            "no_projects_body": "Create a project before adding concourses, Q-sets, or studies."
         },
         "memo": {
             "title_concourse": "Selection notes",
@@ -1107,7 +1109,7 @@
                 "settings": "Project settings",
                 "settings_desc": "Members & profiles",
                 "new_project": "New project",
-                "new_project_desc": "Create a new organization"
+                "new_project_desc": "Create a new project"
             },
             "roles": {
                 "owner": "Owner",
@@ -1125,10 +1127,10 @@
                 "title": "Create project",
                 "card_title": "Project details",
                 "name_label": "Project name",
-                "name_placeholder": "My university research group",
+                "name_placeholder": "Climate attitudes Q study",
                 "url_label": "Project URL",
-                "url_placeholder": "My-research-group",
-                "url_description": "This will be used in your project URL.",
+                "url_placeholder": "climate-attitudes-q-study",
+                "url_description": "This becomes the project path under /app/.",
                 "cancel": "Cancel",
                 "create_button": "Create project",
                 "creating": "Creating...",
