@@ -56,6 +56,7 @@ import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 import { resetAllStores } from '../utils/sessionReset';
+import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
 import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 
 const steps = [
@@ -151,10 +152,10 @@ const StudyLayoutContent: React.FC = () => {
     // unknown slug), reset it so the participant can start fresh in this study.
     // Their submitted data is safe on the backend — only the local state is cleared.
     useEffect(() => {
-        if (slug && isCompleted && studySlug !== slug) {
+        if (shouldResetParticipantSessionForStudy(slug, studySlug)) {
             resetAllStores({ skipConfig: true });
         }
-    }, [slug, isCompleted, studySlug]);
+    }, [slug, studySlug]);
 
     // copyTimeoutRef and resumeButtonRef are stable refs; setters are stable too.
     // biome-ignore lint/correctness/useExhaustiveDependencies: stable refs/setters
