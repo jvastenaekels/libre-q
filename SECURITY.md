@@ -24,9 +24,9 @@ the reporter.
 
 We patch the latest tagged release. Older releases are best-effort.
 
-## Known dependency-level findings (deliberate acceptance)
+## Known static-analysis findings (deliberate acceptance)
 
-Dependencies surface CVEs that we have evaluated and chose not to fix because the affected code paths are not reachable in Qualis's usage.
+Static-analysis tools can flag patterns where the heuristic does not match the actual semantics. These findings are reviewed and documented here rather than silently ignored.
 
 ### Bandit suppressions
 
@@ -37,14 +37,6 @@ Dependencies surface CVEs that we have evaluated and chose not to fix because th
 - `app/services/study_service.py` (~line 542) — `# nosec B105`. The dict key `requires_password` is a payload field name; the value is the literal `False`. Bandit pattern-matches the key and flags the entry. The suppression is hoisted to a single-line local assignment to keep the AST attribution scoped.
 
 Last reviewed: 2026-05-01.
-
-### `xlsx` (SheetJS Community Edition)
-
-[GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) (prototype pollution) and [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) (ReDoS) require **attacker-controlled XLSX inputs to be parsed**. Qualis only **writes** XLSX files for export (`frontend/src/utils/analysisXlsxExport.ts`); it never parses untrusted XLSX. The test suite parses XLSX but only data it just wrote.
-
-Mitigation if reachability changes (e.g. import-from-XLSX is added): switch to ExcelJS or vendor SheetJS Pro from the official CDN.
-
-Last reviewed: 2026-04-25.
 
 ## Security-relevant practices in Qualis
 

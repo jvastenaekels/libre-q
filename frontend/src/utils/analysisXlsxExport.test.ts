@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { generateAnalysisXlsx } from './analysisXlsxExport';
 import type { AnalysisResult } from '@/api/model';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { Workbook, type Worksheet } from 'exceljs';
 
 const mockResult: AnalysisResult = {
     n_participants: 3,
@@ -108,7 +111,38 @@ const mockResult: AnalysisResult = {
     ],
 };
 
+async function loadWorkbook(blob: Blob): Promise<Workbook> {
+    const workbook = new Workbook();
+    await workbook.xlsx.load(await blob.arrayBuffer());
+    return workbook;
+}
+
+function getWorksheet(workbook: Workbook, name: string): Worksheet {
+    const worksheet = workbook.getWorksheet(name);
+    if (!worksheet) throw new Error(`Missing worksheet: ${name}`);
+    return worksheet;
+}
+
+function worksheetRows(worksheet: Worksheet): unknown[][] {
+    const rows: unknown[][] = [];
+    worksheet.eachRow((row) => {
+        rows.push((row.values as unknown[]).slice(1));
+    });
+    return rows;
+}
+
 describe('generateAnalysisXlsx', () => {
+    it('does not depend on SheetJS xlsx at runtime', () => {
+        const packageJson = JSON.parse(
+            readFileSync(resolve(__dirname, '../../package.json'), 'utf8')
+        );
+        const implementation = readFileSync(resolve(__dirname, 'analysisXlsxExport.ts'), 'utf8');
+
+        expect(packageJson.dependencies).not.toHaveProperty('xlsx');
+        expect(implementation).not.toContain("from 'xlsx'");
+        expect(implementation).not.toContain("import('xlsx')");
+    });
+
     it('generates a valid XLSX blob with correct MIME type', async () => {
         const blob = await generateAnalysisXlsx(mockResult);
         expect(blob).toBeInstanceOf(Blob);
@@ -117,12 +151,10 @@ describe('generateAnalysisXlsx', () => {
     });
 
     it('produces a workbook with 7 sheets', async () => {
-        const XLSX = await import('xlsx');
         const blob = await generateAnalysisXlsx(mockResult);
-        const buf = await blob.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array' });
+        const workbook = await loadWorkbook(blob);
 
-        expect(wb.SheetNames).toEqual([
+        expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual([
             'Overview',
             'Factor Loadings',
             'Statement Scores',
@@ -134,16 +166,9 @@ describe('generateAnalysisXlsx', () => {
     });
 
     it('has correct row counts per sheet', async () => {
-        const XLSX = await import('xlsx');
         const blob = await generateAnalysisXlsx(mockResult);
-        const buf = await blob.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array' });
-
-        const rowCount = (name: string) => {
-            const sheet = wb.Sheets[name];
-            const data = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as unknown[][];
-            return data.length;
-        };
+        const workbook = await loadWorkbook(blob);
+        const rowCount = (name: string) => getWorksheet(workbook, name).actualRowCount;
 
         // Overview: 6 metadata rows + 2 eigenvalue rows (no header)
         expect(rowCount('Overview')).toBe(8);
@@ -162,12 +187,9 @@ describe('generateAnalysisXlsx', () => {
     });
 
     it('contains correct overview metadata', async () => {
-        const XLSX = await import('xlsx');
         const blob = await generateAnalysisXlsx(mockResult);
-        const buf = await blob.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array' });
-        const sheet = wb.Sheets.Overview;
-        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as unknown[][];
+        const workbook = await loadWorkbook(blob);
+        const data = worksheetRows(getWorksheet(workbook, 'Overview'));
 
         expect(data[0]).toEqual(['Extraction', 'PCA']);
         expect(data[1]).toEqual(['Rotation', 'Varimax']);
@@ -179,12 +201,9 @@ describe('generateAnalysisXlsx', () => {
     });
 
     it('contains participant loadings with flagging info', async () => {
-        const XLSX = await import('xlsx');
         const blob = await generateAnalysisXlsx(mockResult);
-        const buf = await blob.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array' });
-        const sheet = wb.Sheets['Factor Loadings'];
-        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as unknown[][];
+        const workbook = await loadWorkbook(blob);
+        const data = worksheetRows(getWorksheet(workbook, 'Factor Loadings'));
 
         // Header
         expect(data[0]).toEqual(['Participant', 'F1', 'F2', 'Flagged']);
@@ -194,21 +213,19 @@ describe('generateAnalysisXlsx', () => {
     });
 
     it('applies number formats to cells', async () => {
-        const XLSX = await import('xlsx');
         const blob = await generateAnalysisXlsx(mockResult);
-        const buf = await blob.arrayBuffer();
-        const wb = XLSX.read(buf, { type: 'array', cellNF: true });
+        const workbook = await loadWorkbook(blob);
 
         // Factor Loadings: loading cells should have 4-decimal format
-        const loadingsSheet = wb.Sheets['Factor Loadings'];
-        expect(loadingsSheet.B2?.z).toBe('0.0000');
+        const loadingsSheet = getWorksheet(workbook, 'Factor Loadings');
+        expect(loadingsSheet.getCell('B2').numFmt).toBe('0.0000');
 
         // Factor Characteristics: eigenvalue row should have 3-decimal format
-        const charSheet = wb.Sheets['Factor Characteristics'];
-        expect(charSheet.B2?.z).toBe('0.000'); // Eigenvalue row
+        const charSheet = getWorksheet(workbook, 'Factor Characteristics');
+        expect(charSheet.getCell('B2').numFmt).toBe('0.000'); // Eigenvalue row
 
         // Correlation Matrix: correlations should have 3-decimal format
-        const corrSheet = wb.Sheets['Correlation Matrix'];
-        expect(corrSheet.B2?.z).toBe('0.000');
+        const corrSheet = getWorksheet(workbook, 'Correlation Matrix');
+        expect(corrSheet.getCell('B2').numFmt).toBe('0.000');
     });
 });

@@ -436,7 +436,7 @@ not at the incident occurrence (Art. 33(1)).
 - Monitor `app.middleware.errors` 5xx spikes.
 - Monitor Sentry (if configured) for unhandled exceptions.
 - Subscribe to GitHub security advisories on `pyjwt`, `bcrypt`, `fastapi`,
-  `sqlalchemy`, `dompurify`, `xlsx`.
+  `sqlalchemy`, `dompurify`, `exceljs`.
 - Subscribe to Qualis maintainer security advisories (release notes / RSS).
 
 ### 8.2 Assess (within 72 hours)

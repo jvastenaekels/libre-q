@@ -1,21 +1,10 @@
 import type { AnalysisResult } from '@/api/model';
-import type { WorkSheet } from 'xlsx';
-
-/** Convert 0-indexed (row, col) to a cell address like "A1", "AA2". */
-function cellAddr(r: number, c: number): string {
-    let col = '';
-    let cc = c;
-    do {
-        col = String.fromCharCode(65 + (cc % 26)) + col;
-        cc = Math.floor(cc / 26) - 1;
-    } while (cc >= 0);
-    return col + (r + 1);
-}
+import type { Worksheet } from 'exceljs';
 
 /** Set column widths based on content, capped at 50 characters. */
 type SheetCell = string | number | boolean | null;
 
-function autoSizeColumns(ws: WorkSheet, data: SheetCell[][]) {
+function autoSizeColumns(ws: Worksheet, data: SheetCell[][]) {
     if (data.length === 0) return;
     const maxCols = Math.max(...data.map((row) => row.length));
     const widths: number[] = [];
@@ -27,12 +16,14 @@ function autoSizeColumns(ws: WorkSheet, data: SheetCell[][]) {
         }
         widths.push(Math.min(max + 2, 50));
     }
-    ws['!cols'] = widths.map((wch) => ({ wch }));
+    widths.forEach((width, index) => {
+        ws.getColumn(index + 1).width = width;
+    });
 }
 
 /** Apply an Excel number format (e.g. "0.000") to a rectangular range of numeric cells. */
 function formatRange(
-    ws: WorkSheet,
+    ws: Worksheet,
     startRow: number,
     endRow: number,
     startCol: number,
@@ -41,22 +32,22 @@ function formatRange(
 ) {
     for (let r = startRow; r <= endRow; r++) {
         for (let c = startCol; c <= endCol; c++) {
-            const cell = ws[cellAddr(r, c)];
-            if (cell && typeof cell.v === 'number') {
-                cell.z = fmt;
+            const cell = ws.getCell(r + 1, c + 1);
+            if (typeof cell.value === 'number') {
+                cell.numFmt = fmt;
             }
         }
     }
 }
 
 /** Freeze the top row so headers stay visible while scrolling. */
-function freezeHeaderRow(ws: WorkSheet) {
-    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+function freezeHeaderRow(ws: Worksheet) {
+    ws.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }];
 }
 
 /**
  * Generates a multi-sheet XLSX workbook with the complete analysis.
- * Uses dynamic import to keep SheetJS out of the main bundle.
+ * Uses dynamic import to keep the spreadsheet exporter out of the main bundle.
  *
  * `factorNotes` (optional) is the per-factor interpretive narrative dict
  * keyed by stringified 1-indexed factor number. When provided and at least
@@ -66,12 +57,13 @@ export async function generateAnalysisXlsx(
     result: AnalysisResult,
     factorNotes?: Record<string, string> | null
 ): Promise<Blob> {
-    const XLSX = await import('xlsx');
-    const wb = XLSX.utils.book_new();
+    const { Workbook } = await import('exceljs');
+    const wb = new Workbook();
     const nf = result.n_factors;
 
-    const makeSheet = (data: SheetCell[][]): WorkSheet => {
-        const ws = XLSX.utils.aoa_to_sheet(data);
+    const makeSheet = (name: string, data: SheetCell[][]): Worksheet => {
+        const ws = wb.addWorksheet(name);
+        ws.addRows(data);
         autoSizeColumns(ws, data);
         return ws;
     };
@@ -88,10 +80,9 @@ export async function generateAnalysisXlsx(
     for (let i = 0; i < result.eigenvalues.length; i++) {
         overviewRows.push([`Eigenvalue ${i + 1}`, result.eigenvalues[i] ?? 0]);
     }
-    const wsOverview = makeSheet(overviewRows);
+    const wsOverview = makeSheet('Overview', overviewRows);
     formatRange(wsOverview, 5, 5, 1, 1, '0.0'); // variance
     formatRange(wsOverview, 6, 6 + result.eigenvalues.length - 1, 1, 1, '0.0000'); // eigenvalues
-    XLSX.utils.book_append_sheet(wb, wsOverview, 'Overview');
 
     // 2. Factor Loadings
     const loadingsHeader = [
@@ -104,10 +95,9 @@ export async function generateAnalysisXlsx(
         ...p.loadings,
         (p.flagged_factors ?? []).map((f) => `F${f}`).join(', ') || '',
     ]);
-    const wsLoadings = makeSheet([loadingsHeader, ...loadingsRows]);
+    const wsLoadings = makeSheet('Factor Loadings', [loadingsHeader, ...loadingsRows]);
     freezeHeaderRow(wsLoadings);
     formatRange(wsLoadings, 1, loadingsRows.length, 1, nf, '0.0000');
-    XLSX.utils.book_append_sheet(wb, wsLoadings, 'Factor Loadings');
 
     // 3. Statement Scores
     const dIds = new Set(result.distinguishing.map((d) => d.statement_id));
@@ -126,11 +116,10 @@ export async function generateAnalysisXlsx(
         ...s.factor_arrays,
         dIds.has(s.statement_id) ? 'D' : cIds.has(s.statement_id) ? 'C' : '',
     ]);
-    const wsScores = makeSheet([scoresHeader, ...scoresRows]);
+    const wsScores = makeSheet('Statement Scores', [scoresHeader, ...scoresRows]);
     freezeHeaderRow(wsScores);
     formatRange(wsScores, 1, scoresRows.length, 2, 1 + nf, '0.00'); // z-scores
     formatRange(wsScores, 1, scoresRows.length, 2 + nf, 1 + 2 * nf, '0'); // arrays
-    XLSX.utils.book_append_sheet(wb, wsScores, 'Statement Scores');
 
     // 4. Distinguishing
     const distHeader = [
@@ -149,11 +138,10 @@ export async function generateAnalysisXlsx(
             .map(([pair, sig]) => `${pair}: ${sig}`)
             .join('; '),
     ]);
-    const wsDist = makeSheet([distHeader, ...distRows]);
+    const wsDist = makeSheet('Distinguishing', [distHeader, ...distRows]);
     freezeHeaderRow(wsDist);
     formatRange(wsDist, 1, distRows.length, 2, 1 + nf, '0.00');
     formatRange(wsDist, 1, distRows.length, 2 + nf, 1 + 2 * nf, '0');
-    XLSX.utils.book_append_sheet(wb, wsDist, 'Distinguishing');
 
     // 5. Consensus
     const consHeader = [
@@ -168,11 +156,10 @@ export async function generateAnalysisXlsx(
         ...c.z_scores,
         ...c.factor_arrays,
     ]);
-    const wsCons = makeSheet([consHeader, ...consRows]);
+    const wsCons = makeSheet('Consensus', [consHeader, ...consRows]);
     freezeHeaderRow(wsCons);
     formatRange(wsCons, 1, consRows.length, 2, 1 + nf, '0.00');
     formatRange(wsCons, 1, consRows.length, 2 + nf, 1 + 2 * nf, '0');
-    XLSX.utils.book_append_sheet(wb, wsCons, 'Consensus');
 
     // 6. Factor Characteristics — per-row formats
     const chars = result.factor_characteristics;
@@ -206,13 +193,12 @@ export async function generateAnalysisXlsx(
         charHeader,
         ...charMetrics.map((m) => [m.label, ...m.values]),
     ];
-    const wsChars = makeSheet(charData);
+    const wsChars = makeSheet('Factor Characteristics', charData);
     freezeHeaderRow(wsChars);
     for (let i = 0; i < charMetrics.length; i++) {
         const metric = charMetrics[i];
         if (metric) formatRange(wsChars, i + 1, i + 1, 1, chars.length, metric.fmt);
     }
-    XLSX.utils.book_append_sheet(wb, wsChars, 'Factor Characteristics');
 
     // 7. Correlation Matrix
     const corrHeader: (string | number)[] = [
@@ -223,10 +209,9 @@ export async function generateAnalysisXlsx(
         `F${i + 1}`,
         ...row.map((v) => v ?? 0),
     ]);
-    const wsCorr = makeSheet([corrHeader, ...corrRows]);
+    const wsCorr = makeSheet('Correlation Matrix', [corrHeader, ...corrRows]);
     freezeHeaderRow(wsCorr);
     formatRange(wsCorr, 1, corrRows.length, 1, nf, '0.000');
-    XLSX.utils.book_append_sheet(wb, wsCorr, 'Correlation Matrix');
 
     // 8. Factor Narratives (per-factor interpretive memos, when provided).
     // Skipped entirely if no narratives were authored — no empty sheet.
@@ -241,16 +226,16 @@ export async function generateAnalysisXlsx(
             }
         }
         if (any) {
-            const wsNotes = makeSheet(narrativeRows);
+            const wsNotes = makeSheet('Factor Narratives', narrativeRows);
             freezeHeaderRow(wsNotes);
             // Wider second column to fit prose; row heights default.
-            wsNotes['!cols'] = [{ wch: 8 }, { wch: 80 }];
-            XLSX.utils.book_append_sheet(wb, wsNotes, 'Factor Narratives');
+            wsNotes.getColumn(1).width = 8;
+            wsNotes.getColumn(2).width = 80;
         }
     }
 
     // Write to binary and return as Blob
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const wbout = await wb.xlsx.writeBuffer();
     return new Blob([wbout], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
