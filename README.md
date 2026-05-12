@@ -126,7 +126,7 @@ A reusable pool of candidate statements that lives at the project level, not the
 ### Collaboration
 
 - **Projects** to isolate research groups, each with its own members and studies.
-- **Concurrent editing** with auto-save, optimistic locking, and conflict resolution.
+- **Shared project access** for research teams, with role-based permissions for editing, exports, and member management.
 - **Invitation system** via email, or shareable link when SMTP is not configured.
 
 ---
