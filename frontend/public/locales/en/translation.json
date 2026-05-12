@@ -375,6 +375,9 @@
             "initial_instruction_mobile": "Tap statement",
             "cancel_selection": "Cancel selection",
             "help": "How does it work?",
+            "previous_tip": "Previous tip",
+            "next_tip": "Next tip",
+            "go_to_tip": "Go to tip {{number}}",
             "methodology": {
                 "extremes": "Tip: start with what is most obvious to you (the extremes).",
                 "vertical": "In the same column, the order from top to bottom doesn't matter.",

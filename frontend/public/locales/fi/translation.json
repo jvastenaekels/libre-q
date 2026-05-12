@@ -375,6 +375,9 @@
             "initial_instruction_mobile": "Napauta väitettä",
             "cancel_selection": "Peruuta valinta",
             "help": "Miten tämä toimii?",
+            "previous_tip": "Edellinen vinkki",
+            "next_tip": "Seuraava vinkki",
+            "go_to_tip": "Siirry vinkkiin {{number}}",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
                 "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",

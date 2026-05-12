@@ -375,6 +375,9 @@
             "initial_instruction_mobile": "Touchez un énoncé",
             "cancel_selection": "Annuler la sélection",
             "help": "Comment faire ?",
+            "previous_tip": "Astuce précédente",
+            "next_tip": "Astuce suivante",
+            "go_to_tip": "Aller à l'astuce {{number}}",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
                 "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance.",
