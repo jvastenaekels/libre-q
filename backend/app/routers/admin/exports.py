@@ -448,9 +448,11 @@ async def get_research_package(
         else ""
     )
 
+    analysis_participants = [p for p in full_study.participants if not p.is_discarded]
+
     zip_content = ExportService.generate_research_package(
         full_study,
-        full_study.participants,
+        analysis_participants,
         full_dump=full_dump,
         memo_md=memo_md if memo_md else None,
         memo_discussion_md=memo_discussion_md if memo_discussion_md else None,

@@ -616,9 +616,15 @@ class ExportService:
     def _generate_r_script(study: Study) -> str:
         """Generates a dynamic R script for qmethod package."""
         # Calculate actual metadata column count
-        presort_fields = study.presort_config or {}
+        presort_config = study.presort_config or {}
+        if "fields" in presort_config:
+            presort_fields = presort_config.get("fields", {})
+        elif "enabled" not in presort_config:
+            presort_fields = presort_config
+        else:
+            presort_fields = {}
         n_presort = len(presort_fields)
-        n_fixed_meta = 11  # Participant_UID through Is_Test_Run
+        n_fixed_meta = 10  # Participant_UID through Discard_Reason
         n_meta = n_fixed_meta + n_presort
         n_items = len(study.statements)
 

@@ -228,4 +228,20 @@ describe('generateAnalysisXlsx', () => {
         const corrSheet = getWorksheet(workbook, 'Correlation Matrix');
         expect(corrSheet.getCell('B2').numFmt).toBe('0.000');
     });
+
+    it('includes factor narratives only when at least one narrative is non-empty', async () => {
+        const blob = await generateAnalysisXlsx(mockResult, {
+            '1': 'Factor one narrative',
+            '2': '   ',
+        });
+        const workbook = await loadWorkbook(blob);
+        const narratives = getWorksheet(workbook, 'Factor Narratives');
+        const rows = worksheetRows(narratives);
+
+        expect(rows).toEqual([
+            ['Factor', 'Narrative'],
+            ['F1', 'Factor one narrative'],
+        ]);
+        expect(narratives.getColumn(2).width).toBe(80);
+    });
 });

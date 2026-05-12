@@ -13,6 +13,17 @@
 
 import type { AnalysisResult } from '@/api/model';
 
+function csvField(value: string | number | null): string {
+    if (value === null) return '';
+    const text = String(value);
+    if (!/[",\r\n]/.test(text)) return text;
+    return `"${text.replace(/"/g, '""')}"`;
+}
+
+function csvRow(fields: (string | number | null)[]): string {
+    return fields.map(csvField).join(',');
+}
+
 /**
  * Trigger a browser download of a Blob with the given filename.
  *
@@ -45,7 +56,7 @@ export function generateLoadingsCsv(result: AnalysisResult): string {
         ...p.loadings.map((l) => l.toFixed(4)),
         (p.flagged_factors ?? []).map((f) => `F${f}`).join(';') || '',
     ]);
-    return [headers, ...rows].map((r) => r.join(',')).join('\n');
+    return [headers, ...rows].map(csvRow).join('\n');
 }
 
 /**
@@ -63,7 +74,7 @@ export function generateScoresCsv(result: AnalysisResult): string {
     ];
     const rows = result.statement_scores.map((s) => [
         s.code,
-        `"${s.text.replace(/"/g, '""')}"`,
+        s.text,
         ...s.z_scores.map((z) => (z === null ? '' : z.toFixed(2))),
         ...s.factor_arrays.map(String),
         dIds.has(s.statement_id)
@@ -72,5 +83,5 @@ export function generateScoresCsv(result: AnalysisResult): string {
               ? 'C'
               : '',
     ]);
-    return [headers, ...rows].map((r) => r.join(',')).join('\n');
+    return [headers, ...rows].map(csvRow).join('\n');
 }

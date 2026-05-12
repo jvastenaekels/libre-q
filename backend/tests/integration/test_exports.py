@@ -310,6 +310,81 @@ class TestExports:
             assert f"pqmethod/{study.slug}.sta" in filenames
             assert "r_kit/analysis.R" in filenames
 
+    async def test_research_package_analysis_files_exclude_discarded_participants(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        project_factory,
+        study_factory,
+        auth_token_factory,
+        db,
+    ):
+        """Research package analysis files must match CSV/R-Kit/PQMethod filtering."""
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+
+        from app.models import Statement, StatementTranslation
+
+        stmt = Statement(study_id=study.id, code="S1", display_order=0)
+        db.add(stmt)
+        await db.flush()
+        db.add(
+            StatementTranslation(
+                statement_id=stmt.id, language_code="en", text="Statement 1"
+            )
+        )
+
+        keep_token = uuid.uuid4()
+        drop_token = uuid.uuid4()
+        kept = Participant(
+            study_id=study.id,
+            session_token=keep_token,
+            status=ParticipantStatus.completed,
+            language_used="en",
+            is_discarded=False,
+        )
+        discarded = Participant(
+            study_id=study.id,
+            session_token=drop_token,
+            status=ParticipantStatus.completed,
+            language_used="en",
+            is_discarded=True,
+            discard_reason="quality",
+        )
+        db.add_all([kept, discarded])
+        await db.flush()
+        db.add_all(
+            [
+                QSortEntry(participant_id=kept.id, statement_id=stmt.id, grid_score=1),
+                QSortEntry(
+                    participant_id=discarded.id,
+                    statement_id=stmt.id,
+                    grid_score=-1,
+                    card_comment="discarded-only-comment",
+                ),
+            ]
+        )
+        await db.commit()
+
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/export/package",
+            headers=auth_token_factory(test_user),
+        )
+
+        assert response.status_code == 200
+        with zipfile.ZipFile(io.BytesIO(response.content), "r") as z:
+            data_csv = z.read("data_all.csv").decode("utf-8")
+            r_data_csv = z.read("r_kit/q_data.csv").decode("utf-8")
+            pqmethod_dat = z.read(f"pqmethod/{study.slug}.dat").decode("utf-8")
+
+        assert str(keep_token) in data_csv
+        assert str(drop_token) not in data_csv
+        assert "discarded-only-comment" not in data_csv
+        assert str(drop_token) not in r_data_csv
+        assert "discarded-only-comment" not in r_data_csv
+        # Header + one kept participant line only.
+        assert len([line for line in pqmethod_dat.splitlines() if line.strip()]) == 2
+
     async def test_export_participant_csv_not_found(
         self,
         client: AsyncClient,
@@ -433,10 +508,10 @@ class TestExports:
             r_script = z.read("analysis.R").decode("utf-8")
 
             # Verify dynamic column offset calculation
-            # Should be: 11 fixed metadata + 3 presort = 14
+            # Should be: 10 fixed metadata + 3 presort = 13
             assert (
-                "n_meta <- 14" in r_script
-            ), "Column offset should be 14 (11 fixed + 3 presort)"
+                "n_meta <- 13" in r_script
+            ), "Column offset should be 13 (10 fixed + 3 presort)"
 
             # Verify it extracts only score columns (every 5th)
             assert "seq(n_meta + 1, n_meta + (n_items * 5), by = 5)" in r_script
