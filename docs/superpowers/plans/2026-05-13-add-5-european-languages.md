@@ -12,6 +12,24 @@
 
 ---
 
+## ⚠️ Post-split update (2026-05-14)
+
+After this plan was written, an i18n namespace split landed in three PRs (#157, #158, #159). Every locale now ships **two files** instead of a single `translation.json`:
+
+- `frontend/public/locales/<lang>/participant.json` — **mandatory**, ~25 KB. Participant flow + public chrome (`common`, `welcome`, `consent`, `presort`, `rough`, `fine`, `post`, `audio`, `resume`, `erasure`, `study`, `landing`, `layout`, `footer`, `errors`).
+- `frontend/public/locales/<lang>/admin.json` — **optional**, ~114 KB. Researcher chrome (`admin`, `auth`). A missing or partial `admin.json` is fine; i18next falls back to `en/admin.json` at runtime.
+
+**Practical effect on the per-language tasks below:**
+
+- **Bootstrap**: replace `cp en/translation.json <code>/translation.json` with `cp en/participant.json <code>/participant.json`. Optionally also `cp en/admin.json <code>/admin.json` if shipping admin in the same PR.
+- **`SUPPORTED_LANGUAGES` entry**: add `hasAdmin: false` when shipping participant-only, `hasAdmin: true` when shipping both. The admin sidebar selector filters on `hasAdmin: true` via `getAdminLanguages()`.
+- **CI parity**: `participant.json` is strict (mismatches fail CI). `admin.json` is best-effort (mismatches warn, CI passes). Drift handling per-locale only matters for participant.
+- **Acceptance**: a new locale ships when the participant flow renders fully in that language. Admin may show English; that is acceptable under the differentiated parity policy.
+
+The Phase 1 listings below (validator code, runbook content) document what was *intended* at plan time. The actual implementation that shipped in #157/#158/#159 is the source of truth — refer to the live files (`frontend/scripts/i18n/check_interpolations.py`, `frontend/scripts/i18n/translation-runbook.md`, `frontend/scripts/i18n/namespace_partition.py`) rather than the inline code blocks here.
+
+---
+
 ## File Map
 
 **New files (first PR only — tooling):**
@@ -20,13 +38,14 @@
 - `frontend/scripts/i18n/translation-runbook.md` — procedure Claude Code follows to translate a locale.
 - `frontend/scripts/i18n/glossaries/.gitkeep` — keep the directory.
 
-**New files (each language PR):**
+**New files (each language PR — post-split):**
 - `frontend/scripts/i18n/glossaries/<code>.yaml` — Q-methodology + product terminology for the language.
-- `frontend/public/locales/<code>/translation.json` — full translation (~2647 keys).
+- `frontend/public/locales/<code>/participant.json` — **mandatory**, ~25 KB, full participant translation.
+- `frontend/public/locales/<code>/admin.json` — **optional**, ~114 KB. Skip for participant-only locales; runtime falls back to `en/admin.json` via i18next.
 
 **Modified files (every language PR):**
 - `frontend/src/i18n.ts` — append code to `SUPPORTED_I18N_LANGUAGES`.
-- `frontend/src/constants/languages.ts` — append `{ code, label, flag }` entry.
+- `frontend/src/constants/languages.ts` — append `{ code, label, flag, hasAdmin }` entry. Set `hasAdmin: true` only if shipping `admin.json` in the same PR.
 
 **Modified files (first PR only — wiring):**
 - `Makefile` — add `npm run check-interpolations` after `npm run i18n-check` in the `check` target.
@@ -579,7 +598,7 @@ This task is intentionally left uncommitted; it commits together with Task 6.
 ### Task 6: Translate `es/translation.json` via Claude Code
 
 **Files:**
-- Create: `frontend/public/locales/es/translation.json`
+- Create: `frontend/public/locales/es/participant.json`
 
 This task is performed by an interactive Claude Code session. The plan-execution
 agent does NOT translate inline; it dispatches or instructs the author to run
@@ -589,7 +608,7 @@ this in a fresh session, then resumes here.
 
 ```bash
 mkdir -p frontend/public/locales/es
-cp frontend/public/locales/en/translation.json frontend/public/locales/es/translation.json
+cp frontend/public/locales/en/participant.json frontend/public/locales/es/participant.json
 ```
 
 This guarantees key parity from the start; translation overwrites values
@@ -599,7 +618,7 @@ namespace by namespace.
 
 Open Claude Code in the repo root and issue this prompt to the agent:
 
-> Translate `frontend/public/locales/es/translation.json` from English to Spanish
+> Translate `frontend/public/locales/es/participant.json` from English to Spanish
 > by following `frontend/scripts/i18n/translation-runbook.md` and the glossary
 > at `frontend/scripts/i18n/glossaries/es.yaml`. Translate one top-level
 > namespace at a time using `Edit`. After each namespace, do not move on until
@@ -615,7 +634,7 @@ expect ~17 namespace passes (more, since `admin` is sub-chunked).
 cd frontend
 npm run i18n-check
 python3 scripts/i18n/check_interpolations.py es
-python3 -c "import json; json.load(open('public/locales/es/translation.json'))"
+python3 -c "import json; json.load(open('public/locales/es/participant.json'))"
 ```
 
 All three must pass. If any fails, return to step 2 with the specific failing
@@ -650,7 +669,7 @@ Must pass cleanly.
 ```bash
 git add frontend/src/i18n.ts \
         frontend/src/constants/languages.ts \
-        frontend/public/locales/es/translation.json
+        frontend/public/locales/es/participant.json
 git commit -m "feat(i18n): add Spanish locale"
 git push -u origin HEAD
 gh pr create --title "feat(i18n): add Spanish locale" --body "$(cat <<'EOF'
@@ -744,7 +763,7 @@ In `frontend/src/constants/languages.ts`, append:
 
 ```bash
 mkdir -p frontend/public/locales/it
-cp frontend/public/locales/en/translation.json frontend/public/locales/it/translation.json
+cp frontend/public/locales/en/participant.json frontend/public/locales/it/participant.json
 ```
 
 Open Claude Code and issue the same prompt as Task 6 step 2, swapping `es` → `it`.
@@ -755,7 +774,7 @@ Open Claude Code and issue the same prompt as Task 6 step 2, swapping `es` → `
 cd frontend
 npm run i18n-check
 python3 scripts/i18n/check_interpolations.py it
-python3 -c "import json; json.load(open('public/locales/it/translation.json'))"
+python3 -c "import json; json.load(open('public/locales/it/participant.json'))"
 ```
 
 - [ ] **Step 6: Human + visual review**
@@ -774,7 +793,7 @@ make ci
 git add frontend/src/i18n.ts \
         frontend/src/constants/languages.ts \
         frontend/scripts/i18n/glossaries/it.yaml \
-        frontend/public/locales/it/translation.json
+        frontend/public/locales/it/participant.json
 git commit -m "feat(i18n): add Italian locale"
 git push -u origin HEAD
 gh pr create --title "feat(i18n): add Italian locale" --body "$(cat <<'EOF'
@@ -797,7 +816,7 @@ EOF
 
 **Files:**
 - Create: `frontend/scripts/i18n/glossaries/pt.yaml`
-- Create: `frontend/public/locales/pt/translation.json`
+- Create: `frontend/public/locales/pt/participant.json`
 - Modify: `frontend/src/i18n.ts`
 - Modify: `frontend/src/constants/languages.ts`
 
@@ -867,14 +886,14 @@ In `frontend/src/constants/languages.ts`, append before the closing `];`:
 
 ```bash
 mkdir -p frontend/public/locales/pt
-cp frontend/public/locales/en/translation.json frontend/public/locales/pt/translation.json
+cp frontend/public/locales/en/participant.json frontend/public/locales/pt/participant.json
 ```
 
 - [ ] **Step 6: Translate in a Claude Code session**
 
 Open Claude Code in the repo root and issue:
 
-> Translate `frontend/public/locales/pt/translation.json` from English to
+> Translate `frontend/public/locales/pt/participant.json` from English to
 > European Portuguese by following `frontend/scripts/i18n/translation-runbook.md`
 > and the glossary at `frontend/scripts/i18n/glossaries/pt.yaml`. Translate one
 > top-level namespace at a time using `Edit`. After each namespace, re-read the
@@ -887,7 +906,7 @@ Open Claude Code in the repo root and issue:
 cd frontend
 npm run i18n-check
 python3 scripts/i18n/check_interpolations.py pt
-python3 -c "import json; json.load(open('public/locales/pt/translation.json'))"
+python3 -c "import json; json.load(open('public/locales/pt/participant.json'))"
 ```
 
 All three must pass.
@@ -919,7 +938,7 @@ make ci
 git add frontend/src/i18n.ts \
         frontend/src/constants/languages.ts \
         frontend/scripts/i18n/glossaries/pt.yaml \
-        frontend/public/locales/pt/translation.json
+        frontend/public/locales/pt/participant.json
 git commit -m "feat(i18n): add Portuguese locale"
 git push -u origin HEAD
 gh pr create --title "feat(i18n): add Portuguese locale" --body "$(cat <<'EOF'
@@ -942,7 +961,7 @@ EOF
 
 **Files:**
 - Create: `frontend/scripts/i18n/glossaries/nl.yaml`
-- Create: `frontend/public/locales/nl/translation.json`
+- Create: `frontend/public/locales/nl/participant.json`
 - Modify: `frontend/src/i18n.ts`
 - Modify: `frontend/src/constants/languages.ts`
 
@@ -1012,14 +1031,14 @@ In `frontend/src/constants/languages.ts`, append before the closing `];`:
 
 ```bash
 mkdir -p frontend/public/locales/nl
-cp frontend/public/locales/en/translation.json frontend/public/locales/nl/translation.json
+cp frontend/public/locales/en/participant.json frontend/public/locales/nl/participant.json
 ```
 
 - [ ] **Step 6: Translate in a Claude Code session**
 
 Open Claude Code in the repo root and issue:
 
-> Translate `frontend/public/locales/nl/translation.json` from English to Dutch
+> Translate `frontend/public/locales/nl/participant.json` from English to Dutch
 > by following `frontend/scripts/i18n/translation-runbook.md` and the glossary
 > at `frontend/scripts/i18n/glossaries/nl.yaml`. Translate one top-level
 > namespace at a time using `Edit`. After each namespace, re-read the glossary
@@ -1032,7 +1051,7 @@ Open Claude Code in the repo root and issue:
 cd frontend
 npm run i18n-check
 python3 scripts/i18n/check_interpolations.py nl
-python3 -c "import json; json.load(open('public/locales/nl/translation.json'))"
+python3 -c "import json; json.load(open('public/locales/nl/participant.json'))"
 ```
 
 - [ ] **Step 8: Human review**
@@ -1061,7 +1080,7 @@ make ci
 git add frontend/src/i18n.ts \
         frontend/src/constants/languages.ts \
         frontend/scripts/i18n/glossaries/nl.yaml \
-        frontend/public/locales/nl/translation.json
+        frontend/public/locales/nl/participant.json
 git commit -m "feat(i18n): add Dutch locale"
 git push -u origin HEAD
 gh pr create --title "feat(i18n): add Dutch locale" --body "$(cat <<'EOF'
@@ -1085,10 +1104,10 @@ EOF
 
 **Files:**
 - Create: `frontend/scripts/i18n/glossaries/pl.yaml`
-- Create: `frontend/public/locales/pl/translation.json`
+- Create: `frontend/public/locales/pl/participant.json`
 - Modify: `frontend/src/i18n.ts`
 - Modify: `frontend/src/constants/languages.ts`
-- Possibly modify: `frontend/public/locales/en/translation.json` and all other locales (only if a count-bearing key needs plural variants — see Step 8)
+- Possibly modify: `frontend/public/locales/<lang>/participant.json` and/or `admin.json` for every locale (only if a count-bearing key needs plural variants — see Step 8)
 
 - [ ] **Step 1: Rebase**
 
@@ -1156,14 +1175,14 @@ In `frontend/src/constants/languages.ts`, append before the closing `];`:
 
 ```bash
 mkdir -p frontend/public/locales/pl
-cp frontend/public/locales/en/translation.json frontend/public/locales/pl/translation.json
+cp frontend/public/locales/en/participant.json frontend/public/locales/pl/participant.json
 ```
 
 - [ ] **Step 6: Translate in a Claude Code session**
 
 Open Claude Code in the repo root and issue:
 
-> Translate `frontend/public/locales/pl/translation.json` from English to Polish
+> Translate `frontend/public/locales/pl/participant.json` from English to Polish
 > by following `frontend/scripts/i18n/translation-runbook.md` and the glossary
 > at `frontend/scripts/i18n/glossaries/pl.yaml`. Translate one top-level
 > namespace at a time using `Edit`. After each namespace, re-read the glossary
@@ -1176,7 +1195,7 @@ Open Claude Code in the repo root and issue:
 cd frontend
 npm run i18n-check
 python3 scripts/i18n/check_interpolations.py pl
-python3 -c "import json; json.load(open('public/locales/pl/translation.json'))"
+python3 -c "import json; json.load(open('public/locales/pl/participant.json'))"
 ```
 
 - [ ] **Step 8: Handle pluralisation (only if needed)**
@@ -1186,13 +1205,15 @@ key reads badly because of plural agreement (e.g. `"5 uczestnik"` should be
 `"5 uczestników"`), introduce i18next plural suffixes for that specific key
 **in this same PR**:
 
-1. Identify the key in `en/translation.json` (e.g. `admin.recruitment.count`).
-2. Replace its single value with the suffixed variants in **every locale**:
-   - `en/translation.json`: add `key_one`, `key_other` (English uses two
+1. Identify the key and its namespace file (e.g. `admin.recruitment.count` lives in `admin.json`; `common.foo` lives in `participant.json`).
+2. Replace its single value with the suffixed variants in **every locale that ships that namespace file**:
+   - `en/<namespace>.json`: add `key_one`, `key_other` (English uses two
      forms). Keep the original `key` if i18next requires a fallback.
    - All other locales (`fr`, `fi`, `de`, `es`, `it`, `pt`, `nl`): add
-     `key_one`, `key_other` with their correct singular/plural rendering.
-   - `pl/translation.json`: add `key_one`, `key_few`, `key_many`, `key_other`.
+     `key_one`, `key_other` with their correct singular/plural rendering — only
+     in the same namespace file. Skip locales that don't ship that namespace
+     (admin.json is optional).
+   - `pl/<namespace>.json`: add `key_one`, `key_few`, `key_many`, `key_other`.
 3. Update the calling React code to pass `count` to `t()` (i18next selects the
    suffix automatically).
 4. Re-run `npm run i18n-check` and the interpolation check.
@@ -1226,7 +1247,7 @@ make ci
 git add frontend/src/i18n.ts \
         frontend/src/constants/languages.ts \
         frontend/scripts/i18n/glossaries/pl.yaml \
-        frontend/public/locales/pl/translation.json
+        frontend/public/locales/pl/participant.json
 # Also stage any locale files updated during Step 8:
 git add -u frontend/public/locales/
 git commit -m "feat(i18n): add Polish locale"
@@ -1251,18 +1272,22 @@ EOF
 
 ## Drift handling across PRs
 
-If `en/translation.json` gains new keys between Phase-1 merge and Phase-2 PRs:
+If `en/participant.json` gains new keys between Phase-1 merge and Phase-2 PRs:
 
 - The in-flight language branch rebases onto `main`.
-- `npm run i18n-check` will fail in the in-flight branch because the new locale
-  is missing the new keys.
-- The translation agent translates only the new keys (a small `Edit` pass).
+- `npm run i18n-check` fails in the in-flight branch because the new locale's
+  `participant.json` is missing the new keys (participant is strict).
+- The translation agent translates only the new participant keys (a small `Edit` pass).
 - Validate, commit, push.
 
-For already-merged locales, the next language PR's CI catches missing keys in
-*all* locales — at that point, open a follow-up PR (`fix(i18n): backfill new
-keys for fr/de/es/it/...`) and translate the missing keys for every affected
-locale before continuing with the new-language PR.
+If `en/admin.json` gains new keys, locales that haven't shipped `admin.json`
+are unaffected. Locales that DID ship `admin.json` get a warning (admin is
+best-effort) — backfilling is encouraged but not blocking.
+
+For already-merged locales, the next language PR's CI catches missing
+participant keys in *all* locales — at that point, open a follow-up PR
+(`fix(i18n): backfill new participant keys for fr/de/es/it/...`) and translate
+the missing keys for every affected locale before continuing with the new-language PR.
 
 ---
 
@@ -1272,9 +1297,13 @@ The plan is complete when:
 
 - [ ] All 5 PRs are merged.
 - [ ] `make ci` passes on `main` after each merge.
-- [ ] The `AppSidebar` language selector lists 9 languages with correct flags
-      and endonyms.
+- [ ] All 9 languages appear in participant-domain selectors (CreateStudyDialog,
+      LanguageManagerModal, IntroductionEditor, useConcourseDetailPage).
+- [ ] The `AppSidebar` admin selector lists only languages that ship
+      `admin.json` (i.e. those with `hasAdmin: true` in `SUPPORTED_LANGUAGES`).
 - [ ] Switching to each new locale via `?lang=<code>` renders the participant
-      flow without any English fallback.
+      flow without any English fallback. Admin may show English fallback for
+      locales that don't ship `admin.json`; that is acceptable.
 - [ ] `frontend/scripts/i18n/check_interpolations.py` (no args) returns 0 on
-      `main` with all 8 non-`en` locales.
+      `main` for every locale (admin warnings are tolerated, participant
+      mismatches block CI).
