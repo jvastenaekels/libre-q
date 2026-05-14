@@ -1,461 +1,461 @@
 {
     "common": {
         "placeholders": {
-            "text_response": "Enter your answer..."
+            "text_response": "Geben Sie Ihre Antwort ein..."
         },
-        "add": "Add",
-        "confirm": "Confirm",
-        "all": "All",
-        "agree": "Somewhat agree",
-        "disagree": "Somewhat disagree",
+        "add": "Hinzufügen",
+        "confirm": "Bestätigen",
+        "all": "Alle",
+        "agree": "Eher zustimmend",
+        "disagree": "Eher ablehnend",
         "neutral": "Neutral",
-        "reset_to_default": "Reset to default",
-        "reset_to_default_success": "Restored to default",
-        "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
-        "undo": "Undo",
-        "next": "Next step",
-        "submit": "Share my perspective",
-        "continue": "Continue",
-        "loading": "Loading...",
-        "lang_code": "en",
-        "attention": "Attention",
-        "error": "Error",
-        "submitting": "Submitting...",
-        "cards": "statements",
-        "close": "Close",
-        "unknown_card": "Unknown Card",
-        "unknown": "Unknown",
+        "reset_to_default": "Auf Standard zurücksetzen",
+        "reset_to_default_success": "Standardwert wiederhergestellt",
+        "reset_to_default_confirm": "Sind Sie sicher, dass Sie dieses Feld auf den Standardwert zurücksetzen möchten? Alle benutzerdefinierten Änderungen gehen verloren.",
+        "undo": "Rückgängig",
+        "next": "Nächster Schritt",
+        "submit": "Meine Perspektive teilen",
+        "continue": "Weiter",
+        "loading": "Wird geladen...",
+        "lang_code": "de",
+        "attention": "Achtung",
+        "error": "Fehler",
+        "submitting": "Wird übermittelt...",
+        "cards": "Aussagen",
+        "close": "Schließen",
+        "unknown_card": "Unbekannte Aussage",
+        "unknown": "Unbekannt",
         "duration_short": "{{m}}m {{s}}s",
         "duration_long": "{{h}}h {{m}}m {{s}}s",
         "optional": "Optional",
-        "processing": "Processing...",
-        "statement": "Statement",
-        "step": "Step",
-        "back": "Back",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "slots": "slots",
-        "project_label": "Project",
-        "read_full": "Read full statement",
-        "reduce": "Reduce",
-        "expand": "Expand",
-        "yes": "Yes",
-        "no": "No",
-        "score": "Score",
-        "comment": "Comment",
+        "processing": "Wird verarbeitet...",
+        "statement": "Aussage",
+        "step": "Schritt",
+        "back": "Zurück",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "slots": "Positionen",
+        "project_label": "Projekt",
+        "read_full": "Vollständige Aussage lesen",
+        "reduce": "Verkleinern",
+        "expand": "Erweitern",
+        "yes": "Ja",
+        "no": "Nein",
+        "score": "Punktzahl",
+        "comment": "Kommentar",
         "errors": {
-            "network": "Network connection error. Please check your internet connection.",
-            "not_found": "Study not found.",
-            "validation": "System error: data validation failed.",
-            "unknown": "An unexpected error occurred.",
-            "retry": "Retry",
-            "min": "Value must be at least {{min}}",
-            "max": "Value must be at most {{max}}",
-            "email": "Please enter a valid email address",
-            "min_length": "Minimum {{count}} characters required",
-            "max_length": "Maximum {{count}} characters allowed",
+            "network": "Netzwerkverbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung.",
+            "not_found": "Studie nicht gefunden.",
+            "validation": "Systemfehler: Datenvalidierung fehlgeschlagen.",
+            "unknown": "Ein unerwarteter Fehler ist aufgetreten.",
+            "retry": "Erneut versuchen",
+            "min": "Der Wert muss mindestens {{min}} betragen",
+            "max": "Der Wert darf höchstens {{max}} betragen",
+            "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+            "min_length": "Mindestens {{count}} Zeichen erforderlich",
+            "max_length": "Maximal {{count}} Zeichen erlaubt",
             "404": {
-                "title": "Page not found",
-                "message": "The page or study you are looking for does not exist."
+                "title": "Seite nicht gefunden",
+                "message": "Die gesuchte Seite oder Studie existiert nicht."
             },
             "429": {
-                "title": "Too many requests",
-                "message": "You are doing that too fast. Please wait a moment."
+                "title": "Zu viele Anfragen",
+                "message": "Sie handeln zu schnell. Bitte warten Sie einen Moment."
             },
             "500": {
-                "title": "Server error",
-                "message": "Our servers encountered an issue. Please try again later."
+                "title": "Serverfehler",
+                "message": "Unsere Server haben ein Problem festgestellt. Bitte versuchen Sie es später erneut."
             },
-            "network_title": "Connection lost",
-            "home": "Go to home",
-            "reset": "Reset session",
-            "default_title": "Oops! Something went wrong.",
+            "network_title": "Verbindung unterbrochen",
+            "home": "Zur Startseite",
+            "reset": "Sitzung zurücksetzen",
+            "default_title": "Hoppla! Etwas ist schiefgelaufen.",
             "study_not_found": {
-                "title": "Study not found",
-                "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
-                "action": "Go to home"
+                "title": "Studie nicht gefunden",
+                "message": "Wir konnten keine Studie mit diesem Namen finden. Bitte überprüfen Sie die URL oder kontaktieren Sie den Forscher.",
+                "action": "Zur Startseite"
             }
         },
         "status": {
             "draft": {
-                "title": "Study under preparation",
-                "message": "This study is not available for participation yet. Please check back later.",
-                "action": "Back to home"
+                "title": "Studie in Vorbereitung",
+                "message": "Diese Studie ist noch nicht zur Teilnahme verfügbar. Bitte schauen Sie später wieder vorbei.",
+                "action": "Zurück zur Startseite"
             },
             "steps": {
                 "draft": {
-                    "label": "Draft",
-                    "description": "Configuration & design"
+                    "label": "Entwurf",
+                    "description": "Konfiguration & Design"
                 },
                 "active": {
-                    "label": "Active",
-                    "description": "Collecting responses"
+                    "label": "Aktiv",
+                    "description": "Antworten werden gesammelt"
                 },
                 "paused": {
-                    "label": "Paused",
-                    "description": "On hold"
+                    "label": "Pausiert",
+                    "description": "Vorübergehend angehalten"
                 },
                 "closed": {
-                    "label": "Closed",
-                    "description": "Analysis & export"
+                    "label": "Geschlossen",
+                    "description": "Analyse & Export"
                 }
             },
             "paused": {
-                "title": "Maintenance in progress",
-                "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
-                "action": "Retry"
+                "title": "Wartung läuft",
+                "message": "Die Datenerhebung ist vorübergehend für Wartungsarbeiten unterbrochen. Wir sind bald wieder da.",
+                "action": "Erneut versuchen"
             },
             "closed": {
-                "title": "Data collection closed",
-                "message": "This study is now closed. Participation is no longer possible.",
-                "action": "Back to home"
+                "title": "Datenerhebung abgeschlossen",
+                "message": "Diese Studie ist nun geschlossen. Eine Teilnahme ist nicht mehr möglich.",
+                "action": "Zurück zur Startseite"
             }
         }
     },
     "layout": {
         "title": "Open-Q",
-        "preparing": "Preparing your study session...",
-        "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
-        "default_study_title": "Q-Method study",
-        "loading_content": "Loading study content...",
-        "change_lang_title": "Change language",
+        "preparing": "Ihre Studiensitzung wird vorbereitet...",
+        "pilot_mode": "Pilotmodus: Änderungen sind temporär und Daten werden nicht gespeichert",
+        "default_study_title": "Q-Methodologie-Studie",
+        "loading_content": "Studieninhalt wird geladen...",
+        "change_lang_title": "Sprache wechseln",
         "steps": {
-            "welcome": "Welcome",
-            "consent": "Privacy & Consent",
-            "rough": "First impressions",
-            "fine": "Q-sort",
-            "post": "Final questions"
+            "welcome": "Willkommen",
+            "consent": "Datenschutz & Einwilligung",
+            "rough": "Erste Eindrücke",
+            "fine": "Q-Sortierung",
+            "post": "Abschlussfragen"
         },
-        "mobile_step": "Step",
+        "mobile_step": "Schritt",
         "navigation": "Navigation",
-        "language": "English"
+        "language": "Deutsch"
     },
     "study": {
         "help": {
-            "title": "Help & information",
-            "trigger": "Help",
-            "what": "What we ask",
-            "why": "Why it matters",
+            "title": "Hilfe & Informationen",
+            "trigger": "Hilfe",
+            "what": "Was wir fragen",
+            "why": "Warum es wichtig ist",
             "step_welcome": {
-                "what": "Read the research objectives and the specific instructions for participation.",
-                "why": "Beyond standard ethical consent, you need to grasp the 'condition of instruction': the precise lens or scenario you adopt to evaluate the statements. This matters for data validity."
+                "what": "Lesen Sie die Forschungsziele und die spezifischen Anweisungen zur Teilnahme.",
+                "why": "Neben der standardmäßigen ethischen Einwilligung müssen Sie die „Instruktionsbedingung\" verstehen: den genauen Blickwinkel oder das Szenario, das Sie bei der Bewertung der Aussagen einnehmen. Dies ist für die Datenvalidität wichtig."
             },
             "step_presort": {
-                "what": "Provide background information to help characterize your participant profile.",
-                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group."
+                "what": "Geben Sie Hintergrundinformationen an, um Ihr Teilnehmerprofil zu charakterisieren.",
+                "why": "Dieser Kontext ermöglicht es dem Forschungsteam zu analysieren, ob und wie unterschiedliche Standpunkte (Faktoren) mit bestimmten demografischen Variablen oder beruflichen Hintergründen innerhalb der Teilnehmergruppe korrelieren."
             },
             "step_rough": {
-                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
-                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins."
+                "what": "Sortieren Sie das Set der Aussagen anhand Ihrer unmittelbaren Reaktion in drei erste Stapel.",
+                "why": "Dieser vorbereitende Schritt dient der Reduzierung der kognitiven Belastung; er ermöglicht es Ihnen, sich mit dem gesamten Spektrum des Themas (dem Q-Set) vertraut zu machen, bevor die anspruchsvollere Aufgabe des vergleichenden Rankings beginnt."
             },
             "step_fine": {
-                "what": "Place the statements on the grid by ranking them relative to one another, from those you most agree with (to the right) to those you most disagree with (to the left). Starting with the extremes might help you in this task.",
-                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system."
+                "what": "Platzieren Sie die Aussagen auf dem Raster, indem Sie sie relativ zueinander ordnen, von denen, denen Sie am meisten zustimmen (rechts), bis zu denen, die Sie am meisten ablehnen (links). Es kann hilfreich sein, mit den Extremen zu beginnen.",
+                "why": "Die Struktur des Rasters erzwingt eine „Zwangsverteilung\", die verhindert, dass Sie alles als gleich wichtig einschätzen; sie zwingt Sie zu Abwägungen und modelliert so die relative Bedeutung jeder Idee in Ihrem spezifischen Überzeugungssystem."
             },
             "step_post": {
-                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
-                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices."
+                "what": "Bestätigen Sie Ihre Rasteranordnung und fügen Sie Kommentare hinzu, die Ihre stärksten Entscheidungen erläutern.",
+                "why": "Ihre qualitativen Erklärungen sind entscheidend für die Validierung der statistischen Analyse; sie helfen den Forschern, die Daten durch Ihre Logik zu interpretieren, anstatt ihre eigenen Annahmen auf Ihre Entscheidungen zu projizieren."
             }
         },
         "steps": {
-            "presort": "Pre-sort survey",
-            "rough": "Preliminary sort",
-            "fine": "Grid placement",
-            "post": "Post-sort stage"
+            "presort": "Vorsortierungsbefragung",
+            "rough": "Vorläufige Sortierung",
+            "fine": "Rasterplatzierung",
+            "post": "Nachsortierungsphase"
         }
     },
     "welcome": {
-        "start": "Get started",
+        "start": "Loslegen",
         "consent": {
-            "label": "I confirm that i have read the above information and consent to the processing of my data for the purposes of this study.",
-            "error": "Please accept the terms to continue."
+            "label": "Ich bestätige, dass ich die obigen Informationen gelesen habe und der Verarbeitung meiner Daten für die Zwecke dieser Studie zustimme.",
+            "error": "Bitte akzeptieren Sie die Bedingungen, um fortzufahren."
         },
-        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-        "restart": "Start a new session",
-        "preview_title": "Preview",
-        "conducted_by": "Conducted by",
-        "how_it_works": "Process",
-        "objective_label": "Study objective",
-        "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** First, you will be asked a few short, preliminary questions.\n2. **First impressions:** You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them.\n3. **Your perspective:** During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box.\n4. **Why:** Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices.",
+        "reset_confirm": "Sind Sie sicher, dass Sie eine neue Sitzung starten möchten? Ihr aktueller Fortschritt wird gelöscht.",
+        "restart": "Neue Sitzung starten",
+        "preview_title": "Vorschau",
+        "conducted_by": "Durchgeführt von",
+        "how_it_works": "Ablauf",
+        "objective_label": "Studienziel",
+        "instructions_label": "Ablauf",
+        "default_instructions": "1. **Kennenlernen:** Zunächst werden Ihnen einige kurze Einstiegsfragen gestellt.\n2. **Erste Eindrücke:** Sie lesen die verschiedenen Aussagen und sortieren sie grob nach Ihrem persönlichen Standpunkt: ob Sie eher zustimmen, neutral sind oder ablehnen.\n3. **Ihre Perspektive:** In der Sortierfase platzieren Sie die Aussagen auf einem Raster, um Ihren Standpunkt zu verfeinern. Sie sortieren und ordnen die Aussagen von „am meisten zustimmend\" bis „am meisten ablehnend\", indem Sie jede Aussage in das entsprechende Feld platzieren.\n4. **Warum:** Bevor die Sitzung endet, werden Ihnen einige klärende Fragen gestellt, damit wir Ihre bedeutsamsten Entscheidungen besser verstehen können.",
         "steps": {
             "profile": {
-                "title": "Let's meet",
-                "description": "First, you will be asked a few short, preliminary questions."
+                "title": "Kennenlernen",
+                "description": "Zunächst werden Ihnen einige kurze Einstiegsfragen gestellt."
             },
             "rough": {
-                "title": "First impressions",
-                "description": "You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them. It will make the next task easier."
+                "title": "Erste Eindrücke",
+                "description": "Sie lesen die verschiedenen Aussagen und sortieren sie grob nach Ihrem persönlichen Standpunkt: ob Sie eher zustimmen, neutral sind oder ablehnen. Dies erleichtert die nächste Aufgabe."
             },
             "fine": {
-                "title": "Your perspective",
-                "description": "During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs."
+                "title": "Ihre Perspektive",
+                "description": "In der Sortierfase platzieren Sie die Aussagen auf einem Raster, um Ihren Standpunkt zu verfeinern. Sie sortieren und ordnen die Aussagen von „am meisten zustimmend\" bis „am meisten ablehnend\", indem Sie jede Aussage in das entsprechende Feld platzieren. Es gibt keine richtigen oder falschen Antworten. Die beste Antwort ist die, die Ihre Meinung oder Überzeugungen widerspiegelt."
             },
             "post": {
-                "title": "Why",
-                "description": "Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background."
+                "title": "Warum",
+                "description": "Bevor die Sitzung endet, werden Ihnen einige klärende Fragen gestellt, damit wir Ihre bedeutsamsten Entscheidungen besser verstehen können, sowie einige Fragen zu Ihrem Hintergrund."
             }
         }
     },
     "consent": {
-        "title": "Informed consent and data processing agreement",
-        "subtitle": "Please read the following information carefully.",
-        "record_error": "Could not save consent record. You may continue.",
-        "default_text": "1. Nature of the study and participant understanding. You understand that this exercise employs q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance).\n\nDe-identification and retention:. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: if you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: the final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: if you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: due to the statistical nature of q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights"
+        "title": "Informierte Einwilligung und Datenverarbeitungsvereinbarung",
+        "subtitle": "Bitte lesen Sie die folgenden Informationen sorgfältig durch.",
+        "record_error": "Die Einwilligungserklärung konnte nicht gespeichert werden. Sie können fortfahren.",
+        "default_text": "1. Art der Studie und Verständnis des Teilnehmers. Sie verstehen, dass diese Übung die Q-Methodologie einsetzt, eine Forschungstechnik, die entwickelt wurde, um subjektive Standpunkte zu modellieren. Die Aufgabe erfordert, dass Sie Aussagen nach ihrer Bedeutung für Ihre persönliche Perspektive sortieren; daher gibt es keine objektiv \"richtigen\" oder \"falschen\" Antworten.\n\n2. Datenverarbeitung und Pseudonymisierung (DSGVO-Konformität).\n\nDe-Identifizierung und Aufbewahrung: Dieses technische Verfahren stellt sicher, dass Ihr digitaler Fußabdruck nicht verwendet werden kann, um Sie nach dem Ende der Sitzung wieder zu identifizieren.\n\nAusnahme für Nachverfolgung: Wenn Sie am Ende der Studie freiwillig Ihre Kontaktdaten für eine Folgekontaktaufnahme angeben, wird die Verbindung zwischen Ihrer Identität (E-Mail) und Ihrer Antwort ausschließlich für die Dauer dieser spezifischen Nachverfolgungsphase aufrechterhalten.\n\nBerichterstattung: Die Endergebnisse werden in anonymisierter Form präsentiert. Die Daten werden aggregiert, um gemeinsame soziale Perspektiven (Faktoren) aufzuzeigen. Qualitative Kommentare können zur Kontextualisierung dieser Faktoren zitiert werden, werden aber auf identifizierende Details geprüft.\n\n3. Freiwillige Teilnahme und Rücktrittsrecht. Sie haben das Recht, den Sortierprozess zu unterbrechen und Ihren Browser jederzeit vor der Einreichung ohne Konsequenzen zu schließen.\n\nVor der Einreichung: Wenn Sie sich zurückziehen, bevor Sie Ihre Sortierung abgeschlossen haben, werden keine Teildaten aufbewahrt.\n\nNach der Einreichung: Aufgrund der statistischen Natur der Q-Methodologie (Faktoranalyse) ist ein individueller Rücktritt möglicherweise nicht mehr durchführbar, sobald Ihre Daten eingereicht und in den Datensatz integriert wurden.\n\n4. Datenspeicherung und Rechte"
     },
     "presort": {
-        "title": "Before we start",
-        "description": "Please answer a few questions to help us situate your viewpoint.",
-        "submit": "Continue to sorting",
-        "select_placeholder": "Select...",
-        "error_required": "Please answer this question."
+        "title": "Bevor wir beginnen",
+        "description": "Bitte beantworten Sie einige Fragen, damit wir Ihren Standpunkt einordnen können.",
+        "submit": "Weiter zur Sortierung",
+        "select_placeholder": "Auswählen...",
+        "error_required": "Bitte beantworten Sie diese Frage."
     },
     "rough": {
         "header": {
-            "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
-            "hint": "This is spontaneous. You can change your mind right after."
+            "subtitle": "Wischen Sie nach **links** zum Ablehnen, nach **rechts** zum Zustimmen oder nach **unten** für neutral.",
+            "hint": "Das ist spontan. Sie können direkt danach Ihre Meinung ändern."
         },
         "tip": {
-            "close": "Close tip"
+            "close": "Hinweis schließen"
         },
         "complete": {
-            "title": "First step complete",
-            "subtitle": "We will now refine the nuances.",
-            "button": "Continue to fine sort"
+            "title": "Erster Schritt abgeschlossen",
+            "subtitle": "Wir verfeinern nun die Nuancen.",
+            "button": "Weiter zur Feinsortierung"
         },
         "instructions": {
-            "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
+            "desktop_tip": "Ziehen, klicken oder Tastatur ( ← ↓ → ) zum Sortieren verwenden"
         },
-        "progress_label": "Rough sort progress: {{percent}}% complete"
+        "progress_label": "Fortschritt Grobsortierung: {{percent}}% abgeschlossen"
     },
     "fine": {
         "deck": {
-            "title": "Available statements",
-            "all_placed": "All statements in this pile are sorted"
+            "title": "Verfügbare Aussagen",
+            "all_placed": "Alle Aussagen in diesem Stapel sind sortiert"
         },
         "toolbar": {
-            "preview": "Statement",
-            "zoom_in": "Zoom in",
-            "zoom_out": "Zoom out",
-            "fit_screen": "Fit to screen",
-            "label": "Grid controls"
+            "preview": "Aussage",
+            "zoom_in": "Vergrößern",
+            "zoom_out": "Verkleinern",
+            "fit_screen": "An Bildschirm anpassen",
+            "label": "Rastersteuerung"
         },
         "grid": {
-            "label": "Q-Sort grid",
-            "column": "Column",
-            "slot": "Slot",
-            "in_column": "In column"
+            "label": "Q-Sortierungs-Raster",
+            "column": "Spalte",
+            "slot": "Position",
+            "in_column": "In Spalte"
         },
         "legend": {
-            "disagree": "Most disagree",
+            "disagree": "Am meisten ablehnend",
             "neutral": "Neutral",
-            "agree": "Most agree",
-            "label": "Grid legend"
+            "agree": "Am meisten zustimmend",
+            "label": "Rasterlegende"
         },
         "actions": {
-            "validate": "Confirm sort",
-            "finish": "Finish sorting",
-            "ready": "Review overview",
-            "not_ready": "Place all statements to continue"
+            "validate": "Sortierung bestätigen",
+            "finish": "Sortierung abschließen",
+            "ready": "Übersicht prüfen",
+            "not_ready": "Platzieren Sie alle Aussagen, um fortzufahren"
         },
         "header": {
-            "title": "Place statements on the grid",
-            "instruction_label": "Instruction",
-            "expand_instructions": "Expand instructions",
-            "minimize_instructions": "Minimize instructions"
+            "title": "Aussagen auf dem Raster platzieren",
+            "instruction_label": "Anweisung",
+            "expand_instructions": "Anweisungen ausklappen",
+            "minimize_instructions": "Anweisungen minimieren"
         },
         "workbench": {
-            "active_card": "Active statement",
-            "place_on_grid": "Tap grid to place",
-            "drag_or_tap": "Drag to grid or tap slot",
-            "initial_instruction": "Tap (or drag) statement",
-            "initial_instruction_mobile": "Tap statement",
-            "cancel_selection": "Cancel selection",
-            "help": "How does it work?",
-            "previous_tip": "Previous tip",
-            "next_tip": "Next tip",
-            "go_to_tip": "Go to tip {{number}}",
+            "active_card": "Aktive Aussage",
+            "place_on_grid": "Raster antippen zum Platzieren",
+            "drag_or_tap": "Auf Raster ziehen oder Position antippen",
+            "initial_instruction": "Aussage antippen (oder ziehen)",
+            "initial_instruction_mobile": "Aussage antippen",
+            "cancel_selection": "Auswahl abbrechen",
+            "help": "Wie funktioniert das?",
+            "previous_tip": "Vorheriger Hinweis",
+            "next_tip": "Nächster Hinweis",
+            "go_to_tip": "Zu Hinweis {{number}}",
             "methodology": {
-                "extremes": "Tip: start with what is most obvious to you (the extremes).",
-                "vertical": "In the same column, the order from top to bottom doesn't matter.",
-                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
-                "relative": "Reminder: items are sorted relative to each other (relative agreement).",
-                "zoom": "Feel free to zoom in on different parts of the grid for better visibility.",
-                "flexibility": "Nothing is final: you can move cards or put them back in the deck at any time."
+                "extremes": "Hinweis: Beginnen Sie mit dem, was Ihnen am offensichtlichsten erscheint (die Extreme).",
+                "vertical": "In derselben Spalte spielt die Reihenfolge von oben nach unten keine Rolle.",
+                "constraint": "Alles muss untergebracht werden! Es kann ein Puzzle sein, aber so priorisieren wir Entscheidungen.",
+                "relative": "Erinnerung: Die Elemente werden relativ zueinander sortiert (relative Zustimmung).",
+                "zoom": "Vergrößern Sie verschiedene Teile des Rasters für eine bessere Sicht.",
+                "flexibility": "Nichts ist endgültig: Sie können Aussagen jederzeit verschieben oder zurück in den Stapel legen."
             }
         }
     },
     "post": {
-        "title": "Your perspective & feedback",
-        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
-        "step2_title": "Almost done!",
-        "step2_description": "Please answer these final questions to complete the study.",
+        "title": "Ihre Perspektive & Feedback",
+        "description": "Sie sind fast fertig! Ihre Kommentare zu den bedeutsamsten Aussagen sind entscheidend für unsere Analyse.",
+        "step2_title": "Fast geschafft!",
+        "step2_description": "Bitte beantworten Sie diese abschließenden Fragen, um die Studie abzuschließen.",
         "extreme": {
-            "title": "Key Choices",
-            "why": "Why did you choose to place this statement here? How is it significant to you?",
-            "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
-            "min_chars": "A few words are enough to help us understand the context.",
-            "label_agree": "Strongest agreement",
-            "label_disagree": "Strongest disagreement",
+            "title": "Wichtigste Entscheidungen",
+            "why": "Warum haben Sie sich entschieden, diese Aussage hier zu platzieren? Was bedeutet sie für Sie?",
+            "placeholder": "Z.B. ein bestimmtes Ereignis, eine starke Überzeugung oder ein besonderes Wort in der Aussage...",
+            "min_chars": "Ein paar Worte genügen, um uns den Kontext zu verdeutlichen.",
+            "label_agree": "Stärkste Zustimmung",
+            "label_disagree": "Stärkste Ablehnung",
             "label_neutral": "Neutral",
-            "missing_statement": "Missing Statement",
-            "general_comment": "General Comment"
+            "missing_statement": "Fehlende Aussage",
+            "general_comment": "Allgemeiner Kommentar"
         },
         "optional": {
-            "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
-            "description": "You are also welcome to add comments to any other statement if you would like to further explain your choices.",
-            "select_placeholder": "Select a statement to comment...",
-            "placeholder": "Your comment here..."
+            "title": "Gab es Aussagen, die Sie besonders überraschend, unklar oder verwirrend fanden? Wenn ja, warum?",
+            "description": "Sie können auch gerne Kommentare zu anderen Aussagen hinzufügen, wenn Sie Ihre Entscheidungen näher erläutern möchten.",
+            "select_placeholder": "Eine Aussage zum Kommentieren auswählen...",
+            "placeholder": "Ihr Kommentar hier..."
         },
-        "submit": "Share my perspective",
-        "validation_error": "Please fill in all required fields.",
-        "text_audio_info": "For text + audio questions, you can respond with text, an audio recording, or both.",
-        "text_audio_required": "A few words or an audio recording will help us understand your viewpoint.",
+        "submit": "Meine Perspektive teilen",
+        "validation_error": "Bitte füllen Sie alle Pflichtfelder aus.",
+        "text_audio_info": "Bei Text- und Audiofragen können Sie mit Text, einer Audioaufnahme oder beidem antworten.",
+        "text_audio_required": "Ein paar Worte oder eine Audioaufnahme helfen uns, Ihren Standpunkt zu verstehen.",
         "success": {
-            "title": "Thank you for your participation!",
-            "message": "Your contribution to the study has been saved.",
-            "id_label": "Confirmation code",
+            "title": "Vielen Dank für Ihre Teilnahme!",
+            "message": "Ihr Beitrag zur Studie wurde gespeichert.",
+            "id_label": "Bestätigungscode",
             "share": {
-                "title": "Spread the word",
-                "copy_link": "Copy link",
-                "copy_success": "Link copied!",
-                "message": "I just participated in this study: \"{{title}}\". I thought it might interest you. You can access it here:",
-                "email": "Email",
-                "email_subject": "Participate in this study: {{title}}",
-                "native": "Share"
+                "title": "Weiterempfehlen",
+                "copy_link": "Link kopieren",
+                "copy_success": "Link kopiert!",
+                "message": "Ich habe gerade an dieser Studie teilgenommen: „{{title}}\". Ich dachte, es könnte Sie interessieren. Sie können sie hier aufrufen:",
+                "email": "E-Mail",
+                "email_subject": "An dieser Studie teilnehmen: {{title}}",
+                "native": "Teilen"
             }
         },
         "submit_error": {
-            "title": "Submission failed",
-            "message": "Please check your connection and try again."
+            "title": "Übermittlung fehlgeschlagen",
+            "message": "Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
         },
-        "score": "Score",
-        "back": "Back to sort",
+        "score": "Punktzahl",
+        "back": "Zurück zur Sortierung",
         "contact": {
-            "title": "Results & contact",
-            "email_label": "Your email address (optional)",
-            "email_placeholder": "Example@email.com",
-            "interview_consent": "I agree to be contacted by the researcher for follow-up.",
-            "newsletter_consent": "I wish to be informed about the study results.",
-            "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
-            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up.",
-            "error_invalid_email": "Please enter a valid email address"
+            "title": "Ergebnisse & Kontakt",
+            "email_label": "Ihre E-Mail-Adresse (optional)",
+            "email_placeholder": "beispiel@email.com",
+            "interview_consent": "Ich bin damit einverstanden, dass mich der Forscher für ein Folgegespräch kontaktiert.",
+            "newsletter_consent": "Ich möchte über die Studienergebnisse informiert werden.",
+            "gdpr_note": "Ihre E-Mail wird niemals öffentlich geteilt. Durch die Angabe wird die Pseudonymisierung gewährleistet: Ihre Daten sind ausschließlich für Forschungszwecke durch den Forscher identifizierbar.",
+            "pseudonymization_note": "Die Zustimmung zur Kontaktaufnahme bedeutet, dass der Forscher Ihre Perspektive für diese spezifische Nachverfolgung mit Ihrer E-Mail verknüpfen kann (Pseudonymisierung).",
+            "error_invalid_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
         },
         "audio": {
-            "info": "For each question, you can respond with text, an audio recording, or both.",
-            "section_label": "Audio response (optional)"
+            "info": "Bei jeder Frage können Sie mit Text, einer Audioaufnahme oder beidem antworten.",
+            "section_label": "Audioantwort (optional)"
         }
     },
     "audio": {
-        "record_prompt": "Record audio response if you prefer",
-        "recording": "Recording...",
-        "recorded": "Recorded",
-        "playing": "Playing...",
-        "uploading": "Uploading...",
-        "ready": "Ready to record",
-        "start_recording": "Start recording",
-        "stop_recording": "Stop",
+        "record_prompt": "Audioantwort aufnehmen, wenn Sie möchten",
+        "recording": "Aufnahme läuft...",
+        "recorded": "Aufgenommen",
+        "playing": "Wird abgespielt...",
+        "uploading": "Wird hochgeladen...",
+        "ready": "Bereit zur Aufnahme",
+        "start_recording": "Aufnahme starten",
+        "stop_recording": "Stoppen",
         "pause": "Pause",
-        "play": "Play",
-        "delete": "Delete",
-        "deleted": "Audio deleted",
-        "delete_failed": "Could not delete the recording. Try again.",
-        "file_size": "File size",
-        "upload_success": "Audio uploaded successfully",
-        "upload_failed": "Upload failed. Please try again.",
-        "upload_cancelled": "Recording cancelled",
-        "recording_error": "Recording error - please try again",
-        "invalid_recording": "Recording failed - no audio data captured",
-        "permission_denied": "Microphone permission denied",
-        "unsupported": "Audio recording is not supported in this browser.",
-        "permission_revoked": "Microphone access lost - recording stopped",
-        "refresh_failed": "Could not refresh audio. Your recording is still saved.",
-        "refreshing": "Refreshing audio...",
-        "playback_failed": "Could not play audio. Refresh the page and try again.",
+        "play": "Abspielen",
+        "delete": "Löschen",
+        "deleted": "Audio gelöscht",
+        "delete_failed": "Die Aufnahme konnte nicht gelöscht werden. Versuchen Sie es erneut.",
+        "file_size": "Dateigröße",
+        "upload_success": "Audio erfolgreich hochgeladen",
+        "upload_failed": "Upload fehlgeschlagen. Bitte versuchen Sie es erneut.",
+        "upload_cancelled": "Aufnahme abgebrochen",
+        "recording_error": "Aufnahmefehler – bitte versuchen Sie es erneut",
+        "invalid_recording": "Aufnahme fehlgeschlagen – keine Audiodaten erfasst",
+        "permission_denied": "Mikrofonzugriff verweigert",
+        "unsupported": "Audioaufnahme wird in diesem Browser nicht unterstützt.",
+        "permission_revoked": "Mikrofonzugriff verloren – Aufnahme gestoppt",
+        "refresh_failed": "Audio konnte nicht aktualisiert werden. Ihre Aufnahme ist noch gespeichert.",
+        "refreshing": "Audio wird aktualisiert...",
+        "playback_failed": "Audio konnte nicht abgespielt werden. Laden Sie die Seite neu und versuchen Sie es erneut.",
         "error": {
-            "no_token": "Session token missing",
-            "quota_exceeded": "Storage quota exceeded. Please delete an existing recording or use text instead.",
-            "file_too_large": "Recording file is too large. Try a shorter recording.",
-            "server_error": "Server error. Please try again in a moment.",
-            "upload_in_progress": "Please wait for audio upload to finish.",
-            "security": "Recording blocked by browser security settings",
-            "invalid_state": "Recording encountered an internal error"
+            "no_token": "Sitzungstoken fehlt",
+            "quota_exceeded": "Speicherkontingent überschritten. Bitte löschen Sie eine vorhandene Aufnahme oder verwenden Sie stattdessen Text.",
+            "file_too_large": "Die Aufnahmedatei ist zu groß. Versuchen Sie eine kürzere Aufnahme.",
+            "server_error": "Serverfehler. Bitte versuchen Sie es in einem Moment erneut.",
+            "upload_in_progress": "Bitte warten Sie, bis der Audio-Upload abgeschlossen ist.",
+            "security": "Aufnahme durch Browser-Sicherheitseinstellungen blockiert",
+            "invalid_state": "Die Aufnahme ist auf einen internen Fehler gestoßen"
         },
         "fallback": {
-            "toast": "Audio has been disabled due to repeated errors. Please use text.",
-            "banner_title": "Audio unavailable",
-            "banner_description": "Audio recording encountered repeated errors. You can continue with text responses.",
-            "try_again": "Try again",
-            "inline": "Audio temporarily unavailable."
+            "toast": "Audio wurde aufgrund wiederholter Fehler deaktiviert. Bitte verwenden Sie Text.",
+            "banner_title": "Audio nicht verfügbar",
+            "banner_description": "Die Audioaufnahme ist auf wiederholte Fehler gestoßen. Sie können mit Textantworten fortfahren.",
+            "try_again": "Erneut versuchen",
+            "inline": "Audio vorübergehend nicht verfügbar."
         },
-        "permission_denied_with_guidance": "Microphone permission denied. Check your browser settings to allow microphone access, then try again.",
-        "retry_upload": "Retry upload",
-        "space_shortcut": "or press Space",
+        "permission_denied_with_guidance": "Mikrofonzugriff verweigert. Überprüfen Sie Ihre Browsereinstellungen, um den Mikrofonzugriff zu erlauben, und versuchen Sie es erneut.",
+        "retry_upload": "Upload erneut versuchen",
+        "space_shortcut": "oder Leertaste drücken",
         "waveform": {
-            "recording": "Audio waveform - recording in progress",
-            "playing": "Audio waveform - playing back recording"
+            "recording": "Audiowellenform – Aufnahme läuft",
+            "playing": "Audiowellenform – Aufnahme wird abgespielt"
         }
     },
     "resume": {
-        "continue_later": "Continue later",
-        "copy_link": "Copy link",
-        "copy_failed": "Unable to copy. Please select the link manually.",
-        "link_copied": "Link copied!",
-        "instruction": "To continue on a different device, save this link:",
-        "instruction_same_browser": "If you return on this browser, your progress will be saved automatically.",
-        "instruction_detail": "Keep this link private. It gives access to your session.",
-        "resume_url": "Resume URL",
-        "saving": "Saving...",
-        "saved": "Saved",
-        "save_failed": "Not saved",
-        "loading": "Restoring your session...",
-        "restored": "Welcome back! Your progress has been restored.",
-        "welcome_back": "Welcome back! Your progress has been restored.",
-        "not_found": "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link.",
-        "already_completed": "You've already submitted your responses. Thank you for your participation!",
-        "study_closed": "This study is no longer accepting responses. Please contact the researcher if you have questions.",
-        "rate_limited": "Too many attempts. Please wait a moment and try again.",
-        "error": "Something went wrong while restoring your session. Please try again.",
-        "share": "Send to myself",
-        "share_title": "My study session",
-        "go_to_study": "Start a new session"
+        "continue_later": "Später fortfahren",
+        "copy_link": "Link kopieren",
+        "copy_failed": "Kopieren nicht möglich. Bitte wählen Sie den Link manuell aus.",
+        "link_copied": "Link kopiert!",
+        "instruction": "Um auf einem anderen Gerät fortzufahren, speichern Sie diesen Link:",
+        "instruction_same_browser": "Wenn Sie in diesem Browser zurückkehren, wird Ihr Fortschritt automatisch gespeichert.",
+        "instruction_detail": "Halten Sie diesen Link privat. Er gibt Zugang zu Ihrer Sitzung.",
+        "resume_url": "Wiederaufnahme-URL",
+        "saving": "Wird gespeichert...",
+        "saved": "Gespeichert",
+        "save_failed": "Nicht gespeichert",
+        "loading": "Ihre Sitzung wird wiederhergestellt...",
+        "restored": "Willkommen zurück! Ihr Fortschritt wurde wiederhergestellt.",
+        "welcome_back": "Willkommen zurück! Ihr Fortschritt wurde wiederhergestellt.",
+        "not_found": "Dieser Link ist nicht mehr gültig. Wenn Sie die Studie noch nicht abgeschlossen haben, wenden Sie sich bitte an den Forscher für einen neuen Link.",
+        "already_completed": "Sie haben Ihre Antworten bereits eingereicht. Vielen Dank für Ihre Teilnahme!",
+        "study_closed": "Diese Studie nimmt keine Antworten mehr entgegen. Bitte kontaktieren Sie den Forscher, wenn Sie Fragen haben.",
+        "rate_limited": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+        "error": "Beim Wiederherstellen Ihrer Sitzung ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.",
+        "share": "An mich selbst senden",
+        "share_title": "Meine Studiensitzung",
+        "go_to_study": "Neue Sitzung starten"
     },
     "landing": {
-        "page_title": "Qualis study access",
-        "instruction": "Enter your study code to begin.",
-        "study_code_label": "Study Code",
-        "study_code_placeholder": "e.g. my-study",
-        "go_to_study": "Go to Study",
-        "resetting_session": "Resetting study session…"
+        "page_title": "Qualis Studienzugang",
+        "instruction": "Geben Sie Ihren Studiencode ein, um zu beginnen.",
+        "study_code_label": "Studiencode",
+        "study_code_placeholder": "z.B. meine-studie",
+        "go_to_study": "Zur Studie",
+        "resetting_session": "Studiensitzung wird zurückgesetzt…"
     },
     "erasure": {
-        "section_title": "Your right to erasure (GDPR Art. 17)",
-        "section_intro": "You can request the removal of your personal data at any time. Your anonymous statement rankings will be kept as research data; everything that could identify you will be removed.",
-        "button": "Request my data deletion",
-        "confirm_title": "Erase your personal data?",
-        "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
-        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
-        "confirm_irreversible": "This action is immediate and cannot be undone.",
-        "confirm_action": "Yes, erase my data",
-        "confirm_in_progress": "Erasing…",
-        "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
-        "error": "We could not process your request. Please try again or contact the researcher.",
-        "already_erased": "Your personal data has been removed for this session."
+        "section_title": "Ihr Recht auf Löschung (DSGVO Art. 17)",
+        "section_intro": "Sie können jederzeit die Entfernung Ihrer personenbezogenen Daten beantragen. Ihre anonymen Aussagenrangfolgen werden als Forschungsdaten aufbewahrt; alles, was Sie identifizieren könnte, wird entfernt.",
+        "button": "Löschung meiner Daten beantragen",
+        "confirm_title": "Ihre personenbezogenen Daten löschen?",
+        "confirm_what_erased": "Folgendes wird dauerhaft entfernt: jede IP-Adresse, die mit Ihrer Sitzung protokolliert wurde, Ihr Browser-Identifikator, Ihre schriftlichen Antworten (Vor- und Nachsortierung) sowie alle von Ihnen bereitgestellten Audioaufnahmen.",
+        "confirm_what_kept": "Ihre Aussagenrangfolgen werden als anonyme Forschungsdaten aufbewahrt. Sie sind nicht mehr mit Ihnen verknüpft.",
+        "confirm_irreversible": "Diese Aktion ist sofort wirksam und kann nicht rückgängig gemacht werden.",
+        "confirm_action": "Ja, meine Daten löschen",
+        "confirm_in_progress": "Wird gelöscht…",
+        "success": "Ihre personenbezogenen Daten wurden entfernt. Ihre anonymen Q-Sortierungs-Rangfolgen verbleiben in der Studie.",
+        "error": "Wir konnten Ihre Anfrage nicht verarbeiten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Forscher.",
+        "already_erased": "Ihre personenbezogenen Daten wurden für diese Sitzung entfernt."
     },
     "footer": {
-        "powered_by": "Powered by Qualis",
+        "powered_by": "Bereitgestellt von Qualis",
         "license": "AGPLv3",
-        "github_aria": "View source on GitHub"
+        "github_aria": "Quellcode auf GitHub ansehen"
     },
     "errors": {
-        "member_limit_reached": "Project member limit reached.",
-        "owner_project_limit_reached": "You can't own any more projects.",
-        "owner_role_immutable": "The Owner role can only be assigned at project creation.",
-        "access_denied_title": "Access denied",
-        "access_denied_description": "You do not have permission to perform this action.",
-        "rate_limited_title": "Too many requests",
-        "rate_limited_description": "Please wait a moment before trying again.",
-        "conflict_title": "Conflict",
-        "conflict_description": "The resource has been modified or already exists."
+        "member_limit_reached": "Limit für Projektmitglieder erreicht.",
+        "owner_project_limit_reached": "Sie können keine weiteren Projekte besitzen.",
+        "owner_role_immutable": "Die Eigentümer-Rolle kann nur bei der Projekterstellung vergeben werden.",
+        "access_denied_title": "Zugriff verweigert",
+        "access_denied_description": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
+        "rate_limited_title": "Zu viele Anfragen",
+        "rate_limited_description": "Bitte warten Sie einen Moment, bevor Sie es erneut versuchen.",
+        "conflict_title": "Konflikt",
+        "conflict_description": "Die Ressource wurde geändert oder existiert bereits."
     }
 }
