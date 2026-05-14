@@ -24,6 +24,18 @@ describe('SUPPORTED_LANGUAGES', () => {
         expect(SUPPORTED_I18N_LANGUAGES).toContain('de');
     });
 
+    it('SUPPORTED_LANGUAGES and SUPPORTED_I18N_LANGUAGES are in sync', () => {
+        // Both lists declare the same set of supported language codes.
+        // A divergence would silently break a selector: a code in
+        // SUPPORTED_LANGUAGES but missing from SUPPORTED_I18N_LANGUAGES gets
+        // offered in the UI but rejected by i18next's `supportedLngs` and
+        // falls back to English; the reverse means `?lang=xx` works but no
+        // selector ever offers the language.
+        const fromMeta = new Set(SUPPORTED_LANGUAGES.map((l) => l.code));
+        const fromAllowlist = new Set(SUPPORTED_I18N_LANGUAGES);
+        expect(fromMeta).toEqual(fromAllowlist);
+    });
+
     it('participant.json exists on disk for every declared language', () => {
         const missing = SUPPORTED_LANGUAGES.filter(
             ({ code }) => !fs.existsSync(path.join(localesDir, code, 'participant.json'))
