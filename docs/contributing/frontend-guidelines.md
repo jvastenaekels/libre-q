@@ -32,7 +32,7 @@ return <button>{t('study.activate', 'Activate Study')}</button>;
 
 - Three locales: `en`, `fr`, `fi`. Keep them in sync.
 - `npm run i18n-check` verifies key parity. CI runs it; do not let it drift.
-- Translation files live under `frontend/public/locales/<lang>/translation.json`. Add the new key in `en` first, then mirror it to `fr` and `fi`.
+- Translation files live under `frontend/public/locales/<lang>/`, split into `participant.json` (participant flow + public chrome) and `admin.json` (admin + auth). Add the new key in `en/<namespace>.json` first, then mirror it to `fr`, `fi`, and `de`.
 
 ## 3. Generated API client
 

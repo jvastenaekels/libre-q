@@ -1,12 +1,12 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import enTranslation from '../../public/locales/en/translation.json';
-
-// Use singleton to ensure compatibility
+import enParticipant from '../../public/locales/en/participant.json';
+import enAdmin from '../../public/locales/en/admin.json';
 
 const resources = {
     en: {
-        translation: enTranslation,
+        participant: enParticipant,
+        admin: enAdmin,
     },
 };
 
@@ -15,8 +15,9 @@ if (!i18n.isInitialized) {
     i18n.use(initReactI18next).init({
         lng: 'en',
         fallbackLng: 'en',
-        ns: ['translation'],
-        defaultNS: 'translation',
+        ns: ['participant', 'admin'],
+        defaultNS: 'participant',
+        fallbackNS: 'admin',
         debug: false,
         resources,
         interpolation: {
@@ -28,7 +29,8 @@ if (!i18n.isInitialized) {
     });
 } else {
     // If already initialized, ensure resources are loaded
-    i18n.addResourceBundle('en', 'translation', enTranslation, true, true);
+    i18n.addResourceBundle('en', 'participant', enParticipant, true, true);
+    i18n.addResourceBundle('en', 'admin', enAdmin, true, true);
 }
 
 export default i18n;

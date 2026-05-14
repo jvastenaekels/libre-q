@@ -1,4 +1,4 @@
-"""Verify interpolation parity between en/translation.json and every other locale.
+"""Verify interpolation parity between en/{namespace}.json and every other locale, per namespace.
 
 For each key whose en value contains {{placeholders}}, the set of placeholders
 in the target locale must equal the en set. Missing, renamed, or extra
@@ -8,8 +8,8 @@ Missing keys (target lacks a key present in en) are not reported here —
 scripts/check_i18n.py owns that check.
 
 Usage:
-    python3 frontend/scripts/i18n/check_interpolations.py            # all non-en locales
-    python3 frontend/scripts/i18n/check_interpolations.py es it      # specific locales
+    python3 frontend/scripts/i18n/check_interpolations.py            # all non-en locales, all namespaces
+    python3 frontend/scripts/i18n/check_interpolations.py es it      # specific locales, all namespaces
 """
 import json
 import re
@@ -60,13 +60,9 @@ def check_locale(en_data: dict, target_data: dict) -> list[dict]:
 
 
 def main() -> int:
+    from namespace_partition import NAMESPACES
+
     locales_dir = Path(__file__).resolve().parent.parent.parent / "public" / "locales"
-    en_path = locales_dir / "en" / "translation.json"
-    if not en_path.exists():
-        print(f"Error: {en_path} not found.", file=sys.stderr)
-        return 1
-    with open(en_path, encoding="utf-8") as f:
-        en_data = json.load(f)
 
     if len(sys.argv) > 1:
         targets = sys.argv[1:]
@@ -78,22 +74,32 @@ def main() -> int:
         )
 
     overall_ok = True
-    for code in targets:
-        target_path = locales_dir / code / "translation.json"
-        if not target_path.exists():
-            print(f"⚠️  {code}: translation.json not found")
+    for namespace in NAMESPACES:
+        en_path = locales_dir / "en" / f"{namespace}.json"
+        if not en_path.exists():
+            print(f"❌ Missing master file: {en_path}")
             overall_ok = False
             continue
-        with open(target_path, encoding="utf-8") as f:
-            target_data = json.load(f)
-        errors = check_locale(en_data, target_data)
-        if errors:
-            overall_ok = False
-            print(f"❌ {code}: {len(errors)} interpolation mismatch(es)")
-            for e in errors:
-                print(f"   {e['key']}: expected {e['expected']}, got {e['found']}")
-        else:
-            print(f"✓ {code}: interpolations OK")
+        with open(en_path, encoding="utf-8") as f:
+            en_data = json.load(f)
+
+        print(f"\nChecking namespace: {namespace}")
+        for code in targets:
+            target_path = locales_dir / code / f"{namespace}.json"
+            if not target_path.exists():
+                print(f"❌ {code}/{namespace}.json not found")
+                overall_ok = False
+                continue
+            with open(target_path, encoding="utf-8") as f:
+                target_data = json.load(f)
+            errors = check_locale(en_data, target_data)
+            if errors:
+                overall_ok = False
+                print(f"❌ {code}/{namespace}.json: {len(errors)} interpolation mismatch(es)")
+                for e in errors:
+                    print(f"   {e['key']}: expected {e['expected']}, got {e['found']}")
+            else:
+                print(f"✓ {code}/{namespace}.json: interpolations OK")
     return 0 if overall_ok else 1
 
 
