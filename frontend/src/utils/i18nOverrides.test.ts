@@ -27,7 +27,7 @@ describe('i18nOverrides utility', () => {
 
         expect(i18n.addResourceBundle).toHaveBeenCalledWith(
             'en',
-            'translation',
+            'participant',
             config.ui_labels,
             true,
             true
@@ -44,7 +44,7 @@ describe('i18nOverrides utility', () => {
 
         expect(i18n.addResourceBundle).toHaveBeenCalledWith(
             'fr',
-            'translation',
+            'participant',
             labels,
             true,
             true
@@ -61,13 +61,13 @@ describe('i18nOverrides utility', () => {
     it('should reset base locales to original state', () => {
         resetBaseLocales();
 
-        const langs = ['en', 'fr', 'fi'];
+        const langs = ['en', 'fr', 'fi', 'de'];
 
-        // Check for each supported language
         for (const lang of langs) {
-            expect(i18n.removeResourceBundle).toHaveBeenCalledWith(lang, 'translation');
+            expect(i18n.removeResourceBundle).toHaveBeenCalledWith(lang, 'participant');
+            expect(i18n.removeResourceBundle).toHaveBeenCalledWith(lang, 'admin');
         }
 
-        expect(i18n.reloadResources).toHaveBeenCalledWith(langs, ['translation']);
+        expect(i18n.reloadResources).toHaveBeenCalledWith(langs, ['participant', 'admin']);
     });
 });

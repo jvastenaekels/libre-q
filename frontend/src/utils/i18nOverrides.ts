@@ -15,7 +15,7 @@ export const applyStudyOverrides = (lang: string, labels?: Record<string, string
 
     // i18next handles dot-notated keys automatically when using addResourceBundle
     // with deep: true and the key-value pair.
-    i18n.addResourceBundle(lang, 'translation', labels, true, true);
+    i18n.addResourceBundle(lang, 'participant', labels, true, true);
 };
 
 /**
@@ -24,10 +24,11 @@ export const applyStudyOverrides = (lang: string, labels?: Record<string, string
  * It reloads the base translations from the server/public folder.
  */
 export const resetBaseLocales = () => {
-    const langs = ['en', 'fr', 'fi'];
+    const langs = ['en', 'fr', 'fi', 'de'];
     for (const lang of langs) {
-        i18n.removeResourceBundle(lang, 'translation');
+        i18n.removeResourceBundle(lang, 'participant');
+        i18n.removeResourceBundle(lang, 'admin');
     }
     // Reload will trigger fetching the original JSONs via HttpBackend
-    i18n.reloadResources(langs, ['translation']);
+    i18n.reloadResources(langs, ['participant', 'admin']);
 };

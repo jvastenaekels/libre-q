@@ -35,7 +35,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
 
     // Ensure resources for the active editing language are loaded
     useEffect(() => {
-        if (activeLocale && !i18n.hasResourceBundle(activeLocale, 'translation')) {
+        if (activeLocale && !i18n.hasResourceBundle(activeLocale, 'participant')) {
             i18n.loadLanguages(activeLocale);
         }
     }, [activeLocale, i18n]);
