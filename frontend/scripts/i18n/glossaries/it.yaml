@@ -1,0 +1,46 @@
+# Q-methodology and product terminology for Italian (it).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+language: it
+language_name: Italiano
+
+terms:
+  concourse: concorso
+  Q-methodology: metodologia Q
+  Q-sort: classificazione Q
+  Q-set: insieme Q
+  statement: affermazione
+  factor: fattore
+  factor analysis: analisi fattoriale
+  presort: pre-classificazione
+  rough sort: classificazione iniziale
+  fine sort: classificazione fine
+  postsort: post-classificazione
+  study: studio
+  study design: progettazione dello studio
+  recruitment: reclutamento
+  participant: partecipante
+  member: membro
+  owner: proprietario
+  consent: consenso
+  consent form: modulo di consenso
+  audio recording: registrazione audio
+  memo: nota
+  draft: bozza
+  resume code: codice di ripresa
+  invitation: invito
+  project: progetto
+
+notes: |
+  - Tone: formal but accessible. Use the "Lei" form for participants and
+    administrators (matches Italian academic/professional norms). Avoid the
+    informal "tu" except in clearly intimate UI contexts (none present here).
+  - Imperative impersonal form for buttons ("Salva", "Annulla", "Continua").
+  - Prefer Italian academic equivalents over English loanwords ("affermazione"
+    rather than "statement", "metodologia Q" rather than "Q-methodology")
+    except where "Q" is a label of art in titles.
+  - Numbers: keep decimal points unless a per-locale formatter handles it
+    elsewhere (Qualis uses Intl, do not edit numeric tokens).
+  - Common UI labels: "Cancella" = clear/delete content, "Annulla" = cancel an
+    action. Don't conflate.
+  - GDPR/RGPD: Italian uses "GDPR" verbatim (the EU regulation is referred to
+    by its English acronym in Italian legal practice).

@@ -1,0 +1,2188 @@
+{
+    "auth": {
+        "login": {
+            "email_label": "Indirizzo e-mail",
+            "password_label": "Password",
+            "submit": "Continua",
+            "cta": "Accedi",
+            "forgot_password": "Dimenticata?",
+            "loading": "Autenticazione in corso...",
+            "card_title": "Accedi",
+            "welcome_back": "Bentornato!",
+            "error_401": "E-mail o password non valide",
+            "error_generic": "Qualcosa è andato storto. Riprovi.",
+            "reason_session_expired": "La sessione è scaduta. Acceda di nuovo.",
+            "reason_auth_required": "Acceda per continuare.",
+            "forgot_password_link": "Password dimenticata?",
+            "reset_success_banner": "Password aggiornata. Ora può accedere con la nuova password.",
+            "two_factor_title": "Autenticazione a due fattori",
+            "two_factor_app_prompt": "Inserisca il codice a 6 cifre dalla sua app di autenticazione.",
+            "two_factor_email_prompt": "Abbiamo inviato un codice a 6 cifre alla sua e-mail. Lo inserisca qui sotto.",
+            "two_factor_submit": "Verifica",
+            "two_factor_resend": "Invia di nuovo il codice",
+            "two_factor_resend_cooldown": "Nuovo invio disponibile tra {{seconds}}s",
+            "two_factor_invalid": "Codice non valido. Riprovi.",
+            "lost_2fa_link": "Ha perso l'accesso al suo 2FA?"
+        },
+        "twofa": {
+            "recovery": {
+                "title": "Ha perso l'accesso all'autenticazione a due fattori?",
+                "body": "Inserisca l'e-mail del suo account. Se l'autenticazione a due fattori è attiva su questo account, Le invieremo un link per disattivarla.",
+                "submit": "Invia link di disattivazione",
+                "success": "Se l'e-mail esiste e ha il 2FA attivo, il link di disattivazione è in arrivo."
+            },
+            "disable": {
+                "title": "Disattiva autenticazione a due fattori",
+                "warning": "Facendo clic sul pulsante qui sotto si rimuoverà definitivamente il secondo fattore da questo account. Potrà accedere con la sola password finché non riabilita il 2FA.",
+                "warning_attacker": "Se NON ha effettuato questa richiesta, chiuda questa pagina e cambi immediatamente la password.",
+                "confirm_button": "Sì, disattiva l'autenticazione a due fattori",
+                "loading": "Disattivazione in corso…",
+                "success": "L'autenticazione a due fattori è ora disattivata. Può accedere.",
+                "error_consumed": "Questo link è già stato utilizzato.",
+                "error_expired": "Questo link è scaduto o non è valido.",
+                "missing_token": "Nessun token nell'URL."
+            }
+        },
+        "password_reset": {
+            "request_title": "Reimposta la password",
+            "request_body": "Inserisca la sua e-mail e Le invieremo un link di reimpostazione.",
+            "request_submit": "Invia link di reimpostazione",
+            "request_success": "Se l'e-mail esiste, il link di reimpostazione è in arrivo.",
+            "confirm_title": "Scegli una nuova password",
+            "confirm_submit": "Reimposta password",
+            "success_redirect": "Password aggiornata. Ora può accedere con la nuova password.",
+            "link_expired": "Questo link è scaduto o è già stato utilizzato.",
+            "too_short": "La password deve essere di almeno 8 caratteri.",
+            "mismatch": "Le password non corrispondono.",
+            "missing_token": "Nessun token di reimpostazione nell'URL.",
+            "new_password_placeholder": "Nuova password",
+            "confirm_placeholder": "Conferma password"
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Verifichi la sua e-mail",
+                "body": "Abbiamo inviato un link di verifica a {{email}}. Clicchi sul link per attivare il suo account.",
+                "resend": "Invia di nuovo l'e-mail",
+                "cooldown": "Nuovo invio disponibile tra {{seconds}}s",
+                "error": "Impossibile reinviare. Riprovi più tardi."
+            },
+            "verify": {
+                "verifying": "Verifica dell'e-mail in corso…",
+                "success": "E-mail verificata. Ora può accedere.",
+                "expired": "Questo link è scaduto o non è valido.",
+                "resend_link": "Richiedi una nuova e-mail di verifica"
+            }
+        },
+        "register": {
+            "title": "Crea account",
+            "subtitle": "Partecipa al progetto di ricerca",
+            "secure_invitation": "Invito sicuro",
+            "invitation_to": "Invito a:",
+            "study_label": "Studio",
+            "role_label": "Ruolo",
+            "email_label": "Indirizzo e-mail",
+            "password_label": "Scegli password",
+            "confirm_password_label": "Conferma password",
+            "placeholder_password": "••••••••",
+            "submit": "Completa la registrazione",
+            "loading": "Creazione account in corso...",
+            "success_title": "Benvenuto nel team!",
+            "success_desc": "Il suo account è stato creato e collegato allo studio.",
+            "success_cta": "Vai alla dashboard",
+            "success_hint": "Ora può accedere alla dashboard amministrativa per iniziare a collaborare.",
+            "invalid_title": "Invito non valido",
+            "invalid_desc": "Questo link di invito non è valido o è scaduto.",
+            "missing_token_title": "Token mancante",
+            "missing_token_desc": "Questa pagina richiede un token di invito valido. Verifichi il link ricevuto.",
+            "verifying": "Verifica dell'invito in corso...",
+            "privacy_hint": "Registrandosi, accetta di seguire le linee guida etiche della ricerca configurate per questo studio.",
+            "errors": {
+                "password_mismatch": "Le password non corrispondono",
+                "generic_fail": "Registrazione non riuscita"
+            }
+        }
+    },
+    "admin": {
+        "hub": {
+            "title": "Centro ricercatori",
+            "welcome": "Bentornato,",
+            "new_project": "Nuovo progetto",
+            "your_projects": "I suoi progetti",
+            "studies_count": "studi",
+            "recent_studies": "Studi recenti",
+            "n_studies_one": "{{count}} studio",
+            "n_studies_other": "{{count}} studi",
+            "n_active_one": "{{count}} attivo",
+            "n_active_other": "{{count}} attivi",
+            "collecting": "Raccolta dati",
+            "no_studies": "Nessuno studio ancora",
+            "no_projects": "Nessun progetto ancora. Crei il primo progetto per iniziare.",
+            "no_projects_title": "Avvii il suo primo progetto di ricerca",
+            "no_projects_body": "Crei un progetto prima di aggiungere concorsi, insiemi Q o studi."
+        },
+        "memo": {
+            "title_concourse": "Note di selezione",
+            "title_study": "Nota metodologica",
+            "summary_empty_concourse": "Come e perché ha costruito questo concorso",
+            "summary_empty_study": "Facoltativo · per replica e pre-registrazione",
+            "summary_filled_one": "{{n}} voce · clicchi per visualizzare",
+            "summary_filled_other": "{{n}} voci · clicchi per visualizzare",
+            "summary_unread": "{{n}} non lette",
+            "add_entry": "Aggiungi voce",
+            "insert_template": "Inserisci da modello",
+            "entry_title_placeholder": "Titolo della sezione…",
+            "entry_body_placeholder": "Documenti la sua motivazione…",
+            "comments_count_one": "{{n}} commento",
+            "comments_count_other": "{{n}} commenti",
+            "show_resolved": "Mostra risolti ({{n}})",
+            "hide_resolved": "Nascondi risolti",
+            "comment_placeholder": "Scriva un commento. Usi @ per menzionare.",
+            "post_comment": "Pubblica",
+            "edit": "Modifica",
+            "delete": "Elimina",
+            "deleted_body": "[commento eliminato]",
+            "resolve": "Risolvi",
+            "unresolve": "Riapri",
+            "resolved_label": "[risolto]",
+            "save": "Salva",
+            "cancel": "Annulla",
+            "saved": "Salvato",
+            "save_error": "Impossibile salvare la nota. Riprovi.",
+            "load_error": "Impossibile caricare la nota. Aggiorni la pagina per riprovare.",
+            "mentions_for_you": "Menzioni per Lei",
+            "mention_user_not_found": "Utente sconosciuto",
+            "delete_entry_confirm": "Eliminare questa voce e tutti i suoi commenti?",
+            "include_discussion_in_export": "Includi i thread di discussione della nota",
+            "templates": {
+                "concourse": {
+                    "sources_canvassed": {
+                        "title": "Fonti esaminate"
+                    },
+                    "voices_retained": {
+                        "title": "Voci selezionate"
+                    },
+                    "voices_excluded": {
+                        "title": "Voci escluse"
+                    },
+                    "sampling_rationale": {
+                        "title": "Motivazione del campionamento"
+                    },
+                    "version_notes": {
+                        "title": "Note di versione"
+                    }
+                },
+                "study": {
+                    "distribution_rationale": {
+                        "title": "Motivazione della distribuzione"
+                    },
+                    "conditions_of_instruction": {
+                        "title": "Condizioni di istruzione"
+                    },
+                    "qset_size": {
+                        "title": "Dimensione dell'insieme Q"
+                    },
+                    "pre_post_design": {
+                        "title": "Scelte progettuali pre/post-classificazione"
+                    },
+                    "limitations": {
+                        "title": "Limitazioni"
+                    }
+                }
+            }
+        },
+        "study_design": {
+            "distribution_mode": {
+                "title": "Modalità di distribuzione",
+                "helper": "Scelga quanto rigidamente applicare la griglia di classificazione Q. Forzata: ogni colonna deve essere riempita fino alla sua capacità dichiarata (la scelta più comune). Libera: qualsiasi numero di affermazioni per colonna, totale = dimensione dell'insieme Q. Flessibile: il totale è vincolato, le colonne sono indicazioni orientative.",
+                "forced": {
+                    "label": "Forzata",
+                    "tooltip": "Ogni colonna deve contenere esattamente la sua capacità dichiarata."
+                },
+                "free": {
+                    "label": "Libera",
+                    "tooltip": "Totale affermazioni = dimensione insieme Q; il numero per colonna è libero."
+                },
+                "flexible": {
+                    "label": "Flessibile",
+                    "tooltip": "Totale affermazioni = dimensione insieme Q; le capacità per colonna sono indicazioni orientative (solo avvisi)."
+                }
+            },
+            "rough_sort": {
+                "toggle_label": "Abilita classificazione preliminare (smistamento in 3 pile)",
+                "lock_banner": "Opzione bloccata. {{count}} partecipante/i ha iniziato il sondaggio; archiviare o eliminare quelle sessioni prima di modificare questa impostazione.",
+                "deck_mode_note": "Disabilitato. I partecipanti vedono l'intero insieme Q come un mazzo scorrevole orizzontalmente."
+            }
+        },
+        "study": {
+            "activate_error": "Impossibile attivare lo studio. Verifichi che la progettazione sia valida e riprovi.",
+            "save": {
+                "success": "Modifiche salvate con successo",
+                "save_success": "Salvato con successo",
+                "synced_warnings": "Sincronizzato con il server. Le sue modifiche sono state mantenute in: {{fields}}",
+                "synced_concurrent": "Sincronizzato con le modifiche simultanee di un altro utente",
+                "conflict": "Conflitto rilevato. Alcune modifiche non hanno potuto essere unite.",
+                "error": "Salvataggio delle modifiche non riuscito"
+            },
+            "postsort": {
+                "missing": {
+                    "title": "Affermazioni mancanti",
+                    "desc": "Vi sono idee o prospettive che ritiene mancassero nell'insieme di affermazioni?"
+                }
+            },
+            "state": {
+                "manage": "Gestisci il flusso dello studio"
+            }
+        },
+        "components": {
+            "markdown": {
+                "label": "Markdown",
+                "tooltip": "Supporta Markdown per la formattazione avanzata",
+                "bold": "Grassetto",
+                "italic": "Corsivo",
+                "list": "Elenco",
+                "link": "Collegamento",
+                "edit": "Modifica",
+                "preview": "Anteprima",
+                "empty": "Nulla da visualizzare in anteprima"
+            },
+            "click_to_edit": "Clicchi per modificare"
+        },
+        "layout": {
+            "title": "Admin",
+            "back_home": "Torna alla home",
+            "beta": "Research beta",
+            "logout": "Esci",
+            "account": "Impostazioni account",
+            "admin_user": "Utente admin"
+        },
+        "account": {
+            "title": "Impostazioni account",
+            "description": "Gestisca le sue informazioni personali e la sicurezza dell'account.",
+            "personal": {
+                "title": "Informazioni personali",
+                "email": "Indirizzo e-mail",
+                "email_locked": "La modifica dell'e-mail tramite API sarà presto disponibile su questa pagina; il supporto backend è attivo.",
+                "name": "Nome completo",
+                "save": "Salva",
+                "saving": "Salvataggio in corso...",
+                "success": "Profilo aggiornato con successo",
+                "error": "Aggiornamento del profilo non riuscito",
+                "cannot_remove_self": "Non può rimuovere se stesso",
+                "name_required": "Il nome completo è obbligatorio"
+            },
+            "security": {
+                "title": "Sicurezza",
+                "description": "Gestisca l'autenticazione a due fattori e la sua password.",
+                "tfa_subtitle": "Autenticazione a due fattori",
+                "password_subtitle": "Password",
+                "enabled": "Attiva",
+                "setup_cta": "Configura il 2FA ora",
+                "configure_title": "Configura l'app di autenticazione",
+                "scan_desc": "Scansioni questo codice QR con la sua app di autenticazione (Google Authenticator, Authy, ecc.)",
+                "enter_code": "Inserisca il codice a 6 cifre",
+                "enable_btn": "Abilita 2FA",
+                "disable_btn": "Disabilita 2FA",
+                "confirm_disable": "Conferma disattivazione",
+                "confirm_password_label": "Confermi con la sua password",
+                "verifying": "Verifica in corso...",
+                "cancel": "Annulla",
+                "enabled_success": "Autenticazione a due fattori abilitata",
+                "disabled_success": "Autenticazione a due fattori disabilitata",
+                "secret_copied": "Segreto copiato",
+                "invalid_token": "Codice di verifica non valido",
+                "disable_error": "Disabilitazione del 2FA non riuscita",
+                "channel_select_label": "Come desidera ricevere i codici 2FA?",
+                "channel_app": "App di autenticazione (consigliata)",
+                "channel_email": "E-mail",
+                "channel_email_desc": "Le invieremo un codice a 6 cifre ogni volta che accede. Utile se non può installare un'app di autenticazione.",
+                "enable_email_btn": "Abilita 2FA via e-mail",
+                "enable_email_pending": "Attivazione in corso…"
+            },
+            "password": {
+                "title": "Gestione password",
+                "current": "Password attuale",
+                "new": "Nuova password",
+                "change_btn": "Cambia password",
+                "updating": "Aggiornamento in corso...",
+                "success": "Password modificata con successo",
+                "error": "Modifica della password non riuscita. Verifichi la password attuale.",
+                "validation": {
+                    "required": "Obbligatorio",
+                    "min_length": "Minimo 8 caratteri"
+                }
+            }
+        },
+        "sidebar": {
+            "home": "Dashboard",
+            "add_study": "Aggiungi studio",
+            "create_project": "CREA NUOVO PROGETTO",
+            "dashboard": "Dashboard",
+            "overview": "Panoramica",
+            "design": "Progettazione",
+            "recruit": "Accesso",
+            "data": "Dati",
+            "analysis": "Analisi",
+            "privacy": "Privacy dei dati",
+            "team": "Team",
+            "settings": "Impostazioni studio",
+            "project_settings": "Impostazioni progetto",
+            "study_tools": "Strumenti studio",
+            "project": "Progetto",
+            "documentation": "Documentazione",
+            "support": "Supporto",
+            "study_management": "Gestione studio",
+            "search": "Cerca...",
+            "studies": "Studi",
+            "select_study": "Seleziona studio",
+            "select_study_msg": "Selezioni o crei uno studio per iniziare.",
+            "view_all_studies": "Tutti gli studi",
+            "study": "Studio",
+            "select_project": "Seleziona progetto",
+            "concourses": "Concorsi",
+            "concourse": "Concorso",
+            "members": "Membri del team"
+        },
+        "concourse": {
+            "title": "Concorso",
+            "description": "Gestisca le affermazioni candidate per il suo studio di metodologia Q",
+            "default_title": "Concorso",
+            "default_title_for_project": "Concorso {{project}}",
+            "create": "Nuovo concorso",
+            "create_success": "Concorso creato",
+            "create_error": "Creazione del concorso non riuscita",
+            "create_dialog_title": "Crea concorso",
+            "create_dialog_desc": "Un concorso è una raccolta di affermazioni candidate da cui selezionerà il suo insieme Q.",
+            "field_title": "Titolo",
+            "field_title_placeholder": "es. Atteggiamenti verso il cambiamento climatico",
+            "field_description": "Descrizione",
+            "field_description_placeholder": "Breve descrizione di questo concorso...",
+            "field_code": "Codice",
+            "field_text": "Testo dell'affermazione",
+            "field_text_placeholder": "Inserisca il testo dell'affermazione...",
+            "field_source": "Fonte",
+            "items_label": "voci",
+            "updated": "Aggiornato",
+            "empty_title": "Nessun concorso ancora",
+            "empty_desc": "Crei un concorso per iniziare a raccogliere e organizzare le affermazioni candidate per la sua ricerca di metodologia Q.",
+            "add_item": "Aggiungi voce",
+            "bulk_import": "Importazione in blocco",
+            "import_desc": "Incolli le affermazioni separate da a capo. Ogni riga diventa una voce.",
+            "import_prefix": "Prefisso codice",
+            "import_statements": "Affermazioni",
+            "import_placeholder": "Un'affermazione per riga...",
+            "items_to_import": "affermazioni da importare",
+            "import_button": "Importa",
+            "import_success": "{{count}} voci importate",
+            "import_error": "Importazione non riuscita",
+            "item_created": "Voce aggiunta",
+            "item_create_error": "Aggiunta della voce non riuscita",
+            "item_updated": "Voce aggiornata",
+            "item_update_error": "Aggiornamento della voce non riuscito",
+            "item_deleted": "Voce eliminata",
+            "item_delete_error": "Eliminazione della voce non riuscita",
+            "status_error": "Modifica dello stato non riuscita",
+            "search_placeholder": "Cerca voci...",
+            "source_placeholder": "es. Intervista n°3, Rassegna della letteratura",
+            "no_items": "Nessuna voce ancora. Aggiunga la prima affermazione.",
+            "no_matches": "Nessuna voce corrisponde ai filtri.",
+            "danger_zone": "Zona di pericolo",
+            "delete": "Elimina concorso",
+            "delete_confirm": "È sicuro di voler eliminare questo concorso e tutte le sue voci?",
+            "deleted": "Concorso eliminato",
+            "delete_error": "Eliminazione del concorso non riuscita",
+            "delete_item_title": "Elimina voce",
+            "delete_item_confirm": "Eliminare questa voce? L'operazione non può essere annullata.",
+            "status": {
+                "proposed": "Proposta",
+                "accepted": "Accettata",
+                "rejected": "Rifiutata"
+            },
+            "change_note_placeholder": "Nota di modifica (facoltativa)",
+            "history": "Cronologia",
+            "comments": "Commenti",
+            "no_history": "Nessuna cronologia di modifica ancora.",
+            "no_comments": "Nessun commento ancora.",
+            "add_comment": "Scriva un commento...",
+            "send_comment": "Invia",
+            "comment_added": "Commento aggiunto",
+            "comment_error": "Impossibile aggiungere il commento. Riprovi.",
+            "version_label": "v{{n}}",
+            "item_detail_desc": "Cronologia e commenti per questa voce",
+            "manage_tags": "Etichette",
+            "tag_name_placeholder": "Nome etichetta",
+            "tag_color": "Colore etichetta",
+            "tag_created": "Etichetta creata",
+            "tag_create_error": "Creazione dell'etichetta non riuscita",
+            "tag_deleted": "Etichetta eliminata",
+            "tag_delete_error": "Eliminazione dell'etichetta non riuscita",
+            "no_tags": "Nessuna etichetta ancora. Crei la prima etichetta qui sopra.",
+            "field_tags": "Etichette",
+            "export_csv": "Esporta CSV",
+            "select_language": "Lingua",
+            "add_language": "Aggiungi lingua",
+            "add_language_desc": "Inserisca un codice lingua (es. en, fr, fi).",
+            "add_language_desc_v2": "Selezioni una lingua per le traduzioni delle affermazioni.",
+            "add_language_tooltip": "Aggiungi una lingua di traduzione",
+            "field_language": "Lingua",
+            "import_language": "Lingua",
+            "select_all": "Seleziona tutto",
+            "bulk_selected": "{{count}} selezionate",
+            "bulk_set_status": "Imposta stato:",
+            "bulk_clear": "Cancella",
+            "bulk_status_success": "{{count}} voci aggiornate",
+            "bulk_status_error": "Aggiornamento di alcune voci non riuscito",
+            "qset_title": "Curazione",
+            "qset_pending": "{{count}} voci ancora da rivedere",
+            "qset_complete": "Tutte le voci revisionate",
+            "show_pending": "Da rivedere",
+            "bulk_confirm_title": "Conferma cambio di stato",
+            "bulk_confirm_desc": "Impostare {{count}} voci su \"{{status}}\"?",
+            "no_translation": "Nessun testo",
+            "language_tooltip": "Lingua dei testi delle affermazioni",
+            "loading": "Configurazione del concorso...",
+            "diff_code": "codice",
+            "diff_status": "stato",
+            "diff_text": "testo",
+            "diff_tags": "etichette",
+            "diff_changed": "Modificato:",
+            "methodological_context": {
+                "title": "Contesto metodologico",
+                "subtitle": "Campi di documentazione facoltativi. Compili quelli rilevanti per la sua progettazione; lasci gli altri vuoti."
+            },
+            "import_from_csv": "Importa CSV/TSV…",
+            "import_csv_hint": "CSV/TSV richiede colonne: code, language, text.",
+            "import_csv_no_match": "Nessuna riga corrisponde alla lingua selezionata ({{lang}}).",
+            "import_csv_skipped": "Saltate {{count}} riga/e in altre lingue: {{langs}}.",
+            "import_csv_more_errors": "{{count}} altri problemi"
+        },
+        "concourse_import": {
+            "title": "Importa dal concorso",
+            "desc": "Selezioni le voci da un concorso da importare come affermazioni dello studio. Le voci vengono copiate; le modifiche al concorso non influiranno sullo studio.",
+            "button_label": "Importa dal concorso",
+            "select_concourse": "Concorso",
+            "select_placeholder": "Scelga un concorso...",
+            "code_prefix": "Prefisso codice",
+            "code_prefix_placeholder": "es. S",
+            "only_accepted": "Solo accettate",
+            "replace_existing": "Sostituisci le affermazioni esistenti",
+            "replace_warning": "Tutte le affermazioni esistenti verranno eliminate definitivamente e sostituite dalle voci selezionate.",
+            "selected": "{{count}} selezionate",
+            "select_all": "Seleziona tutto",
+            "import_button": "Importa {{count}} affermazioni",
+            "success": "{{count}} affermazioni importate",
+            "error": "Impossibile importare le voci dal concorso. Riprovi.",
+            "no_accepted": "Nessuna voce accettata in questo concorso. Deselezioni \"Solo accettate\" per visualizzare tutto.",
+            "no_items": "Questo concorso non ha voci.",
+            "no_concourses": "Nessun concorso in questo progetto. Crearne uno prima."
+        },
+        "concourse_sync": {
+            "update_available": "Aggiorna",
+            "source_deleted": "Fonte eliminata",
+            "source_deleted_tip": "La voce sorgente del concorso è stata eliminata.",
+            "new_version": "Nuova versione nel concorso:",
+            "synced": "Affermazione aggiornata dal concorso",
+            "error": "Impossibile sincronizzare con il concorso. Riprovi.",
+            "stale_banner": "{{count}} affermazione/i ha aggiornamenti disponibili dal concorso."
+        },
+        "analysis": {
+            "title": "Analisi",
+            "description": "Analisi fattoriale dei dati di classificazione Q: estrai punti di vista dalle risposte dei partecipanti",
+            "configuration": "Configurazione",
+            "configuration_description": "Seleziona il metodo di estrazione, il numero di fattori e la rotazione",
+            "extraction_method": "Estrazione",
+            "centroid": "Centroide",
+            "n_factors": "Fattori",
+            "rotation_method": "Rotazione",
+            "none": "Nessuna",
+            "run": "Avvia analisi",
+            "run_will_replace": "Una nuova esecuzione sostituirà la visualizzazione dei risultati corrente. Usa il pannello della cronologia per confrontare le esecuzioni.",
+            "running": "Analisi in corso...",
+            "reanalyzing": "Riesecuzione dell'analisi...",
+            "success": "Analisi completata. {{n}} fattori estratti.",
+            "error": "Analisi non riuscita: {{message}}",
+            "scree_hint": "Ogni barra mostra quanta varianza spiega un fattore (il suo autovalore). La linea tratteggiata indica autovalore = 1 (criterio di Kaiser). Clicchi su una barra per selezionare il numero di fattori da estrarre.",
+            "kaiser_suggestion": "{{n}} fattore/i ha autovalori superiori a 1 (criterio di Kaiser)",
+            "factor": "Fattore",
+            "factor_n": "Fattore {{n}}",
+            "eigenvalue": "Autovalore",
+            "too_few_participants": "Servono almeno 2 partecipanti che abbiano completato la classificazione per eseguire l'analisi.",
+            "eigenvalue_error": "Caricamento dei dati di analisi non riuscito. Riprovi.",
+            "scree_plot_label": "Scree plot degli autovalori per {{n}} fattori",
+            "loading_eigenvalues": "Caricamento degli autovalori...",
+            "empty_state": "Imposti i parametri ed esegua l'analisi.",
+            "empty": {
+                "contract_title": "Dati di classificazione Q insufficienti",
+                "contract_body": "L'analisi fattoriale di metodologia Q richiede almeno 2 partecipanti che abbiano completato la classificazione. Le scelte di configurazione (estrazione, fattori, rotazione, segnalazione) acquistano significato quando esistono i dati. Condivida il link dello studio dalla panoramica per iniziare a raccogliere risposte.",
+                "contract_cta": "Apri panoramica studio"
+            },
+            "advanced": {
+                "title": "Impostazioni avanzate",
+                "summary": "Rotazione: {{rotation}} · Segnalazione: {{flagging}} · Bootstrap: {{bootstrap}}",
+                "bootstrap_off": "disattivato",
+                "bootstrap_on": "{{n}} iterazioni"
+            },
+            "tab_loadings": "Saturazioni",
+            "tab_factor_arrays": "Distribuzioni fattoriali",
+            "tab_statements": "Affermazioni",
+            "tab_summary": "Riepilogo",
+            "participant": "Partecipante",
+            "flagged": "Segnalato",
+            "significance_threshold": "Soglia di significatività (p<0,05): ±{{threshold}}",
+            "sorts": "classificazioni",
+            "distinguishing_legend": "Affermazione distintiva",
+            "code": "Codice",
+            "statement": "Affermazione",
+            "type": "Tipo",
+            "distinguishing": "Distintiva",
+            "consensus": "Consenso",
+            "variance_explained": "Varianza spiegata (%)",
+            "cumulative_variance": "Varianza cumulata (%)",
+            "n_flagged": "N classificazioni segnalate",
+            "composite_reliability": "Affidabilità composita",
+            "se_factor_scores": "Errore standard dei punteggi fattoriali",
+            "factor_correlations": "Correlazioni tra fattori",
+            "high_correlation": "Alta correlazione",
+            "total_variance": "Varianza totale spiegata",
+            "method_used": "Metodo",
+            "statements_label": "affermazioni",
+            "pca": "ACP",
+            "varimax": "Varimax",
+            "metric": "Metrica",
+            "caption_loadings": "Saturazioni fattoriali per partecipante",
+            "caption_statements": "Z-score delle affermazioni e distribuzioni fattoriali per fattore",
+            "caption_characteristics": "Caratteristiche dei fattori e statistiche di affidabilità",
+            "caption_correlations": "Matrice di correlazione tra fattori",
+            "retry": "Riprova",
+            "flagging_method": "Segnalazione",
+            "auto": "Auto",
+            "manual": "Manuale",
+            "manual_flag_hint": "Clicchi su una cella di saturazione per segnalare/desegnalare un partecipante per quel fattore. Riesegua l'analisi per aggiornare i risultati.",
+            "no_flagged_participants": "Nessun partecipante segnalato per alcun fattore. Provi a modificare il numero di fattori o il metodo di segnalazione.",
+            "no_statement_scores": "Nessun punteggio delle affermazioni disponibile. Assicuri che i partecipanti siano segnalati per almeno un fattore.",
+            "no_characteristics": "Nessuna caratteristica fattoriale disponibile.",
+            "export": "Esporta",
+            "export_loadings": "Saturazioni fattoriali (CSV)",
+            "export_scores": "Punteggi affermazioni (CSV)",
+            "export_xlsx": "Analisi completa (XLSX)",
+            "export_error": "Generazione dell'esportazione XLSX non riuscita.",
+            "select_factors": "Seleziona il numero di fattori",
+            "loadings_help": "Le saturazioni fattoriali mostrano quanto fortemente la classificazione di ogni partecipante correla con ciascun fattore. Le celle evidenziate superano la soglia di significatività indicata sopra.",
+            "factor_array_help": "Classificazione Q composita che mostra il pattern ideale per questo fattore. Le affermazioni sono posizionate nella distribuzione in base ai loro z-score ponderati.",
+            "factor_array_label": "Classificazione composita del fattore {{n}}",
+            "factor_arrays": {
+                "toggle_narratives": "Mostra narrazioni dei fattori",
+                "toggle_narratives_aria": "Attiva/disattiva le narrazioni interpretative per fattore"
+            },
+            "statements_help": "Gli z-score mostrano la posizione standardizzata di ciascun fattore su ogni affermazione. D = distintiva (significativamente diversa tra fattori), C = consenso (nessuna differenza significativa).",
+            "z_scores_description": "Z-score e posizioni nella distribuzione fattoriale per affermazione",
+            "factor_statistics": "Statistiche dei fattori",
+            "characteristics_help": "Gli autovalori riflettono la quantità di varianza spiegata. L'affidabilità composita riflette la coerenza interna tra le classificazioni segnalate. L'errore standard dei punteggi fattoriali riflette la precisione della stima composita.",
+            "help_extraction": "L'ACP massimizza la varianza spiegata. Il centroide è meno vincolato matematicamente.",
+            "help_n_factors": "Ogni fattore rappresenta un punto di vista distinto.",
+            "help_rotation": "Il Varimax separa i fattori per una struttura più semplice.",
+            "help_flagging": "Auto: segnala i partecipanti che saturano su esattamente un fattore. Manuale: sovrascrittura per partecipante.",
+            "guide_loadings_title": "Lettura delle saturazioni fattoriali",
+            "guide_loadings_1": "Ogni saturazione è una correlazione (da -1 a +1) tra un partecipante e un fattore (punto di vista condiviso).",
+            "guide_loadings_2": "I valori evidenziati superano la soglia di significatività mostrata sopra la tabella.",
+            "guide_arrays_title": "Interpretazione delle distribuzioni fattoriali",
+            "guide_arrays_1": "Ogni distribuzione fattoriale è la classificazione Q composita che rappresenta un punto di vista condiviso.",
+            "guide_arrays_2": "Si legge da sinistra a destra: da più in disaccordo a più d'accordo. Le posizioni estreme forniscono il segnale più forte per l'interpretazione.",
+            "guide_statements_title": "Comprensione dei punteggi delle affermazioni",
+            "guide_statements_1": "Gli z-score mostrano quanto fortemente ogni fattore concorda o è in disaccordo con ogni affermazione (0 = neutrale).",
+            "guide_statements_2": "D = distintiva (posizionata significativamente in modo diverso tra i fattori). Le stelle indicano il livello di significatività.",
+            "guide_summary_title": "Valutazione della soluzione",
+            "guide_summary_1": "Gli autovalori misurano quanta varianza spiega un fattore. Il criterio di Kaiser (autovalore > 1) è un'euristica comune per decidere quanti fattori mantenere.",
+            "guide_summary_2": "L'affidabilità composita riflette quanto coerentemente le classificazioni segnalate definiscono ciascun fattore. Valori più alti indicano che la stima del fattore si basa su un maggiore accordo tra le sue classificazioni definenti.",
+            "benchmark_above": "Sopra la soglia",
+            "benchmark_below": "Sotto la soglia",
+            "history": {
+                "title": "Cronologia delle analisi",
+                "loading": "Caricamento della cronologia…",
+                "fetch_error": "Impossibile caricare la cronologia delle analisi.",
+                "empty": "Nessuna analisi precedente per questo studio. Eseguirne una per avviare il registro di audit.",
+                "empty_explainer": "Ogni esecuzione viene registrata qui in modo da poter documentare e riesaminare ogni decisione.",
+                "load_error": "Impossibile caricare questa esecuzione dell'analisi. Aggiorni la pagina per riprovare.",
+                "load_run_aria": "Carica l'esecuzione dell'analisi del {{date}}",
+                "loading_run": "Caricamento…",
+                "current_tag": "corrente",
+                "n_factors_label": "{{n}}F",
+                "edit_notes": "Modifica note",
+                "edit_notes_aria": "Modifica le note per questa esecuzione",
+                "notes_placeholder": "Aggiunga una nota su questa esecuzione…",
+                "notes_aria": "Modifica le note per questa esecuzione",
+                "save_notes_aria": "Salva note",
+                "cancel_edit_aria": "Annulla modifica",
+                "notes_saved": "Note salvate.",
+                "notes_error": "Impossibile salvare le note. Verifichi la connessione e riprovi.",
+                "delete_run": "Elimina esecuzione",
+                "delete_run_aria": "Elimina questa esecuzione dell'analisi",
+                "delete_dialog_title": "Eliminare l'esecuzione dell'analisi?",
+                "delete_dialog_description": "Eliminando un'esecuzione si rimuove la prova di una scelta analitica dal registro di audit. È sicuro?",
+                "cancel": "Annulla",
+                "delete_confirm": "Elimina",
+                "deleted": "Esecuzione dell'analisi eliminata.",
+                "delete_error": "Eliminazione dell'esecuzione non riuscita.",
+                "viewing_banner": "Visualizzazione esecuzione del {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
+                "back_to_current": "Torna alla corrente"
+            },
+            "factor_voices": {
+                "title": "Voci sul fattore {{n}}",
+                "no_audio": "Nessuna registrazione audio post-classificazione dai partecipanti segnalati su questo fattore.",
+                "no_material": "Nessuna registrazione audio post-classificazione né commenti scritti dai partecipanti segnalati su questo fattore.",
+                "loading": "Caricamento registrazioni…",
+                "error": "Impossibile caricare le registrazioni audio. Riprovi.",
+                "context": "Ancori l'interpretazione del fattore alle parole dei partecipanti stessi: le loro motivazioni audio e i commenti scritti sulle affermazioni.",
+                "context_aria": "Informazioni su questo pannello",
+                "audio_label": "Registrazione: {{key}} di {{participant}}",
+                "url_unavailable": "URL audio non disponibile.",
+                "comments_label": "Commenti alle affermazioni"
+            },
+            "factor_note": {
+                "label": "Narrativa del fattore",
+                "placeholder": "Scriva la narrativa interpretativa per questo fattore: il discorso, le voci e le tensioni che porta in primo piano.",
+                "empty_hint": "Aggiunga una narrativa interpretativa per questo fattore",
+                "char_count": "{{n}}/{{max}}",
+                "edit_aria": "Modifica la narrativa del fattore {{n}}",
+                "save_aria": "Salva la narrativa del fattore",
+                "cancel_aria": "Annulla modifica",
+                "aria": "Modifica la narrativa del fattore {{n}}",
+                "saved": "Narrativa del fattore salvata.",
+                "error": "Salvataggio della narrativa del fattore non riuscito."
+            },
+            "rotation": {
+                "judgmental": {
+                    "label": "Judgmental (manuale)",
+                    "short": "Judgmental",
+                    "tooltip": "Ruoti manualmente le coppie di fattori di angoli scelti per allinearli a posizioni sostanzialmente significative."
+                }
+            },
+            "manual_rotations": {
+                "title": "Rotazioni manuali",
+                "helper": "Specifichi le rotazioni come 'ruota il fattore F di Δ° attorno al fattore G'. Le rotazioni vengono applicate nell'ordine.",
+                "add": "Aggiungi rotazione",
+                "remove_aria": "Rimuovi rotazione",
+                "empty": "Aggiunga almeno una rotazione per eseguire l'analisi.",
+                "factor_a_label": "Ruota fattore",
+                "angle_label": "di",
+                "factor_b_label": "attorno al fattore"
+            },
+            "bootstrap": {
+                "toggle_label": "Esegui stabilità bootstrap",
+                "iterations_label": "Iterazioni (B)",
+                "helper": "Facoltativo. Ricampiona le classificazioni Q B volte per stimare gli intervalli di confidenza sui punteggi fattoriali.",
+                "running": "Esecuzione bootstrap…",
+                "se_column": "SE medio (z)",
+                "tooltip": "Bootstrap non parametrico delle classificazioni Q (ricampionate con rimpiazzo); l'analisi viene ripetuta B volte per stimare gli IC al 95% sugli z-score."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostica",
+                "kaiser": "Kaiser",
+                "parallel": "Analisi parallela",
+                "map": "MAP di Velicer",
+                "advisory": "Solo orientativo. Il mantenimento nel metodo Q dipende anche dall'interpretabilità e dalla stabilità (Watts & Stenner 2012).",
+                "preview_range_title": "Anteprima intervallo",
+                "preview_range_disabled": "L'anteprima intervallo supporta solo ACP + varimax. L'estrazione centroide e la rotazione judgmental dipendono dal percorso; commetta un'esecuzione reale per ispezionare.",
+                "select_k": "{{k}} fattori",
+                "empty_factor": "Fattore vuoto (iper-fattorizzazione)",
+                "cumvar": "cumvar %",
+                "pct_flagged": "% segnalati",
+                "n_distinguishing": "# distintive",
+                "n_cross_loaders": "# cross-loaders",
+                "min_def_sorts": "min classificazioni definenti",
+                "advanced_title": "Configurazione avanzata",
+                "commit_cta": "Conferma e interpreta"
+            },
+            "interpret": {
+                "def_sorts": "Classificazioni definenti: {{n}}",
+                "statements_title": "Affermazioni",
+                "narrative_title": "Narrativa F{{n}}",
+                "insert_comment_quote": "Inserisci commento come citazione",
+                "focus_mode": "Focus per fattore",
+                "overview_mode": "Panoramica",
+                "mode_toggle": "Modalità di visualizzazione"
+            },
+            "compare": {
+                "pin_cta": "Fissa confronto",
+                "no_other_runs": "Nessun'altra esecuzione disponibile",
+                "run_label": "Esecuzione #{{id}} ({{n}} fattori)",
+                "pinned": "Confronto con esecuzione #{{id}}",
+                "phi": "φ = {{phi}}",
+                "ambiguous": "corrispondenza ambigua (interpretare i delta con cautela)",
+                "unpin": "Rimuovi fissaggio",
+                "delta_z_aria": "Δz {{delta}} rispetto all'esecuzione di confronto",
+                "delta_loading_aria": "Δsaturazione {{delta}} rispetto all'esecuzione di confronto"
+            },
+            "quote_insert_format": "> {{text}}\n> {{p}}, sull'affermazione {{code}}: \"{{stmt}}\""
+        },
+        "project": {
+            "remove_member": "Rimuovi membro",
+            "table_caption": "Membri del progetto",
+            "switcher": {
+                "settings": "Impostazioni progetto",
+                "settings_desc": "Membri e profili",
+                "new_project": "Nuovo progetto",
+                "new_project_desc": "Crea un nuovo progetto"
+            },
+            "roles": {
+                "owner": "Proprietario",
+                "admin": "Amministratore",
+                "viewer": "Osservatore",
+                "member": "Membro"
+            },
+            "study_states": {
+                "active": "Attivo",
+                "draft": "Bozza",
+                "paused": "In pausa",
+                "closed": "Chiuso"
+            },
+            "create": {
+                "title": "Crea progetto",
+                "card_title": "Dettagli progetto",
+                "name_label": "Nome progetto",
+                "name_placeholder": "Studio Q sugli atteggiamenti climatici",
+                "url_label": "URL progetto",
+                "url_placeholder": "studio-q-atteggiamenti-climatici",
+                "url_description": "Questo diventa il percorso del progetto sotto /app/.",
+                "cancel": "Annulla",
+                "create_button": "Crea progetto",
+                "creating": "Creazione in corso...",
+                "success": "Progetto creato con successo",
+                "error": "Creazione del progetto non riuscita"
+            }
+        },
+        "recruitment": {
+            "title": "Accesso",
+            "description": "Configurare l'URL dello studio, gestire l'accesso dei partecipanti e monitorare l'efficienza del reclutamento.",
+            "study_url": {
+                "title": "URL dello studio",
+                "description": "L'indirizzo pubblico dove i partecipanti accedono al suo studio.",
+                "full_url_label": "URL completo",
+                "slug_label": "Slug URL",
+                "slug_description": "L'identificatore univoco utilizzato nell'URL dello studio. Solo lettere minuscole, numeri e trattini.",
+                "slug_locked": "Lo slug URL può essere modificato solo mentre lo studio è in modalità bozza."
+            },
+            "state_draft": "Modalità bozza. I link funzioneranno una volta attivato lo studio.",
+            "state_closed": "Questo studio è chiuso. I link esistenti rimangono visibili ma nuovi partecipanti non possono iniziare.",
+            "state_archived": "Questo studio è archiviato. Tutti i dati di reclutamento sono di sola lettura.",
+            "empty_title": "Nessun link di reclutamento ancora",
+            "empty_description": "Crei il primo link per iniziare a invitare partecipanti.",
+            "empty_cta": "Crea link di accesso",
+            "stats_summary": {
+                "links": "link",
+                "started": "avviati",
+                "submitted": "inviati"
+            },
+            "access_rules": {
+                "title": "Regole di accesso",
+                "description": "Controlli quando e come i partecipanti possono accedere allo studio.",
+                "password_toggle": "Richiedi password",
+                "password_toggle_desc": "I partecipanti devono inserire una password prima di iniziare lo studio.",
+                "password_label": "Password di accesso",
+                "password_placeholder": "Inserisca la password di accesso",
+                "password_locked": "La protezione con password può essere modificata solo mentre lo studio è in modalità bozza.",
+                "password_set": "È attualmente impostata una password. Inserisca un nuovo valore per cambiarla, o disattivi l'opzione per rimuoverla.",
+                "collection_window": "Finestra di raccolta",
+                "window_toggle": "Limita la finestra di raccolta",
+                "window_toggle_help": "Restringa l'accesso dei partecipanti a un intervallo di tempo specifico.",
+                "start_date_label": "Apertura",
+                "end_date_label": "Chiusura",
+                "date_hint": "Lasci vuoto per nessuna restrizione temporale.",
+                "clear_date": "Cancella data",
+                "save_button": "Salva regole di accesso",
+                "save_success": "Regole di accesso aggiornate",
+                "save_error": "Aggiornamento delle regole di accesso non riuscito",
+                "non_draft_notice": "Al di fuori della bozza, è possibile modificare solo la finestra di raccolta. Riporti lo studio in bozza per modificare le altre regole di accesso.",
+                "archived_notice": "Questo studio è archiviato. Le regole di accesso sono di sola lettura."
+            },
+            "new_link": "Nuovo link di accesso",
+            "create_title": "Crea link di accesso",
+            "link_type": "Strategia di accesso",
+            "select_type": "Scelga un tipo di reclutamento...",
+            "campaign_name": "Nome canale / campagna",
+            "name_placeholder": "Es. LinkedIn, batch e-mail a, lista studenti...",
+            "link_count": "Dimensione batch",
+            "capacity_label": "Invii massimi",
+            "generate_links": "Genera link",
+            "no_links": "Nessun link di reclutamento generato ancora.",
+            "unnamed": "Canale senza nome",
+            "revoked": "Accesso revocato",
+            "qr_title": "Condividi tramite QR",
+            "copy_link": "Copia URL",
+            "table_title": "Link di reclutamento",
+            "share_title": "Condividi studio",
+            "share_desc": "Distribuisca l'URL del suo studio per invitare i partecipanti.",
+            "public_url_label": "URL pubblico di partecipazione",
+            "hide_qr": "Nascondi QR",
+            "show_qr": "Mostra codice QR",
+            "delete_link": "Elimina link",
+            "qr_alt": "Codice QR per {{url}}",
+            "table_caption": "Link di reclutamento",
+            "progress_label": "{{count}} di {{max}} risposte",
+            "usage": {
+                "started": "avviati",
+                "submitted": "inviati",
+                "completed": "Completati",
+                "in_progress": "In corso",
+                "unused": "Non utilizzati"
+            },
+            "live_study": "Studio attivo",
+            "download_qr": "Scarica immagine",
+            "qr_print_hint": "Scansi o stampi questo codice per i materiali di reclutamento fisici (volantini, manifesti).",
+            "analytics_title": "Analisi delle campagne",
+            "analytics_desc": "I link diretti e le scansioni QR sono tracciati automaticamente nella dashboard di monitoraggio sopra.",
+            "copy_success": "Link dello studio copiato negli appunti",
+            "types": {
+                "public": "Accesso libero (pubblico)",
+                "individual": "Codice monouso",
+                "limited": "Partecipazione limitata"
+            },
+            "guidance": {
+                "public": "Ideale per un reclutamento ad alto volume. Un singolo URL per tutti i partecipanti.",
+                "individual": "Sicurezza massima. Genera link univoci che scadono dopo un completamento riuscito.",
+                "limited": "Accesso controllato. Un link che smette di funzionare dopo un numero fisso di invii."
+            },
+            "stats": {
+                "total_links": "Canali totali",
+                "active_channels": "Lotti di reclutamento attivi",
+                "started": "Sessioni totali",
+                "engagements": "Partecipanti che hanno iniziato",
+                "submitted": "Dati validi",
+                "completions": "Invii completati",
+                "conversion": "Tasso di acquisizione",
+                "efficiency": "Rendimento finale dei dati"
+            },
+            "table": {
+                "name": "Campagna / lotto",
+                "type": "Tipo di accesso",
+                "token": "Token di sicurezza",
+                "usage": "Capacità",
+                "status": "Stato",
+                "actions": "Gestisci",
+                "type_help": "Pubblico, monouso o a capacità limitata. Vedere le descrizioni delle strategie nella finestra di dialogo \"Nuovo link di accesso\"."
+            },
+            "status": {
+                "public": "Pubblico",
+                "individual": "Individuale",
+                "limited": "Limitato"
+            },
+            "toasts": {
+                "created": "Link di reclutamento creati con successo",
+                "failed": "Impossibile creare i link di reclutamento. Verifichi gli input e riprovi.",
+                "revoked": "Link revocato",
+                "revoke_failed": "Impossibile revocare questo link. Potrebbe essere già in uso.",
+                "copied": "Copiato negli appunti"
+            }
+        },
+        "analytics": {
+            "charts": {
+                "recruitment_funnel": {
+                    "title": "Funnel di reclutamento",
+                    "subtitle": "Performance aggregata di conversione",
+                    "initial_contact": "Contatto iniziale",
+                    "completion": "Completamento",
+                    "started_study": "Studio avviato",
+                    "submitted": "Inviato",
+                    "yield": "Rendimento",
+                    "success_rate": "Tasso di successo",
+                    "completion_rate": "{{rate}}% degli avviati ha completato"
+                },
+                "link_performance": {
+                    "title": "Monitoraggio performance dei link",
+                    "subtitle": "Monitoraggio dell'efficacia dei singoli canali di reclutamento",
+                    "volume": "Volume",
+                    "yield": "Rendimento",
+                    "conversion_rate": "Tasso di conversione",
+                    "total_responses": "risposte"
+                }
+            }
+        },
+        "breadcrumbs": {
+            "admin": "Admin",
+            "dashboard": "Dashboard",
+            "study_dashboard": "Panoramica",
+            "design": "Progettazione",
+            "participants": "Partecipanti",
+            "team": "Team",
+            "recruitment": "Accesso",
+            "exports": "Dati",
+            "data": "Dati",
+            "privacy": "Privacy dei dati",
+            "account": "Impostazioni account",
+            "participant_n": "Partecipante {{code}}",
+            "analysis": "Analisi",
+            "settings": "Impostazioni",
+            "concourse": "Concorso",
+            "members": "Membri del team"
+        },
+        "command_menu": {
+            "title": "Menu comandi globale",
+            "placeholder": "Scriva un comando o cerchi...",
+            "no_results": "Nessun risultato trovato.",
+            "switch_project": "Cambia progetto",
+            "switch_study": "Cambia studio",
+            "study_actions": "Azioni studio",
+            "system": "Sistema",
+            "no_studies": "Nessuno studio in questo progetto.",
+            "open_dashboard": "Apri dashboard",
+            "design_study": "Progettazione studio",
+            "collaborators": "Collaboratori",
+            "copy_link": "Copia link pubblico",
+            "toggle_theme": "Cambia tema",
+            "logout": "Esci",
+            "search_label": "Cerca o esegui comandi",
+            "to_open": "Per aprire",
+            "active": "Attivo",
+            "link_copied": "Link dello studio copiato!",
+            "logged_out": "Disconnessione effettuata con successo",
+            "switched_project": "Passato a {{name}}"
+        },
+        "dashboard": {
+            "title": "Dashboard del progetto",
+            "welcome": "Bentornato,",
+            "snapshot": "Ecco un riepilogo della sua attività di ricerca.",
+            "create_study": "Crea studio",
+            "total_studies": "Studi totali",
+            "across_statuses": "Tutti gli stati",
+            "active_data_collection": "Raccolta dati attiva",
+            "receiving_responses": "Studi che ricevono risposte",
+            "total_participants": "Partecipanti totali",
+            "all_studies": "Tutti gli studi",
+            "all_studies_description": "Tutti gli studi in questo progetto.",
+            "languages_count_one": "{{count}} lingua",
+            "languages_count_other": "{{count}} lingue",
+            "n_participants_one": "{{count}} partecipante",
+            "n_participants_other": "{{count}} partecipanti",
+            "n_studies_one": "{{count}} studio",
+            "n_studies_other": "{{count}} studi",
+            "n_active_one": "{{count}} attivo",
+            "n_active_other": "{{count}} attivi",
+            "n_participants_total_one": "{{count}} partecipante",
+            "n_participants_total_other": "{{count}} partecipanti",
+            "concourse_n_items_one": "{{count}} affermazione",
+            "concourse_n_items_other": "{{count}} affermazioni",
+            "concourse_open_hint": "Cura le affermazioni candidate",
+            "created": "Creato",
+            "no_studies": "Nessuno studio trovato. Crei il primo studio per iniziare!",
+            "import_study": "Importa studio",
+            "get_started": "Inizi con il suo progetto di ricerca",
+            "onboarding_title": "Primi passi",
+            "step_create_project": "Crei il suo progetto",
+            "step_create_project_desc": "Il suo progetto è pronto.",
+            "step_concourse": "Raccolga le affermazioni nel concorso",
+            "step_concourse_desc": "Aggiunga le affermazioni candidate dalla sua rassegna della letteratura.",
+            "step_qset": "Selezioni l'insieme Q",
+            "step_qset_desc": "Esamini e accetti le voci che formeranno il suo insieme Q.",
+            "step_study": "Crei uno studio",
+            "step_study_desc": "Definisca la griglia di classificazione per la sua classificazione Q.",
+            "step_import": "Importi l'insieme Q nel suo studio",
+            "step_import_desc": "Importi le voci del concorso accettate come affermazioni dello studio.",
+            "step_configure": "Configuri il percorso dei partecipanti",
+            "step_configure_desc": "Imposti le istruzioni, la pre-classificazione e le domande post-classificazione.",
+            "step_launch": "Avvii il reclutamento",
+            "step_launch_desc": "Generi i link di partecipazione e li condivida.",
+            "go_to_concourse": "Apri concorso",
+            "go_to_qset": "Apri insieme Q",
+            "concourse": "Concorso",
+            "concourse_empty": "Nessuna voce ancora. Inizi a costruire la sua raccolta di affermazioni.",
+            "team": "Team",
+            "team_loading": "Caricamento...",
+            "studies": "Studi",
+            "active_studies": "Attivi",
+            "paused_studies": "In pausa",
+            "draft_studies": "Bozze",
+            "closed_studies": "Completati",
+            "attention": "Richiede attenzione",
+            "alert_deadline": "{{study}}: chiusura tra {{days}} giorni con {{count}} partecipanti",
+            "view": "Visualizza",
+            "open_study": "Apri studio",
+            "add_study": "Aggiungi studio",
+            "closes": "Chiude",
+            "timeline": {
+                "title": "Timeline degli invii",
+                "subtitle": "Tendenze giornaliere di partecipazione",
+                "started": "Avviati",
+                "completed": "Completati"
+            },
+            "devices": {
+                "title": "Distribuzione dei dispositivi",
+                "subtitle": "Come i partecipanti accedono al suo studio",
+                "types": {
+                    "desktop": "Desktop",
+                    "mobile": "Mobile",
+                    "tablet": "Tablet",
+                    "unknown": "Sconosciuto"
+                }
+            },
+            "n_studies_help": "Numero totale di studi in questo progetto, incluse bozze e chiusi.",
+            "n_active_help": "Studi che accettano attualmente invii di partecipanti (stato = attivo).",
+            "n_participants_total_help": "Somma dei partecipanti completati in tutti gli studi di questo progetto.",
+            "tool_help": {
+                "design": "Configura lo studio: griglia di distribuzione, condizioni di istruzione, affermazioni, consenso.",
+                "recruit": "Link di reclutamento, regole di accesso e impostazioni URL dello studio.",
+                "data": "Risposte dei partecipanti ed esportazioni (CSV, dump classificazione Q).",
+                "analysis": "Configurazione dell'analisi fattoriale e esecuzioni storiche."
+            }
+        },
+        "export": {
+            "config": "Esporta configurazione",
+            "exporting": "Esportazione in corso...",
+            "config_success": "Configurazione esportata con successo",
+            "config_error": "Impossibile esportare la configurazione. Riprovi.",
+            "label": "Esporta dati",
+            "success": "Esportazione riuscita",
+            "error": "Esportazione non riuscita. Riprovi.",
+            "csv": "Esporta CSV",
+            "json": "Esporta JSON",
+            "audio": "Esporta audio (ZIP)",
+            "formats": {
+                "csv": "CSV",
+                "pqmethod": "PQMethod (ZIP)",
+                "rkit": "R-Kit (ZIP)",
+                "package": "Pacchetto di ricerca (ZIP)",
+                "json": "Dump JSON"
+            },
+            "download": "Scarica",
+            "package_dialog": {
+                "title": "Scarica pacchetto di ricerca",
+                "description": "Raggruppa tutti i dati dello studio in un unico ZIP per OSF / pre-registrazione.",
+                "discussion_hint": "Aggiunge memo/memo-discussion.md con tutti i thread di commento (firmati e datati). Disattivato per impostazione predefinita; mantenga l'esportazione pulita a meno che non desideri il percorso deliberativo."
+            }
+        },
+        "import": {
+            "title": "Importa configurazione studio",
+            "config": "Importa configurazione",
+            "upload_desc": "Carichi un file di configurazione dello studio precedentemente esportato",
+            "validate_desc": "Riveda la configurazione e fornisca uno slug univoco",
+            "creating_desc": "Creazione studio in corso...",
+            "file_upload": "Caricamento file",
+            "paste_json": "Incolla JSON",
+            "drop_here": "Rilasci il file qui",
+            "drag_drop": "Trascini e rilasci il file JSON o clicchi per sfogliare",
+            "supported": "Formato supportato: .json",
+            "paste_label": "Incolla configurazione JSON",
+            "validate": "Valida e continua",
+            "valid": "Configurazione valida",
+            "invalid": "La configurazione contiene errori",
+            "errors": "Errori",
+            "warnings": "Avvisi",
+            "summary": "Riepilogo studio",
+            "title_field": "Titolo",
+            "languages": "Lingue",
+            "statements": "Affermazioni",
+            "grid": "Intervallo griglia",
+            "new_slug": "Nuovo slug studio",
+            "slug_help": "Deve essere univoco, da 3 a 100 caratteri, solo lettere minuscole, numeri e trattini",
+            "creating": "Creazione studio dalla configurazione...",
+            "create_study": "Crea studio",
+            "invalid_json": "File JSON non valido",
+            "validation_failed": "La configurazione non è valida",
+            "success": "Studio importato con successo",
+            "redirecting": "Apertura del progettista studio...",
+            "failed": "Impossibile importare lo studio. Veda i dettagli qui sotto e riprovi.",
+            "validation": {
+                "errors": {
+                    "missing_version": "Campo versione mancante",
+                    "unsupported_version": "Versione non supportata: {{version}}",
+                    "missing_field": "Campo obbligatorio mancante: {{field}}",
+                    "no_translations": "È richiesta almeno una traduzione",
+                    "missing_translation_field": "Traduzione {{index}} mancante del campo obbligatorio: {{field}}",
+                    "invalid_lang_code": "Codice lingua non valido: {{lang}}",
+                    "no_statements": "È richiesta almeno un'affermazione",
+                    "duplicate_codes": "Codici affermazione duplicati: {{codes}}",
+                    "missing_stmt_translations": "Affermazione {{index}} priva di traduzioni",
+                    "invalid_grid_config": "grid_config non valido: deve essere un elenco",
+                    "invalid_grid_structure": "Struttura grid_config non valida: {{error}}"
+                },
+                "warnings": {
+                    "grid_capacity_mismatch": "Il numero di affermazioni ({{count}}) non corrisponde alla capacità della griglia ({{capacity}})",
+                    "missing_consent_draft": "Titolo o descrizione del consenso mancante (studio in bozza)",
+                    "external_branding_logo": "Il logo del brand usa un URL esterno: {{url}}",
+                    "external_partner_logo": "Il logo del partner '{{name}}' usa un URL esterno: {{url}}",
+                    "external_logo": "L'URL del logo fa riferimento a una risorsa esterna - potrebbe non essere accessibile"
+                }
+            }
+        },
+        "dialogs": {
+            "create_study": {
+                "title": "Crea nuovo studio",
+                "description": "Avvii un nuovo studio di metodologia Q. Potrà configurare le affermazioni e le impostazioni in seguito.",
+                "study_title": "Titolo dello studio",
+                "study_title_placeholder": "Es. Prospettive sull'IA",
+                "url_slug": "Slug URL",
+                "url_slug_placeholder": "es. prospettive-ia-2025",
+                "cancel": "Annulla",
+                "create": "Crea studio",
+                "success": "Studio creato con successo",
+                "error": "Creazione dello studio non riuscita",
+                "languages": "Lingue",
+                "languages_desc": "Selezioni le lingue da abilitare. I contenuti verranno inizializzati con i valori predefiniti localizzati."
+            }
+        },
+        "validation": {
+            "required": "Obbligatorio",
+            "slug_min": "Lo slug deve essere di almeno 3 caratteri",
+            "slug_regex": "Lo slug deve contenere solo lettere minuscole, numeri e trattini"
+        },
+        "study_overview": {
+            "title": "Panoramica",
+            "back_to_overview": "Torna alla panoramica",
+            "sample_size": "Numero di partecipanti (P-Set)",
+            "valid": "validi",
+            "completion_rate": "Tasso di completamento",
+            "active": "attivi",
+            "mobile": "mobile",
+            "median_duration": "Durata mediana",
+            "suspect": "Sospetto",
+            "recent_activity": "Attività recente",
+            "latest_participants": "Ultimi partecipanti (ultimi {{count}} di {{total}})",
+            "recently_completed": "Completati di recente",
+            "in_progress": "In corso",
+            "discarded": "Scartati",
+            "started": "Avviati",
+            "view_all": "Visualizza tutti i partecipanti e i dettagli dei dati",
+            "no_participants": "Nessun partecipante ancora.",
+            "view_data": "Visualizza",
+            "submitted": "Inviati",
+            "edit_design": "Modifica progettazione",
+            "export_csv": "Scarica CSV",
+            "export_json": "Scarica JSON",
+            "steps": {
+                "welcome": "Benvenuto",
+                "consent": "Consenso",
+                "rough_sort": "Classificazione iniziale",
+                "fine_sort": "Classificazione Q",
+                "final": "Passi finali"
+            }
+        },
+        "overview": {
+            "copy_id": "Copia ID partecipante"
+        },
+        "study_status": {
+            "dialog": {
+                "draft": {
+                    "title": "Ripristinare la bozza?",
+                    "desc": "Questo interromperà la raccolta dati ma consentirà di modificare la progettazione dello studio. I dati esistenti vengono conservati.",
+                    "action": "Ripristina bozza"
+                },
+                "active": {
+                    "title": "Avviare lo studio?",
+                    "desc": "L'attivazione dello studio lo aprirà ai partecipanti.",
+                    "action": "Imposta come attivo"
+                },
+                "paused": {
+                    "title": "Mettere in pausa lo studio?",
+                    "desc": "I partecipanti non potranno accedere allo studio mentre è in pausa. Potrà riprendere in seguito.",
+                    "action": "Metti in pausa lo studio"
+                },
+                "closed": {
+                    "title": "Chiudere lo studio?",
+                    "desc": "Questo impedirà l'ingresso di nuovi partecipanti. Le sessioni esistenti possono comunque concludersi. Potrà riaprire in seguito.",
+                    "action": "Chiudi lo studio"
+                }
+            },
+            "steps": {
+                "draft": {
+                    "label": "Bozza",
+                    "description": "Configurazione e progettazione"
+                },
+                "active": {
+                    "label": "Attivo",
+                    "description": "Raccolta risposte"
+                },
+                "paused": {
+                    "label": "In pausa",
+                    "description": "In attesa"
+                },
+                "closed": {
+                    "label": "Chiuso",
+                    "description": "Analisi ed esportazione"
+                }
+            },
+            "state": {
+                "activate": "Attiva studio",
+                "switch_to_draft": "Modalità bozza",
+                "manage": "Gestisci stato"
+            },
+            "notifications": {
+                "success": {
+                    "draft": "Studio ripristinato in bozza con successo",
+                    "active": "Studio avviato con successo",
+                    "paused": "Studio messo in pausa con successo",
+                    "closed": "Studio chiuso con successo"
+                },
+                "error": "Impossibile cambiare lo stato dello studio. Verifichi i permessi e riprovi.",
+                "state_changed_active": "Lo studio è ora attivo!"
+            }
+        },
+        "design": {
+            "title": "Progettazione studio",
+            "translation_needed": "Revisione richiesta (testo)",
+            "reset_defaults": "Ripristina valori predefiniti",
+            "editing_language_banner": "Modifica della versione {{language}}. Utilizzi il selettore lingua nella barra degli strumenti per cambiare.",
+            "multilang": {
+                "view_others": "Visualizza in altre lingue",
+                "other_formulations": "Altre formulazioni"
+            },
+            "guidance": {
+                "title": "Guida alla progettazione",
+                "intro_title": "Benvenuto nello studio",
+                "intro_desc": "Inizi definendo lo scopo del suo studio. Queste informazioni verranno mostrate ai partecipanti prima che inizino il processo di classificazione.",
+                "qsort_title": "Bilanciamento affermazioni e griglia",
+                "qsort_desc": "Assicuri che la capacità della griglia corrisponda esattamente al numero di affermazioni. Un insieme Q bilanciato segue di solito una distribuzione quasi-normale (a campana)."
+            },
+            "checklist": {
+                "title": "Checklist",
+                "statements": "Affermazioni",
+                "grid_balance": "Griglia bilanciata",
+                "branding": "Logo e colori",
+                "instructions": "Istruzioni",
+                "ready": "Tutte le parti essenziali sono pronte. Ora può avviare il suo studio!",
+                "pending": "Completi i passi richiesti sopra per abilitare l'attivazione dello studio.",
+                "study_title": "Titolo dello studio",
+                "consent_defined": "Modulo di consenso",
+                "progress": "Avanzamento",
+                "languages": "Lingue",
+                "status_ready": "Pronto",
+                "status_pending": "In attesa",
+                "required": "Obbligatorio",
+                "reset_defaults": "Ripristina valori predefiniti"
+            },
+            "unsaved_changes": {
+                "title": "Modifiche non salvate",
+                "description": "Ci sono modifiche non salvate nella progettazione del suo studio. Se esce ora, queste modifiche andranno perse.",
+                "confirm": "Esci senza salvare",
+                "cancel": "Continua a modificare"
+            },
+            "tips": {
+                "title": "Consiglio rapido",
+                "pilot": "Esegua sempre una classificazione di prova prima di condividere il link con i partecipanti."
+            },
+            "toolbar": {
+                "title": "Progettazione",
+                "back": "Indietro",
+                "preview": "Mostra anteprima",
+                "hide_preview": "Nascondi anteprima",
+                "popout": "Apri anteprima in finestra",
+                "discard": "Scarta modifiche non salvate",
+                "test_run": "Esegui test",
+                "save": "Salva",
+                "saved": "Salvato",
+                "closed": "Chiuso",
+                "back_to_study": "Torna allo studio",
+                "editing_language": "Lingua di modifica",
+                "manage_langs": "Gestisci lingue",
+                "select_lang": "Seleziona lingua",
+                "test_run_help": "Anteprima come partecipante. Queste esecuzioni non sono incluse nei dati.",
+                "more_actions": "Altre azioni"
+            },
+            "sync": {
+                "saving": "Salvataggio in corso...",
+                "error": "Errore di salvataggio",
+                "modified": "Modifiche non salvate",
+                "synced": "Modifiche salvate",
+                "wait_save": "Salvataggio in corso... Attenda un momento.",
+                "recovered": "Bozza recuperata dal backup locale!",
+                "recovery_title": "Trovate modifiche non salvate",
+                "recovery_desc": "Abbiamo trovato una versione locale di questo studio più recente di quella sul server. Desidera ripristinarla?",
+                "recovery_restore": "Ripristina versione locale",
+                "recovery_discard": "Scarta versione locale"
+            },
+            "validation": {
+                "failed_title": "Configurazione incompleta",
+                "failed_desc": "Corregga questi problemi per attivare:",
+                "errors": {
+                    "no_statements": "Lo studio deve avere almeno un'affermazione.",
+                    "no_grid": "La configurazione della griglia è mancante.",
+                    "capacity_mismatch": "La capacità della griglia ({{total}}) non corrisponde al numero di affermazioni ({{count}}).",
+                    "no_translations": "Lo studio deve avere almeno una traduzione in una lingua.",
+                    "missing_default_lang": "La traduzione nella lingua predefinita ({{lang}}) è mancante.",
+                    "missing_title": "Il titolo è mancante per la lingua '{{lang}}'.",
+                    "missing_consent_title": "Il titolo del consenso è mancante per la lingua '{{lang}}'.",
+                    "missing_consent_description": "La descrizione del consenso è mancante per la lingua '{{lang}}'.",
+                    "missing_grid_instructions": "Le istruzioni di classificazione Q sono mancanti per la lingua '{{lang}}'.",
+                    "missing_step_title": "Il titolo del passo {{index}} è mancante per la lingua '{{lang}}'.",
+                    "missing_statement_translation": "L'affermazione '{{code}}' è priva di traduzioni per: {{missing}}.",
+                    "empty_statement_text": "L'affermazione '{{code}}' ha testo vuoto per la lingua '{{lang}}'.",
+                    "missing_question_label": "La domanda '{{id}}' è priva di etichetta per la lingua '{{lang}}' ({{section}}).",
+                    "missing_option_label": "L'opzione {{index}} della domanda '{{id}}' è priva di etichetta per la lingua '{{lang}}' ({{section}})."
+                }
+            },
+            "languages": {
+                "manage_title": "Gestisci lingue",
+                "manage_desc": "Abiliti o disabiliti le lingue disponibili per i partecipanti in questo studio.",
+                "auto_translate": "Traduzione automatica",
+                "auto_translate_desc": "Presto potrà usare l'IA per tradurre automaticamente il suo studio in oltre 30 lingue.",
+                "activate_title": "Attiva lingua",
+                "activate_desc": "Scelga una lingua sorgente da cui copiare le traduzioni. Questo evita campi vuoti per i partecipanti.",
+                "source_label": "Lingua sorgente",
+                "copy_notice": "Tutti i campi verranno copiati. Vedrà un indicatore visivo sui campi che richiedono ancora la sua traduzione.",
+                "confirm_activate": "Attiva e copia"
+            },
+            "tabs": {
+                "welcome": "Generale",
+                "presort": "Pre-classificazione",
+                "condition": "Condizione",
+                "qsort": "Classificazione Q",
+                "postsort": "Post-classificazione",
+                "interface": "Interfaccia",
+                "theme": "Tema",
+                "general": "Generale",
+                "statements": "Affermazioni",
+                "grid": "Griglia",
+                "survey": "Sondaggio",
+                "branding": "Brand"
+            },
+            "view_mode": {
+                "mobile": "Vista mobile",
+                "desktop": "Vista desktop"
+            },
+            "intro": {
+                "general_settings": "Impostazioni generali",
+                "welcome_title": "Messaggio di benvenuto",
+                "process_title": "Panoramica dei passi dello studio",
+                "process_steps": {
+                    "title": "Panoramica dei passi dello studio",
+                    "desc": "Definisca le fasi mostrate ai partecipanti nella pagina di benvenuto. Se lasciate vuote, verranno utilizzati i passi predefiniti.",
+                    "add_step": "Aggiungi passo",
+                    "empty": {
+                        "title": "Nessun passo personalizzato definito",
+                        "desc": "Lo studio utilizzerà il flusso di lavoro standard di metodologia Q (incontro, prime impressioni, prospettiva, perché)."
+                    },
+                    "fields": {
+                        "title": "Titolo del passo",
+                        "description": "Breve descrizione",
+                        "icon": "Icona",
+                        "toggle": "Attiva/disattiva"
+                    },
+                    "defaults": {
+                        "new_step": "Nuovo passo dello studio",
+                        "new_desc": "Spieghi cosa farà il partecipante in questa fase."
+                    },
+                    "reset": {
+                        "instructions": "Ripristina istruzioni",
+                        "consent_title": "Ripristina titolo consenso",
+                        "consent_description": "Ripristina descrizione consenso",
+                        "process_steps": "Ripristina passi del processo",
+                        "process_steps_confirm": "È sicuro di voler ripristinare tutti i passi del processo ai valori predefiniti? Questo sostituirà i suoi passi personalizzati."
+                    },
+                    "inconsistent": {
+                        "banner_title": "Passi del processo incoerenti",
+                        "rough_disabled": "Il passo 'Prime impressioni' (classificazione iniziale) è in questo elenco ma lo studio ha la classificazione iniziale disabilitata. I partecipanti non lo vedranno.",
+                        "presort_disabled": "Il passo 'Facciamoci conoscere' (sondaggio pre-classificazione) è in questo elenco ma lo studio ha il sondaggio pre-classificazione disabilitato. I partecipanti non lo vedranno.",
+                        "remove_action": "Rimuovi"
+                    }
+                },
+                "consent_title": "Modulo di consenso",
+                "reset": "Ripristina istruzione",
+                "consent_details": "Dettagli del modulo di consenso",
+                "fields": {
+                    "default_lang": "Lingua predefinita",
+                    "default_lang_help": "Questa lingua verrà mostrata ai partecipanti per impostazione predefinita se la lingua del browser non è supportata.",
+                    "title": "Titolo dello studio",
+                    "title_placeholder": "Inserisca il titolo pubblico...",
+                    "subtitle": "Sottotitolo (facoltativo)",
+                    "subtitle_placeholder": "Un breve motto...",
+                    "objective": "Obiettivo dello studio",
+                    "objective_placeholder": "Qual è la domanda di ricerca o lo scopo di questo studio?",
+                    "task_overview": "Introduzione",
+                    "task_placeholder": "Descriva qui il processo dello studio (numero di passi, durata stimata, ecc.). Questo campo è facoltativo se utilizza i passi personalizzati sopra.",
+                    "consent_title_label": "Titolo del consenso",
+                    "legal_text": "Testo legale / accordo",
+                    "legal_placeholder": "Inserisca il testo completo dell'accordo legale..."
+                },
+                "consent_desc": "I partecipanti devono accettare questi termini prima di iniziare."
+            },
+            "condition": {
+                "title": "Condizione di istruzione",
+                "label": "Definisca la condizione di istruzione",
+                "desc": "Questo è il prompt principale che guida i partecipanti durante il processo di classificazione.",
+                "field_label": "Testo dell'istruzione",
+                "placeholder": "Es. Classifichi le seguenti affermazioni da quelle con cui è maggiormente d'accordo a quelle con cui è meno d'accordo",
+                "grid_title": "Istruzione di classificazione Q",
+                "grid_desc": "Questa è l'istruzione principale che guida i partecipanti durante il processo di classificazione Q.",
+                "pre_title": "Istruzione di classificazione preliminare",
+                "pre_desc": "Istruzione fornita ai partecipanti durante la classificazione iniziale.",
+                "pre_field_label": "Testo dell'istruzione",
+                "pre_placeholder": "Es. In base al suo punto di vista personale, divida le affermazioni in tre pile...",
+                "enable_pre": "Abilita passo pre-istruzione",
+                "pre_label": "Contenuto della pre-istruzione",
+                "tips": {
+                    "title": "Perché è importante?",
+                    "desc": "Nella metodologia Q, la 'condizione di istruzione' determina il punto di vista dal quale il partecipante classifica le voci. Deve essere chiara e coerente in tutte le fasi di classificazione."
+                }
+            },
+            "questions": {
+                "enable_presort": "Abilita sondaggio pre-classificazione",
+                "enable_presort_desc": "Raccoglie informazioni demografiche o altri dati prima del compito di classificazione.",
+                "add_field": "Aggiungi un nuovo campo",
+                "basic_fields": "Campi di base",
+                "choice_fields": "Campi a scelta",
+                "scale_fields": "Campi a scala",
+                "labels": {
+                    "question": "Etichetta domanda",
+                    "required": "Campo obbligatorio",
+                    "options": "Opzioni",
+                    "multiple": "(Selezione multipla consentita)",
+                    "single": "(Selezione singola)",
+                    "placeholder": "Inserisca qui la sua domanda...",
+                    "scale": "Scala di valutazione",
+                    "scale_points": "Numero di punti",
+                    "scale_left": "Etichetta estremo sinistro",
+                    "scale_right": "Etichetta estremo destro"
+                },
+                "types": {
+                    "text": "Testo",
+                    "long_text": "Testo lungo",
+                    "number": "Numero",
+                    "date": "Data",
+                    "email": "E-mail",
+                    "dropdown": "Menu a tendina",
+                    "radio": "Radio",
+                    "checkboxes": "Caselle di controllo",
+                    "text_audio": "Testo + Audio",
+                    "rating": "Scala di valutazione"
+                },
+                "empty": {
+                    "title": "Nessuna domanda ancora",
+                    "desc": "Clicchi sopra per aggiungere la prima domanda"
+                },
+                "defaults": {
+                    "new_question": "Nuova domanda",
+                    "option": "Opzione",
+                    "enter_answer": "Inserisca la sua risposta...",
+                    "untitled": "Domanda senza titolo",
+                    "scale_left": "Fortemente in disaccordo",
+                    "scale_right": "Fortemente d'accordo"
+                },
+                "actions": {
+                    "add_option": "Aggiungi opzione",
+                    "copy_from": "Importa da lingua",
+                    "copy_success": "Importato"
+                },
+                "logic": {
+                    "title": "Logica di visibilità",
+                    "enable": "Aggiungi condizione di visibilità",
+                    "depends_on": "Mostra questa domanda solo se...",
+                    "select_placeholder": "Seleziona una domanda principale",
+                    "operator": "Operatore",
+                    "value": "Valore di confronto",
+                    "operators": {
+                        "equals": "Uguale a",
+                        "not_equals": "Diverso da",
+                        "contains": "Contiene",
+                        "greater_than": "Maggiore di",
+                        "less_than": "Minore di"
+                    }
+                }
+            },
+            "qsort": {
+                "tabs": {
+                    "statements": "Affermazioni",
+                    "distribution": "Distribuzione"
+                },
+                "bulk": {
+                    "title": "Editor in blocco (incolla rapido)",
+                    "desc": "Un'affermazione per riga. Supporta \"codice: testo\" e copia-incolla da Excel (multilingue).",
+                    "replace_all": "Sostituisci tutto",
+                    "append": "Aggiungi all'elenco",
+                    "sync_by_code": "Sincronizza/Unisci per codice",
+                    "placeholder": "Semplice:. La mia affermazione",
+                    "detected": "{{count}} affermazioni rilevate",
+                    "process_replace": "Elabora e sostituisci affermazioni",
+                    "process_append": "Elabora e aggiungi affermazioni",
+                    "process_sync": "Elabora e sincronizza traduzioni",
+                    "detected_format": {
+                        "excel": "Formato Excel rilevato (tabulazioni)",
+                        "list": "Formato elenco rilevato (codice: testo)",
+                        "simple": "Elenco semplice rilevato (uno per riga)",
+                        "multi_lang": "Multilingue: {{langs}}",
+                        "with_codes": "Con codici personalizzati"
+                    }
+                },
+                "set": {
+                    "title": "Insieme Q",
+                    "clear": "Cancella tutto",
+                    "confirm_clear": "È sicuro di voler eliminare TUTTE le affermazioni? L'operazione non può essere annullata.",
+                    "updated": "Affermazione aggiornata",
+                    "cleared": "Tutte le affermazioni cancellate",
+                    "imported": "{{count}} affermazioni importate con successo",
+                    "reset_codes": "Reimposta codici",
+                    "confirm_reset_codes": "È sicuro di voler risequenziare tutti i codici delle affermazioni (s1, s2, s3...)?",
+                    "codes_reset": "Codici delle affermazioni risequenziati"
+                },
+                "settings": {
+                    "title": "Impostazioni di ricerca",
+                    "desc": "Configuri la modalità di presentazione delle affermazioni ai partecipanti",
+                    "show_codes": "Mostra codici affermazioni",
+                    "show_codes_desc": "Visualizza i codici delle affermazioni (es. \"S1\", \"S2\") accanto al testo.",
+                    "randomize": "Randomizza l'ordine delle affermazioni",
+                    "randomize_desc": "Presenta le affermazioni in ordine casuale a ogni partecipante (coerente nella sessione)"
+                },
+                "grid": {
+                    "title": "Griglia di distribuzione della classificazione Q",
+                    "desc": "La forma della griglia costringe i partecipanti a discriminare tra le affermazioni, approssimando una distribuzione normale.",
+                    "slot_count": "{{count}} posizioni allocate",
+                    "stat_count": "{{count}} affermazioni",
+                    "perfect": "Bilanciamento perfetto",
+                    "too_many": "{{count}} affermazioni in eccesso",
+                    "too_few": "{{count}} affermazioni mancanti",
+                    "min_reached": "Intervallo minimo raggiunto (±2)",
+                    "max_reached": "Intervallo massimo raggiunto (±6)",
+                    "remove_extreme_columns": "Rimuovi colonne estreme",
+                    "add_extreme_columns": "Aggiungi colonne estreme",
+                    "symmetry_lock": "Blocco simmetria",
+                    "symmetry_lock_desc": "Applica automaticamente le modifiche alle colonne opposte per mantenere una distribuzione bilanciata.",
+                    "auto_balance": "Bilanciamento automatico",
+                    "auto_balance_desc": "Ridisegna la griglia in una distribuzione semi-normale bilanciata",
+                    "reshaped": "Griglia ridisegnata in una distribuzione bilanciata",
+                    "balanced": "Griglia bilanciata alla distribuzione standard",
+                    "no_statements": "Aggiunga prima le affermazioni per modellare automaticamente la griglia",
+                    "statements": "affermazioni",
+                    "ideal_shape": "Forma ideale",
+                    "symmetric": "Simmetrica",
+                    "asymmetric": "Asimmetrica",
+                    "tooltip_title": "Perché la distribuzione forzata?",
+                    "tooltip_desc": "La metodologia Q utilizza una distribuzione quasi-normale (curtosi > 0) per garantire che i partecipanti facciano distinzioni significative. La forma a piramide previene il bias di tendenza centrale.",
+                    "locked": "Progettazione bloccata",
+                    "locked_desc": "Le modifiche strutturali (codici affermazioni, griglia) sono disabilitate perché lo studio ha raccolto dati o non è più in modalità bozza. È ancora possibile modificare le traduzioni dei testi.",
+                    "locked_active": "Questo studio è attivo. Passi alla modalità bozza per modificare.",
+                    "locked_paused": "Questo studio è in pausa. Passi alla modalità bozza per modificare.",
+                    "locked_closed": "Questo studio è chiuso. La progettazione è archiviata.",
+                    "mismatch_title": "Capacità della griglia non corrispondente",
+                    "mismatch_desc": "Ha {{statements}} affermazioni ma la griglia ha posizioni solo per {{slots}} voci. Regoli le colonne qui sotto per corrispondere.",
+                    "unlock_hint": "Vada all'esploratore dati per eliminare le sessioni e sbloccare la struttura"
+                }
+            },
+            "postsort": {
+                "extreme": {
+                    "title": "Colonne mirate",
+                    "desc": "Selezioni le colonne che attivano domande di approfondimento.",
+                    "no_columns": "Nessuna colonna selezionata.",
+                    "add_label": "Aggiungi colonna:",
+                    "prompt_label": "Prompt per le affermazioni",
+                    "prompt_placeholder": "Perché ha posizionato questa affermazione qui?",
+                    "add": "Aggiungi",
+                    "add_defaults": "Aggiungi estremi predefiniti",
+                    "select_placeholder": "Seleziona..."
+                },
+                "random_comments": {
+                    "title": "Consenti commenti liberi",
+                    "desc": "Consenti ai partecipanti di aggiungere commenti a qualsiasi affermazione nella griglia."
+                },
+                "custom": {
+                    "title": "Domande personalizzate",
+                    "desc": "Aggiunga domande personalizzate al sondaggio post-classificazione."
+                },
+                "missing": {
+                    "title": "Chiedi delle affermazioni mancanti",
+                    "desc": "In caso affermativo, le descriva brevemente.",
+                    "prompt_label": "Testo del prompt",
+                    "prompt_placeholder": "Si senta libero di suggerire e spiegare."
+                },
+                "steps": {
+                    "step1": "Passo 1: feedback",
+                    "step2": "Passo 2: domande"
+                },
+                "email": {
+                    "title": "Contatto di follow-up con il partecipante",
+                    "desc": "Raccolga indirizzi e-mail per follow-up o risultati della ricerca.",
+                    "interview": "Offri follow-up",
+                    "results": "Offri l'iscrizione a una mailing list sui risultati dello studio",
+                    "interview_warning": "Nota: accettare di essere contattati rimuove l'anonimato nei confronti del ricercatore.",
+                    "results_hint": "E-mail solo per i risultati, anonimato preservato."
+                },
+                "audio": {
+                    "title": "Registrazione audio",
+                    "desc": "Consenti ai partecipanti di registrare risposte audio invece di testo.",
+                    "max_duration": "Durata massima",
+                    "seconds": "secondi",
+                    "max_duration_help": "Tempo massimo di registrazione per domanda (30–600 secondi).",
+                    "participant_choice_info": "I partecipanti possono rispondere con testo, audio o entrambi per ogni domanda."
+                }
+            },
+            "interface": {
+                "title": "Personalizzazione dell'interfaccia",
+                "desc": "Personalizzi i pulsanti e le etichette dell'interfaccia per adattarli al tono del suo studio (es. cambiando \"d'accordo/in disaccordo\" in \"mi piace/non mi piace\").",
+                "nav": {
+                    "title": "Pulsanti di navigazione",
+                    "start": "Pulsante Avvia",
+                    "next": "Pulsante Passo successivo",
+                    "submit": "Pulsante Invia",
+                    "confirm": "Pulsante Conferma classificazione",
+                    "tooltips": {
+                        "start": "Pulsante che avvia lo studio",
+                        "next": "Passa al passo successivo",
+                        "submit": "Invia i risultati alla fine",
+                        "confirm": "Pulsante di validazione generico"
+                    }
+                },
+                "terms": {
+                    "title": "Terminologia di classificazione",
+                    "desc": "Definisca le etichette per la classificazione spontanea e lo spettro della griglia.",
+                    "rough": "Etichette classificazione iniziale",
+                    "agree": "D'accordo",
+                    "neutral": "Neutrale",
+                    "disagree": "In disaccordo",
+                    "grid": "Legende della griglia (estremi)",
+                    "most_agree": "Maggiormente d'accordo",
+                    "most_disagree": "Maggiormente in disaccordo"
+                },
+                "hints": {
+                    "title": "Suggerimenti metodologici",
+                    "desc": "Aggiunga o modifichi i suggerimenti visualizzati durante la fase di classificazione nella griglia.",
+                    "placeholder": "Inserisca un suggerimento metodologico...",
+                    "add": "Aggiungi suggerimento",
+                    "reset": "Ripristina valori predefiniti"
+                },
+                "help": {
+                    "title": "Guida del passo (cosa/perché)",
+                    "desc": "Personalizzi la guida contestuale disponibile ai partecipanti a ogni passo tramite il pannello '?'.",
+                    "step_disabled": "(passo disabilitato)"
+                }
+            },
+            "theme": {
+                "title": "Brand visivo",
+                "accent": {
+                    "title": "Colore di accento",
+                    "desc": "Questo colore verrà utilizzato per pulsanti, link e highlights in tutto lo studio.",
+                    "pick": "Scegli un colore",
+                    "reset": "Ripristina valore predefinito"
+                },
+                "logo": {
+                    "title": "Logo dello studio",
+                    "desc": "Carichi un logo personalizzato per sostituire il brand predefinito Open-Q.",
+                    "label": "URL logo",
+                    "hint": "Dimensione consigliata: 200x50px. Supporta PNG, SVG, JPG.",
+                    "preview": "Anteprima logo",
+                    "help_title": "Dove appare questo logo?",
+                    "help_desc": "Il logo viene visualizzato in cima a ogni pagina dello studio (barra di navigazione) e nella pagina di benvenuto. Rafforza l'identità visiva del suo progetto."
+                },
+                "partners": {
+                    "title": "Partner istituzionali",
+                    "desc": "Aggiunga i loghi degli istituti o partner di supporto.",
+                    "add": "Aggiungi partner",
+                    "name_label": "Nome partner",
+                    "name_placeholder": "Nome istituzione",
+                    "logo_label": "URL logo",
+                    "url_label": "Sito web (facoltativo)",
+                    "url_placeholder": "Https://...",
+                    "help_title": "Visualizzazione dei loghi",
+                    "help_desc": "I loghi dei partner vengono visualizzati nella pagina di destinazione e nell'intestazione dello studio, accanto al logo principale."
+                },
+                "upload": {
+                    "upload": "Carica",
+                    "recommended": "Consigliato",
+                    "invalid_type": "Tipo di file non valido. Usi PNG, JPG o SVG.",
+                    "file_too_large": "File troppo grande. Dimensione massima: {{size}}kb.",
+                    "conversion_error": "Elaborazione dell'immagine non riuscita.",
+                    "processing": "Elaborazione immagine...",
+                    "drag_drop": "Trascini e rilasci o clicchi per caricare",
+                    "max": "Max"
+                }
+            },
+            "activate_dialog": {
+                "title": "Attivare questo studio?",
+                "description": "L'attivazione apre il reclutamento e sblocca i link pubblici. I partecipanti reali possono iniziare a inviare.",
+                "checklist_title": "Verifiche pre-lancio",
+                "languages_title": "Lingue",
+                "lang_ready": "Pronto",
+                "lang_incomplete": "Incompleto",
+                "required": "(obbligatorio)",
+                "attestation": "Ho rivisto il testo del consenso, la politica di conservazione, e confermo che questo studio è pronto a ricevere partecipanti reali.",
+                "confirm": "Attiva studio"
+            }
+        },
+        "data": {
+            "title": "Dati",
+            "description": "Monitora la partecipazione in tempo reale, analizza la qualità dei dati e gestisci le sessioni di ricerca.",
+            "sections": {
+                "key_indicators": "Indicatori chiave",
+                "responses": "Risposte",
+                "key_statistics": "Statistiche chiave"
+            },
+            "stats": {
+                "email_collection": "Raccolta e-mail",
+                "participants": "totale",
+                "newsletter": "Vuole i risultati",
+                "opt_in": "Tasso di risposta",
+                "follow_up": "Potenziale di follow-up",
+                "interested": "interessati",
+                "click_to_filter": "Clicchi per filtrare",
+                "click_to_export": "Clicchi per esportare l'elenco",
+                "completed": "Completati",
+                "in_progress": "In corso",
+                "abandoned_count": "{{count}} abbandonati",
+                "interview_interested": "Accetta follow-up",
+                "interview": "Accetta follow-up",
+                "email": "E-mail"
+            },
+            "tabs": {
+                "live": "Partecipanti live",
+                "test": "Sessioni di test",
+                "browse": "Vista interattiva",
+                "export": "Hub di esportazione"
+            },
+            "status": {
+                "started": "avviato",
+                "completed": "Completato",
+                "in_progress": "In corso",
+                "abandoned": "Abbandonato",
+                "discarded": "scartato"
+            },
+            "step": {
+                "consent": "Consenso",
+                "presort": "Sondaggio pre-classificazione",
+                "rough": "Classificazione preliminare",
+                "fine": "Classificazione Q",
+                "post": "Sondaggio post-classificazione"
+            },
+            "actions": {
+                "discard": "Scarta",
+                "restore": "Ripristina",
+                "export": "Esporta",
+                "clear_all": "Azzera tutti i dati",
+                "clear_all_confirm": "ATTENZIONE: Questa operazione eliminerà definitivamente TUTTI i dati dei partecipanti per questo studio. Non può essere annullata.",
+                "clear_all_success": "Tutti i dati cancellati",
+                "clear_all_error": "Impossibile cancellare i dati. Verifichi i permessi e riprovi."
+            },
+            "confirm_discard": {
+                "title": "Scartare il partecipante?",
+                "description": "Questo partecipante verrà escluso dalle esportazioni e dall'analisi. Potrà ripristinarlo in seguito.",
+                "reason_label": "Motivo (facoltativo)",
+                "reason_placeholder": "Perché questo partecipante viene scartato?"
+            },
+            "confirm_restore": {
+                "title": "Ripristinare il partecipante?",
+                "description": "Questo partecipante verrà nuovamente incluso nelle esportazioni e nell'analisi."
+            },
+            "guide": {
+                "title": "Guida ai formati",
+                "csv": {
+                    "title": "CSV universale",
+                    "desc": "Dati grezzi rettangolari. Ideale per analisi con R, Python, SPSS o Excel. Include tutti i metadati."
+                },
+                "json": {
+                    "title": "KenQ JSON",
+                    "desc": "Ottimizzato per lo strumento di analisi web-kenq. Contiene la definizione dello studio e le classificazioni."
+                },
+                "zip": {
+                    "title": "Bundle PQMethod (ZIP)",
+                    "desc": "Contiene i file legacy .DAT e .STA per l'analisi PQMethod DOS."
+                }
+            },
+            "table": {
+                "participant": "Partecipante",
+                "lang": "Lingua",
+                "status": "Stato",
+                "consent": "Consenso",
+                "flags": "Segnalazioni",
+                "duration": "Durata",
+                "submitted": "Inviato",
+                "last_step": "Ultimo passo",
+                "current_step": "Passo attuale",
+                "view": "Visualizza",
+                "actions": "Dettagli",
+                "duplicate_ip": "IP duplicato",
+                "duplicate_ip_hint": "Condivide l'hash IP con altri partecipanti"
+            },
+            "tooltips": {
+                "suspect": "Potenzialmente sospetto: durata sessione < 2 minuti",
+                "has_comments": "Contiene commenti del partecipante sulle affermazioni",
+                "has_audio": "Ha risposte audio",
+                "email_provided": "E-mail fornita",
+                "newsletter_consent": "Vuole i risultati",
+                "interview_consent": "Accetta follow-up"
+            },
+            "toast": {
+                "discarded": "Partecipante scartato",
+                "restored": "Partecipante ripristinato",
+                "error": "Impossibile aggiornare il partecipante. Verifichi la connessione e riprovi."
+            },
+            "detail": {
+                "participant": "Partecipante",
+                "participant_n": "Partecipante {{code}}",
+                "not_found": "Partecipante non trovato",
+                "title": "Profilo partecipante",
+                "session": "Sessione",
+                "discarded_badge": "Scartato",
+                "description": "Risultati completi della classificazione Q e metadati.",
+                "stats": {
+                    "duration": "Durata totale",
+                    "language": "Lingua utilizzata"
+                },
+                "actions": {
+                    "discard": "Scarta partecipante",
+                    "restore": "Ripristina partecipante"
+                },
+                "sort_config": "Configurazione della classificazione",
+                "survey": {
+                    "title": "Risposte al questionario",
+                    "csv_note": "Risposte complete disponibili nell'esportazione CSV."
+                }
+            },
+            "filter": {
+                "show_discarded": "Includi record scartati",
+                "all_states": "Tutti gli stati",
+                "only_active": "Solo attivi",
+                "only_flagged": "Qualità segnalata"
+            },
+            "filters": {
+                "active": "Filtri attivi",
+                "has_email": "E-mail fornita",
+                "newsletter": "Vuole i risultati",
+                "interview": "Accetta follow-up",
+                "flagged": "Solo segnalati",
+                "clear_all": "Cancella filtri",
+                "remove_filter": "Rimuovi filtro",
+                "all_statuses": "Tutti gli stati",
+                "all_consents": "Tutti",
+                "all_indicators": "Tutti",
+                "all_steps": "Tutti i passi",
+                "has_comments": "Ha commenti",
+                "has_audio": "Ha audio",
+                "has_recruitment": "Ha link di reclutamento"
+            },
+            "charts": {
+                "section_title": "Distribuzioni delle risposte",
+                "distribution_label": "Distribuzione per {{question}}",
+                "multi_select_note": "Selezione multipla consentita",
+                "responses_count": "{{count}} risposte",
+                "no_answer": "Nessuna risposta",
+                "option": "Opzione",
+                "count": "Conteggio"
+            },
+            "search": {
+                "placeholder": "Cerca per ID o token di reclutamento...",
+                "records_found": "Record rilevati",
+                "no_results": "Nessun record corrisponde alla sua query"
+            },
+            "errors": {
+                "load_failed": "Sincronizzazione cloud interrotta. Verifichi la connessione."
+            },
+            "export_emails_success": "E-mail esportate con successo",
+            "empty": {
+                "no_participants_title": "Nessun partecipante ancora",
+                "no_participants_desc": "Condivida il link del suo studio per iniziare a raccogliere risposte.",
+                "contract_title": "Nessun invio ancora",
+                "contract_body": "Gli invii e le esportazioni appariranno qui. Condivida il link dello studio per iniziare a raccogliere.",
+                "contract_cta": "Apri panoramica studio"
+            },
+            "pagination": {
+                "showing": "Visualizzazione {{from}}–{{to}} di {{total}}"
+            }
+        },
+        "team": {
+            "title": "Team dello studio",
+            "description": "Gestisca i collaboratori e il controllo degli accessi a livello di studio.",
+            "invite_title": "Invita collaboratore",
+            "invite_description": "Generi un link sicuro per invitare un nuovo membro in questo studio.",
+            "email_label": "Indirizzo e-mail",
+            "role_label": "Ruolo",
+            "select_role": "Seleziona un ruolo",
+            "generate_link": "Genera link",
+            "invite_success": "Link di invito generato!",
+            "invite_error": "Generazione dell'invito non riuscita",
+            "copy_success": "Link copiato negli appunti",
+            "share_label": "Condivida questo link con l'invitato:",
+            "collab_overview": "Panoramica della collaborazione",
+            "active_members": "Membri attivi",
+            "permissions_info": "Informazioni sui permessi",
+            "list_title": "Team di ricerca",
+            "list_description": "Gestisca l'accesso per i collaboratori esistenti.",
+            "added_on": "Aggiunto il",
+            "headers": {
+                "collaborator": "Collaboratore",
+                "role": "Ruolo",
+                "actions": "Azioni"
+            },
+            "roles": {
+                "owner": "Proprietario (controllo completo)",
+                "editor": "Editor (progettazione e analisi)",
+                "viewer": "Osservatore (sola lettura)",
+                "owner_badge": "PROPRIETARIO",
+                "editor_badge": "EDITOR",
+                "viewer_badge": "OSSERVATORE"
+            },
+            "permissions": {
+                "owner": "Può eliminare lo studio e gestire il team.",
+                "editor": "Può modificare la progettazione e visualizzare i risultati.",
+                "viewer": "Accesso in sola lettura a tutti i moduli."
+            }
+        },
+        "empty_states": {
+            "participants": {
+                "title": "Pronto al lancio?",
+                "desc": "Condivida il link dello studio per iniziare a raccogliere risposte. Il suo primo partecipante è a un clic di distanza.",
+                "action": "Copia link studio",
+                "hint": "Oppure scansi il codice QR",
+                "copy_success": "Link dello studio copiato negli appunti!"
+            },
+            "team": {
+                "title": "È solo",
+                "desc": "Inviti dei collaboratori ad aiutare a gestire questo studio. Possono visualizzare i dati, modificare la progettazione o semplicemente osservare.",
+                "action": "Inviti il primo collaboratore"
+            },
+            "designer": {
+                "title": "Tabula rasa",
+                "desc": "Questo studio non ha ancora affermazioni. Aggiunga le voci dell'insieme Q per iniziare a progettare la classificazione.",
+                "action": "Carica insieme Q di esempio"
+            }
+        },
+        "status": {
+            "active": "Attivo",
+            "paused": "In pausa",
+            "closed": "Chiuso",
+            "draft": "Bozza"
+        },
+        "settings": {
+            "title": "Impostazioni",
+            "description": "Conservazione dei dati, archiviazione ed eliminazione dello studio.",
+            "lifecycle": {
+                "title": "Archiviazione",
+                "description": "Archivi lo studio per renderlo di sola lettura per tutti.",
+                "notice": "Per archiviare uno studio, deve prima essere chiuso. Una volta archiviato, non possono essere apportate ulteriori modifiche.",
+                "archived_status": "Studio archiviato",
+                "archive_button": "Archivia studio",
+                "current_state": "Stato attuale"
+            },
+            "danger": {
+                "title": "Zona di pericolo",
+                "description": "Le azioni qui sono irreversibili.",
+                "notice": "L'eliminazione di uno studio rimuove definitivamente TUTTI i dati (partecipanti, risposte, configurazione). Lo studio deve essere archiviato prima dell'eliminazione.",
+                "delete_button": "Elimina studio",
+                "delete_confirm": "È sicuro? Questa azione è IRREVERSIBILE.",
+                "delete_dialog_title": "Eliminare questo studio?",
+                "delete_dialog_intro": "Elimina definitivamente classificazioni, audio ed esecuzioni di analisi.",
+                "delete_dialog_typed_label": "Digiti lo slug dello studio per confermare",
+                "delete_dialog_action": "Elimina definitivamente"
+            },
+            "save_button": "Salva",
+            "save_success": "Impostazioni aggiornate",
+            "save_success_desc": "Le impostazioni dello studio sono state salvate.",
+            "save_error": "Impossibile salvare le impostazioni. Verifichi i valori e riprovi.",
+            "save_error_desc": "Aggiornamento delle impostazioni non riuscito. Lo slug potrebbe essere già in uso.",
+            "archive_success": "Studio archiviato",
+            "archive_success_desc": "Lo studio è ora archiviato e di sola lettura.",
+            "archive_error": "Errore durante l'archiviazione dello studio",
+            "archive_error_desc": "Archiviazione dello studio non riuscita. È chiuso?",
+            "delete_success": "Studio eliminato",
+            "delete_success_desc": "Lo studio è stato rimosso definitivamente.",
+            "delete_error": "Impossibile eliminare lo studio. Assicuri che tutti i dati siano stati cancellati prima.",
+            "delete_error_desc": "Eliminazione dello studio non riuscita.",
+            "storage": {
+                "title": "Utilizzo archiviazione audio",
+                "used": "Archiviazione utilizzata",
+                "quota": "Quota",
+                "quota_label": "Quota di archiviazione",
+                "quota_help": "Archiviazione audio totale massima per questo studio (10–1000 MB).",
+                "error": "Caricamento dell'utilizzo dell'archiviazione non riuscito.",
+                "warning_high_usage": "L'utilizzo dell'archiviazione è elevato. Consideri di aumentare la quota o rimuovere le registrazioni vecchie.",
+                "save_success": "Quota di archiviazione aggiornata",
+                "save_error": "Impossibile aggiornare la quota di archiviazione. Riprovi."
+            },
+            "retention": {
+                "title": "Conservazione dei dati",
+                "months_label": "Conservazione (mesi)",
+                "help": "Valori comuni: 6, 12, 24, 60 mesi. Lasci vuoto per il valore predefinito di sistema (12).",
+                "save_success": "Politica di conservazione dei dati aggiornata",
+                "save_error": "Aggiornamento della politica di conservazione dei dati non riuscito",
+                "range_error": "La conservazione deve essere un numero intero compreso tra 1 e 240 mesi."
+            }
+        },
+        "privacy": {
+            "title": "Privacy dei dati",
+            "header_desc": "Consenso, inventario e anonimizzazione",
+            "load_error": "Caricamento dell'inventario dati non riuscito.",
+            "participants_title": "Istantanea partecipanti",
+            "stat_started": "Avviati",
+            "stat_completed": "Completati",
+            "stat_discarded": "Scartati",
+            "stat_anonymised": "Anonimizzati",
+            "older_1y": "Più vecchi di 1 anno (non anonimizzati)",
+            "older_2y": "Più vecchi di 2 anni (non anonimizzati)",
+            "audio_title": "Archiviazione audio",
+            "audio_count": "Registrazioni",
+            "audio_mb": "Dimensione totale",
+            "locale_title": "Distribuzione per lingua",
+            "locale_col": "Lingua",
+            "locale_count_col": "Partecipanti",
+            "locale_empty": "Nessun dato linguistico ancora.",
+            "timeline_title": "Timeline",
+            "tl_first": "Primo invio",
+            "tl_last": "Ultimo invio",
+            "tl_anon": "Ultima anonimizzazione",
+            "bulk_title": "Anonimizzazione in blocco",
+            "bulk_desc": "Rimuove i dati personali dai partecipanti completati che hanno inviato prima di una data limite. Le classificazioni Q vengono conservate.",
+            "cutoff_label": "Data limite",
+            "cutoff_help": "Verranno anonimizzati solo i partecipanti completati che hanno inviato strettamente prima di questa data.",
+            "preview_label": "Candidati:",
+            "preview_zero": "Nessun partecipante soddisfa questa data limite. Provi con una data precedente.",
+            "anonymise_button": "Anonimizza",
+            "anonymise_success": "Anonimizzazione completata",
+            "anonymise_success_desc": "{{n}} partecipante/i anonimizzati, {{s}} già anonimi.",
+            "anonymise_error": "Anonimizzazione non riuscita",
+            "confirm_title": "Anonimizzare i dati dei partecipanti?",
+            "confirm_candidates": "{{count}} partecipante/i completati che hanno inviato prima del {{date}} verranno anonimizzati.",
+            "confirm_preserved": "Le classificazioni Q vengono conservate; l'identità viene rimossa.",
+            "confirm_irreversible": "Questa azione è immediata e non può essere annullata.",
+            "confirm_in_progress": "Anonimizzazione in corso…",
+            "confirm_action": "Sì, anonimizza",
+            "cutoff_from_policy": "Valore predefinito derivato dalla politica di conservazione dello studio ({{months}} mesi).",
+            "empty": {
+                "title": "Nessun dato partecipante ancora",
+                "body": "Questa pagina si attiva quando i partecipanti inviano. Condivida prima il link dello studio.",
+                "cta": "Apri panoramica studio"
+            },
+            "consent": {
+                "title": "Modulo di consenso",
+                "description": "Ciò che i partecipanti vedono prima di entrare nello studio. Modificabile in Progettazione studio.",
+                "no_text": "Nessun testo di consenso impostato ancora.",
+                "no_title": "(nessun titolo)",
+                "no_body": "(vuoto)",
+                "edit_in_design": "Modifica in Progettazione studio",
+                "view": "Visualizza"
+            }
+        },
+        "projects": {
+            "title": "Progetti",
+            "settings": {
+                "title": "Impostazioni progetto",
+                "identity_desc": "Gestisca l'identità del progetto.",
+                "general": {
+                    "title": "Impostazioni generali",
+                    "desc": "Identità e identificazione principale del suo progetto.",
+                    "label_title": "Titolo del progetto",
+                    "placeholder_title": "Il mio laboratorio",
+                    "label_slug": "Slug URL",
+                    "placeholder_slug": "mio-laboratorio",
+                    "slug_hint": "Cambiare lo slug aggiornerà tutti i link della dashboard di ricerca.",
+                    "save": "Salva",
+                    "save_success": "Progetto aggiornato con successo",
+                    "save_error": "Aggiornamento del progetto non riuscito."
+                },
+                "team_growth_title": "Gestione del team",
+                "team_growth_desc": "Ha bisogno di più ricercatori? Può invitare collaboratori nel suo progetto. Potranno gestire tutti gli studi all'interno di questo progetto.",
+                "team": {
+                    "title": "Membri del team",
+                    "desc": "Elenco degli utenti con accesso a questo progetto.",
+                    "col_user": "Utente",
+                    "col_role": "Ruolo",
+                    "col_joined": "Aggiunto il",
+                    "col_actions": "Azioni",
+                    "remove_confirm": "È sicuro di voler rimuovere questo membro?",
+                    "remove_dialog_title": "Rimuovere il membro del team?",
+                    "remove_dialog_body": "{{name}} perderà l'accesso a questo progetto. Potrà essere reinvitato in seguito.",
+                    "remove_dialog_action": "Rimuovi",
+                    "remove_member_aria": "Rimuovi {{name}}",
+                    "remove_success": "Membro rimosso con successo",
+                    "remove_error": "Rimozione del membro non riuscita",
+                    "growth_title": "Crescita del team",
+                    "growth_desc": "Ha bisogno di più ricercatori? Può invitare collaboratori nel suo progetto. Potranno gestire tutti gli studi all'interno di questo progetto.",
+                    "invite_button": "Invita collaboratore",
+                    "permissions_matrix": {
+                        "title": "Matrice dei permessi",
+                        "admin": {
+                            "label": "Amministratore",
+                            "desc": "Può gestire le impostazioni del progetto, i membri e tutti gli studi."
+                        },
+                        "owner": {
+                            "label": "Proprietario",
+                            "desc": "Controllo completo di progetto, membri e studi."
+                        },
+                        "member": {
+                            "label": "Membro",
+                            "desc": "Può creare e gestire tutti gli studi. Accesso alle impostazioni del progetto limitato."
+                        },
+                        "viewer": {
+                            "label": "Osservatore",
+                            "desc": "Accesso in sola lettura a tutti gli studi e dati del progetto."
+                        }
+                    },
+                    "coming_soon": "Prossimamente",
+                    "invite_modal": {
+                        "title": "Invita collaboratore",
+                        "email_label": "E-mail del collaboratore",
+                        "role_label": "Ruolo assegnato",
+                        "success": "Link di invito generato!",
+                        "error": "Creazione dell'invito non riuscita.",
+                        "send": "Crea e invia invito",
+                        "copy_success": "Link copiato negli appunti!"
+                    }
+                }
+            },
+            "members": {
+                "quota": "{{count}}/{{limit}} posti utilizzati",
+                "quota_full_tooltip": "Limite membri raggiunto. Aumenti MAX_MEMBERS_PER_PROJECT o rimuova un membro."
+            },
+            "create": {
+                "quota": "{{count}}/{{limit}} progetti di proprietà",
+                "quota_full_tooltip": "Ha raggiunto il limite dei progetti di proprietà."
+            }
+        },
+        "members": {
+            "title": "Membri del team",
+            "description": "Gestisca chi può accedere a questo progetto e cosa può fare."
+        },
+        "participants": {
+            "title": "Partecipanti",
+            "description": "Gestisca i partecipanti ed esplori i dati inviati.",
+            "table": {
+                "id": "ID",
+                "status": "Stato",
+                "started": "Avviato il",
+                "completed": "Completato il",
+                "duration": "Durata",
+                "actions": "Azioni"
+            }
+        },
+        "participant": {
+            "tabs": {
+                "session": "Metadati",
+                "presort": "Pre-classificazione",
+                "grid": "Griglia classificazione Q",
+                "postsort": "Post-classificazione"
+            },
+            "grid": {
+                "detail_view": "Dettagli affermazione",
+                "no_comment": "Nessun commento fornito.",
+                "select_instruction": "Selezioni un'affermazione sulla griglia per visualizzare i dettagli.",
+                "read_only_mode": "Modalità osservatore",
+                "score": "Punteggio"
+            },
+            "metadata": {
+                "title": "Metadati della sessione",
+                "technology": "Tecnologia",
+                "browser": "Browser",
+                "session": "Dettagli sessione",
+                "duration": "Durata totale",
+                "started": "Avviato",
+                "submitted": "Inviato",
+                "id": "ID interno",
+                "ip_hash": "Hash IP",
+                "recruitment_token": "Token di reclutamento",
+                "device": {
+                    "mobile": "Mobile",
+                    "tablet": "Tablet",
+                    "desktop": "Desktop"
+                }
+            },
+            "status": {
+                "started": "Avviato",
+                "completed": "Completato",
+                "discarded": "Scartato",
+                "in_progress": "In corso"
+            },
+            "survey": {
+                "presort": "Domande pre-classificazione",
+                "postsort": "Domande post-classificazione",
+                "no_answers": "Nessuna risposta registrata per questa sezione.",
+                "categories": {
+                    "identity": "Identità e contatto",
+                    "questions": "Risposte al questionario",
+                    "comments": "Commenti alle affermazioni",
+                    "feedback": "Feedback generale"
+                }
+            }
+        }
+    }
+}

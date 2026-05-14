@@ -1,0 +1,461 @@
+{
+    "common": {
+        "placeholders": {
+            "text_response": "Inserisca la sua risposta..."
+        },
+        "add": "Aggiungi",
+        "confirm": "Conferma",
+        "all": "Tutti",
+        "agree": "Parzialmente d'accordo",
+        "disagree": "Parzialmente in disaccordo",
+        "neutral": "Neutrale",
+        "reset_to_default": "Ripristina valore predefinito",
+        "reset_to_default_success": "Valore predefinito ripristinato",
+        "reset_to_default_confirm": "È sicuro di voler ripristinare questo campo al suo valore predefinito? Le modifiche personalizzate andranno perse.",
+        "undo": "Annulla",
+        "next": "Passo successivo",
+        "submit": "Condividi la mia prospettiva",
+        "continue": "Continua",
+        "loading": "Caricamento in corso...",
+        "lang_code": "it",
+        "attention": "Attenzione",
+        "error": "Errore",
+        "submitting": "Invio in corso...",
+        "cards": "affermazioni",
+        "close": "Chiudi",
+        "unknown_card": "Affermazione sconosciuta",
+        "unknown": "Sconosciuto",
+        "duration_short": "{{m}}m {{s}}s",
+        "duration_long": "{{h}}h {{m}}m {{s}}s",
+        "optional": "Facoltativo",
+        "processing": "Elaborazione in corso...",
+        "statement": "Affermazione",
+        "step": "Passo",
+        "back": "Indietro",
+        "cancel": "Annulla",
+        "delete": "Elimina",
+        "slots": "posizioni",
+        "project_label": "Progetto",
+        "read_full": "Leggi l'affermazione completa",
+        "reduce": "Riduci",
+        "expand": "Espandi",
+        "yes": "Sì",
+        "no": "No",
+        "score": "Punteggio",
+        "comment": "Commento",
+        "errors": {
+            "network": "Errore di connessione di rete. Verifichi la connessione a Internet.",
+            "not_found": "Studio non trovato.",
+            "validation": "Errore di sistema: la validazione dei dati non è riuscita.",
+            "unknown": "Si è verificato un errore imprevisto.",
+            "retry": "Riprova",
+            "min": "Il valore deve essere almeno {{min}}",
+            "max": "Il valore deve essere al massimo {{max}}",
+            "email": "Inserisca un indirizzo e-mail valido",
+            "min_length": "Sono richiesti almeno {{count}} caratteri",
+            "max_length": "Sono consentiti al massimo {{count}} caratteri",
+            "404": {
+                "title": "Pagina non trovata",
+                "message": "La pagina o lo studio che cerca non esiste."
+            },
+            "429": {
+                "title": "Troppe richieste",
+                "message": "Sta agendo troppo rapidamente. Attenda un momento."
+            },
+            "500": {
+                "title": "Errore del server",
+                "message": "I nostri server hanno riscontrato un problema. Riprovi più tardi."
+            },
+            "network_title": "Connessione persa",
+            "home": "Vai alla home",
+            "reset": "Reimposta sessione",
+            "default_title": "Ops! Qualcosa è andato storto.",
+            "study_not_found": {
+                "title": "Studio non trovato",
+                "message": "Non è stato possibile trovare uno studio con quel nome. Verifichi l'URL o contatti il ricercatore.",
+                "action": "Vai alla home"
+            }
+        },
+        "status": {
+            "draft": {
+                "title": "Studio in preparazione",
+                "message": "Questo studio non è ancora disponibile per la partecipazione. La invitiamo a riprovare più tardi.",
+                "action": "Torna alla home"
+            },
+            "steps": {
+                "draft": {
+                    "label": "Bozza",
+                    "description": "Configurazione e progettazione"
+                },
+                "active": {
+                    "label": "Attivo",
+                    "description": "Raccolta risposte"
+                },
+                "paused": {
+                    "label": "In pausa",
+                    "description": "In attesa"
+                },
+                "closed": {
+                    "label": "Chiuso",
+                    "description": "Analisi ed esportazione"
+                }
+            },
+            "paused": {
+                "title": "Manutenzione in corso",
+                "message": "La raccolta dei dati è temporaneamente sospesa per manutenzione. Saremo di nuovo operativi a breve.",
+                "action": "Riprova"
+            },
+            "closed": {
+                "title": "Raccolta dati conclusa",
+                "message": "Questo studio è ora chiuso. La partecipazione non è più possibile.",
+                "action": "Torna alla home"
+            }
+        }
+    },
+    "layout": {
+        "title": "Open-Q",
+        "preparing": "Preparazione della sessione di studio in corso...",
+        "pilot_mode": "Modalità pilota: le modifiche sono temporanee e i dati non verranno salvati",
+        "default_study_title": "Studio di metodologia Q",
+        "loading_content": "Caricamento dei contenuti dello studio...",
+        "change_lang_title": "Cambia lingua",
+        "steps": {
+            "welcome": "Benvenuto",
+            "consent": "Privacy e consenso",
+            "rough": "Prime impressioni",
+            "fine": "Classificazione Q",
+            "post": "Domande finali"
+        },
+        "mobile_step": "Passo",
+        "navigation": "Navigazione",
+        "language": "Italiano"
+    },
+    "footer": {
+        "powered_by": "Sviluppato con Qualis",
+        "license": "AGPLv3",
+        "github_aria": "Visualizza il codice sorgente su GitHub"
+    },
+    "errors": {
+        "member_limit_reached": "Raggiunto il limite di membri del progetto.",
+        "owner_project_limit_reached": "Non è possibile essere proprietario di altri progetti.",
+        "owner_role_immutable": "Il ruolo di proprietario può essere assegnato solo alla creazione del progetto.",
+        "access_denied_title": "Accesso negato",
+        "access_denied_description": "Non dispone dell'autorizzazione per eseguire questa azione.",
+        "rate_limited_title": "Troppe richieste",
+        "rate_limited_description": "Attenda un momento prima di riprovare.",
+        "conflict_title": "Conflitto",
+        "conflict_description": "La risorsa è stata modificata o esiste già."
+    },
+    "landing": {
+        "page_title": "Accesso allo studio Qualis",
+        "instruction": "Inserisca il codice dello studio per iniziare.",
+        "study_code_label": "Codice dello studio",
+        "study_code_placeholder": "es. mio-studio",
+        "go_to_study": "Vai allo studio",
+        "resetting_session": "Reimpostazione della sessione di studio in corso…"
+    },
+    "welcome": {
+        "start": "Inizia",
+        "consent": {
+            "label": "Confermo di aver letto le informazioni precedenti e di acconsentire al trattamento dei miei dati per le finalità di questo studio.",
+            "error": "Accetti i termini per continuare."
+        },
+        "reset_confirm": "È sicuro di voler avviare una nuova sessione? Il progresso attuale andrà perso.",
+        "restart": "Avvia una nuova sessione",
+        "preview_title": "Anteprima",
+        "conducted_by": "Condotto da",
+        "how_it_works": "Processo",
+        "objective_label": "Obiettivo dello studio",
+        "instructions_label": "Processo",
+        "default_instructions": "1. **Facciamo conoscenza:** Prima di tutto, Le verranno poste alcune brevi domande preliminari.\n2. **Prime impressioni:** Leggerà le diverse affermazioni e le classificherà approssimativamente in base al suo punto di vista personale: se tende ad essere d'accordo, neutrale o in disaccordo.\n3. **La sua prospettiva:** Durante la fase di classificazione, posizionerà le affermazioni su una griglia per affinare il suo punto di vista. Ordinerà e classificherà le affermazioni da «più d'accordo» a «più in disaccordo» collocando ciascuna affermazione nella casella corrispondente.\n4. **Perché:** Prima della fine della sessione, Le verranno poste alcune domande di chiarimento per aiutarci a comprendere meglio le sue scelte più significative.",
+        "steps": {
+            "profile": {
+                "title": "Facciamo conoscenza",
+                "description": "Prima di tutto, Le verranno poste alcune brevi domande preliminari."
+            },
+            "rough": {
+                "title": "Prime impressioni",
+                "description": "Leggerà le diverse affermazioni e le classificherà approssimativamente in base al suo punto di vista personale: se tende ad essere d'accordo, neutrale o in disaccordo. Questo renderà più semplice il compito successivo."
+            },
+            "fine": {
+                "title": "La sua prospettiva",
+                "description": "Durante la fase di classificazione, posizionerà le affermazioni su una griglia per affinare il suo punto di vista. Ordinerà e classificherà le affermazioni da «più d'accordo» a «più in disaccordo» collocando ciascuna affermazione nella casella corrispondente. Non esistono risposte giuste o sbagliate. La risposta migliore è quella che riflette la sua opinione o le sue convinzioni."
+            },
+            "post": {
+                "title": "Perché",
+                "description": "Prima della fine della sessione, Le verranno poste alcune domande di chiarimento per aiutarci a comprendere meglio le sue scelte più significative, nonché alcune domande sul suo percorso."
+            }
+        }
+    },
+    "consent": {
+        "title": "Consenso informato e accordo sul trattamento dei dati",
+        "subtitle": "Legga attentamente le informazioni seguenti.",
+        "record_error": "Impossibile salvare il registro del consenso. Può continuare.",
+        "default_text": "1. Natura dello studio e comprensione del partecipante. Lei comprende che questo esercizio impiega la metodologia Q, una tecnica di ricerca progettata per modellare punti di vista soggettivi. Il compito richiede di classificare le affermazioni in base alla loro rilevanza rispetto alla sua prospettiva personale; di conseguenza, non esistono risposte \"corrette\" o \"errate\" in senso oggettivo.\n\n2. Trattamento dei dati e pseudonimizzazione (conformità al GDPR).\n\nDe-identificazione e conservazione: questo processo tecnico garantisce che la sua impronta digitale non possa essere utilizzata per re-identificarla una volta terminata la sessione.\n\nEccezione per il follow-up: se fornisce volontariamente i suoi dati di contatto al termine dello studio per un contatto di follow-up, il collegamento tra la sua identità (e-mail) e la sua risposta sarà mantenuto esclusivamente per la durata di quella specifica fase di follow-up.\n\nResoconto: i risultati finali saranno presentati in formato anonimizzato. I dati saranno aggregati per rivelare prospettive sociali condivise (fattori). I commenti qualitativi potranno essere citati per contestualizzare questi fattori, ma saranno esaminati per rimuovere dettagli identificativi.\n\n3. Partecipazione volontaria e diritto di recesso. Lei mantiene il diritto di interrompere il processo di classificazione e chiudere il browser in qualsiasi momento prima dell'invio, senza alcuna penalità.\n\nPrima dell'invio: se si ritira prima di finalizzare la sua classificazione, nessun dato parziale sarà conservato.\n\nDopo l'invio: a causa della natura statistica della metodologia Q (analisi fattoriale), una volta che i suoi dati siano stati inviati e aggregati nel dataset, il recesso individuale potrebbe non essere fattibile.\n\n4. Conservazione dei dati e diritti"
+    },
+    "presort": {
+        "title": "Prima di iniziare",
+        "description": "Risponda ad alcune domande per aiutarci a contestualizzare il suo punto di vista.",
+        "submit": "Continua alla classificazione",
+        "select_placeholder": "Seleziona...",
+        "error_required": "Risponda a questa domanda."
+    },
+    "rough": {
+        "header": {
+            "subtitle": "Scorri verso **sinistra** per essere in disaccordo, verso **destra** per essere d'accordo, o verso **il basso** per essere neutrale.",
+            "hint": "È una reazione spontanea. Può cambiare idea subito dopo."
+        },
+        "tip": {
+            "close": "Chiudi suggerimento"
+        },
+        "complete": {
+            "title": "Primo passo completato",
+            "subtitle": "Ora affineremo le sfumature.",
+            "button": "Continua alla classificazione fine"
+        },
+        "instructions": {
+            "desktop_tip": "Trascina, premi o usa la tastiera ( ← ↓ → ) per classificare"
+        },
+        "progress_label": "Avanzamento della classificazione iniziale: {{percent}}% completato"
+    },
+    "fine": {
+        "deck": {
+            "title": "Affermazioni disponibili",
+            "all_placed": "Tutte le affermazioni di questo gruppo sono state classificate"
+        },
+        "toolbar": {
+            "preview": "Affermazione",
+            "zoom_in": "Zoom avanti",
+            "zoom_out": "Zoom indietro",
+            "fit_screen": "Adatta allo schermo",
+            "label": "Controlli della griglia"
+        },
+        "grid": {
+            "label": "Griglia di classificazione Q",
+            "column": "Colonna",
+            "slot": "Posizione",
+            "in_column": "Nella colonna"
+        },
+        "legend": {
+            "disagree": "Massimo disaccordo",
+            "neutral": "Neutrale",
+            "agree": "Massimo accordo",
+            "label": "Legenda della griglia"
+        },
+        "actions": {
+            "validate": "Conferma classificazione",
+            "finish": "Termina classificazione",
+            "ready": "Rivedi il riepilogo",
+            "not_ready": "Posizioni tutte le affermazioni per continuare"
+        },
+        "header": {
+            "title": "Posizioni le affermazioni sulla griglia",
+            "instruction_label": "Istruzione",
+            "expand_instructions": "Espandi istruzioni",
+            "minimize_instructions": "Comprimi istruzioni"
+        },
+        "workbench": {
+            "active_card": "Affermazione attiva",
+            "place_on_grid": "Tocchi la griglia per posizionare",
+            "drag_or_tap": "Trascini sulla griglia o tocchi la posizione",
+            "initial_instruction": "Tocchi (o trascini) l'affermazione",
+            "initial_instruction_mobile": "Tocchi l'affermazione",
+            "cancel_selection": "Annulla selezione",
+            "help": "Come funziona?",
+            "previous_tip": "Suggerimento precedente",
+            "next_tip": "Suggerimento successivo",
+            "go_to_tip": "Vai al suggerimento {{number}}",
+            "methodology": {
+                "extremes": "Suggerimento: inizi con ciò che le sembra più evidente (gli estremi).",
+                "vertical": "Nella stessa colonna, l'ordine dall'alto al basso non è rilevante.",
+                "constraint": "Tutto deve trovare posto! Può essere come un puzzle, ma è così che si stabiliscono le priorità.",
+                "relative": "Promemoria: le affermazioni vengono classificate in relazione tra loro (accordo relativo).",
+                "zoom": "Non esiti a ingrandire diverse parti della griglia per una migliore visibilità.",
+                "flexibility": "Nulla è definitivo: può spostare le affermazioni o rimetterle nel gruppo in qualsiasi momento."
+            }
+        }
+    },
+    "post": {
+        "title": "La sua prospettiva e i suoi commenti",
+        "description": "Ci siamo quasi! I suoi commenti sulle affermazioni più significative sono fondamentali per la nostra analisi.",
+        "step2_title": "Quasi fatto!",
+        "step2_description": "Risponda a queste ultime domande per completare lo studio.",
+        "extreme": {
+            "title": "Scelte chiave",
+            "why": "Perché ha scelto di collocare questa affermazione qui? Che importanza ha per Lei?",
+            "placeholder": "Ad esempio, un evento specifico, una convinzione profonda, o una parola particolare nell'affermazione...",
+            "min_chars": "Poche parole sono sufficienti per aiutarci a comprendere il contesto.",
+            "label_agree": "Massimo accordo",
+            "label_disagree": "Massimo disaccordo",
+            "label_neutral": "Neutrale",
+            "missing_statement": "Affermazione mancante",
+            "general_comment": "Commento generale"
+        },
+        "optional": {
+            "title": "Ci sono affermazioni che ha trovato particolarmente sorprendenti, poco chiare o confuse? Se sì, perché?",
+            "description": "Può anche aggiungere commenti a qualsiasi altra affermazione se desidera spiegare ulteriormente le sue scelte.",
+            "select_placeholder": "Seleziona un'affermazione da commentare...",
+            "placeholder": "Il suo commento qui..."
+        },
+        "submit": "Condividi la mia prospettiva",
+        "validation_error": "Compili tutti i campi obbligatori.",
+        "text_audio_info": "Per le domande con testo e audio, può rispondere con testo, una registrazione audio o entrambi.",
+        "text_audio_required": "Poche parole o una registrazione audio ci aiuteranno a comprendere il suo punto di vista.",
+        "success": {
+            "title": "Grazie per la sua partecipazione!",
+            "message": "Il suo contributo allo studio è stato salvato.",
+            "id_label": "Codice di conferma",
+            "share": {
+                "title": "Diffonda la notizia",
+                "copy_link": "Copia link",
+                "copy_success": "Link copiato!",
+                "message": "Ho appena partecipato a questo studio: \"{{title}}\". Ho pensato che potesse interessarLe. Può accedervi qui:",
+                "email": "E-mail",
+                "email_subject": "Partecipi a questo studio: {{title}}",
+                "native": "Condividi"
+            }
+        },
+        "submit_error": {
+            "title": "Invio non riuscito",
+            "message": "Verifichi la connessione e riprovi."
+        },
+        "score": "Punteggio",
+        "back": "Torna alla classificazione",
+        "contact": {
+            "title": "Risultati e contatto",
+            "email_label": "Il suo indirizzo e-mail (facoltativo)",
+            "email_placeholder": "esempio@email.com",
+            "interview_consent": "Acconsento ad essere contattato dal ricercatore per un follow-up.",
+            "newsletter_consent": "Desidero essere informato sui risultati dello studio.",
+            "gdpr_note": "La sua e-mail non sarà mai condivisa pubblicamente. Fornirla garantisce la pseudonimizzazione: i suoi dati rimarranno identificabili solo per scopi di ricerca da parte del ricercatore.",
+            "pseudonymization_note": "Acconsentire ad essere contattato implica che il ricercatore possa collegare la sua prospettiva alla sua e-mail (pseudonimizzazione) per questo specifico follow-up.",
+            "error_invalid_email": "Inserisca un indirizzo e-mail valido"
+        },
+        "audio": {
+            "info": "Per ciascuna domanda, può rispondere con testo, una registrazione audio o entrambi.",
+            "section_label": "Risposta audio (facoltativa)"
+        }
+    },
+    "audio": {
+        "record_prompt": "Registri una risposta audio se preferisce",
+        "recording": "Registrazione in corso...",
+        "recorded": "Registrato",
+        "playing": "Riproduzione in corso...",
+        "uploading": "Caricamento in corso...",
+        "ready": "Pronto per la registrazione",
+        "start_recording": "Avvia registrazione",
+        "stop_recording": "Interrompi",
+        "pause": "Pausa",
+        "play": "Riproduci",
+        "delete": "Elimina",
+        "deleted": "Audio eliminato",
+        "delete_failed": "Impossibile eliminare la registrazione. Riprovi.",
+        "file_size": "Dimensione file",
+        "upload_success": "Audio caricato con successo",
+        "upload_failed": "Caricamento non riuscito. Riprovi.",
+        "upload_cancelled": "Registrazione annullata",
+        "recording_error": "Errore di registrazione - riprovi",
+        "invalid_recording": "Registrazione non riuscita - nessun dato audio acquisito",
+        "permission_denied": "Autorizzazione al microfono negata",
+        "unsupported": "La registrazione audio non è supportata in questo browser.",
+        "permission_revoked": "Accesso al microfono perso - registrazione interrotta",
+        "refresh_failed": "Impossibile aggiornare l'audio. La registrazione è ancora salvata.",
+        "refreshing": "Aggiornamento audio in corso...",
+        "playback_failed": "Impossibile riprodurre l'audio. Aggiorni la pagina e riprovi.",
+        "error": {
+            "no_token": "Token di sessione mancante",
+            "quota_exceeded": "Quota di archiviazione superata. Elimini una registrazione esistente o utilizzi il testo.",
+            "file_too_large": "Il file di registrazione è troppo grande. Provi con una registrazione più breve.",
+            "server_error": "Errore del server. Riprovi tra un momento.",
+            "upload_in_progress": "Attenda il completamento del caricamento audio.",
+            "security": "Registrazione bloccata dalle impostazioni di sicurezza del browser",
+            "invalid_state": "La registrazione ha riscontrato un errore interno"
+        },
+        "fallback": {
+            "toast": "L'audio è stato disabilitato a causa di errori ripetuti. Utilizzi il testo.",
+            "banner_title": "Audio non disponibile",
+            "banner_description": "La registrazione audio ha riscontrato errori ripetuti. Può continuare con risposte testuali.",
+            "try_again": "Riprova",
+            "inline": "Audio temporaneamente non disponibile."
+        },
+        "permission_denied_with_guidance": "Autorizzazione al microfono negata. Verifichi le impostazioni del browser per consentire l'accesso al microfono, quindi riprovi.",
+        "retry_upload": "Riprova caricamento",
+        "space_shortcut": "o premi Spazio",
+        "waveform": {
+            "recording": "Forma d'onda audio - registrazione in corso",
+            "playing": "Forma d'onda audio - riproduzione registrazione"
+        }
+    },
+    "resume": {
+        "continue_later": "Continua più tardi",
+        "copy_link": "Copia link",
+        "copy_failed": "Impossibile copiare. Selezioni il link manualmente.",
+        "link_copied": "Link copiato!",
+        "instruction": "Per continuare su un altro dispositivo, salvi questo link:",
+        "instruction_same_browser": "Se torna su questo browser, il suo progresso verrà salvato automaticamente.",
+        "instruction_detail": "Mantenga questo link privato. Consente l'accesso alla sua sessione.",
+        "resume_url": "URL di ripresa",
+        "saving": "Salvataggio in corso...",
+        "saved": "Salvato",
+        "save_failed": "Non salvato",
+        "loading": "Ripristino della sessione in corso...",
+        "restored": "Bentornato! Il suo progresso è stato ripristinato.",
+        "welcome_back": "Bentornato! Il suo progresso è stato ripristinato.",
+        "not_found": "Questo link non è più valido. Se non ha completato lo studio, contatti il ricercatore per ottenere un nuovo link.",
+        "already_completed": "Ha già inviato le sue risposte. Grazie per la sua partecipazione!",
+        "study_closed": "Questo studio non accetta più risposte. Contatti il ricercatore per eventuali domande.",
+        "rate_limited": "Troppi tentativi. Attenda un momento e riprovi.",
+        "error": "Si è verificato un problema durante il ripristino della sessione. Riprovi.",
+        "share": "Invia a me stesso",
+        "share_title": "La mia sessione di studio",
+        "go_to_study": "Avvia una nuova sessione"
+    },
+    "erasure": {
+        "section_title": "Il suo diritto alla cancellazione (GDPR Art. 17)",
+        "section_intro": "Può richiedere la rimozione dei suoi dati personali in qualsiasi momento. Le sue classificazioni anonime delle affermazioni saranno conservate come dati di ricerca; tutto ciò che potrebbe identificarLa verrà rimosso.",
+        "button": "Richiedi la cancellazione dei miei dati",
+        "confirm_title": "Cancellare i suoi dati personali?",
+        "confirm_what_erased": "Quanto segue sarà rimosso definitivamente: qualsiasi indirizzo IP registrato con la sua sessione, il suo identificatore del browser, le sue risposte scritte (pre- e post-classificazione) e qualsiasi registrazione audio fornita.",
+        "confirm_what_kept": "Le sue classificazioni delle affermazioni saranno conservate come dati di ricerca anonimi. Non saranno più collegate a Lei.",
+        "confirm_irreversible": "Questa azione è immediata e non può essere annullata.",
+        "confirm_action": "Sì, cancella i miei dati",
+        "confirm_in_progress": "Cancellazione in corso…",
+        "success": "I suoi dati personali sono stati rimossi. Le sue classificazioni Q anonime rimangono nello studio.",
+        "error": "Impossibile elaborare la sua richiesta. Riprovi o contatti il ricercatore.",
+        "already_erased": "I suoi dati personali sono stati rimossi per questa sessione."
+    },
+    "study": {
+        "help": {
+            "title": "Aiuto e informazioni",
+            "trigger": "Aiuto",
+            "what": "Cosa chiediamo",
+            "why": "Perché è importante",
+            "step_welcome": {
+                "what": "Legga gli obiettivi della ricerca e le istruzioni specifiche per la partecipazione.",
+                "why": "Oltre al consenso etico standard, è necessario comprendere la 'condizione di istruzione': la prospettiva precisa o lo scenario che adotta per valutare le affermazioni. Questo è importante per la validità dei dati."
+            },
+            "step_presort": {
+                "what": "Fornisca informazioni di contesto per aiutare a caratterizzare il suo profilo di partecipante.",
+                "why": "Questo contesto consente al gruppo di ricerca di analizzare come i diversi punti di vista (fattori) possano o meno correlarsi con specifiche variabili demografiche o percorsi professionali all'interno del gruppo di partecipanti."
+            },
+            "step_rough": {
+                "what": "Classifichi il mazzo di affermazioni in tre pile iniziali sulla base della sua reazione immediata.",
+                "why": "Questo passo preparatorio è progettato per ridurre il carico cognitivo; Le permette di familiarizzare con l'intera gamma dell'argomento (l'insieme Q) prima di affrontare il compito più impegnativo della classificazione comparativa."
+            },
+            "step_fine": {
+                "what": "Posizioni le affermazioni sulla griglia classificandole l'una rispetto all'altra, da quelle con cui è più d'accordo (a destra) a quelle con cui è più in disaccordo (a sinistra). Iniziare dagli estremi potrebbe facilitare questo compito.",
+                "why": "La struttura della griglia impone una 'distribuzione forzata' che Le impedisce di valutare tutto come ugualmente importante; La obbliga a fare delle scelte, modellando così la rilevanza relativa di ciascuna idea nel suo specifico sistema di convinzioni."
+            },
+            "step_post": {
+                "what": "Confermi la disposizione della sua griglia e aggiunga commenti che spieghino le sue scelte più significative.",
+                "why": "Le sue spiegazioni qualitative sono fondamentali per validare l'analisi statistica; aiutano i ricercatori a interpretare i dati attraverso la sua logica anziché imporre le proprie ipotesi sulle sue scelte."
+            }
+        },
+        "steps": {
+            "presort": "Sondaggio di pre-classificazione",
+            "rough": "Classificazione preliminare",
+            "fine": "Posizionamento sulla griglia",
+            "post": "Fase di post-classificazione"
+        }
+    }
+}
