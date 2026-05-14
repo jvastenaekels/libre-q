@@ -1,57 +1,74 @@
+"""Verify that each non-en locale has the same key set as en, per namespace.
+
+After the namespace split (PR i18n-namespace-split #1), each locale ships
+two files: participant.json and admin.json. Both must match the en key set
+exactly. Policy differentiation (admin best-effort) lands in PR #2.
+"""
 import json
 import os
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "i18n"))
+
 from i18n_utils import get_keys
+from namespace_partition import NAMESPACES
 
-def check_i18n():
-    locales_dir = os.path.join(os.path.dirname(__file__), '../public/locales')
-    master_file = os.path.join(locales_dir, 'en/translation.json')
 
+def load(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def check_namespace(locales_dir, namespace, languages):
+    master_file = os.path.join(locales_dir, "en", f"{namespace}.json")
     if not os.path.exists(master_file):
-        print(f"Error: Master file {master_file} not found.")
-        sys.exit(1)
+        print(f"❌ Missing master file: {master_file}")
+        return False
 
-    with open(master_file, 'r', encoding='utf-8') as f:
-        master_data = json.load(f)
-
-    master_keys = get_keys(master_data)
-
-    # In public/locales, each language has its own directory
-    languages = [d for d in os.listdir(locales_dir) if os.path.isdir(os.path.join(locales_dir, d)) and d != 'en']
-
-    overall_success = True
+    master_keys = get_keys(load(master_file))
+    ok = True
 
     for lang in languages:
-        filepath = os.path.join(locales_dir, lang, 'translation.json')
-        if not os.path.exists(filepath):
-            print(f"⚠️  Missing translation.json for language: {lang}")
-            overall_success = False
+        target_file = os.path.join(locales_dir, lang, f"{namespace}.json")
+        if not os.path.exists(target_file):
+            print(f"❌ {lang}/{namespace}.json missing")
+            ok = False
             continue
 
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        target_keys = get_keys(load(target_file))
+        missing = master_keys - target_keys
+        extra = target_keys - master_keys
 
-        keys = get_keys(data)
-
-        missing = master_keys - keys
-        extra = keys - master_keys
-
-        print(f"Checking {lang}...")
         if not missing and not extra:
-            print("  ✓ Perfect sync.")
+            print(f"  ✓ {lang}/{namespace}.json in sync")
         else:
-            overall_success = False
+            ok = False
             if missing:
-                print(f"  ❌ Missing keys: {sorted(list(missing))}")
+                print(f"  ❌ {lang}/{namespace}.json missing keys: {sorted(missing)}")
             if extra:
-                print(f"  ⚠️  Extra keys (not in en.json): {sorted(list(extra))}")
-        print("-" * 20)
+                print(f"  ⚠️  {lang}/{namespace}.json extra keys: {sorted(extra)}")
+    return ok
 
-    if not overall_success:
+
+def check_i18n():
+    locales_dir = os.path.join(os.path.dirname(__file__), "../public/locales")
+    languages = sorted(
+        d
+        for d in os.listdir(locales_dir)
+        if os.path.isdir(os.path.join(locales_dir, d)) and d != "en"
+    )
+
+    overall = True
+    for namespace in NAMESPACES:
+        print(f"\nChecking namespace: {namespace}")
+        if not check_namespace(locales_dir, namespace, languages):
+            overall = False
+
+    if not overall:
+        print("\nFAIL: at least one locale is out of sync.")
         sys.exit(1)
-    else:
-        print("All localization files are in sync with en.json!")
+    print("\nAll localization files are in sync with en!")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     check_i18n()

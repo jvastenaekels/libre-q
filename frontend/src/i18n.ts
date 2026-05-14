@@ -22,6 +22,19 @@ i18n
     // init i18next
     // for all options read: https://www.i18next.com/overview/configuration-options
     .init({
+        // Namespaces: 'participant' carries the participant flow + public chrome
+        // (common, layout, footer, errors, landing, welcome, consent, presort,
+        // rough, fine, post, audio, resume, erasure, study); 'admin' carries
+        // researcher-facing copy (admin.*, auth.*).
+        //
+        // Resolution: t('common.next') resolves in defaultNS 'participant'.
+        // t('admin.dashboard.title') misses in 'participant' and falls back to
+        // 'admin' via fallbackNS. The admin.json file keeps the 'admin.' and
+        // 'auth.' top-level prefixes inside it, so the full path resolves
+        // without renaming any of the 1320 t(...) call sites in the codebase.
+        ns: ['participant', 'admin'],
+        defaultNS: 'participant',
+        fallbackNS: 'admin',
         fallbackLng: 'en',
         supportedLngs: SUPPORTED_I18N_LANGUAGES, // Allow list
         debug: false,
@@ -31,7 +44,7 @@ i18n
         },
 
         backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json?v=20260401_v1',
+            loadPath: '/locales/{{lng}}/{{ns}}.json?v=20260514_v1',
         },
 
         detection: {

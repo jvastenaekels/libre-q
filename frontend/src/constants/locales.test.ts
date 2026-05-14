@@ -10,9 +10,11 @@ const thisDir = path.dirname(fileURLToPath(import.meta.url));
 const localesDir = path.resolve(thisDir, '../../public/locales');
 
 describe('locale resources', () => {
-    it('has a translation file for each supported language', () => {
+    it('has participant and admin namespace files for each supported language', () => {
         const missingLanguages = SUPPORTED_LANGUAGES.filter(
-            ({ code }) => !fs.existsSync(path.join(localesDir, code, 'translation.json'))
+            ({ code }) =>
+                !fs.existsSync(path.join(localesDir, code, 'participant.json')) ||
+                !fs.existsSync(path.join(localesDir, code, 'admin.json'))
         ).map(({ code }) => code);
 
         expect(missingLanguages).toEqual([]);

@@ -46,11 +46,13 @@ export const AllTheProviders: React.FC<AllTheProvidersProps> = ({
 
     // Defensive: Ensure i18n resources are loaded (they can get cleared between tests)
     if (
-        !i18n.hasResourceBundle('en', 'translation') ||
-        Object.keys(i18n.store.data.en?.translation || {}).length === 0
+        !i18n.hasResourceBundle('en', 'participant') ||
+        !i18n.hasResourceBundle('en', 'admin') ||
+        Object.keys(i18n.store.data.en?.participant || {}).length === 0
     ) {
         // Resources got cleared, re-add them
-        i18n.addResourceBundle('en', 'translation', testResources, true, true);
+        i18n.addResourceBundle('en', 'participant', testResources.participant, true, true);
+        i18n.addResourceBundle('en', 'admin', testResources.admin, true, true);
     }
 
     return (
