@@ -1,0 +1,158 @@
+# Q-methodology and product terminology for German (de).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+#
+# CONTEXT: This glossary was added during the de-rework refactor (post-#163)
+# to fix terminology chaos in the original DE locale. The original DE locale
+# shipped without a glossary, leading to ~5-10× more inconsistency than the
+# glossary-driven es/it/nl locales. The canonical choices below resolve the
+# specific issues surfaced by the quality review.
+language: de
+language_name: Deutsch
+
+terms:
+  # Q-methodology core (label-of-art preserved where applicable)
+  concourse: Aussagenpool
+  Q-methodology: Q-Methodologie
+  Q-sort: Q-Sortierung
+  Q-set: Q-Set
+  statement: Aussage
+  factor: Faktor
+  factor analysis: Faktoranalyse
+  factor loading: Faktorladung
+  factor array: Faktorarray
+  eigenvalue: Eigenwert
+  presort: Vorsortierung
+  rough sort: Grobsortierung
+  fine sort: Feinsortierung
+  postsort: Nachsortierung
+
+  # Product entities
+  study: Studie
+  study design: Studiendesign
+  recruitment: Rekrutierung
+  participant: Teilnehmer
+  member: Mitglied
+  owner: Eigentümer
+  viewer: Betrachter
+  editor: Bearbeiter
+  consent: Einwilligung
+  consent form: Einwilligungserklärung
+  audio recording: Audioaufnahme
+  memo: Notiz
+  draft: Entwurf
+  resume code: Wiederaufnahmecode
+  invitation: Einladung
+  project: Projekt
+
+  # UI primitives (these were the WORST offenders in the original DE locale)
+  grid: Raster                  # never "Netz", "Gitter", "Verteilernetz"
+  cancel: Abbrechen             # never "Stornieren" (commercial-cancel sense)
+  save: Speichern               # never "Sparen" (money-save sense)
+  saving: Speichern...
+  delete: Löschen
+  view (verb / button): Anzeigen
+  view (noun): Ansicht
+  loading: Wird geladen
+  dashboard: Dashboard          # loanword, widely accepted in German tech UI
+  slug: Slug                    # technical term, keep English
+  share (verb / button): Teilen # never "Aktie" (stock-market share!)
+  flag (verb): markieren
+  flag (noun): Markierung
+  narrative (factor): Interpretation # never "Erzählung" (storytelling sense)
+
+  # State labels (standardise to these)
+  draft (state): Entwurf
+  active: Aktiv
+  paused: Pausiert
+  closed: Geschlossen
+  archived: Archiviert
+  completed: Abgeschlossen      # never "Vollendet" (poetic)
+  discarded: Verworfen          # never "Weggeworfen" (colloquial)
+  in_progress: In Bearbeitung
+  abandoned: Abgebrochen
+
+notes: |
+  # === REGISTER (CRITICAL) ===
+  - Tone: formal **"Sie"** form throughout, NEVER informal "du/dein/dich/dir".
+    Especially critical in: consent forms, GDPR text, destructive admin
+    actions ("Sind Sie sicher?"), system errors, empty states. The original
+    DE locale had "Bist du sicher?" in a destructive admin context — never
+    again.
+  - For empty-state titles addressing the researcher, use 3rd-person-singular
+    polite forms or impersonal phrasings ("Aktuell sind Sie der einzige
+    Mitarbeitende"), not "Du fliegst alleine".
+
+  # === COMPOUND WORDS ===
+  - German agglutinates aggressively. For DENSE UI labels (sidebar nav,
+    status badges, narrow chips, toolbar items), prefer SHORTER forms or
+    accept English loanwords when widely understood (e.g. "Dashboard",
+    "Slug"). Long compounds are fine in section titles and prose where
+    space is available.
+  - Example triage:
+    - sidebar.dashboard → "Dashboard" (loanword) NOT "Armaturenbrett"
+      (car-instrument-panel literal)
+    - sidebar.design → "Design" or "Studiendesign" depending on context
+    - status badge → short ("Aktiv") not compound
+
+  # === FALSE-FRIEND TRAPS (the original DE locale fell into all of these) ===
+  - "close" (verb to close a study) → "schließen", NEVER parsed as adjective
+    "eng" / adverb "genau".
+  - "study" (noun, research study) → "Studie", NEVER "Studium" (= university
+    degree program).
+  - "statement" (Q-methodology item) → "Aussage", NEVER "Kontoauszug"
+    (= bank statement) or "Stellungnahme" (= official position-statement) or
+    "Anweisung" (= instruction).
+  - "grid" (sorting grid) → "Raster", NEVER "Netz" (= electric grid) or
+    "Gitter" (= fence/lattice).
+  - "share" (button to share a study) → "Teilen", NEVER "Aktie"
+    (= stock-market share).
+  - "resume" (verb / URL to resume a session) → "Wiederaufnahme" /
+    "Wiederaufnahme-URL", NEVER "Lebenslauf" (= curriculum vitae).
+  - "slug" (URL slug) → "Slug" verbatim, NEVER "Schnecke" (= the mollusk).
+  - "taken" in "slug might be taken" → "vergeben", NEVER "erbeutet"
+    (= captured as prey).
+  - "manual" (as in manual mode) → "manuell", NEVER "Handbuch"
+    (= instruction booklet).
+  - "lot" (recruitment batch) → "Charge" or "Kanal", NEVER "Lose"
+    (= lottery tickets).
+  - "view" (button to view data) → "Anzeigen", NEVER "Sicht"
+    (= viewpoint/perspective).
+  - "concourse" → "Aussagenpool", NEVER "Halle" (= architectural lobby)
+    or "Versammlung" (= meeting/gathering).
+  - "mobile" (device type) → "Mobil", NEVER untranslated "Mobile".
+  - "tablet" (device) → "Tablet", NEVER "Tablette" (= medicinal pill).
+  - "Markdown" (the formatting language) → "Markdown" verbatim, NEVER
+    "Abschlag" (= rebate/discount).
+  - "bold" (markdown bold) → "Fett", NEVER "Deutlich" (= clear/distinct).
+  - "all states" (filter for all study/participant states) → "Alle Status",
+    NEVER "Alle Staaten" (= all countries/nations).
+
+  # === COUNT-AND-NOUN PATTERN ===
+  - When rendering `{{count}} thing`, use a regular SPACE between the
+    placeholder and the noun: "{{count}} Studie", never "{{count}}-Studie"
+    (the hyphen makes it a compound adjective, which is grammatically wrong).
+  - For singular/plural distinction, use i18next plural keys (`_one`/`_other`)
+    when the source has them.
+
+  # === LEGAL / GDPR ===
+  - GDPR → "DSGVO" (German official term: Datenschutz-Grundverordnung) IS
+    standard in Germany. EN's "GDPR" can be kept verbatim OR rendered as
+    "DSGVO"; prefer "DSGVO" to match German institutional norms.
+  - "right to erasure" (Art. 17) → "Recht auf Löschung"
+  - "pseudonymisation" → "Pseudonymisierung"
+  - "data processing" → "Datenverarbeitung"
+
+  # === BUTTON CAPITALIZATION ===
+  - German nouns and verbs used as button labels are capitalized: "Speichern",
+    "Abbrechen", "Anmelden", "Weiter", "Zurück". Never lowercase ("anmelden").
+
+  # === GENDER ===
+  - The codebase uses generic masculine plurals (Teilnehmer, Forscher,
+    Mitarbeiter). Stay consistent with that convention; do NOT introduce
+    gender-neutral participles (Teilnehmende, Mitarbeitende) selectively,
+    as that creates a different kind of inconsistency. If the project
+    decides to migrate, that's a separate PR.
+
+  # === NUMBERS ===
+  - Keep decimal points unless a per-locale formatter handles it elsewhere.
+    Qualis uses Intl, so do not edit numeric tokens.
