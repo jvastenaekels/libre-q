@@ -348,6 +348,21 @@ async def regular_user(db: AsyncSession) -> User:
 
 
 @pytest_asyncio.fixture
+async def regular_user_token(regular_user: User) -> str:
+    """Bearer token (string, no header dict) for ``regular_user``.
+    Generated via the production ``create_access_token`` helper so ``iat`` is
+    populated correctly and the token behaves exactly like one minted by the
+    live /api/token login path."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=regular_user.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
 async def totp_user(db: AsyncSession) -> User:
     """A user with app-channel TOTP enabled (password: 'totp-pw')."""
     hashed = get_password_hash("totp-pw")

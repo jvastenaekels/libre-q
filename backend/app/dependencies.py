@@ -77,6 +77,14 @@ async def get_current_user(
     if token_iat < pwa_epoch:
         raise credentials_exception
 
+    # Deactivated users are locked out at the dependency level, not just at
+    # ``get_current_active_user``: a flipped ``is_active=False`` must
+    # invalidate in-flight access tokens against EVERY bearer-token endpoint,
+    # not only the ones that opt into the active-user dep. Same 401 as the
+    # iat-vs-pwa branch above, so there is no enumeration channel.
+    if not user.is_active:
+        raise credentials_exception
+
     return user
 
 
