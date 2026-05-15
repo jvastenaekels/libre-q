@@ -15,19 +15,23 @@ from app.services.admin_user_service import (
 def _db_with_active_superuser_count(count: int) -> AsyncMock:
     """Build a db mock matching the real SQLAlchemy async call shape.
 
-    The production helper does ``(await db.execute(stmt)).scalar_one()``.
-    In real SQLAlchemy, ``AsyncSession.execute`` is a coroutine, but the
-    ``Result`` it resolves to is *synchronous* — ``.scalar_one()`` is a
-    plain method, not a coroutine. A bare ``AsyncMock()`` mis-models this:
-    ``db.execute.return_value`` is itself an AsyncMock, so
-    ``.scalar_one()`` would yield an un-awaited coroutine rather than the
-    stubbed int. We therefore force the awaited result to a MagicMock so
-    ``.scalar_one()`` returns the int synchronously, faithfully exercising
-    the ``remaining <= 1`` guard branch.
+    The production helper does
+    ``(await db.execute(stmt)).scalars().all()`` and returns ``len()`` of
+    the resulting list (it now selects + locks the active-superuser rows
+    via ``FOR UPDATE`` rather than aggregate-counting them). In real
+    SQLAlchemy, ``AsyncSession.execute`` is a coroutine, but the
+    ``Result`` it resolves to is *synchronous* — ``.scalars().all()`` is
+    a plain chain, not a coroutine. A bare ``AsyncMock()`` mis-models
+    this: ``db.execute.return_value`` is itself an AsyncMock, so the
+    chain would yield un-awaited coroutines rather than the stubbed list.
+    We force the awaited result to a MagicMock so ``.scalars().all()``
+    returns a list synchronously. Only the list LENGTH matters (the
+    helper returns ``len(rows)``); the element values are irrelevant, so
+    we hand back ``list(range(count))``.
     """
     db = AsyncMock()
     result = MagicMock()
-    result.scalar_one.return_value = count
+    result.scalars.return_value.all.return_value = list(range(count))
     db.execute.return_value = result
     return db
 

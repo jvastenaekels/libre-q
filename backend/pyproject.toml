@@ -236,17 +236,6 @@ warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-# Service-capabilities endpoint (full strict) — no Any: reads two bool
-# settings properties, returns the Capabilities schema from common.py.
-module = [
-    "app.routers.capabilities",
-]
-disallow_untyped_defs = true
-disallow_any_explicit = true
-warn_return_any = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
 # Phase 3 wave 4 — batch 1 routers (full strict)
 # audio: 3 missing return types added (AudioUploadResponse, dict[str, str], AudioRecordingRead).
 # recruitment: List[T] → list[T], 3 return types added; ORM → schema cast via response_model.

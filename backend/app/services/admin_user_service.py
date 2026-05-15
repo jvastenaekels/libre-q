@@ -23,6 +23,17 @@ foot-guns:
 
 The verb actions (force_password_reset, reset_totp) live here too so the
 router stays a thin HTTP layer.
+
+CONTRACT (at-least-one-active-superuser floor). The floor guarantee in
+rule 2 holds *only* if the endpoint runs ``assert_can_*`` + the flag
+mutation + ``commit()`` inside a single transaction with no intervening
+commit or rollback. ``_count_active_superusers`` acquires ``FOR UPDATE``
+row locks on the active-superuser set; those locks serialise concurrent
+demote/deactivate attempts, but enforce serialization only for the
+duration of that one transaction. Committing between the guard and the
+mutation releases the locks and reopens the lockout race (two requests
+both read count=2, both pass, both commit → zero active superusers =
+permanent platform lockout). T6/T7/T8 endpoint wrappers MUST honour this.
 """
 
 from __future__ import annotations
@@ -30,7 +41,7 @@ from __future__ import annotations
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -49,13 +60,27 @@ class AdminUserError(Exception):
 
 
 async def _count_active_superusers(db: AsyncSession) -> int:
+    """Number of users that are BOTH superuser AND active.
+
+    Locks the matching rows with ``FOR UPDATE`` (locks the actual rows,
+    NOT ``func.count()``, which cannot be locked meaningfully). CONTRACT:
+    callers that enforce the at-least-one-active-superuser floor MUST run
+    this guard, the flag mutation, and the commit inside ONE transaction
+    with NO intervening commit/rollback. The row locks acquired here
+    serialise concurrent demote/deactivate attempts: a second transaction
+    trying to mutate one of these rows BLOCKS until the first commits.
+    Releasing the transaction early (committing between the guard and the
+    mutation) reopens the lockout race. See assert_can_demote_superuser /
+    assert_can_deactivate.
+    """
     stmt = (
-        select(func.count())
-        .select_from(User)
+        select(User.id)
         .where(User.is_superuser.is_(True))
         .where(User.is_active.is_(True))
+        .with_for_update()
     )
-    return int((await db.execute(stmt)).scalar_one())
+    rows = (await db.execute(stmt)).scalars().all()
+    return len(rows)
 
 
 async def assert_can_demote_superuser(
@@ -110,6 +135,12 @@ async def force_password_reset(*, db: AsyncSession, target: User) -> None:
     The user is fully locked out until they click the email link and pick
     a new password. The endpoint is the operator's "this account is
     compromised, force-rotate now" button.
+
+    If email dispatch fails, the password rotation still stands
+    (fail-locked by design): the commit precedes the send so a
+    compromised account is locked even if SMTP is down. The operator must
+    re-trigger this action or hand the user a fresh password-reset link
+    out of band.
     """
     throwaway = secrets.token_urlsafe(32)
     target.hashed_password = get_password_hash(throwaway)
@@ -131,6 +162,11 @@ async def reset_totp(*, db: AsyncSession, target: User) -> None:
     Use case: the user has lost their authenticator and the operator
     verifies their identity out of band. Next login, the target will be
     able to set up 2FA again from /me. No email is sent in v1.
+
+    This does NOT bump ``password_changed_at`` and does NOT invalidate
+    existing access tokens — sessions established before the reset remain
+    valid. It only removes the second factor; it is not a
+    session-revocation tool.
     """
     target.totp_secret = None
     target.is_totp_enabled = False
