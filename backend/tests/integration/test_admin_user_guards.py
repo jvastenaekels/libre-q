@@ -315,3 +315,14 @@ async def test_reset_totp_403_for_non_superuser(
         headers={"Authorization": f"Bearer {regular_user_token}"},
     )
     assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_reset_totp_404_when_target_missing(
+    client: AsyncClient, superuser_token: str
+) -> None:
+    resp = await client.post(
+        "/api/admin/users/999999/reset-totp",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 404

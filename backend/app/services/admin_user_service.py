@@ -167,6 +167,10 @@ async def reset_totp(*, db: AsyncSession, target: User) -> None:
     existing access tokens — sessions established before the reset remain
     valid. It only removes the second factor; it is not a
     session-revocation tool.
+
+    Superuser targets are allowed: callers accept that this may leave a
+    superuser without 2FA until they re-enrol — the 2FA-for-superuser
+    rule is enforced at promotion time only, not continuously.
     """
     target.totp_secret = None
     target.is_totp_enabled = False

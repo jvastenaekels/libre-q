@@ -198,12 +198,16 @@ async def reset_totp_endpoint(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(check_superuser),
 ) -> None:
-    """Superuser-only: clear the target's second factor.
+    """Superuser-only: clear a user's TOTP (lost-authenticator recovery).
 
     The heavy lifting lives in ``admin_user_service.reset_totp``, which
     commits the session itself. By design it removes ONLY the second
     factor — it does NOT bump ``password_changed_at`` nor invalidate
     existing sessions; it is not a session-revocation tool.
+
+    Allowed on superuser targets; this can transiently leave a superuser
+    without 2FA (the 2FA-for-superuser rule is checked at promotion time,
+    not continuously). The action is audit-logged.
     """
     result = await db.execute(select(User).where(User.id == user_id))
     target = result.scalar_one_or_none()
