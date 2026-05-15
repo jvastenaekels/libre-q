@@ -10,7 +10,6 @@ from ...database import get_db
 from ...dependencies import PaginationParams, check_superuser
 from ...limiter import limiter
 from ...models import User
-from ...schemas import UserCreate, UserRead
 from ...schemas.common import PaginatedResponse
 from ...schemas.users import UserAdminUpdate, UserReadAdmin
 from ...services.admin_user_service import (
@@ -22,17 +21,16 @@ from ...services.admin_user_service import (
     reset_totp,
 )
 from ...utils.audit import log_admin_action
-from ...utils.security import get_password_hash
 
 router = APIRouter(tags=["Admin Users"])
 
 
-@router.get("", response_model=PaginatedResponse[UserRead])
+@router.get("", response_model=PaginatedResponse[UserReadAdmin])
 async def list_users(
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
     pagination: PaginationParams = Depends(),
-) -> PaginatedResponse[UserRead]:
+) -> PaginatedResponse[UserReadAdmin]:
     """List all users in the system with pagination."""
     count_result = await db.execute(select(func.count(User.id)))
     total = count_result.scalar() or 0
@@ -42,50 +40,13 @@ async def list_users(
     )
     items = list(result.scalars().all())
 
-    # FastAPI serialises User → UserRead via response_model; cast aligns mypy.
+    # FastAPI serialises User → UserReadAdmin via response_model; cast aligns mypy.
     return cast(
-        PaginatedResponse[UserRead],
+        PaginatedResponse[UserReadAdmin],
         PaginatedResponse(
             items=items, total=total, limit=pagination.limit, offset=pagination.offset
         ),
     )
-
-
-@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-@limiter.limit("30/minute")
-async def create_user(
-    request: Request,
-    user_in: UserCreate,
-    db: AsyncSession = Depends(get_db),
-    admin: User = Depends(check_superuser),
-) -> User:
-    """Create a new user."""
-    # Check if user already exists
-    existing_check = await db.execute(select(User).where(User.email == user_in.email))
-    if existing_check.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
-        )
-
-    new_user = User(
-        email=user_in.email,
-        hashed_password=get_password_hash(user_in.password),
-        is_active=user_in.is_active,
-        is_superuser=user_in.is_superuser,
-    )
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    log_admin_action(
-        actor_user_id=admin.id,
-        action="create",
-        resource="user",
-        resource_id=new_user.id,
-        is_superuser=new_user.is_superuser,
-        is_active=new_user.is_active,
-    )
-    return new_user
 
 
 @router.patch("/{user_id}", response_model=UserReadAdmin)
