@@ -2010,6 +2010,7 @@
             "summary_filled_other": "{{n}} merkintää · avaa napsauttamalla",
             "summary_unread": "{{n}} lukematonta",
             "add_entry": "Lisää merkintä",
+            "export": "Vie",
             "insert_template": "Lisää mallista",
             "entry_title_placeholder": "Osion otsikko…",
             "entry_body_placeholder": "Perustele valintasi…",

@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} entradas · clique para ver",
             "summary_unread": "{{n}} não lidas",
             "add_entry": "Adicionar entrada",
+            "export": "Exportar",
             "insert_template": "Inserir a partir de modelo",
             "entry_title_placeholder": "Título da secção…",
             "entry_body_placeholder": "Documente o seu raciocínio…",

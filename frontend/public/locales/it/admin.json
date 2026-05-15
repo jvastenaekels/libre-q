@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} voci · clicchi per visualizzare",
             "summary_unread": "{{n}} non lette",
             "add_entry": "Aggiungi voce",
+            "export": "Esporta",
             "insert_template": "Inserisci da modello",
             "entry_title_placeholder": "Titolo della sezione…",
             "entry_body_placeholder": "Documenti la sua motivazione…",

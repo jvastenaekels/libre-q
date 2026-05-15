@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} Einträge · zum Anzeigen klicken",
             "summary_unread": "{{n}} ungelesen",
             "add_entry": "Eintrag hinzufügen",
+            "export": "Exportieren",
             "insert_template": "Aus Vorlage einfügen",
             "entry_title_placeholder": "Abschnittstitel...",
             "entry_body_placeholder": "Begründung dokumentieren...",

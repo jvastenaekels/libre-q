@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} entradas · haga clic para ver",
             "summary_unread": "{{n}} sin leer",
             "add_entry": "Añadir entrada",
+            "export": "Exportar",
             "insert_template": "Insertar desde plantilla",
             "entry_title_placeholder": "Título de sección…",
             "entry_body_placeholder": "Documente su justificación…",

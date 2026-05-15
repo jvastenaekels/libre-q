@@ -2064,6 +2064,7 @@
             "summary_filled_other": "{{n}} entrées · cliquer pour ouvrir",
             "summary_unread": "{{n}} non lus",
             "add_entry": "Ajouter une entrée",
+            "export": "Exporter",
             "insert_template": "Insérer un modèle",
             "entry_title_placeholder": "Titre de la section…",
             "entry_body_placeholder": "Documentez votre raisonnement…",

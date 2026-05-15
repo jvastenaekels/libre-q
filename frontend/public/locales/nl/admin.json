@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} items · klik om te bekijken",
             "summary_unread": "{{n}} ongelezen",
             "add_entry": "Item toevoegen",
+            "export": "Exporteren",
             "insert_template": "Uit sjabloon invoegen",
             "entry_title_placeholder": "Sectietitel…",
             "entry_body_placeholder": "Documenteer uw redenering…",
