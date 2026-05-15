@@ -31,7 +31,14 @@ vi.mock('@/api/generated', () => ({
 }));
 
 vi.mock('sonner', () => ({
-    toast: { error: vi.fn() },
+    toast: { error: vi.fn(), success: vi.fn() },
+}));
+
+vi.mock('@/api/admin', () => ({
+    AdminService: {
+        exportConcourseMemo: vi.fn(),
+        exportStudyMemo: vi.fn(),
+    },
 }));
 
 beforeEach(() => {
@@ -231,6 +238,41 @@ describe('useMemoSection', () => {
             await result.current.addEntry({ title: 'N', body: '' });
         });
         expect(result.current.entries.find((e) => e.id === 99)).toBeTruthy();
+    });
+
+    it('exportMemo downloads a blob and toasts success', async () => {
+        const admin = await import('@/api/admin');
+        const generated = await import('@/api/generated');
+        (
+            generated.getConcourseMemoApiAdminConcoursesCidMemoGet as ReturnType<typeof vi.fn>
+        ).mockResolvedValue({ parent_type: 'concourse', parent_id: 1, entries: [] });
+        (
+            generated.getTemplatesApiAdminMemoTemplatesGet as ReturnType<typeof vi.fn>
+        ).mockResolvedValue([]);
+        const blob = new Blob(['# memo'], { type: 'text/markdown' });
+        (admin.AdminService.exportConcourseMemo as ReturnType<typeof vi.fn>).mockResolvedValue(
+            blob
+        );
+
+        const createSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
+        vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
+
+        const { result } = renderHook(() =>
+            useMemoSection({
+                parentType: 'concourse',
+                parentId: 1,
+                currentUserId: 1,
+                projectMembers: [],
+            })
+        );
+        await waitFor(() => expect(result.current.entries).toEqual([]));
+
+        await act(async () => {
+            await result.current.exportMemo();
+        });
+
+        expect(admin.AdminService.exportConcourseMemo).toHaveBeenCalledWith(1);
+        expect(createSpy).toHaveBeenCalledWith(blob);
     });
 
     it('markSeen bumps localStorage and clears unread', async () => {

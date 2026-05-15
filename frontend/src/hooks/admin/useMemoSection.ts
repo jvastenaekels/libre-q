@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { AdminService } from '@/api/admin';
 import {
     createConcourseEntryApiAdminConcoursesCidMemoEntriesPost,
     createStudyEntryApiAdminStudiesSidMemoEntriesPost,
@@ -140,6 +141,26 @@ export function useMemoSection({
         const m = await fetchMemo();
         setMemo(m);
     }, [fetchMemo]);
+
+    const exportMemo = useCallback(async (): Promise<void> => {
+        try {
+            const blob =
+                parentType === 'concourse'
+                    ? await AdminService.exportConcourseMemo(parentId)
+                    : await AdminService.exportStudyMemo(parentId);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `memo_${parentType}_${parentId}.md`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            toast.success(t('admin.export.success', 'Export successful'));
+        } catch {
+            toast.error(t('admin.export.error', 'Export failed. Try again.'));
+        }
+    }, [parentType, parentId, t]);
 
     const addEntry = useCallback(
         async (payload: MemoEntryCreate): Promise<MemoEntryRead> => {
@@ -265,6 +286,7 @@ export function useMemoSection({
         setShowResolved,
         markSeen,
         refetch,
+        exportMemo,
         addEntry,
         editEntry,
         removeEntry,
