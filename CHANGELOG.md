@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.6.8](https://github.com/jvastenaekels/qualis/compare/v0.6.7...v0.6.8) (2026-05-15)
+
+
+### Features
+
+* **demo:** add Lipset (1963) published dataset as validation example ([b4d24a9](https://github.com/jvastenaekels/qualis/commit/b4d24a9772ef0af7a47df488ea8b49bbda00d6f0))
+* **demo:** make demo-seed produce a submission-ready (active) study ([02eeef9](https://github.com/jvastenaekels/qualis/commit/02eeef9a261957e46adcc346fc946dc668d23bb6))
+* **demo:** seed post-sort questionnaire + explicit rough-sort ([d672fe4](https://github.com/jvastenaekels/qualis/commit/d672fe46b24f70c091e614d0808495cb270936c9))
+* **memo:** add AdminService memo export download helpers ([934a046](https://github.com/jvastenaekels/qualis/commit/934a046aefa33070e8bda335ddb7d20fb305a885))
+* **memo:** add concourse/study memo Markdown export endpoints ([08180f1](https://github.com/jvastenaekels/qualis/commit/08180f1d627f0c7ab0919e02da182d06e38eb0c2))
+* **memo:** add MemoService.render_markdown audit-trail renderer ([ad71aca](https://github.com/jvastenaekels/qualis/commit/ad71acac8b8698d4043cff53da7af8493a385145))
+* **memo:** Markdown export for concourse/study memos ([23ed6fa](https://github.com/jvastenaekels/qualis/commit/23ed6fa2582bee1bdc063125ecb2839c8969c654))
+* **memo:** wire memo export button + hook handler ([132eacd](https://github.com/jvastenaekels/qualis/commit/132eacdeb46e8798bbb263db2a13eaaf844c5ff2))
+* superuser-only /app/users admin page + account-management endpoints ([#171](https://github.com/jvastenaekels/qualis/issues/171)) ([bb51c88](https://github.com/jvastenaekels/qualis/commit/bb51c8800c5ba3d27afb37f9c585fe6f4355873a))
+
+
+### Documentation
+
+* **citation:** cite concept DOI; keep v0.6.7 archive as identifier ([44ddc61](https://github.com/jvastenaekels/qualis/commit/44ddc61fc0e62b351ae910c05f0fba970679b302))
+* **citation:** wire Zenodo v0.6.7 DOI; drop "critical Q" positioning ([3cff48a](https://github.com/jvastenaekels/qualis/commit/3cff48acb7db81b04f5a68610e2879559bdc5d93))
+* **memo:** add export spec + implementation plan ([4dc3dbe](https://github.com/jvastenaekels/qualis/commit/4dc3dbec91318842a52815d60cfda483edeaa96a))
+* **readme:** point DOI badge at concept DOI (always-latest) ([f65b873](https://github.com/jvastenaekels/qualis/commit/f65b8730464c45f13cccef76d4637e680f996a77))
+
 ## [0.6.7](https://github.com/jvastenaekels/qualis/compare/v0.6.6...v0.6.7) (2026-05-15)
 
 
