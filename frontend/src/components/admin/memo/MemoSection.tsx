@@ -104,6 +104,15 @@ export function MemoSection({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}
+                <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                        void m.exportMemo();
+                    }}
+                >
+                    {t('admin.memo.export', 'Export')}
+                </Button>
                 <div className="flex-1" />
                 <button
                     type="button"

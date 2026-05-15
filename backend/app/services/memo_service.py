@@ -136,6 +136,100 @@ class MemoService:
         )
 
     @staticmethod
+    async def render_markdown(
+        db: AsyncSession,
+        *,
+        parent_type: MemoParentType,
+        parent_id: int,
+        parent_title: str,
+    ) -> str:
+        """Render the full memo (entries + comment audit trail) as Markdown.
+
+        Soft-deleted comments keep author + timestamp but their body
+        becomes ``*[deleted]*``. Resolved comments carry a
+        ``resolved by <name>`` marker. User ids resolve to
+        ``full_name or email``; missing/None ids render ``Unknown``.
+        """
+        from datetime import timezone
+
+        from app.models import User
+
+        stmt = (
+            select(MemoEntry)
+            .where(
+                MemoEntry.parent_type == parent_type,
+                MemoEntry.parent_id == parent_id,
+            )
+            .options(selectinload(MemoEntry.comments))
+            .order_by(MemoEntry.position, MemoEntry.id)
+        )
+        entries: Sequence[MemoEntry] = (await db.execute(stmt)).scalars().all()
+
+        user_ids: set[int] = set()
+        for e in entries:
+            for uid in (e.created_by, e.last_edited_by):
+                if uid is not None:
+                    user_ids.add(uid)
+            for c in e.comments:
+                for uid in (c.user_id, c.resolved_by):
+                    if uid is not None:
+                        user_ids.add(uid)
+
+        names: dict[int, str] = {}
+        if user_ids:
+            rows = (
+                (await db.execute(select(User).where(User.id.in_(user_ids))))
+                .scalars()
+                .all()
+            )
+            for u in rows:
+                names[u.id] = u.full_name or u.email
+
+        def name_of(uid: int | None) -> str:
+            if uid is None:
+                return "Unknown"
+            return names.get(uid, "Unknown")
+
+        def fmt(dt: datetime) -> str:
+            return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        lines: list[str] = [
+            f"# {parent_title} — {parent_type.value} memo",
+            "",
+            f"_Exported {now}_",
+            "",
+        ]
+
+        if not entries:
+            lines.append("No entries.")
+            return "\n".join(lines) + "\n"
+
+        for e in entries:
+            lines.append(f"## {e.title}")
+            lines.append("")
+            meta = f"_Created by {name_of(e.created_by)} on {fmt(e.created_at)}_"
+            if e.last_edited_by is not None and e.last_edited_by != e.created_by:
+                meta += f" · _last edited by {name_of(e.last_edited_by)}_"
+            lines.append(meta)
+            lines.append("")
+            if e.body:
+                lines.append(e.body)
+                lines.append("")
+            ordered = sorted(e.comments, key=lambda c: c.created_at)
+            for c in ordered:
+                header = f"**{name_of(c.user_id)}** · {fmt(c.created_at)}"
+                if c.resolved:
+                    header += f" · resolved by {name_of(c.resolved_by)}"
+                lines.append(f"> {header}")
+                body = "*[deleted]*" if c.deleted else c.body
+                for bl in body.splitlines() or [""]:
+                    lines.append(f"> {bl}")
+                lines.append("")
+
+        return "\n".join(lines) + "\n"
+
+    @staticmethod
     async def add_entry(
         db: AsyncSession,
         *,

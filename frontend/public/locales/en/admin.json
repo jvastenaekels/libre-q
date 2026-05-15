@@ -129,6 +129,7 @@
             "summary_filled_other": "{{n}} entries · click to view",
             "summary_unread": "{{n}} unread",
             "add_entry": "Add entry",
+            "export": "Export",
             "insert_template": "Insert from template",
             "entry_title_placeholder": "Section title…",
             "entry_body_placeholder": "Document your rationale…",
