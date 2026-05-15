@@ -79,5 +79,6 @@ async def test_list_users_includes_admin_audit_fields(
     assert data["total"] >= 1, "at least the seeded superuser must appear"
     item = data["items"][0]
     assert "password_changed_at" in item
+    assert item["password_changed_at"] is not None
     assert "last_login_at" in item
     assert "email_verified_at" in item
