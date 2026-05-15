@@ -19,6 +19,7 @@ from ...services.admin_user_service import (
     assert_can_demote_superuser,
     assert_can_promote_superuser,
     force_password_reset,
+    reset_totp,
 )
 from ...utils.audit import log_admin_action
 from ...utils.security import get_password_hash
@@ -183,6 +184,36 @@ async def force_password_reset_endpoint(
     log_admin_action(
         actor_user_id=current_user.id,
         action="force_password_reset",
+        resource="user",
+        resource_id=target.id,
+    )
+    return None
+
+
+@router.post("/{user_id}/reset-totp", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
+async def reset_totp_endpoint(
+    request: Request,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(check_superuser),
+) -> None:
+    """Superuser-only: clear the target's second factor.
+
+    The heavy lifting lives in ``admin_user_service.reset_totp``, which
+    commits the session itself. By design it removes ONLY the second
+    factor — it does NOT bump ``password_changed_at`` nor invalidate
+    existing sessions; it is not a session-revocation tool.
+    """
+    result = await db.execute(select(User).where(User.id == user_id))
+    target = result.scalar_one_or_none()
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await reset_totp(db=db, target=target)
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="reset_totp",
         resource="user",
         resource_id=target.id,
     )

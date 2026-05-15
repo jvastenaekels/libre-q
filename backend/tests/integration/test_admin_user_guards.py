@@ -282,3 +282,36 @@ async def test_force_password_reset_403_for_non_superuser(
         headers={"Authorization": f"Bearer {regular_user_token}"},
     )
     assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_reset_totp_clears_all_fields(
+    client: AsyncClient,
+    superuser_token: str,
+    totp_user: User,
+    db: AsyncSession,
+) -> None:
+    assert totp_user.is_totp_enabled is True
+    assert totp_user.totp_secret is not None
+
+    resp = await client.post(
+        f"/api/admin/users/{totp_user.id}/reset-totp",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 204
+
+    await db.refresh(totp_user)
+    assert totp_user.is_totp_enabled is False
+    assert totp_user.totp_secret is None
+    assert totp_user.totp_channel is None
+
+
+@pytest.mark.asyncio
+async def test_reset_totp_403_for_non_superuser(
+    client: AsyncClient, regular_user_token: str, totp_user: User
+) -> None:
+    resp = await client.post(
+        f"/api/admin/users/{totp_user.id}/reset-totp",
+        headers={"Authorization": f"Bearer {regular_user_token}"},
+    )
+    assert resp.status_code == 403
