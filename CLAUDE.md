@@ -19,7 +19,7 @@ backend/        # FastAPI app
   tests/        # Unit + integration tests (pytest)
 frontend/       # React SPA
   src/           # Components, pages, hooks, store, api
-  public/locales/  # i18n translation files (en, fr, fi)
+  public/locales/  # i18n translation files (one dir per locale; see `SUPPORTED_LANGUAGES`)
 ```
 
 ## Key Commands (from project root)
@@ -112,8 +112,10 @@ Inside a strict module: every function declares its return type, no implicit `An
 
 ### Internationalization
 - All user-facing strings must use `useTranslation()` / `t()` with a key and English fallback: `t('key', 'Fallback')`
-- Three locales: `en`, `fr`, `fi` — keep all translation files in sync
-- Run `npm run i18n-check` to verify key parity
+- Supported locales: see `SUPPORTED_LANGUAGES` in `frontend/src/constants/languages.ts` (canonical source). Each entry has a `hasAdmin` flag — when false, admin chrome falls back to English via i18next's `fallbackLng`.
+- Locale files: `frontend/public/locales/<lang>/{participant,admin}.json`. **Participant strict** parity (mandatory), **admin best-effort** (warning-only). Policy enforced by `frontend/scripts/check_i18n.py`.
+- Adding a new locale: write `frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `frontend/scripts/i18n/translation-runbook.md`. Cross-consistency tests catch missing `SUPPORTED_I18N_LANGUAGES` entries and `setupTests.ts` mock drift automatically.
+- Run `npm run i18n-check` to verify key parity. `npm run check-interpolations` verifies per-key `{{var}}` parity.
 
 ### Testing
 - Backend: pytest with async fixtures. Mocks must include all methods used by the code under test.
