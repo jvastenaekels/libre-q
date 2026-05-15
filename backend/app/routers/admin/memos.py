@@ -6,10 +6,13 @@
 
 from __future__ import annotations
 
+import io
 import logging
+import re
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -148,6 +151,60 @@ async def get_study_memo(
     await _check_member(db, s.project_id, user, ProjectRole.viewer)
     return await MemoService.get_memo(
         db, parent_type=MemoParentType.study, parent_id=sid
+    )
+
+
+def _memo_filename(stem: str) -> str:
+    """Slugify a parent title/slug into a safe ``<slug>_memo.md`` filename."""
+    slug = re.sub(r"[^a-z0-9]+", "-", stem.lower()).strip("-")
+    return f"{slug or 'memo'}_memo.md"
+
+
+@router.get("/concourses/{cid}/memo/export")
+async def export_concourse_memo(
+    cid: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> StreamingResponse:
+    c = await db.get(Concourse, cid)
+    if c is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
+    await _check_member(db, c.project_id, user, ProjectRole.viewer)
+    md = await MemoService.render_markdown(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=cid,
+        parent_title=c.title,
+    )
+    filename = _memo_filename(c.title)
+    return StreamingResponse(
+        io.StringIO(md),
+        media_type="text/markdown",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+@router.get("/studies/{sid}/memo/export")
+async def export_study_memo(
+    sid: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> StreamingResponse:
+    s = await db.get(Study, sid)
+    if s is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
+    await _check_member(db, s.project_id, user, ProjectRole.viewer)
+    md = await MemoService.render_markdown(
+        db,
+        parent_type=MemoParentType.study,
+        parent_id=sid,
+        parent_title=s.slug,
+    )
+    filename = _memo_filename(s.slug)
+    return StreamingResponse(
+        io.StringIO(md),
+        media_type="text/markdown",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
 
 
