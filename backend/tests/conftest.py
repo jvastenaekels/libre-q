@@ -330,6 +330,39 @@ async def study_factory(db: AsyncSession):
 
 
 @pytest_asyncio.fixture
+async def regular_user(db: AsyncSession) -> User:
+    """A plain user for last_login_at / login-flow tests (password: 'regular-pw')."""
+    hashed = get_password_hash("regular-pw")
+    user = User(
+        email="regular@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def totp_user(db: AsyncSession) -> User:
+    """A user with app-channel TOTP enabled (password: 'totp-pw')."""
+    hashed = get_password_hash("totp-pw")
+    user = User(
+        email="totp@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified in this test
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
 def auth_token_factory():
     """Create JWT token for a user."""
     from datetime import timedelta
