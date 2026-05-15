@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.7](https://github.com/jvastenaekels/qualis/compare/v0.6.6...v0.6.7) (2026-05-15)
+
+
+### Features
+
+* **i18n:** add Polish locale (participant + admin) ([#169](https://github.com/jvastenaekels/qualis/issues/169)) ([c7e731e](https://github.com/jvastenaekels/qualis/commit/c7e731eb1323d32d06be72b30e7f0703dd612774))
+* **i18n:** add Portuguese locale (participant + admin) ([#167](https://github.com/jvastenaekels/qualis/issues/167)) ([29a7582](https://github.com/jvastenaekels/qualis/commit/29a758234bcf50a07f5b18e36cd7f03f058ccd65))
+
+
+### Bug fixes
+
+* **i18n:** rework German locale with glossary-driven retranslation ([#165](https://github.com/jvastenaekels/qualis/issues/165)) ([c2fa139](https://github.com/jvastenaekels/qualis/commit/c2fa1394c580520a8a275adc993b8b41e8478be0))
+
+
+### Documentation
+
+* sync i18n references with current locale architecture ([#168](https://github.com/jvastenaekels/qualis/issues/168)) ([b62c138](https://github.com/jvastenaekels/qualis/commit/b62c1389fe7c3d73063c40831fb64f1d3c74b881))
+
 ## [0.6.6](https://github.com/jvastenaekels/qualis/compare/v0.6.5...v0.6.6) (2026-05-14)
 
 
