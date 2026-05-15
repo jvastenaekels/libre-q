@@ -60,7 +60,7 @@ A handful of domain rules must hold in every change that touches the participant
 ## 7. Conventional checklist before opening a PR
 
 - `make ci` passes.
-- New user-facing strings use `t('key', 'Fallback')` and exist in `en`, `fr`, `fi`. `npm run i18n-check` passes.
+- New user-facing strings use `t('key', 'Fallback')` and exist in every locale's `participant.json` or `admin.json` (depending on which namespace the key lives in). `npm run i18n-check` passes.
 - Backend route or schema changes are followed by `make generate-api`; the regenerated client is committed.
 - New database columns ship with a reviewed Alembic migration (`make migration-new`).
 - New tests cover the behaviour. Non-trivial code without a test is a blocker.

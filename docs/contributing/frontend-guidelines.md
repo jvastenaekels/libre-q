@@ -30,9 +30,10 @@ const { t } = useTranslation();
 return <button>{t('study.activate', 'Activate Study')}</button>;
 ```
 
-- Three locales: `en`, `fr`, `fi`. Keep them in sync.
-- `npm run i18n-check` verifies key parity. CI runs it; do not let it drift.
-- Translation files live under `frontend/public/locales/<lang>/`, split into `participant.json` (participant flow + public chrome) and `admin.json` (admin + auth). Add the new key in `en/<namespace>.json` first, then mirror it to `fr`, `fi`, and `de`.
+- Supported locales: see `SUPPORTED_LANGUAGES` in `frontend/src/constants/languages.ts`. Each entry carries a `hasAdmin` flag controlling whether the locale appears in the admin sidebar selector.
+- Translation files live under `frontend/public/locales/<lang>/`, split into `participant.json` (participant flow + public chrome — **strict parity**, mandatory) and `admin.json` (admin + auth — **best-effort**, may be partial or absent; missing keys fall back to English via i18next's `fallbackLng`).
+- Adding a key: add it to `en/<namespace>.json` first, then mirror it to every other locale's same namespace. `npm run i18n-check` and `npm run check-interpolations` verify key and placeholder parity; CI runs both.
+- Adding a new locale: write `frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `frontend/scripts/i18n/translation-runbook.md`. Update `SUPPORTED_LANGUAGES`, `SUPPORTED_I18N_LANGUAGES` (in `frontend/src/i18n.ts`), and the mocked allowlist in `frontend/src/setupTests.ts` in lock-step — the cross-consistency invariant test in `languages.test.ts` will catch drift.
 
 ## 3. Generated API client
 

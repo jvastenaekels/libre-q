@@ -194,7 +194,7 @@ For the migration chain and conventions, see the "Database Migrations" section i
 | `src/components/admin/analysis/` | Analysis result visualizations |
 | `src/store/` | Zustand state management stores |
 | `src/api/` | Generated API client (Orval) |
-| `public/locales/` | i18n translation files (en, fr, fi) |
+| `public/locales/` | i18n translation files (one dir per locale; see `SUPPORTED_LANGUAGES` constant) |
 
 ## Common troubleshooting
 
