@@ -1,0 +1,461 @@
+{
+    "common": {
+        "placeholders": {
+            "text_response": "Wpisz swoją odpowiedź..."
+        },
+        "add": "Dodaj",
+        "confirm": "Potwierdź",
+        "all": "Wszystkie",
+        "agree": "Raczej zgadzam się",
+        "disagree": "Raczej nie zgadzam się",
+        "neutral": "Neutralnie",
+        "reset_to_default": "Przywróć domyślne",
+        "reset_to_default_success": "Przywrócono domyślne",
+        "reset_to_default_confirm": "Czy na pewno chcesz przywrócić domyślną wartość tego pola? Wszelkie własne zmiany zostaną utracone.",
+        "undo": "Cofnij",
+        "next": "Następny krok",
+        "submit": "Podziel się swoją perspektywą",
+        "continue": "Kontynuuj",
+        "loading": "Ładowanie...",
+        "lang_code": "pl",
+        "attention": "Uwaga",
+        "error": "Błąd",
+        "submitting": "Wysyłanie...",
+        "cards": "stwierdzenia",
+        "close": "Zamknij",
+        "unknown_card": "Nieznana karta",
+        "unknown": "Nieznane",
+        "duration_short": "{{m}}m {{s}}s",
+        "duration_long": "{{h}}h {{m}}m {{s}}s",
+        "optional": "Opcjonalnie",
+        "processing": "Przetwarzanie...",
+        "statement": "Stwierdzenie",
+        "step": "Krok",
+        "back": "Wstecz",
+        "cancel": "Anuluj",
+        "delete": "Usuń",
+        "slots": "miejsca",
+        "project_label": "Projekt",
+        "read_full": "Przeczytaj całe stwierdzenie",
+        "reduce": "Zwiń",
+        "expand": "Rozwiń",
+        "yes": "Tak",
+        "no": "Nie",
+        "score": "Wynik",
+        "comment": "Komentarz",
+        "errors": {
+            "network": "Błąd połączenia sieciowego. Proszę sprawdzić połączenie z Internetem.",
+            "not_found": "Nie znaleziono badania.",
+            "validation": "Błąd systemu: weryfikacja danych nie powiodła się.",
+            "unknown": "Wystąpił nieoczekiwany błąd.",
+            "retry": "Spróbuj ponownie",
+            "min": "Wartość musi wynosić co najmniej {{min}}",
+            "max": "Wartość musi wynosić co najwyżej {{max}}",
+            "email": "Proszę podać prawidłowy adres e-mail",
+            "min_length": "Wymagana minimalna liczba znaków: {{count}}",
+            "max_length": "Dozwolona maksymalna liczba znaków: {{count}}",
+            "404": {
+                "title": "Nie znaleziono strony",
+                "message": "Strona lub badanie, którego szukasz, nie istnieje."
+            },
+            "429": {
+                "title": "Zbyt wiele żądań",
+                "message": "Działanie zbyt szybkie. Proszę chwilę poczekać."
+            },
+            "500": {
+                "title": "Błąd serwera",
+                "message": "Nasze serwery napotkały problem. Proszę spróbować ponownie później."
+            },
+            "network_title": "Utracono połączenie",
+            "home": "Przejdź do strony głównej",
+            "reset": "Zresetuj sesję",
+            "default_title": "Ups! Coś poszło nie tak.",
+            "study_not_found": {
+                "title": "Nie znaleziono badania",
+                "message": "Nie mogliśmy znaleźć badania o tej nazwie. Proszę sprawdzić adres URL lub skontaktować się z badaczem.",
+                "action": "Przejdź do strony głównej"
+            }
+        },
+        "status": {
+            "draft": {
+                "title": "Badanie w przygotowaniu",
+                "message": "To badanie nie jest jeszcze dostępne do uczestnictwa. Proszę wrócić później.",
+                "action": "Wróć do strony głównej"
+            },
+            "steps": {
+                "draft": {
+                    "label": "Szkic",
+                    "description": "Konfiguracja i projekt"
+                },
+                "active": {
+                    "label": "Aktywne",
+                    "description": "Zbieranie odpowiedzi"
+                },
+                "paused": {
+                    "label": "Wstrzymane",
+                    "description": "Wstrzymane"
+                },
+                "closed": {
+                    "label": "Zamknięte",
+                    "description": "Analiza i eksport"
+                }
+            },
+            "paused": {
+                "title": "Trwa konserwacja",
+                "message": "Zbieranie danych zostało tymczasowo wstrzymane ze względu na konserwację. Wrócimy wkrótce.",
+                "action": "Spróbuj ponownie"
+            },
+            "closed": {
+                "title": "Zbieranie danych zakończone",
+                "message": "To badanie jest już zamknięte. Uczestnictwo nie jest już możliwe.",
+                "action": "Wróć do strony głównej"
+            }
+        }
+    },
+    "layout": {
+        "title": "Open-Q",
+        "preparing": "Przygotowywanie sesji badania...",
+        "pilot_mode": "Tryb pilotażowy: zmiany są tymczasowe i dane nie zostaną zapisane",
+        "default_study_title": "Badanie metodologią Q",
+        "loading_content": "Ładowanie treści badania...",
+        "change_lang_title": "Zmień język",
+        "steps": {
+            "welcome": "Powitanie",
+            "consent": "Prywatność i zgoda",
+            "rough": "Pierwsze wrażenia",
+            "fine": "Sortowanie Q",
+            "post": "Pytania końcowe"
+        },
+        "mobile_step": "Krok",
+        "navigation": "Nawigacja",
+        "language": "Polski"
+    },
+    "study": {
+        "help": {
+            "title": "Pomoc i informacje",
+            "trigger": "Pomoc",
+            "what": "Co prosimy zrobić",
+            "why": "Dlaczego to ważne",
+            "step_welcome": {
+                "what": "Proszę przeczytać cele badania oraz szczegółowe instrukcje dotyczące uczestnictwa.",
+                "why": "Poza standardową zgodą etyczną konieczne jest zrozumienie „warunku instrukcji”: precyzyjnego punktu widzenia lub scenariusza, który przyjmuje Pan/Pani przy ocenie stwierdzeń. Ma to znaczenie dla trafności danych."
+            },
+            "step_presort": {
+                "what": "Proszę podać informacje ogólne, które pomogą scharakteryzować profil uczestnika.",
+                "why": "Ten kontekst pozwala zespołowi badawczemu analizować, w jaki sposób odmienne punkty widzenia (czynniki) mogą — lub nie — korelować z określonymi zmiennymi demograficznymi lub zawodowymi wewnątrz grupy uczestników."
+            },
+            "step_rough": {
+                "what": "Proszę podzielić zestaw stwierdzeń na trzy wstępne stosy na podstawie pierwszego wrażenia.",
+                "why": "Ten krok przygotowawczy ma na celu zmniejszenie obciążenia poznawczego; pozwala zapoznać się z pełnym zakresem tematu (zbiorem Q) przed bardziej wymagającym zadaniem porównawczego rangowania."
+            },
+            "step_fine": {
+                "what": "Proszę umieścić stwierdzenia na siatce, rangując je względem siebie — od tych, z którymi Pan/Pani najbardziej się zgadza (po prawej), do tych, z którymi najbardziej się nie zgadza (po lewej). Pomocne może być rozpoczęcie od skrajności.",
+                "why": "Struktura siatki narzuca „wymuszony rozkład”, który uniemożliwia ocenę wszystkiego jako równie ważnego; zmusza do dokonywania kompromisów, modelując w ten sposób względne znaczenie każdej idei w indywidualnym systemie przekonań."
+            },
+            "step_post": {
+                "what": "Proszę potwierdzić układ siatki i dodać komentarze wyjaśniające najbardziej znaczące wybory.",
+                "why": "Jakościowe wyjaśnienia są niezbędne do walidacji analizy statystycznej; pomagają badaczom interpretować dane zgodnie z logiką uczestnika, zamiast narzucać własne założenia na jego wybory."
+            }
+        },
+        "steps": {
+            "presort": "Ankieta wstępna",
+            "rough": "Sortowanie wstępne",
+            "fine": "Umiejscowienie na siatce",
+            "post": "Etap po sortowaniu"
+        }
+    },
+    "welcome": {
+        "start": "Rozpocznij",
+        "consent": {
+            "label": "Potwierdzam, że zapoznałem/am się z powyższymi informacjami i wyrażam zgodę na przetwarzanie moich danych na potrzeby tego badania.",
+            "error": "Proszę zaakceptować warunki, aby kontynuować."
+        },
+        "reset_confirm": "Czy na pewno chcesz rozpocząć nową sesję? Spowoduje to usunięcie bieżącego postępu.",
+        "restart": "Rozpocznij nową sesję",
+        "preview_title": "Podgląd",
+        "conducted_by": "Prowadzone przez",
+        "how_it_works": "Przebieg",
+        "objective_label": "Cel badania",
+        "instructions_label": "Przebieg",
+        "default_instructions": "1. **Poznajmy się:** Na początku zostanie zadanych kilka krótkich pytań wstępnych.\n2. **Pierwsze wrażenia:** Proszę przeczytać różne stwierdzenia i wstępnie posortować je według własnego punktu widzenia: czy raczej się Pan/Pani z nimi zgadza, jest neutralny/a, czy też się nie zgadza.\n3. **Twoja perspektywa:** Na etapie sortowania proszę umieścić stwierdzenia na siatce, aby doprecyzować swój punkt widzenia. Proszę posortować i uszeregować stwierdzenia od „najbardziej zgadzam się” do „najbardziej nie zgadzam się”, umieszczając każde stwierdzenie w odpowiednim polu.\n4. **Dlaczego:** Przed zakończeniem sesji zostanie zadanych kilka pytań wyjaśniających, które pomogą nam lepiej zrozumieć najbardziej znaczące wybory.",
+        "steps": {
+            "profile": {
+                "title": "Poznajmy się",
+                "description": "Na początku zostanie zadanych kilka krótkich pytań wstępnych."
+            },
+            "rough": {
+                "title": "Pierwsze wrażenia",
+                "description": "Proszę przeczytać różne stwierdzenia i wstępnie posortować je według własnego punktu widzenia: czy raczej się Pan/Pani z nimi zgadza, jest neutralny/a, czy też się nie zgadza. Ułatwi to kolejne zadanie."
+            },
+            "fine": {
+                "title": "Twoja perspektywa",
+                "description": "Na etapie sortowania proszę umieścić stwierdzenia na siatce, aby doprecyzować swój punkt widzenia. Proszę posortować i uszeregować stwierdzenia od „najbardziej zgadzam się” do „najbardziej nie zgadzam się”, umieszczając każde stwierdzenie w odpowiednim polu. Nie ma odpowiedzi prawidłowych ani błędnych. Najlepsza odpowiedź to ta, która odzwierciedla opinię lub przekonania uczestnika."
+            },
+            "post": {
+                "title": "Dlaczego",
+                "description": "Przed zakończeniem sesji zostanie zadanych kilka pytań wyjaśniających, które pomogą nam lepiej zrozumieć najbardziej znaczące wybory, a także kilka pytań dotyczących Pana/Pani tła."
+            }
+        }
+    },
+    "consent": {
+        "title": "Świadoma zgoda i umowa o przetwarzaniu danych",
+        "subtitle": "Proszę uważnie przeczytać poniższe informacje.",
+        "record_error": "Nie udało się zapisać zgody. Można kontynuować.",
+        "default_text": "1. Charakter badania i zrozumienie uczestnika. Rozumie Pan/Pani, że ćwiczenie to wykorzystuje metodologię Q — technikę badawczą zaprojektowaną do modelowania subiektywnych punktów widzenia. Zadanie polega na sortowaniu stwierdzeń według ich znaczenia względem osobistej perspektywy uczestnika; w związku z tym nie istnieją obiektywnie „prawidłowe” ani „błędne” odpowiedzi.\n\n2. Przetwarzanie danych i pseudonimizacja (zgodność z RODO).\n\nDe-identyfikacja i okres przechowywania: Ten techniczny proces zapewnia, że cyfrowy ślad uczestnika nie może zostać użyty do jego ponownej identyfikacji po zakończeniu sesji.\n\nWyjątek dotyczący badania uzupełniającego: jeśli uczestnik dobrowolnie poda dane kontaktowe na końcu badania w celu kontaktu uzupełniającego, powiązanie między tożsamością (e-mail) a odpowiedzią będzie utrzymywane wyłącznie przez czas trwania tej konkretnej fazy uzupełniającej.\n\nRaportowanie: ostateczne wyniki zostaną przedstawione w formie zanonimizowanej. Dane zostaną zagregowane w celu ujawnienia wspólnych perspektyw społecznych (czynników). Komentarze jakościowe mogą być cytowane w celu kontekstualizacji tych czynników, ale zostaną sprawdzone pod kątem usunięcia ujawniających szczegółów.\n\n3. Dobrowolne uczestnictwo i prawo do wycofania się. Uczestnik zachowuje prawo do przerwania procesu sortowania i zamknięcia przeglądarki w dowolnym momencie przed przesłaniem danych bez żadnych konsekwencji.\n\nPrzed przesłaniem: jeśli uczestnik wycofa się przed sfinalizowaniem sortowania, żadne częściowe dane nie zostaną zachowane.\n\nPo przesłaniu: ze względu na statystyczny charakter metodologii Q (analiza czynnikowa), po przesłaniu i zagregowaniu danych w zbiorze danych indywidualne wycofanie może nie być możliwe.\n\n4. Przechowywanie danych i prawa"
+    },
+    "presort": {
+        "title": "Zanim zaczniemy",
+        "description": "Proszę odpowiedzieć na kilka pytań, które pomogą nam zlokalizować Pana/Pani punkt widzenia.",
+        "submit": "Przejdź do sortowania",
+        "select_placeholder": "Wybierz...",
+        "error_required": "Proszę odpowiedzieć na to pytanie."
+    },
+    "rough": {
+        "header": {
+            "subtitle": "Przesuń **w lewo**, aby nie zgadzać się, **w prawo**, aby zgadzać się, lub **w dół**, aby być neutralnym.",
+            "hint": "To jest spontaniczne. Można zmienić zdanie od razu po."
+        },
+        "tip": {
+            "close": "Zamknij wskazówkę"
+        },
+        "complete": {
+            "title": "Pierwszy krok ukończony",
+            "subtitle": "Teraz doprecyzujemy niuanse.",
+            "button": "Przejdź do sortowania szczegółowego"
+        },
+        "instructions": {
+            "desktop_tip": "Przeciągnij, naciśnij lub użyj klawiatury ( ← ↓ → ), aby sortować"
+        },
+        "progress_label": "Postęp sortowania zgrubnego: {{percent}}% ukończone"
+    },
+    "fine": {
+        "deck": {
+            "title": "Dostępne stwierdzenia",
+            "all_placed": "Wszystkie stwierdzenia w tym stosie są posortowane"
+        },
+        "toolbar": {
+            "preview": "Stwierdzenie",
+            "zoom_in": "Powiększ",
+            "zoom_out": "Pomniejsz",
+            "fit_screen": "Dopasuj do ekranu",
+            "label": "Sterowanie siatką"
+        },
+        "grid": {
+            "label": "Siatka sortowania Q",
+            "column": "Kolumna",
+            "slot": "Miejsce",
+            "in_column": "W kolumnie"
+        },
+        "legend": {
+            "disagree": "Najbardziej nie zgadzam się",
+            "neutral": "Neutralnie",
+            "agree": "Najbardziej zgadzam się",
+            "label": "Legenda siatki"
+        },
+        "actions": {
+            "validate": "Potwierdź sortowanie",
+            "finish": "Zakończ sortowanie",
+            "ready": "Przejrzyj zestawienie",
+            "not_ready": "Umieść wszystkie stwierdzenia, aby kontynuować"
+        },
+        "header": {
+            "title": "Umieść stwierdzenia na siatce",
+            "instruction_label": "Instrukcja",
+            "expand_instructions": "Rozwiń instrukcje",
+            "minimize_instructions": "Zwiń instrukcje"
+        },
+        "workbench": {
+            "active_card": "Aktywne stwierdzenie",
+            "place_on_grid": "Dotkniąć siatki, aby umieścić",
+            "drag_or_tap": "Przeciągnij na siatkę lub dotknięcie miejsca",
+            "initial_instruction": "Dotkniąć (lub przeciągnąć) stwierdzenie",
+            "initial_instruction_mobile": "Dotkniąć stwierdzenie",
+            "cancel_selection": "Anuluj wybór",
+            "help": "Jak to działa?",
+            "previous_tip": "Poprzednia wskazówka",
+            "next_tip": "Następna wskazówka",
+            "go_to_tip": "Przejdź do wskazówki {{number}}",
+            "methodology": {
+                "extremes": "Wskazówka: zacznij od tego, co jest najbardziej oczywiste (skrajności).",
+                "vertical": "W tej samej kolumnie kolejność od góry do dołu nie ma znaczenia.",
+                "constraint": "Trzeba dopasować wszystko! To może być jak układanka, ale właśnie w ten sposób ustalamy priorytety wyborów.",
+                "relative": "Przypomnienie: elementy są sortowane względem siebie (względna zgoda).",
+                "zoom": "Można swobodnie powiększać różne części siatki, aby lepiej widzieć.",
+                "flexibility": "Nic nie jest ostateczne: można w dowolnym momencie przenosić karty lub odkładać je z powrotem do stosu."
+            }
+        }
+    },
+    "post": {
+        "title": "Twoja perspektywa i opinia",
+        "description": "Prawie gotowe! Komentarze dotyczące najbardziej znaczących stwierdzeń są kluczowe dla naszej analizy.",
+        "step2_title": "Prawie gotowe!",
+        "step2_description": "Proszę odpowiedzieć na te ostatnie pytania, aby ukończyć badanie.",
+        "extreme": {
+            "title": "Kluczowe wybory",
+            "why": "Dlaczego zdecydował/a się Pan/Pani umieścić to stwierdzenie w tym miejscu? Jakie ma ono dla Pana/Pani znaczenie?",
+            "placeholder": "Np. konkretne zdarzenie, mocne przekonanie lub szczególne słowo w stwierdzeniu...",
+            "min_chars": "Kilka słów wystarczy, aby pomóc nam zrozumieć kontekst.",
+            "label_agree": "Najsilniejsza zgoda",
+            "label_disagree": "Najsilniejszy sprzeciw",
+            "label_neutral": "Neutralnie",
+            "missing_statement": "Brakujące stwierdzenie",
+            "general_comment": "Komentarz ogólny"
+        },
+        "optional": {
+            "title": "Czy któreś stwierdzenia wydały się Panu/Pani szczególnie zaskakujące, niejasne lub mylące? Jeśli tak, dlaczego?",
+            "description": "Można również dodać komentarze do innych stwierdzeń, jeśli chce Pan/Pani bliżej wyjaśnić swoje wybory.",
+            "select_placeholder": "Wybierz stwierdzenie do skomentowania...",
+            "placeholder": "Komentarz tutaj..."
+        },
+        "submit": "Podziel się swoją perspektywą",
+        "validation_error": "Proszę wypełnić wszystkie wymagane pola.",
+        "text_audio_info": "W przypadku pytań tekstowych i dźwiękowych można odpowiedzieć tekstem, nagraniem audio lub obydwoma.",
+        "text_audio_required": "Kilka słów lub nagranie audio pomoże nam zrozumieć Pana/Pani punkt widzenia.",
+        "success": {
+            "title": "Dziękujemy za uczestnictwo!",
+            "message": "Pana/Pani wkład w badanie został zapisany.",
+            "id_label": "Kod potwierdzenia",
+            "share": {
+                "title": "Podziel się z innymi",
+                "copy_link": "Skopiuj link",
+                "copy_success": "Link skopiowany!",
+                "message": "Właśnie wziąłem/wzięłam udział w tym badaniu: „{{title}}”. Może to zainteresować i innych. Można do niego przejść tutaj:",
+                "email": "E-mail",
+                "email_subject": "Weź udział w tym badaniu: {{title}}",
+                "native": "Udostępnij"
+            }
+        },
+        "submit_error": {
+            "title": "Wysyłanie nie powiodło się",
+            "message": "Proszę sprawdzić połączenie i spróbować ponownie."
+        },
+        "score": "Wynik",
+        "back": "Wróć do sortowania",
+        "contact": {
+            "title": "Wyniki i kontakt",
+            "email_label": "Adres e-mail (opcjonalnie)",
+            "email_placeholder": "Przykład@email.com",
+            "interview_consent": "Zgadzam się na kontakt ze strony badacza w celu dalszego badania.",
+            "newsletter_consent": "Chcę być informowany/a o wynikach badania.",
+            "gdpr_note": "Adres e-mail nigdy nie będzie publicznie udostępniany. Jego podanie zapewnia pseudonimizację: dane pozostają możliwe do zidentyfikowania wyłącznie na potrzeby badań przez badacza.",
+            "pseudonymization_note": "Zgoda na kontakt oznacza, że badacz może powiązać Pana/Pani perspektywę z adresem e-mail (pseudonimizacja) na potrzeby tej konkretnej fazy uzupełniającej.",
+            "error_invalid_email": "Proszę podać prawidłowy adres e-mail"
+        },
+        "audio": {
+            "info": "Dla każdego pytania można odpowiedzieć tekstem, nagraniem audio lub obydwoma.",
+            "section_label": "Odpowiedź audio (opcjonalnie)"
+        }
+    },
+    "audio": {
+        "record_prompt": "Nagraj odpowiedź audio, jeśli wolisz",
+        "recording": "Nagrywanie...",
+        "recorded": "Nagrano",
+        "playing": "Odtwarzanie...",
+        "uploading": "Przesyłanie...",
+        "ready": "Gotowe do nagrywania",
+        "start_recording": "Rozpocznij nagrywanie",
+        "stop_recording": "Zatrzymaj",
+        "pause": "Pauza",
+        "play": "Odtwórz",
+        "delete": "Usuń",
+        "deleted": "Audio usunięte",
+        "delete_failed": "Nie udało się usunąć nagrania. Spróbuj ponownie.",
+        "file_size": "Rozmiar pliku",
+        "upload_success": "Audio przesłane pomyślnie",
+        "upload_failed": "Przesyłanie nie powiodło się. Proszę spróbować ponownie.",
+        "upload_cancelled": "Nagrywanie anulowane",
+        "recording_error": "Błąd nagrywania — proszę spróbować ponownie",
+        "invalid_recording": "Nagrywanie nie powiodło się — nie przechwycono danych audio",
+        "permission_denied": "Odmówiono dostępu do mikrofonu",
+        "unsupported": "Nagrywanie audio nie jest obsługiwane w tej przeglądarce.",
+        "permission_revoked": "Utracono dostęp do mikrofonu — nagrywanie zatrzymane",
+        "refresh_failed": "Nie udało się odświeżyć audio. Nagranie jest nadal zapisane.",
+        "refreshing": "Odświeżanie audio...",
+        "playback_failed": "Nie udało się odtworzyć audio. Proszę odświeżyć stronę i spróbować ponownie.",
+        "error": {
+            "no_token": "Brak tokenu sesji",
+            "quota_exceeded": "Przekroczono limit miejsca. Proszę usunąć istniejące nagranie lub zamiast tego użyć tekstu.",
+            "file_too_large": "Plik nagrania jest zbyt duży. Proszę spróbować krótszego nagrania.",
+            "server_error": "Błąd serwera. Proszę spróbować ponownie za chwilę.",
+            "upload_in_progress": "Proszę poczekać na zakończenie przesyłania audio.",
+            "security": "Nagrywanie zablokowane przez ustawienia zabezpieczeń przeglądarki",
+            "invalid_state": "Nagrywanie napotkało błąd wewnętrzny"
+        },
+        "fallback": {
+            "toast": "Audio zostało wyłączone z powodu powtarzających się błędów. Proszę używać tekstu.",
+            "banner_title": "Audio niedostępne",
+            "banner_description": "Nagrywanie audio napotkało powtarzające się błędy. Można kontynuować z odpowiedziami tekstowymi.",
+            "try_again": "Spróbuj ponownie",
+            "inline": "Audio tymczasowo niedostępne."
+        },
+        "permission_denied_with_guidance": "Odmówiono dostępu do mikrofonu. Proszę sprawdzić ustawienia przeglądarki, aby zezwolić na dostęp do mikrofonu, a następnie spróbować ponownie.",
+        "retry_upload": "Prześlij ponownie",
+        "space_shortcut": "lub naciśnij Spację",
+        "waveform": {
+            "recording": "Fala dźwiękowa — nagrywanie w toku",
+            "playing": "Fala dźwiękowa — odtwarzanie nagrania"
+        }
+    },
+    "resume": {
+        "continue_later": "Kontynuuj później",
+        "copy_link": "Skopiuj link",
+        "copy_failed": "Nie można skopiować. Proszę ręcznie wybrać link.",
+        "link_copied": "Link skopiowany!",
+        "instruction": "Aby kontynuować na innym urządzeniu, proszę zapisać ten link:",
+        "instruction_same_browser": "Jeśli wróci Pan/Pani w tej samej przeglądarce, postęp zostanie zapisany automatycznie.",
+        "instruction_detail": "Proszę zachować ten link w tajemnicy. Daje on dostęp do sesji.",
+        "resume_url": "URL wznowienia",
+        "saving": "Zapisywanie...",
+        "saved": "Zapisano",
+        "save_failed": "Nie zapisano",
+        "loading": "Przywracanie sesji...",
+        "restored": "Witamy z powrotem! Postęp został przywrócony.",
+        "welcome_back": "Witamy z powrotem! Postęp został przywrócony.",
+        "not_found": "Ten link jest już nieważny. Jeśli badanie nie zostało ukończone, proszę skontaktować się z badaczem w celu uzyskania nowego linku.",
+        "already_completed": "Odpowiedzi zostały już przesłane. Dziękujemy za uczestnictwo!",
+        "study_closed": "To badanie nie przyjmuje już odpowiedzi. Proszę skontaktować się z badaczem, jeśli mają Państwo pytania.",
+        "rate_limited": "Zbyt wiele prób. Proszę chwilę poczekać i spróbować ponownie.",
+        "error": "Coś poszło nie tak podczas przywracania sesji. Proszę spróbować ponownie.",
+        "share": "Wyślij do siebie",
+        "share_title": "Moja sesja badania",
+        "go_to_study": "Rozpocznij nową sesję"
+    },
+    "landing": {
+        "page_title": "Dostęp do badania Qualis",
+        "instruction": "Wpisz kod badania, aby rozpocząć.",
+        "study_code_label": "Kod badania",
+        "study_code_placeholder": "np. moje-badanie",
+        "go_to_study": "Przejdź do badania",
+        "resetting_session": "Resetowanie sesji badania…"
+    },
+    "erasure": {
+        "section_title": "Prawo do usunięcia danych (art. 17 RODO)",
+        "section_intro": "Można w każdej chwili zażądać usunięcia danych osobowych. Anonimowe rankingi stwierdzeń zostaną zachowane jako dane badawcze; wszystko, co mogłoby Pana/Panią zidentyfikować, zostanie usunięte.",
+        "button": "Zażądaj usunięcia moich danych",
+        "confirm_title": "Usunąć dane osobowe?",
+        "confirm_what_erased": "Następujące dane zostaną trwale usunięte: wszelkie adresy IP zarejestrowane w sesji, identyfikator przeglądarki, pisemne odpowiedzi (przed i po sortowaniu) oraz wszelkie nagrane nagrania audio.",
+        "confirm_what_kept": "Rankingi stwierdzeń zostaną zachowane jako anonimowe dane badawcze. Nie są już z Panem/Panią powiązane.",
+        "confirm_irreversible": "Działanie jest natychmiastowe i nieodwracalne.",
+        "confirm_action": "Tak, usuń moje dane",
+        "confirm_in_progress": "Usuwanie…",
+        "success": "Dane osobowe zostały usunięte. Anonimowe rankingi sortowania Q pozostają w badaniu.",
+        "error": "Nie udało się przetworzyć żądania. Proszę spróbować ponownie lub skontaktować się z badaczem.",
+        "already_erased": "Dane osobowe zostały już usunięte dla tej sesji."
+    },
+    "footer": {
+        "powered_by": "Powered by Qualis",
+        "license": "AGPLv3",
+        "github_aria": "Wyświetl kod źródłowy na GitHub"
+    },
+    "errors": {
+        "member_limit_reached": "Osiągnięto limit członków projektu.",
+        "owner_project_limit_reached": "Nie można posiadać więcej projektów.",
+        "owner_role_immutable": "Rola właściciela może być przypisana wyłącznie podczas tworzenia projektu.",
+        "access_denied_title": "Odmowa dostępu",
+        "access_denied_description": "Brak uprawnień do wykonania tej czynności.",
+        "rate_limited_title": "Zbyt wiele żądań",
+        "rate_limited_description": "Proszę chwilę poczekać przed ponowną próbą.",
+        "conflict_title": "Konflikt",
+        "conflict_description": "Zasób został zmodyfikowany lub już istnieje."
+    }
+}
