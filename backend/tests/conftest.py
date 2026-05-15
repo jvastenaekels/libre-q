@@ -381,6 +381,45 @@ async def totp_user(db: AsyncSession) -> User:
 
 
 @pytest_asyncio.fixture
+async def superuser(db: AsyncSession) -> User:
+    """An active superuser with TOTP enabled (password: 'super-pw').
+
+    Distinct email from ``regular_user``/``totp_user`` so it never collides.
+    2FA is enabled so this user can itself be a promotion target if needed
+    and so it satisfies any future "superuser must have 2FA" invariant."""
+    hashed = get_password_hash("super-pw")
+    user = User(
+        email="super@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_active=True,
+        is_superuser=True,
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified here
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def superuser_token(superuser: User) -> str:
+    """Bearer token (string, no header dict) for ``superuser``.
+    Generated via the production ``create_access_token`` helper so ``iat`` is
+    populated correctly and the token behaves exactly like one minted by the
+    live /api/token login path."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=superuser.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
 def auth_token_factory():
     """Create JWT token for a user."""
     from datetime import timedelta
