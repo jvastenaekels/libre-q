@@ -275,6 +275,39 @@ describe('useMemoSection', () => {
         expect(createSpy).toHaveBeenCalledWith(blob);
     });
 
+    it('exportMemo shows an error toast when the download fails', async () => {
+        const admin = await import('@/api/admin');
+        const generated = await import('@/api/generated');
+        const { toast } = await import('sonner');
+        (
+            generated.getConcourseMemoApiAdminConcoursesCidMemoGet as ReturnType<typeof vi.fn>
+        ).mockResolvedValue({ parent_type: 'concourse', parent_id: 1, entries: [] });
+        (
+            generated.getTemplatesApiAdminMemoTemplatesGet as ReturnType<typeof vi.fn>
+        ).mockResolvedValue([]);
+        (admin.AdminService.exportConcourseMemo as ReturnType<typeof vi.fn>).mockRejectedValue(
+            new Error('network down')
+        );
+        const createSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
+
+        const { result } = renderHook(() =>
+            useMemoSection({
+                parentType: 'concourse',
+                parentId: 1,
+                currentUserId: 1,
+                projectMembers: [],
+            })
+        );
+        await waitFor(() => expect(result.current.entries).toEqual([]));
+
+        await act(async () => {
+            await result.current.exportMemo();
+        });
+
+        expect(toast.error).toHaveBeenCalled();
+        expect(createSpy).not.toHaveBeenCalled();
+    });
+
     it('markSeen bumps localStorage and clears unread', async () => {
         const api = await import('@/api/generated');
         // Comment timestamp is in the past (before "now") but after epoch — so it's

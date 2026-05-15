@@ -164,3 +164,79 @@ class TestRenderMarkdown:
             parent_title="My Concourse",
         )
         assert "resolved by Cara Cole" in md
+
+    async def test_comments_nest_under_their_own_entry(self, db: AsyncSession):
+        c = await self._mk_concourse(db)
+        user = await self._mk_user(db, "n@x.io", "Nel Nest")
+        e1 = await MemoService.add_entry(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            title="Alpha",
+            body="a",
+            position=10,
+            user_id=user.id,
+        )
+        e2 = await MemoService.add_entry(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            title="Beta",
+            body="b",
+            position=20,
+            user_id=user.id,
+        )
+        await MemoService.add_comment(
+            db, entry_id=e1.id, user_id=user.id, body="alpha-comment", mentions=[]
+        )
+        await MemoService.add_comment(
+            db, entry_id=e2.id, user_id=user.id, body="beta-comment", mentions=[]
+        )
+        md = await MemoService.render_markdown(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            parent_title="My Concourse",
+        )
+        # Each comment must sit after its own entry heading and before the next.
+        alpha_h = md.index("## Alpha")
+        beta_h = md.index("## Beta")
+        assert alpha_h < md.index("alpha-comment") < beta_h
+        assert beta_h < md.index("beta-comment")
+
+    async def test_last_edited_by_marker_only_when_different(self, db: AsyncSession):
+        c = await self._mk_concourse(db)
+        author = await self._mk_user(db, "auth@x.io", "Orig Author")
+        editor = await self._mk_user(db, "edit@x.io", "Other Editor")
+        same = await MemoService.add_entry(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            title="Untouched",
+            body="x",
+            position=10,
+            user_id=author.id,
+        )
+        edited = await MemoService.add_entry(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            title="Edited",
+            body="y",
+            position=20,
+            user_id=author.id,
+        )
+        await MemoService.update_entry(
+            db, entry_id=edited.id, user_id=editor.id, body="y2"
+        )
+        md = await MemoService.render_markdown(
+            db,
+            parent_type=MemoParentType.concourse,
+            parent_id=c.id,
+            parent_title="My Concourse",
+        )
+        assert "last edited by Other Editor" in md
+        # The untouched entry (created_by == last_edited_by) carries no marker.
+        untouched_block = md.split("## Untouched")[1].split("## Edited")[0]
+        assert "last edited by" not in untouched_block
+        assert same.created_by == same.last_edited_by
