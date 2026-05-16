@@ -25,7 +25,6 @@ import {
     getCoreRowModel,
     getSortedRowModel,
     getPaginationRowModel,
-    createColumnHelper,
     type SortingState,
 } from '@tanstack/react-table';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -61,8 +60,6 @@ import {
     PAGE_SIZE,
 } from '@/components/admin/dashboard/InteractiveDataView.columns';
 
-const columnHelper = createColumnHelper<DumpParticipant>();
-
 export interface UseInteractiveDataViewParams {
     slug: string;
     initialParticipants?: ParticipantRead[];
@@ -72,6 +69,10 @@ export interface UseInteractiveDataViewResult {
     status: { isLoading: boolean; error: unknown; hasData: boolean };
     data: DumpResponse;
     table: ReturnType<typeof useReactTable<DumpParticipant>>;
+    columns: ReturnType<typeof buildColumns>;
+    pagination: { pageIndex: number; pageSize: number };
+    liveParticipants: DumpParticipant[];
+    submittedParticipants: DumpParticipant[];
     stepLabels: ReturnType<typeof getStepLabels>;
     currentLocale: Locale;
     metrics: {
@@ -107,6 +108,7 @@ export interface UseInteractiveDataViewResult {
         handleViewParticipant: (participant: DumpParticipant) => void;
         runExport: (exportFn: () => Promise<void>) => Promise<void>;
         exportNewsletterList: () => void;
+        downloadBlob: (blob: Blob, filename: string) => void;
         isExportLoading: boolean;
     };
 }
@@ -389,6 +391,10 @@ export function useInteractiveDataView({
         status: { isLoading, error, hasData: Boolean(rawData) },
         data,
         table,
+        columns,
+        pagination,
+        liveParticipants,
+        submittedParticipants,
         stepLabels,
         currentLocale,
         metrics: {
@@ -424,6 +430,7 @@ export function useInteractiveDataView({
             handleViewParticipant,
             runExport,
             exportNewsletterList,
+            downloadBlob,
             isExportLoading,
         },
     };
