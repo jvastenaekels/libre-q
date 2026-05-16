@@ -623,6 +623,13 @@ Add `import type { ParticipantRead } from '@/api/model';` to the test file impor
 Run: `cd frontend && npx vitest run src/hooks/admin/useInteractiveDataView.test.ts`
 Expected: PASS — 6 tests across 6 `describe` blocks. If `filteredParticipants` assertions are brittle against the react-table internal API, assert on `metrics.completedCount` / `liveCount` only (already included) and drop the `getFilteredRowModel` line.
 
+- [ ] **Step 2b: Lint/format the test file (mandatory — prevents a red `make ci` at Task 4)**
+
+Adding the tests clears the previously-unused `act` import, but the file also carries a Biome **format** violation (the multi-line `renderHook(() => …, { wrapper: AllTheProviders })` call) that adding more tests reusing the same pattern only multiplies. Normalize it now:
+
+Run: `cd frontend && npx @biomejs/biome check --write src/hooks/admin/useInteractiveDataView.test.ts && npx @biomejs/biome check src/hooks/admin/useInteractiveDataView.test.ts`
+Expected: first command rewrites formatting in place; second reports **0 errors, 0 warnings** for the file (no `noUnusedImports`, no format diff). Then re-run Step 2's vitest command to confirm the formatting rewrite did not break any test (still 6 PASS).
+
 - [ ] **Step 3: Commit**
 
 ```bash
