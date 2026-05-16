@@ -5,6 +5,8 @@ import type {
     StudyTranslationRead,
     StudyTranslationCreate,
 } from '@/api/model';
+import type { PreSortField, PreSortFieldOption } from '@/schemas/study';
+import { presortFields, postsortConfig } from '@/utils/studyConfig';
 import { produce } from 'immer';
 
 /**
@@ -46,8 +48,7 @@ export interface StudyDesignerState {
     setSyncStatus: (status: 'synced' | 'saving' | 'error' | 'modified') => void;
     setLastSavedAt: (date: Date) => void;
     updateOriginal: (study: StudyRead) => void;
-    // biome-ignore lint/suspicious/noExplicitAny: flexible study configuration import
-    importConfig: (config: any) => void;
+    importConfig: (config: unknown) => void;
 }
 
 /**
@@ -102,24 +103,22 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
 /**
  * Deeply strips internal fields AND sorts keys to ensure deterministic JSON stringification.
  */
-// biome-ignore lint/suspicious/noExplicitAny: generic object cleaner
-function stripInternalFields(obj: any): any {
+function stripInternalFields<T>(obj: T): T {
     if (Array.isArray(obj)) {
-        return obj.map(stripInternalFields);
+        return obj.map(stripInternalFields) as unknown as T;
     }
     if (obj !== null && typeof obj === 'object') {
-        // biome-ignore lint/suspicious/noExplicitAny: generic object construction
-        const newObj: any = {};
+        const newObj: Record<string, unknown> = {};
         // Sort keys to ensure deterministic order
-        const sortedKeys = Object.keys(obj).sort();
+        const sortedKeys = Object.keys(obj as Record<string, unknown>).sort();
 
         for (const key of sortedKeys) {
             // Skip underscore-prefixed fields and last_updated_at (changes on every save)
             if (!key.startsWith('_') && key !== 'last_updated_at') {
-                newObj[key] = stripInternalFields(obj[key]);
+                newObj[key] = stripInternalFields((obj as Record<string, unknown>)[key]);
             }
         }
-        return newObj;
+        return newObj as unknown as T;
     }
     return obj;
 }
@@ -129,8 +128,7 @@ function stripInternalFields(obj: any): any {
  * or partially populated object to a fully populated localized object.
  */
 function normalizeLocalizedField(
-    // biome-ignore lint/suspicious/noExplicitAny: can be string or object
-    field: any,
+    field: unknown,
     availableLanguages: string[],
     defaultLang = 'en'
 ): Record<string, string> {
@@ -141,10 +139,11 @@ function normalizeLocalizedField(
         return result;
     }
     if (field && typeof field === 'object') {
-        const sourceVal = field[defaultLang] || Object.values(field)[0] || '';
+        const localized = field as Record<string, string>;
+        const sourceVal = localized[defaultLang] || (Object.values(localized)[0] ?? '') || '';
         const result: Record<string, string> = {};
         for (const lang of availableLanguages) {
-            result[lang] = field[lang] || sourceVal;
+            result[lang] = localized[lang] || sourceVal;
         }
         return result;
     }
@@ -156,12 +155,10 @@ function normalizeLocalizedField(
 
 /** Normalize a single question option (string or object form). */
 function normalizeOption(
-    // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
-    opt: any,
+    opt: PreSortFieldOption,
     availableLanguages: string[],
     defaultLang: string
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic option shape
-): any {
+): PreSortFieldOption {
     if (typeof opt === 'string') {
         return {
             label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
@@ -179,8 +176,7 @@ function normalizeOption(
 
 /** Normalize the label / placeholder / options of a single question. */
 function normalizeQuestion(
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic question shape
-    q: any,
+    q: PreSortField,
     availableLanguages: string[],
     defaultLang: string
 ): void {
@@ -189,23 +185,22 @@ function normalizeQuestion(
         q.placeholder = normalizeLocalizedField(q.placeholder, availableLanguages, defaultLang);
     }
     if (Array.isArray(q.options)) {
-        q.options = q.options.map(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic option shape
-            (opt: any) => normalizeOption(opt, availableLanguages, defaultLang)
+        q.options = q.options.map((opt: PreSortFieldOption) =>
+            normalizeOption(opt, availableLanguages, defaultLang)
         );
     }
 }
 
 /** Iterate a question-id keyed map and normalize each entry. */
 function normalizeQuestionMap(
-    // biome-ignore lint/suspicious/noExplicitAny: legacy map of questions
-    questions: Record<string, any> | undefined,
+    questions: Record<string, PreSortField> | undefined,
     availableLanguages: string[],
     defaultLang: string
 ): void {
     if (!questions) return;
     for (const qId in questions) {
-        normalizeQuestion(questions[qId], availableLanguages, defaultLang);
+        const q = questions[qId];
+        if (q) normalizeQuestion(q, availableLanguages, defaultLang);
     }
 }
 
@@ -226,19 +221,16 @@ function normalizeStudyData(draft: StudyUpdate) {
         if (!('enabled' in draft.presort_config)) {
             draft.presort_config = {
                 enabled: true,
-                // biome-ignore lint/suspicious/noExplicitAny: legacy migration
-                fields: draft.presort_config as any,
+                fields: draft.presort_config as Record<string, PreSortField>,
             };
         }
-        // biome-ignore lint/suspicious/noExplicitAny: legacy migration
-        const fields = (draft.presort_config as any).fields;
+        const fields = presortFields(draft);
         normalizeQuestionMap(fields, availableLanguages, defaultLang);
     }
 
     // --- Normalize Post-Sort ---
     if (draft.postsort_config) {
-        // biome-ignore lint/suspicious/noExplicitAny: config traversal
-        const questions = (draft.postsort_config as any).questions;
+        const questions = postsortConfig(draft)?.questions;
         normalizeQuestionMap(questions, availableLanguages, defaultLang);
     }
 }
@@ -329,12 +321,12 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     setSyncStatus: (status) => set({ syncStatus: status }),
     setLastSavedAt: (date) => set({ lastSavedAt: date }),
     updateOriginal: (study) => set({ original: study }),
-    // biome-ignore lint/suspicious/noExplicitAny: flexible study configuration import
-    importConfig: (config: any) =>
+    importConfig: (config: unknown) =>
         set(
             produce((state: StudyDesignerState) => {
                 if (!state.draft) return;
-                const studyData = config.study || config; // wrapped or unwrapped
+                const raw = config as Record<string, unknown>;
+                const studyData = (raw.study ?? config) as Record<string, unknown>; // wrapped or unwrapped
                 applyImportedSimpleFields(state.draft, studyData);
                 applyImportedStructuralFields(state.draft, studyData);
                 applyImportedMergedConfigs(state.draft, studyData);
@@ -345,8 +337,8 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
         ),
 }));
 
-// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
-function applyImportedSimpleFields(draft: StudyUpdate, studyData: any): void {
+function applyImportedSimpleFields(draft: StudyUpdate, studyData: Record<string, unknown>): void {
+    const partial = studyData as Partial<StudyUpdate>;
     const keys = [
         'default_language',
         'show_statement_codes',
@@ -356,42 +348,48 @@ function applyImportedSimpleFields(draft: StudyUpdate, studyData: any): void {
         'distribution_mode',
     ] as const;
     for (const key of keys) {
-        if (studyData[key] !== undefined) {
-            draft[key] = studyData[key];
+        if (partial[key] !== undefined) {
+            // Correlated write: partial[key] has the exact type for draft[key]
+            // (both are Partial<StudyUpdate>); cast to never resolves the union.
+            (draft[key] as StudyUpdate[typeof key]) = partial[key] as StudyUpdate[typeof key];
         }
     }
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
-function applyImportedStructuralFields(draft: StudyUpdate, studyData: any): void {
-    if (studyData.grid_config) draft.grid_config = studyData.grid_config;
-    if (studyData.statements) draft.statements = studyData.statements;
+function applyImportedStructuralFields(
+    draft: StudyUpdate,
+    studyData: Record<string, unknown>
+): void {
+    if (studyData.grid_config)
+        draft.grid_config = studyData.grid_config as StudyUpdate['grid_config'];
+    if (studyData.statements) draft.statements = studyData.statements as StudyUpdate['statements'];
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
-function applyImportedMergedConfigs(draft: StudyUpdate, studyData: any): void {
+function applyImportedMergedConfigs(draft: StudyUpdate, studyData: Record<string, unknown>): void {
     if (studyData.branding) {
-        draft.branding = { ...(draft.branding || {}), ...studyData.branding };
+        draft.branding = {
+            ...(draft.branding || {}),
+            ...(studyData.branding as StudyUpdate['branding']),
+        };
     }
     if (studyData.presort_config) {
         draft.presort_config = {
             ...(draft.presort_config || {}),
-            ...studyData.presort_config,
+            ...(studyData.presort_config as Record<string, unknown>),
         };
     }
     if (studyData.postsort_config) {
         draft.postsort_config = {
             ...(draft.postsort_config || {}),
-            ...studyData.postsort_config,
+            ...(studyData.postsort_config as Record<string, unknown>),
         };
     }
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: imported config has dynamic shape
-function applyImportedTranslations(draft: StudyUpdate, studyData: any): void {
+function applyImportedTranslations(draft: StudyUpdate, studyData: Record<string, unknown>): void {
     if (!Array.isArray(studyData.translations)) return;
     if (!draft.translations) draft.translations = [];
-    for (const tIn of studyData.translations) {
+    for (const tIn of studyData.translations as StudyTranslationCreate[]) {
         const existingIdx = draft.translations.findIndex(
             (tr) => tr.language_code === tIn.language_code
         );
