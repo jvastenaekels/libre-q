@@ -119,16 +119,27 @@ via `renderHook` (Phase 5 G convention):
 6. `effectiveParticipants` fallback — `rawData` absent + `initialParticipants`
    provided → correct mapping shape.
 
-Existing `InteractiveDataView` `*.test.tsx` files stay in place as
-hook+JSX integration tests (anti-regression net during extraction).
+**Anti-regression net (corrected at planning time).** No full-render
+`InteractiveDataView.*.test.tsx` exists — only
+`InteractiveDataView.helpers.test.ts` (filter helpers, already extracted to
+`InteractiveDataView.helpers.ts`, well covered). The net for this wave is:
+`InteractiveDataView.helpers.test.ts` (unchanged) + the new hook unit tests +
+TypeScript strict + the sole consumer `pages/admin/DataExportsPage.tsx` still
+compiling/rendering + `make ci-fast`. A full hook+JSX integration test is
+explicitly a future item (consistent with the `useRecruitmentPage` precedent,
+whose own docstring records the same deliberate gap), not this wave.
 
 ## Risks
 
 - **Hook order.** `useReactTable` must remain after `columns` /
   `filteredParticipants`. Moving the whole block into the hook preserves order.
-- **Filter / sort / pagination regression.** Covered by the existing
-  integration `*.test.tsx` plus `make ci-fast`. Run admin E2E only if
-  `ci-fast` passes (this touches admin-flow code).
+- **Filter / sort / pagination regression.** Filter logic is covered by the
+  unchanged `InteractiveDataView.helpers.test.ts`; the hook's *composition* of
+  those helpers is covered by the new hook tests; structural breakage is caught
+  by TypeScript strict and by the sole consumer `DataExportsPage.tsx`. Plus
+  `make ci-fast`. Run admin E2E only if `ci-fast` passes (touches admin-flow
+  code). The absence of a full-render integration test is a known, accepted
+  gap (see Anti-regression net above), not introduced by this wave.
 
 ## Definition of done
 
