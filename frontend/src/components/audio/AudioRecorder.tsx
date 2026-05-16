@@ -26,14 +26,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = (props) => {
         upload: { retry: retryUpload, delete: deleteRecording },
         waveform: { audioLevels },
         dom: { containerRef },
-        ui: {
-            formatTime,
-            maxDurationSeconds,
-            disabled,
-            existingRecording,
-            playbackRetryRef,
-            audioPlayerRef,
-        },
+        ui: { formatTime, maxDurationSeconds, disabled, existingRecording },
     } = useAudioRecorder(props);
 
     return (
@@ -105,14 +98,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = (props) => {
                     <div className="flex flex-wrap items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
                         <button
                             type="button"
-                            onClick={
-                                state === 'playing'
-                                    ? pausePlayback
-                                    : () => {
-                                          playbackRetryRef.current = false;
-                                          playRecording();
-                                      }
-                            }
+                            onClick={state === 'playing' ? pausePlayback : playRecording}
                             aria-label={
                                 state === 'playing'
                                     ? t('audio.pause', 'Pause')
@@ -169,12 +155,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = (props) => {
                                 <button
                                     type="button"
                                     key={speed}
-                                    onClick={() => {
-                                        setPlaybackSpeed(speed);
-                                        if (audioPlayerRef.current && state === 'playing') {
-                                            audioPlayerRef.current.playbackRate = speed;
-                                        }
-                                    }}
+                                    onClick={() => setPlaybackSpeed(speed)}
                                     className={`px-2 py-1 text-xs font-medium transition-colors ${
                                         playbackSpeed === speed
                                             ? 'bg-slate-100 text-slate-800'
