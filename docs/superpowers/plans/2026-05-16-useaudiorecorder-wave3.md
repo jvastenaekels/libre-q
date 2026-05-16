@@ -4,7 +4,7 @@
 
 **Goal:** Reduce `frontend/src/components/audio/AudioRecorder.tsx` (946 LOC) to a declarative JSX shell by relocating the entire media-recording/playback/waveform lifecycle verbatim into `frontend/src/hooks/participant/useAudioRecorder.ts`, with identical media-resource cleanup on every path (no behaviour change).
 
-**Architecture:** Phase-5-G hook extraction with a documented boundary exception — imperative-resource refs move into the hook (they ARE the lifecycle it owns); only the JSX-bound `containerRef` stays. The module-level cleanup helpers (`clearIntervalRef` etc.) and the shared `RecorderState`/`AudioRecorderProps` types co-locate in the hook file to avoid a hook→component import cycle (Wave-1 `.columns` precedent); the component imports them back from the hook. Behaviour preservation is structural: the existing 948-LOC `AudioRecorder.test.tsx` stays green unchanged (the cardinal cleanup-correctness oracle) + `tsc -b` + `npm run build`.
+**Architecture:** Phase-5-G hook extraction with a documented boundary exception — imperative-resource refs move into the hook (they ARE the lifecycle it owns). `containerRef` also moves into the hook and is *returned* by it (the keyboard-shortcut effect reads it); the component declares no ref and merely binds the hook-returned `containerRef` onto its root `<div>`. The module-level cleanup helpers (`clearIntervalRef` etc.) and the shared `RecorderState`/`AudioRecorderProps` types co-locate in the hook file to avoid a hook→component import cycle (Wave-1 `.columns` precedent); the component imports them back from the hook. Behaviour preservation is structural: the existing 948-LOC `AudioRecorder.test.tsx` stays green unchanged (the cardinal cleanup-correctness oracle) + `tsc -b` + `npm run build`.
 
 **Tech Stack:** React 19, TypeScript (strict via `tsc -b`/Biome), MediaRecorder/getUserMedia/AudioContext Web APIs, Vitest + @testing-library/react `renderHook`.
 
@@ -121,11 +121,12 @@ Create `frontend/src/hooks/participant/useAudioRecorder.ts` with this exact scaf
  * AudioRecorder renders JSX from this hook's return value.
  *
  * Boundary exception (Phase-5-G refined, documented): imperative-resource
- * refs live here because they ARE the lifecycle; only the JSX-bound
- * containerRef stays in the component.
+ * refs live here because they ARE the lifecycle. containerRef also lives
+ * here (the keyboard-shortcut effect depends on it) and is returned via
+ * `dom`; the component declares no ref and only binds the returned one.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 // ⟶ MOVE: carry over every other import AudioRecorder.tsx uses for the
@@ -186,6 +187,7 @@ export interface UseAudioRecorderResult {
         seek: (pos: number) => void;
     };
     waveform: { audioLevels: number[] };
+    dom: { containerRef: RefObject<HTMLDivElement> };
 }
 
 export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderResult {
@@ -202,14 +204,16 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
     //     references `_questionKey`, destructure `const { questionKey:
     //     _questionKey, maxDurationSeconds, onRecordingComplete, … } =
     //     props;`).
-    //   - DO NOT move `containerRef` (AudioRecorder.tsx:115,
-    //     `useRef<HTMLDivElement>(null)`) — it stays in the component.
-    //     Any moved line referencing `containerRef` must instead be
-    //     reached via the return (if the lifecycle needs the DOM node,
-    //     expose nothing new — verify no moved logic actually uses
-    //     containerRef; the waveform is state-driven via audioLevels, so
-    //     it should not. If a moved line DOES use containerRef, STOP and
-    //     report — the boundary needs re-examination).
+    //   - `containerRef` (AudioRecorder.tsx:115,
+    //     `const containerRef = useRef<HTMLDivElement>(null);`) **moves
+    //     into the hook with the rest of the state/ref block** (corrected
+    //     boundary: the keyboard-shortcut useEffect at ~256-285 reads
+    //     `containerRef.current?.contains(event.target)`, so the ref is
+    //     hook-owned lifecycle state). The moved keyboard effect uses
+    //     `containerRef` exactly as-is — no change. Expose it via the
+    //     `dom: { containerRef }` return group (below); the component will
+    //     bind it onto its root `<div>` in Task 2. Do NOT also redeclare a
+    //     containerRef in the component.
     //
     //   NO other logic edits. The moved code's behaviour must be identical.
 
@@ -221,6 +225,7 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
             playbackPosition, play: playRecording, pause: pausePlayback,
             seek: seekPlayback },
         waveform: { audioLevels },
+        dom: { containerRef },
     };
 }
 ```
@@ -272,8 +277,10 @@ In `AudioRecorder.tsx`:
 - Replace the local `type RecorderState` and `interface AudioRecorderProps`
   declarations with: `import { useAudioRecorder, type RecorderState, type AudioRecorderProps } from '@/hooks/participant/useAudioRecorder';`
 - Replace the entire span from the state/ref block (line 88) through the
-  last line before `return (` (743) with: keep ONLY
-  `const containerRef = useRef<HTMLDivElement>(null);` and
+  last line before `return (` (743) with **only** the hook call below.
+  The component declares **no `useRef`** — `containerRef` comes from the
+  hook's `dom` group (the JSX `<div ref={containerRef}>` binding is
+  unchanged; only the ref's source moves to the hook return):
   ```ts
   const {
       status: { state, uploadStatus, isAtMaxDuration },
@@ -283,6 +290,7 @@ In `AudioRecorder.tsx`:
           playbackPosition, play: playRecording, pause: pausePlayback,
           seek: seekPlayback },
       waveform: { audioLevels },
+      dom: { containerRef },
   } = useAudioRecorder(props);
   ```
   where `props` is the component's destructured-then-reassembled props, OR
@@ -415,7 +423,7 @@ Expected: `AudioRecorder.test.tsx` byte-identical to `main` (exit 0) AND full su
 - [ ] **Step 3: Shell shrank; scope discipline**
 
 Run: `wc -l < frontend/src/components/audio/AudioRecorder.tsx && git diff main...HEAD --name-only`
-Expected: `AudioRecorder.tsx` decreased by ≥600 lines from 946 (now a JSX shell + `containerRef`). Changed files = the spec/plan docs + `useAudioRecorder.ts` + `useAudioRecorder.test.ts` + `AudioRecorder.tsx` ONLY. `Step1_Feedback.tsx`/`Step2_Questionnaire.tsx` NOT in the diff. No other wave's files.
+Expected: `AudioRecorder.tsx` decreased by ≥600 lines from 946 (now a pure JSX shell that binds the hook-returned `containerRef`, declaring no `useRef`). Changed files = the spec/plan docs + `useAudioRecorder.ts` + `useAudioRecorder.test.ts` + `AudioRecorder.tsx` ONLY. `Step1_Feedback.tsx`/`Step2_Questionnaire.tsx` NOT in the diff. No other wave's files.
 
 - [ ] **Step 4: No `any`, no new suppressions**
 
@@ -438,7 +446,7 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 ## Self-Review
 
 **Spec coverage:**
-- Resource-refs→hook documented exception; only `containerRef` stays → Task 1 Step 3 (explicit MOVE/keep boundary). ✓
+- Resource-refs→hook documented exception; `containerRef` also moves into the hook and is returned via `dom` (corrected: keyboard-shortcut effect depends on it); component binds the returned ref, declares none → Task 1 Step 3 + Task 2 Step 1. ✓
 - Helpers + `RecorderState`/`AudioRecorderProps` co-located in hook to avoid cycle → Task 1 Step 3, imported back in Task 2 Step 1. ✓
 - Verbatim relocation, behaviour-identical wiring only → Task 1 Step 3 constraints + "NO other logic edits". ✓
 - Hook API role-grouped, `any`-free, controls stable → `UseAudioRecorderResult` interface (Task 1 Step 3). ✓
@@ -451,4 +459,4 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 **Type consistency:** `UseAudioRecorderResult` field names in Task 1 match the Task 2 destructure exactly (`status`/`recording`/`playback`/`waveform`). The handler-name caveat is explicit in Task 1 Step 3 (map 1:1 to the real moved identifiers; do not invent) and re-stated in Task 2 Step 1 (adjust destructure aliases to the JSX, never edit JSX). `RecorderState`/`AudioRecorderProps` exported from the hook, imported by the component.
 
-**Open note for the reviewer:** the one judgement risk is the verbatim move of ~650 LOC of imperative media + cleanup. The plan's defence is structural: `AudioRecorder.test.tsx` is the 948-LOC behaviour oracle and Task 2 Step 5 enforces it is byte-unchanged via `git diff --exit-code`. If a moved line references `containerRef` (it should not — waveform is state-driven), Task 1 Step 3 mandates STOP rather than improvise the boundary. Spec-reviewer should independently confirm zero moved-line references to `containerRef` and that no cleanup path was dropped/duplicated.
+**Open note for the reviewer:** the one judgement risk is the verbatim move of ~650 LOC of imperative media + cleanup. The plan's defence is structural: `AudioRecorder.test.tsx` is the 948-LOC behaviour oracle and Task 2 Step 5 enforces it is byte-unchanged via `git diff --exit-code` (it includes 4 Space-key keyboard-shortcut tests that exercise the moved `containerRef`-scoped effect). Boundary correction made during execution: `containerRef` moves into the hook and is returned via the `dom` group (the keyboard-shortcut effect at ~256-285 reads `containerRef.current?.contains(...)`); the component binds the returned ref and declares no `useRef`. Spec-reviewer should confirm the keyboard-shortcut effect moved intact with `containerRef`, the ref is created once in the hook and returned, the component binds it without redeclaring, and no cleanup path was dropped/duplicated.

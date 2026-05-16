@@ -60,9 +60,19 @@ fracture cleanup correctness — explicitly rejected.
   stream/track stop, `AudioContext.close()`, `cancelAnimationFrame`,
   `clearInterval` (timer + permission-check), `URL.revokeObjectURL`.
 
-**Stays in `AudioRecorder.tsx`:** the ~200 LOC of JSX, and `containerRef`
-only (the sole genuine `HTMLDivElement` JSX ref). The waveform is
-state-driven (`audioLevels` updated via rAF) — no canvas ref.
+- `containerRef` (`useRef<HTMLDivElement>(null)`) **also moves into the
+  hook** and is **returned** by it. Rationale (corrected at planning time):
+  the keyboard-shortcut `useEffect` — part of the lifecycle — reads
+  `containerRef.current?.contains(event.target)` to scope the Space-key
+  start/stop to this recorder's container. The ref is therefore lifecycle
+  state the hook owns; the component merely binds the hook-returned ref onto
+  its root `<div>`. This is the idiomatic "hook needs a DOM node" pattern and
+  keeps lifecycle ownership whole (the brainstorm's principle). The waveform
+  is state-driven (`audioLevels` via rAF) — no canvas ref.
+
+**Stays in `AudioRecorder.tsx`:** only the ~200 LOC of JSX. It binds the
+hook-returned `containerRef` (`ref={containerRef}`) — it does **not** declare
+any `useRef` itself.
 
 ## Hook API
 
@@ -80,12 +90,15 @@ with an explicit `any`-free interface (precedent: Wave-1
   playback:  { audioUrl, urlExpiresAt, playbackSpeed, setPlaybackSpeed,
                playbackPosition, play, pause, seek },
   waveform:  { audioLevels },
+  dom:       { containerRef },   // hook-created RefObject<HTMLDivElement>;
+                                 // the component binds it onto its root <div>
 }
 ```
 
 All controls are stable `useCallback`s. The ~16 resource refs are
-hook-internal, never exposed. `containerRef` is NOT in the return — it stays a
-component `useRef` bound to JSX.
+hook-internal, never exposed. `containerRef` **is** in the return (`dom`
+group) because the hook's keyboard-shortcut effect depends on it; the
+component binds it but declares no ref of its own.
 
 ## Testing
 
@@ -115,8 +128,9 @@ Behaviour preservation is structural, not new-test-driven:
   remain on the **component shell** only — never inside the hook.
 - `cd frontend && npx vitest run` → full suite green;
   **`AudioRecorder.test.tsx` unchanged and green** + ≥5 new hook tests.
-- `AudioRecorder.tsx` reduced to JSX shell + `containerRef` (~735 logic LOC
-  moved out; expect a ≥600-line decrease).
+- `AudioRecorder.tsx` reduced to a pure JSX shell that binds the
+  hook-returned `containerRef` and declares no `useRef` of its own (~735
+  logic LOC moved out; expect a ≥600-line decrease).
 - Consumers `Step1_Feedback.tsx` / `Step2_Questionnaire.tsx` untouched and
   still type-checking; `AudioRecorderProps` interface unchanged.
 - No behaviour change: identical media cleanup on every path (record, stop,
