@@ -318,7 +318,17 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 In `QSortEditor.tsx`:
 - Add `import { useQSortEditor, type UseQSortEditorResult } from '@/hooks/admin/useQSortEditor';` and import `QSortEditorProps` from the hook if it now owns it (otherwise keep the local interface and pass it to the hook generic — pick whichever keeps types single-sourced and cycle-free; the hook exporting `QSortEditorProps` and the component importing it back is the precedent, W3).
-- Replace the span from `const { t } = useTranslation();` (309) through the last line before `return (` (699) with a single destructured `useQSortEditor(props)` call. Change the component signature to `(props: QSortEditorProps)` and pass `props` straight through; destructure the hook's grouped return into the EXACT identifiers the JSX below already uses (do NOT edit the JSX — alias to it). Bind `sensors` from `dnd` onto the existing `<DndContext sensors={sensors}>`.
+- Replace the span from `const { t } = useTranslation();` (309) through the last line before `return (` (699) with the hook call **plus the re-applied null-guard** (the hook returns `UseQSortEditorResult | null` because the verbatim `if (!draft) return null;` moved into it — directly destructuring a `… | null` fails `tsc -b`). Change the component signature to `(props: QSortEditorProps)` and pass `props` straight through. The replacement is **exactly**:
+  ```tsx
+  const editor = useQSortEditor(props);
+  if (!editor) return null;
+  const { data, bulk, editing, dialogs, actions, dnd } = editor;
+  // then alias the group members to the EXACT identifiers the JSX below
+  // already uses (do NOT edit the JSX — alias to it), e.g.
+  // const { t, draft, grid, statements, … } = data; const { bulkText,
+  // setBulkText, … } = bulk; … etc. — map 1:1 to the hook's typed groups.
+  ```
+  The `if (!editor) return null;` MUST sit here — logically **before** the JSX `return (` — exactly mirroring the parent's `if (!draft) return null;` (was line ~443, before JSX at 699): same condition, same point, behaviour-identical. Do NOT relocate the guard elsewhere or change when null is produced. Bind `sensors` from `dnd` onto the existing `<DndContext sensors={sensors}>` unchanged; bind `handleStatementDragEnd` from `dnd` and keep `SortableContext` items keyed by `s.code` and row textContent stable (T1-oracle dnd test depends on real `arrayMove` + `.code` keying — a behaviour-preserving rewire keeps these; do not alter them).
 - Delete the now-orphaned moved local types (if they were moved to the hook). Keep `SortableStatementItem` (95–300) exactly as-is.
 
 - [ ] **Step 2: Handle the pre-existing complexity suppression**
