@@ -64,10 +64,16 @@ state, derived data, effects and callbacks into
 early-returns (now driven by the hook flags). No DOM `useRef` exists in this
 component (verified) — no boundary edge case.
 
-**Out of scope (deliberate scope control):** the module-level sub-components
-already extracted from the main body (`ParticipantCell`, `CollapsibleSection`,
-`buildColumns`, helpers `getDisplayStatus` / `parseUA`) are NOT moved to sibling
-files. No behaviour, style, or i18n change. No react-table redesign.
+**Accepted exception (decided at planning time).** `buildColumns`,
+`ParticipantCell`, `getDisplayStatus`, the icon maps and the duration/page
+constants currently live at module level *inside* `InteractiveDataView.tsx`.
+The hook needs `buildColumns`; importing it from the component would create a
+hook → component import cycle. They are therefore moved **verbatim** into a new
+sibling `InteractiveDataView.columns.ts`. This is a forced, minimal,
+behaviour-preserving move — strictly narrower than gratuitous restructuring,
+and the only sub-component relocation permitted. `CollapsibleSection` and the
+JSX-only pieces stay in the component. No behaviour, style, or i18n change. No
+react-table redesign.
 
 **Single opportunistic typing win:** `dateLocales: Record<string, any>`
 (current lines 882–883, carrying a `biome-ignore lint/suspicious/noExplicitAny`)
@@ -152,7 +158,8 @@ whose own docstring records the same deliberate gap), not this wave.
 
 ## Non-goals
 
-- Moving in-file sub-components to sibling files.
+- Moving in-file sub-components to sibling files *beyond* the accepted
+  cycle-breaking exception (`InteractiveDataView.columns.ts`) above.
 - Any behaviour, style, or i18n change.
 - react-table redesign.
 - Touching `GridSort` or `StudyLayout` (audit false positives).
