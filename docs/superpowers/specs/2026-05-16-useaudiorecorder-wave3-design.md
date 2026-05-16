@@ -76,29 +76,37 @@ any `useRef` itself.
 
 ## Hook API
 
-`useAudioRecorder(props)` accepts the behaviour-driving subset of the existing
-`AudioRecorderProps` (`onRecordingComplete`, `maxDurationSeconds`, existing
-recording url/expiry, `disabled`, the upload handler — exact field set fixed
-during planning against the real interface). Returns a role-grouped object
+`useAudioRecorder(props: AudioRecorderProps)` returns a role-grouped object
 with an explicit `any`-free interface (precedent: Wave-1
-`UseInteractiveDataViewResult`):
+`UseInteractiveDataViewResult`). **The shape exposes exactly what the source
+defines and the JSX consumes — no fabricated handlers** (corrected during
+implementation: the recorder has no pause/resume/seek and no
+`isAtMaxDuration` variable — auto-stop is internal, the "near max" hint is an
+inline JSX computation; a `ui` group carries the JSX-shell support
+identifiers the moved body owns):
 
 ```ts
 {
-  status:    { state, uploadStatus, isAtMaxDuration },
-  recording: { start, stop, pause, resume, duration },
+  status:    { state, uploadStatus },
+  recording: { duration, start, stop },
   playback:  { audioUrl, urlExpiresAt, playbackSpeed, setPlaybackSpeed,
-               playbackPosition, play, pause, seek },
+               playbackPosition, play, pause },
+  upload:    { retry, delete },
   waveform:  { audioLevels },
-  dom:       { containerRef },   // hook-created RefObject<HTMLDivElement>;
+  dom:       { containerRef },   // hook-created RefObject<HTMLDivElement|null>;
                                  // the component binds it onto its root <div>
+  ui:        { formatTime, maxDurationSeconds, disabled, existingRecording,
+               playbackRetryRef, audioPlayerRef },  // JSX-shell support only
 }
 ```
 
-All controls are stable `useCallback`s. The ~16 resource refs are
-hook-internal, never exposed. `containerRef` **is** in the return (`dom`
-group) because the hook's keyboard-shortcut effect depends on it; the
-component binds it but declares no ref of its own.
+Controls are stable `useCallback`s. The remaining ~16 resource refs are
+hook-internal, never exposed. `containerRef` is returned (`dom`) because the
+hook's keyboard-shortcut effect depends on it; the component binds it and
+declares no ref of its own. The `ui` group exists because the JSX shell still
+references those moved-body identifiers directly — exposing them verbatim is
+required for the Task-2 rewire to be zero-behaviour-change with the oracle
+test byte-unchanged.
 
 ## Testing
 

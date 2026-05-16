@@ -167,14 +167,11 @@ export interface UseAudioRecorderResult {
     status: {
         state: RecorderState;
         uploadStatus: 'idle' | 'uploading' | 'success' | 'failed';
-        isAtMaxDuration: boolean;
     };
     recording: {
         duration: number;
         start: () => void | Promise<void>;
         stop: () => void;
-        pause: () => void;
-        resume: () => void;
     };
     playback: {
         audioUrl: string | null;
@@ -184,18 +181,35 @@ export interface UseAudioRecorderResult {
         playbackPosition: number;
         play: () => void | Promise<void>;
         pause: () => void;
-        seek: (pos: number) => void;
+    };
+    upload: {
+        retry: () => Promise<void>;
+        delete: () => Promise<void>;
     };
     waveform: { audioLevels: number[] };
-    dom: { containerRef: RefObject<HTMLDivElement> };
+    dom: { containerRef: RefObject<HTMLDivElement | null> };
+    // JSX-shell support: identifiers the moved body owns that the
+    // component's JSX still references directly. Exposes ONLY what exists
+    // — no fabricated pause/resume/seek/isAtMaxDuration (they are not in
+    // the source: there is no pause/resume/seek handler; the "near max"
+    // hint is an inline JSX computation; auto-stop is internal).
+    ui: {
+        formatTime: (seconds: number) => string;
+        maxDurationSeconds: number;
+        disabled: boolean;
+        existingRecording: AudioRecorderProps['existingRecording'];
+        playbackRetryRef: MutableRef<boolean>;
+        audioPlayerRef: RefObject<HTMLAudioElement | null>;
+    };
 }
 
 export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderResult {
     // ⟶ MOVE verbatim: the entire component body from the state/ref block
     //   (AudioRecorder.tsx:88) through the LAST line before `return (` at
     //   743 — all useState, all resource useRef, durationRef/startTimeRef,
-    //   every useEffect/useCallback, the start/stop/pause/resume/play/seek
-    //   handlers, waveform rAF loop, upload, and EVERY cleanup path.
+    //   every useEffect/useCallback, the recorder/playback/upload/delete
+    //   handlers that actually exist, waveform rAF loop, formatTime, and
+    //   EVERY cleanup path.
     //
     //   Wiring changes ALLOWED (behaviour-identical only):
     //   - destructure `props` instead of the component's prop params
@@ -218,13 +232,14 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
     //   NO other logic edits. The moved code's behaviour must be identical.
 
     return {
-        status: { state, uploadStatus, isAtMaxDuration },
-        recording: { duration, start: startRecording, stop: stopRecording,
-            pause: pauseRecording, resume: resumeRecording },
+        status: { state, uploadStatus },
+        recording: { duration, start: startRecording, stop: stopRecording },
         playback: { audioUrl, urlExpiresAt, playbackSpeed, setPlaybackSpeed,
-            playbackPosition, play: playRecording, pause: pausePlayback,
-            seek: seekPlayback },
+            playbackPosition, play: playRecording, pause: pausePlayback },
+        upload: { retry: retryUpload, delete: deleteRecording },
         waveform: { audioLevels },
+        ui: { formatTime, maxDurationSeconds, disabled, existingRecording,
+            playbackRetryRef, audioPlayerRef },
         dom: { containerRef },
     };
 }
@@ -283,16 +298,24 @@ In `AudioRecorder.tsx`:
   unchanged; only the ref's source moves to the hook return):
   ```ts
   const {
-      status: { state, uploadStatus, isAtMaxDuration },
-      recording: { duration, start: startRecording, stop: stopRecording,
-          pause: pauseRecording, resume: resumeRecording },
+      status: { state, uploadStatus },
+      recording: { duration, start: startRecording, stop: stopRecording },
       playback: { audioUrl, urlExpiresAt, playbackSpeed, setPlaybackSpeed,
-          playbackPosition, play: playRecording, pause: pausePlayback,
-          seek: seekPlayback },
+          playbackPosition, play: playRecording, pause: pausePlayback },
+      upload: { retry: retryUpload, delete: deleteRecording },
       waveform: { audioLevels },
       dom: { containerRef },
+      ui: { formatTime, maxDurationSeconds, disabled, existingRecording,
+          playbackRetryRef, audioPlayerRef },
   } = useAudioRecorder(props);
   ```
+  Note: the destructure aliases above must map 1:1 to whatever identifiers
+  the JSX (lines 743–946) already uses (`retryUpload`, `deleteRecording`,
+  `formatTime`, `containerRef`, `audioPlayerRef`, `playbackRetryRef`,
+  `maxDurationSeconds`, `disabled`, `existingRecording`, plus
+  state/playback names). Do NOT edit the JSX — adjust the alias to the JSX.
+  `props` here is the component's `AudioRecorderProps` param passed straight
+  through (`useAudioRecorder(props)`).
   where `props` is the component's destructured-then-reassembled props, OR
   change the component signature to `(props: AudioRecorderProps)` and pass
   `props` straight through, then read fields from the destructured hook
