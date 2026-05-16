@@ -308,10 +308,12 @@ describe('useAudioRecorder — play() wrapper', () => {
         ).toHaveLength(1);
         expect(result.current.status.state).toBe('playing');
 
-        // Act 2: second play() from the playing state — play() resets the guard
-        // (which the internal onerror path may have set to true) and calls
-        // playRecording again regardless, constructing a second Audio element.
-        // This directly asserts the contract: play() always re-attempts.
+        // Act 2: second play() from the playing state. play() unconditionally
+        // clears playbackRetryRef then calls playRecording, constructing a
+        // second Audio element. (The internal onerror path is not driven at
+        // unit level — sessionToken is unset — so the guard is never actually
+        // true here; the second Audio construction is the real proof that
+        // play() always re-attempts regardless of guard state.)
         await act(async () => {
             await result.current.playback.play();
         });
