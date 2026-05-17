@@ -104,6 +104,9 @@
         }
     },
     "admin": {
+        "smtp_banner": {
+            "manual": "Email delivery not configured — recovery links are generated manually from Admin → Users."
+        },
         "hub": {
             "title": "Researcher Hub",
             "welcome": "Welcome back,",
