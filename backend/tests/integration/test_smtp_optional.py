@@ -6,6 +6,8 @@ import pytest
 
 from app.core.config import settings
 
+from tests.conftest import TEST_PASSWORD
+
 
 @pytest.mark.asyncio
 class TestPublicConfig:
@@ -103,3 +105,48 @@ class TestRecoveryLink:
             data={"username": test_user.email, "password": "testpassword"},
         )
         assert login.status_code == 200
+
+
+@pytest.mark.asyncio
+class TestEmail2FAEnrolmentGuard:
+    async def test_email_channel_rejected_without_smtp(
+        self, client, test_user, monkeypatch
+    ):
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+        login = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        access = login.json()["access_token"]
+        r = await client.post(
+            "/api/me/2fa/enable",
+            headers={"Authorization": f"Bearer {access}"},
+            json={"channel": "email"},
+        )
+        assert r.status_code == 400
+        # The errors middleware reshapes HTTPException(detail=...) into the
+        # StandardError envelope: the string lands in ["message"], not
+        # ["detail"] (documented house convention — see
+        # test_admin_user_guards.py module docstring).
+        assert r.json()["message"] == "email_2fa_unavailable"
+
+    async def test_email_channel_allowed_with_smtp(
+        self, client, test_user, monkeypatch
+    ):
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pw")
+        login = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        access = login.json()["access_token"]
+        r = await client.post(
+            "/api/me/2fa/enable",
+            headers={"Authorization": f"Bearer {access}"},
+            json={"channel": "email"},
+        )
+        assert r.status_code == 200
+        assert r.json()["status"] == "enabled"

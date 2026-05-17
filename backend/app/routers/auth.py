@@ -619,6 +619,11 @@ async def enable_totp(
             )
 
     # channel == "email"
+    if not settings.is_smtp_configured:
+        raise HTTPException(
+            status_code=400,
+            detail="email_2fa_unavailable",
+        )
     try:
         current_user.is_totp_enabled = True
         current_user.totp_channel = "email"
