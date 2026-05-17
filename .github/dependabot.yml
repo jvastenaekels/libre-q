@@ -32,6 +32,20 @@ updates:
     labels:
       - "dependencies"
       - "frontend"
+    # Major bumps for these are breaking-API migrations, not routine
+    # upgrades — their auto-PRs failed CI and were closed (PRs #130,
+    # #136, #137, #138). Block the major line so Dependabot stops
+    # recreating them; minor/patch still flow. Remove the relevant
+    # entry when doing the dedicated migration for that package.
+    ignore:
+      - dependency-name: "zod"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "zustand"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-zoom-pan-pinch"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
