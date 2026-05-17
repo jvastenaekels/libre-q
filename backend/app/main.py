@@ -111,6 +111,11 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Development environment detected.")
 
+    from app.utils.smtp_mode import smtp_mode_banner_lines
+
+    for line in smtp_mode_banner_lines(smtp_configured=settings.is_smtp_configured):
+        logger.warning(line)
+
     yield
 
 
