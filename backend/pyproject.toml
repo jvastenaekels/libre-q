@@ -151,6 +151,7 @@ module = [
     "app.schemas.audio",
     "app.schemas.auth",
     "app.schemas.common",
+    "app.schemas.config",
     "app.schemas.concourses",
     "app.schemas.participants",
     "app.schemas.projects",
@@ -246,6 +247,7 @@ module = [
     "app.routers.audio",
     "app.routers.admin.recruitment",
     "app.routers.admin.users",
+    "app.routers.config",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true

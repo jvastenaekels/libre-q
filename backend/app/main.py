@@ -26,6 +26,7 @@ from app.middleware.errors import (
 from app.middleware.log_scrub import install_access_log_scrub
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import audio, auth, logs, participants, submissions
+from app.routers import config as config_router
 from app.routers.admin import concourses as admin_concourses
 from app.routers.admin import analysis as admin_analysis
 from app.routers.admin import exports as admin_exports
@@ -197,6 +198,7 @@ app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]
 )
 app.include_router(logs.router, prefix="/api", tags=["logs"])
+app.include_router(config_router.router, prefix="/api", tags=["config"])
 app.include_router(audio.router)
 
 # Include test router (only active in test/dev environments)

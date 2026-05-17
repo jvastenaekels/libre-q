@@ -40,6 +40,7 @@ from .auth import (
     TwoFAEnableRequest,
 )
 from .common import PaginatedResponse, QuotaInfo
+from .config import PublicConfig
 from .participants import (
     ConsentInput,
     ConsentResponse,
@@ -167,6 +168,8 @@ __all__ = [
     # common
     "PaginatedResponse",
     "QuotaInfo",
+    # config
+    "PublicConfig",
     # participants
     "ConsentInput",
     "ConsentResponse",
