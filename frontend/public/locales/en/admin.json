@@ -48,6 +48,7 @@
             "request_body": "Enter your email and we'll send a reset link.",
             "request_submit": "Send reset link",
             "request_success": "If the email exists, a reset link is on its way.",
+            "request_success_manual": "Email delivery is not configured on this instance. Contact your administrator to obtain a reset link.",
             "confirm_title": "Choose a new password",
             "confirm_submit": "Reset password",
             "success_redirect": "Password updated. You can now sign in with your new password.",
