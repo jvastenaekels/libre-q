@@ -94,6 +94,8 @@ from .studies import (
 from .users import (
     PasswordChange,
     PasswordConfirm,
+    RecoveryLinkRequest,
+    RecoveryLinkResponse,
     UserAdminUpdate,
     UserBase,
     UserCreate,
@@ -237,6 +239,8 @@ __all__ = [
     # users
     "PasswordChange",
     "PasswordConfirm",
+    "RecoveryLinkRequest",
+    "RecoveryLinkResponse",
     "UserAdminUpdate",
     "UserBase",
     "UserCreate",

@@ -21,8 +21,9 @@ foot-guns:
    working second factor; without it, the promotion is refused so the
    operator fixes the prerequisite first.
 
-The verb actions (force_password_reset, reset_totp) live here too so the
-router stays a thin HTTP layer.
+The verb actions (force_password_reset, reset_totp) and the
+side-effect-free ``mint_password_reset_link`` live here too so the router
+stays a thin HTTP layer.
 
 CONTRACT (at-least-one-active-superuser floor). The floor guarantee in
 rule 2 holds *only* if the endpoint runs ``assert_can_*`` + the flag
@@ -154,6 +155,29 @@ async def force_password_reset(*, db: AsyncSession, target: User) -> None:
     url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
     await db.commit()
     send_password_reset(target.email, url)
+
+
+def mint_password_reset_link(*, target: User) -> tuple[str, datetime]:
+    """Mint a fresh password-reset link for ``target`` WITHOUT rotating
+    the password.
+
+    This is the SMTP-optional in-product path: a superuser obtains the
+    same link the user would receive by email and delivers it out of
+    band. Distinct from ``force_password_reset`` (which rotates the
+    password and locks the account). Nothing is persisted — the JWT is
+    stateless and self-expiring; the ``pwa`` claim still gives single-use
+    semantics via the existing confirm-time check.
+    """
+    expires = timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS)
+    token = create_email_token(
+        email=target.email,
+        purpose="password_reset",
+        expires_delta=expires,
+        password_changed_at=target.password_changed_at,
+    )
+    url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+    expires_at = datetime.now(timezone.utc) + expires
+    return url, expires_at
 
 
 async def reset_totp(*, db: AsyncSession, target: User) -> None:

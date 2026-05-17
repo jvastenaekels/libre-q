@@ -11,13 +11,19 @@ from ...dependencies import PaginationParams, check_superuser
 from ...limiter import limiter
 from ...models import User
 from ...schemas.common import PaginatedResponse
-from ...schemas.users import UserAdminUpdate, UserReadAdmin
+from ...schemas.users import (
+    RecoveryLinkRequest,
+    RecoveryLinkResponse,
+    UserAdminUpdate,
+    UserReadAdmin,
+)
 from ...services.admin_user_service import (
     AdminUserError,
     assert_can_deactivate,
     assert_can_demote_superuser,
     assert_can_promote_superuser,
     force_password_reset,
+    mint_password_reset_link,
     reset_totp,
 )
 from ...utils.audit import log_admin_action
@@ -177,6 +183,34 @@ async def reset_totp_endpoint(
         resource_id=target.id,
     )
     return None
+
+
+@router.post("/{user_id}/recovery-link", response_model=RecoveryLinkResponse)
+@limiter.limit("30/minute")
+async def recovery_link_endpoint(
+    request: Request,
+    user_id: int,
+    payload: RecoveryLinkRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(check_superuser),
+) -> RecoveryLinkResponse:
+    """Superuser-only: mint a password-reset link for out-of-band
+    delivery (SMTP-optional mode). Does NOT rotate the password and
+    persists nothing. Audit-logged on every call."""
+    result = await db.execute(select(User).where(User.id == user_id))
+    target = result.scalar_one_or_none()
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    url, expires_at = mint_password_reset_link(target=target)
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="recovery_link_revealed",
+        resource="user",
+        resource_id=target.id,
+        kind=payload.kind,
+    )
+    return RecoveryLinkResponse(kind=payload.kind, url=url, expires_at=expires_at)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -1,6 +1,7 @@
 """User schemas."""
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -109,3 +110,18 @@ class PasswordConfirm(BaseModel):
     """Schema for confirming identity with current password."""
 
     current_password: str
+
+
+class RecoveryLinkRequest(BaseModel):
+    """Body for POST /api/admin/users/{id}/recovery-link."""
+
+    kind: Literal["password_reset"]
+
+
+class RecoveryLinkResponse(BaseModel):
+    """A freshly-minted, never-persisted recovery link for out-of-band
+    delivery when SMTP is not configured."""
+
+    kind: Literal["password_reset"]
+    url: str
+    expires_at: datetime
