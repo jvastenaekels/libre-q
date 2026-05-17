@@ -128,8 +128,6 @@ export interface UseAudioRecorderResult {
         maxDurationSeconds: number;
         disabled: boolean;
         existingRecording: AudioRecorderProps['existingRecording'];
-        playbackRetryRef: MutableRef<boolean>;
-        audioPlayerRef: RefObject<HTMLAudioElement | null>;
     };
 }
 
@@ -805,6 +803,24 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
+    // Public play entry: resets the existing-recording retry guard, then plays.
+    // Internal callers keep using `playRecording` directly (they must NOT reset
+    // the guard — that is the guard's purpose).
+    const play = () => {
+        playbackRetryRef.current = false;
+        return playRecording();
+    };
+
+    // Public speed setter: sets state, and — only while actually playing —
+    // applies the rate to the live audio element (closure-safe via stateRef,
+    // the hook's existing mirror of `state`).
+    const applyPlaybackSpeed = (s: number) => {
+        setPlaybackSpeed(s);
+        if (audioPlayerRef.current && stateRef.current === 'playing') {
+            audioPlayerRef.current.playbackRate = s;
+        }
+    };
+
     // `_questionKey` is destructured to preserve the exact identifier the
     // moved component body declared (it was already unused there, hence the
     // underscore prefix); referenced via `void` to keep the verbatim move
@@ -818,9 +834,9 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
             audioUrl,
             urlExpiresAt,
             playbackSpeed,
-            setPlaybackSpeed,
+            setPlaybackSpeed: applyPlaybackSpeed,
             playbackPosition,
-            play: playRecording,
+            play: play,
             pause: pausePlayback,
         },
         upload: { retry: retryUpload, delete: deleteRecording },
@@ -831,8 +847,6 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
             maxDurationSeconds,
             disabled,
             existingRecording,
-            playbackRetryRef,
-            audioPlayerRef,
         },
     };
 }
