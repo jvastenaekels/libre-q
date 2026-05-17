@@ -150,3 +150,119 @@ class TestEmail2FAEnrolmentGuard:
         )
         assert r.status_code == 200
         assert r.json()["status"] == "enabled"
+
+
+class TestLegacyEmail2FALogin:
+    @pytest.mark.asyncio
+    async def test_login_blocked_when_smtp_manual(self, client, db, monkeypatch):
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+
+        from datetime import datetime, timezone
+
+        from app.models import User
+        from app.utils.security import get_password_hash
+
+        u = User(
+            email="legacy2fa@example.com",
+            hashed_password=get_password_hash("testpassword"),
+            is_active=True,
+            email_verified_at=datetime.now(timezone.utc),
+            is_totp_enabled=True,
+            totp_channel="email",
+            password_changed_at=datetime.now(timezone.utc),
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "legacy2fa@example.com", "password": "testpassword"},
+        )
+        assert r.status_code == 503
+        assert r.json()["message"] == "email_2fa_unavailable"
+
+    @pytest.mark.asyncio
+    async def test_app_channel_2fa_unaffected_when_smtp_manual(
+        self, client, db, monkeypatch
+    ):
+        # App-channel 2FA users must STILL get the normal requires_2fa
+        # response even when SMTP is manual (regression guard).
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+
+        from datetime import datetime, timezone
+
+        from app.models import User
+        from app.utils.security import get_password_hash
+
+        u = User(
+            email="app2fa@example.com",
+            hashed_password=get_password_hash("testpassword"),
+            is_active=True,
+            is_totp_enabled=True,
+            totp_channel="app",
+            totp_secret="JBSWY3DPEHPK3PXP",
+            email_verified_at=datetime.now(timezone.utc),
+            password_changed_at=datetime.now(timezone.utc),
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "app2fa@example.com", "password": "testpassword"},
+        )
+        assert r.status_code == 200
+        body = r.json()
+        assert body["requires_2fa"] is True
+        assert body["channel"] == "app"
+
+    @pytest.mark.asyncio
+    async def test_email_channel_2fa_works_when_smtp_configured(
+        self, client, db, monkeypatch
+    ):
+        # Closes the guard's truth table symmetrically: manual->503,
+        # configured->200. With SMTP "configured" but no real server,
+        # the OTP send falls back to logging (_send_or_log); the
+        # endpoint still returns Token(requires_2fa=True, channel="email").
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pw")
+        # With SMTP "configured", _send_or_log no longer falls back to
+        # logging and would attempt a real socket connection; stub the
+        # OTP dispatch (we assert the guard's response, not delivery).
+        monkeypatch.setattr(
+            "app.routers.auth.send_twofa_login_otp", lambda *a, **k: None
+        )
+
+        from datetime import datetime, timezone
+
+        from app.models import User
+        from app.utils.security import get_password_hash
+
+        u = User(
+            email="email2fa-ok@example.com",
+            hashed_password=get_password_hash("testpassword"),
+            is_active=True,
+            email_verified_at=datetime.now(timezone.utc),
+            is_totp_enabled=True,
+            totp_channel="email",
+            password_changed_at=datetime.now(timezone.utc),
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={
+                "username": "email2fa-ok@example.com",
+                "password": "testpassword",
+            },
+        )
+        assert r.status_code == 200
+        body = r.json()
+        assert body["requires_2fa"] is True
+        assert body["channel"] == "email"
