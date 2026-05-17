@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from .common import QuotaInfo, validate_non_empty_string
 
@@ -125,3 +125,10 @@ class RecoveryLinkResponse(BaseModel):
     kind: Literal["password_reset"]
     url: str
     expires_at: datetime
+
+
+class AdminSetEmailRequest(BaseModel):
+    """Body for POST /api/admin/users/{id}/set-email (superuser-only,
+    SMTP-optional direct email swap)."""
+
+    new_email: EmailStr

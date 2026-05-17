@@ -43,6 +43,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -200,3 +201,20 @@ async def reset_totp(*, db: AsyncSession, target: User) -> None:
     target.is_totp_enabled = False
     target.totp_channel = None
     await db.commit()
+
+
+async def set_user_email(*, db: AsyncSession, target: User, new_email: str) -> None:
+    """Superuser-only direct email swap.
+
+    The SMTP-optional alternative to the user-driven dual-confirmation
+    flow: a trusted superuser sets the address with no confirmation loop.
+    Clears any in-flight ``pending_email``. Raises ``AdminUserError`` on a
+    uniqueness collision so the router can map it to 409.
+    """
+    target.email = new_email
+    target.pending_email = None
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise AdminUserError("email_already_registered") from exc

@@ -92,6 +92,7 @@ from .studies import (
     StudyUpdate,
 )
 from .users import (
+    AdminSetEmailRequest,
     PasswordChange,
     PasswordConfirm,
     RecoveryLinkRequest,
@@ -237,6 +238,7 @@ __all__ = [
     "StudyTranslationRead",
     "StudyUpdate",
     # users
+    "AdminSetEmailRequest",
     "PasswordChange",
     "PasswordConfirm",
     "RecoveryLinkRequest",

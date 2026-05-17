@@ -12,6 +12,7 @@ from ...limiter import limiter
 from ...models import User
 from ...schemas.common import PaginatedResponse
 from ...schemas.users import (
+    AdminSetEmailRequest,
     RecoveryLinkRequest,
     RecoveryLinkResponse,
     UserAdminUpdate,
@@ -25,6 +26,7 @@ from ...services.admin_user_service import (
     force_password_reset,
     mint_password_reset_link,
     reset_totp,
+    set_user_email,
 )
 from ...utils.audit import log_admin_action
 
@@ -211,6 +213,49 @@ async def recovery_link_endpoint(
         kind=payload.kind,
     )
     return RecoveryLinkResponse(kind=payload.kind, url=url, expires_at=expires_at)
+
+
+@router.post("/{user_id}/set-email", response_model=UserReadAdmin)
+@limiter.limit("30/minute")
+async def set_email_endpoint(
+    request: Request,
+    user_id: int,
+    payload: AdminSetEmailRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(check_superuser),
+) -> User:
+    """Superuser-only: set a user's email directly (SMTP-optional path,
+    bypasses the F-03-011 dual-confirmation flow by design — the
+    superuser is the trust anchor when SMTP may be unavailable). Clears
+    any in-flight ``pending_email``. Audit-logged on every call.
+
+    Side effect: the target's existing access tokens carry
+    ``sub=old-email``, so they stop validating on the next request
+    (user-by-email lookup miss → 401) and the user must re-log in under
+    the new address. ``password_changed_at`` is intentionally not bumped
+    — an email change is not a credential rotation (consistent with
+    F-03-011)."""
+    result = await db.execute(select(User).where(User.id == user_id))
+    target = result.scalar_one_or_none()
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    old_email = target.email
+    try:
+        await set_user_email(db=db, target=target, new_email=str(payload.new_email))
+    except AdminUserError:
+        raise HTTPException(status_code=409, detail="Email already registered")
+
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="admin_set_email",
+        resource="user",
+        resource_id=target.id,
+        old_email=old_email,
+        new_email=str(payload.new_email),
+    )
+    await db.refresh(target)
+    return target
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
