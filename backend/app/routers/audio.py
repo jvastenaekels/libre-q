@@ -29,9 +29,7 @@ def require_audio_storage() -> None:
     safety net, not the primary path. Without it, storage_service is built
     with skip_init=True and any call raises AttributeError -> 500."""
     if not settings.is_s3_configured:
-        raise HTTPException(
-            status_code=503, detail="audio_storage_unavailable"
-        )
+        raise HTTPException(status_code=503, detail="audio_storage_unavailable")
 
 
 async def validate_audio_file(file: UploadFile) -> str:
