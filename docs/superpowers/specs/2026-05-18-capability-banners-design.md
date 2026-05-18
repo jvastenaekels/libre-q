@@ -36,6 +36,8 @@ the vertical space it consumes on every admin page.
 - S3 parity row + collapse-to-chip behaviour + localStorage persistence.
 - Copy polish on: the two admin banner rows, the collapsed chip, the existing
   `PostSortConfigEditor` study-design contextual note (aligned register).
+- **Backend static serving of the repo `docs/` directory** so the `View
+  guide` links resolve (the app does not serve docs today). See §4.
 - Phrasing alignment of the two backend startup-log helpers
   (`smtp_mode_banner_lines`, `storage_mode_banner_lines`) — clarity only, no
   behavioural or structural change, helpers remain separate.
@@ -45,6 +47,8 @@ the vertical space it consumes on every admin page.
 - Merging the two banners into one combined capability message.
 - Any new backend endpoint or settings (the `email_delivery` and
   `audio_storage` flags on `GET /api/config` already exist and are unchanged).
+- Rendering markdown to HTML — the guide links serve the raw `.md` file
+  (acceptable for a technical operator audience; renderer is YAGNI).
 - Participant-facing copy/behaviour.
 - Per-row individual dismissal (only whole-stack collapse).
 - Persisting collapse state server-side or per-user (localStorage only).
@@ -133,13 +137,38 @@ Admin banner rows (i18n keys under `admin.capability_banner.*`):
 - Chip tooltip (`admin.capability_banner.chip_tooltip`): *"Some platform
   capabilities are unavailable. Click for details."*
 
-Guide hrefs (relative links served by the SPA's static docs; both files
-exist): SMTP → `/docs/guides/running-without-smtp.md`, S3 →
-`/docs/guides/running-without-s3.md`. If the app does not serve `docs/` as
-static assets, fall back to the GitHub blob URL of the repo's
-`docs/guides/running-without-{smtp,s3}.md` (the implementation plan resolves
-which is correct by checking how existing in-app doc links behave; there must
-be no broken link).
+Guide hrefs (relative, served by the new backend docs mount — see below):
+SMTP → `/docs/guides/running-without-smtp.md`, S3 →
+`/docs/guides/running-without-s3.md`. Both files exist. Opened in a new tab
+(`target="_blank" rel="noopener noreferrer"`).
+
+**Backend docs static mount (pinned decision — "serve docs as static").**
+The app currently serves only `frontend/dist/assets` via
+`app.middleware.spa.mount_spa`; `docs/` is not served. Add, at the very top
+of `mount_spa(app)` — **before** the existing `FRONTEND_DIST` early-return
+guard and before the SPA catch-all route — a static mount of the
+project-root `docs/` directory:
+
+- Resolve `DOCS_DIR = os.path.join(_ROOT_DIR, "docs")` (`_ROOT_DIR` already
+  defined in `spa.py`).
+- `if os.path.isdir(DOCS_DIR): app.mount("/docs",
+  StaticFiles(directory=DOCS_DIR), name="docs")`. Guard on existence so a
+  packaging without `docs/` degrades gracefully (the link 404s, the banner
+  still works — no crash), mirroring how `mount_spa` already guards
+  `FRONTEND_DIST`.
+- Independent of `FRONTEND_DIST`: placing it before the early return means
+  docs are served even when the frontend build is absent.
+- Mount registration precedes the `/{full_path:path}` catch-all, so `/docs/*`
+  is served by `StaticFiles` and never swallowed by the SPA fallback (same
+  ordering as the existing `/assets` mount).
+- `StaticFiles` serves the raw `.md` (Content-Type `text/markdown`); no
+  rendering (out of scope).
+
+**Dev caveat:** in local dev the frontend is served by the Vite dev server,
+not FastAPI, so `/docs/...` resolves only when the app is run as the
+integrated FastAPI service (every real deployment — the operator scenario the
+banner targets). Acceptable and noted; no dev-only doc copy is introduced
+(that would duplicate content and risk drift).
 
 Study-design contextual note (`PostSortConfigEditor`, existing keys
 `admin.design.postsort.audio.storage_unavailable_{title,body}`) — copy
@@ -192,13 +221,24 @@ No signature change, no merge, no lifespan-wiring change.
 - Update `test_smtp_mode.py` / `test_storage_mode.py` assertions for the new
   first-line wording; keep the existing
   `docs/guides/running-without-*.md` and env-var substring assertions.
+- New test: `GET /docs/guides/running-without-smtp.md` returns 200 and the
+  body contains a known substring from that file (e.g. the H1). Asserts the
+  docs mount is active and the banner links resolve. (Run via the existing
+  integration `client` fixture, which exercises the app with `mount_spa`
+  applied.)
 
 ## Strict-typing / gates
 
 - No new backend modules; the two helpers stay in their already-strict
   modules (`app.utils.smtp_mode`, `app.utils.storage_mode`) — keep
   `-> list[str]` typing, no `Any`.
-- No new FastAPI route/Pydantic field → no `vulture_whitelist.py` change.
+- `app.middleware.spa` is in the strict-overrides list — the added
+  `DOCS_DIR`/mount lines must keep it mypy-clean (the existing
+  `# type: ignore[explicit-any]` on `serve_spa` is unchanged; the new mount
+  introduces no `Any`).
+- No new FastAPI route handler/Pydantic field (a `StaticFiles` mount is not a
+  route handler) → no `vulture_whitelist.py` change. Confirm with full
+  `make check` regardless.
 - Frontend: `npm run i18n-check` + `npm run check-interpolations` for the
   `{{n}}` chip interpolation; `npm run type-check`.
 - Full `make ci` before the final gate (the security-suite/vulture gate gaps
