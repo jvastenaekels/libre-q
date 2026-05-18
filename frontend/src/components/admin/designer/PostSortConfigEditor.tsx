@@ -1,4 +1,5 @@
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -36,6 +37,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     const { t, i18n } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
+    const audioStorageAvailable = usePlatformConfigStore((s) => s.isAudioStorageAvailable());
 
     // Ensure resources for the active editing language are loaded
     useEffect(() => {
@@ -533,6 +535,26 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 />
                             </div>
                         </CardHeader>
+                        {!audioStorageAvailable && (
+                            <div
+                                role="status"
+                                data-testid="audio-storage-unavailable-note"
+                                className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+                            >
+                                <p className="font-semibold">
+                                    {t(
+                                        'admin.design.postsort.audio.storage_unavailable_title',
+                                        'Audio capture is unavailable on this server'
+                                    )}
+                                </p>
+                                <p className="mt-1">
+                                    {t(
+                                        'admin.design.postsort.audio.storage_unavailable_body',
+                                        'Object storage (S3) is not configured, so audio responses cannot be collected. You can still enable audio below, but participants will answer in text only — no audio is recorded and they see no error. Configure object storage and restart the server to capture audio.'
+                                    )}
+                                </p>
+                            </div>
+                        )}
                         {config?.audio?.enabled && (
                             <CardContent className="pt-0 space-y-6">
                                 {/* Max Duration */}

@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { evaluateVisibilityCondition } from '@/utils/visibilityEvaluator';
 import { buildQuestionnaireSchema } from '@/utils/buildQuestionnaireSchema';
 import { getLocalizedText } from '@/utils/localization';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 
 interface Step2Props {
     onBack: () => void;
@@ -45,6 +46,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     // Track in-progress uploads to block submission
     const [uploadingKeys, setUploadingKeys] = useState<Set<string>>(new Set());
     const [audioUnsupported, setAudioUnsupported] = useState(false);
+    const audioStorageAvailable = usePlatformConfigStore((s) => s.isAudioStorageAvailable());
 
     // --- Config Logic ---
     const questions = useMemo(() => config?.postsort_config?.questions, [config]);
@@ -57,15 +59,16 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     const audioConfig = config?.postsort_config?.audio;
     const isAudioEnabled = audioConfig?.enabled ?? false;
     const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
-    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported;
+    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported && audioStorageAvailable;
 
     // Whether to show the audio section for a given question
-    // text_audio questions always show audio (it's part of the question type)
-    // Other questions only show audio when global audio is enabled
+    // text_audio questions show audio only when storage is available (it's part of the question type)
+    // Other questions also require global audio to be enabled
     const showAudioSection = useCallback(
         (questionKey: string, isTextAudio = false): boolean =>
-            isTextAudio || isAudioEffectivelyEnabled || !!getAudioRecording(questionKey),
-        [isAudioEffectivelyEnabled, getAudioRecording]
+            audioStorageAvailable &&
+            (isTextAudio || isAudioEffectivelyEnabled || !!getAudioRecording(questionKey)),
+        [audioStorageAvailable, isAudioEffectivelyEnabled, getAudioRecording]
     );
 
     // --- Audio Handlers ---

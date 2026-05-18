@@ -39,6 +39,7 @@ import inspect
 import pytest
 from httpx import AsyncClient
 
+from app.core.config import settings
 from app.routers.audio import (
     delete_audio_recording,
     get_audio_url,
@@ -46,6 +47,23 @@ from app.routers.audio import (
 )
 
 from .conftest import TenancyFixtures
+
+
+@pytest.fixture(autouse=True)
+def _configure_s3_for_audio_tests(monkeypatch):
+    """The audio routes now guard on settings.is_s3_configured (503
+    safety-net when object storage is unconfigured, Task 4). The ownership
+    tests below assert the 403 wrong-session-token rejection, which sits
+    *after* the storage guard — so configure S3 here to let the request
+    reach the ownership check instead of short-circuiting at the 503.
+
+    If you add a test that asserts the *S3-absent* (503) path, override
+    these settings locally in that test — this autouse fixture will
+    otherwise mask the very condition you are trying to verify."""
+    monkeypatch.setattr(settings, "S3_ENDPOINT_URL", "https://s3.example.com")
+    monkeypatch.setattr(settings, "S3_BUCKET_NAME", "bucket")
+    monkeypatch.setattr(settings, "S3_ACCESS_KEY_ID", "key")
+    monkeypatch.setattr(settings, "S3_SECRET_ACCESS_KEY", "secret")
 
 
 class TestAudioUploadOwnership:

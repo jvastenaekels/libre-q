@@ -10,6 +10,7 @@ import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { useNavigate } from 'react-router-dom';
 import { useViewport } from '@/contexts/ViewportContext';
 import {
@@ -60,7 +61,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     // Audio unsupported detection (browser lacks MediaRecorder / getUserMedia)
     const [audioUnsupported, setAudioUnsupported] = useState(false);
-    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported;
+    const audioStorageAvailable = usePlatformConfigStore((s) => s.isAudioStorageAvailable());
+    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported && audioStorageAvailable;
 
     const handleAudioError = useCallback(
         (type: 'mic_denied' | 'mic_revoked' | 'recorder_error' | 'empty_blob' | 'unsupported') => {

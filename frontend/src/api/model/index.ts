@@ -230,6 +230,7 @@ export * from './projectUpdateSlug';
 export * from './projectUpdateTitle';
 export * from './projectWithRole';
 export * from './publicConfig';
+export * from './publicConfigAudioStorage';
 export * from './publicConfigEmailDelivery';
 export * from './qSortEntryInput';
 export * from './qSortEntryInputCardComment';

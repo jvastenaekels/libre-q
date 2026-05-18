@@ -14620,7 +14620,8 @@ export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext =
 
 /**
  * Return client bootstrap config. Unauthenticated by design — it
-exposes only the email-delivery mode, no secrets.
+exposes only capability modes (email delivery, audio storage), no
+secrets.
  * @summary Get Public Config
  */
 export const getPublicConfigApiConfigGet = (signal?: AbortSignal) => {
@@ -20141,6 +20142,7 @@ export const getGetPublicConfigApiConfigGetResponseMock = (
     overrideResponse: Partial<PublicConfig> = {}
 ): PublicConfig => ({
     email_delivery: faker.helpers.arrayElement(['smtp', 'manual'] as const),
+    audio_storage: faker.helpers.arrayElement(['available', 'unavailable'] as const),
     ...overrideResponse,
 });
 
