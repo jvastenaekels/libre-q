@@ -21,7 +21,11 @@ def _configure_s3_for_audio_tests(monkeypatch):
     this module exercises an audio route and either mocks the
     storage_service singleton or asserts pre-storage validation/auth
     behaviour, so configure S3 module-wide to keep the guard from firing
-    before the code under test is reached."""
+    before the code under test is reached.
+
+    If you add a test that asserts the *S3-absent* (503) path, override
+    these settings locally in that test — this autouse fixture will
+    otherwise mask the very condition you are trying to verify."""
     monkeypatch.setattr(settings, "S3_ENDPOINT_URL", "https://s3.example.com")
     monkeypatch.setattr(settings, "S3_BUCKET_NAME", "bucket")
     monkeypatch.setattr(settings, "S3_ACCESS_KEY_ID", "key")
