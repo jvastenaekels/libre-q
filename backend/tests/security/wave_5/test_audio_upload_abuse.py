@@ -47,7 +47,6 @@ from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,6 +58,24 @@ from app.routers.audio import upload_audio, validate_audio_file
 # ---------------------------------------------------------------------------
 # Storage / file fixtures
 # ---------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _configure_s3_for_audio_tests(monkeypatch):
+    """The audio routes now guard on settings.is_s3_configured (503
+    safety-net when object storage is unconfigured, Task 4). Every test in
+    this module exercises POST /api/audio/upload (with a mocked
+    storage_service) and asserts duration/MIME handling that sits *after*
+    the storage guard, so configure S3 here to keep the guard from firing
+    before the code under test is reached.
+
+    If you add a test that asserts the *S3-absent* (503) path, override
+    these settings locally in that test — this autouse fixture will
+    otherwise mask the very condition you are trying to verify."""
+    monkeypatch.setattr(settings, "S3_ENDPOINT_URL", "https://s3.example.com")
+    monkeypatch.setattr(settings, "S3_BUCKET_NAME", "bucket")
+    monkeypatch.setattr(settings, "S3_ACCESS_KEY_ID", "key")
+    monkeypatch.setattr(settings, "S3_SECRET_ACCESS_KEY", "secret")
 
 
 @pytest.fixture
@@ -73,9 +90,7 @@ def mock_storage_service():
                 "mime_type": "audio/webm",
             }
         )
-        mock.generate_presigned_url = MagicMock(
-            return_value="https://s3.example.com/p"
-        )
+        mock.generate_presigned_url = MagicMock(return_value="https://s3.example.com/p")
         mock.delete_audio = AsyncMock(return_value=None)
         yield mock
 
@@ -270,8 +285,7 @@ class TestImplementationContract:
             or "content_type=sniffed_mime" in source
         ), (
             "upload_audio must call storage_service.upload_audio with "
-            "content_type derived from sniffed_mime. Source preview:\n"
-            + source[:1200]
+            "content_type derived from sniffed_mime. Source preview:\n" + source[:1200]
         )
 
     def test_handler_uses_settings_for_duration_default(self) -> None:
